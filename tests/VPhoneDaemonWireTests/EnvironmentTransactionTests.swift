@@ -46,6 +46,104 @@ struct EnvironmentTransactionTests {
         SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
+    @Test func journalTemporarySymlinkCannotOverwriteExternalFile() throws {
+        let guest = try Guest()
+        var journal = try guest.transaction.prepare(try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new")]))
+        let victim = guest.root.appendingPathComponent("victim")
+        try Data("preserve".utf8).write(to: victim)
+        let link = guest.transaction.stateDirectory + "/" + journal.id + "/journal.json.tmp"
+        try FileManager.default.createSymbolicLink(atPath: link, withDestinationPath: victim.path)
+        #expect(throws: Error.self) { try guest.transaction.abandon(&journal, reason: "fixture") }
+        #expect(try String(contentsOf: victim, encoding: .utf8) == "preserve")
+    }
+
+    @Test func unknownFailedOutputCannotAuthorizeAnotherInstall() throws {
+        let guest = try Guest()
+        var journal = try guest.transaction.prepare(try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new")]))
+        try guest.transaction.apply(&journal) { _, target in try Data("unknown".utf8).write(to: URL(fileURLWithPath: target)) }
+        let entries = try guest.transaction.validate([try guest.stage("libcamfix.dylib", "next")])
+        #expect(throws: Error.self) { try guest.transaction.prepare(entries) }
+    }
+
+    @Test func journalSaveFailureStopsBeforeNextReplacement() throws {
+        let guest = try Guest()
+        let entries = try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new camfix"),
+                                                      try guest.stage("libvlocation.dylib", "new location")])
+        var journal = try guest.transaction.prepare(entries)
+        let blocked = guest.transaction.stateDirectory + "/" + journal.id + "/journal.json.tmp"
+        var calls = 0
+        #expect(throws: Error.self) {
+            try guest.transaction.apply(&journal) { source, destination in
+                calls += 1
+                try guest.install(source, destination)
+                if calls == 1 { try FileManager.default.createDirectory(atPath: blocked, withIntermediateDirectories: false) }
+            }
+        }
+        #expect(calls == 1)
+        #expect(try guest.read("usr/lib/libvlocation.dylib") == "old libvlocation.dylib")
+        #expect(try guest.transaction.journal(id: journal.id)?.state == "prepared")
+    }
+
+    @Test func restoreJournalSaveFailureStopsBeforeNextReplacement() throws {
+        let guest = try Guest()
+        let entries = try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new camfix"),
+                                                      try guest.stage("libvlocation.dylib", "new location")])
+        var journal = try guest.transaction.prepare(entries)
+        try guest.transaction.apply(&journal, replace: guest.install)
+        let blocked = guest.transaction.stateDirectory + "/" + journal.id + "/journal.json.tmp"
+        var calls = 0
+        #expect(throws: Error.self) {
+            try guest.transaction.applyRestore(&journal) { source, destination in
+                calls += 1
+                try guest.install(source, destination)
+                if calls == 1 { try FileManager.default.createDirectory(atPath: blocked, withIntermediateDirectories: false) }
+            }
+        }
+        #expect(calls == 1)
+        #expect(try guest.read("usr/lib/libvlocation.dylib") == "new location")
+        #expect(try guest.transaction.journal(id: journal.id)?.state == "complete")
+    }
+
+    @Test func replacementRequiresActualOutputReadback() throws {
+        let guest = try Guest()
+        var journal = try guest.transaction.prepare(try guest.transaction.validate([
+            try guest.stage("libcamfix.dylib", "new camfix"), try guest.stage("libvlocation.dylib", "new location")]))
+        var calls = 0
+        try guest.transaction.apply(&journal) { _, destination in
+            calls += 1
+            try Data("wrong output".utf8).write(to: URL(fileURLWithPath: destination))
+        }
+        #expect(calls == 1)
+        #expect(journal.state == "incomplete")
+        #expect(journal.libraries.map(\.state) == ["failed", "not_attempted"])
+        #expect(try guest.read("usr/lib/libvlocation.dylib") == "old libvlocation.dylib")
+    }
+
+    @Test func unresolvedJournalRefusesAnotherInstall() throws {
+        let guest = try Guest()
+        let entries = try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new camfix")])
+        _ = try guest.transaction.prepare(entries)
+        #expect(throws: EnvironmentTransaction.Failure.self) { try guest.transaction.prepare(entries) }
+        #expect(try guest.read("usr/lib/libcamfix.dylib") == "old libcamfix.dylib")
+    }
+
+    @Test func corruptRestoreComponentSetIsRefusedBeforeReplacement() throws {
+        for mutation in 0..<3 {
+            let guest = try Guest()
+            var journal = try guest.transaction.prepare(try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new camfix")]))
+            try guest.transaction.apply(&journal, replace: guest.install)
+            switch mutation {
+            case 0: journal.libraries.append(journal.libraries[0])
+            case 1: journal.libraries[0].name = "../lib/libcamfix.dylib"
+            default: journal.libraries[0].backup = guest.root.appendingPathComponent("usr/lib/libvlocation.dylib").path
+                journal.libraries[0].previousSHA256 = Self.digest("old libvlocation.dylib")
+            }
+            try JSONEncoder().encode(journal).write(to: URL(fileURLWithPath: guest.transaction.stateDirectory + "/" + journal.id + "/journal.json"))
+            #expect(throws: EnvironmentTransaction.Failure.self) { try guest.transaction.prepareRestore(id: journal.id) }
+            #expect(try guest.read("usr/lib/libcamfix.dylib") == "new camfix")
+        }
+    }
+
     @Test func statusReportsInstalledAndStagedDigests() throws {
         let guest = try Guest()
         _ = try guest.stage("libcamfix.dylib", "new camfix")
@@ -86,7 +184,7 @@ struct EnvironmentTransactionTests {
         let before = try #require(EnvironmentTransaction.identity(atPath: guest.root.appendingPathComponent("usr/lib/libcamfix.dylib").path))
         var journal = try guest.transaction.prepare(entries)
         #expect(journal.state == "prepared")
-        guest.transaction.apply(&journal, replace: guest.install)
+        try guest.transaction.apply(&journal, replace: guest.install)
         #expect(journal.state == "complete")
         #expect(journal.libraries.map(\.state) == ["replaced", "replaced"])
         #expect(try guest.read("usr/lib/libcamfix.dylib") == "new camfix")
@@ -108,7 +206,7 @@ struct EnvironmentTransactionTests {
                                                       try guest.stage("libvlocation.dylib", "new location")])
         var journal = try guest.transaction.prepare(entries)
         var calls = 0
-        guest.transaction.apply(&journal) { source, destination in
+        try guest.transaction.apply(&journal) { source, destination in
             calls += 1
             if calls == 2 { throw EnvironmentTransaction.Failure.io("injected EIO") }
             try guest.install(source, destination)
@@ -129,7 +227,7 @@ struct EnvironmentTransactionTests {
 
         // Restore puts the replaced library back from its backup.
         var restored = try guest.transaction.prepareRestore(id: journal.id)
-        guest.transaction.applyRestore(&restored, replace: guest.install)
+        try guest.transaction.applyRestore(&restored, replace: guest.install)
         #expect(restored.state == "restored")
         #expect(restored.libraries.map(\.state) == ["restored", "failed", "not_attempted"])
         #expect(try guest.read("usr/lib/launchdhook-vphone.dylib") == "old launchdhook-vphone.dylib")
@@ -139,7 +237,7 @@ struct EnvironmentTransactionTests {
         let guest = try Guest()
         let entries = try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new camfix")])
         var journal = try guest.transaction.prepare(entries)
-        guest.transaction.apply(&journal, replace: guest.install)
+        try guest.transaction.apply(&journal, replace: guest.install)
         try guest.write("usr/lib/libcamfix.dylib", "changed later")
         #expect(throws: EnvironmentTransaction.Failure.self) { try guest.transaction.prepareRestore(id: journal.id) }
         #expect(throws: EnvironmentTransaction.Failure.self) { try guest.transaction.prepareRestore(id: "../escape") }
@@ -152,7 +250,7 @@ struct EnvironmentTransactionTests {
         let old = try #require(EnvironmentTransaction.identity(atPath: path))
         let entries = try guest.transaction.validate([try guest.stage("libcamfix.dylib", "new camfix")])
         var journal = try guest.transaction.prepare(entries)
-        guest.transaction.apply(&journal, replace: guest.install)
+        try guest.transaction.apply(&journal, replace: guest.install)
         let new = try #require(EnvironmentTransaction.identity(atPath: path))
         #expect(new.inode != old.inode)
         let location = try #require(EnvironmentTransaction.identity(
@@ -179,11 +277,11 @@ struct EnvironmentTransactionTests {
         var transaction = guest.transaction
         transaction.retained = 2
         var incomplete = try transaction.prepare(try transaction.validate([try guest.stage("libcamfix.dylib", "a")]))
-        transaction.apply(&incomplete) { _, _ in throw EnvironmentTransaction.Failure.io("no") }
+        try transaction.apply(&incomplete) { _, _ in throw EnvironmentTransaction.Failure.io("no") }
         var ids: [String] = []
         for index in 0..<3 {
             var journal = try transaction.prepare(try transaction.validate([try guest.stage("libcamfix.dylib", "v\(index)")]))
-            transaction.apply(&journal, replace: guest.install)
+            try transaction.apply(&journal, replace: guest.install)
             ids.append(journal.id)
         }
         let kept = Set(transaction.transactions().compactMap { $0["id"] as? String })

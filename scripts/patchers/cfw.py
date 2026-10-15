@@ -134,7 +134,7 @@ if __name__ == "__main__":
     from patchers.cfw_patch_camera_dsc import apply_all_camera_patches
     from patchers.cfw_patch_watchdogd import patch_watchdogd
     from patchers.cfw_patch_diskimagesiod import patch_diskimagesiod
-    from patchers.cfw_daemons import parse_cryptex_paths, inject_daemons, patch_dropbear_plist
+    from patchers.cfw_daemons import parse_cryptex_paths, inject_daemons, inject_daemon, patch_dropbear_plist
 else:
     from .cfw_patch_seputil import patch_seputil
     from .cfw_patch_cache_loader import patch_launchd_cache_loader
@@ -150,10 +150,10 @@ else:
     from .cfw_patch_camera_dsc import apply_all_camera_patches
     from .cfw_patch_watchdogd import patch_watchdogd
     from .cfw_patch_diskimagesiod import patch_diskimagesiod
-    from .cfw_daemons import parse_cryptex_paths, inject_daemons, patch_dropbear_plist
+    from .cfw_daemons import parse_cryptex_paths, inject_daemons, inject_daemon, patch_dropbear_plist
 
 
-def main():
+def _dispatch(*, dry_run=False):
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
@@ -200,7 +200,6 @@ def main():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-hv-vmm-dsc <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         results = patch_hv_vmm_in_dsc(sys.argv[2], dry_run=dry_run)
         sys.exit(0)
 
@@ -209,7 +208,6 @@ def main():
             print("Usage: patch_cfw.py patch-iomfb-swapend <chunks_dir> "
                   "[--target-size <hex|int>] [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         kwargs = {}
         if "--target-size" in sys.argv:
             i = sys.argv.index("--target-size")
@@ -225,7 +223,6 @@ def main():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-iomfb-force-kern <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         try:
             patch_iomfb_force_kern(sys.argv[2], dry_run=dry_run)
         except ValueError as e:
@@ -237,7 +234,6 @@ def main():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-dsc-maxslide <chunks_dir> [--dry-run] [--force]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         force = "--force" in sys.argv[3:]
         patch_dsc_maxslide(sys.argv[2], dry_run=dry_run, force=force)
         sys.exit(0)
@@ -246,7 +242,6 @@ def main():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-lsd-embedded-reg <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         patch_lsd_embedded_reg(sys.argv[2], dry_run=dry_run)
         sys.exit(0)
 
@@ -254,14 +249,12 @@ def main():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-xpc-lwcr <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         patch_xpc_lwcr(sys.argv[2], dry_run=dry_run)
 
     elif cmd == "patch-lockdown-mode":
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-lockdown-mode <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         patch_lockdown_mode(sys.argv[2], dry_run=dry_run)
         sys.exit(0)
 
@@ -269,7 +262,6 @@ def main():
         if len(sys.argv) < 4:
             print("Usage: patch_cfw.py patch-camera-dsc <chunks_dir> <dsc_header> [--dry-run] [--force]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[4:]
         force   = "--force"   in sys.argv[4:]
         apply_all_camera_patches(sys.argv[2], sys.argv[3], dry_run=dry_run, force=force)
         sys.exit(0)
@@ -278,7 +270,6 @@ def main():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-watchdogd <binary> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         try:
             n = patch_watchdogd(sys.argv[2], dry_run=dry_run)
         except ValueError as e:
@@ -302,6 +293,12 @@ def main():
             sys.exit(1)
         inject_daemons(sys.argv[2], sys.argv[3])
 
+    elif cmd in ("inject-daemon", "inject-jb-daemon"):
+        if len(sys.argv) != 5:
+            print("Usage: cfw.py inject-daemon <launchd.plist> <daemon.plist> <launchd_key>")
+            sys.exit(1)
+        inject_daemon(sys.argv[2], sys.argv[3], sys.argv[4])
+
     elif cmd == "patch-dropbear-plist":
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-dropbear-plist <dropbear.plist>")
@@ -312,31 +309,150 @@ def main():
         if len(sys.argv) < 4:
             print("Usage: patch_cfw.py inject-dylib <binary> <dylib_path>")
             sys.exit(1)
-        import subprocess, shutil
-        insert_dylib_bin = shutil.which("insert_dylib")
-        if not insert_dylib_bin:
-            # Check .tools/bin/ relative to project root
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            candidate = os.path.join(project_root, ".tools", "bin", "insert_dylib")
-            if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
-                insert_dylib_bin = candidate
-        if not insert_dylib_bin:
-            print("[-] insert_dylib not found. Run: make setup_tools")
-            sys.exit(1)
-        rc = subprocess.run(
-            [insert_dylib_bin, "--weak", "--inplace", "--all-yes", sys.argv[3], sys.argv[2]],
-        ).returncode
+        import subprocess
+        rc = subprocess.run(dylib_command(sys.argv[2], sys.argv[3])).returncode
         if rc != 0:
             sys.exit(rc)
 
+    elif cmd == "patch-post-restore-dt":
+        from .cfw_patch_post_restore_dt import _main
+        sys.exit(_main([sys.argv[0]] + sys.argv[2:]))
+    elif cmd == "patch-build-version":
+        from .cfw_patch_build_version import _main
+        sys.exit(_main([sys.argv[0]] + sys.argv[2:]))
+    elif cmd == "patch-campo-entitlements":
+        from .campo_mach_lookup_exceptions import main as campo_main
+        sys.exit(campo_main([sys.argv[0]] + sys.argv[2:]))
     else:
         print(f"Unknown command: {cmd}")
         print("Commands: cryptex-paths, patch-seputil, patch-launchd-cache-loader, patch-camera-dsc,")
         print("          patch-mobileactivationd, patch-launchd-jetsam,")
         print("          patch-hv-vmm-dsc, patch-iomfb-swapend, patch-iomfb-force-kern, patch-dsc-maxslide, patch-lsd-embedded-reg, patch-xpc-lwcr, patch-lockdown-mode, patch-watchdogd,")
-        print("          patch-diskimagesiod, inject-daemons, patch-dropbear-plist, inject-dylib")
+        print("          patch-diskimagesiod, inject-daemons, inject-daemon, patch-dropbear-plist, inject-dylib")
         sys.exit(1)
 
 
+def dylib_command(binary, dylib):
+    """Resolve the existing native injector and preserve its command options."""
+    import shutil
+    insert_dylib_bin = shutil.which("insert_dylib")
+    if not insert_dylib_bin:
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        candidate = os.path.join(project_root, ".tools", "bin", "insert_dylib")
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            insert_dylib_bin = candidate
+    if not insert_dylib_bin:
+        print("[-] insert_dylib not found. Run: make setup_tools")
+        sys.exit(1)
+    return [insert_dylib_bin, "--weak", "--inplace", "--all-yes", str(dylib), str(binary)]
+
+
+def main():
+    if len(sys.argv) < 2 or sys.argv[1] == "cryptex-paths":
+        return _dispatch()
+    if sys.argv[1] == 'patch-build-version':
+        from .cfw_patch_build_version import parse_arguments
+        args = parse_arguments(sys.argv[2:])
+        sys.argv = [sys.argv[0], sys.argv[1], args.path, args.target] + (['--dry-run'] if args.dry_run else [])
+    dry_commands = {"patch-hv-vmm-dsc", "patch-iomfb-swapend", "patch-iomfb-force-kern",
+        "patch-dsc-maxslide", "patch-lsd-embedded-reg", "patch-xpc-lwcr", "patch-lockdown-mode",
+        "patch-camera-dsc", "patch-watchdogd", "patch-post-restore-dt", "patch-build-version"}
+    option_start = 4 if sys.argv[1] in {'patch-build-version', 'patch-camera-dsc'} else 3
+    if sys.argv[1] in dry_commands and "--dry-run" in sys.argv[option_start:]:
+        return _dispatch(dry_run=True)
+    from patchers import plan_gate as gate
+    from patchers.guest_write import logical, no_link_parents
+    from pathlib import Path
+    plan = gate.from_environment()
+    gate.require_write_context(plan)
+    command = sys.argv[1]
+    if '--force' in sys.argv[2:]: raise ValueError('force override has no frozen authorization')
+    if command == 'patch-build-version' and (len(sys.argv) < 4 or sys.argv[3] != plan.context['spoofBuild']):
+        raise ValueError('build version differs from frozen context')
+    from patchers.guest_write import target_table
+    table = target_table()[0]
+    mapping, dsc = table['commands'], table['dscCommands']
+    if len(sys.argv) < 3: raise ValueError("guest patch target missing")
+    if command == 'inject-jb-daemon':
+        sources={str(Path(__file__).resolve().parents[1]/('vphone_'+name+'.plist')):
+                 '/System/Library/LaunchDaemons/com.vphone.'+key+'.plist'
+                 for name,key in [('jb_setup','jb-setup'),('sshd','sshd')]}
+        if plan.context['variant'] not in ('jb','exp') or len(sys.argv)!=5 or sources.get(sys.argv[3])!=sys.argv[4]:
+            raise ValueError('unknown JB daemon producer source/key')
+
+    path = Path(os.path.abspath(sys.argv[2]))
+    observations = []
+    from patchers import component_effects
+    effect_store = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent / 'effect-blobs'
+    source_image = None
+    source_binding = None
+    if plan.context['variant'] == 'less':
+        from patchers.guest_write import target_table
+        target = target_table()[0]['lessCommands'].get(command)
+        if target is None: raise ValueError('unknown less filesystem subcommand')
+        declaration = 'filesystem-less-cryptex_merge'
+        gate.authorize(plan, declaration, target)
+        work = Path(plan.context['filesystemTransaction']) / 'work'
+        if work not in path.parents or path.is_symlink() or path.name != target.rsplit('/',1)[-1]:
+            raise ValueError('less filesystem target outside exact private staging')
+        current = path.parent
+        while current != work:
+            if current.is_symlink(): raise ValueError('linked less staging parent')
+            current = current.parent
+        if command != 'inject-daemons' and not str(path).endswith(target.removeprefix('system:')):
+            raise ValueError('less filesystem target suffix differs')
+        observations.append((path, target, gate.snapshot(path), component_effects.capture_input(path, effect_store)))
+    elif command in dsc:
+        declaration = dsc[command]
+        mount = Path(os.environ['CFW_HOST_MNT'])
+        if mount not in path.parents or path.is_symlink(): raise ValueError("DSC target outside current staged mounts")
+        import re
+        if mount / 'mnt_sysos_hv_vmm' in path.parents:
+            from patchers.cryptex_source import mounted
+            source_image = mounted(plan, mount / 'mnt_sysos_hv_vmm')
+            from patchers.cryptex_source import proof
+            source_binding = proof(plan,source_image)
+        for item in sorted(path.iterdir()):
+            if item.name.startswith('dyld_shared_cache_arm64e') and not item.name.endswith('.map') and not re.fullmatch(r"dyld_shared_cache_arm64e(?:\.[0-9]{1,2}|\.symbols)?", item.name):
+                raise ValueError("undeclared DSC write member: " + item.name)
+            if re.fullmatch(r"dyld_shared_cache_arm64e(?:\.[0-9]{1,2}|\.symbols)?", item.name):
+                if item.is_symlink() or not item.is_file():
+                    raise ValueError("DSC write target must be a non-linked regular file")
+                target = "dsc:/" + item.name
+                gate.authorize(plan, declaration, target)
+                no_link_parents(item)
+                observations.append((item, target, gate.snapshot(item), component_effects.capture_input(item, effect_store)))
+        if not observations: raise ValueError("no declared DSC targets")
+    else:
+        if command == "inject-dylib":
+            if len(sys.argv) != 4 or sys.argv[3] not in ('/b','/vh'): raise ValueError("unknown guest dylib target")
+            declaration = "system-launchd-jb-hook" if sys.argv[3] == '/b' else "system-launchdaemons-boot-environment"
+            target = "system:/sbin/launchd"
+        else:
+            if command not in mapping: raise ValueError("unknown guest patch command: " + command)
+            declaration, target = mapping[command]
+        if os.environ.get('VPHONE_DECLARATION_ID', declaration) != declaration: raise ValueError("guest declaration override refused")
+        gate.authorize(plan, declaration, target)
+        staging = Path(plan.context['vmDirectory']) / '.cfw_temp'
+        in_stage = staging in path.parents or (command == 'patch-dropbear-plist' and path == Path(plan.context['vmDirectory']) / 'cfw_input/jb/LaunchDaemons/dropbear.plist')
+        if in_stage: gate.private_path(plan, path)
+        if not in_stage and logical(path) != target: raise ValueError("patch target differs from declared guest path/staging")
+        if not in_stage: no_link_parents(path)
+        if path.is_symlink(): raise ValueError("linked guest patch target")
+        observations.append((path, target, gate.snapshot(path), component_effects.capture_input(path, effect_store)))
+    gate.recheck(plan)
+    try:
+        return _dispatch()
+    finally:
+        for item, target, before, effect_input in observations:
+            effect = component_effects.capture_change(effect_input, item, effect_store)
+            gate.append_evidence(plan, declaration, target, item, before, gate.snapshot(item), source_image=source_image, effect=effect, source_binding=source_binding)
+
+
 if __name__ == "__main__":
-    main()
+    __package__ = 'patchers'
+    try:
+        main()
+    except (ValueError, KeyError, OSError) as error:
+        print("[-] frozen plan: " + str(error), file=sys.stderr)
+        sys.exit(1)

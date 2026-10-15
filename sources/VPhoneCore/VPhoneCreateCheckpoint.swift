@@ -1,6 +1,7 @@
 import CryptoKit
 import Darwin
 import Foundation
+import Virtualization
 
 // MARK: - Stages
 
@@ -60,6 +61,11 @@ public enum VPhoneCreateOverallStatus: String, Codable, Sendable {
 
 // MARK: - Options
 
+public enum VPhoneGuestEnvironmentProfile: String, Codable, Sendable {
+    case classic
+    case v2
+}
+
 public enum VPhonePrepareBackend: String, Codable, Sendable {
     case script
     case native
@@ -99,6 +105,9 @@ public struct VPhoneCreateSourceRecord: Codable, Equatable, Sendable {
 /// part of it and may differ between attempts.
 public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
     public var variant: String
+    public var guestEnvironment: VPhoneGuestEnvironmentProfile?
+    public var effectiveGuestEnvironment: VPhoneGuestEnvironmentProfile { guestEnvironment ?? .classic }
+    public var experimentalV2RootRemount: Bool?
     public var iphoneSource: VPhoneCreateSourceRecord?
     public var cloudosSource: VPhoneCreateSourceRecord?
     public var spoofBuild: String?
@@ -117,9 +126,12 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
     public init(
         variant: String, iphoneSource: String?, cloudosSource: String?, spoofBuild: String?,
         forceDscMaxSlide: Bool, enableFrida: Bool, cpuCount: UInt, memoryMb: UInt64, diskSizeGb: UInt64,
-        restoreBackend: VPhoneRestoreBackend = .python, prepareBackend: VPhonePrepareBackend = .script
+        restoreBackend: VPhoneRestoreBackend = .python, prepareBackend: VPhonePrepareBackend = .script,
+        guestEnvironment: VPhoneGuestEnvironmentProfile = .classic, experimentalV2RootRemount: Bool = false
     ) {
         self.variant = variant
+        self.guestEnvironment = guestEnvironment == .classic ? nil : guestEnvironment
+        self.experimentalV2RootRemount = experimentalV2RootRemount ? true : nil
         self.iphoneSource = iphoneSource.map(VPhoneCreateSourceRecord.init)
         self.cloudosSource = cloudosSource.map(VPhoneCreateSourceRecord.init)
         self.spoofBuild = spoofBuild
@@ -151,6 +163,12 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         if effectivePrepareBackend != other.effectivePrepareBackend { result.append(("prepare_backend", .prepare)) }
         if effectiveRestoreBackend != other.effectiveRestoreBackend { result.append(("restore_backend", .restore)) }
         if enableFrida != other.enableFrida { result.append(("enable_frida", .patch)) }
+        if (experimentalV2RootRemount == true) != (other.experimentalV2RootRemount == true) {
+            result.append(("experimental_v2_root_remount", .prepare))
+        }
+        if effectiveGuestEnvironment != other.effectiveGuestEnvironment {
+            result.append(("guest_environment", .cfw))
+        }
         if spoofBuild != other.spoofBuild { result.append(("spoof_build", .cfw)) }
         if forceDscMaxSlide != other.forceDscMaxSlide { result.append(("force_dsc_max_slide", .cfw)) }
         return result
@@ -410,6 +428,9 @@ public struct VPhoneCreateCheckpoint: Codable, Equatable, Sendable {
         guard ["regular", "dev", "jb", "exp", "less"].contains(effectiveOptions.variant) else {
             throw invalid("unknown variant \(effectiveOptions.variant)")
         }
+        guard effectiveOptions.effectiveGuestEnvironment != .v2 || effectiveOptions.variant == "regular" else {
+            throw invalid("guest environment v2 supports only variant regular")
+        }
         let names = stages.map(\.stage)
         guard Set(names).count == names.count else { throw invalid("duplicate stage records") }
         guard names == VPhoneCreateStage.allCases else { throw invalid("stage list must be exactly \(VPhoneCreateStage.allCases.map(\.rawValue))") }
@@ -579,5 +600,75 @@ public enum VPhoneCreateDigest {
               !manifest.machineIdentifier.isEmpty
         else { return nil }
         return sha256(manifest.machineIdentifier)
+    }
+}
+
+
+/// Stable across a directory rename and normal writes to the same disk file.
+/// Copy/import/replacement deliberately requires explicit rebinding.
+public struct VPhoneFirmwareIdentity: Codable, Equatable, Sendable {
+    public let machineIdentifierSHA256: String
+    public let diskName: String
+    public let diskDevice: Int64
+    public let diskInode: UInt64
+    public let diskBirthSeconds: Int64
+    public let diskBirthNanoseconds: Int64
+
+    public static func read(in directory: URL) throws -> Self {
+        var directoryInfo = stat()
+        guard lstat(directory.path, &directoryInfo) == 0, directoryInfo.st_mode & S_IFMT == S_IFDIR else {
+            throw VPhoneCreateCheckpointError.invalid("VM directory is missing or linked")
+        }
+        let config = directory.appendingPathComponent("config.plist")
+        let bytes = try VPhoneCreateDigest.strictFileData(config, maximumBytes: 8 << 20)
+        guard let plist = try PropertyListSerialization.propertyList(from: bytes, format: nil) as? [String: Any],
+              plist["schemaVersion"] == nil,
+              let machine = plist["machineIdentifier"] as? Data,
+              !machine.isEmpty, VZMacMachineIdentifier(dataRepresentation: machine) != nil,
+              let disk = plist["diskImage"] as? String,
+              !disk.isEmpty, disk != ".", disk != "..", !disk.contains("/"), !disk.contains("\0") else {
+            throw VPhoneCreateCheckpointError.invalid("missing or invalid machineIdentifier/diskImage")
+        }
+        let url = directory.appendingPathComponent(disk)
+        let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        guard fd >= 0 else { throw VPhoneCreateCheckpointError.invalid("disk is missing or linked") }
+        defer { close(fd) }
+        var value = stat(), named = stat()
+        guard fstat(fd, &value) == 0, lstat(url.path, &named) == 0,
+              value.st_mode & S_IFMT == S_IFREG, named.st_mode & S_IFMT == S_IFREG,
+              value.st_dev == named.st_dev, value.st_ino == named.st_ino else {
+            throw VPhoneCreateCheckpointError.invalid("disk is not a stable regular file")
+        }
+        return Self(machineIdentifierSHA256: VPhoneCreateDigest.sha256(machine), diskName: disk,
+                    diskDevice: Int64(value.st_dev), diskInode: UInt64(value.st_ino),
+                    diskBirthSeconds: Int64(value.st_birthtimespec.tv_sec),
+                    diskBirthNanoseconds: Int64(value.st_birthtimespec.tv_nsec))
+    }
+}
+
+extension VPhoneCreateDigest {
+    /// Strict identity reads never convert missing, corrupt or linked files to nil.
+    public static func strictFileData(_ url: URL, maximumBytes: Int) throws -> Data {
+        let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        defer { close(fd) }
+        var before = stat(), after = stat(), named = stat()
+        guard fstat(fd, &before) == 0, before.st_mode & S_IFMT == S_IFREG,
+              before.st_size >= 0, before.st_size <= maximumBytes else {
+            throw VPhoneCreateCheckpointError.invalid("invalid regular file: \(url.lastPathComponent)")
+        }
+        let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: false)
+        let bytes = try handle.read(upToCount: Int(before.st_size) + 1) ?? Data()
+        guard bytes.count == before.st_size, fstat(fd, &after) == 0, lstat(url.path, &named) == 0,
+              named.st_mode & S_IFMT == S_IFREG,
+              before.st_dev == named.st_dev, before.st_ino == named.st_ino,
+              before.st_size == after.st_size,
+              before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
+              before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
+              before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
+              before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec else {
+            throw VPhoneCreateCheckpointError.invalid("file changed while reading: \(url.lastPathComponent)")
+        }
+        return bytes
     }
 }

@@ -776,5 +776,23 @@ if [[ -z "${VPHONE_KEEP_ARTIFACTS:-}" ]]; then
     done
 fi
 
+# Record explicit source locations only after successful preparation. Consumers
+# independently reproduce and hash the source bytes; this record grants no trust.
+"$PYTHON3" - "$IPHONE_IPSW_PATH" "$CLOUDOS_IPSW_PATH" <<'PYGEN'
+import json, os, sys, tempfile
+record = {"schemaVersion": 1, "iPhoneArchive": os.path.realpath(sys.argv[1]),
+          "cloudOSArchive": os.path.realpath(sys.argv[2])}
+fd, temporary = tempfile.mkstemp(prefix=".firmware-prepare-sources-", dir=".")
+try:
+    with os.fdopen(fd, "w") as output:
+        json.dump(record, output, sort_keys=True)
+        output.flush()
+        os.fsync(output.fileno())
+    os.replace(temporary, ".firmware-prepare-sources.json")
+finally:
+    if os.path.exists(temporary):
+        os.unlink(temporary)
+PYGEN
+
 echo "==> Done. Restore directory ready: $IPHONE_DIR/"
 echo "    Run 'make fw_patch' to patch boot-chain components."

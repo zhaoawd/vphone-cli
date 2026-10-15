@@ -1,0 +1,197 @@
+warning: 'machokit': /Users/qcz3840/github/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[5/38] Compiling download.c
+[6/38] Compiling locking.c
+[7/38] Compiling fls.c
+[7/38] Compiling log.c
+[9/38] Compiling fdr.c
+[10/38] Compiling ipsw.c
+[11/38] Compiling asr.c
+[12/38] Compiling limera1n.c
+[13/38] Compiling normal.c
+[14/38] Compiling restore.c
+[15/38] Compiling dfu.c
+[16/38] Compiling recovery.c
+[16/38] Compiling img4.c
+[18/38] Compiling ace3.c
+[19/38] Compiling img3.c
+[20/38] Compiling ftab.c
+[21/38] Compiling mbn.c
+[22/38] Compiling common.c
+[23/38] Compiling deviceinterfaced.c
+[24/38] Compiling vphone_zip_stub.c
+[25/38] Compiling idevicerestore.c
+[26/38] Compiling vphone_restore_bridge.c
+[27/38] Compiling MobileRecoveryCore libirecovery.c
+[29/39] Emitting module VPhoneDaemonWireTests
+[30/39] Compiling VPhoneDaemonWireTests EnvironmentTransactionTests.swift
+macro expansion #expect:2:13: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/qcz3840/github/vphone-cli/tests/VPhoneDaemonWireTests/EnvironmentTransactionTests.swift:62:10: note: expanded code originates here
+ 54 |         let blocked = guest.transaction.stateDirectory + "/" + journal.id + "/journal.json.tmp"
+ 55 |         var calls = 0
+ 56 |         #expect(throws: Error.self) {
+    |         `- note: in expansion of macro 'expect' here
+ 57 |             try guest.transaction.apply(&journal) { source, destination in
+ 58 |                 calls += 1
+    :
+ 60 |                 if calls == 1 { try FileManager.default.createDirectory(atPath: blocked, withIntermediateDirectories: false) }
+ 61 |             }
+ 62 |         }
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkClosureCall(throws: Error.self,performing: {
+    |2 |             try guest.transaction.apply(&journal) { source, destination in
+    |  |             `- warning: no calls to throwing functions occur within 'try' expression
+    |3 |                 calls += 1
+    |4 |                 try guest.install(source, destination)
+    +-------------------------------------------------------------------
+ 63 |         #expect(calls == 1)
+ 64 |         #expect(try guest.read("usr/lib/libvlocation.dylib") == "old libvlocation.dylib")
+
+macro expansion #expect:2:13: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/qcz3840/github/vphone-cli/tests/VPhoneDaemonWireTests/EnvironmentTransactionTests.swift:82:10: note: expanded code originates here
+ 74 |         let blocked = guest.transaction.stateDirectory + "/" + journal.id + "/journal.json.tmp"
+ 75 |         var calls = 0
+ 76 |         #expect(throws: Error.self) {
+    |         `- note: in expansion of macro 'expect' here
+ 77 |             try guest.transaction.applyRestore(&journal) { source, destination in
+ 78 |                 calls += 1
+    :
+ 80 |                 if calls == 1 { try FileManager.default.createDirectory(atPath: blocked, withIntermediateDirectories: false) }
+ 81 |             }
+ 82 |         }
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkClosureCall(throws: Error.self,performing: {
+    |2 |             try guest.transaction.applyRestore(&journal) { source, destination in
+    |  |             `- warning: no calls to throwing functions occur within 'try' expression
+    |3 |                 calls += 1
+    |4 |                 try guest.install(source, destination)
+    +-------------------------------------------------------------------
+ 83 |         #expect(calls == 1)
+ 84 |         #expect(try guest.read("usr/lib/libvlocation.dylib") == "new location")
+[31/39] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[31/39] Write Objects.LinkFileList
+[34/68] Compiling VPhoneCLITests CreateResourceFreezeTests.swift
+[35/68] Compiling VPhoneCLITests DoctorCLITests.swift
+[36/68] Compiling VPhoneCLITests ExpectedBindingCLITests.swift
+[37/68] Compiling VPhoneCLITests FWDesiredPlanCLITests.swift
+[38/71] Emitting module VPhoneCLITests
+[39/71] Compiling VPhoneCLITests FWPlanDuplicateSelectionTests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[40/71] Compiling VPhoneCLITests GuestCLITests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[41/71] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[42/71] Compiling VPhoneCLITests GuestResourceCLITests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[43/71] Compiling VPhoneCLITests GuestTransportTests.swift
+[44/71] Compiling VPhoneCLITests HostAPICommandTests.swift
+[45/71] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[46/71] Compiling VPhoneCLITests HostCommandServiceTests.swift
+[47/71] Compiling VPhoneCLITests APIProxyCLITests.swift
+[48/71] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[49/71] Compiling VPhoneCLITests CFWFrozenPlanTests.swift
+[50/71] Compiling VPhoneCLITests ClipboardFocusTests.swift
+[50/71] Linking vphone-vm
+[51/71] Linking vphone-cli
+[52/71] Applying vphone-vm
+[53/71] Applying vphone-cli
+[55/71] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[56/71] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[57/71] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[58/71] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[59/71] Compiling VPhoneCLITests PatchComponentResultTests.swift
+[60/71] Compiling VPhoneCLITests PatchExperimentRecordCLITests.swift
+[61/71] Compiling VPhoneCLITests PatchSelectionFileMigrationTests.swift
+[62/71] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[63/71] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[64/71] Compiling VPhoneCLITests HostRPCTests.swift
+[65/71] Compiling VPhoneCLITests LocationValidationTests.swift
+[66/71] Compiling VPhoneCLITests ClipboardMacWriterTests.swift
+[67/71] Compiling VPhoneCLITests ClipboardShortcutTests.swift
+[68/71] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[69/71] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[69/71] Write Objects.LinkFileList
+[70/71] Linking vphone-cliPackageTests
+Build complete! (16.60s)
+Test Suite 'Selected tests' started at 2026-10-13 05:25:24.205.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:25:24.207.
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-13 05:25:24.207.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused]' started.
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:532: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused] : XCTAssertEqual failed: ("Optional(true)") is not equal to ("Optional(false)")
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:533: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused] : XCTAssertEqual failed: ("nil") is not equal to ("Optional("api_protocol")")
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:534: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused] : XCTAssertFalse failed
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused]' failed (0.562 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' failed at 2026-10-13 05:25:24.770.
+	 Executed 1 test, with 3 failures (0 unexpected) in 0.562 (0.563) seconds
+Test Suite 'vphone-cliPackageTests.xctest' failed at 2026-10-13 05:25:24.770.
+	 Executed 1 test, with 3 failures (0 unexpected) in 0.562 (0.563) seconds
+Test Suite 'Selected tests' failed at 2026-10-13 05:25:24.770.
+	 Executed 1 test, with 3 failures (0 unexpected) in 0.562 (0.565) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite EnvironmentTransactionTests started.
+◇ Test journalSaveFailureStopsBeforeNextReplacement() started.
+◇ Test restoreJournalSaveFailureStopsBeforeNextReplacement() started.
+✘ Test journalSaveFailureStopsBeforeNextReplacement() recorded an issue at EnvironmentTransactionTests.swift:56:9: Expectation failed: an error was expected but none was thrown
+✘ Test journalSaveFailureStopsBeforeNextReplacement() recorded an issue at EnvironmentTransactionTests.swift:63:9: Expectation failed: (calls → 2) == 1
+✘ Test journalSaveFailureStopsBeforeNextReplacement() recorded an issue at EnvironmentTransactionTests.swift:64:9: Expectation failed: try guest.read("usr/lib/libvlocation.dylib") == "old libvlocation.dylib"
+✘ Test restoreJournalSaveFailureStopsBeforeNextReplacement() recorded an issue at EnvironmentTransactionTests.swift:76:9: Expectation failed: an error was expected but none was thrown
+✘ Test restoreJournalSaveFailureStopsBeforeNextReplacement() recorded an issue at EnvironmentTransactionTests.swift:83:9: Expectation failed: (calls → 2) == 1
+✘ Test restoreJournalSaveFailureStopsBeforeNextReplacement() recorded an issue at EnvironmentTransactionTests.swift:84:9: Expectation failed: try guest.read("usr/lib/libvlocation.dylib") == "new location"
+✘ Test journalSaveFailureStopsBeforeNextReplacement() failed after 0.013 seconds with 3 issues.
+✘ Test restoreJournalSaveFailureStopsBeforeNextReplacement() failed after 0.014 seconds with 3 issues.
+✘ Suite EnvironmentTransactionTests failed after 0.014 seconds with 6 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.014 seconds with 6 issues.

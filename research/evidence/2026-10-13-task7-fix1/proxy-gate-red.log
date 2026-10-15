@@ -1,0 +1,53 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/8] Compiling VPhoneDaemonWire EnvironmentOperation.swift
+[7/8] Emitting module VPhoneDaemonWire
+[8/12] Emitting module VPhoneDaemonWireTests
+[9/12] Compiling VPhoneDaemonWireTests EnvironmentOperationTests.swift
+[10/12] Compiling VPhoneCLITests GuestProxyMaintenanceTests.swift
+[11/12] Emitting module VPhoneCLITests
+[11/13] Write Objects.LinkFileList
+[12/13] Linking vphone-cliPackageTests
+Build complete! (4.57s)
+Test Suite 'Selected tests' started at 2026-10-13 06:32:12.341.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 06:32:12.342.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 06:32:12.342.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 06:32:12.342.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite EnvironmentOperationTests started.
+◇ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() started.
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed environment.restore
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed environment.install
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed bootstrap.install
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed bootstrap.uninstall
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed agent.apply_update
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed bootstrap.firmware
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed system.respring
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:39:13: Expectation failed: an error was expected but none was thrown
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:40:13: Expectation failed: !(mutated → <not evaluated>)
+↳ external proxy executed system.reboot
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() recorded an issue at EnvironmentOperationTests.swift:35:6: Caught error: Guest shutdown has sealed maintenance writes
+✘ Test externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() failed after 0.001 seconds with 17 issues.
+✘ Suite EnvironmentOperationTests failed after 0.002 seconds with 17 issues.
+✘ Test run with 1 test in 1 suite failed after 0.002 seconds with 17 issues.

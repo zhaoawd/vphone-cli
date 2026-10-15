@@ -1,0 +1,52 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/11] Emitting module FirmwarePatcher
+[6/11] Compiling FirmwarePatcher FirmwareInstalledReadback.swift
+[6/13] Write Objects.LinkFileList
+[9/14] Linking vphone-vm
+[9/14] Linking vphone-cli
+[11/14] Applying vphone-cli
+[12/14] Applying vphone-vm
+[13/14] Linking vphone-cliPackageTests
+Build complete! (5.71s)
+Test Suite 'Selected tests' started at 2026-10-13 04:54:56.951.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 04:54:56.952.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 04:54:56.952.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 04:54:56.952.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareInstalledOriginTests started.
+◇ Suite FirmwareInstalledReadbackTests started.
+◇ Test differentOrChangedEffectiveExecutableCannotQualify() started.
+◇ Test expiredStoreCallbackCannotAuthorizeOrigin() started.
+◇ Test installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "success" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "wrong-image" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "changed-image" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "writable" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "detach" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "wrong-root" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+✔ Test differentOrChangedEffectiveExecutableCannotQualify() passed after 0.004 seconds.
+✔ Test expiredStoreCallbackCannotAuthorizeOrigin() passed after 0.005 seconds.
+✔ Suite FirmwareInstalledOriginTests passed after 0.005 seconds.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test installedDiskRequiresLiveReadonlyAssociation(_:) with 6 test cases passed after 0.441 seconds.
+✔ Suite FirmwareInstalledReadbackTests passed after 0.441 seconds.
+✔ Test run with 3 tests in 2 suites passed after 0.441 seconds.

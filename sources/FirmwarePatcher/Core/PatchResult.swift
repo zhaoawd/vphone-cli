@@ -5,6 +5,7 @@
 // evaluated outcome, and the indices of the byte records it emitted.
 
 import Foundation
+import CryptoKit
 
 /// The gate values captured at the moment necessity rules were evaluated.
 public struct PatchGateSnapshot: Codable, Sendable, Equatable {
@@ -18,6 +19,9 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
     public let excGuardActive: Bool
     public let applyIOS27: Bool
     public let applyFrida: Bool
+    /// Absent on historical/default reports to preserve their selection identity.
+    public let experimentalV2RootRemount: Bool?
+    public let guestEnvironmentV2: Bool?
 
     public init(
         variant: String,
@@ -28,7 +32,9 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
         enableFrida: Bool,
         excGuardActive: Bool,
         applyIOS27: Bool,
-        applyFrida: Bool
+        applyFrida: Bool,
+        experimentalV2RootRemount: Bool = false,
+        guestEnvironmentV2: Bool? = nil
     ) {
         self.variant = variant
         self.iosBaseIs18 = iosBaseIs18
@@ -39,12 +45,15 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
         self.excGuardActive = excGuardActive
         self.applyIOS27 = applyIOS27
         self.applyFrida = applyFrida
+        self.experimentalV2RootRemount = experimentalV2RootRemount ? true : nil
+        self.guestEnvironmentV2 = guestEnvironmentV2
     }
 
     /// Compact one-line description used in `notApplicable` reasons.
     public var summary: String {
         "variant=\(variant) iosBaseIs18=\(iosBaseIs18) iosBaseIs27=\(iosBaseIs27) "
             + "excGuardActive=\(excGuardActive) applyIOS27=\(applyIOS27) applyFrida=\(applyFrida)"
+            + (experimentalV2RootRemount == true ? " experimentalV2RootRemount=true" : "")
     }
 }
 
@@ -58,6 +67,8 @@ public struct PatchResult: Codable, Sendable, Equatable {
     /// Indices into the owning `ComponentReport.records` array.
     public let recordIndices: [Int]
     public let gates: PatchGateSnapshot
+    /// Per-record attribution and actual current-payload verification for idempotent outcomes.
+    public let declarationEvidence: [DeclarationExecutionEvidence]?
 
     public init(
         id: PatchID,
@@ -66,7 +77,8 @@ public struct PatchResult: Codable, Sendable, Equatable {
         outcome: OutcomeKind,
         reason: String?,
         recordIndices: [Int],
-        gates: PatchGateSnapshot
+        gates: PatchGateSnapshot,
+        declarationEvidence: [DeclarationExecutionEvidence]? = nil
     ) {
         self.id = id
         self.requirement = requirement
@@ -75,6 +87,7 @@ public struct PatchResult: Codable, Sendable, Equatable {
         self.reason = reason
         self.recordIndices = recordIndices
         self.gates = gates
+        self.declarationEvidence = declarationEvidence
     }
 
     /// Whether this result is a failure that must fail its component: outcome is
@@ -143,5 +156,21 @@ public struct PatchRunReport: Codable, Sendable, Equatable {
     /// All byte records across all components, in pipeline order (parity with `patchAll`).
     public var allRecords: [PatchRecord] {
         components.flatMap { $0.records }
+    }
+}
+
+public struct DeclarationExecutionEvidence: Codable, Sendable, Equatable {
+    public let declarationID: String
+    public let recordIndex: Int
+    public let component: String
+    public let fileOffset: Int
+    public let byteCount: Int
+    /// SHA-256 of the complete payload read before discovery, when the record range
+    /// already contained the expected output. Nil means no idempotence proof.
+    public let verifiedPayloadSHA256: String?
+    public let verifiedOutputSHA256: String?
+
+    static func digest(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 }

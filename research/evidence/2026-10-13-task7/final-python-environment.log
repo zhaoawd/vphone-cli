@@ -1,0 +1,191 @@
+[-] environment update refused: already_current
+.[-] environment update refused: full_migration_required
+    - /usr/lib/libvlocation.dylib is missing
+    A stopped-VM replacement only swaps libraries that already exist. Create a new VM with vm create <name> --variant regular --guest-environment v2 and validate it as a separate copy; this VM is left unchanged.
+....................FFF.FFF.F.FEFF.FF.F.FF.....
+======================================================================
+ERROR: test_failure_midway_leaves_the_original_disk_unchanged (test_cfw_env_update.DriverUpdateTests.test_failure_midway_leaves_the_original_disk_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 771, in test_failure_midway_leaves_the_original_disk_unchanged
+    report = json.loads((record / 'environment-update.json').read_text())
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 787, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test voeadh83/vm/.cfw-history/20261012T220818Z-YkXNyisq/environment-update.json'
+
+======================================================================
+FAIL: test_attach_failure_names_the_attach_stage (test_cfw_env_update.CheckVMTests.test_attach_failure_names_the_attach_stage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 599, in test_attach_failure_names_the_attach_stage
+    self.assertEqual(code, 5, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 5 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+
+
+======================================================================
+FAIL: test_check_reads_a_stopped_vm_without_writing_its_disk (test_cfw_env_update.CheckVMTests.test_check_reads_a_stopped_vm_without_writing_its_disk)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 514, in test_check_reads_a_stopped_vm_without_writing_its_disk
+    self.assertEqual(code, 0, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+
+
+======================================================================
+FAIL: test_check_refuses_while_another_process_holds_the_disk (test_cfw_env_update.CheckVMTests.test_check_refuses_while_another_process_holds_the_disk)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 547, in test_check_refuses_while_another_process_holds_the_disk
+    self.assertEqual(code, 4, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 4 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+
+
+======================================================================
+FAIL: test_less_vm_is_not_applicable_without_attaching (test_cfw_env_update.CheckVMTests.test_less_vm_is_not_applicable_without_attaching)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 554, in test_less_vm_is_not_applicable_without_attaching
+    self.assertEqual(code, 0, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+
+
+======================================================================
+FAIL: test_mount_timeout_names_the_stage_and_releases_the_image (test_cfw_env_update.CheckVMTests.test_mount_timeout_names_the_stage_and_releases_the_image)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 572, in test_mount_timeout_names_the_stage_and_releases_the_image
+    self.assertEqual(code, 5, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 5 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+
+
+======================================================================
+FAIL: test_read_failure_on_the_mounted_volume_names_the_read_stage (test_cfw_env_update.CheckVMTests.test_read_failure_on_the_mounted_volume_names_the_read_stage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 611, in test_read_failure_on_the_mounted_volume_names_the_read_stage
+    self.assertEqual(code, 5, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 5 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+
+
+======================================================================
+FAIL: test_report_file_carries_the_result_to_the_caller (test_cfw_env_update.CheckVMTests.test_report_file_carries_the_result_to_the_caller)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 622, in test_report_file_carries_the_result_to_the_caller
+    self.assertEqual(code, 0, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+[*] check result (exit 2) written to /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw env test usn7jf6j/caller/report.json for uid 2035870432
+
+
+======================================================================
+FAIL: test_unprivileged_check_announces_the_mount_and_its_limit_first (test_cfw_env_update.CheckVMTests.test_unprivileged_check_announces_the_mount_and_its_limit_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 589, in test_unprivileged_check_announces_the_mount_and_its_limit_first
+    self.assertEqual(code, 0, err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : [-] check-vm: [Errno 1] Operation not permitted: 'ps'
+
+
+======================================================================
+FAIL: test_full_migration_is_refused_and_the_disk_is_not_published (test_cfw_env_update.DriverUpdateTests.test_full_migration_is_refused_and_the_disk_is_not_published)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 750, in test_full_migration_is_refused_and_the_disk_is_not_published
+    self.assertIn('full_migration_required', output)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'full_migration_required' not found in '[*] host-mode guest environment update: vm=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test aybe2q5l/vm candidates=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test aybe2q5l/stage mounts=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test aybe2q5l/vm/.cfw_mount.yNPymzMX staging=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test aybe2q5l/vm/.cfw_disk.aLRvNlRt\n[-] CFW disk stage: EPERM: Operation not permitted\n[-] CFW install did not change /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test aybe2q5l/vm/Disk.img; record: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test aybe2q5l/vm/.cfw-history/20261012T220820Z-aLRvNlRt/transaction.json\n[!] ownership of host-side artifacts NOT restored: invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)\n'
+
+======================================================================
+FAIL: test_root_popup_update_returns_the_record_to_the_invoker (test_cfw_env_update.DriverUpdateTests.test_root_popup_update_returns_the_record_to_the_invoker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 783, in test_root_popup_update_returns_the_record_to_the_invoker
+    self.assertEqual(proc.returncode, 0, output)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : [*] host-mode guest environment update: vm=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 24jxu1pm/vm candidates=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 24jxu1pm/stage mounts=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 24jxu1pm/vm/.cfw_mount.weegiGLK staging=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 24jxu1pm/vm/.cfw_disk.WhORMBRN
+[*] restored ownership of host-side artifacts to uid 2035870432 (hard-linked files and other accounts' entries left as found)
+[-] CFW disk stage: EPERM: Operation not permitted
+[-] CFW install did not change /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 24jxu1pm/vm/Disk.img; record: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 24jxu1pm/vm/.cfw-history/20261012T220821Z-WhORMBRN/transaction.json
+
+
+======================================================================
+FAIL: test_update_publishes_only_the_target_libraries_and_keeps_identity (test_cfw_env_update.DriverUpdateTests.test_update_publishes_only_the_target_libraries_and_keeps_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 721, in test_update_publishes_only_the_target_libraries_and_keeps_identity
+    self.assertEqual(rc, 0, output)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : [*] host-mode guest environment update: vm=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 0bo30o75/vm candidates=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 0bo30o75/stage mounts=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 0bo30o75/vm/.cfw_mount.MCFSEJ1S staging=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 0bo30o75/vm/.cfw_disk.58lnarfp
+[*] restored ownership of host-side artifacts to uid 2035870432 (hard-linked files and other accounts' entries left as found)
+[-] CFW disk stage: EPERM: Operation not permitted
+[-] CFW install did not change /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 0bo30o75/vm/Disk.img; record: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 0bo30o75/vm/.cfw-history/20261012T220822Z-58lnarfp/transaction.json
+
+
+======================================================================
+FAIL: test_check_progress_is_on_stderr_and_stdout_is_empty (test_cfw_env_update.ElevatedCheckTests.test_check_progress_is_on_stderr_and_stdout_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 884, in test_check_progress_is_on_stderr_and_stdout_is_empty
+    self.assertEqual(proc.returncode, 0, proc.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : [*] read-only guest environment check as uid 2035870432: vm=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 6on26ig5/vm report=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 6on26ig5/caller/report.json
+[-] check-vm: [Errno 1] Operation not permitted: 'ps'
+[*] check result (exit 2) written to /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 6on26ig5/caller/report.json for uid 2035870432
+
+
+======================================================================
+FAIL: test_mount_timeout_is_reported_with_its_stage_and_cleaned_up (test_cfw_env_update.ElevatedCheckTests.test_mount_timeout_is_reported_with_its_stage_and_cleaned_up)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 933, in test_mount_timeout_is_reported_with_its_stage_and_cleaned_up
+    self.assertEqual(rc, 5, output)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 5 : [*] read-only guest environment check as uid 2035870432: vm=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test _q89fd78/vm report=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test _q89fd78/caller/report.json
+[-] check-vm: [Errno 1] Operation not permitted: 'ps'
+[*] check result (exit 2) written to /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test _q89fd78/caller/report.json for uid 2035870432
+
+
+======================================================================
+FAIL: test_root_popup_path_check_is_read_only_and_returns_the_report (test_cfw_env_update.ElevatedCheckTests.test_root_popup_path_check_is_read_only_and_returns_the_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 907, in test_root_popup_path_check_is_read_only_and_returns_the_report
+    self.assertEqual(rc, 0, output)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : [*] read-only guest environment check as uid 2035870432: vm=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test s5kl7wyk/vm report=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test s5kl7wyk/caller/report.json
+[-] check-vm: [Errno 1] Operation not permitted: 'ps'
+[*] check result (exit 2) written to /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test s5kl7wyk/caller/report.json for uid 2035870432
+
+
+======================================================================
+FAIL: test_sudo_path_check_is_read_only_and_returns_the_report (test_cfw_env_update.ElevatedCheckTests.test_sudo_path_check_is_read_only_and_returns_the_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_cfw_env_update.py", line 893, in test_sudo_path_check_is_read_only_and_returns_the_report
+    self.assertEqual(rc, 0, output)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : [*] read-only guest environment check as uid 2035870432: vm=/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test dp0f3e_h/vm report=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test dp0f3e_h/caller/report.json
+[-] check-vm: [Errno 1] Operation not permitted: 'ps'
+[*] check result (exit 2) written to /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test dp0f3e_h/caller/report.json for uid 2035870432
+
+
+----------------------------------------------------------------------
+Ran 48 tests in 10.687s
+
+FAILED (failures=15, errors=1)
+  [+] /usr/lib/SystemHook-vphone.dylib: 159b0a25e84387e3 -> 69995818b00addde
+  [+] /usr/lib/libcamfix.dylib: e12c1943c6d9320e -> 7b782b387088d082
+[*] replaced 2 environment libraries on the staged copy: SystemHook-vphone.dylib, libcamfix.dylib

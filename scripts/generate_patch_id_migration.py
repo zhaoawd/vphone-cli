@@ -6,16 +6,17 @@ import json
 from pathlib import Path
 import sys
 
+from generate_target_patch_catalog import TARGET, RESEARCH, fixed_sources, reviewed_declarations
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "sources/FirmwarePatcher/PatchSet/PatchSelectionMigrationData.swift"
 
 
 def render():
     mapping = json.loads((ROOT / "research/t09_patch_id_mapping_2026-10-01.json").read_text())
-    delta = json.loads((ROOT / "research/upstream_integration_2026-10-06/T09_declaration_delta.json").read_text())
-    local = json.loads((ROOT / "research/t10_patch_declarations_2026-10-01.json").read_text())
-    if delta["target"] != "2d21d21fbdd4f51f013616273ceda9b35a3e0789":
-        raise ValueError("This migration revision requires the fixed 2d21d21 target")
+    delta = json.loads((ROOT / RESEARCH / "T09_declaration_delta.json").read_text())
+    if delta["target"] != TARGET:
+        raise ValueError("This migration revision requires the fixed 8a75092 target")
     rows = [(p["old_id"], p["id"]) for p in mapping["patches"]]
     aliases = dict(rows)
     if len(rows) != 117 or len(aliases) != 117 or len(set(aliases.values())) != 117:
@@ -24,17 +25,25 @@ def render():
     if rename["old_id"] in aliases:
         raise ValueError("Intermediate alias duplicates an old dotted ID")
     aliases[rename["old_id"]] = rename["new_id"]
-    target = {r["id"] for r in delta["rows"]}
-    local_ids = {r["id"] for r in local["declarations"]}
+    released_renames = delta["released_id_renames"]
+    aliases = {key: released_renames.get(value, value) for key, value in aliases.items()}
+    if set(released_renames) & set(aliases):
+        raise ValueError("Released rename duplicates an existing alias")
+    aliases.update(released_renames)
+    target = set(fixed_sources())
+    if target != {r["id"] for r in delta["rows"]}:
+        raise ValueError("Migration delta differs from the verified fixed source snapshot")
+    local_ids = {r["id"] for r in reviewed_declarations()}
     known = target | local_ids
-    if len(target) != 141 or len(known) != 143 or not set(aliases.values()) <= target:
+    if len(target) != 148 or len(known) != 159 or not set(aliases.values()) <= target:
         raise ValueError("Migration vocabulary differs from reviewed target/local IDs")
     if set(aliases) & known:
         raise ValueError("Alias is also a canonical ID; chained/ambiguous mapping refused")
     lines = ["// Generated from the source-backed T09 maps. ID recognition does not authorize execution.",
              "// Sources: research/t09_patch_id_mapping_2026-10-01.json and",
-             "// research/upstream_integration_2026-10-06/T09_declaration_delta.json.",
-             "// The two less IDs remain local. This table does not alter PatchDeclarationCatalog.",
+             "// research/upstream_integration_2026-10-15/T09_declaration_delta.json.",
+             "// Canonical IDs also require reviewed T09_target_applicability.json decisions.",
+             "// The less and guest installation IDs remain local. Recognition alone never enables execution.",
              "", "extension PatchSelectionMigration {", "    static let aliases: [String: String] = ["]
     lines += [f"        {json.dumps(k)}: {json.dumps(v)}," for k, v in sorted(aliases.items())]
     lines += ["    ]", "", "    static let knownIDs: Set<String> = ["]
@@ -51,7 +60,7 @@ def main():
     if args.check:
         if OUTPUT.read_text() != generated:
             parser.error("Generated migration table differs; regenerate from the reviewed research maps")
-        print("Migration vocabulary matches reviewed sources: 118 aliases, 143 canonical IDs")
+        print("Migration vocabulary matches reviewed sources: 119 aliases, 159 canonical IDs")
     else:
         sys.stdout.write(generated)
 

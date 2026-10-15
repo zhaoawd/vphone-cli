@@ -1,0 +1,38 @@
+test_inherited_lock_for_another_directory_refuses_command (tests.test_firmware_worker.FirmwareWorkerTests.test_inherited_lock_for_another_directory_refuses_command) ... ok
+test_publication_worker_inherits_the_live_lock_and_retains_it (tests.test_firmware_worker.FirmwareWorkerTests.test_publication_worker_inherits_the_live_lock_and_retains_it) ... FAIL
+test_shell_lock_refuses_unrecovered_firmware (tests.test_firmware_worker.FirmwareWorkerTests.test_shell_lock_refuses_unrecovered_firmware) ... ok
+test_worker_cannot_start_after_recovery_archives_its_lock (tests.test_firmware_worker.FirmwareWorkerTests.test_worker_cannot_start_after_recovery_archives_its_lock) ... ok
+test_worker_holds_lock_until_child_finishes (tests.test_firmware_worker.FirmwareWorkerTests.test_worker_holds_lock_until_child_finishes) ... FAIL
+test_worker_survives_parent_kill_and_retains_lock (tests.test_firmware_worker.FirmwareWorkerTests.test_worker_survives_parent_kill_and_retains_lock) ... FAIL
+
+======================================================================
+FAIL: test_publication_worker_inherits_the_live_lock_and_retains_it (tests.test_firmware_worker.FirmwareWorkerTests.test_publication_worker_inherits_the_live_lock_and_retains_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_firmware_worker.py", line 144, in test_publication_worker_inherits_the_live_lock_and_retains_it
+    self.assertTrue(ready.exists(), 'publication child did not run under inherited lock')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : publication child did not run under inherited lock
+
+======================================================================
+FAIL: test_worker_holds_lock_until_child_finishes (tests.test_firmware_worker.FirmwareWorkerTests.test_worker_holds_lock_until_child_finishes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_firmware_worker.py", line 84, in test_worker_holds_lock_until_child_finishes
+    self.assertTrue(ready.exists())
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_worker_survives_parent_kill_and_retains_lock (tests.test_firmware_worker.FirmwareWorkerTests.test_worker_survives_parent_kill_and_retains_lock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_firmware_worker.py", line 44, in test_worker_survives_parent_kill_and_retains_lock
+    self.assertTrue(ready.exists())
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 6 tests in 20.593s
+
+FAILED (failures=3)

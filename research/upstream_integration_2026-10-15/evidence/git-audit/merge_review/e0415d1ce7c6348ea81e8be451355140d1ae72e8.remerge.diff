@@ -1,0 +1,17 @@
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift
+remerge CONFLICT (content): Merge conflict in VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift
+index 103e3ad8..e72e1289 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift
+@@ -113,11 +113,8 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
+         self.control = control
+         if !command.dfu {
+             control.unlocksAtStartup = vm.unlocksAtStartup
+-<<<<<<< 5050c4d8 (Keep the 2.7 series for the host location setting)
+             control.syncsHostLocation = vm.syncsHostLocation
+-=======
+             control.guestDeviceName = Self.guestDeviceName(forConfig: options.configURL)
+->>>>>>> f1accd89 (Merge pull request #613 from 0xJacky/fix/remove-dead-boot-args)
+             startNetworkServices(vm: vm, control: control)
+             let vphonedURL = URL(fileURLWithPath: command.vphonedBin)
+             if FileManager.default.fileExists(atPath: vphonedURL.path) {

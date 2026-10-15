@@ -1,0 +1,454 @@
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+index 246195dfdf348376b931cd4ad4a7325ec9ce4d3a..9556cec37adbc38d0a0d599921d7ecd4d2b924d7 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -1,5 +1,22 @@
+ # Patch Comparison: Regular / Development / Jailbreak / Experimental
+ 
++> **iOS 27 disabled services (2026-10-13):**
++> `system-jetsamproperties-cfw-disable_allowed` removes every
++> `DisableAllowed = false` from
++> `System/Library/LaunchDaemons/com.apple.jetsamproperties.*.plist`. The guest
++> system set selects it for iOS 27 only; `cfw install` and environment updates
++> back each file up and restore it when deselected. iOS 27 marks 19 daemons
++> this way, and launchd loads a marked job whatever its disabled override says
++> (`force-enabled` in `launchctl print`). launchd reads the file the device
++> tree's `target-type` names, so every guest but the iPhone17,3 was affected:
++> the trimmed service profile left five jobs running and a slimmed template's
++> setup boot failed its check, and the OTA block could not stop
++> `mobile.softwareupdated`. No executable is patched. On an iPad16,1 24A446
++> guest the patch took 19 marks out of each of J410 and J411; after it no job
++> was force-enabled, none of the profile's 144 was loaded, and a slimmed
++> template built from nothing passed its setup boot. See
++> [evidence and verification](Guest/service_trimming.md#ios-27-and-disableallowed).
++
+ > **iOS 27 locationd startup (2026-10-08):**
+ > `system-locationd-cfw-disable_auto_cohort` disables only `CLAutoCohort` in
+ > `System/Library/FeatureFlags/Domain/CoreLocation.plist`. The guest system set
+diff --git a/Research/Guest/ota_software_update_block.md b/Research/Guest/ota_software_update_block.md
+index f6f939cd5cb71cea7d4464689b581bb695eff1eb..ef3e600879ba40df1bf3ec859d12fb10ff22c85e 100644
+--- a/Research/Guest/ota_software_update_block.md
++++ b/Research/Guest/ota_software_update_block.md
+@@ -23,6 +23,12 @@ Leave `com.apple.mobileassetd` **enabled** — it serves many non-OTA assets
+ (dictionaries, keyboards, Siri, fonts); disabling it breaks unrelated features.
+ Leave `akd` alone.
+ 
++On iOS 27 this holds on a guest that presents its board (every device but the
++iPhone17,3) only with `system-jetsamproperties-cfw-disable_allowed`: the
++board's jetsam properties mark `mobile.softwareupdated` and `OTATaskingAgent`
++`DisableAllowed = false`, and launchd then loads them whatever the override
++says. See [service trimming](service_trimming.md#ios-27-and-disableallowed).
++
+ ## The daemons and why these three
+ 
+ `services.list` on the guest, filtered to update machinery, shows the OTA set
+diff --git a/Research/Guest/service_trimming.md b/Research/Guest/service_trimming.md
+index 708a0a39e5abef26cfdf8e02cba7c823609a84e4..9e0cfd346ea5416bfd280f56137709523f0003b9 100644
+--- a/Research/Guest/service_trimming.md
++++ b/Research/Guest/service_trimming.md
+@@ -28,6 +28,10 @@ load a disabled job at the next boot. It is the same mechanism
+ - **It is not a firmware patch.** The system volume and `launchd.plist` are
+   untouched, nothing goes into a patch set, and the Services panel still lists
+   every job, disabled ones marked as such.
++- **On iOS 27 it leans on one.** launchd there ignores the override for the
++  jobs the board's jetsam properties mark `DisableAllowed = false`, and
++  `system-jetsamproperties-cfw-disable_allowed` removes that mark
++  ([iOS 27 and DisableAllowed](#ios-27-and-disableallowed)).
+ - **It reverts cleanly.** vphoned records the labels it disabled in
+   `/var/db/vphoned/service-profile.plist`. `profile: "none"` turns back on
+   those labels and no others. A job that was already disabled when the profile
+@@ -72,8 +76,9 @@ selects.
+ iOS 26 and 27 have a list, both measured on iPhone guests (see
+ [iOS 26](#ios-26) for how the 26 list differs). vphoned picks the list by
+ the major version alone, so an iPadOS guest of those versions gets the iPhone
+-list, which nobody has measured there. Any other version gets "No trimmed
+-service list".
++list. An iPad16,1 template builds with it on 26.6.2 and on 27.0.1
++([iOS 27 and DisableAllowed](#ios-27-and-disableallowed)); its idle cost was
++not measured there. Any other version gets "No trimmed service list".
+ 
+ ## Never disabled
+ 
+@@ -227,6 +232,79 @@ CHSIntentReference from" an App Intent. They are launched again on demand,
+ and nothing visible was affected; which disabled job the intent reference
+ needs was not found. `SiriSearchFeedback` crashed in both configurations.
+ 
++## iOS 27 and DisableAllowed
++
++On a guest that presents its board, iOS 27 kept five of the profile's jobs
++running after the reboot, and a template's strict setup boot failed its last
++check (2026-10-13, iPad16,1 27.0.1 (24A446), bundle 2.9.3):
++
++```
++[setup] failed at verify: 5 profile service(s) still running:
++com.apple.OTATaskingAgent, com.apple.analyticsd, com.apple.diagnosticextensionsd,
++com.apple.mobile.softwareupdated, com.apple.symptomsd-diag
++```
++
++All 144 overrides were in place (`services.profile` → `disabled`). 139 of
++those jobs were not loaded at all; `services.print` showed the other five with
++`force-enabled` among their properties.
++
++The cause is a key iOS 27 added to the jetsam properties,
++`/System/Library/LaunchDaemons/com.apple.jetsamproperties.<target-type>.plist`.
++Under `Version4` → `Daemon` (and `XPCService`) → `Override` → `<label>`, 19
++entries carry `DisableAllowed = false`: the five above and
++`com.apple.DumpPanic`, `ReportCrash`, `ReportCrash.Root`, `ReportCrashService`,
++`logd`, `logd_helper`, `logd_reporter`, `mobile.obliteration`,
++`mobileactivationd`, `osanalytics.osanalyticshelper` and its `.agent`,
++`pluginkit.pkd`, `sysdiagnose` and `sysdiagnose_helper`. launchd reads the key
++with the other `JetsamProperties` and, when it bootstraps a disabled job that
++has it, logs `Ignoring disabled state because DisableAllowed=false` and loads
++the job anyway. `launchctl print` then lists `force-enabled`.
++
++Which file launchd reads follows the device tree's `target-type`:
++
++- An **iPhone17,3** guest keeps `VPHONE600`. The profile and the
++  [OTA block](ota_software_update_block.md) were measured there, and a slimmed
++  27.0.1 template passes the same check without the patch, so nothing is
++  force-enabled; the image presumably has no jetsam properties under that
++  name, which was not looked at.
++- **Every other guest** presents its board (`VPhoneGuestDevice.presentsBoard`:
++  J410 for the iPad16,1), gets that board's file, and with it the 19 marks.
++- **iOS 26** has the files without the key: the J410 one on 26.6.2 (23G90)
++  holds no `DisableAllowed`, and `services.dump` on that guest shows no
++  `force-enabled` job. A trimmed iPad16,1 template builds there unchanged.
++
++`system-jetsamproperties-cfw-disable_allowed` removes every
++`DisableAllowed = false` from each `com.apple.jetsamproperties.*.plist` during
++`cfw install` and `cfw update-environment`, for iOS 27 only. It keeps a `.bak`
++beside each file and puts it back when the patch is turned off. Nothing else
++in the files changes, and the key has no effect on a job that is not disabled.
++
++Two things did not work from inside the guest. The system volume is read-only
++there, so vphoned cannot edit the file. And `services.remove` unloads the
++three of the five that live in the user domain but is refused for
++`com.apple.analyticsd` and `com.apple.OTATaskingAgent`, which are in the
++system domain ("remove failed: launchd status 3 (No such process)").
++
++Validated on 2026-10-13 with the patch, on iPad16,1 27.0.1 (24A446):
++
++- The failing guest after `cfw update-environment` ("19 DisableAllowed =
++  false removed" for each of J410 and J411): no `force-enabled` job, none of
++  the 144 labels loaded, `services.profile` → `running` empty.
++- A new machine from nothing (`vphone-launchpad-cli vm create --device
++  iPad16,1 --slim on`): every step passed, the strict setup boot in 87 s
++  (settled after 64 s, 144 services owned, verify passed), and the clone of
++  template `0c8682d7c241` reaches the Home Screen with the same three
++  answers.
++
++The same creation on iPadOS 26.6.2 (23G90) passed with bundle 2.9.3, which
++does not have the patch: 138 services owned, setup boot in 90 s, template
++`65cb509bf161`.
++
++An iOS 27 guest restored by an older bundle has the marks until an environment
++update or a reinstall runs with the patch. Until then the five jobs keep
++running, and so does `softwareupdated` on a guest whose OTA block was applied
++by hand.
++
+ ## Applying it in a template
+ 
+ A template is changed once, in its setup boot, and frozen; every clone
+@@ -310,7 +388,12 @@ not change.
+ ## Open items
+ 
+ - **iPadOS.** vphoned picks the list by major version only, so iPad guests on
+-  26 and 27 get the iPhone lists. No iPad guest has been measured with them.
++  26 and 27 get the iPhone lists. Templates build with them
++  ([iOS 27 and DisableAllowed](#ios-27-and-disableallowed)), but no iPad
++  guest's idle cost or function checks have been measured.
++- **Other board-presenting iPhones on iOS 27.** They read their board's
++  jetsam properties as an iPad does, so the same patch should apply; only the
++  iPad16,1 was run.
+ - **WidgetKit control extensions on iOS 26.** The `ControlAction.init(_:)`
+   crashes on 2 of 16 trimmed 26.6.2 boots ([iOS 26](#ios-26)) point at a
+   disabled job an App Intent reference needs; which one was not found.
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareJetsamDisableAllowed.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareJetsamDisableAllowed.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..5eb9d426716299b8f6fb5a1036c87f65da3bcd0f
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareJetsamDisableAllowed.swift
+@@ -0,0 +1,61 @@
++import Foundation
++import VPhonePatchKit
++
++/// Let launchd's disabled overrides hold on iOS 27. Its jetsam properties mark
++/// some daemons `DisableAllowed = false`, and launchd then loads them whatever
++/// the override says (`force-enabled` in `launchctl print`). launchd reads the
++/// file named after the device tree's `target-type`, so every guest that
++/// presents its board gets it, and the trimmed service profile and the OTA
++/// block cannot turn those daemons off. See Research/Guest/service_trimming.md.
++public enum CustomFirmwareJetsamDisableAllowed {
++    public static let directory = "System/Library/LaunchDaemons"
++    public static let key = "DisableAllowed"
++
++    /// `com.apple.jetsamproperties.<board>.plist`: one per board the image serves.
++    public static func isJetsamProperties(_ name: String) -> Bool {
++        name.hasPrefix("com.apple.jetsamproperties.") && name.hasSuffix(".plist")
++    }
++
++    /// Removes every `DisableAllowed = false`, at any depth, and returns how
++    /// many. The installer owns the pristine backup and rollback. Everything
++    /// else and the input plist's encoding are preserved; a file without the
++    /// key is not written.
++    @discardableResult
++    public static func patch(at url: URL, dryRun: Bool = false) throws -> Int {
++        let input = try Data(contentsOf: url)
++        var format = PropertyListSerialization.PropertyListFormat.xml
++        guard let root = try PropertyListSerialization.propertyList(
++            from: input, options: [], format: &format,
++        ) as? [String: Any] else {
++            throw PatcherError.invalidFormat("Jetsam properties are not a dictionary: \(url.path)")
++        }
++        var removed = 0
++        let stripped = strip(root, removed: &removed)
++        guard removed > 0 else { return 0 }
++        let output = try PropertyListSerialization.data(fromPropertyList: stripped, format: format, options: 0)
++        if !dryRun {
++            try output.write(to: url, options: .atomic)
++        }
++        return removed
++    }
++
++    private static func strip(_ value: Any, removed: inout Int) -> Any {
++        if let dictionary = value as? [String: Any] {
++            var result: [String: Any] = [:]
++            for (name, child) in dictionary {
++                if name == key, let number = child as? NSNumber,
++                   CFGetTypeID(number) == CFBooleanGetTypeID(), !number.boolValue
++                {
++                    removed += 1
++                    continue
++                }
++                result[name] = strip(child, removed: &removed)
++            }
++            return result
++        }
++        if let array = value as? [Any] {
++            return array.map { strip($0, removed: &removed) }
++        }
++        return value
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
+index b638f58368a917e55aa1ca64a7246c289a60a249..14befecdb74dd07b7cbddf95e3349a4a405dbeac 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
+@@ -25,6 +25,7 @@ public enum FirmwareGuestSystemPatchSet {
+     public static let attitude = "system-apps-cfw-attitude"
+ 
+     public static let locationdCohorting = "system-locationd-cfw-disable_auto_cohort"
++    public static let jetsamDisableAllowed = "system-jetsamproperties-cfw-disable_allowed"
+ 
+     private static let ios27 = VPhonePatchApplicability(iOSBase: .major(27))
+ 
+@@ -56,6 +57,17 @@ public enum FirmwareGuestSystemPatchSet {
+                 target: .guestFile(path: "/" + CustomFirmwareLocationdCohorting.relativePath),
+                 applicability: ios27,
+             ),
++            VPhonePatchDeclaration(
++                identifier: jetsamDisableAllowed,
++                title: "Disabled services stay off",
++                summary: """
++                Removes the iOS 27 jetsam property that makes launchd load some daemons whatever \
++                its disabled list says. Without it the trimmed service profile and the OTA block \
++                do not hold on a guest that presents its board.
++                """,
++                target: .guestFile(path: "/" + CustomFirmwareJetsamDisableAllowed.directory),
++                applicability: ios27,
++            ),
+ 
+             // MARK: Shared Cache Policy
+ 
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareJetsamDisableAllowedTests.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareJetsamDisableAllowedTests.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..a92298f9d76b60c8723c84d758ed417ce013f562
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareJetsamDisableAllowedTests.swift
+@@ -0,0 +1,96 @@
++@testable import FirmwarePatcher
++import Foundation
++import Testing
++import VPhonePatchKit
++
++@Suite("Jetsam DisableAllowed")
++struct CustomFirmwareJetsamDisableAllowedTests {
++    @Test
++    func `selected only for IOS 27`() throws {
++        for base in [nil, "18.6", "26.6.2", "27.0", "27.0.1", "28.0"] as [String?] {
++            let plan = try VPhonePatchPlan.resolve(
++                preset: FirmwarePatchSetCatalog.standardPreset,
++                patchSets: FirmwarePatchSetCatalog.bundled,
++                iOSBase: base.flatMap { VPhoneVersion($0) }, cloudOS: VPhoneVersion("26.4"),
++            )
++            #expect(plan.isEnabled(FirmwareGuestSystemPatchSet.jetsamDisableAllowed) == (base?.hasPrefix("27.") == true))
++        }
++    }
++
++    @Test
++    func `names only jetsam properties`() {
++        #expect(CustomFirmwareJetsamDisableAllowed.isJetsamProperties("com.apple.jetsamproperties.J410.plist"))
++        #expect(!CustomFirmwareJetsamDisableAllowed.isJetsamProperties("com.apple.jetsamproperties.J410.plist.bak"))
++        #expect(!CustomFirmwareJetsamDisableAllowed.isJetsamProperties("com.apple.analyticsd.plist"))
++    }
++
++    @Test(arguments: [PropertyListSerialization.PropertyListFormat.xml, .binary])
++    func `removes only the false key and keeps encoding`(format: PropertyListSerialization.PropertyListFormat) throws {
++        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: url) }
++        // The shape of iOS 27's file: Version4 / Daemon / Override / <label>.
++        let original: [String: Any] = [
++            "Version4": [
++                "Daemon": [
++                    "Default": ["JetsamPriority": 3],
++                    "Override": [
++                        "com.apple.analyticsd": ["DisableAllowed": false, "ActiveSoftMemoryLimit": 8, "JetsamPriority": 140],
++                        "com.apple.mobile.softwareupdated": ["DisableAllowed": false],
++                        "com.apple.kept": ["DisableAllowed": true, "ExecuteAllowed": false],
++                        "com.apple.other": ["JetsamPriority": 100],
++                    ],
++                ],
++                "XPCService": ["Override": ["com.apple.ReportCrashService": ["DisableAllowed": false]]],
++            ],
++        ]
++        let input = try PropertyListSerialization.data(fromPropertyList: original, format: format, options: 0)
++        try input.write(to: url)
++        #expect(try CustomFirmwareJetsamDisableAllowed.patch(at: url, dryRun: true) == 3)
++        #expect(try Data(contentsOf: url) == input)
++        #expect(try CustomFirmwareJetsamDisableAllowed.patch(at: url) == 3)
++
++        let output = try Data(contentsOf: url)
++        var outputFormat = PropertyListSerialization.PropertyListFormat.xml
++        let root = try #require(PropertyListSerialization.propertyList(from: output, format: &outputFormat) as? [String: Any])
++        #expect(outputFormat == format)
++        let version = try #require(root["Version4"] as? [String: Any])
++        let daemon = try #require(version["Daemon"] as? [String: Any])
++        let overrides = try #require(daemon["Override"] as? [String: [String: Any]])
++        #expect((daemon["Default"] as? NSDictionary) == ["JetsamPriority": 3] as NSDictionary)
++        #expect((overrides["com.apple.analyticsd"] as NSDictionary?) == ["ActiveSoftMemoryLimit": 8, "JetsamPriority": 140] as NSDictionary)
++        #expect(overrides["com.apple.mobile.softwareupdated"]?.isEmpty == true)
++        #expect((overrides["com.apple.kept"] as NSDictionary?) == ["DisableAllowed": true, "ExecuteAllowed": false] as NSDictionary)
++        #expect((overrides["com.apple.other"] as NSDictionary?) == ["JetsamPriority": 100] as NSDictionary)
++        let service = try #require(version["XPCService"] as? [String: [String: [String: Any]]])
++        #expect(service["Override"]?["com.apple.ReportCrashService"]?.isEmpty == true)
++
++        #expect(try CustomFirmwareJetsamDisableAllowed.patch(at: url) == 0)
++        #expect(try Data(contentsOf: url) == output)
++    }
++
++    @Test
++    func `leaves A file without the key unwritten`() throws {
++        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: url) }
++        // iOS 26's file has no DisableAllowed; one that is not a boolean false is not ours.
++        for root: [String: Any] in [
++            ["Version4": ["Daemon": ["Override": ["com.apple.analyticsd": ["JetsamPriority": 140]]]]],
++            ["Version4": ["Daemon": ["Override": ["com.apple.analyticsd": ["DisableAllowed": 0]]]]],
++        ] {
++            let input = try PropertyListSerialization.data(fromPropertyList: root, format: .binary, options: 0)
++            try input.write(to: url)
++            #expect(try CustomFirmwareJetsamDisableAllowed.patch(at: url) == 0)
++            #expect(try Data(contentsOf: url) == input)
++        }
++    }
++
++    @Test
++    func `rejects A plist that is not A dictionary`() throws {
++        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: url) }
++        let input = try PropertyListSerialization.data(fromPropertyList: ["DisableAllowed"], format: .binary, options: 0)
++        try input.write(to: url)
++        #expect(throws: (any Error).self) { try CustomFirmwareJetsamDisableAllowed.patch(at: url) }
++        #expect(try Data(contentsOf: url) == input)
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+index 477dd89cfe46fc23725e486b0c0797e87f0a1a9b..1bd272e38b56cfea5df1f84f3376e79dcdba63ab 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+@@ -1205,6 +1205,41 @@ struct VPhoneCustomFirmwareInstaller {
+             }
+         }
+ 
++        // The jetsam properties of every board the image serves: launchd
++        // reads the one the guest's device tree names. Like the locationd
++        // change this is for iOS 27 only, where DisableAllowed first appears.
++        let jetsamID = FirmwareGuestSystemPatchSet.jetsamDisableAllowed
++        let jetsamDirectory = CustomFirmwareJetsamDisableAllowed.directory
++        isolate([jetsamID]) {
++            let names = try system.directory(jetsamDirectory).entries().sorted()
++            if version.hasPrefix("27."), on(jetsamID) {
++                for name in names where CustomFirmwareJetsamDisableAllowed.isJetsamProperties(name) {
++                    let path = "\(jetsamDirectory)/\(name)"
++                    guard try system.isRegularFile(path) else { continue }
++                    try patchCopy(
++                        of: path, in: system, work: work,
++                        verb: "patch-jetsam-disable-allowed", backupSafe: backupSafe(jetsamID),
++                    )
++                }
++                live.insert(jetsamID)
++            } else {
++                var reverted = false
++                for name in names where name.hasSuffix(".bak") {
++                    let original = String(name.dropLast(4))
++                    guard CustomFirmwareJetsamDisableAllowed.isJetsamProperties(original) else { continue }
++                    if try revertCopy(of: "\(jetsamDirectory)/\(original)", in: system) {
++                        reverted = true
++                    }
++                }
++                if reverted {
++                    print("  [+] \(jetsamID): restored the jetsam properties")
++                } else if priorGuest.contains(jetsamID) {
++                    print("  [!] \(jetsamID): no backup to revert (not revertible)")
++                    live.insert(jetsamID)
++                }
++            }
++        }
++
+         // 3. The build-version spoof. Off by default (needs a preset parameter
+         //    or SPOOF_BUILD). Backed up only when it was not already applied.
+         let buildVersion = plan?.parameters[FirmwareGuestSystemPatchSet.buildVersionParameter] ?? spoofBuild
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchCommand.swift
+index fa6332cc439fd2194c4b1bc4836a735dc3b58aa5..68e48053cece5311c6f4d2ecc863bb0f208aa96b 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchCommand.swift
+@@ -200,6 +200,27 @@ struct VPhoneCustomFirmwarePatchLocationdCohortingCommand: ParsableCommand {
+     }
+ }
+ 
++// MARK: - patch-jetsam-disable-allowed
++
++struct VPhoneCustomFirmwarePatchJetsamDisableAllowedCommand: ParsableCommand {
++    static let configuration = CommandConfiguration(
++        commandName: "patch-jetsam-disable-allowed",
++        abstract: "Remove DisableAllowed = false from a staged jetsam properties plist",
++        shouldDisplay: false,
++    )
++
++    @Argument(transform: URL.init(fileURLWithPath:))
++    var plist: URL
++
++    @Flag(name: .customLong("dry-run"))
++    var dryRun = false
++
++    func run() throws {
++        let removed = try CustomFirmwareJetsamDisableAllowed.patch(at: plist, dryRun: dryRun)
++        print("  [\(removed > 0 ? "+" : ".")] \(plist.lastPathComponent): \(removed) DisableAllowed = false removed\(dryRun ? " (dry-run)" : "")")
++    }
++}
++
+ // MARK: - patch-build-version
+ 
+ struct VPhoneCustomFirmwarePatchBuildVersionCommand: ParsableCommand {
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift
+index c7ec1a7e2bcdf59fc1a71b3ca3513fe2c922bbfc..5bd5761e9a2fb42480c900fac7ad95040c8bd640 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift
+@@ -244,6 +244,7 @@ struct VPhoneCustomFirmwareCommand: ParsableCommand {
+             VPhoneCustomFirmwareInjectDylibCommand.self,
+             VPhoneCustomFirmwarePatchBuildVersionCommand.self,
+             VPhoneCustomFirmwarePatchLocationdCohortingCommand.self,
++            VPhoneCustomFirmwarePatchJetsamDisableAllowedCommand.self,
+             VPhoneCustomFirmwarePatchVirtualAudioGraphConfigurationsCommand.self,
+             VPhoneCustomFirmwarePatchVirtualAudioSpeakerRawCommand.self,
+             VPhoneCustomFirmwarePatchVirtualAudioMicrophoneChainsCommand.self,

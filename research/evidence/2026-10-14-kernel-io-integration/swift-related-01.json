@@ -1,0 +1,16 @@
+{
+  "command": [
+    "swift",
+    "test",
+    "--disable-sandbox",
+    "--disable-automatic-resolution",
+    "--cache-path",
+    ".build/test-cache",
+    "--filter",
+    "KernelIOTraceTests|FirmwareKernelIO|FirmwareKernelDiskMemoryTests|FirmwareKernelUpdateTests|FirmwareKernelRollbackTests|FirmwareGenerationTests|FirmwareTransactionTests|FirmwareDesiredPlan|PatchExperiment|FirmwareInstalledOrigin|VPhoneBundleStoreTests"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 310.1304334590677,
+  "log": "swift-related-01.log",
+  "environment_policy": "Cleared real-firmware, benchmark and trace selectors; project Python; no pyc"
+}

@@ -36,13 +36,19 @@ set -euo pipefail
 SCRIPT_DIR="${0:a:h}"
 PROJ="${SCRIPT_DIR:h}"
 
-VARIANT=exp
+VARIANT="${VPHONE_CFW_VARIANT:-}"
 MODE=install
+GUEST_ENVIRONMENT=classic
+GUEST_ENVIRONMENT_GIVEN=0
 REPORT=""
 VM_DIR="$PROJ/vm"
 while (( $# )); do
   case "$1" in
     --variant) VARIANT="$2"; shift 2 ;;
+    --guest-environment)
+      (( $# >= 2 )) || { echo "[-] --guest-environment needs classic|v2" >&2; exit 1; }
+      GUEST_ENVIRONMENT="$2"; GUEST_ENVIRONMENT_GIVEN=1; shift 2 ;;
+    --install-environment) echo "[-] standalone environment migration is not enabled yet" >&2; exit 1 ;;
     --update-environment|--check-environment)
       [[ "$MODE" == install ]] || { echo "[-] --update-environment and --check-environment are exclusive" >&2; exit 1; }
       [[ "$1" == --update-environment ]] && MODE=environment || MODE=check
@@ -52,6 +58,18 @@ while (( $# )); do
     *)         VM_DIR="$1";  shift ;;
   esac
 done
+
+case "$GUEST_ENVIRONMENT" in
+  classic|v2) ;;
+  *) echo "[-] unknown guest environment: $GUEST_ENVIRONMENT (classic|v2)" >&2; exit 1 ;;
+esac
+if (( GUEST_ENVIRONMENT_GIVEN )) && [[ "$MODE" != install ]]; then
+  echo "[-] --guest-environment is only valid for CFW installation" >&2; exit 1
+fi
+# B1 profile contract: initial v2 rollout supports regular only.
+if [[ "$GUEST_ENVIRONMENT" == v2 && "$VARIANT" != regular ]]; then
+  echo "[-] guest environment v2 supports only variant regular" >&2; exit 1
+fi
 
 if [[ "$MODE" == check ]]; then
   [[ "$REPORT" == /* ]] || { echo "[-] --check-environment requires --report with an absolute file path" >&2; exit 1; }
@@ -71,6 +89,21 @@ else
     *) echo "[-] unknown variant: $VARIANT (regular|dev|jb|exp)" >&2; exit 1 ;;
   esac
   MODE_ARGS=(--variant "$VARIANT")
+  [[ "$GUEST_ENVIRONMENT" == classic ]] || MODE_ARGS+=(--guest-environment "$GUEST_ENVIRONMENT")
+fi
+
+# The canonical restore-info writer uses this literal JSON field. Refuse a
+# classic reinstall before elevation or disk tools can remove the API entry.
+V2_RECORD_PATTERN='"guest_environment"[[:space:]]*:[[:space:]]*"v2"'
+if [[ "$MODE" == install && "$GUEST_ENVIRONMENT" == classic && -f "$VM_DIR/restore-info.json" ]] \
+    && [[ "$(<"$VM_DIR/restore-info.json")" =~ $V2_RECORD_PATTERN ]]; then
+  echo "[-] this VM records v2; reinstall with --guest-environment v2" >&2; exit 1
+fi
+
+# A direct script invocation cannot invent defaults or bypass Swift validation.
+if [[ "$MODE" != check ]]; then
+  [[ -n "$VARIANT" && "$VARIANT" == "${VPHONE_CFW_VARIANT:-}" ]] || { echo "[-] variant differs from bound frozen plan" >&2; exit 1; }
+  "${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 fi
 
 # Re-exec as root; owners-honored mounts + chown/cp require it.
@@ -130,6 +163,8 @@ else
 fi
 export PATH="$P"
 PY="${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}"
+# Python imports must not create root-owned files in the app or source resources.
+export PYTHONDONTWRITEBYTECODE=1
 
 # --check-environment: the read-only eligibility check, run as root because a
 # normal user may not mount a VM's System volume (real host, 2026-10-01). It
@@ -160,7 +195,9 @@ if ! "$PY" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR"; then
   export VPHONE_CFW_LOCK_REEXEC=1
   exec "$PY" "$SCRIPT_DIR/vm_lock.py" "$VM_DIR" cfw -- /bin/zsh "$0" "${MODE_ARGS[@]}" "$VM_DIR"
 fi
+"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 GUEST_COMPONENTS="${VPHONE_GUEST_COMPONENTS:-$PROJ/.build/guest-components-v2/stage}"
+API_DAEMON="${VPHONE_API_DAEMON:-$PROJ/.build/daemon-api-v2/candidate-v2}"
 
 # FORCE_DSC_MAXSLIDE (non-27 maxSlide opt-in) is removed (T13a, upstream d930e50).
 # Report it for every variant and keep it from the installers; patch-dsc-maxslide
@@ -247,6 +284,7 @@ hand_back_artifacts() {
 exec {DISK_FD}<"$IMG"
 CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
 CFW_STAGED_IMG=""
+export VPHONE_GUEST_EVIDENCE="$CFW_DISK_WORK/guest-changes.jsonl"
 TXN_STATE=none
 txn() {
   local command="$1"; shift
@@ -394,6 +432,19 @@ else
       ${SPOOF_BUILD:+SPOOF_BUILD="$SPOOF_BUILD"} \
       ${VPHONE_FRIDA:+VPHONE_FRIDA="$VPHONE_FRIDA"} \
       zsh "$SCRIPT_DIR/$INSTALLER" . )
+  if [[ "$GUEST_ENVIRONMENT" == v2 ]]; then
+    TRANSACTION_ID=$("$PY" -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$CFW_DISK_WORK/transaction.json")
+    echo "[*] installing v2 guest environment on the staged System volume..."
+    ( exec {DISK_FD}<&-; "$PY" "$SCRIPT_DIR/cfw_env_install.py" install --device "/dev/$SYS" \
+        --mount "$CFW_HOST_MNT/mnt1" --components "$GUEST_COMPONENTS" --daemon "$API_DAEMON" \
+        --variant "$VARIANT" --transaction-id "$TRANSACTION_ID" \
+        --report "$CFW_DISK_WORK/guest-environment-install.json" "$VM_DIR" ) || exit $?
+  fi
+fi
+
+if [[ "$MODE" != environment ]]; then
+  echo "[*] verifying final guest effects on the staged image..."
+  "$PY" "$SCRIPT_DIR/patchers/plan_gate.py" verify-final || exit $?
 fi
 
 if ! cleanup; then
@@ -412,6 +463,7 @@ if [[ "$MODE" != environment ]]; then
 fi
 
 echo "[*] publishing the staged copy as $IMG (exchange rename)..."
+"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 txn publish || exit $?
 TXN_STATE=published
 trap - EXIT INT TERM HUP

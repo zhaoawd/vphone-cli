@@ -1,5 +1,7 @@
 import ArgumentParser
 import Foundation
+import FirmwarePatcher
+import CryptoKit
 import VPhoneCore
 
 // MARK: - restore
@@ -116,7 +118,7 @@ struct VPhoneCFWCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "cfw",
         abstract: "Custom-firmware install (host-mount; VM must be off; re-execs sudo)",
-        subcommands: [VPhoneCFWInstallCommand.self, VPhoneCFWUpdateEnvironmentCommand.self])
+        subcommands: [VPhoneCFWInstallCommand.self, VPhoneCFWUpdateEnvironmentCommand.self, VPhoneCFWVerifyPlanCommand.self])
 }
 
 struct VPhoneCFWInstallCommand: ParsableCommand {
@@ -125,7 +127,9 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
 
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
-    @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp") var variant: String = "exp"
+    @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp") var variant: String?
+    @Option(help: "Guest environment: classic (default) or v2 (regular only; recorded v2 VM required)")
+    var guestEnvironment: VPhoneGuestEnvironmentProfile = .classic
     @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?
     @Flag(name: .customLong("root-popup"), help: "Elevate via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
     @Flag(name: .customLong("keep-artifacts"), help: "Keep the extracted CFW input dirs (cfw_input/, cfw_jb_input/) after install (default: removed to save space)") var keepArtifacts = false
@@ -134,13 +138,26 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     @Flag(name: .customShort("v"), help: "Increase verbosity: -v tool detail, -vv guest serial, -vvv internal trace")
     var verboseCount: Int
 
+    mutating func validate() throws {
+        if let variant { try guestEnvironment.validateVariant(variant) }
+    }
+
+    static func validateRecordedEnvironment(requested: VPhoneGuestEnvironmentProfile, recorded: VPhoneGuestEnvironmentProfile) throws {
+        guard requested == recorded else {
+            throw ValidationError("guest environment differs from restore-info.json; migration is not supported by cfw install")
+        }
+    }
+
     func run() throws {
         let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
-        guard ["regular", "dev", "jb", "exp"].contains(variant) else {
-            throw ValidationError("unknown cfw variant '\(variant)' (regular|dev|jb|exp)")
-        }
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
+        try Self.validateRecordedEnvironment(requested: guestEnvironment, recorded: VPhoneRestoreInfo.load(fromBundle: bundle)?.effectiveGuestEnvironment ?? .classic)
+        let frozen = try VPhoneBundleGuard.withBundleLock(directory: bundle.url, operation: VPhoneVMOperation.cfwRecord) { _ in
+            try VPhoneCFWFrozenContext.prepare(in: bundle.url, requestedVariant: self.variant,
+                guestEnvironment: guestEnvironment.rawValue, spoofBuild: spoofBuild ?? "")
+        }
+        let variant = frozen.variant
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
 
         // Env the bundled scripts read: rides along via `sudo -E` by default;
@@ -150,6 +167,13 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
         try FileManager.default.createDirectory(at: resources.debsCacheDir, withIntermediateDirectories: true)
         var scriptEnv: [String: String] = [
             "VPHONE_PYTHON": try resources.pythonExecutable().path,
+            "VPHONE_FROZEN_PLAN": bundle.url.appendingPathComponent(FirmwareDesiredPlanStore.filename).path,
+            "VPHONE_FROZEN_PLAN_SHA256": frozen.rawSHA256,
+            "VPHONE_FROZEN_CONTEXT": try frozen.json,
+            "VPHONE_CFW_VARIANT": variant,
+            "VPHONE_GUEST_ENVIRONMENT": guestEnvironment.rawValue,
+            "VPHONE_FRIDA": frozen.enableFrida ? "1" : "0",
+            "DISABLE_LAUNCHD_HOOK": frozen.disableLaunchdHook,
             "IPSW_DIR": resources.ipswCacheDir.path,
             "VPHONE_SEAL_DIR": resources.sealVolumeCacheDir.path,
             "VPHONE_DEBS_DIR": resources.debsCacheDir.path,
@@ -157,7 +181,13 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
         if let spoofBuild { scriptEnv["SPOOF_BUILD"] = spoofBuild }
         if keepArtifacts { scriptEnv["VPHONE_KEEP_ARTIFACTS"] = "1" }
 
-        let args = [resources.cfwInstallHostScript.path, "--variant", variant, bundle.url.path]
+        if guestEnvironment == .v2 {
+            scriptEnv["VPHONE_GUEST_COMPONENTS"] = ProcessInfo.processInfo.environment["VPHONE_GUEST_COMPONENTS"] ?? resources.guestComponentsStage.path
+            scriptEnv["VPHONE_API_DAEMON"] = ProcessInfo.processInfo.environment["VPHONE_API_DAEMON"] ?? resources.daemonAPICandidate.path
+        }
+        var args = [resources.cfwInstallHostScript.path, "--variant", variant]
+        if guestEnvironment == .v2 { args += ["--guest-environment", "v2"] }
+        args.append(bundle.url.path)
         // Both paths carry VPHONE_INVOKER_UID/GID so the driver returns the
         // artifacts it creates as root (the popup sets no SUDO_UID).
         let invocation = VPhoneCreateOrchestrator.cfwInvocation(
@@ -182,7 +212,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
             let recorded: Void? = try? VPhoneBundleGuard.withBundleLock(
                 directory: bundle.url, operation: VPhoneVMOperation.cfwRecord
             ) { lock in
-                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock),
+                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock, guestEnvironment: guestEnvironment),
                    info.variant != nil {
                     print("[cfw] recorded variant \(variant), device \(info.device ?? "?")")
                 }
@@ -197,5 +227,94 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
             }
         }
         throw ExitCode(code)
+    }
+}
+
+// MARK: - CFW frozen context
+
+struct VPhoneCFWFrozenContext: Encodable {
+    let schemaVersion = 1
+    let vmDirectory: String
+    let identity: VPhoneFirmwareIdentity
+    let generationID: String
+    let catalogSHA256: String
+    let planSHA256: String
+    let upstreamTarget: String
+    let variant: String
+    let verifierPath: String
+    let verifierSHA256: String
+    let guestEnvironment: String
+    let spoofBuild: String
+    let disableLaunchdHook: String
+    let rawSHA256: String
+    let enableFrida: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion, vmDirectory, identity, generationID, catalogSHA256, planSHA256,
+             upstreamTarget, variant, verifierPath, verifierSHA256, guestEnvironment, spoofBuild, disableLaunchdHook
+    }
+    var json: String {
+        get throws {
+            let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+            return String(decoding: try encoder.encode(self), as: UTF8.self)
+        }
+    }
+    var environment: [String: String] {
+        get throws {
+            ["VPHONE_FROZEN_PLAN": URL(fileURLWithPath: vmDirectory).appendingPathComponent(FirmwareDesiredPlanStore.filename).path,
+             "VPHONE_FROZEN_PLAN_SHA256": rawSHA256, "VPHONE_FROZEN_CONTEXT": try json,
+             "VPHONE_CFW_VARIANT": variant, "VPHONE_GUEST_ENVIRONMENT": guestEnvironment,
+             "VPHONE_FRIDA": enableFrida ? "1" : "0", "DISABLE_LAUNCHD_HOOK": disableLaunchdHook,
+             "SPOOF_BUILD": spoofBuild]
+        }
+    }
+    static func prepare(in directory: URL, requestedVariant: String?, guestEnvironment: String, spoofBuild: String) throws -> Self {
+        guard case .ready(let record) = try FirmwareDesiredPlanStore.read(in: directory) else {
+            throw ValidationError("CFW requires a current bound desired plan; missing/legacy selection cannot authorize installation")
+        }
+        guard ["regular", "dev", "jb", "exp"].contains(record.plan.variant),
+              requestedVariant == nil || requestedVariant == record.plan.variant else {
+            throw ValidationError("CFW variant differs from frozen desired plan")
+        }
+        guard (record.plan.gates.guestEnvironmentV2 == true) == (guestEnvironment == "v2"),
+              record.plan.gates.guestEnvironmentV2 != nil else {
+            throw ValidationError("guest environment differs from frozen plan; legacy nil gates cannot authorize CFW")
+        }
+        guard spoofBuild.isEmpty || record.plan.variant == "exp" else {
+            throw ValidationError("build-version rewrite requires EXP")
+        }
+        let hook = ProcessInfo.processInfo.environment["DISABLE_LAUNCHD_HOOK"] ?? "0"
+        guard ["0", "1"].contains(hook) else { throw ValidationError("invalid DISABLE_LAUNCHD_HOOK") }
+        let verifier = URL(fileURLWithPath: CommandLine.arguments[0]).standardizedFileURL.resolvingSymlinksInPath()
+        let digest = SHA256.hash(data: try Data(contentsOf: verifier)).map { String(format: "%02x", $0) }.joined()
+        return Self(vmDirectory: directory.standardizedFileURL.resolvingSymlinksInPath().path,
+            identity: record.identity, generationID: record.generationID, catalogSHA256: record.catalogSHA256,
+            planSHA256: record.planSHA256, upstreamTarget: record.upstreamTarget, variant: record.plan.variant,
+            verifierPath: verifier.path, verifierSHA256: digest, guestEnvironment: guestEnvironment,
+            spoofBuild: spoofBuild, disableLaunchdHook: hook, rawSHA256: try record.sha256,
+            enableFrida: record.plan.gates.enableFrida)
+    }
+}
+
+/// Read-only revalidation under the host driver's inherited VM lock. It deliberately
+/// does not reacquire that flock in a child process. This command never grants writes.
+struct VPhoneCFWVerifyPlanCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(commandName: "verify-plan", shouldDisplay: false)
+    @Argument var vmDirectory: String
+    @Option var expectedSha256: String
+    func run() throws {
+        let directory = URL(fileURLWithPath: vmDirectory, isDirectory: true)
+        guard case .ready(let record) = try FirmwareDesiredPlanStore.read(in: directory),
+              try record.sha256 == expectedSha256 else {
+            throw ValidationError("current frozen desired plan missing or changed")
+        }
+        struct Export: Encodable {
+            let schemaVersion = 1
+            let state = "ready"
+            let rawSHA256: String
+            let record: FirmwareDesiredPlanStore.Record
+        }
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        print(String(decoding: try encoder.encode(Export(rawSHA256: expectedSha256, record: record)), as: UTF8.self))
     }
 }

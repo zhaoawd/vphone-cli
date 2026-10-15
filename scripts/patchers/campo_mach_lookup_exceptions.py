@@ -56,4 +56,11 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    # Real CLI writes share cfw.py's frozen plan gate; imported helpers are
+    # retained for inspection and controlled binary-fixture tests.
+    import os, sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from patchers.cfw import main as guarded_main
+    args = sys.argv[1:]
+    sys.argv = [sys.argv[0], 'patch-campo-entitlements'] + args
+    guarded_main()

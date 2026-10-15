@@ -1,0 +1,482 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "scope": "Read-only evidence verification and statistical recomputation only; no business/controller/build/benchmark/VM/AMFI/process/mount invocation and no repeated large artifact binary hashing",
+  "observations": 24,
+  "warmups_excluded": 6,
+  "measured": 18,
+  "rounds": 3,
+  "bytes": 536870915,
+  "controller_elapsed_seconds": 69.28776516695507,
+  "all_unique_child_pids": [
+    62715,
+    62833,
+    62927,
+    63083,
+    63166,
+    63246,
+    63313,
+    63398,
+    63478,
+    63578,
+    63659,
+    63741,
+    63810,
+    63907,
+    63985,
+    64063,
+    64130,
+    64215,
+    64294,
+    64374,
+    64440,
+    64525,
+    64608,
+    64703
+  ],
+  "round_order": [
+    [
+      true,
+      0,
+      "baseline",
+      "capture"
+    ],
+    [
+      true,
+      0,
+      "baseline",
+      "validate"
+    ],
+    [
+      true,
+      0,
+      "timed4k",
+      "capture"
+    ],
+    [
+      true,
+      0,
+      "timed4k",
+      "validate"
+    ],
+    [
+      true,
+      0,
+      "buffered1m",
+      "capture"
+    ],
+    [
+      true,
+      0,
+      "buffered1m",
+      "validate"
+    ],
+    [
+      false,
+      1,
+      "baseline",
+      "capture"
+    ],
+    [
+      false,
+      1,
+      "baseline",
+      "validate"
+    ],
+    [
+      false,
+      1,
+      "timed4k",
+      "capture"
+    ],
+    [
+      false,
+      1,
+      "timed4k",
+      "validate"
+    ],
+    [
+      false,
+      1,
+      "buffered1m",
+      "capture"
+    ],
+    [
+      false,
+      1,
+      "buffered1m",
+      "validate"
+    ],
+    [
+      false,
+      2,
+      "timed4k",
+      "capture"
+    ],
+    [
+      false,
+      2,
+      "timed4k",
+      "validate"
+    ],
+    [
+      false,
+      2,
+      "buffered1m",
+      "capture"
+    ],
+    [
+      false,
+      2,
+      "buffered1m",
+      "validate"
+    ],
+    [
+      false,
+      2,
+      "baseline",
+      "capture"
+    ],
+    [
+      false,
+      2,
+      "baseline",
+      "validate"
+    ],
+    [
+      false,
+      3,
+      "buffered1m",
+      "capture"
+    ],
+    [
+      false,
+      3,
+      "buffered1m",
+      "validate"
+    ],
+    [
+      false,
+      3,
+      "baseline",
+      "capture"
+    ],
+    [
+      false,
+      3,
+      "baseline",
+      "validate"
+    ],
+    [
+      false,
+      3,
+      "timed4k",
+      "capture"
+    ],
+    [
+      false,
+      3,
+      "timed4k",
+      "validate"
+    ]
+  ],
+  "trace_count": 16,
+  "measured_window_sha_calls_including_warmups": {
+    "capture": 40,
+    "validate": 16
+  },
+  "expected_offsets": [
+    0,
+    1044480,
+    1048576,
+    268435456,
+    536870912
+  ],
+  "input_sha256": [
+    "22cc91f262967b04f2af005ab2b4fe740119967c5e8782c01f399a3f61e6a688",
+    "8c21bc2f3c04efe527693165d9bdd91254b85207af9540dda1018372b4c17cab"
+  ],
+  "compare_counts": {
+    "timed4k_capture": {
+      "blocks": 131073,
+      "changed_blocks": 5,
+      "logical_bytes": 536870915,
+      "new_bytes": 536870915,
+      "new_read_calls": 131074,
+      "old_bytes": 536870915,
+      "old_read_calls": 131074
+    },
+    "timed4k_validate": {
+      "blocks": 131073,
+      "disk_bytes": 536870915,
+      "disk_read_calls": 131074,
+      "logical_bytes": 536870915,
+      "new_bytes": 536870915,
+      "new_read_calls": 131073,
+      "old_bytes": 536870915,
+      "old_read_calls": 131073
+    },
+    "buffered1m_capture": {
+      "blocks": 131073,
+      "changed_blocks": 5,
+      "logical_bytes": 536870915,
+      "new_bytes": 536870915,
+      "new_read_calls": 514,
+      "old_bytes": 536870915,
+      "old_read_calls": 514
+    },
+    "buffered1m_validate": {
+      "blocks": 131073,
+      "disk_bytes": 536870915,
+      "disk_read_calls": 514,
+      "logical_bytes": 536870915,
+      "new_bytes": 536870915,
+      "new_read_calls": 514,
+      "old_bytes": 536870915,
+      "old_read_calls": 514
+    }
+  },
+  "recomputed_groups": {
+    "baseline_capture": {
+      "variant": "baseline",
+      "operation": "capture",
+      "samples": 3,
+      "helper_median_seconds": 1.907613459,
+      "helper_min_seconds": 1.893213542,
+      "helper_max_seconds": 1.920056166,
+      "compare_median_seconds": null,
+      "rss_peak_after_bytes": [
+        30195712,
+        30212096,
+        29097984
+      ],
+      "raw_helper_seconds": [
+        1.907613459,
+        1.920056166,
+        1.893213542
+      ],
+      "raw_compare_seconds": []
+    },
+    "baseline_validate": {
+      "variant": "baseline",
+      "operation": "validate",
+      "samples": 3,
+      "helper_median_seconds": 1.368736792,
+      "helper_min_seconds": 1.348523416,
+      "helper_max_seconds": 1.596468666,
+      "compare_median_seconds": null,
+      "rss_peak_after_bytes": [
+        30228480,
+        30277632,
+        30277632
+      ],
+      "raw_helper_seconds": [
+        1.368736792,
+        1.348523416,
+        1.596468666
+      ],
+      "raw_compare_seconds": []
+    },
+    "timed4k_capture": {
+      "variant": "timed4k",
+      "operation": "capture",
+      "samples": 3,
+      "helper_median_seconds": 2.415776208,
+      "helper_min_seconds": 1.931794791,
+      "helper_max_seconds": 2.438756166,
+      "compare_median_seconds": 0.635480042,
+      "rss_peak_after_bytes": [
+        34652160,
+        34635776,
+        34570240
+      ],
+      "raw_helper_seconds": [
+        2.438756166,
+        1.931794791,
+        2.415776208
+      ],
+      "raw_compare_seconds": [
+        1.021652083,
+        0.635480042,
+        0.617859709
+      ]
+    },
+    "timed4k_validate": {
+      "variant": "timed4k",
+      "operation": "validate",
+      "samples": 3,
+      "helper_median_seconds": 1.357616792,
+      "helper_min_seconds": 1.346847875,
+      "helper_max_seconds": 1.3967915,
+      "compare_median_seconds": 0.768465875,
+      "rss_peak_after_bytes": [
+        34684928,
+        34652160,
+        34586624
+      ],
+      "raw_helper_seconds": [
+        1.357616792,
+        1.3967915,
+        1.346847875
+      ],
+      "raw_compare_seconds": [
+        0.768465875,
+        0.801914667,
+        0.754106291
+      ]
+    },
+    "buffered1m_capture": {
+      "variant": "buffered1m",
+      "operation": "capture",
+      "samples": 3,
+      "helper_median_seconds": 1.661059458,
+      "helper_min_seconds": 1.636216083,
+      "helper_max_seconds": 1.733670583,
+      "compare_median_seconds": 0.345068125,
+      "rss_peak_after_bytes": [
+        35700736,
+        35700736,
+        36651008
+      ],
+      "raw_helper_seconds": [
+        1.733670583,
+        1.636216083,
+        1.661059458
+      ],
+      "raw_compare_seconds": [
+        0.35815875,
+        0.328784792,
+        0.345068125
+      ]
+    },
+    "buffered1m_validate": {
+      "variant": "buffered1m",
+      "operation": "validate",
+      "samples": 3,
+      "helper_median_seconds": 0.721516042,
+      "helper_min_seconds": 0.699104666,
+      "helper_max_seconds": 0.7636955,
+      "compare_median_seconds": 0.140184291,
+      "rss_peak_after_bytes": [
+        36831232,
+        36765696,
+        36749312
+      ],
+      "raw_helper_seconds": [
+        0.721516042,
+        0.7636955,
+        0.699104666
+      ],
+      "raw_compare_seconds": [
+        0.140184291,
+        0.148150083,
+        0.130445625
+      ]
+    }
+  },
+  "ratios": {
+    "capture": {
+      "baseline_to_optimized_helper_ratio": 1.1484317733555809,
+      "helper_elapsed_reduction_percent": 12.924735870192873,
+      "timed4k_to_optimized_compare_ratio": 1.8416074854784108,
+      "compare_elapsed_reduction_percent": 45.69961254581776
+    },
+    "validate": {
+      "baseline_to_optimized_helper_ratio": 1.8970289117979169,
+      "helper_elapsed_reduction_percent": 47.285990541269825,
+      "timed4k_to_optimized_compare_ratio": 5.481825884470893,
+      "compare_elapsed_reduction_percent": 81.75790291273506
+    }
+  },
+  "all_samples_guard_and_cleanup_passed": true,
+  "input_evidence_sha256": {
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/run-benchmarks.py": "0858bda3e1d91abc49bd039e34c72bf9ed19491492cf95c6eec0378e73edef48",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/run-recorded.py": "4ede7ffd6158c6485a2dc0564216847d518239fbb0f5f06971d14db1d0908385",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/benchmark-variants.json": "58c3d886d3cd8d53deb3b24d2ab1d665819f01d101674ec69fe5fca5c63506dd",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-results.json": "6c311194517bc85a7cde08bdf4845673939b2af6f0188b657dbc7bbc2c772313",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-controller.json": "3a195c80098b8c14f31056cae56ae5b6275183190b0ca72f3315b04bc0b52e2c",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-controller.log": "f4efa9dda3515c9a49c9142171542cd4e8227d67c5ca6fb8a51d81c60be5f3a0",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-observations.jsonl": "f63489f4d976869817c6ceba4f9a5870b50a4c939628d014e602b7f30ca6d8bb",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-baseline-capture.json": "0fd729345d505fc07dc709a28b6e566bd2054d69cb59ee4991f19bfd76e59250",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-baseline-capture.log": "e5f92a44c559a89243e3d3877a939eecdb19549de9cf22a53aa8321e76d80b11",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-baseline-validate.json": "8182f9729cc16061203008965612e57233118ca6c80e94e4f0859abd73920483",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-baseline-validate.log": "8118dc0e0a61cb9e977086c51f195604a0b193dfabf71cb93093bb6fac1d443c",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-timed4k-capture.json": "6f3989b4b4581ae24c63cc1522c8511274a7fc171832a72f9be8f8fbd66ef438",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-timed4k-capture.log": "96f93b4c771cfc7e32fc1eff2757e5a07c2eac463fc85468fdc4cc36e04a1a31",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-warm-timed4k-capture.62927.jsonl": "18c01d5438d3b07bb99f491b1e6bee78d58c296fcd5dda6f4199ff6990093039",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-timed4k-validate.json": "1623454e9ec3de351e8ec66750aa9095b923c876d3596aac003cc66f14f2b7bc",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-timed4k-validate.log": "8905232aed9e5fed9ba2820a55508e43a4c216fb3a30fae19d576edad67acb51",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-warm-timed4k-validate.63083.jsonl": "c2c1f67a74848cc4ee26f9b23f7e9a86273574a787a765c8acae7922c4a562cd",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-buffered1m-capture.json": "50000673167f6fe7a81f99355cec7bd59be2c79ed5925cb492daa7a1eb511716",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-buffered1m-capture.log": "99409aa0709efaf1637fbf3881ba99d5d6f6c5c4118873b6ebd138c29ac98958",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-warm-buffered1m-capture.63166.jsonl": "9f096071ee30df46a9f5de410303b90ab5a07a4997eac07037e79ae5c189e9cc",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-buffered1m-validate.json": "9b08d5515f8b5e2a6df4f507aa1554d7f677b1b8946aa8c273fb3fdc75ef984f",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-warm-buffered1m-validate.log": "263856a2b532993a6ca843cb850ec9ad7d173162b34bbe7772d46479340bc1af",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-warm-buffered1m-validate.63246.jsonl": "955ed540ed80cc729b8cbd248e5e4f54a3ef48fd02e377e0596a0f0c77089d68",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-baseline-capture.json": "7a2e55b8b3f5b270c871d04d20240c723f9dbd21ac9279973e6c600ba780d452",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-baseline-capture.log": "a2459a560a1549b0f49aad7294b04ca1f007d6b2fe8fee5ffa84adc8da74d5b8",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-baseline-validate.json": "c292f154a3f19482b148d9d823399cd28878b5335c5fcc67f20639fd5f833e03",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-baseline-validate.log": "7f59a09a8f1f829ca844e5b6dc8dd5416860548f14047051982b7cb89d557536",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-timed4k-capture.json": "4559515f2e299d294cb2bf86337c51850d9e47ffde9403112d8ec13f62bf945f",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-timed4k-capture.log": "3aecb4e6b56bb58c64d54d9388f5c0bce8f8ba53fc02a0991b69de8a994cb7d6",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r1-timed4k-capture.63478.jsonl": "3cdb0c5a7a8904516f0371f5b27d3af0a2871f73cc4befc1e53f22b598de0b65",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-timed4k-validate.json": "5a7a1b6502b888f4e9a61fe22f3130a4653f80bf30c9d6c42cdff4a25005d1c8",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-timed4k-validate.log": "601f9e04ad41f9f426bb288d2a6a7508e7e86e02dc42abe940587c05b098b923",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r1-timed4k-validate.63578.jsonl": "be806b332b5da751a64e1877e8721b1e7dfa6d34487943fb9dd6c43b565bd962",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-buffered1m-capture.json": "72f27bae646b06434730bb600e0db0d093cd2261a5e8c4440ca88fea67356460",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-buffered1m-capture.log": "21a88899306c7d64e219e1dd60a4d4154e8ba6c9edb1ee56c9631a167b0394b1",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r1-buffered1m-capture.63659.jsonl": "e19399543ee93022b3ac669c11f5488b2999cd2af91dbf98270de01ff176f41c",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-buffered1m-validate.json": "6121bb34f57068579b7ffdfbb9c0733ca7f0f440000befd14fe6c5b636d82baa",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r1-buffered1m-validate.log": "33ed42c89107fee59fc823e26ab85d042d426427932430baa9fc1607f597bb38",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r1-buffered1m-validate.63741.jsonl": "7c36166ff7a64422b680b8961397a0cdde4b9d768fba4008a022c8d9d20eda38",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-timed4k-capture.json": "efc99b8c196d0f332e657bc03a03cb17626e7e535fb215c4946b5a8e4ddbbe76",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-timed4k-capture.log": "979df0fb6980be531d60e77a9ff4a59115a65ce8bcfb7df5125626b0366efa5a",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r2-timed4k-capture.63810.jsonl": "afd2de83b173d387dff18fa646004eae5a2db8f01da70c9955d4e41e6ae04b55",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-timed4k-validate.json": "8f717dcf2c2cbfe6875cb326c30fde4946811ece64046cec9d1a134d804a18bb",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-timed4k-validate.log": "fc438008ebbd128cba1e9890030d687e2952d5ca5cde80edbde493feaaeef52d",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r2-timed4k-validate.63907.jsonl": "233d717b04aa6fa888c847bd64f61e7c897e32820309f21995bd881ddb12eb61",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-buffered1m-capture.json": "92911ae6c9165c1b453ac7fa0eac8a0c8bdff8a2b80789659c9d8ccee7528c8d",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-buffered1m-capture.log": "22343e5ed755e12c8ac72181f848cf2d5759bad8346d86d5be5239807d604e3b",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r2-buffered1m-capture.63985.jsonl": "0129fade1d486fbfb39a4690a993c7893359c5f684f124553944eeb531b4d75e",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-buffered1m-validate.json": "f2db60b167a278ec533fca845bca12fd658f66543545381986690d1c07f90a5d",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-buffered1m-validate.log": "4d383ac319e90700289ebf051c9a3300d9577498bea1931e85b615f2f05bb0cb",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r2-buffered1m-validate.64063.jsonl": "266ad92296aafcac4796697868e3749c1c3b77375441191546baa53023586d1c",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-baseline-capture.json": "bce5822966a3d69e182d1318708106de8c99296a32f32f454fa4499d1a292d3c",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-baseline-capture.log": "1865ddc38908fd19906dd5abda6eee00a22861679e3f36b96279d8697ba65e22",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-baseline-validate.json": "40466e4cd02982a89d3aaa5fafa42da9a1b398282cf51362eb38a205042554d5",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-baseline-validate.log": "c1732b696ac64210be9a515034dbb0ad343c77de549d3f77471a3e0a3b790300",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-buffered1m-capture.json": "f93128483f47fb5a5c2a7ea20fc1baa65373e4aeade1e492039c698b3bd9efed",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-buffered1m-capture.log": "635860a170a5ff5c538ddfc2a4d37467ae03207ae94b3089ce0104237415bf40",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r3-buffered1m-capture.64294.jsonl": "100b0837bd8526d56984d8b318a7ddf5c4b7962d8e1ac15b383ef48478fcdee5",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-buffered1m-validate.json": "360f14a297299a5f7eb2fbd1f24d3506872f97cf8a388699aa8d26359e4df9b3",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-buffered1m-validate.log": "b16429516af0b4f4834a610b82809354c45ca18ab79a6c66d5b0910139f8b9a4",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r3-buffered1m-validate.64374.jsonl": "ce9bf2929fedcbffe76ad86de6a19363ea791f79cd376a0fe7d1cf14e33a09fe",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-baseline-capture.json": "aaadec6ba644ca450b3b327da0de5eddecee2b7e6850071d49d69881bbfdd8e0",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-baseline-capture.log": "226cfbb0cf31a34c8eb65c0e43007e55a882d5fc399d0d16a91c4d1bd4d00129",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-baseline-validate.json": "fb4815327bd50561dad184539f55f3468ea8341881b790338cf2f392b7b20ecf",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-baseline-validate.log": "5a1d25ae3194f77b8a76ba0025eb1eca466e568b55aecf99bdc8da33f9af6edb",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-timed4k-capture.json": "fe82e6c6ada4572429fd4b90bc3821d2e14fe3c7b2b50bd415e47623edea2ce4",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-timed4k-capture.log": "2d6b00e0d7b26f6536c82f5f9b8d69f19483f15479b90696f917ac2c50fddfc7",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r3-timed4k-capture.64608.jsonl": "62a208af7b45a297438f7af6de8a0b32d5b05d147b35f931f6e9bd008c1db5c8",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-timed4k-validate.json": "7b25ff5fae450004a8e8acc799793870692e1199951932a92b7f154641305263",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r3-timed4k-validate.log": "61082aeb4741729b38ed6ceac80e15da49bd9f2a81bf2e407e32ffbc90a8ab89",
+    "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r3-timed4k-validate.64703.jsonl": "1485f8c9768afef43f0a0c3ccddcb84cc3ceb71e0be8656eebb0d60ecae3a477"
+  },
+  "large_artifact_scope": "Root/controller verified frozen binary/tool SHA before and after; this reviewer did not repeat those large reads",
+  "limitations": [
+    "Warm synthetic 512MiB+3 ordinary files; three measured samples per group; no complete CLI/64GiB/real-VM acceleration claim",
+    "timed4k capture median 2.415776208s and range1.931794791\u20132.438756166s vary; cause unknown; cannot assign full baseline difference to telemetry",
+    "Parent and child inclusive times not summed, and 52-SHA complete-operation shares not inferred",
+    "Baseline FileHandle API attempts differ from optimized native pread attempts including EOF/EINTR/errors",
+    "RSS is historical process peak and setup/trace initialization differ between capture and validate",
+    "Actual attachment/pending guard raw snapshots are not in wrapper JSON; frozen guard code and successful guarded paths support checks, not independent live process/mount observation"
+  ],
+  "independent_trace_crosschecks": {
+    "traces": 16,
+    "measured_window_sha_consumer_and_leaf_read_pairs": 56,
+    "each_sha_leaf_actual_bytes": 536870915,
+    "each_sha_leaf_actual_read_calls_including_EOF": 514,
+    "untimed_validate_setup_sha_excluded": 16,
+    "implementation": "Independent graph/Counter/clock checks in addition to reviewed controller helper reparse; no controller main invoked"
+  }
+}

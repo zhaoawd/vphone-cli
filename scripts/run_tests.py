@@ -82,6 +82,7 @@ LATENCY_TESTS = "|".join((
 
 
 def run_swift(firmware=False):
+    run([sys.executable, ROOT / "scripts/prepare_vendor.py"])
     env = os.environ.copy()
     # Real firmware selectors must not activate acceptance tests in a fast run.
     # The fixture suite also starts clean, then enables only its declared target.

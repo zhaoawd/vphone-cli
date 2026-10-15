@@ -1,0 +1,516 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUTC": "2026-10-14T06:07:04.972376+00:00",
+  "mode": "read-only characterization of existing frozen V9; no optimization implemented",
+  "scope": {
+    "version": "2.6.20261021-local",
+    "build": "2026101404",
+    "observedOperation": "vm update-kernel (schema3)",
+    "diskBytes": 68719476736,
+    "metadataCount": 2,
+    "locksPreserved": true,
+    "productionModified": false,
+    "testsModified": false,
+    "buildRun": false,
+    "vmOrMountOrAMFIOperated": false,
+    "diskHashBenchmarkRun": false,
+    "fastEndToEndRedGreenEstablished": false,
+    "writesOnly": [
+      "performance-analysis.md",
+      "performance-analysis.json"
+    ]
+  },
+  "skillScope": "Read diagnosing-bugs/CONTEXT/current design and review. Existing baseline and sample characterize hot work; reproducibility, instrumentation, optimization and validation deferred outside current read-only scope.",
+  "baselines": {
+    "a_publication": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/kernel-v9-plan-a.json",
+      "elapsedSeconds": 3240.822112798691,
+      "exitCode": 0
+    },
+    "a_independent_readback": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/readback-kernel-v9-plan-a.json",
+      "elapsedSeconds": 105.03660798072815,
+      "exitCode": 0
+    },
+    "b_desired_preview": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/kernel-v9-plan-b-desired-preview-restored.json",
+      "elapsedSeconds": 52.41327381134033,
+      "exitCode": 0
+    },
+    "b_desired_apply": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/kernel-v9-plan-b-desired-apply.json",
+      "elapsedSeconds": 101.96836304664612,
+      "exitCode": 0
+    },
+    "b_snapshot": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/snapshot-kernel-v9-plan-b.json",
+      "elapsedSeconds": 51.520018100738525,
+      "exitCode": 0
+    },
+    "b_publication": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/kernel-v9-plan-b.json",
+      "elapsedSeconds": 3389.3964290618896,
+      "exitCode": 0
+    },
+    "b_independent_readback": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/readback-kernel-v9-plan-b.json",
+      "elapsedSeconds": 110.51344776153564,
+      "exitCode": 0
+    },
+    "rollback_a_publication": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/kernel-v9-rollback-a.json",
+      "elapsedSeconds": 4370.195726156235,
+      "exitCode": 0
+    },
+    "rollback_a_independent_readback": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/readback-kernel-v9-rollback-a.json",
+      "elapsedSeconds": 115.8253059387207,
+      "exitCode": 0
+    }
+  },
+  "observations": {
+    "kernel-v9-plan-a": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/kernel-v9-plan-a-observations.jsonl",
+      "observedChangedBlocks": 14,
+      "imageBlockWriteBytes": 57344,
+      "lastZeroPendingFalseElapsed": 1277.4,
+      "firstFullPendingFalseElapsed": 1312.4,
+      "observationalWriteWindowSeconds": 35.0,
+      "lastFullPendingFalseElapsedInRead": 3175.8,
+      "latestUTCInRead": "2026-10-14T04:44:51.604196+00:00",
+      "latestPhaseInRead": "before-transaction-or-archived",
+      "limits": "Polling window, not isolated pwrite/fsync timing; observer and command clocks have different origins; B evidence can append while operation continues"
+    },
+    "kernel-v9-plan-b": {
+      "evidence": "research/evidence/2026-10-13-task8/acceptance/kernel-v9-plan-b-observations.jsonl",
+      "observedChangedBlocks": 49,
+      "imageBlockWriteBytes": 200704,
+      "lastZeroPendingFalseElapsed": 1342.2,
+      "firstFullPendingFalseElapsed": 1402.3,
+      "observationalWriteWindowSeconds": 60.1,
+      "lastFullPendingFalseElapsedInRead": 2965.1,
+      "latestUTCInRead": "2026-10-14T06:06:16.157921+00:00",
+      "latestPhaseInRead": "publishing",
+      "limits": "Polling window, not isolated pwrite/fsync timing; observer and command clocks have different origins; B evidence can append while operation continues"
+    }
+  },
+  "sample": {
+    "evidence": [
+      "kernel-v9-plan-b-publication-sample.txt",
+      "kernel-v9-plan-b-publication-sample.json"
+    ],
+    "pid": 32495,
+    "durationRequestedSeconds": 1,
+    "intervalRequestedMilliseconds": 1,
+    "launchLocal": "2026-10-14 13:16:45.322 +0800",
+    "sampleLocal": "2026-10-14 13:49:46.190 +0800",
+    "mainThreadSamples": 562,
+    "mainThreadSamplesInsideSHACompression": 370,
+    "mainThreadSamplesInsideFileHandleReadBranch": 192,
+    "callSite": "FirmwareTransaction:636 -> verifyOrigin:167 -> FirmwareKernelUpdate:170 -> FirmwareKernelMount:30 -> FirmwareGeneration.readFile/SHA",
+    "conclusion": "The sampled window was hashing the image after readonly detach",
+    "limits": [
+      "Not whole-run percentages",
+      "Not CPU utilization or physical disk I/O attribution",
+      "Does not exclude waits in other stages"
+    ]
+  },
+  "singleSuccessfulVerifyOrigin": {
+    "conditions": [
+      "kernelOnly=true",
+      "one installed Disk.img output",
+      "complete successful callback",
+      "schema3 normal update"
+    ],
+    "published": {
+      "fullImageSHA256Calls": 5,
+      "logicalImageBytesHashed": 343597383680,
+      "generationLoadVerifiedCalls": 3,
+      "storeVerifiedReceiptCalls": 2,
+      "explicitSignatureValidityAPICalls": 6,
+      "cliFileSHA256Calls": 2,
+      "generalFirmwareComponentReceiptVerifyCalls": 0
+    },
+    "candidate": {
+      "fullImageSHA256Calls": 3,
+      "logicalImageBytesHashed": 206158430208,
+      "generationLoadVerifiedCalls": 3,
+      "storeVerifiedReceiptCalls": 2
+    },
+    "imageCallSites": [
+      {
+        "source": "FirmwareTransaction.swift",
+        "line": 142,
+        "kind": "published output preguard"
+      },
+      {
+        "source": "FirmwareKernelUpdate.swift",
+        "line": 169,
+        "kind": "callback image identity"
+      },
+      {
+        "source": "FirmwareKernelMount.swift",
+        "line": 12,
+        "kind": "readonly before attach"
+      },
+      {
+        "source": "FirmwareKernelMount.swift",
+        "line": 30,
+        "kind": "readonly after detach; sampled site"
+      },
+      {
+        "source": "FirmwareTransaction.swift",
+        "line": 187,
+        "kind": "published output tail guard; omitted by prior four-call lower bound"
+      }
+    ],
+    "generationNesting": "planBinding.validate=1; DesiredPlanStore.validate=loadVerified1+originalURLs(loadVerified1)=2",
+    "storeNesting": "Two Session.recheck calls, each verifiedReceipt -> bundle verify + cli.cdhash(verify) + vm.cdhash(verify), plus actual CLI SHA. Nested-code flags may duplicate coverage internally; cache and time unmeasured."
+  },
+  "successfulCommitOriginStatic": {
+    "countStatus": "Conditional exact source call counts, not dynamic instrumentation; failures can short-circuit",
+    "candidateVerifyOriginCalls": 2,
+    "publishedVerifyOriginCalls": 6,
+    "totalVerifyOriginCalls": 8,
+    "publishedFormula": "2 + 2*m",
+    "m": 2,
+    "callbackSites": [
+      {
+        "line": 95,
+        "candidate": 1,
+        "published": 0,
+        "prepared": false
+      },
+      {
+        "line": 568,
+        "candidate": 1,
+        "published": 0,
+        "prepared": true
+      },
+      {
+        "line": 601,
+        "published": 1
+      },
+      {
+        "line": 636,
+        "published": 2,
+        "branch": "one per metadata entry"
+      },
+      {
+        "line": 648,
+        "published": 2,
+        "branch": "one per metadata entry, irrespective of original presence"
+      },
+      {
+        "line": 656,
+        "published": 1
+      }
+    ],
+    "originOnlyImageSHA256Calls": 36,
+    "originOnlyLogicalGiBHashed": 2304,
+    "originOnlyLogicalTiBHashed": 2.25,
+    "additionalBackupImageSHA256CallsFromTwoDiskValidate": 4,
+    "additionalLiveImageSHA256AtDiskPublishEnd": 1,
+    "allCommitExplicitImageSHA256Calls": 41,
+    "allCommitLogicalGiBHashed": 2624,
+    "allCommitLogicalTiBHashed": 2.5625,
+    "additionalFullImageComparisonStreams": 6,
+    "logicalImageReadGiBLowerBoundIncludingComparison": 3008,
+    "logicalImageReadTiBLowerBoundIncludingComparison": 2.9375,
+    "validateReportForCommitCalls": 13,
+    "planBindingCurrentCatalogValidateCalls": 13,
+    "generationLoadVerifiedCalls": 39,
+    "generationFormula": "(7+3*m)*2 desired + (7+3*m) planBinding = 21+9*m",
+    "storeVerifiedReceiptCalls": 16,
+    "explicitSignatureValidityAPICalls": 48,
+    "cliFileSHA256Calls": 16,
+    "readPublicationCalls": 10,
+    "reportBlobReadAndHashCalls": 23,
+    "generalFirmwareComponentReceiptVerifyCalls": 0,
+    "installedPayloadEffectsDSCEnvelopeCallbackRounds": 8,
+    "branchLimits": [
+      "Kernel-only firmware root publication loops do not run",
+      "Receipt and launchpad metadata are always prepared; old-file absence only skips backup move",
+      "General generated-firmware receipt verification does not run because publication.records is empty",
+      "Does not include setup/capture/CLI prepare/readback or external acceptance tools"
+    ]
+  },
+  "normalCLIWholeOperationStatic": {
+    "explicitFullImageSHA256Calls": 52,
+    "logicalGiBHashed": 3328,
+    "logicalTiBHashed": 3.25,
+    "additionalFullImageComparisonStreams": 8,
+    "logicalImageReadTiBLowerBoundIncludingComparison": 3.75,
+    "setupBreakdown": {
+      "prepare": 1,
+      "threePreparedRechecks": 3,
+      "candidateCloneCheck": 1,
+      "capture": 5,
+      "receiptImageSHA": 1,
+      "commit": 41
+    },
+    "limits": [
+      "Excludes clone copy/hdiutil internals/generation/signature/small evidence files",
+      "Logical content read is not SSD physical I/O",
+      "No wall-time prediction derived from these counts"
+    ]
+  },
+  "desiredCLIStatic": {
+    "conditions": "ready current desired, no legacy import, actual CLI explicit classic guestEnvironment",
+    "previewGenerationLoadVerifiedCalls": 8,
+    "applyGenerationLoadVerifiedCalls": 16,
+    "timeContribution": "unmeasured"
+  },
+  "futureSchema4Static": {
+    "selectionValidationGenerationCalls": 9,
+    "singleVerifyOriginGenerationCalls": 10,
+    "sameTwoMetadataCommitGenerationCalls": 130,
+    "formula": "13*9 selection +13 outer planBinding",
+    "measuredRollbackDuration": null
+  },
+  "blockIOStatic": {
+    "blockSize": 4096,
+    "iterationsPer64GiBComparison": 16777216,
+    "captureFileHandleReadCallsApprox": 33554432,
+    "singleValidateFileHandleReadCallsApprox": 50331648,
+    "aJournalSavesForBlockLoop": 28,
+    "bJournalSavesForBlockLoop": 98,
+    "diskFsyncPerChangedBlock": 1,
+    "journalSavesPerChangedBlock": 2,
+    "journalSaveSyncs": [
+      "journal file sync",
+      "parent directory sync"
+    ],
+    "limits": "Read API counts do not imply exact kernel syscall counts; synchronization time unmeasured"
+  },
+  "rankedHypotheses": [
+    {
+      "rank": 1,
+      "hypothesis": "Repeated full image SHA dominates publication duration",
+      "prediction": "Per-call accumulated SHA wall time is the largest category; otherwise hypothesis rejected"
+    },
+    {
+      "rank": 2,
+      "hypothesis": "Repeated generation traversal contributes to plan save and future rollback overhead",
+      "prediction": "Caller-tagged generation bytes/time rises with nested count; measure directly"
+    },
+    {
+      "rank": 3,
+      "hypothesis": "Repeated Store signatures/resources add visible overhead",
+      "prediction": "secureTree/signature/CLI SHA stage timings quantify or reject contribution"
+    },
+    {
+      "rank": 4,
+      "hypothesis": "4KiB comparison API overhead and durable sync are secondary slow stages",
+      "prediction": "Separate compare/read/fsync/journal timings and isolated same-input batch-read comparison"
+    }
+  ],
+  "optimizationTiers": [
+    {
+      "tier": "lower-risk candidates, still require design and regression",
+      "items": [
+        "One strict generation pass jointly captures hashes, original URLs and bound manifest bytes; non-Codable scoped result only",
+        "One strict evidence read/decode per actual checkpoint; retain both sides of callbacks/mounts/mutations",
+        "Larger sequential reads while retaining exact 4KiB diff and recovery granularity/bounded autoreleasepool"
+      ]
+    },
+    {
+      "tier": "needs careful phase/TOCTOU review",
+      "items": [
+        "Fuse digest with comparison in the same stable file streams",
+        "Checkpoint interface passes existing digest evidence inward without removing pre/post mutation checks"
+      ]
+    },
+    {
+      "tier": "high-risk; new modification evidence mechanism required",
+      "items": [
+        "Cross-callback full-disk hash reuse",
+        "Persistent generation/Store cache",
+        "Batch publication/journal sync with a new durable recovery contract"
+      ]
+    },
+    {
+      "tier": "reject simplistic shortcuts",
+      "items": [
+        "mtime/inode/version-only cache",
+        "Removing Store/VM/worker locks",
+        "Skipping executable/currentCatalog/CAS/effects/DSC/envelope checks",
+        "Treating historical receipt or read-only mount as current content authority"
+      ]
+    }
+  ],
+  "nextValidation": "After current frozen Task8 acceptance: new isolated optimization scope; call counters/monotonic timings; production seam RED/GREEN; tamper/crash/recovery matrix; noncompetitive 64GiB fixed-input measurement; independent review/rebuild/authorized acceptance",
+  "sourceInspectionSHA256": {
+    "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift": "ae0b7b8f2bea2269c5e34feee66189f2f0fea8d20beafab3e95901d468c93d10",
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelUpdate.swift": "09037d03d2a1e2165659206e676d21cc533b92e9f7f316f17824a45f69abbb4f",
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelMount.swift": "00b4c9535dc8bd3d678a40433d24d7bbefb0082e017d209bf4718a2c4ff5e48e",
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelDisk.swift": "d166b6493d976b171e74eca4fe73d578f3256017f1ea20eab4256fb93e46db62",
+    "sources/FirmwarePatcher/Pipeline/FirmwareInstalledOrigin.swift": "11e4db329fec3fd6664082b05ac51cbd751a16e31833d62202d2b3411d00fac2",
+    "sources/FirmwarePatcher/Pipeline/FirmwareGeneration.swift": "2f02e2e8aab8ccbd0b66a1ced1b2a53c46d897e59174274547b8930af75c58f9",
+    "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift": "18083155694438ab3877c38ebffe9b00bb719496978a4134dff08fd7a6e7ce58",
+    "sources/FirmwarePatcher/Pipeline/FirmwarePlanBinding.swift": "b9695607b1c61c60abeff709c7bcb2049a99fc89af5b3ac809ea4f2b629660b3",
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelRollback.swift": "691be976269f9d6332515e1c47528304af259d1291f60f347421674e0637292b",
+    "sources/VPhoneBundleStore/VPhoneCoreBundleStore.swift": "44ab8efbbd59f86c8c10c32b9c0913af8c53782c25068f5db56efd3fb9dad00e",
+    "sources/VPhoneBundleStore/VPhoneBundleCodeSignature.swift": "6ff8df4727bb4b577d45913e7ea89f077e7dc24c610a60bdcfcbd9afc4cfe4bc",
+    "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift": "0a728061989d00b7b4a92c68f0e6770aabe06520e652e42eae809351147cb179"
+  },
+  "mdSHA256": "ec8153ca913b49491b496757d25f0ad7b96c2c5ff3dd181bbba4943ebc4616ad",
+  "rootWordingReview": "Changed inferred authorization wording to analysis scope and future validation within applicable authorization; counts and evidence unchanged.",
+  "updatedAtUTC": "2026-10-14T11:05:39.991856+00:00",
+  "separateHostPreflightStall": {
+    "firstWatchPassed": false,
+    "firstWatchSeconds": 361.804,
+    "amfidPID": 95240,
+    "beforeBSDState": 4,
+    "beforeXStatus": 17,
+    "traced": false,
+    "signal": "SIGCONT only, same identity",
+    "afterBSDState": 2,
+    "originalLaunchContinued": true,
+    "guestSystemQueryPassed": true,
+    "detachStoppedStateCause": "unknown",
+    "launchWrapperSeconds": 1751.0593531131744,
+    "supplementalWatchSeconds": 0.355,
+    "limits": "Neither wrapper duration nor supplemental watch is normal complete boot latency; distinct from kernel publication repeated verification",
+    "evidenceSHA256": {
+      "kernel-v9-plan-b-boot-watch.json": "8eb26d7817b1e507bc2fa931bc9883f725534118f5c108dc9d90d1ce8cfb4334",
+      "kernel-v9-plan-b-amfi-resume-check.json": "20fc9b9f34150008c08ef43347a8567bdbb619afcfd213af8bb411444d0feb0d",
+      "kernel-v9-plan-b-vm-launch.json": "27d18d30316d57977f11c7bca3ebd8d3f6ba30903fe76315b4191fe880912fc5",
+      "kernel-v9-plan-b-resumed-boot-watch.json": "cfca2e384742a3eba963f38702b897676f7cc6cf34d5e11170c6eab5094d8f71",
+      "kernel-v9-plan-b-boot-independent-review.json": "cf198c5b01cd5ea3cfacfa34e485d3f83113c5c2b14e59e71818d4cc7c1fabc5"
+    }
+  },
+  "currentRollbackBuildingSample": {
+    "pid": 71137,
+    "sampleLocal": "2026-10-14 15:17:26.907 +0800",
+    "launchLocal": "2026-10-14 15:09:37.868 +0800",
+    "durationRequestedSeconds": 1,
+    "mainThreadSamples": 635,
+    "shaCompressionSamples": 456,
+    "fileReadBranchSamples": 179,
+    "site": "FirmwareKernelUpdate.recheck:204 -> Disk.img full SHA",
+    "wholeRollbackDurationKnown": false,
+    "limits": "One window, not whole-run percentage or remaining-time prediction",
+    "evidenceSHA256": {
+      "kernel-v9-rollback-a-pretransaction-sample-root.json": "33cd08fc3ddc1d80620ed026f493834e72d49916e74733bf67fa0e6e4d6c810f",
+      "kernel-v9-rollback-a-pretransaction-sample-root.txt": "640304f07d0e646f88dc394b557e21d8d06549c8ec0311f46e6cb45695c08e65",
+      "kernel-v9-rollback-a-pretransaction-sample.json": "8a83720f8429739979a59134e12b07500af0c702e3745f6fa0a478e9d11b1ec3"
+    },
+    "phase": "building; second recheck inside transaction.withWorkerLock, line86 -> recheck204",
+    "phaseClassificationCorrection": "Original unprivileged observer Path.exists falsely reported absent root0700 directory. Journal birth07:15:58 predates sample07:17:26; filenames and original records preserved.",
+    "journalBirthEpoch": 1791962158.1689463,
+    "originalObserverHasPhaseAuthority": false,
+    "rootObserver": "kernel-v9-rollback-a-root-observations.jsonl",
+    "transactionID": "58597f0a-e94c-4f69-86af-b0fdfa9fd3f3"
+  },
+  "rollbackBeforeFirstTransactionDirectoryStatic": {
+    "countStatus": "Conditional successful source-path call counts, not dynamic instrumentation or time attribution",
+    "prepareGenerationLoadVerified": 17,
+    "firstPublishRecheckGenerationLoadVerified": 10,
+    "inputOriginalURLsGenerationLoadVerified": 1,
+    "transactionInitGenerationLoadVerified": 11,
+    "totalGenerationLoadVerified": 39,
+    "additionalWholeInputCollectionDigest": 1,
+    "fullDiskSHA256": 2,
+    "storeVerifiedReceipt": 3,
+    "cliSHA256": 3,
+    "hdiutilInfo": 2,
+    "insideWorkerSecondRecheckAddsGenerationLoadVerified": 10,
+    "insideWorkerSecondRecheckAddsFullDiskSHA256": 1,
+    "currentSampleBelongsToInsideWorkerSecondRecheck": true
+  },
+  "independentPreparationReviewSHA256": {
+    "kernel-rollback/performance-prepare-independent-review.md": "fd6c4748ad4f410df3a04792cb6fa23c24ef0700750ff8efff8facc0858c7637",
+    "kernel-rollback/performance-prepare-independent-review.json": "044b92a6ad23bf0022d471a176bb8fab1de4362ea22b7667b5a1916dc72660c0"
+  },
+  "rollbackPostPublicationSample": {
+    "pid": 71137,
+    "sampleLocal": "2026-10-14 15:54:06.516 +0800",
+    "durationRequestedSeconds": 1,
+    "mainThreadSamples": 545,
+    "hashUpdateBranchSamples": 424,
+    "shaCompressionSamples": 423,
+    "fileReadBranchSamples": 121,
+    "site": "Transaction637 validateReport -> rollback selection -> live desired -> generation loadVerified/treeDigest",
+    "scope": "Metadata backup precheck, one-second main-thread window only; other worker wait samples excluded",
+    "evidenceSHA256": {
+      "kernel-v9-rollback-a-post-publication-sample.json": "f111cd2f48fdf74c1c308f1c955e0cadbad3150caa03271fa9755b091f449261",
+      "kernel-v9-rollback-a-post-publication-sample.txt": "3aaf20c36f835f5dfa79e176aa8d44af97aa37c786db46c3002846dcec97ad76"
+    }
+  },
+  "user_execution_order": [
+    "isolated opt-in phase timings",
+    "capture/validate 1MiB equivalence/recovery/memory tests",
+    "isolated benchmark"
+  ],
+  "deferred_without_equivalence_assumption": [
+    "verifyOrigin SHA merging",
+    "capture digest/diff fusion",
+    "metadata disk recheck skipping",
+    "cross-stage caches",
+    "fsync batching"
+  ],
+  "markdown_sha256": "ec8153ca913b49491b496757d25f0ad7b96c2c5ff3dd181bbba4943ebc4616ad",
+  "isolated_stage1": {
+    "recorder_xctest": 9,
+    "swift_testing_reported_tests": 38,
+    "fixture_selectors_skipped": 2,
+    "producer_helpers_synthetic_probe_events": 13962,
+    "probe_check": "research/evidence/2026-10-14-kernel-io-performance/stage1-production-probe-check.json",
+    "full_cli_runtime_profile": false,
+    "optimization_benefit_measured": false
+  },
+  "isolated_optimization_results": {
+    "completed_stages": [
+      "component instrumentation",
+      "reader equivalence/recovery/memory",
+      "isolated 3-artifact benchmark"
+    ],
+    "task8_acceptance_changed": false,
+    "frozen_v9_replaced": false,
+    "amfi_actions": false,
+    "bytes": 536870915,
+    "rounds": 3,
+    "warmup_calls_excluded": 6,
+    "measured_calls": 18,
+    "metrics": {
+      "capture": {
+        "baseline_median_seconds": 1.907613459,
+        "optimized_median_seconds": 1.661059458,
+        "helper_reduction_percent": 12.924735870192873,
+        "timed4k_compare_median_seconds": 0.635480042,
+        "optimized_compare_median_seconds": 0.345068125,
+        "compare_reduction_percent": 45.69961254581776
+      },
+      "validate": {
+        "baseline_median_seconds": 1.368736792,
+        "optimized_median_seconds": 0.721516042,
+        "helper_reduction_percent": 47.285990541269825,
+        "timed4k_compare_median_seconds": 0.768465875,
+        "optimized_compare_median_seconds": 0.140184291,
+        "compare_reduction_percent": 81.75790291273506
+      }
+    },
+    "scope": [
+      "Scope is synthetic helper calls, not 64 GiB or complete CLI.",
+      "First trace initialization can be inside capture but outside validate preparation.",
+      "FileHandle API attempt counts are not measured baseline kernel syscall counts.",
+      "RSS is process historical peak; independent memory regressions establish bounds.",
+      "System load, frequency and physical I/O are not controlled or attributed."
+    ],
+    "markdown_sha256": "0fc4b334fceef2bd57ce1a680a25e7098497f08ad470036e0b653dff94676976",
+    "evidence": {
+      "isolated-512m-results.json": "6c311194517bc85a7cde08bdf4845673939b2af6f0188b657dbc7bbc2c772313",
+      "isolated-512m-observations.jsonl": "f63489f4d976869817c6ceba4f9a5870b50a4c939628d014e602b7f30ca6d8bb",
+      "benchmark-variants.json": "58c3d886d3cd8d53deb3b24d2ab1d665819f01d101674ec69fe5fca5c63506dd",
+      "stage2-independent-review.json": "d618db5c17fb7b934ac41961b52e907a18df46c34d5db653b93d317a4a2c2a3a",
+      "component-timings.json": "c939599ad2b44776bcfc0d26f0eb6233609d3015ad4156a14f46d0077c368acb",
+      "stage2-artifact-stage2.patch": "e97a42ee2e21e6d37b267df97077b0370c2a74851d31d4d8eec3943f1e6b82a9",
+      "benchmark-results-independent-review.json": "4683132f56ede6f739600177c61415fecffc0b9aa5d603032a17726df9622917",
+      "benchmark-results-independent-review.md": "42f3dc923e611d21c9fa888984ac7e053387cb9024bcef4162667946f589af27",
+      "final-preservation-check.json": "76a1aa89f33313fcae6c115e96680f5531b9e43347b32e7a324f6fa7f008e690",
+      "benchmark-controller-independent-review-final.json": "5e2419f546162c7c943385702855308d6e836fc067563a7bcc70ca6d5ec422d8",
+      "benchmark-controller-final-pure-tests.json": "edaf7c093c6543a0e6a535fec82b291fa8902dfa715e58828b1b7457a57741d8"
+    }
+  }
+}

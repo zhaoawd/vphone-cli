@@ -6,6 +6,29 @@
 
 本次 T00 和 T02 完成，其余 30 项均有剩余工作。部分项已有实现与历史验证，状态明确保留。每项实施结束后回填代码提交、实际命令/结果、日志和真实验收；未提交实现记录工作区摘要。
 
+### 2026-10-01 Codex 接手进度
+
+分支 `codex/handoff-20261001`，基线 `e8d825b`。以 `upstream_handoff_2026-10-01.md` 的顺序执行。
+
+- 已完成：第 1 项，修改前两项新增回归失败；修改后 Python 559 项、相关 Swift 9 项通过。
+- 已完成：第 2 项，新增 clone 断言修改前失败；修改后 `make test_swift` 退出 0。
+- 已完成：B1，Python 562 项及完整 Swift 测试通过；见 `v2_guest_environment_b1_2026-10-01.md`。
+- 已完成：B2，25 项 Python、11 项资源测试与 `make daemon_api_build` 通过；候选未激活。
+- 已完成：B3，合成树 11 项及相关 34 项通过；全量 Python 575 项通过（最后的卸载用例另由相关测试覆盖）。
+- 已完成：B4，T15/隔离/环境相关 107 项通过；安装器与驱动 16 项通过。
+- 已完成：B5，两个 Swift 入口及报告证据校验；Python 581 项、完整 Swift 与客户机组件 124 项通过；见 `v2_guest_environment_b5_2026-10-02.md`。
+- 进行中：2026-10-02 用户已批准独立构建与测试 VM 的 R1–R4；独立工作树 `/private/tmp/vphone-v2-build-20261002`，测试库 `/Users/kolar/vphone-v2-accept-20261002/VMs`。
+- 当前进度：R1–R3 通过；R4 未通过，SystemHook 在完整扫描中 not_mapped，运行中的 cameracaptured 未映射它；原因未查明。按 D6 停止后续验收，测试 VM 已停止并保留。见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
+- 已完成：注入诊断与用户态修正 `e344aa2`；590 项 Python 通过。用户批准 T16 单库事务并重启后，两次原复现通过，R4 加载复核通过；测试 VM 已停止，旧盘保留。
+- 已准备：R5–R9/T17 计划、R6/R7 单库差异候选和分阶段脚本，见 `v2_remaining_acceptance_plan_2026-10-02.md`。候选已校验，真实写入阶段未执行。
+- 当前批准：用户已批准 R5–R9/T17 的完整具体范围；首次 R5 启动因宿主预检 exit 137 停止，沙箱外复核同样失败，未发现 amfidont 进程。R5 回归脚本已保存，待用户重新启动 amfidont；R6 只读检查等待 macOS 管理员认证。真实写入未执行，见 `v2_remaining_acceptance_plan_2026-10-02.md`。
+- 待办：完成 R5–R9/T17；B6/B7 及后续依赖任务。本次 R4 不再支持 D6 内核不足假设。
+- 最新进度：R6 只读检查与单库停机事务已完成；`20261002T101052Z-Oakm5X1p` published，更新后 already_current，7 项身份文件摘要不变，旧盘保留。启动复核待验证。用户回复已启动 amfidont 后，签名预检仍返回 137，进程检查未发现 amfidont；已请求前台诊断输出，退出原因未查明。R5 将针对 R6 的 libcamfix -O1 候选执行；R7–R9 未执行。
+- 前台启动后：R6 加载复核通过；R5 文件、定位协议、截图和单次 tap 协议通过，但 App 启动能力缺失、应用 CoreLocation 读取未验证，整项不标完整通过。R7/T17 在根卷可写重挂阶段被拒绝，journal aborted、无库替换、根卷仍只读，未重启相机。R8 成功回退缺少前置条件，未执行。R9 通过：classic 创建的 6 个适用阶段成功，离线检查 bootstrap none、v2 库/API 缺失、磁盘不变，启动后经典连接与合约能力正常。两个测试 VM 已停止保留。B7 的 R 通过闸门未满足；不跳过 T17 成功路径或扩大补丁范围。
+- T17 只读诊断已完成至证据范围：当前 23B85 vphone600 动态恢复现有 MAC mount 双点锚点，regular 固件记录未修改它们；相近公开 XNU 的根卷可写拒绝与第二处形态吻合，运行时命中仍未验证。新建单独实验 VM 与额外两项内核记录的对照范围待批准，见 `t17_mount_rejection_diagnosis_2026-10-02.md`；未新增补丁或操作客户机。
+- 约束：不操作 `vm-2607`、`vm-new`；不在主仓库运行 `make build`；真实 VM 操作仅限本次批准的测试对象。
+- 验证日志：`/tmp/vphone-step1-{swift-red,swift-green,python-green}.log`；临时日志不属于长期仓库资产，结果写入各任务研究记录。
+
 ### 2026-10-01 本轮提交（本地，未 push）
 
 在 `8d84bbc` 之上按任务分项提交，每项配 `research/tXX_*_2026-10-01.md` 记录，合并回归 `make test_python`/`make test_swift` 通过（无固件夹具，`make test_firmware` 未执行；真实 VM 未涉及）：
@@ -403,3 +426,9 @@ T00 已完成 → T01 保存变动 → T02 已完成、随实现持续回填 →
 - 保护与回退：代码回退或降级 Core Bundle 不等于磁盘/guest 状态回退；使用独立目标，遵守导入暂缓约束。
 - 当前证据：整组恢复尚未完成；既有导出内容对比不替代恢复验收
 - 结果回填：提交/工作区摘要、命令及结果、日志、真实验收状态（待回填；T00/T02 的本次输出见当前证据）。
+
+### 2026-10-02 MAC mount 对照实验
+
+用户已批准 `t17_mount_rejection_diagnosis_2026-10-02.md` 的独立实验范围。显式 regular-v2 实验入口、记录和恢复验证已实现；测试按失败再实现执行。23B85 原始内核的内存对照通过：基础 28 项不变，仅增加两项 mount 记录。第二次完整 Swift 回归通过；新 VM 的 R1–R4、R7/R8 尚未执行，B7 闸门仍未满足。下一步独立签名构建、宿主预检与创建 `lp-v2-mount-accept-20261002`。
+
+- MAC mount 实验准备 `71e8140`：独立 `make build` 与 bundle 校验通过，基线/更新 manifest 通过。宿主 preflight 和直接 VM `--help` 均 exit 137，当前无 amfidont 进程；已请求用户前台启动新目录/CDHash 范围。验收断言脚本与证据已保存。新 VM 未创建，R1–R4/R7/R8 待环境恢复后执行。

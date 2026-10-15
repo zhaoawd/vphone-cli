@@ -1,0 +1,148 @@
+{
+  "passed": true,
+  "expected": {
+    "binding": {
+      "bundle": "2.6.20261016-local",
+      "kernel": "2.6.20261021-local"
+    },
+    "binding_sha256": "dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d",
+    "receipt_sha256": "518a87862d31de453dd4fd6875f3dc29342f11452e30c8cc38b94ccc05f2ecb0",
+    "desired_sha256": "3ad404b6361d1989bda18be961ce72d1415f6e84025138ec6623bc0578aad949",
+    "transaction_id": "2901d975-2379-4b50-9340-8580786aacc1",
+    "payload_sha256": "a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0"
+  },
+  "expectations_sha256": "2f52ce3208aa50ba74d029d02a82b8bef805c8ad091ee8dd18b10020d30680c8",
+  "attempts": [
+    {
+      "command": [
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "guest",
+        "send",
+        "task8-copy",
+        "--library-root",
+        "/private/tmp/vphone-task8-acceptance-vms",
+        "--timeout",
+        "15",
+        "{\"t\":\"capabilities\"}"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"rpc_methods\":[],\"boot_mode\":\"normal\",\"target\":{\"vm\":\"task8-copy\",\"instance_id\":\"CC65D525-3CE7-41F4-83A8-937095907BD7\",\"process_started_at\":1791960031.5124581,\"pid\":35061},\"limits\":{\"request_bytes\":2097152,\"inline_file_bytes\":1048576,\"connections\":16,\"host_file_bytes\":67108864,\"command_timeout_ms\":180000},\"commands\":{\"file_get\":true,\"swipe\":false,\"location_stream_start\":true,\"camera_present\":true,\"open_url\":true,\"type\":true,\"location_source_stop\":true,\"ipa_install\":true,\"location_source_set\":true,\"rpc\":false,\"file_put\":true,\"location_source_status\":true,\"shell\":true,\"app_terminate\":true,\"screenshot\":false,\"tap\":false,\"app_launch\":true,\"location\":true,\"capabilities\":true,\"camera_stop\":true,\"environment_status\":false,\"location_stop\":true,\"location_source_control\":true,\"app_foreground\":true,\"key\":true,\"location_stream_push\":true,\"camera_status\":true,\"environment_rollback\":false,\"app_list\":true,\"environment_update\":false},\"protocol_version\":1,\"guest_connected\":true,\"guest_capabilities\":[\"hid\",\"devmode\",\"file\",\"keychain\",\"location\",\"location_owned\",\"ipa_install\",\"clipboard\",\"apps_v2\",\"apps\",\"app_launch\",\"url\",\"settings\",\"shell\",\"touch\",\"touch_edge\",\"vcam_status\",\"vcam_receipt_v3\"],\"screen_available\":false}\n",
+      "stderr": "",
+      "response": {
+        "ok": true,
+        "rpc_methods": [],
+        "boot_mode": "normal",
+        "target": {
+          "vm": "task8-copy",
+          "instance_id": "CC65D525-3CE7-41F4-83A8-937095907BD7",
+          "process_started_at": 1791960031.512458,
+          "pid": 35061
+        },
+        "limits": {
+          "request_bytes": 2097152,
+          "inline_file_bytes": 1048576,
+          "connections": 16,
+          "host_file_bytes": 67108864,
+          "command_timeout_ms": 180000
+        },
+        "commands": {
+          "file_get": true,
+          "swipe": false,
+          "location_stream_start": true,
+          "camera_present": true,
+          "open_url": true,
+          "type": true,
+          "location_source_stop": true,
+          "ipa_install": true,
+          "location_source_set": true,
+          "rpc": false,
+          "file_put": true,
+          "location_source_status": true,
+          "shell": true,
+          "app_terminate": true,
+          "screenshot": false,
+          "tap": false,
+          "app_launch": true,
+          "location": true,
+          "capabilities": true,
+          "camera_stop": true,
+          "environment_status": false,
+          "location_stop": true,
+          "location_source_control": true,
+          "app_foreground": true,
+          "key": true,
+          "location_stream_push": true,
+          "camera_status": true,
+          "environment_rollback": false,
+          "app_list": true,
+          "environment_update": false
+        },
+        "protocol_version": 1,
+        "guest_connected": true,
+        "guest_capabilities": [
+          "hid",
+          "devmode",
+          "file",
+          "keychain",
+          "location",
+          "location_owned",
+          "ipa_install",
+          "clipboard",
+          "apps_v2",
+          "apps",
+          "app_launch",
+          "url",
+          "settings",
+          "shell",
+          "touch",
+          "touch_edge",
+          "vcam_status",
+          "vcam_receipt_v3"
+        ],
+        "screen_available": false
+      },
+      "elapsed_seconds": 0.088
+    },
+    {
+      "command": [
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "guest",
+        "send",
+        "task8-copy",
+        "--library-root",
+        "/private/tmp/vphone-task8-acceptance-vms",
+        "--timeout",
+        "15",
+        "{\"t\":\"shell\",\"cmd\":\"/var/jb/usr/bin/uname -a; /var/jb/usr/sbin/sysctl kern.osrelease hw.machine\",\"timeout_ms\":10000,\"target\":{\"vm\":\"task8-copy\",\"instance_id\":\"CC65D525-3CE7-41F4-83A8-937095907BD7\",\"process_started_at\":1791960031.512458,\"pid\":35061}}"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"truncated\":false,\"code\":0,\"stderr\":\"\",\"ok\":true,\"stdout\":\"Darwin iPhone 25.1.0 Darwin Kernel Version 25.1.0: Thu Oct 23 11:11:48 PDT 2025; root:xnu-12377.42.6~55\\/RELEASE_ARM64_VRESEARCH1 iPhone17,3 arm Darwin\\nkern.osrelease: 25.1.0\\nhw.machine: iPhone17,3\\n\",\"timed_out\":false}\n",
+      "stderr": "",
+      "response": {
+        "truncated": false,
+        "code": 0,
+        "stderr": "",
+        "ok": true,
+        "stdout": "Darwin iPhone 25.1.0 Darwin Kernel Version 25.1.0: Thu Oct 23 11:11:48 PDT 2025; root:xnu-12377.42.6~55/RELEASE_ARM64_VRESEARCH1 iPhone17,3 arm Darwin\nkern.osrelease: 25.1.0\nhw.machine: iPhone17,3\n",
+        "timed_out": false
+      },
+      "elapsed_seconds": 0.322
+    }
+  ],
+  "actual_vm_command": "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-vm --config /private/tmp/vphone-task8-acceptance-vms/task8-copy/config.plist --no-vphoned-update --binding-sha256 dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d --headless",
+  "target": {
+    "vm": "task8-copy",
+    "instance_id": "CC65D525-3CE7-41F4-83A8-937095907BD7",
+    "process_started_at": 1791960031.512458,
+    "pid": 35061
+  },
+  "guest_state": {
+    "truncated": false,
+    "code": 0,
+    "stderr": "",
+    "ok": true,
+    "stdout": "Darwin iPhone 25.1.0 Darwin Kernel Version 25.1.0: Thu Oct 23 11:11:48 PDT 2025; root:xnu-12377.42.6~55/RELEASE_ARM64_VRESEARCH1 iPhone17,3 arm Darwin\nkern.osrelease: 25.1.0\nhw.machine: iPhone17,3\n",
+    "timed_out": false
+  },
+  "elapsed_seconds": 0.355
+}

@@ -213,7 +213,7 @@ struct VPhoneVMStopCommand: ParsableCommand {
     /// exists to avoid.
     @Option(name: .shortAndLong, help: "Seconds to wait for graceful shutdown before SIGKILL")
     var timeout: Int = VPhoneShutdownPolicy.defaultStopTimeout
-    @Flag(help: "Skip the graceful shutdown request and SIGKILL the boot process immediately")
+    @Flag(help: "Skip graceful shutdown and SIGKILL; refuses while a guest write operation is active")
     var force = false
 
     func run() throws {

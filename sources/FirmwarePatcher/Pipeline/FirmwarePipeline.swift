@@ -15,6 +15,7 @@
 import Darwin
 import Foundation
 import CryptoKit
+import VPhoneCore
 
 /// Orchestrates firmware patching for all boot-chain components.
 ///
@@ -83,11 +84,17 @@ public final class FirmwarePipeline {
     let noVphoned: Bool
     let forceExcGuard: Bool
     let enableFrida: Bool
+    let experimentalV2RootRemount: Bool
+    let requestedGuestEnvironmentV2: Bool?
+    var guestEnvironmentV2 = false
+    let generationID: String?
     let loader: any FirmwareLoader
     private var transaction: FirmwareTransaction?
     private var executionPlan: VariantPlanResolver.VariantPlan?
+    private var guestWriteEnvironment: [String: String]?
     private var versionInputs: FirmwareVersionInputs?
     private var baseVersionKnown = false
+    private var componentOutputs: [String: URL] = [:]
 
     /// Progress of the most recent run (C5). Shared with the staged pipeline so a
     /// failure keeps the stage, completed component reports and transaction.
@@ -116,6 +123,9 @@ public final class FirmwarePipeline {
         noVphoned: Bool = false,
         forceExcGuard: Bool = false,
         enableFrida: Bool = false,
+        experimentalV2RootRemount: Bool = false,
+        generationID: String? = nil,
+        guestEnvironmentV2: Bool? = nil,
         loader: (any FirmwareLoader)? = nil
     ) {
         self.vmDirectory = vmDirectory
@@ -125,6 +135,9 @@ public final class FirmwarePipeline {
         self.noVphoned = noVphoned
         self.forceExcGuard = forceExcGuard
         self.enableFrida = enableFrida
+        self.experimentalV2RootRemount = experimentalV2RootRemount
+        self.generationID = generationID
+        self.requestedGuestEnvironmentV2 = guestEnvironmentV2
         self.loader = loader ?? ContainerFirmwareLoader()
     }
 
@@ -148,10 +161,67 @@ public final class FirmwarePipeline {
         return report.allRecords
     }
 
-    /// Read the manifests, set the gate flags, log the run header, and return the
-    /// restore directory plus the gate snapshot used for necessity-rule evaluation.
+    /// Resolve the same gates and declarations used by the transaction preflight.
+    public func resolvedPlan(select: Set<String> = [], block: Set<String> = []) throws -> VariantPlanResolver.VariantPlan {
+        let (_, gates) = try prepare()
+        return try VariantPlanResolver.resolve(variant: variant, gates: gates,
+            baseVersionKnown: baseVersionKnown, cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil, select: select, block: block)
+    }
+
+    /// The CLI adapter owns the bundle lock across observation, validation and publication.
+    public func saveDesiredPlan(generationID: String, apply: Bool, expectedSHA256: String?,
+                                importLegacy: Bool = false, expectedLegacySHA256: String? = nil,
+                                select: [String] = [], block: [String] = []) throws -> FirmwareDesiredPlanStore.Prepared {
+        try VPhoneBundleGuard.withBundleLock(directory: vmDirectory, operation: VPhoneVMOperation.fwPatch) { _ in
+            guard !FirmwareTransaction.exists(vmDirectory.appendingPathComponent(".firmware-transaction")) else {
+                throw PatcherError.invalidFormat("Pending firmware transaction; recover first")
+            }
+            try PatchSelectionMigration.validateExplicitInputs(select: select, block: block)
+            if importLegacy, !select.isEmpty || !block.isEmpty {
+                throw PatcherError.invalidFormat("Import legacy selection separately from explicit overrides")
+            }
+            var selected = Set(select), blocked = Set(block)
+            if case .legacy(let legacy) = try FirmwareDesiredPlanStore.read(in: vmDirectory) {
+                guard importLegacy else { throw PatcherError.invalidFormat("Legacy selection requires explicit --import-legacy") }
+                if apply, legacy.sourceSHA256 != expectedLegacySHA256 { throw FirmwareDesiredPlanStore.Failure.changedSincePreview }
+                selected = Set(legacy.selection.selected); blocked = Set(legacy.selection.blocked)
+            } else if importLegacy { throw PatcherError.invalidFormat("No legacy selection to import") }
+            let generation = try FirmwareGeneration.loadVerified(in: vmDirectory, id: generationID)
+            let prepared = try FirmwareDesiredPlanStore.prepare(in: vmDirectory,
+                plan: resolvedPlan(select: selected, block: blocked), generation: generation)
+            if apply { _ = try FirmwareDesiredPlanStore.publish(prepared, expectedSHA256: expectedSHA256) }
+            return prepared
+        }
+    }
+
+    public static func readDesiredPlan(in directory: URL) throws -> FirmwareDesiredPlanStore.Read {
+        try VPhoneBundleGuard.withBundleLock(directory: directory, operation: VPhoneVMOperation.fwPatch) { _ in
+            try FirmwareDesiredPlanStore.read(in: directory)
+        }
+    }
+
+    public static func readbackDesiredPlan(in directory: URL) throws -> FirmwareDesiredPlanStore.Read {
+        try VPhoneBundleGuard.withBundleLock(directory: directory, operation: VPhoneVMOperation.fwPatch) { _ in
+            try FirmwareDesiredPlanStore.readback(in: directory)
+        }
+    }
+
+    /// Read manifests and compute the gate snapshot used for necessity rules.
     private func prepare() throws -> (restoreDir: URL, gates: PatchGateSnapshot) {
+        if experimentalV2RootRemount, variant != .regular {
+            throw PatcherError.invalidFormat("experimental v2 root remount requires variant regular")
+        }
         let restoreDir = try findRestoreDirectory()
+        if let requestedGuestEnvironmentV2 {
+            guestEnvironmentV2 = requestedGuestEnvironmentV2
+        } else if case .ready(let desired) = try FirmwareDesiredPlanStore.read(in: vmDirectory) {
+            guestEnvironmentV2 = desired.plan.gates.guestEnvironmentV2 == true
+        } else {
+            guestEnvironmentV2 = false
+        }
+        guard !guestEnvironmentV2 || variant == .regular else {
+            throw PatcherError.invalidFormat("guest environment v2 requires regular")
+        }
         if let plan = executionPlan {
             guard let versionInputs else {
                 throw PatcherError.invalidFormat("Frozen plan has no version input snapshot")
@@ -207,7 +277,9 @@ public final class FirmwarePipeline {
             enableFrida: enableFrida,
             excGuardActive: variant == .dev || iosBaseIs18 || forceExcGuard,
             applyIOS27: iosBaseIs27,
-            applyFrida: enableFrida && cloudOSIsFridaCapable
+            applyFrida: enableFrida && cloudOSIsFridaCapable,
+            experimentalV2RootRemount: experimentalV2RootRemount,
+            guestEnvironmentV2: guestEnvironmentV2
         )
     }
 
@@ -218,11 +290,12 @@ public final class FirmwarePipeline {
     ///   an ablated step. Unknown values throw before any component is loaded.
     /// - `allowOutput`: when false (the default for an ablation run), patched firmware
     ///   is NOT written back — the report is still produced. A non-ablation run always
-    ///   writes.
+    ///   requests publication. Publication still requires every selected required declaration
+    ///   to have verified execution evidence; ablation does not waive this gate.
     ///
     /// This method does not throw on required failures; callers inspect
     /// ``PatchRunReport/failedRequired``. It throws only on hard I/O / format errors
-    /// (missing files, unreadable payloads, unknown ablation ids).
+    /// (missing files, unreadable payloads, unknown ablation ids) and declaration-gate violations.
     public func patchAllStructured(ablate ablateValues: [String] = [], allowOutput: Bool = true) throws -> PatchRunReport {
         trace = FirmwareRunTrace()
         executionPlan = nil
@@ -231,6 +304,10 @@ public final class FirmwarePipeline {
         guard !FirmwareTransaction.exists(vmDirectory.appendingPathComponent(".firmware-transaction")) else {
             throw PatcherError.invalidFormat("Pending firmware transaction; run patch-firmware --recover first")
         }
+        // Neither a journal nor its archived plan grants a fresh execution.
+        let desired = try FirmwareDesiredPlanStore.read(in: vmDirectory)
+        let bound: FirmwareDesiredPlanStore.Record?
+        if case .ready(let record) = desired { bound = record } else { bound = nil }
         let ablate = Set(ablateValues)
         let unknown = ablate.subtracting(knownAblationTargets(buildComponentList()))
         guard unknown.isEmpty else {
@@ -241,31 +318,41 @@ public final class FirmwarePipeline {
             trace.stage = .finished
             return report
         }
+        guard let bound else { throw FirmwareDesiredPlanStore.Failure.missing }
+        if let generationID, generationID != bound.generationID { throw FirmwareDesiredPlanStore.Failure.identityMismatch }
         trace.stage = .prepare
         let (_, gates) = try prepare()
         let plan = try VariantPlanResolver.resolve(
             variant: variant, gates: gates, baseVersionKnown: baseVersionKnown,
-            cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil)
+            cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil,
+            block: Set(bound.plan.excludedByOptIn.filter { $0.reason == "blocked by request" }.map(\.id)))
         // Every variant's iBEC/LLB boot arguments depend on the iPhone base,
         // even when EXC_GUARD activation is independently known (dev/forced).
         guard baseVersionKnown else {
             throw PatcherError.invalidFormat("iPhone base version is unknown; boot argument parameters cannot be resolved")
         }
+        guard plan == bound.plan else { throw FirmwareDesiredPlanStore.Failure.invalidPlan }
         executionPlan = plan
         let roots = try transactionRoots()
         trace.stage = .stageInputs
-        let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots, options: [
+        var transactionOptions = [
             "variant": variant.rawValue, "noBinpack": String(noBinpack), "noVphoned": String(noVphoned),
             "forceExcGuard": String(forceExcGuard), "frida": String(enableFrida),
             "ablate": ablateValues.joined(separator: ","),
-        ], plan: plan, versionInputs: versionInputs)
+        ]
+        if experimentalV2RootRemount { transactionOptions["experimentalV2RootRemount"] = "true" }
+        transactionOptions["generationID"] = bound.generationID
+        transactionOptions["desiredSHA256"] = try bound.sha256
+        let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots,
+            options: transactionOptions, plan: plan, versionInputs: versionInputs)
         trace.transaction = transaction
         do {
             let staged = FirmwarePipeline(vmDirectory: transaction.stage, variant: variant, verbose: verbose,
                 noBinpack: noBinpack, noVphoned: noVphoned, forceExcGuard: forceExcGuard,
-                enableFrida: enableFrida, loader: loader)
+                enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount, guestEnvironmentV2: guestEnvironmentV2, loader: loader)
             staged.transaction = transaction
             staged.executionPlan = plan
+            if variant == .less { staged.guestWriteEnvironment = try FirmwareGuestWriteContext.environment(record: bound, directory: vmDirectory, transaction: transaction.root) }
             staged.versionInputs = versionInputs
             staged.trace = trace
             if variant == .less {
@@ -287,6 +374,7 @@ public final class FirmwarePipeline {
             // records the failure like any other pre-commit error).
             try PatchDeclarationGate.enforce(report: report, plan: plan)
             if variant == .less { try Self.validateManifest(in: staged.findRestoreDirectory()) }
+            try transaction.prepareComponentReceipts(report: report, outputs: staged.componentOutputs)
             trace.stage = .commit
             let archive = try transaction.commit()
             log("[+] Firmware transaction committed; receipt and backups: \(archive.path)")
@@ -441,6 +529,7 @@ public final class FirmwarePipeline {
                 log("  [.] ablation dry-run — not saved")
             } else {
                 try loader.save(currentData, to: fileURL)
+                componentOutputs[component.name.lowercased()] = fileURL
                 log("  [+] saved")
             }
             trace.record(component.name, reports)
@@ -453,7 +542,7 @@ public final class FirmwarePipeline {
         if report.failedRequired.isEmpty {
             log("  \(components.count) components processed"
                 + (report.isAblationRun ? " (ablation run: \(ablatedIDs.count) step(s) ablated)" : "")
-                + " (\(report.allRecords.count) total patches)")
+                + " (\(report.allRecords.count) byte records, including verified unchanged outputs)")
         } else {
             log("  REQUIRED FAILURES: \(report.failedRequired.map(\.description).joined(separator: ", "))")
         }
@@ -600,6 +689,35 @@ public final class FirmwarePipeline {
         return (currentData, reports)
     }
 
+    /// Recompute one installed component from verified generation originals.
+    /// This invokes the real current Bundle producer and never replays a decoded
+    /// report. No output is written by this operation.
+    func reproduceInstalledComponent(_ name: String, input: Data,
+                                     plan: VariantPlanResolver.VariantPlan) throws -> (Data, [PatchRecord]) {
+        let (output, reports) = try reproduceInstalledComponentReport(name, input: input, plan: plan)
+        return (output, reports.flatMap(\.records))
+    }
+
+    func reproduceInstalledComponentReport(_ name: String, input: Data,
+        plan: VariantPlanResolver.VariantPlan) throws -> (Data, [ComponentReport]) {
+        guard plan.variant == variant.rawValue else { throw FirmwareGeneration.fail("Installed producer variant differs") }
+        iosBaseIs18 = plan.gates.iosBaseIs18
+        iosBaseIs27 = plan.gates.iosBaseIs27
+        cloudOSIsFridaCapable = plan.gates.cloudOSIsFridaCapable
+        guestEnvironmentV2 = plan.gates.guestEnvironmentV2 == true
+        guard gateSnapshot == plan.gates,
+              let component = buildComponentList().first(where: { $0.name.lowercased() == name.lowercased() }),
+              !["filesystem", "manifest", "avpbooter"].contains(name.lowercased()) else {
+            throw FirmwareGeneration.fail("Unsupported installed binary producer")
+        }
+        let (output, reports) = try patchDataStructured(input, componentName: component.name,
+            patcherFactories: component.patcherFactories, gates: plan.gates, ablate: [], enabledSteps: plan.enabledStepIDs)
+        guard !reports.isEmpty, reports.allSatisfy({ !$0.hasRequiredFailure }) else {
+            throw FirmwareGeneration.fail("Installed binary producer failed required effects")
+        }
+        return (output, reports)
+    }
+
     // MARK: - Component List Builder
 
     /// Build the ordered component list based on the variant.
@@ -625,6 +743,7 @@ public final class FirmwarePipeline {
 
         // Opt-in Frida Stalker kernel relaxations (--frida), gated to cloudOS 26.4+.
         let applyFrida = enableFrida && cloudOSIsFridaCapable
+        let experimentalV2RootRemount = experimentalV2RootRemount
 
         // iOS 18 bases: disable the skywalk flowswitch netagents via boot-arg so
         // Network.framework uses the BSD path (the 26.1-kernel skywalk
@@ -732,9 +851,19 @@ public final class FirmwarePipeline {
                 case .less:
                     []
                 case .regular:
-                    [{ data, verbose in
-                        KernelPatcher(data: data, verbose: verbose, isDev: false, applyExcGuard: applyExcGuard)
-                    }]
+                    { () -> [(Data, Bool) -> any Patcher] in
+                        var factories: [(Data, Bool) -> any Patcher] = [{ data, verbose in
+                            KernelPatcher(data: data, verbose: verbose, isDev: false, applyExcGuard: applyExcGuard)
+                        }]
+                        if experimentalV2RootRemount {
+                            factories.append { data, verbose in
+                                let patcher = KernelJBPatcher(data: data, verbose: verbose)
+                                patcher.mountOnly = true
+                                return patcher
+                            }
+                        }
+                        return factories
+                    }()
                 case .dev:
                     [{ data, verbose in
                         KernelPatcher(data: data, verbose: verbose, isDev: true)
@@ -798,6 +927,7 @@ public final class FirmwarePipeline {
                     [{ data, verbose in
                         let patcher = CryptexFilesystemPatcher(buildManiest: data, restoreDir: try! self.findRestoreDirectory(), verbose: verbose, noBinpack: self.noBinpack, noVphoned: self.noVphoned)
                         patcher.transaction = self.transaction
+                        patcher.guestWriteEnvironment = self.guestWriteEnvironment
                         return patcher
                     }]
                 case .regular, .dev, .jb, .exp:

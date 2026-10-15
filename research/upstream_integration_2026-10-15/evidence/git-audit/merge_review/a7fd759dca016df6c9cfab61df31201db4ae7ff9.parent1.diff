@@ -1,0 +1,438 @@
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+index d6c92289ebe62905acdad413b501c229ed9bc2df..6c75747c865a08685665091b6cb3e255282970c9 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -2840,3 +2840,12 @@ before deleting its temporary library instead of querying `hdiutil info`.
+ `VPhone` bundle build and bundle admission pass on macOS 27.0.1 / Xcode 27.1.
+ Real image attachment and execution on macOS 15 still require live validation;
+ no VM disk is modified by the validation tests.
++
++## Flutter AOT executable-remap compatibility
++
++The existing guest SystemHook component has a guarded `vm_remap` fallback for
++an observed Flutter AOT callback layout whose returned RX permission disagrees
++with the actual read-only destination. The fallback creates a private RW copy,
++then changes it to RX; other calls pass through. No kernel patch or protection
++policy change is added. See `Research/Guest/flutter_aot_remap_compatibility.md`
++for exact guards, failure semantics, reproduction and validation limits.
+diff --git a/Research/Guest/flutter_aot_remap_compatibility.md b/Research/Guest/flutter_aot_remap_compatibility.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..be6f92a316a5276ba2c340f2225f4ae3be5dba86
+--- /dev/null
++++ b/Research/Guest/flutter_aot_remap_compatibility.md
+@@ -0,0 +1,68 @@
++# Flutter AOT callback remap compatibility
++
++## Failure and scope
++
++On a tested iPadOS 26.6.2 guest using cloudOS 26.4, an executable page remap
++returned success and RX protection while the destination was actually read-only.
++Executing a callback in that mapping caused `CODESIGNING / Invalid Page`.
++A crash reporter could subsequently fail with `EXC_GUARD`, masking the first fault.
++
++A standalone signed Swift probe reproduced the mismatch without Flutter or an
++injected script. Disabling optional tweaks for that probe did not change it.
++`vm_remap_new` and changing the destination to RX afterwards did not recover it.
++Allocating RW memory, copying bytes, then setting RX did work. The precise
++responsible kernel-policy branch has not been established; this change is a
++bounded guest compatibility fallback, not a kernel fix.
++
++## Runtime behavior
++
++SystemHook provides the interpose before application initialization. It first
++calls the original `vm_remap` and leaves all normal outcomes unchanged. Repair
++requires every condition below:
++
++- The executable and both images resolve to the same canonical `.app` bundle.
++- The source is its `Frameworks/App.framework/App`; the caller is its
++  `Frameworks/Flutter.framework/Flutter`.
++- Same-task, private-copy, fixed-overwrite remap of 32 KiB, with source image
++  offset 16 KiB: the observed AOT callback layout, not an arbitrary code copy.
++- Original success with reported RX/current and RWX/maximum; source actually RX.
++- An exact destination mapping that is read-only with maximum RW, and no overlap
++  with the source.
++
++The fallback atomically overwrites the newly created, not-yet-published target
++with private RW memory, honors inheritance, copies the bytes, changes it to RX,
++and verifies the result. It never requests simultaneous writable/executable
++access and does not change signing or kernel protection policy. Allocation,
++inheritance or protection failures propagate as errors with cleanup of owned
++replacement mappings. Unrecognized layouts continue through the native path.
++
++This interpose is linked into the existing SystemHook component; it needs no
++new firmware patch selector or public command. An old host bundle will resync
++its old library on guest reconnect, so the guest must be bound to the bundle
++containing the fix to keep it across restarts.
++
++## Validation
++
++Host checks:
++
++```sh
++make -C VPhoneGuestComponents test-flutter-remap test-flutter-remap-repair test-injection-environment
++make -C VPhoneGuestComponents build-executable-remap-probe
++```
++
++`ExecutableRemapProbe` is a standalone guest test binary, not shipped runtime
++code. It duplicates its own constant-returning function. Default mode reports
++the permission mismatch and exits3 without executing a non-executable mapping;
++`--copy` exercises the alternate path and expects42. Stage and run it only on
++an existing authorized test guest.
++
++The core fallback was exercised with a Flutter AOT guest workload: two cold
++launches remained alive for60seconds each, followed by another60second same-PID
++check after a full VM restart and bundle rebinding. The interface rendered
++normally and the deployed library hash remained unchanged after reconnect.
++
++That live acceptance used an earlier application-filtered prototype. This PR
++replaces that filter with canonical same-bundle image checks, covered by host
++positive/negative tests. Broad Flutter/application/version coverage and live
++acceptance of that generalized selector are still pending. Keep this change
++in draft until that additional coverage is reviewed.
+diff --git a/VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h b/VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c3880861d3385f51ab4f279418725e43364f554
+--- /dev/null
++++ b/VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h
+@@ -0,0 +1,33 @@
++#ifndef VP_FLUTTER_REMAP_POLICY_H
++#define VP_FLUTTER_REMAP_POLICY_H
++#include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <string.h>
++
++// Inputs are canonical paths (realpath at the runtime boundary). Only images
++// inside the executable's own app bundle may participate in the fallback.
++static inline bool vpFlutterBundleImages(const char *process, const char *source,
++                                         const char *caller) {
++    if (!process || !source || !caller) return false;
++    const char *program = strrchr(process, '/');
++    if (!program || !program[1]) return false;
++    size_t root = (size_t)(program - process);
++    if (root < 4 || memcmp(process + root - 4, ".app", 4) != 0) return false;
++    const char *aot = "/Frameworks/App.framework/App";
++    const char *engine = "/Frameworks/Flutter.framework/Flutter";
++    return strlen(source) == root + strlen(aot) &&
++        strlen(caller) == root + strlen(engine) &&
++        memcmp(process, source, root) == 0 && memcmp(process, caller, root) == 0 &&
++        strcmp(source + root, aot) == 0 && strcmp(caller + root, engine) == 0;
++}
++
++// Limited to the observed 16 KiB-page AOT callback layout. Unknown layouts,
++// writable sources, cross-task remaps and shared mappings remain unsupported.
++static inline bool vpFlutterRemapCandidate(const char *process, const char *source,
++    const char *caller, uintptr_t offset, uint64_t size, int flags, int copy,
++    bool sameTask) {
++    return sameTask && copy == 1 && flags == 0x4000 && size == 32768 && offset == 16384 &&
++        vpFlutterBundleImages(process, source, caller);
++}
++#endif
+diff --git a/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c b/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..7eab343c36f1bc131c8acdc252baa53fd18f3189
+--- /dev/null
++++ b/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c
+@@ -0,0 +1,108 @@
++#include "FlutterRemapPolicy.h"
++#include <dlfcn.h>
++#include <limits.h>
++#include <mach/mach.h>
++#include <mach-o/dyld.h>
++#include <os/log.h>
++#include <pthread.h>
++#include <stdatomic.h>
++#include <stdlib.h>
++#include <string.h>
++
++static char executable[PATH_MAX];
++static pthread_once_t executableOnce = PTHREAD_ONCE_INIT;
++static _Atomic unsigned loggedRepairs;
++static void readExecutable(void) {
++    char path[PATH_MAX];
++    uint32_t size = sizeof(path);
++    if (_NSGetExecutablePath(path, &size) != 0 || !realpath(path, executable))
++        executable[0] = 0;
++}
++
++static bool region(vm_address_t address, vm_size_t length, vm_prot_t *protection,
++                   vm_prot_t *maximum, bool exact) {
++    vm_address_t start = address;
++    vm_size_t size = 0;
++    vm_region_basic_info_data_64_t info = {0};
++    mach_msg_type_number_t count = VM_REGION_BASIC_INFO_COUNT_64;
++    mach_port_t object = MACH_PORT_NULL;
++    kern_return_t result = vm_region_64(mach_task_self(), &start, &size,
++        VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &count, &object);
++    if (object != MACH_PORT_NULL) mach_port_deallocate(mach_task_self(), object);
++    if (result != KERN_SUCCESS || start > address || address - start > size ||
++        length > size - (address - start) || (exact && (start != address || size != length)))
++        return false;
++    *protection = info.protection;
++    *maximum = info.max_protection;
++    return true;
++}
++
++static kern_return_t repair(vm_address_t target, vm_address_t source, vm_size_t size, vm_inherit_t inheritance) {
++    vm_address_t address = target;
++    // The caller has not published this just-created mapping yet. Overwrite it
++    // atomically, avoiding a deallocate/allocate race with other threads.
++    kern_return_t result = vm_allocate(mach_task_self(), &address, size,
++        VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE);
++    if (result != KERN_SUCCESS) return result;
++    if (address != target) {
++        vm_deallocate(mach_task_self(), address, size);
++        return KERN_FAILURE;
++    }
++    result = vm_inherit(mach_task_self(), target, size, inheritance);
++    if (result != KERN_SUCCESS) { vm_deallocate(mach_task_self(), target, size); return result; }
++    memcpy((void *)target, (const void *)source, size);
++    result = vm_protect(mach_task_self(), target, size, false, VM_PROT_READ | VM_PROT_EXECUTE);
++    vm_prot_t current = 0, maximum = 0;
++    if (result == KERN_SUCCESS && (!region(target, size, &current, &maximum, false) ||
++        current != (VM_PROT_READ | VM_PROT_EXECUTE))) result = KERN_PROTECTION_FAILURE;
++    if (result != KERN_SUCCESS) vm_deallocate(mach_task_self(), target, size);
++    return result;
++}
++
++static kern_return_t vpFlutterRemap(vm_map_t targetTask, vm_address_t *target,
++    vm_size_t size, vm_address_t mask, int flags, vm_map_read_t sourceTask,
++    vm_address_t source, boolean_t copy, vm_prot_t *current, vm_prot_t *maximum,
++    vm_inherit_t inheritance) {
++    // dyld does not apply an image's own interposition to its imports: this is
++    // the original vm_remap, not recursion into this wrapper.
++    kern_return_t result = vm_remap(targetTask, target, size, mask, flags,
++        sourceTask, source, copy, current, maximum, inheritance);
++    if (result != KERN_SUCCESS || !target || !current || !maximum ||
++        *current != (VM_PROT_READ | VM_PROT_EXECUTE) || *maximum != VM_PROT_ALL ||
++        targetTask != mach_task_self() || sourceTask != mach_task_self() ||
++        size != 32768 || copy != 1 || flags != (VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE)) return result;
++
++    pthread_once(&executableOnce, readExecutable);
++    Dl_info sourceInfo = {0}, callerInfo = {0};
++    char sourcePath[PATH_MAX], callerPath[PATH_MAX];
++    if (!dladdr((void *)source, &sourceInfo) ||
++        !dladdr(__builtin_return_address(0), &callerInfo) ||
++        !sourceInfo.dli_fname || !callerInfo.dli_fname ||
++        !realpath(sourceInfo.dli_fname, sourcePath) || !realpath(callerInfo.dli_fname, callerPath) ||
++        !vpFlutterRemapCandidate(executable, sourcePath, callerPath,
++            source - (uintptr_t)sourceInfo.dli_fbase, size, flags, copy, true)) return result;
++    vm_prot_t sourceProtection = 0, sourceMaximum = 0, actual = 0, actualMaximum = 0;
++    if (!region(source, size, &sourceProtection, &sourceMaximum, false) ||
++        sourceProtection != (VM_PROT_READ | VM_PROT_EXECUTE) ||
++        !region(*target, size, &actual, &actualMaximum, true) || actual != VM_PROT_READ || actualMaximum != (VM_PROT_READ | VM_PROT_WRITE) ||
++        (*target <= source ? source - *target < size : *target - source < size)) return result;
++
++    result = repair(*target, source, size, inheritance);
++    if (result != KERN_SUCCESS) {
++        os_log_error(OS_LOG_DEFAULT, "vphone Flutter remap repair failed: %{public}d", result);
++        return result; // Never report success for an unusable mapping.
++    }
++    // Preserve the successful original result; actual current protection is RX.
++    if (atomic_fetch_add(&loggedRepairs, 1) < 8)
++        os_log(OS_LOG_DEFAULT, "vphone Flutter remap repaired: %{public}llu bytes, RW then RX",
++            (unsigned long long)size);
++    return KERN_SUCCESS;
++}
++
++#ifndef VP_REMAP_FIX_NO_INTERPOSE
++__attribute__((used, section("__DATA,__interpose")))
++static const struct { const void *replacement; const void *original; } interposition = {
++    (const void *)&vpFlutterRemap, (const void *)&vm_remap
++};
++
++#endif
+diff --git a/VPhoneGuestComponents/Makefile b/VPhoneGuestComponents/Makefile
+index a47bef0349c1422ce466034d9b175eb56a924ad8..53188f7b83bc49708b0e2a6c942fb1cee9735720 100644
+--- a/VPhoneGuestComponents/Makefile
++++ b/VPhoneGuestComponents/Makefile
+@@ -38,8 +38,8 @@ LAUNCHHOOK := $(STAGE)/launchhook/launchdhook-vphone.dylib
+ LAUNCHHOOK_SOURCES := $(wildcard LaunchHook/*.c) Shared/RootHideLoaderLinks.c
+ LAUNCHHOOK_INCLUDES := $(wildcard LaunchHook/*.h LaunchHook/*.inc Shared/*.h)
+ SYSTEMHOOK := $(STAGE)/systemhook/SystemHook-vphone.dylib
+-SYSTEMHOOK_SOURCES := $(wildcard SystemHook/*.c) Shared/RootHideLoaderLinks.c
+-SYSTEMHOOK_INCLUDES := $(wildcard SystemHook/*.h SystemHook/*.inc Shared/*.h)
++SYSTEMHOOK_SOURCES := $(wildcard SystemHook/*.c) $(wildcard FlutterRemapFix/*.c) Shared/RootHideLoaderLinks.c
++SYSTEMHOOK_INCLUDES := $(wildcard SystemHook/*.h SystemHook/*.inc FlutterRemapFix/*.h Shared/*.h)
+ # libmis is not a framework and has no header; the iPhoneOS SDK does ship
+ # libmis.tbd, so the interposed symbols bind two-level like any other import
+ # rather than through flat dynamic lookup.
+@@ -326,3 +326,20 @@ test-installcoordination-persona:
+ 	xcrun --sdk macosx clang -Wall -Wextra -Werror \
+ 		-o $(OUT)/InstallCoordinationPersonaTests Tests/InstallCoordinationPersonaTests.c
+ 	@$(OUT)/InstallCoordinationPersonaTests
++
++.PHONY: test-flutter-remap test-flutter-remap-repair
++test-flutter-remap:
++	@mkdir -p $(OUT)
++	xcrun --sdk macosx clang -Wall -Wextra -Werror -o $(OUT)/FlutterRemapPolicyTests Tests/FlutterRemapPolicyTests.c
++	@$(OUT)/FlutterRemapPolicyTests
++
++test-flutter-remap-repair:
++	@mkdir -p $(OUT)
++	xcrun --sdk macosx clang -Wall -Wextra -Werror -Wno-unused-function -o $(OUT)/FlutterRemapRepairTests Tests/FlutterRemapRepairTests.c
++	@$(OUT)/FlutterRemapRepairTests
++
++.PHONY: build-executable-remap-probe
++build-executable-remap-probe:
++	@mkdir -p $(OUT)
++	xcrun --sdk iphoneos swiftc -target arm64-apple-ios26.0 -O Tests/ExecutableRemapProbe.swift -module-cache-path $(OUT)/probe-module-cache -o $(OUT)/ExecutableRemapProbe
++	codesign --force --sign - --timestamp=none $(OUT)/ExecutableRemapProbe
+diff --git a/VPhoneGuestComponents/README.md b/VPhoneGuestComponents/README.md
+index 35bda090894e8bf417ac52f925e822d7c314f5b9..0c47428e4d3d20aad3d3862f8a01268d5ec8daa4 100644
+--- a/VPhoneGuestComponents/README.md
++++ b/VPhoneGuestComponents/README.md
+@@ -64,3 +64,9 @@ which iOS ships no driver for. audiomxd loads it when the kernel publishes
+ `make test-virtiosound` checks its format choice, its rings and how captured
+ frames are served, on the host. See `Research/Guest/virtio_sound.md` and
+ `Research/Guest/virtio_sound_microphone.md`.
++
++`FlutterRemapFix` is linked into SystemHook for early handling of a specific
++Flutter AOT callback remap permission mismatch. It checks canonical same-bundle
++images, native parameters and actual permissions before making a private copy
++and transitioning RW to RX. It does not alter kernel policy. Tests and coverage
++limits are in `Research/Guest/flutter_aot_remap_compatibility.md`.
+diff --git a/VPhoneGuestComponents/Tests/ExecutableRemapProbe.swift b/VPhoneGuestComponents/Tests/ExecutableRemapProbe.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..1042a9e5169e7cd11ccc048805be32fb4994859d
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/ExecutableRemapProbe.swift
+@@ -0,0 +1,54 @@
++import Darwin
++
++// Standalone guest probe: no app dependencies, injected scripts or kernel writes.
++// The default mode reports the remap mismatch without executing an NX mapping.
++// --copy exercises the RW-copy-then-RX alternative.
++@_cdecl("remap_probe_marker") public func remapProbeMarker() -> Int32 { 42 }
++
++func protection(at value: vm_address_t) -> vm_prot_t? {
++    var address = value, size: vm_size_t = 0
++    var info = vm_region_basic_info_data_64_t()
++    var count = mach_msg_type_number_t(MemoryLayout<vm_region_basic_info_data_64_t>.size / 4)
++    var object: mach_port_t = 0
++    let result = withUnsafeMutablePointer(to: &info) { pointer in
++        pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
++            vm_region_64(mach_task_self_, &address, &size, VM_REGION_BASIC_INFO_64, $0, &count, &object)
++        }
++    }
++    if object != 0 { mach_port_deallocate(mach_task_self_, object) }
++    guard result == KERN_SUCCESS, address <= value, value - address < size else { return nil }
++    return info.protection
++}
++
++let marker: @convention(c) () -> Int32 = remapProbeMarker
++let source = vm_address_t(UInt(bitPattern: unsafeBitCast(marker, to: UnsafeRawPointer.self)))
++let page = source & ~vm_address_t(vm_page_size - 1)
++let offset = source - page
++let rx = VM_PROT_READ | VM_PROT_EXECUTE
++var target: vm_address_t = 0, current: vm_prot_t = 0, maximum: vm_prot_t = 0
++print("original marker", marker(), "protection", protection(at: source) ?? -1)
++let result: kern_return_t
++if CommandLine.arguments.contains("--copy") {
++    result = vm_allocate(mach_task_self_, &target, vm_size_t(vm_page_size), VM_FLAGS_ANYWHERE)
++    if result == KERN_SUCCESS {
++        memcpy(UnsafeMutableRawPointer(bitPattern: UInt(target))!, UnsafeRawPointer(bitPattern: UInt(page))!, Int(vm_page_size))
++        let changed = vm_protect(mach_task_self_, target, vm_size_t(vm_page_size), 0, rx)
++        print("copy protection result", changed)
++    }
++} else {
++    result = vm_remap(mach_task_self_, &target, vm_size_t(vm_page_size), 0, VM_FLAGS_ANYWHERE,
++                     mach_task_self_, page, 1, &current, &maximum, VM_INHERIT_NONE)
++    print("remap result", result, "reported protections", current, maximum)
++}
++guard result == KERN_SUCCESS else { exit(2) }
++let actual = protection(at: target)
++print("actual protection", actual ?? -1)
++guard actual == rx else {
++    vm_deallocate(mach_task_self_, target, vm_size_t(vm_page_size))
++    exit(3)
++}
++let copied = unsafeBitCast(UnsafeRawPointer(bitPattern: UInt(target + offset))!, to: (@convention(c) () -> Int32).self)
++let answer = copied()
++print("copied marker", answer)
++vm_deallocate(mach_task_self_, target, vm_size_t(vm_page_size))
++exit(answer == 42 ? 0 : 4)
+diff --git a/VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c b/VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..16a5a11f66ab783141765e328f88b94779d8c064
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c
+@@ -0,0 +1,29 @@
++#include "../FlutterRemapFix/FlutterRemapPolicy.h"
++#include <assert.h>
++#include <stdio.h>
++
++int main(void) {
++    const char *app = "/private/var/containers/Bundle/Application/id/Probe.app/Probe";
++    const char *src = "/private/var/containers/Bundle/Application/id/Probe.app/Frameworks/App.framework/App";
++    const char *caller = "/private/var/containers/Bundle/Application/id/Probe.app/Frameworks/Flutter.framework/Flutter";
++    assert(vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 0x4000, 1, true));
++    assert(vpFlutterBundleImages("/Applications/Other.app/Runner", "/Applications/Other.app/Frameworks/App.framework/App", "/Applications/Other.app/Frameworks/Flutter.framework/Flutter"));
++    assert(!vpFlutterBundleImages(app, "/Applications/Other.app/Frameworks/App.framework/App", caller));
++    assert(!vpFlutterBundleImages(app, src, "/Applications/Other.app/Frameworks/Flutter.framework/Flutter"));
++    assert(!vpFlutterBundleImages("/tmp/Probe", src, caller));
++    assert(!vpFlutterBundleImages("/tmp/not.appx/Probe", src, caller));
++    assert(!vpFlutterBundleImages("/tmp/.app/", src, caller));
++    assert(!vpFlutterBundleImages("Probe", src, caller));
++    assert(!vpFlutterBundleImages(app, "/tmp/App", caller));
++    assert(!vpFlutterBundleImages(NULL, src, caller));
++    assert(!vpFlutterBundleImages(app, NULL, caller));
++    assert(!vpFlutterBundleImages(app, src, NULL));
++    // Policy receives canonical paths; a different/unresolved root is rejected.
++    assert(!vpFlutterBundleImages("/var/containers/Bundle/Application/id/Probe.app/Probe", src, caller));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 0, 32768, 0x4000, 1, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 65536, 0x4000, 1, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 1, 1, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 0x4000, 0, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 0x4000, 1, false));
++    puts("FlutterRemapPolicyTests: bundle isolation and remap boundaries passed");
++}
+diff --git a/VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c b/VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..106b106517caf0b8b8e86870f8af79a056fde6c7
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c
+@@ -0,0 +1,43 @@
++#include <mach/mach.h>
++#include <assert.h>
++#include <stdio.h>
++#include <string.h>
++static unsigned char targetBytes[32768], sourceBytes[32768];
++static int allocateError, inheritError, protectError, queryProtection, wrongAddress, frees, copies;
++static kern_return_t testAllocate(vm_map_t task, vm_address_t *address, vm_size_t size, int flags) {
++ (void)task;assert(size==32768);assert(flags==(VM_FLAGS_FIXED|VM_FLAGS_OVERWRITE));
++ if(wrongAddress)*address+=32768;
++ return allocateError;
++}
++static kern_return_t testInherit(vm_map_t task, vm_address_t address, vm_size_t size, vm_inherit_t inheritance) {
++ (void)task;(void)address;assert(size==32768);assert(inheritance==VM_INHERIT_NONE);return inheritError;
++}
++static kern_return_t testProtect(vm_map_t task, vm_address_t address, vm_size_t size, boolean_t maximum, vm_prot_t protection) {
++ (void)task;(void)address;assert(size==32768);assert(!maximum);assert(protection==(VM_PROT_READ|VM_PROT_EXECUTE));copies++;return protectError;
++}
++static kern_return_t testDeallocate(vm_map_t task, vm_address_t address, vm_size_t size) {
++ (void)task;(void)address;assert(size==32768);frees++;return KERN_SUCCESS;
++}
++static kern_return_t testRegion(vm_map_read_t task, vm_address_t *address, vm_size_t *size, vm_region_flavor_t flavor,
++ vm_region_info_t info, mach_msg_type_number_t *count, mach_port_t *object) {
++ (void)task;(void)address;(void)count;assert(flavor==VM_REGION_BASIC_INFO_64);*size=32768;*object=MACH_PORT_NULL;
++ vm_region_basic_info_64_t output=(vm_region_basic_info_64_t)info;memset(output,0,sizeof(*output));output->protection=queryProtection;output->max_protection=7;return KERN_SUCCESS;
++}
++#define vm_allocate testAllocate
++#define vm_inherit testInherit
++#define vm_protect testProtect
++#define vm_deallocate testDeallocate
++#define vm_region_64 testRegion
++#define VP_REMAP_FIX_NO_INTERPOSE
++#include "../FlutterRemapFix/libflutterremapfix.c"
++static void reset(void){allocateError=inheritError=protectError=wrongAddress=frees=copies=0;queryProtection=5;memset(targetBytes,0,sizeof(targetBytes));memset(sourceBytes,42,sizeof(sourceBytes));}
++static int perform(void){return repair((vm_address_t)targetBytes,(vm_address_t)sourceBytes,32768,VM_INHERIT_NONE);}
++int main(void){
++ reset();assert(perform()==0);assert(memcmp(targetBytes,sourceBytes,32768)==0);assert(copies==1&&frees==0);
++ reset();allocateError=KERN_NO_SPACE;assert(perform()==KERN_NO_SPACE);assert(copies==0&&frees==0&&targetBytes[0]==0);
++ reset();wrongAddress=1;assert(perform()==KERN_FAILURE);assert(copies==0&&frees==1);
++ reset();inheritError=KERN_INVALID_ARGUMENT;assert(perform()==KERN_INVALID_ARGUMENT);assert(copies==0&&frees==1);
++ reset();protectError=KERN_PROTECTION_FAILURE;assert(perform()==KERN_PROTECTION_FAILURE);assert(frees==1);
++ reset();queryProtection=VM_PROT_READ;assert(perform()==KERN_PROTECTION_FAILURE);assert(frees==1);
++ puts("FlutterRemapRepairTests: atomic overwrite, exact copy, RX-only transition and failure cleanup passed");
++}

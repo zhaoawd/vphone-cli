@@ -1,0 +1,103 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling vphone_zip_stub.c
+[5/35] Compiling locking.c
+[6/35] Compiling deviceinterfaced.c
+[7/35] Compiling log.c
+[8/35] Compiling common.c
+[9/37] Compiling idevicerestore.c
+[10/38] Compiling asr.c
+[11/38] Compiling download.c
+[12/38] Compiling ipsw.c
+[13/38] Compiling fdr.c
+[14/38] Compiling recovery.c
+[15/38] Compiling restore.c
+[16/38] Compiling limera1n.c
+[17/38] Compiling normal.c
+[18/38] Compiling dfu.c
+[19/38] Compiling img4.c
+[20/38] Compiling img3.c
+[21/38] Compiling ace3.c
+[22/38] Compiling mbn.c
+[23/38] Compiling ftab.c
+[24/38] Compiling fls.c
+[25/38] Compiling vphone_restore_bridge.c
+[26/38] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Compiling FirmwarePatcherTests FirmwareInstalledReadbackTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledReadbackTests.swift:14:26: error: cannot find 'FirmwareInstalledReadback' in scope
+12 |         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+13 |         try Data("installed payload".utf8).write(to: root.appendingPathComponent("kernelcache"))
+14 |         let attachment = FirmwareInstalledReadback.Attachment(image: image, device: "/dev/disk999",
+   |                          `- error: cannot find 'FirmwareInstalledReadback' in scope
+15 |             volumes: ["preboot": .init(device: "disk998s5", root: root)])
+16 |         var detachCount = 0
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledReadbackTests.swift:15:35: error: 'Any' cannot be constructed because it has no accessible initializers
+13 |         try Data("installed payload".utf8).write(to: root.appendingPathComponent("kernelcache"))
+14 |         let attachment = FirmwareInstalledReadback.Attachment(image: image, device: "/dev/disk999",
+15 |             volumes: ["preboot": .init(device: "disk998s5", root: root)])
+   |                                   `- error: 'Any' cannot be constructed because it has no accessible initializers
+16 |         var detachCount = 0
+17 |         let operations = FirmwareInstalledReadback.Operations(attach: { _, _ in attachment },
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledReadbackTests.swift:17:26: error: cannot find 'FirmwareInstalledReadback' in scope
+15 |             volumes: ["preboot": .init(device: "disk998s5", root: root)])
+16 |         var detachCount = 0
+17 |         let operations = FirmwareInstalledReadback.Operations(attach: { _, _ in attachment },
+   |                          `- error: cannot find 'FirmwareInstalledReadback' in scope
+18 |             validate: { observed in
+19 |                 guard fault != "wrong-image", observed.image == image, fault != "writable", fault != "wrong-root" else { throw POSIXError(.EINVAL) }
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledReadbackTests.swift:21:26: error: cannot find 'FirmwareInstalledReadback' in scope
+19 |                 guard fault != "wrong-image", observed.image == image, fault != "writable", fault != "wrong-root" else { throw POSIXError(.EINVAL) }
+20 |             }, detach: { _ in detachCount += 1; if fault == "detach" { throw POSIXError(.EIO) } })
+21 |         let reader = try FirmwareInstalledReadback(transaction: transaction)
+   |                          `- error: cannot find 'FirmwareInstalledReadback' in scope
+22 |         var escaped: FirmwareInstalledReadback.Volumes?
+23 |         func perform() throws {
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledReadbackTests.swift:22:22: error: cannot find type 'FirmwareInstalledReadback' in scope
+20 |             }, detach: { _ in detachCount += 1; if fault == "detach" { throw POSIXError(.EIO) } })
+21 |         let reader = try FirmwareInstalledReadback(transaction: transaction)
+22 |         var escaped: FirmwareInstalledReadback.Volumes?
+   |                      `- error: cannot find type 'FirmwareInstalledReadback' in scope
+23 |         func perform() throws {
+24 |             try reader.withReadOnlyVolumes(operations: operations) { volumes in
+[29/38] Compiling FirmwarePatcherTests FirmwareInstalledOriginTests.swift
+macro expansion #expect:5:17: error: recursive expansion of macro 'expect(throws:_:sourceLocation:performing:)'
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:39:10: note: expanded code originates here
+31 |                 effectiveExecutable: other, recheck: {}) { _ in }
+32 |         }
+33 |         #expect(throws: (any Error).self) {
+   |         `- note: in expansion of macro 'expect' here
+34 |             try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+35 |                 effectiveExecutable: executable, recheck: {}) { session in
+   :
+37 |                 #expect(throws: (any Error).self) { try session.recheck() }
+38 |             }
+39 |         }
+   +--- macro expansion #expect ----------------------------------------
+   |3 |                 effectiveExecutable: executable, recheck: {}) { session in
+   |4 |                 try Data("changed executable".utf8).write(to: executable)
+   |5 |                 #expect(throws: (any Error).self) { try session.recheck() }
+   |  |                 `- error: recursive expansion of macro 'expect(throws:_:sourceLocation:performing:)'
+   |6 |             }
+   |7 |         },expression: .__fromSyntaxNode(#"try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,\#n                effectiveExecutable: executable, recheck: {}) { session in\#n                try Data("changed executable".utf8).write(to: executable)\#n                #expect(throws: (any Error).self) { try session.recheck() }\#n            }"#),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+   +--------------------------------------------------------------------
+40 |     }
+41 | }
+[30/39] Emitting module FirmwarePatcherTests
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+error: fatalError

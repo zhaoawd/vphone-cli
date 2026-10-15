@@ -1,0 +1,47 @@
+{
+  "sha256": "f83e8f997f63ee486cd1f65a6ac1b88e9124f6ca137959dd83fc2accba3c9c54",
+  "observations": [
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "-dvvv",
+        "/private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Executable=/private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-555549448b5aa3f14ee13f0aacf2c5a4d43d9ee0\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=122027 flags=0x2(adhoc) hashes=3802+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=14d87bc3cf997469a27cb98514cf4b0e5c9a1e28\nCandidateCDHashFull sha256=14d87bc3cf997469a27cb98514cf4b0e5c9a1e28e97e671e0d6a877f3b01eeff\nHash choices=sha256\nCMSDigest=14d87bc3cf997469a27cb98514cf4b0e5c9a1e28e97e671e0d6a877f3b01eeff\nCMSDigestType=2\nCDHash=14d87bc3cf997469a27cb98514cf4b0e5c9a1e28\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "-d",
+        "--entitlements",
+        ":-",
+        "/private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm"
+      ],
+      "exit_code": 0,
+      "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.private.bmk.allow</key><true/><key>com.apple.private.virtualization</key><true/><key>com.apple.private.virtualization.security-research</key><true/><key>com.apple.security.get-task-allow</key><true/><key>com.apple.security.personal-information.location</key><true/><key>com.apple.security.virtualization</key><true/><key>com.apple.vm.networking</key><true/></dict></plist>\n",
+      "stderr": "Executable=/private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n"
+    },
+    {
+      "command": [
+        "/usr/bin/dwarfdump",
+        "--uuid",
+        "/private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm"
+      ],
+      "exit_code": 0,
+      "stdout": "UUID: 8B5AA3F1-4EE1-3F0A-ACF2-C5A4D43D9EE0 (arm64) /private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/otool",
+        "-L",
+        "/private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-task8-acceptance-build/core-candidate-v3/VPhone.bundle/Contents/MacOS/vphone-vm:\n\t/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization (compatibility version 1.0.0, current version 259.5.15)\n\t/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.50.119)\n\t/System/Library/Frameworks/SwiftUI.framework/Versions/A/SwiftUI (compatibility version 1.0.0, current version 7.4.27)\n\t/System/Library/Frameworks/CoreLocation.framework/Versions/A/CoreLocation (compatibility version 1.0.0, current version 3072.0.46)\n\t/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation (compatibility version 1.0.0, current version 2.0.0)\n\t/System/Library/Frameworks/Security.framework/Versions/A/Security (compatibility version 1.0.0, current version 61901.101.4)\n\t/System/Library/Frameworks/ServiceManagement.framework/Versions/A/ServiceManagement (compatibility version 1.0.0, current version 3102.100.102)\n\t/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit (compatibility version 1.0.0, current version 275.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 4424.1.255)\n\t/usr/lib/libz.1.dylib (compatibility version 1.0.0, current version 1.2.12)\n\t/usr/lib/libbz2.1.0.dylib (compatibility version 1.0.0, current version 1.0.8)\n\t/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)\n\t/usr/lib/libxml2.2.dylib (compatibility version 10.0.0, current version 10.9.0)\n\t/usr/lib/libcurl.4.dylib (compatibility version 7.0.0, current version 9.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/CFNetwork.framework/Versions/A/CFNetwork (compatibility version 1.0.0, current version 3860.255.112)\n\t/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.4.5)\n\t/System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage (compatibility version 1.0.1, current version 7.0.0)\n\t/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia (compatibility version 1.0.0, current version 3305.24.5)\n\t/System/Library/Frameworks/CoreTransferable.framework/Versions/A/CoreTransferable (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo (compatibility version 1.2.0, current version 734.4.0)\n\t/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 4424.1.255)\n\t/System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/LocalAuthentication.framework/Versions/A/LocalAuthentication (compatibility version 1.0.0, current version 2005.100.186)\n\t/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI (compatibility version 1.0.0, current version 0.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)\n\t/usr/lib/libcompression.dylib (compatibility version 1.0.0, current version 1.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftAVFoundation.dylib (compatibility version 1.0.0, current version 2410.24.5, weak)\n\t/usr/lib/swift/libswiftCompression.dylib (compatibility version 1.0.0, current version 11.0.0, weak)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreAudio.dylib (compatibility version 1.0.0, current version 411.255.0, weak)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0)\n\t/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 2.2.0, weak)\n\t/usr/lib/swift/libswiftCoreLocation.dylib (compatibility version 1.0.0, current version 53.0.0, weak)\n\t/usr/lib/swift/libswiftCoreMIDI.dylib (compatibility version 1.0.0, current version 6.0.0, weak)\n\t/usr/lib/swift/libswiftCoreMedia.dylib (compatibility version 1.0.0, current version 3305.24.5)\n\t/usr/lib/swift/libswiftDarwin.dylib (compatibility version 1.0.0, current version 377.100.15)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1542.100.32)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 372.16.0, weak)\n\t/usr/lib/swift/libswiftOSLog.dylib (compatibility version 1.0.0, current version 10.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.7.0)\n\t/usr/lib/swift/libswiftObservation.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 5.0.0, weak)\n\t/usr/lib/swift/libswiftQuickLookUI.dylib (compatibility version 1.0.0, current version 1018.5.5, weak)\n\t/usr/lib/swift/libswiftSpatial.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftSynchronization.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 877.4.9)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 128.100.15, weak)\n\t/usr/lib/swift/libswift_Builtin_float.dylib (compatibility version 0.0.0, current version 0.0.0, weak)\n\t/usr/lib/swift/libswift_Concurrency.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftos.dylib (compatibility version 1.0.0, current version 1082.0.0, weak)\n\t/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 23.0.0, weak)\n\t/usr/lib/swift/libswift_errno.dylib (compatibility version 1.0.0, current version 377.100.15)\n\t/usr/lib/swift/libswift_stdio.dylib (compatibility version 1.0.0, current version 377.100.15)\n\t/usr/lib/swift/libswift_signal.dylib (compatibility version 1.0.0, current version 377.100.15)\n",
+      "stderr": ""
+    }
+  ]
+}

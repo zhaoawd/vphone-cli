@@ -1,0 +1,301 @@
+{
+  "reviewed_at": "2026-10-14T05:09:56.523817+00:00",
+  "status": "plan-A-normal-V4-guest-boot-stop-and-cleanup-accepted; distinct-payload-B-and-rollback-still-outstanding",
+  "scope": "Independent E-file/source/log/JSON parsing only; no live VM/status/process reads, no VM/mount/guest/AMFI, no production changes or test/build execution.",
+  "evidence_sha256": {
+    "kernel-v9-plan-a-boot-watch.json": "cbf219d42ce6d00d22c545232864f7a409dc2b601ae28e3264d95dd01f6512fa",
+    "kernel-v9-plan-a-boot-expectations.json": "8ae02f1acef42bdc960956d5b016f67fa000daf20f4d0f90e04c813659377049",
+    "kernel-v9-plan-a-boot-observations.jsonl": "198e1df1aa42795f1da42860ff98366bb013a1c7541b5a7332dcb2878e02c4f0",
+    "kernel-v9-plan-a-vm-launch.json": "a7afc62e130a8620f4190f70260bd5e97d4ff97c1fb69f844809baf7e5cc61b3",
+    "kernel-v9-plan-a-vm-launch.log": "5581399c4bcd7528108e16f649fd3ea45d14a3c403d067cac77c198798c37ffc",
+    "kernel-v9-plan-a-vm-stop.json": "a646ae497978c18ff63a23782048bcc95b46cb9595c16fb9282c88937b0f9006",
+    "kernel-v9-plan-a-vm-stop.log": "cf510c1d6e91f547e6cbcfa8f22a4fff3704964bb1bd24c5b77414e95a5cf601",
+    "kernel-v9-plan-a-post-boot-cleanup.json": "cecaf746e9e4d83c88aac1ecd6a9405138811a1db24f7daa58a3b2f014c31913",
+    "kernel-v9-plan-a-host4-host-rebind-check.json": "fd56e9270779890a2d73704041835892794b2a3a1cd0908f6e243f08531ab6e5",
+    "kernel-v9-plan-a-host4-host-binding.json": "dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d",
+    "kernel-v9-plan-a-host4-binding-owner-check.json": "e44cfd76b13466bfd8d817d7199d41f4a083b6f0af303662b500c57ec754b274",
+    "kernel-v9-plan-a-target-list.json": "c270c8a35d30b8b1eead1058ffe074280c077b6255ed7d7145b4e0d23cdc25ef",
+    "kernel-v9-plan-a-target-list.log": "bd433b28c6ea9c90c4201b43e93c73d09549d7575bb84d7be2ec031857b1a1f6",
+    "kernel-v9-plan-a-target-list-check.json": "f91fb32ebe4769e2606fdd66595b5765e7be8509becc363f58d6c93e5c8ed073",
+    "kernel-v9-plan-a-amfi-once.json": "746f3943c7c0d348113dadeba262da42f926349d461c9a13bcbc6d10820ae811",
+    "kernel-v9-plan-a-amfi-once.log": "51b4ed7107c8c63953d38085c2078b6e8d0f8bca48784f737929cd5e6c51f69d",
+    "kernel-v9-plan-a-v4-preflight.json": "9eea5bd824422a24bc4ea51cc016d68c512d0510fb2527b8150c536d85c78ee2",
+    "kernel-v9-plan-a-v4-preflight.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "kernel-v9-plan-a-readback.json": "24f571935712b9b2a03e531c30857a8c529c9d985cc9ca2fb51ca60534fb4e47",
+    "kernel-v9-plan-a-committed-component-receipts.json": "e59819c579c3f958227a76c5d7fa5397134e01fb95937ea17a330c23bbc47169",
+    "restore-acceptance-binding-owner.py": "8d6f05229b362338cd43fb96735bf0d059f61989630f99329912e12d77b135a0",
+    "scoped-amfi-v4-once.py": "f99f3c92d6ef68d3cf0f18d295622603ed72991950da9c39fdecd8a0da37c219",
+    "cleanup-kernel-boot.py": "4bc39effe61cb6fa5fa10158f9efb1ec0e881b40cbac5ed2d76f73e42b4b1b61",
+    "watch-boot-v4-rollback-acceptance.py": "5036b2e20ba2f5a0f5928c6decdc3746a23ca72738d58f7ec6872e4acb2a2a0f"
+  },
+  "target": {
+    "pid": 14713,
+    "process_started_at": 1791954181.522774,
+    "instance_id": "BF494884-1005-4FDB-8504-C14DA034354D",
+    "vm": "task8-copy"
+  },
+  "actual_vm_command": "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-vm --config /private/tmp/vphone-task8-acceptance-vms/task8-copy/config.plist --no-vphoned-update --binding-sha256 dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d --headless",
+  "expected": {
+    "binding": {
+      "bundle": "2.6.20261016-local",
+      "kernel": "2.6.20261021-local"
+    },
+    "binding_sha256": "dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d",
+    "receipt_sha256": "e59819c579c3f958227a76c5d7fa5397134e01fb95937ea17a330c23bbc47169",
+    "desired_sha256": "ea1f464ba1ffb63737082879323cdac4a1efc8b40aa30e7ee7e505606a7fac34",
+    "transaction_id": "c0a0a7a8-3677-4a44-aa36-f370bb67b5ca",
+    "payload_sha256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb"
+  },
+  "guest_state": {
+    "timed_out": false,
+    "stdout": "Darwin iPhone 25.1.0 Darwin Kernel Version 25.1.0: Thu Oct 23 11:11:48 PDT 2025; root:xnu-12377.42.6~55/RELEASE_ARM64_VRESEARCH1 iPhone17,3 arm Darwin\nkern.osrelease: 25.1.0\nhw.machine: iPhone17,3\n",
+    "ok": true,
+    "code": 0,
+    "truncated": false,
+    "stderr": ""
+  },
+  "timing": {
+    "first_ready_seconds": 60.517,
+    "watch_completion_seconds": 65.504,
+    "vm_launch_until_stop_seconds": 122.38938903808594,
+    "formal_stop_seconds": 7.015675783157349,
+    "amfi_once_seconds": 24.986774921417236
+  },
+  "boot_chain_checks": [
+    "Frozen boot expected object and raw SHA equal watch expected; receipt raw SHA e59819... equals actual A committed publication, transaction UUID c0a0... and payload d2b901... equal A readback.",
+    "Host rebind keeps A kernel V9 and changes only host to V4. Result binding SHA dc087... equals ownership-fix expected SHA and boot expected SHA.",
+    "Actual VM argv is fixed V4 vphone-vm, exact task8-copy config, --no-vphoned-update and frozen --binding-sha256, with --headless.",
+    "Target remains PID14713 / BF494884-1005-4FDB-8504-C14DA034354D / task8-copy. Capabilities report normal boot, guest_connected and shell at60.517s.",
+    "Absolute uname/sysctl shell request pins that target and returns outerexit0, oktrue, integercode0, timed_outfalse, truncatedfalse; Darwin25.1.0/iPhone17,3 output markers present.",
+    "Formal V4 launch/headless and stop wrapper argv are exact and both exit0. Stop log identifies the same instance/PID; launch log records graceful guest power-off, classicAccepted and Guest stopped.",
+    "Post-stop cleanup passes with no matching task8 VM/fixed driver processes, no task8 attachments and both pending markers absent; binding/receipt and explicitly required desired A remain frozen."
+  ],
+  "binding_owner_fix": {
+    "script_sha256": "8d6f05229b362338cd43fb96735bf0d059f61989630f99329912e12d77b135a0",
+    "record": {
+      "passed": true,
+      "binding_sha256": "dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d",
+      "rebind_label": "kernel-v9-plan-a-host4",
+      "before": {
+        "uid": 0,
+        "gid": 0,
+        "mode": 384,
+        "inode": 589376505
+      },
+      "after": {
+        "uid": 2035870432,
+        "gid": 0,
+        "mode": 384,
+        "inode": 589376505
+      }
+    },
+    "static_checks": [
+      "Fixed task8-copy only; requires root, passed matching rebind record and fixed raw binding SHA.",
+      "VM directory exclusive lock plus noVM/noattachments/no pending checks; directory/config owner fixed UID2035870432 GID0.",
+      "O_NOFOLLOW ordinary nlink1 binding, root:wheel0600, exact raw content SHA checked before fchown on the same fd.",
+      "After fchown, descriptor/named dev/inode/size/mtime/mode/nlink and content remain equal, owner/group equal VM directory. Only owner changes; ctime may change."
+    ],
+    "actual_result": "uid0 ->2035870432; gid0 unchanged;0600 and inode589376505 preserved; rawSHA dc087... preserved."
+  },
+  "public_history_list": {
+    "command": {
+      "command": [
+        "sudo",
+        "-n",
+        "env",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261021-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "vm",
+        "rollback-kernel",
+        "task8-copy",
+        "--library-root",
+        "/private/tmp/vphone-task8-acceptance-vms",
+        "--list",
+        "--json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 93.99410891532898,
+      "log": "kernel-v9-plan-a-target-list.log"
+    },
+    "checked_count": 12,
+    "a": {
+      "eligibilityScope": "historical-selection-only; publication requires fresh verified producer",
+      "eligible": true,
+      "executableSHA256": "e1c6ca75c19966ec8bcada05ca235c1e5019c572570b64e8ebed041f0d14da76",
+      "generationID": "d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62",
+      "im4pSHA256": "b1f07780484d9dc88f989d6e236049050b38e50a1ddb94030dcecaed43f962db",
+      "payloadSHA256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb",
+      "planSHA256": "703f9ad46613fa819ec6460846865ba9cd3ccd389f4b03c078fbc9baae741a3c",
+      "sourceVersion": "2.6.20261021-local",
+      "transactionID": "c0a0a7a8-3677-4a44-aa36-f370bb67b5ca"
+    },
+    "v8_refused": {
+      "eligibilityScope": "historical-selection-only; publication requires fresh verified producer",
+      "eligible": false,
+      "reason": "Failure(message: \"Historical producer lacks the supported rollback evidence protocol; old bundles require a verified producer adapter\")",
+      "transactionID": "2b52edcf-ac9b-4515-bb80-338d94bcbd2b"
+    },
+    "scope": "historical-selection-only; publication still requires fresh verified producer",
+    "relationships": "Actual log array matches target-list-check entries; A UUID/version/executable/plan/payload/IM4P equal independently accepted commit; V8 explicitly refuses unsupported evidence protocol."
+  },
+  "amfi_once": {
+    "wrapper": {
+      "command": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-13-task8/acceptance/scoped-amfi-v4-once.py",
+        "--run"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 24.986774921417236,
+      "log": "kernel-v9-plan-a-amfi-once.log"
+    },
+    "driver_sha256": "f99f3c92d6ef68d3cf0f18d295622603ed72991950da9c39fdecd8a0da37c219",
+    "driver_matches_previously_reviewed": "f99f3c92d6ef68d3cf0f18d295622603ed72991950da9c39fdecd8a0da37c219",
+    "binary_sha256": "0e5944b2b79aaa059af156cb47824c399183d970a93db35b839b5dda39b31ca1",
+    "allowed_cdhash": "43c00d51b4c7f07a5feba006f3c244edbac39cea",
+    "paths": [],
+    "allow_all": false,
+    "persistent_config": false,
+    "observed_amfid_pid": 95240,
+    "matched_hook_results": {
+      "validate": 1,
+      "isApple": 1
+    },
+    "nonmatching_cdhash": "eba1b73c59773863934410a182bfd92a640425d5",
+    "nonmatching_hook_scope": "observed validate/isApple; log says invalid path not patched; no return override recorded",
+    "cleanup": "Existing stopped state5; DeleteAllBreakpoints true; Detach success keep_stoppedfalse; Destroy followed by CLEANUP_DONE. No new Stop or external pause is in the reviewed driver."
+  },
+  "retained_preflight_failure": {
+    "record": {
+      "command": [
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-vm",
+        "--help"
+      ],
+      "exit_code": -9,
+      "elapsed_seconds": 0.005263090133666992,
+      "log": "kernel-v9-plan-a-v4-preflight.log"
+    },
+    "interpretation": "Exit-9 before this successful launch is retained. Cause unknown; no causation attributed to binding ownership or AMFI based only on sequence."
+  },
+  "cleanup_scope": {
+    "actual": {
+      "passed": true,
+      "label": "kernel-v9-plan-a",
+      "source_metadata": {
+        "AVPBooter.vresearch1.bin": {
+          "device": 16777233,
+          "inode": 577380240,
+          "size": 335688,
+          "mtime_ns": 1790726340257467464,
+          "ctime_ns": 1790726380483082301
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "device": 16777233,
+          "inode": 577379528,
+          "size": 167936,
+          "mtime_ns": 1788431650000000000,
+          "ctime_ns": 1790726242487234848
+        },
+        "Disk.img": {
+          "device": 16777233,
+          "inode": 577379524,
+          "size": 68719476736,
+          "mtime_ns": 1791557475810588395,
+          "ctime_ns": 1791557475810588395
+        },
+        "SEPStorage": {
+          "device": 16777233,
+          "inode": 577379525,
+          "size": 524288,
+          "mtime_ns": 1791557475423132102,
+          "ctime_ns": 1791557475423132102
+        },
+        "config.plist": {
+          "device": 16777233,
+          "inode": 586117160,
+          "size": 1166,
+          "mtime_ns": 1791393399067155235,
+          "ctime_ns": 1791393399067810911
+        },
+        "nvram.bin": {
+          "device": 16777233,
+          "inode": 577380554,
+          "size": 33570816,
+          "mtime_ns": 1791557475843330516,
+          "ctime_ns": 1791557475843330516
+        }
+      },
+      "source_metadata_unchanged": true,
+      "source_scope": "six device/inode/size/mtime_ns/ctime_ns only; no new source content hash",
+      "test_metadata": {
+        "AVPBooter.vresearch1.bin": {
+          "device": 16777233,
+          "inode": 589096918,
+          "size": 335688,
+          "mtime_ns": 1790726340257467464,
+          "ctime_ns": 1791899693163019272
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "device": 16777233,
+          "inode": 589097000,
+          "size": 167936,
+          "mtime_ns": 1788431650000000000,
+          "ctime_ns": 1791899693285245031
+        },
+        "Disk.img": {
+          "device": 16777233,
+          "inode": 589096904,
+          "size": 68719476736,
+          "mtime_ns": 1791954295363162089,
+          "ctime_ns": 1791954295363162089
+        },
+        "SEPStorage": {
+          "device": 16777233,
+          "inode": 589096997,
+          "size": 524288,
+          "mtime_ns": 1791954294874145563,
+          "ctime_ns": 1791954294874145563
+        },
+        "config.plist": {
+          "device": 16777233,
+          "inode": 589096998,
+          "size": 1166,
+          "mtime_ns": 1791393399067155235,
+          "ctime_ns": 1791899693282259508
+        },
+        "nvram.bin": {
+          "device": 16777233,
+          "inode": 589096999,
+          "size": 33570816,
+          "mtime_ns": 1791954295385996312,
+          "ctime_ns": 1791954295385996312
+        }
+      },
+      "test_file_identities_unchanged": true,
+      "static_test_file_sha256": {
+        "config.plist": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+        "AVPBooter.vresearch1.bin": "0b8be61be526a94b0ef778df383cb2e1d308e6577f1d2a15f00dcad6833e0e20",
+        "AVPSEPBooter.vresearch1.bin": "86d008eb3d203d99fb20962b69227af9f8ecdc98f1c9bd9fed6d3581c655f5b6"
+      },
+      "task8_processes": [],
+      "task8_attachments": [],
+      "pending_transaction": false,
+      "desired_pending": false,
+      "binding_unchanged": true,
+      "receipt_unchanged": true
+    },
+    "source": "Six file dev/inode/size/mtime/ctime match clone source_before. No new source content digest.",
+    "target": "Six dev/inode/size match original target; config/two ROM full SHA match baseline. Boot may change Disk/NVRAM/SEP data or timestamps; no post-boot full content equality claim.",
+    "process": "Absence check is limited to task8 VM argv and fixed AMFI driver paths. Reviewer did not independently query current amfid/debugserver status."
+  },
+  "limits": [
+    "A still uses baseline/V8 d2b901... payload. This successful A boot does not establish a different-payload update or committed rollback.",
+    "Public list eligible is selection-only; no fresh rollback publication is established by list.",
+    "No plan-B real commit/boot or rollback-A/new guest instance/marker preservation is concluded here.",
+    "Owner repair, temporary AMFI driver and successful boot are separately observed; this sequence does not identify the cause of the prior preflight-9.",
+    "A normal guest state query does not establish runtime correctness of every kernel patch.",
+    "The AMFI driver enforces its fixed single CDHash. VM selection is established by the actual root-scheduled V4 task8-copy launch argv, not by an AMFI hook inspecting VM config."
+  ]
+}

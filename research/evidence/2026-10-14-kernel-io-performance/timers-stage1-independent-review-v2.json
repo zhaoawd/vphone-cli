@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "signed_v6",
+  "recordedAtUTC": "2026-10-14T10:16:21.407172+00:00",
+  "conclusion": "Saved synthetic production trace counts and complete parent structure independently match; no performance benefit conclusion",
+  "timedCloneManifestMatches": {
+    "Package.swift": true,
+    "sources/VPhoneKernelIOTrace/KernelIOTrace.swift": true,
+    "tests/VPhoneKernelIOTraceTests/KernelIOTraceTests.swift": true,
+    "sources/FirmwarePatcher/Pipeline/FirmwareGeneration.swift": true,
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelDisk.swift": true,
+    "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift": true,
+    "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift": true,
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelUpdate.swift": true,
+    "sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift": true,
+    "sources/FirmwarePatcher/Pipeline/FirmwareInstalledOrigin.swift": true,
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelRollback.swift": true,
+    "sources/VPhoneBundleStore/VPhoneCoreBundleStore.swift": true,
+    "sources/VPhoneBundleStore/VPhoneBundleCodeSignature.swift": true
+  },
+  "sharedV9_16StillFrozen": true,
+  "independentCheckSHA256": "525d5b01a23a7f78d796917f55429b6210c647f1020da56a72abc6119db5e004",
+  "checkScriptSHA256": "c06b77629d15fd623d4774a0b6f8317a8beadfbf49374c16d7fd2a9b0f0e3029",
+  "rootCheckSHA256": "327382cdb9b08828e78bf8c609c6a70423514998dd5a7b1e669848d37df880c5",
+  "traces": {
+    "stage1-smoke-capture.94468.jsonl": {
+      "sha256": "5fffd10b8889784a7d62cdd5ebb606742f450b655306de28f6e95e4b4ac06e4c",
+      "pid": 94468,
+      "events": 15,
+      "complete": true,
+      "prefix_matches_run": true,
+      "logger_error_absent": true,
+      "parent_intervals_verified": true
+    },
+    "stage1-smoke-validate.96165.jsonl": {
+      "sha256": "8bb8ce6ecdad1bf135855dd9182e9bc834ede37459a7ac5f00bdee094d287253",
+      "pid": 96165,
+      "events": 10,
+      "complete": true,
+      "prefix_matches_run": true,
+      "logger_error_absent": true,
+      "parent_intervals_verified": true
+    },
+    "stage1-production-probes.847.jsonl": {
+      "sha256": "652304aed6cd1dbeaf918eda0edef348989f5f2ff136368633df5d7cb3b2ce84",
+      "pid": 847,
+      "events": 1,
+      "complete": true,
+      "prefix_matches_run": true,
+      "logger_error_absent": true,
+      "parent_intervals_verified": true
+    },
+    "stage1-production-probes.849.jsonl": {
+      "sha256": "8bf52a7e99565d8e3b96c3aed8e49f378df98286e04b043a60d0240761d4edb2",
+      "pid": 849,
+      "events": 13961,
+      "complete": true,
+      "prefix_matches_run": true,
+      "logger_error_absent": true,
+      "parent_intervals_verified": true
+    }
+  },
+  "smoke": {
+    "capture": {
+      "bytes": 1048579,
+      "sha_calls_within_helper": 5,
+      "sha_bytes_within_helper": 5242895,
+      "setup_hashes_outside_helper": 0,
+      "comparison": {
+        "blocks": 257,
+        "changed_blocks": 4,
+        "logical_bytes": 1048579,
+        "new_bytes": 1048579,
+        "new_read_calls": 258,
+        "old_bytes": 1048579,
+        "old_read_calls": 258
+      },
+      "fsyncs_within_helper": 3,
+      "logger_helper_ns": 19897208,
+      "root_span_ns": 8265708,
+      "same_pid_and_monotonic_window": true
+    },
+    "validate": {
+      "bytes": 1048579,
+      "sha_calls_within_helper": 2,
+      "sha_bytes_within_helper": 2097158,
+      "setup_hashes_outside_helper": 2,
+      "comparison": {
+        "blocks": 257,
+        "disk_bytes": 1048579,
+        "disk_read_calls": 258,
+        "logical_bytes": 1048579,
+        "new_bytes": 1048579,
+        "new_read_calls": 257,
+        "old_bytes": 1048579,
+        "old_read_calls": 257
+      },
+      "fsyncs_within_helper": 0,
+      "logger_helper_ns": 4091542,
+      "root_span_ns": 3985500,
+      "same_pid_and_monotonic_window": true
+    }
+  },
+  "production": {
+    "events": 13962,
+    "phase_event_counts": {
+      "generation.readFile": 5116,
+      "generation.fileSHA256": 330,
+      "generation.treeDigest": 7020,
+      "generation.fileHandleSynchronize": 148,
+      "generation.fsync": 105,
+      "generation.verifyOriginals": 311,
+      "generation.loadVerified": 291,
+      "FirmwareDesiredPlanStore.fsync": 36,
+      "FirmwareTransaction.fsync": 177,
+      "transaction.journal.encode": 54,
+      "FirmwareTransaction.fileHandleSynchronize": 96,
+      "transaction.writeDurably": 96,
+      "transaction.saveJournal": 54,
+      "kernelDisk.capture.compare": 6,
+      "kernelDisk.fsync": 18,
+      "kernelDisk.capture": 6,
+      "kernelDisk.validate.compare": 17,
+      "kernelDisk.validate": 17,
+      "kernelDisk.publish": 6,
+      "kernelDisk.reverse": 4,
+      "security.staticCode": 15,
+      "security.SecStaticCodeCheckValidityWithErrors": 9,
+      "security.verify": 9,
+      "security.SecCodeCopySigningInformation": 6,
+      "security.cdhash": 6,
+      "VPhoneCoreBundleStore.fileHandleSynchronize": 1,
+      "store.secureTree": 2,
+      "store.receiptReadDecode": 2,
+      "store.requireBundleLayout": 2,
+      "store.verifiedReceipt": 2
+    },
+    "partial_error_pid": 847,
+    "partial_error_bytes": 1048576,
+    "partial_error_read_calls": 1,
+    "external_child_pid_not_in_runner_record": true
+  },
+  "reviewSHA256": "0bca7446252ae839f836c06f511fc3e55412a2f01b4090cd1dc4a503e46bb8e1",
+  "benchmarkOrBusinessHelperReexecuted": false,
+  "externalProbeChildPIDIdentityVerified": false,
+  "smokeStandardPIDAndMonotonicWindowVerified": true,
+  "limits": [
+    "Probe child process types not independently identified",
+    "No 1MiB or full CLI benefit conclusion",
+    "Inclusive and aggregate measurements overlap"
+  ]
+}

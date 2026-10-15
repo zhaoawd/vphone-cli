@@ -1,0 +1,14 @@
+{
+  "recordedAtUTC": "2026-10-14T07:29:27.918148+00:00",
+  "rootActualTransactionID": "58597f0a-e94c-4f69-86af-b0fdfa9fd3f3",
+  "rootActualPhase": "building",
+  "rootActualCursor": 0,
+  "rootActualBlocks": 49,
+  "journalBirthEpoch": 1791962158.1689463,
+  "affectedObserver": "kernel-v9-rollback-a-observations.jsonl",
+  "affectedObserverPhaseAuthority": false,
+  "reason": "Observer invoked without sudo. Root-created 0700 transaction directory inaccessible; Path.exists in Python3.14 returns false for access error. No operation or disk failure established.",
+  "replacementObserver": "kernel-v9-rollback-a-root-observations.jsonl",
+  "sampleClassification": "second recheck inside worker after transaction creation; former pretransaction name preserved",
+  "operationNotInterrupted": true
+}

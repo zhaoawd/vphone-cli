@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "scope": "Revised tools static review; 23 pure-mock/small ordinary-file tests; no benchmark-controller main, actual Popen/signal/process inspection/VM/mount/build/benchmark/large binary hashing",
+  "tests": 23,
+  "test_exit_code": 0,
+  "ast_passed": true,
+  "sources_sha256": {
+    "run-recorded.py": "4ede7ffd6158c6485a2dc0564216847d518239fbb0f5f06971d14db1d0908385",
+    "run-benchmarks.py": "0858bda3e1d91abc49bd039e34c72bf9ed19491492cf95c6eec0378e73edef48",
+    "prepare-test-manifest.py": "9084f324c33143b7466688e97999ba6cde1cb496181e7390d26d21bd63aaf267",
+    "test-benchmark-controller-review.py": "308edc081882d4948235ccddc0baab74f93d9e9db2f71b92f935eb2729c2e44c"
+  },
+  "variants_manifest_sha256": "58c3d886d3cd8d53deb3b24d2ab1d665819f01d101674ec69fe5fca5c63506dd",
+  "actual_small_source_and_build_evidence_checked": [
+    {
+      "path": "/private/tmp/vphone-kernel-io-baseline-20261014/tests/FirmwarePatcherTests/FirmwareKernelIOBenchmarkTests.swift",
+      "sha256": "dd17c66de594455b49f74ee32d4e455033a2e18c5965d06695783f082125334a"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-baseline-20261014/Package.swift",
+      "sha256": "b3f1c795d5cfbdf6d9b29a6c2d230682caee590cd44fb43f14b1de9b7407a10c"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-baseline-20261014/sources/FirmwarePatcher/Pipeline/FirmwareKernelDisk.swift",
+      "sha256": "d166b6493d976b171e74eca4fe73d578f3256017f1ea20eab4256fb93e46db62"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/baseline-regressions-02.json",
+      "sha256": "98974dd21fa54ee55d754360a00ed7df870c83b7617074697cafb00669a7dd58"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-timed-20261014/tests/FirmwarePatcherTests/FirmwareKernelIOBenchmarkTests.swift",
+      "sha256": "dd17c66de594455b49f74ee32d4e455033a2e18c5965d06695783f082125334a"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-timed-20261014/Package.swift",
+      "sha256": "e50f73d2edfe24c95f867307e53e0bb624ba04ba5aa51b9cef05a1568a5061b9"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-timed-20261014/sources/FirmwarePatcher/Pipeline/FirmwareKernelDisk.swift",
+      "sha256": "d341129d23816e143f8e83c29adbe9000684d19c9983563f3173fab98cc50600"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/stage1-production-probes.json",
+      "sha256": "43c6ae24a0ddba8018973059842b7999c15e1c7933671c9b777291a6984a5418"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-optimization-20261014/tests/FirmwarePatcherTests/FirmwareKernelIOBenchmarkTests.swift",
+      "sha256": "dd17c66de594455b49f74ee32d4e455033a2e18c5965d06695783f082125334a"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-optimization-20261014/Package.swift",
+      "sha256": "e50f73d2edfe24c95f867307e53e0bb624ba04ba5aa51b9cef05a1568a5061b9"
+    },
+    {
+      "path": "/private/tmp/vphone-kernel-io-optimization-20261014/sources/FirmwarePatcher/Pipeline/FirmwareKernelDisk.swift",
+      "sha256": "01711a3a9aab78984daea314ca25d773cbf650fdf39ceab7961cacf55321c6e1"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/stage2-green-regressions-02.json",
+      "sha256": "f295a21c939c7e12e96321d270e36642af7d7ff521fa1b009bd5588754e112f1"
+    }
+  ],
+  "large_binary_and_xctest_hash_scope": "Not independently read by this reviewer. Qualification shape was tested with frozen manifest values at those two large-file digest seams; root/controller must perform actual complete hash verification before/during benchmark.",
+  "resolved": [
+    "Finite seconds/ns correspondence and strict decode rejection",
+    "Independent expected offsets",
+    "Compare ancestry and SHA role distribution",
+    "Strict three-variant trace/readsize/test-source/build argv contract",
+    "Own-child bounded TERM/KILL/reap, cleanup_complete/error failure record and locks finally",
+    "Wrapper timeout remains failure and original interrupt reraises",
+    "Artifact locks, Task8 tmp alias, Package NOFOLLOW/nlink1/identity and reserve-before-write"
+  ],
+  "remaining_blockers": [],
+  "limitations": [
+    "No 24-run performance result accepted by this review",
+    "Only stable ordinary-file helper benchmarks are in scope; not complete CLI or Task8 VM",
+    "FileHandle API attempts and native pread attempts retain different counting semantics",
+    "Public artifact provenance remains rooted in frozen source/build records and actual controller SHA checks",
+    "Initial blocked review, source reproduction test copy and log preserved"
+  ]
+}

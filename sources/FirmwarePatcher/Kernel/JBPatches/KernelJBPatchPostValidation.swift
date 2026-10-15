@@ -95,7 +95,7 @@ extension KernelJBPatcher {
 
         if let patchOff = uniqueAlreadyPatchedHits.first {
             log("  [=] postValidation compare already bypassed at 0x\(String(patchOff, radix: 16, uppercase: true))")
-            return .idempotent
+            return emitVerifiedOutput(patchOff, expected: ARM64.cmpW0W0, patchID: "jb.post_validation.cmp_w0_w0", description: "postValidation compare")
         }
 
         let patchOff = uniqueHits[0]

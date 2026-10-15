@@ -1,0 +1,329 @@
+{
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "attach",
+        "-readonly",
+        "-nomount",
+        "-nobrowse",
+        "-plist",
+        "/private/tmp/vphone-task8-acceptance-vms/task8-before-binding/Disk.img"
+      ],
+      "exit_code": 0,
+      "stderr": "hdiutil: WARNING: 'hdiutil attach -readonly -nomount -nobrowse ...' is deprecated. Please use 'diskutil image attach --readOnly --noMount --mountOptions nobrowse ...' instead.\n"
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "apfs",
+        "list",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/sbin/mount_apfs",
+        "-o",
+        "rdonly",
+        "/dev/disk9s5",
+        "/private/tmp/task8-readback-vlutcf_6/preboot"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "info",
+        "-plist",
+        "/dev/disk9s5"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "info",
+        "-plist",
+        "/dev/disk9s5"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "detach",
+        "/dev/disk7"
+      ],
+      "exit_code": 0,
+      "stderr": "hdiutil: WARNING: 'hdiutil detach ...' is deprecated. Please use 'diskutil eject ...' instead.\n"
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "attach",
+        "-readonly",
+        "-nomount",
+        "-nobrowse",
+        "-plist",
+        "/private/tmp/vphone-task8-acceptance-vms/task8-copy/.firmware-history/1526d1ea-9f0c-48ae-ae06-f1d65394759b/kernel-disk-candidate.img"
+      ],
+      "exit_code": 0,
+      "stderr": "hdiutil: WARNING: 'hdiutil attach -readonly -nomount -nobrowse ...' is deprecated. Please use 'diskutil image attach --readOnly --noMount --mountOptions nobrowse ...' instead.\n"
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "apfs",
+        "list",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/sbin/mount_apfs",
+        "-o",
+        "rdonly",
+        "/dev/disk9s5",
+        "/private/tmp/task8-readback-ewxr6cf2/preboot"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "info",
+        "-plist",
+        "/dev/disk9s5"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "info",
+        "-plist",
+        "/dev/disk9s5"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "detach",
+        "/dev/disk7"
+      ],
+      "exit_code": 0,
+      "stderr": "hdiutil: WARNING: 'hdiutil detach ...' is deprecated. Please use 'diskutil eject ...' instead.\n"
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "kernels": {
+    "baseline": {
+      "relative_path": "B4491B383B98259E8F3C44F6517759621C73D19CF34DB50EF256FA2167A847570D1032BAB267ACA39383736C80029282/System/Library/Caches/com.apple.kernelcaches/kernelcache",
+      "image_sha256": "5b90c5a0ee87bf810c7e90795d537265f39774fbf85c430263fd2f61fc41ce7a",
+      "payload_sha256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb",
+      "im4m_sha256": "ec08fc625f7f8b76861b93fb9a950022103fe4031ead235f64daad1df8c4c657",
+      "readonly": true,
+      "volume_info": {
+        "APFSContainerFree": 39560224768,
+        "APFSContainerReference": "disk9",
+        "APFSContainerSize": 68231806976,
+        "APFSPhysicalStores": [
+          {
+            "APFSPhysicalStore": "disk7s1"
+          }
+        ],
+        "APFSSnapshot": false,
+        "Bootable": false,
+        "BooterDeviceIdentifier": "disk9s5",
+        "BusProtocol": "Disk Image",
+        "CanBeMadeBootable": false,
+        "CanBeMadeBootableRequiresDestroy": false,
+        "CapacityInUse": 294584320,
+        "Content": "41504653-0000-11AA-AA11-00306543ECAC",
+        "DeviceBlockSize": 4096,
+        "DeviceIdentifier": "disk9s5",
+        "DeviceNode": "/dev/disk9s5",
+        "DeviceTreePath": "IODeviceTree:/",
+        "DiskUUID": "61706673-7575-6964-0010-766F6C756D04",
+        "Ejectable": true,
+        "EjectableMediaAutomaticUnderSoftwareControl": true,
+        "EjectableOnly": true,
+        "Encryption": false,
+        "EncryptionThisVolumeProper": false,
+        "FileVault": false,
+        "FilesystemName": "Case-sensitive APFS",
+        "FilesystemType": "apfs",
+        "FilesystemUserVisibleName": "APFS (Case-sensitive)",
+        "FreeSpace": 0,
+        "GlobalPermissionsEnabled": true,
+        "IOKitSize": 68231806976,
+        "IORegistryEntryName": "Preboot",
+        "Internal": false,
+        "Locked": false,
+        "MediaName": "",
+        "MediaType": "\u901a\u7528",
+        "MountPoint": "/private/tmp/task8-readback-vlutcf_6/preboot",
+        "OSInternalMedia": false,
+        "ParentWholeDisk": "disk9",
+        "PartitionMapPartition": false,
+        "RAIDMaster": false,
+        "RAIDSlice": false,
+        "Removable": true,
+        "RemovableMedia": true,
+        "RemovableMediaOrExternalDevice": true,
+        "SMARTDeviceSpecificKeysMayVaryNotGuaranteed": {},
+        "SMARTStatus": "Not Supported",
+        "Sealed": "No",
+        "Size": 68231806976,
+        "SupportsGlobalPermissionsDisable": true,
+        "SystemImage": false,
+        "TotalSize": 62013661184,
+        "VolumeAllocationBlockSize": 4096,
+        "VolumeName": "Preboot",
+        "VolumeSize": 0,
+        "VolumeUUID": "61706673-7575-6964-0010-766F6C756D04",
+        "WholeDisk": false,
+        "Writable": false,
+        "WritableMedia": false,
+        "WritableVolume": false
+      }
+    },
+    "installed": {
+      "relative_path": "B4491B383B98259E8F3C44F6517759621C73D19CF34DB50EF256FA2167A847570D1032BAB267ACA39383736C80029282/System/Library/Caches/com.apple.kernelcaches/kernelcache",
+      "image_sha256": "e8ead0a8a83b4e68254b73cc2f70fe5df7486f5ea91f0bd217b34f4a5a87dcf2",
+      "payload_sha256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb",
+      "im4m_sha256": "ec08fc625f7f8b76861b93fb9a950022103fe4031ead235f64daad1df8c4c657",
+      "readonly": true,
+      "volume_info": {
+        "APFSContainerFree": 39560224768,
+        "APFSContainerReference": "disk9",
+        "APFSContainerSize": 68231806976,
+        "APFSPhysicalStores": [
+          {
+            "APFSPhysicalStore": "disk7s1"
+          }
+        ],
+        "APFSSnapshot": false,
+        "Bootable": false,
+        "BooterDeviceIdentifier": "disk9s5",
+        "BusProtocol": "Disk Image",
+        "CanBeMadeBootable": false,
+        "CanBeMadeBootableRequiresDestroy": false,
+        "CapacityInUse": 294584320,
+        "Content": "41504653-0000-11AA-AA11-00306543ECAC",
+        "DeviceBlockSize": 4096,
+        "DeviceIdentifier": "disk9s5",
+        "DeviceNode": "/dev/disk9s5",
+        "DeviceTreePath": "IODeviceTree:/",
+        "DiskUUID": "61706673-7575-6964-0010-766F6C756D04",
+        "Ejectable": true,
+        "EjectableMediaAutomaticUnderSoftwareControl": true,
+        "EjectableOnly": true,
+        "Encryption": false,
+        "EncryptionThisVolumeProper": false,
+        "FileVault": false,
+        "FilesystemName": "Case-sensitive APFS",
+        "FilesystemType": "apfs",
+        "FilesystemUserVisibleName": "APFS (Case-sensitive)",
+        "FreeSpace": 0,
+        "GlobalPermissionsEnabled": true,
+        "IOKitSize": 68231806976,
+        "IORegistryEntryName": "Preboot",
+        "Internal": false,
+        "Locked": false,
+        "MediaName": "",
+        "MediaType": "\u901a\u7528",
+        "MountPoint": "/private/tmp/task8-readback-ewxr6cf2/preboot",
+        "OSInternalMedia": false,
+        "ParentWholeDisk": "disk9",
+        "PartitionMapPartition": false,
+        "RAIDMaster": false,
+        "RAIDSlice": false,
+        "Removable": true,
+        "RemovableMedia": true,
+        "RemovableMediaOrExternalDevice": true,
+        "SMARTDeviceSpecificKeysMayVaryNotGuaranteed": {},
+        "SMARTStatus": "Not Supported",
+        "Sealed": "No",
+        "Size": 68231806976,
+        "SupportsGlobalPermissionsDisable": true,
+        "SystemImage": false,
+        "TotalSize": 62013661184,
+        "VolumeAllocationBlockSize": 4096,
+        "VolumeName": "Preboot",
+        "VolumeSize": 0,
+        "VolumeUUID": "61706673-7575-6964-0010-766F6C756D04",
+        "WholeDisk": false,
+        "Writable": false,
+        "WritableMedia": false,
+        "WritableVolume": false
+      }
+    }
+  },
+  "passed": true
+}

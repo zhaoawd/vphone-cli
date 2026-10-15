@@ -1,0 +1,73 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/11] Compiling vphone_cli VPhoneGuestWriteCoordinator.swift
+[6/11] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:47:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 45 |     let code: String
+ 46 |     let message: String
+ 47 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 48 | 
+ 49 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[7/35] Compiling vphone_cli VPhoneTouchIDMonitor.swift
+[8/35] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[9/35] Compiling vphone_cli VPhoneWindowController.swift
+[10/35] Compiling vphone_cli VPhoneHostCapabilities.swift
+[11/35] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[12/35] Compiling vphone_cli VPhoneHostCommandService.swift
+[13/35] Compiling vphone_cli VPhoneHostControl.swift
+[14/35] Compiling vphone_cli VPhoneKeyHelper.swift
+[15/35] Compiling vphone_cli VPhoneKeychainBrowserModel.swift
+[16/35] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[17/35] Compiling vphone_cli VPhoneFileBrowserView.swift
+[18/35] Compiling vphone_cli VPhoneHostAPICommands.swift
+[19/35] Compiling vphone_cli VPhoneMenuBattery.swift
+[20/35] Compiling vphone_cli VPhoneMenuConnect.swift
+[21/35] Compiling vphone_cli VPhoneMenuLocation.swift
+[22/35] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[23/35] Compiling vphone_cli VPhoneLocationProvider.swift
+[24/35] Compiling vphone_cli VPhoneMenuApps.swift
+[25/35] Compiling vphone_cli VPhoneControl.swift
+[26/35] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[27/35] Compiling vphone_cli VPhoneEntry.swift
+[28/35] Compiling vphone_cli VPhoneAppBrowserModel.swift
+[29/35] Compiling vphone_cli VPhoneAppBrowserView.swift
+[30/35] Compiling vphone_cli VPhoneAppDelegate.swift
+[30/37] Write Objects.LinkFileList
+[33/41] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[34/41] Compiling VPhoneCLITests GuestWriteCoordinationTests.swift
+[35/41] Compiling VPhoneCLITests GuestTransportTests.swift
+[36/41] Emitting module VPhoneCLITests
+[36/42] Write Objects.LinkFileList
+[37/42] Linking vphone-cli
+[38/42] Linking vphone-vm
+[39/42] Applying vphone-cli
+[40/42] Applying vphone-vm
+[41/42] Linking vphone-cliPackageTests
+Build complete! (10.13s)
+Test Suite 'Selected tests' started at 2026-10-13 06:25:10.962.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 06:25:10.963.
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-13 06:25:10.963.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testConcurrentOldReconciliationCannotReleaseNewWriterLease]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testConcurrentOldReconciliationCannotReleaseNewWriterLease]' passed (0.250 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' passed at 2026-10-13 06:25:11.214.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.250 (0.251) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 06:25:11.214.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.250 (0.251) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 06:25:11.214.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.250 (0.252) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

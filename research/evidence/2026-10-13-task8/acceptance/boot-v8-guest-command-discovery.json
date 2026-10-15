@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+    "guest",
+    "send",
+    "task8-copy",
+    "--library-root",
+    "/private/tmp/vphone-task8-acceptance-vms",
+    "--timeout",
+    "15",
+    "{\"t\": \"shell\", \"cmd\": \"printf \\\"shell=%s PATH=%s\\\\n\\\" \\\"$0\\\" \\\"$PATH\\\"; for f in /usr/bin/uname /bin/uname /var/jb/usr/bin/uname /var/jb/bin/uname /usr/sbin/sysctl /sbin/sysctl /var/jb/usr/sbin/sysctl /var/jb/sbin/sysctl; do if [ -x \\\"$f\\\" ]; then printf \\\"executable=%s\\\\n\\\" \\\"$f\\\"; \\\"$f\\\" -a 2>/dev/null; fi; done\", \"timeout_ms\": 10000, \"target\": {\"vm\": \"task8-copy\", \"instance_id\": \"D46D87C2-A877-4348-BA7F-A9410522C493\", \"process_started_at\": 1791945152.677849, \"pid\": 22914}}"
+  ],
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "error: task8-copy: connect to /private/tmp/vphone-task8-acceptance-vms/task8-copy/vphone.sock failed: Operation not permitted\n"
+}

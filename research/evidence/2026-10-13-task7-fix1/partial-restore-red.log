@@ -1,0 +1,81 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling deviceinterfaced.c
+[5/35] Compiling fls.c
+[5/35] Compiling locking.c
+[7/35] Compiling log.c
+[8/35] Compiling ftab.c
+[9/35] Compiling ipsw.c
+[10/35] Compiling idevicerestore.c
+[11/35] Compiling download.c
+[12/35] Compiling normal.c
+[13/35] Compiling asr.c
+[14/35] Compiling fdr.c
+[14/35] Compiling limera1n.c
+[16/35] Compiling recovery.c
+[17/35] Compiling restore.c
+[18/35] Compiling dfu.c
+[19/35] Compiling vphone_zip_stub.c
+[20/35] Compiling mbn.c
+[21/35] Compiling img4.c
+[22/35] Compiling ace3.c
+[23/35] Compiling common.c
+[23/35] Compiling img3.c
+[25/35] Compiling vphone_restore_bridge.c
+[26/35] Compiling MobileRecoveryCore libirecovery.c
+[28/36] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:47:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 45 |     let code: String
+ 46 |     let message: String
+ 47 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 48 | 
+ 49 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[28/36] Write Objects.LinkFileList
+[31/38] Emitting module VPhoneCLITests
+[32/38] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:429:29: error: main actor-isolated property 'journalOverride' can not be mutated from a nonisolated context
+ 17 |                 "environment_update", "environment_transaction", "environment_transaction_v2", "environment_activation"]
+ 18 |     var sourceContext: [String: String] = [:]
+ 19 |     var journalOverride: [String: VPhoneJSONValue]?
+    |         `- note: mutation of this property is only permitted within the actor
+ 20 |     var performRestore: (([String: VPhoneJSONValue]) throws -> VPhoneJSONValue)?
+ 21 |     var hideInstallJournal = false
+    :
+427 |                         for i in rows.indices { rows[i]["backup"] = "/var/root/Library/Caches/vphone-environment/transactions/" + journal.id + "/backup/" + (rows[i]["name"] as! String) }
+428 |                         value["libraries"] = rows
+429 |                         api.journalOverride = try JSONDecoder().decode([String: VPhoneJSONValue].self, from: JSONSerialization.data(withJSONObject: value))
+    |                             `- error: main actor-isolated property 'journalOverride' can not be mutated from a nonisolated context
+430 |                         api.installed = try transaction.completeHashes().mapValues { Optional($0) }
+431 |                     }
+
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:430:29: error: main actor-isolated property 'installed' can not be mutated from a nonisolated context
+ 27 |     var generation = UUID()
+ 28 |     var vmInstanceID = "fixture"
+ 29 |     var installed: [String: String?] = [:]
+    |         `- note: mutation of this property is only permitted within the actor
+ 30 |     var staged: [String: String] = [:]
+ 31 |     var aliasTarget: String? = "/usr/lib/launchdhook-vphone.dylib"
+    :
+428 |                         value["libraries"] = rows
+429 |                         api.journalOverride = try JSONDecoder().decode([String: VPhoneJSONValue].self, from: JSONSerialization.data(withJSONObject: value))
+430 |                         api.installed = try transaction.completeHashes().mapValues { Optional($0) }
+    |                             `- error: main actor-isolated property 'installed' can not be mutated from a nonisolated context
+431 |                     }
+432 |                     try publish()
+[32/38] Linking vphone-vm
+[32/38] Linking vphone-cli
+error: fatalError

@@ -1,0 +1,127 @@
+{
+  "passed": true,
+  "target_version": "2.6.20261021-local",
+  "before": {
+    "binding": {
+      "bundle": "2.6.20261016-local",
+      "kernel": "2.6.20261020-local"
+    },
+    "binding_sha256": "d270a47c62463a4adca22196b890a4dc228c7a11d2d3c1763f56078467452b25",
+    "receipt_sha256": "266ba0ad4589044c4f736ed2911267db03c22658c8f756fab453bb5e6b855cfb",
+    "desired_sha256": "ea1f464ba1ffb63737082879323cdac4a1efc8b40aa30e7ee7e505606a7fac34",
+    "journal_sha256": "0c82c842e7de04019f2f43d236db89a586e0e995ecd614c7c018e9df9777f82d",
+    "proof_sha256": "36ac7493c92e7634c004cdedb48519cb7e4132c9127efbac0e4b0c3244710d71",
+    "files_metadata": {
+      "Disk.img": {
+        "st_dev": 16777233,
+        "st_ino": 589096904,
+        "st_size": 68719476736,
+        "st_mtime_ns": 1791945744927731089,
+        "st_ctime_ns": 1791945744927731089
+      },
+      "nvram.bin": {
+        "st_dev": 16777233,
+        "st_ino": 589096999,
+        "st_size": 33570816,
+        "st_mtime_ns": 1791945744949593706,
+        "st_ctime_ns": 1791945744949593706
+      },
+      "SEPStorage": {
+        "st_dev": 16777233,
+        "st_ino": 589096997,
+        "st_size": 524288,
+        "st_mtime_ns": 1791945744615611946,
+        "st_ctime_ns": 1791945744615611946
+      },
+      "config.plist": {
+        "st_dev": 16777233,
+        "st_ino": 589096998,
+        "st_size": 1166,
+        "st_mtime_ns": 1791393399067155235,
+        "st_ctime_ns": 1791899693282259508
+      },
+      "AVPBooter.vresearch1.bin": {
+        "st_dev": 16777233,
+        "st_ino": 589096918,
+        "st_size": 335688,
+        "st_mtime_ns": 1790726340257467464,
+        "st_ctime_ns": 1791899693163019272
+      },
+      "AVPSEPBooter.vresearch1.bin": {
+        "st_dev": 16777233,
+        "st_ino": 589097000,
+        "st_size": 167936,
+        "st_mtime_ns": 1788431650000000000,
+        "st_ctime_ns": 1791899693285245031
+      }
+    }
+  },
+  "command": [
+    "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261021-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+    "vm",
+    "bind-core-bundle",
+    "task8-copy",
+    "--library-root",
+    "/private/tmp/vphone-task8-acceptance-vms",
+    "--version",
+    "2.6.20261021-local"
+  ],
+  "exit_code": 0,
+  "stdout": "task8-copy: host Core Bundle bound to 2.6.20261021-local; guest, kernel and boot-chain origins preserved\n",
+  "stderr": "",
+  "after": {
+    "binding": {
+      "bundle": "2.6.20261021-local",
+      "kernel": "2.6.20261020-local"
+    },
+    "binding_sha256": "211d294a81951424537cd68fc02064a40d4b00bea819ed34e093e7d241024076",
+    "receipt_sha256": "266ba0ad4589044c4f736ed2911267db03c22658c8f756fab453bb5e6b855cfb",
+    "desired_sha256": "ea1f464ba1ffb63737082879323cdac4a1efc8b40aa30e7ee7e505606a7fac34",
+    "journal_sha256": "0c82c842e7de04019f2f43d236db89a586e0e995ecd614c7c018e9df9777f82d",
+    "proof_sha256": "36ac7493c92e7634c004cdedb48519cb7e4132c9127efbac0e4b0c3244710d71",
+    "files_metadata": {
+      "Disk.img": {
+        "st_dev": 16777233,
+        "st_ino": 589096904,
+        "st_size": 68719476736,
+        "st_mtime_ns": 1791945744927731089,
+        "st_ctime_ns": 1791945744927731089
+      },
+      "nvram.bin": {
+        "st_dev": 16777233,
+        "st_ino": 589096999,
+        "st_size": 33570816,
+        "st_mtime_ns": 1791945744949593706,
+        "st_ctime_ns": 1791945744949593706
+      },
+      "SEPStorage": {
+        "st_dev": 16777233,
+        "st_ino": 589096997,
+        "st_size": 524288,
+        "st_mtime_ns": 1791945744615611946,
+        "st_ctime_ns": 1791945744615611946
+      },
+      "config.plist": {
+        "st_dev": 16777233,
+        "st_ino": 589096998,
+        "st_size": 1166,
+        "st_mtime_ns": 1791393399067155235,
+        "st_ctime_ns": 1791899693282259508
+      },
+      "AVPBooter.vresearch1.bin": {
+        "st_dev": 16777233,
+        "st_ino": 589096918,
+        "st_size": 335688,
+        "st_mtime_ns": 1790726340257467464,
+        "st_ctime_ns": 1791899693163019272
+      },
+      "AVPSEPBooter.vresearch1.bin": {
+        "st_dev": 16777233,
+        "st_ino": 589097000,
+        "st_size": 167936,
+        "st_mtime_ns": 1788431650000000000,
+        "st_ctime_ns": 1791899693285245031
+      }
+    }
+  }
+}

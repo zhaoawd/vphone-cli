@@ -14,8 +14,10 @@ final class VPhoneHostCommandExecutor {
     private let locationProvider: (any VPhoneHostLocation)?
     private let screen: (any VPhoneHostScreen)?
     private let target: VPhoneHostTarget?
+    private let runtime: VPhoneVMLock?
     /// `scripts/guest_environment.json` for the T17 environment commands.
     private let environmentManifest: URL
+    let guestWrites: VPhoneGuestWriteCoordinator
     let inputQueue: VPhoneHostInputQueue
 
     init(control: (any VPhoneHostGuest)? = nil,
@@ -25,7 +27,10 @@ final class VPhoneHostCommandExecutor {
          apiSession: (any VPhoneHostAPISession)? = nil,
          bootMode: BootMode = .normal,
          target: VPhoneHostTarget? = nil,
-         environmentManifest: URL? = nil, inputQueue: VPhoneHostInputQueue = VPhoneHostInputQueue()) {
+         environmentManifest: URL? = nil, inputQueue: VPhoneHostInputQueue = VPhoneHostInputQueue(),
+         guestWrites: VPhoneGuestWriteCoordinator = VPhoneGuestWriteCoordinator(), runtime: VPhoneVMLock? = nil) {
+        self.runtime = runtime
+        self.guestWrites = guestWrites
         self.inputQueue = inputQueue
         self.bootMode = bootMode
         self.target = target
@@ -81,9 +86,32 @@ final class VPhoneHostCommandExecutor {
         // Guest library replacement has its own path; `rpc` refuses
         // environment.install and environment.restore (T17).
         if VPhoneGuestEnvironmentUpdater.commands.contains(type) {
-            let outcome = await VPhoneGuestEnvironmentUpdater(session: apiSession, manifestURL: environmentManifest)
-                .execute(type, request: json)
-            return Self.response(ok: outcome.ok, error: outcome.error, extra: outcome.fields)
+            do {
+                let outcome: VPhoneGuestEnvironmentUpdater.Outcome
+                if type == "environment_status" || apiSession?.snapshot.state != .ready {
+                    if type == "environment_status" { await guestWrites.reconcile(apiSession) }
+                    outcome = await VPhoneGuestEnvironmentUpdater(session: apiSession, manifestURL: environmentManifest)
+                        .execute(type, request: json)
+                } else {
+                    guard let runtime else { throw VPhoneGuestEnvironmentRefusal("source_unqualified", "No live runtime source authority") }
+                    outcome = try await guestWrites.run {
+                        try await VPhoneGuestEnvironmentSource.withCurrentBundle(runtime: runtime, requestedStage: json["components"] as? String) { source in
+                            let result = await VPhoneGuestEnvironmentUpdater(session: apiSession, manifestURL: source.manifest, source: source, operationID: guestWrites.operationID)
+                                .execute(type, request: json)
+                            if let recovery = result.recovery { guestWrites.retainForRecovery(recovery) }
+                            else if result.fields["operation_may_continue"] as? Bool == true { guestWrites.retainForRecovery() }
+                            return result
+                        }
+                    }
+                }
+                var fields = outcome.fields
+                if guestWrites.pendingRecovery { fields["recovery_state"] = "pending_recovery"; fields["stop_blocked"] = true }
+                return Self.response(ok: outcome.ok, error: outcome.error, extra: fields)
+            } catch let refusal as VPhoneGuestEnvironmentRefusal {
+                return Self.response(ok: false, error: refusal.message, extra: refusal.fields.merging(["code": refusal.code]) { $1 })
+            } catch {
+                return Self.response(ok: false, error: String(describing: error), extra: ["code": "guest_write_busy"])
+            }
         }
         if let transport = json["transport"] {
             guard let name = transport as? String, ["classic", "api"].contains(name) else {
@@ -1062,6 +1090,17 @@ final class VPhoneHostCommandExecutor {
             outcome = await inputQueue.run(cancelled: .failure(.init(code: "command_cancelled"))) {
                 await VPhoneHostRPC.call(plan, session: session)
             }
+        } else if ["bootstrap.install", "bootstrap.uninstall", "bootstrap.firmware", "system.shutdown", "system.reboot", "system.respring"].contains(plan.method) {
+            do {
+                outcome = try await guestWrites.run {
+                    let result = await VPhoneHostRPC.call(plan, session: session)
+                    if case let .failure(failure) = result, failure.mayContinue { guestWrites.retainForRecovery() }
+                    return result
+                }
+                if ["system.shutdown", "system.reboot"].contains(plan.method), case .success = outcome {
+                    await guestWrites.sealAndWait()
+                }
+            } catch { outcome = .failure(.init(code: "guest_write_busy")) }
         } else {
             outcome = await VPhoneHostRPC.call(plan, session: session)
         }
@@ -1069,6 +1108,7 @@ final class VPhoneHostCommandExecutor {
         case let .failure(failure):
             var extra = failure.fields
             extra["method"] = plan.method
+            if guestWrites.pendingRecovery { extra["recovery_state"] = "pending_recovery"; extra["stop_blocked"] = true }
             return Self.response(ok: false, error: failure.code, extra: extra)
         case let .success(data):
             guard let value = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) else {

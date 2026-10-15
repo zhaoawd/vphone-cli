@@ -1,0 +1,37 @@
+{
+  "recorded_at": "2026-10-14T09:29:31.882066+00:00",
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/sw_vers"
+      ],
+      "exit_code": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0\nBuildVersion:\t\t26A428\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/sysctl",
+        "hw.model",
+        "hw.memsize",
+        "hw.ncpu",
+        "machdep.cpu.brand_string"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "sysctl: sysctl fmt -1 1024 1: Operation not permitted\n"
+    },
+    {
+      "command": [
+        "/usr/bin/swift",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "Apple Swift version 6.3 (swiftlang-6.3.0.123.5 clang-2100.0.123.102)\nTarget: arm64-apple-macosx28.0\n",
+      "stderr": "swift-driver version: 1.148.6 "
+    }
+  ],
+  "benchmark_input": "independent full-materialized synthetic files only",
+  "cache_policy": "warm; no eviction",
+  "acceptance_state": "task8-copy formally stopped and cleanup passed; readonly marker inspection ended and detached"
+}

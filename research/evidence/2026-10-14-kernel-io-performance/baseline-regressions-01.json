@@ -1,0 +1,21 @@
+{
+  "command": [
+    "swift",
+    "test",
+    "--package-path",
+    "/private/tmp/vphone-kernel-io-baseline-20261014",
+    "--scratch-path",
+    "/private/tmp/vphone-kernel-io-baseline-20261014/.build",
+    "--cache-path",
+    "/private/tmp/vphone-kernel-io-baseline-20261014/.swiftpm-cache",
+    "--disable-automatic-resolution",
+    "-c",
+    "release",
+    "--filter",
+    "FirmwareKernelIOEquivalenceTests|FirmwareKernelDiskMemoryTests"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 164.94409029197413,
+  "log": "baseline-regressions-01.log",
+  "phase": "unmodified algorithm + new direct equivalence and existing memory tests"
+}

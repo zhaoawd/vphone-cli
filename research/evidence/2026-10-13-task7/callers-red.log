@@ -1,0 +1,37 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/8] Compiling VPhoneCLITests GuestWriteCoordinationTests.swift
+[6/8] Emitting module VPhoneCLITests
+[7/8] Compiling VPhoneCLITests GuestTransportTests.swift
+[7/9] Write Objects.LinkFileList
+[8/9] Linking vphone-cliPackageTests
+Build complete! (5.14s)
+Test Suite 'Selected tests' started at 2026-10-13 05:54:29.279.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:54:29.280.
+Test Suite 'GuestTransportTests' started at 2026-10-13 05:54:29.280.
+Test Case '-[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect]' started.
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestTransportTests.swift:111: error: -[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect] : XCTAssertNotNil failed
+<unknown>:0: error: -[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect] : failed: caught error: "未能完成该操作。输入/输出错误"
+Test Case '-[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect]' failed (3.522 seconds).
+Test Suite 'GuestTransportTests' failed at 2026-10-13 05:54:32.802.
+	 Executed 1 test, with 2 failures (1 unexpected) in 3.522 (3.522) seconds
+Test Suite 'GuestWriteCoordinationTests' started at 2026-10-13 05:54:32.802.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed]' started.
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestWriteCoordinationTests.swift:61: error: -[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed] : XCTAssertEqual failed: ("["bootstrap.firmware", "clipboard.get"]") is not equal to ("["clipboard.get"]")
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestWriteCoordinationTests.swift:66: error: -[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed] : XCTAssertEqual failed: ("["bootstrap.firmware", "clipboard.get", "system.shutdown"]") is not equal to ("["clipboard.get", "bootstrap.firmware", "system.shutdown"]")
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed]' failed (0.006 seconds).
+Test Suite 'GuestWriteCoordinationTests' failed at 2026-10-13 05:54:32.808.
+	 Executed 1 test, with 2 failures (0 unexpected) in 0.006 (0.006) seconds
+Test Suite 'vphone-cliPackageTests.xctest' failed at 2026-10-13 05:54:32.808.
+	 Executed 2 tests, with 4 failures (1 unexpected) in 3.528 (3.528) seconds
+Test Suite 'Selected tests' failed at 2026-10-13 05:54:32.808.
+	 Executed 2 tests, with 4 failures (1 unexpected) in 3.528 (3.529) seconds
+[control] connected to unknown v1, caps: ["file"]
+[control] update requested but no binary available
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

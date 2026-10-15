@@ -1,0 +1,69 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Compiling VPhoneDaemonWire EnvironmentTransaction.swift
+[6/7] Emitting module VPhoneDaemonWire
+[6/8] Write Objects.LinkFileList
+[7/8] Linking vphone-cliPackageTests
+Build complete! (4.21s)
+Test Suite 'Selected tests' started at 2026-10-13 05:59:12.607.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:59:12.608.
+Test Suite 'GuestTransportTests' started at 2026-10-13 05:59:12.608.
+Test Case '-[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect]' passed (0.005 seconds).
+Test Suite 'GuestTransportTests' passed at 2026-10-13 05:59:12.613.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.005 (0.005) seconds
+Test Suite 'GuestWriteCoordinationTests' started at 2026-10-13 05:59:12.613.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed]' passed (0.003 seconds).
+Test Suite 'GuestWriteCoordinationTests' passed at 2026-10-13 05:59:12.616.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 05:59:12.616.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.008 (0.009) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 05:59:12.616.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.008 (0.009) seconds
+[control] vphoned binary: classic-update-F1A8A8AA-CFD8-4430-A1BE-46972BEA1558 (17 bytes, df268a5d992b...)
+[control] connected to unknown v1, caps: ["file"]
+[control] pushing update (17 bytes)...
+[control] vphoned binary: classic-update-A161D46D-0FD7-46A3-9513-5976205ADA0F (17 bytes, df268a5d992b...)
+[control] connected to unknown v1, caps: ["file"]
+[control] pushing update (17 bytes)...
+[control] read loop ended
+[control] guest update refused or failed: not connected to vphoned
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite EnvironmentTransactionTests started.
+◇ Test mappingsAreCurrentOrStaleByFileIdentity() started.
+◇ Test corruptRestoreComponentSetIsRefusedBeforeReplacement() started.
+◇ Test journalSaveFailureStopsBeforeNextReplacement() started.
+◇ Test unknownFailedOutputCannotAuthorizeAnotherInstall() started.
+◇ Test unresolvedJournalRefusesAnotherInstall() started.
+◇ Test retentionKeepsIncompleteTransactions() started.
+◇ Test validationRejectsBeforeAnyWrite() started.
+◇ Test statusReportsInstalledAndStagedDigests() started.
+◇ Test completeInstallKeepsBackupsAndJournal() started.
+◇ Test journalTemporarySymlinkCannotOverwriteExternalFile() started.
+◇ Test failedReplacementStopsAndRecordsRecovery() started.
+◇ Test replacementRequiresActualOutputReadback() started.
+◇ Test restoreRefusesAFileChangedAfterTheTransaction() started.
+◇ Test restoreJournalSaveFailureStopsBeforeNextReplacement() started.
+✔ Test statusReportsInstalledAndStagedDigests() passed after 0.024 seconds.
+✔ Test validationRejectsBeforeAnyWrite() passed after 0.024 seconds.
+✔ Test unresolvedJournalRefusesAnotherInstall() passed after 0.024 seconds.
+✔ Test mappingsAreCurrentOrStaleByFileIdentity() passed after 0.024 seconds.
+✔ Test journalSaveFailureStopsBeforeNextReplacement() passed after 0.024 seconds.
+✔ Test journalTemporarySymlinkCannotOverwriteExternalFile() passed after 0.024 seconds.
+✔ Test unknownFailedOutputCannotAuthorizeAnotherInstall() passed after 0.024 seconds.
+✔ Test completeInstallKeepsBackupsAndJournal() passed after 0.028 seconds.
+✘ Test retentionKeepsIncompleteTransactions() recorded an issue at EnvironmentTransactionTests.swift:275:6: Caught error: Failed transaction has an unknown output; recovery is required
+✘ Test retentionKeepsIncompleteTransactions() failed after 0.031 seconds with 1 issue.
+✔ Test replacementRequiresActualOutputReadback() passed after 0.033 seconds.
+✔ Test restoreRefusesAFileChangedAfterTheTransaction() passed after 0.033 seconds.
+✔ Test restoreJournalSaveFailureStopsBeforeNextReplacement() passed after 0.036 seconds.
+✔ Test failedReplacementStopsAndRecordsRecovery() passed after 0.037 seconds.
+✔ Test corruptRestoreComponentSetIsRefusedBeforeReplacement() passed after 0.047 seconds.
+✘ Suite EnvironmentTransactionTests failed after 0.047 seconds with 1 issue.
+✘ Test run with 14 tests in 1 suite failed after 0.047 seconds with 1 issue.

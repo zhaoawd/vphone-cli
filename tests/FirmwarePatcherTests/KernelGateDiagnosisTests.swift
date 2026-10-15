@@ -7,6 +7,34 @@ import Testing
 // Explicit original-kernel diagnostic loop; never part of the default fast run.
 @Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["VPHONE_DIAG_KERNEL_IM4P"] != nil))
 struct KernelGateDiagnosisTests {
+    @Test func regularMountExperimentChangesOnlyTwoAdditionalInstructions() throws {
+        let original = try payload()
+        func patch(experimental: Bool) throws -> (Data, PatchRunReport) {
+            let pipeline = FirmwarePipeline(vmDirectory: URL(fileURLWithPath: "/nonexistent/mount-test"),
+                variant: .regular, verbose: true, experimentalV2RootRemount: experimental)
+            let component = try #require(pipeline.buildComponentList().first { $0.name == "kernelcache" })
+            let (output, reports) = try pipeline.patchDataStructured(original, componentName: component.name,
+                patcherFactories: component.patcherFactories, gates: pipeline.gateSnapshot, ablate: [])
+            let report = FirmwarePipeline.makeReport(variant: "regular", gates: pipeline.gateSnapshot, components: reports)
+            try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: pipeline.gateSnapshot)
+            #expect(report.failedRequired.isEmpty)
+            return (output, report)
+        }
+        let (baseline, regular) = try patch(experimental: false)
+        let (candidate, experimental) = try patch(experimental: true)
+        #expect(regular.allRecords.count == 28)
+        #expect(Array(experimental.allRecords.prefix(regular.allRecords.count)) == regular.allRecords)
+        let additional = Array(experimental.allRecords.dropFirst(regular.allRecords.count))
+        #expect(additional.map(\.patchID) == ["kernelcache_jb.mac_mount.flag_gate", "kernelcache_jb.mac_mount.state_clear"])
+        var expected = baseline
+        for record in additional {
+            #expect(record.originalBytes.count == 4 && record.patchedBytes.count == 4)
+            #expect(Data(baseline[record.fileOffset..<record.fileOffset + 4]) == record.originalBytes)
+            expected.replaceSubrange(record.fileOffset..<record.fileOffset + 4, with: record.patchedBytes)
+        }
+        #expect(candidate == expected)
+    }
+
     private func payload() throws -> Data {
         let path = try #require(ProcessInfo.processInfo.environment["VPHONE_DIAG_KERNEL_IM4P"])
         return try IM4PHandler.load(contentsOf: URL(fileURLWithPath: path)).payload

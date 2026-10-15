@@ -1,0 +1,1550 @@
+diff --git a/Documents/Guides/create-and-run.md b/Documents/Guides/create-and-run.md
+index 7c4e67c65518dc452d4839d311cf076681c9d9af..e9dc22017707c525f5574670edbb7dea5e7afba1 100644
+--- a/Documents/Guides/create-and-run.md
++++ b/Documents/Guides/create-and-run.md
+@@ -85,3 +85,19 @@ vphone-cli vm import myphone.tzst --name restored
+ Do not swap `SEPStorage`, `nvram.bin` or the disk image between machines: they were made together by one restore, and a guest whose SEP storage does not match its disk panics at boot.
+ 
+ Run resource-heavy creations **one at a time**. Both the IPSWs and temporary restore tree consume substantial disk space, and patching large caches can be memory intensive. Check free space before starting a second VM.
++
++### Sharing disk space between VMs
++
++Two VMs restored separately from the same IPSW share nothing on disk, although much of their disk images is the same: two iOS 27.0 iPhones hold about 8.6 GB of identical bytes at the same places in their roughly 20 GB of data, mostly the system volume. `vm rebase` makes a stopped VM store those blocks once with another VM's:
++
++```sh
++vphone-cli vm rebase second --onto template --dry-run
++vphone-cli vm rebase second --onto template
++```
++
++It rebuilds `second`'s disk image from an APFS clone of `template`'s and writes in only the blocks that differ. Every byte is compared with the original before the image is replaced, so the guest sees exactly the same disk. Only the disk image changes: `SEPStorage`, `nvram.bin`, `config.plist` and the device identity stay as they are. Both VMs must be stopped and on the same APFS volume, and the volume needs free space for the blocks that are written until the old image is released. `--dry-run` reports what would be shared and written without writing anything.
++
++- The space comes back only when nothing else holds the old image's blocks. Snapshots of the VM, and clones made from it, keep them; delete those first or expect no saving.
++- `du` and Finder still count each image at its full size. Free space on the volume (`df`) is the honest measure.
++- The two images drift apart again as either VM writes to its disk. A base that is never booted, such as a freshly restored VM kept as a template, stays the best base, and rebasing again later recovers what drifted.
++- A rebase that is interrupted leaves the VM unchanged and may leave a hidden `.rebase-*` folder in it; delete that folder.
+diff --git a/Documents/Guides/snapshots.md b/Documents/Guides/snapshots.md
+index 134f99b9c2a7ac7345d58c2dfcf754de44c2f718..7e61ef8f070f8957bb7fbeddbbc8cba27c1ea6bf 100644
+--- a/Documents/Guides/snapshots.md
++++ b/Documents/Guides/snapshots.md
+@@ -69,6 +69,11 @@ writes to it, and then only the changed blocks take new space. Because of this,
+ `du` and Finder count each snapshot at the full size of the disk and overstate
+ what it really uses. Free space on the volume is the honest measure.
+ 
++A snapshot keeps the disk blocks it was taken with. `vm rebase`, which makes a
++VM share identical blocks with another VM's, frees nothing while a snapshot of
++that VM still holds the old ones; see
++[Sharing disk space between VMs](create-and-run.md#sharing-disk-space-between-vms).
++
+ The VM must be on an APFS volume. Elsewhere `create` refuses rather than copying
+ a disk image that can be tens of gigabytes.
+ 
+diff --git a/Research/Host/disk_rebase.md b/Research/Host/disk_rebase.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..4f366d366e5eba9db30202ae037dde4289e6925f
+--- /dev/null
++++ b/Research/Host/disk_rebase.md
+@@ -0,0 +1,134 @@
++# Disk rebase: sharing identical blocks between machines
++
++Why two machines restored from one IPSW share nothing on disk, how
++`vm rebase` makes them share what is identical, and what was measured. The
++implementation is `VPhoneDiskRebase` in
++`VPhoneKit/VPhoneCoreKit/Bundle/VPhoneDiskRebase.swift`; user-facing
++behaviour is in `Documents/Guides/create-and-run.md` ("Sharing disk space
++between VMs").
++
++## The problem
++
++`vm clone` shares every block with its source through `clonefile(2)`, but two
++machines restored separately share none, although the restore writes much the
++same bytes into both. Measured on 2026-10-06 with two iPhone99,11 machines
++restored from iOS 27.0 (24A435) on cloudOS 26.4 (23E5207q): of about 20 GB
++of data in each 64 GB sparse `Disk.img`, 8.6 GB is byte-identical at the same
++offset, mostly the ASR-restored system volume between roughly 1 GB and 9.7 GB
++into the image. Physical sharing between them, by `F_LOG2PHYS_EXT`, was 0.
++
++## Method
++
++macOS has no public call that clones a range of one file into another, so a
++block cannot be deduplicated in place. A whole file can be cloned, though:
++
++1. `clonefile` the base's image into `<target>/.rebase-<uuid>/Disk.img`, on the
++   target's volume. The staging file shares every block with the base. Off
++   APFS, or across volumes, `clonefile` fails and the rebase is refused; there
++   is no full-copy fallback.
++2. `ftruncate` it to the target's logical size.
++3. Walk the union of both files' data ranges (`SEEK_DATA` / `SEEK_HOLE`) in
++   8 MiB chunks with `F_NOCACHE`. Where the two read the same, the base's
++   block stays. Where they differ, the target's bytes are written, runs of
++   differing units in one `pwrite`; where the target reads as zeros (a hole,
++   or zero-filled blocks) the unit is punched with `F_PUNCHHOLE` instead, so
++   the result stays sparse. A partial unit at the end of the file is always
++   written.
++4. `F_FULLFSYNC`, then compare the staging file with the target over the
++   union of their data ranges (outside it both read as zeros): every byte.
++   Any difference refuses the rebase.
++5. Give the staging file the target's owner, mode and times, check both
++   machines are stopped and the target image's inode, size, mtime and ctime
++   are what they were at the start, then `rename(2)` it over `Disk.img`.
++
++The result holds exactly the target's bytes. Only the disk image changes:
++`SEPStorage`, `nvram.bin` and `config.plist` are untouched, and since the
++guest reads the same bytes, the SEP/keybag pairing and the identity are
++unaffected (see [machine identity](machine_identity_and_clone.md)).
++
++Both machines are checked stopped with `VPhoneBundleActivity.requireStopped`
++before anything starts and again before the swap, after every descriptor is
++closed (the check counts this process too). A write stops while the volume
++would have less than 4 GiB free, so a rebase does not fill the disk under
++running machines.
++
++### The unit is the 16 KiB page, not the 4 KiB block
++
++APFS on this Mac reports 4 KiB blocks (`f_bsize`), but a write into a cloned
++file replaces whole VM pages. Measured on macOS 27 with `F_LOG2PHYS_EXT` after
++`F_FULLFSYNC`, on a 1 MiB clone:
++
++| Write into the clone | Blocks that stopped being shared |
++| --- | --- |
++| 4 KiB at 64 KiB, `F_NOCACHE` | 4 (64–80 KiB) |
++| 8 KiB at 68 KiB, inside one page | 4 |
++| 16 KiB at 68 KiB, across a page boundary | 8 |
++
++Comparing 4 KiB blocks would count blocks as shared that the write beside
++them takes away, so `VPhoneDiskRebase.blockSize` is `getpagesize()` (16 KiB)
++and a differing unit is written whole. `F_PUNCHHOLE` itself works at 4 KiB.
++
++### APFS fills small holes
++
++A file written sparse does not stay sparse at every scale: after
++`F_FULLFSYNC`, a 4 MiB and a 32 MiB file with 256 KiB of data came back as
++all data, and in a 64 MiB file a hole of about 16 MiB between two extents was
++filled while a 23 MiB one was kept. Holes punched with `F_PUNCHHOLE` stayed.
++This only matters for the unit tests, which use 64 MiB images with large
++gaps; a 64 GB `Disk.img` keeps its holes.
++
++## Caveats
++
++- The space comes back only when the old image's blocks have no other owner.
++  A snapshot of the target, or a clone made from it, keeps them, and the
++  rebase then costs the written bytes instead of saving the shared ones.
++- `du` and Finder count each image at its full size; `df` is the measure.
++- Both images diverge again as either machine writes. A base that is never
++  booted makes the best one.
++
++## Measurements
++
++Live test on 2026-10-07 (macOS 27, APFS volume holding `~/.vphone/machines`),
++with the Debug `vphone-cli` from the build directory. Two machines restored
++separately from iOS 27.0 (24A435), iPhone99,11 on cloudOS 26.4:
++`rbtest-a`, a clone of one, and `rbtest-b`, a clone of the other, made with
++`vm clone`. A plain clone keeps sharing every block with its source, so a
++rebase of it would release nothing; `rbtest-a`'s image was first copied
++extent by extent into a file of its own (21.0 GB of data, `df` down by the
++same), so that the old image's blocks had no other owner.
++
++| | Before | After |
++| --- | --- | --- |
++| Physical sharing `rbtest-a` / `rbtest-b` (`F_LOG2PHYS_EXT`) | 0.00 GB | 8.69 GB |
++| `rbtest-a` data / held only by it | 21.04 GB / 21.04 GB | 20.64 GB / 11.95 GB |
++| Free space (`df`, 1K blocks) | 66,360,908 | 75,132,760 (+8.77 GB) |
++| SHA-256 of `rbtest-a/Disk.img` (64 GB) | `c14ced17…c27810d` | `c14ced17…c27810d` |
++
++```text
++$ vphone-cli vm rebase rbtest-a --onto rbtest-b
++rebased rbtest-a onto rbtest-b in 00:17
++  disk image  64.00 GB  logical size; 21.09 GB holds data in either image
++  shared       8.73 GB  identical to rbtest-b at the same offset, now shared
++  written     11.95 GB  differs from rbtest-b, written
++  punched      0.29 GB  zeros where rbtest-b has data, now holes
++```
++
++- `--dry-run` printed the same figures in 5 s; the rebase, with its full
++  verification pass, took 17 s.
++- The bytes held only by `rbtest-a` afterwards equal the bytes written. The
++  8.73 GB counted as shared and the 8.69 GB `physshare` finds differ by 0.5%,
++  probably because the report counts whole 16 KiB units, and a unit where
++  the base holds data in only some of its 4 KiB blocks counts in full.
++- Other machines were running and restoring on the volume during the test,
++  so `df` moves by a few hundred megabytes on its own; the +8.77 GB was read
++  immediately before and after the 17 s run.
++- The modification time of `Disk.img` was kept. A rebase between two plain
++  clones of one machine (identical images) shared all 21.02 GB, wrote
++  nothing and took 26 s.
++- Boot: `vm clone rbtest-a rbtest-boot --new-identity`, then
++  `vphone-launchpad-cli vm start rbtest-boot --headless --wait`. The guest
++  booted with a new UDID and vphoned answered `device.info` (iOS 27.0.0,
++  uptime 32 s); no panic in the console log. Stopped with `vm stop`.
++- Deleting the three test machines afterwards returned 12.3 GB: the 11.95 GB
++  written plus what `rbtest-boot` wrote while it ran.
++
+diff --git a/Research/Host/machine_identity_and_clone.md b/Research/Host/machine_identity_and_clone.md
+index ea839f50e339cf60eed51a553ea12b73aab0753b..36fb72942ad8f631c27644ef013c55712c42e4c5 100644
+--- a/Research/Host/machine_identity_and_clone.md
++++ b/Research/Host/machine_identity_and_clone.md
+@@ -146,3 +146,6 @@ deleting the source frees no shared blocks while a clone remains.
+ - Deleting clones leaves their DHCP bindings to unused MACs;
+   `vm leases --release-orphans` returns them (see
+   [network notes](network_fixed_address.md)).
++- Two machines restored separately share no disk blocks, although about 8.6 GB
++  of their images is identical; `vm rebase` re-shares it without touching
++  `SEPStorage`, `nvram.bin` or the identity (see [disk rebase](disk_rebase.md)).
+diff --git a/Research/README.md b/Research/README.md
+index 918d4e9fccf96263acdce8c7a093c549db5928eb..102e6943b99af257f48fe70a1bd584a49c28b448 100644
+--- a/Research/README.md
++++ b/Research/README.md
+@@ -19,7 +19,7 @@ This directory keeps the evidence behind firmware patches, restore and the self-
+ | Kernel | [CFW overview](Kernel/kernel_jb_patch_notes.md), [patcher verification](Kernel/kernel_patcher_verification.md), [FairPlay kexts](Kernel/kernel_fairplay_kexts.md), [base validation 1–5](Kernel/kernel_patch_base_first5_validation.md), [11–15](Kernel/kernel_patch_base_11_15_validation.md), [16–20](Kernel/kernel_patch_base_16_20_validation.md), [sandbox hooks](Kernel/kernel_patch_sandbox_hooks_17_26_validation.md), [individual patch notes](KernelCustomFirmwarePatches/README.md) |
+ | Other patches and captures | [Launchd jetsam](Patches/cfw_patch_launchd_jetsam.md), [user-mode hypervisor references](Patches/hv_vmm_present_usermode_xrefs.md), [reference capture](Patches/patch_reference_capture.md) |
+ | Restore | [DFU probe](Restore/virtual_dfu_probe.md), [in-process restore](Restore/native_restore_architecture.md) |
+-| Host and archives | [Binary split](Host/host_binary_split.md), [runtime dependency tiers](Host/runtime_dependency_tiers.md), [archive extraction contracts](Host/archive_extraction_contracts.md), [libarchive validation](Host/libarchive_xcframework_validation.md), [guest MAC, fixed address, port forwarding and names](Host/network_fixed_address.md), [machine identity and `vm clone --new-identity`](Host/machine_identity_and_clone.md) |
++| Host and archives | [Binary split](Host/host_binary_split.md), [runtime dependency tiers](Host/runtime_dependency_tiers.md), [archive extraction contracts](Host/archive_extraction_contracts.md), [libarchive validation](Host/libarchive_xcframework_validation.md), [guest MAC, fixed address, port forwarding and names](Host/network_fixed_address.md), [machine identity and `vm clone --new-identity`](Host/machine_identity_and_clone.md), [sharing identical disk blocks with `vm rebase`](Host/disk_rebase.md) |
+ | Guest interaction and VM identity | [DevMode XPC](Guest/devmode_xpc_protocol.md), [keyboard events](Guest/keyboard_event_pipeline.md), [machine identifier](Guest/machine_identifier_storage_analysis.md), [Auto-Lock on the Lock Screen](Guest/lock_screen_idle_timer.md), [display refresh rate](Guest/display_refresh_rate.md), [GPU acceleration](Guest/gpu_acceleration.md), [RootHide bootstrap base](Guest/roothide_bootstrap_base.md), [the Mac's .local name](Guest/mac_name_resolution.md), [locationd startup deadlock](Guest/locationd_startup_deadlock.md) |
+ | Historical project records | [Migration ledger](History/intg_update_status.md), [manifest refactoring summary](History/manifest_and_refactoring_summary.md) |
+ 
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCommand.swift
+index f799532df294ef40cd8ba9d744e345c6f9e54626..a09d7654f2a7e215f643ffcd1b24ebd8fccc42a0 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCommand.swift
+@@ -18,6 +18,7 @@ struct VPhoneVirtualMachineCommand: ParsableCommand {
+             VPhoneVirtualMachineRenameCommand.self,
+             VPhoneVirtualMachineDeleteCommand.self,
+             VPhoneVirtualMachineCloneCommand.self,
++            VPhoneVirtualMachineRebaseCommand.self,
+             VPhoneVirtualMachineSnapshotCommand.self,
+             VPhoneVirtualMachineExportCommand.self,
+             VPhoneVirtualMachineImportCommand.self,
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineRebaseCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineRebaseCommand.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..447fe023180f3670f64430b767e98f0518d4dcae
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineRebaseCommand.swift
+@@ -0,0 +1,97 @@
++import ArgumentParser
++import Foundation
++import VPhoneCoreKit
++
++// MARK: - rebase
++
++/// `vm rebase`: re-share a stopped machine's disk image with another's.
++struct VPhoneVirtualMachineRebaseCommand: ParsableCommand {
++    static let configuration = CommandConfiguration(
++        commandName: "rebase",
++        abstract: "Share a stopped VM's identical disk blocks with another VM",
++        discussion: """
++        Compares the disk images of two stopped VMs and rebuilds the first one's from an \
++        APFS clone of the base's, writing only the blocks that differ. Wherever both images \
++        hold the same bytes at the same offset (for VMs restored from the same IPSW, most of \
++        the system volume), the blocks are then stored once for both. Every byte is checked \
++        against the original before it is replaced, so the guest sees exactly the same disk; \
++        SEPStorage, nvram.bin, config.plist and the device identity are not touched.
++
++        Both VMs must be stopped and on one APFS volume. The rebase needs free space for the \
++        blocks it writes until the old image is released.
++
++        The space comes back only if nothing else holds the old image's blocks: snapshots of \
++        the VM, and clones made from it, keep them. du and Finder still report the full size \
++        of each image; free space on the volume is the honest measure. The two images drift \
++        apart again as either VM writes to its disk, so a base that is never booted, such as \
++        a freshly restored template, makes the best base.
++
++        --dry-run only compares the images and reports what a rebase would share and write.
++        """,
++    )
++
++    @OptionGroup var lib: VPhoneLibraryOption
++    @Argument(help: "VM whose disk image is rebased") var name: String?
++    @Option(name: .long, help: "VM whose disk blocks it shares") var onto: String
++    @Flag(help: "only report what would be shared and written") var dryRun = false
++
++    func run() throws {
++        let name = try VPhoneVirtualMachineSelection.resolveExisting(name, in: lib.library)
++        let target = try lib.library.bundle(named: name)
++        let base = try lib.library.bundle(named: onto)
++
++        let clock = ContinuousClock()
++        let start = clock.now
++        var bar: VPhoneProgressBar?
++        var phase: VPhoneDiskRebase.Phase?
++        let progress: VPhoneDiskRebase.Progress = { current, done, total in
++            if current != phase {
++                bar?.finish()
++                phase = current
++                bar = VPhoneProgressBar(label: current == .comparing ? "comparing" : "verifying")
++            }
++            bar?.update(done: done, total: total)
++        }
++        let report = dryRun
++            ? try VPhoneDiskRebase.plan(target, onto: base, progress: progress)
++            : try VPhoneDiskRebase.rebase(target, onto: base, progress: progress)
++        bar?.finish()
++        let elapsed = clock.now - start
++        let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
++
++        let elapsedText = VPhoneProgressBar.clock(seconds)
++        if dryRun {
++            print("dry run: compared \(target.name) with \(base.name) in \(elapsedText); nothing was changed")
++        } else {
++            print("rebased \(target.name) onto \(base.name) in \(elapsedText)")
++        }
++        for line in Self.describe(report, base: base.name, dryRun: dryRun) {
++            print("  " + line)
++        }
++        if !dryRun, let snapshots = try? VPhoneMachineSnapshots.list(of: target), !snapshots.isEmpty {
++            print("note: \(target.name) has \(snapshots.count) snapshot(s), which keep the old image's blocks until deleted")
++        }
++    }
++
++    /// The report as aligned lines, in decimal gigabytes like disk sizes.
++    static func describe(_ report: VPhoneDiskRebaseReport, base: String, dryRun: Bool) -> [String] {
++        let rows: [(String, Int64, String)] = [
++            ("disk image", report.logicalSize, "logical size; \(gigabytes(report.comparedBytes)) holds data in either image"),
++            ("shared", report.sharedBytes, dryRun
++                ? "identical to \(base) at the same offset, would be shared"
++                : "identical to \(base) at the same offset, now shared"),
++            ("written", report.writtenBytes, dryRun ? "differs from \(base), would be written" : "differs from \(base), written"),
++            ("punched", report.punchedBytes, dryRun ? "zeros where \(base) has data, would become holes" : "zeros where \(base) has data, now holes"),
++        ]
++        let sizes = rows.map { gigabytes($0.1) }
++        let width = sizes.map(\.count).max() ?? 0
++        return zip(rows, sizes).map { row, size in
++            row.0.padding(toLength: 12, withPad: " ", startingAt: 0)
++                + String(repeating: " ", count: width - size.count) + size + "  " + row.2
++        }
++    }
++
++    static func gigabytes(_ bytes: Int64) -> String {
++        String(format: "%.2f GB", Double(bytes) / 1e9)
++    }
++}
+diff --git a/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift
+index 8db005744dc3bf99ed6ef0e88cdea9cb1bbd6233..3efb682edaa58c0a49008b8f4c8cdb265ace7baf 100644
+--- a/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift
++++ b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift
+@@ -336,7 +336,8 @@ public enum VPhoneBundleOperations {
+     /// temporary cloudOS VM. None of these is `--include-ipsw`'s restore tree.
+     /// Snapshots stay with the machine they were taken on: in an archive each
+     /// one would be another full copy of the disk. A revert's staging folder
+-    /// is left behind only by a revert that was killed.
++    /// is left behind only by a revert that was killed, and a rebase's staging
++    /// folder only by a rebase that was killed.
+     ///
+     /// Export itself is `VPhoneBundleTransfer` in `VPhoneArchiveKit` — it needs
+     /// libarchive, and this does not. The list stays here because it describes
+@@ -349,6 +350,7 @@ public enum VPhoneBundleOperations {
+         ".pcc-system-*",
+         VPhoneMachineSnapshots.directoryName,
+         ".snapshot-revert-*",
++        VPhoneDiskRebase.stagingPrefix + "*",
+     ]
+ 
+     /// The directory holding each boot-chain file exactly as the restore tree laid
+diff --git a/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneDiskRebase.swift b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneDiskRebase.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..7bd8113a7873e101eebbc019f6857083eec1ffb7
+--- /dev/null
++++ b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneDiskRebase.swift
+@@ -0,0 +1,657 @@
++import Darwin
++import Foundation
++
++// MARK: - Report
++
++/// What a rebase did, or what a dry run would do, in bytes of the target's
++/// logical disk image.
++public struct VPhoneDiskRebaseReport: Equatable, Sendable {
++    /// The target image's size, unchanged by the rebase.
++    public var logicalSize: Int64 = 0
++    /// Bytes read from both images: everywhere either one holds data. Where
++    /// both are holes they read as zeros and nothing needs comparing.
++    public var comparedBytes: Int64 = 0
++    /// Bytes where the base holds data identical to the target's at the same
++    /// offset. The rebased image keeps the base's blocks there, so they are
++    /// stored once for both machines. Counted in whole units of
++    /// `VPhoneDiskRebase.blockSize`.
++    public var sharedBytes: Int64 = 0
++    /// Bytes that differ from the base and were written from the target.
++    public var writtenBytes: Int64 = 0
++    /// Bytes where the base holds data and the target reads as zeros, a hole
++    /// or zero-filled blocks. They become holes in the rebased image.
++    public var punchedBytes: Int64 = 0
++
++    public init() {}
++}
++
++// MARK: - Rebase
++
++/// Re-shares a stopped machine's disk image with another machine's, offline.
++///
++/// Two machines restored separately from one IPSW share nothing on disk, yet
++/// most of their system volume is byte-identical at the same offset in both
++/// images. macOS has no public call to clone a range of one file into
++/// another, but a whole file can be cloned: the base image is cloned into a
++/// staging file, which already shares every block with the base, and then
++/// only the blocks where the target differs are written into it. The result
++/// holds exactly the target's bytes and keeps the base's blocks wherever they
++/// already matched. It replaces the target's image with one `rename(2)`.
++///
++/// Only the disk image changes. `SEPStorage`, `nvram.bin`, `config.plist`
++/// and every other file are small and belong to the target machine, and stay
++/// as they are. The guest reads exactly the bytes it read before, so the
++/// identity, the SEP's anti-replay state and the keybag pairing between the
++/// disk and `SEPStorage` are what they were: to the guest nothing happened.
++///
++/// The space comes back only when nothing else holds the old image's blocks:
++/// a snapshot of the target, or a clone made from it, keeps them. Afterwards
++/// both machines diverge again as either one writes to its disk.
++public enum VPhoneDiskRebase {
++    /// The hidden staging folder in the target's machine folder: on the
++    /// target's volume, so `rename(2)` can put the result in place. A killed
++    /// rebase leaves one behind, and it can be deleted; `vm export` skips it.
++    public static let stagingPrefix = ".rebase-"
++
++    public enum Phase: Sendable {
++        case comparing
++        case verifying
++    }
++
++    /// Bytes done and the phase's total, reported in order from one thread.
++    public typealias Progress = (Phase, Int64, Int64) -> Void
++
++    /// Reads and writes move in pieces of this size, a multiple of
++    /// `blockSize`, and every piece starts on a multiple of it.
++    static let defaultChunkSize = 8 << 20
++    /// Writing stops while the volume has less than this left free, so a
++    /// rebase never fills the disk under machines that are running from it.
++    static let defaultFreeSpaceReserve: Int64 = 4 << 30
++
++    /// Test seams: chunk size, free-space floor, and calls at the two points
++    /// where a concurrent change matters.
++    struct Options {
++        var chunkSize = VPhoneDiskRebase.defaultChunkSize
++        var freeSpaceReserve = VPhoneDiskRebase.defaultFreeSpaceReserve
++        /// After the staging file is written, before it is verified.
++        var beforeVerify: (URL) throws -> Void = { _ in }
++        /// After verification, before the second running check and the swap.
++        var beforeSwap: () throws -> Void = {}
++    }
++
++    // MARK: Dry run
++
++    /// What `rebase` would share, write and punch, computed by comparing the
++    /// two images in place. Nothing is created or changed.
++    public static func plan(
++        _ target: VPhoneBundle,
++        onto base: VPhoneBundle,
++        progress: Progress = { _, _, _ in },
++    ) throws -> VPhoneDiskRebaseReport {
++        try plan(target, onto: base, options: Options(), progress: progress)
++    }
++
++    static func plan(
++        _ target: VPhoneBundle,
++        onto base: VPhoneBundle,
++        options: Options,
++        progress: Progress,
++    ) throws -> VPhoneDiskRebaseReport {
++        let (targetImage, baseImage) = try images(of: target, onto: base)
++        try VPhoneBundleActivity.requireStopped(target)
++        try VPhoneBundleActivity.requireStopped(base)
++
++        let targetFile = try ImageFile(path: targetImage.path, writable: false)
++        defer { targetFile.close() }
++        let baseFile = try ImageFile(path: baseImage.path, writable: false)
++        defer { baseFile.close() }
++        let size = targetFile.size
++        // Read as the staging file would be after it is cut to the target's
++        // size: the base's bytes up to there, zeros past the base's end.
++        let walk = try Walk(
++            target: targetFile,
++            reference: baseFile,
++            referenceData: baseFile.dataRanges(upTo: min(size, baseFile.size)),
++            size: size,
++            chunkSize: options.chunkSize,
++        )
++        return try walk.compare(apply: nil, progress: progress)
++    }
++
++    // MARK: Rebase
++
++    /// Rebases the target's disk image onto the base's. Both machines must be
++    /// stopped, and are checked again just before the swap. The target's
++    /// bytes are verified, all of them, before its image is replaced.
++    @discardableResult
++    public static func rebase(
++        _ target: VPhoneBundle,
++        onto base: VPhoneBundle,
++        progress: Progress = { _, _, _ in },
++    ) throws -> VPhoneDiskRebaseReport {
++        try rebase(target, onto: base, options: Options(), progress: progress)
++    }
++
++    @discardableResult
++    static func rebase(
++        _ target: VPhoneBundle,
++        onto base: VPhoneBundle,
++        options: Options,
++        progress: Progress,
++    ) throws -> VPhoneDiskRebaseReport {
++        let (targetImage, baseImage) = try images(of: target, onto: base)
++        try VPhoneBundleActivity.requireStopped(target)
++        try VPhoneBundleActivity.requireStopped(base)
++        let original = try FileState(path: targetImage.path)
++
++        let fm = FileManager.default
++        let staging = target.url.appendingPathComponent(stagingPrefix + UUID().uuidString, isDirectory: true)
++        try fm.createDirectory(at: staging, withIntermediateDirectories: false)
++        defer { try? fm.removeItem(at: staging) }
++        let stagedImage = staging.appendingPathComponent(target.manifest.diskImage)
++
++        // A clone, never a copy: off APFS, or across volumes, the operation
++        // is refused rather than writing the whole image.
++        guard clonefile(baseImage.path, stagedImage.path, UInt32(CLONE_NOFOLLOW)) == 0 else {
++            let code = errno
++            if code == ENOTSUP || code == EXDEV {
++                throw VPhoneDiskRebaseError.notCloneable(path: baseImage.path)
++            }
++            throw VPhoneDiskRebaseError.failed(path: baseImage.path, reason: String(cString: strerror(code)))
++        }
++
++        let report: VPhoneDiskRebaseReport
++        do {
++            let targetFile = try ImageFile(path: targetImage.path, writable: false)
++            defer { targetFile.close() }
++            let stagedFile = try ImageFile(path: stagedImage.path, writable: true)
++            defer { stagedFile.close() }
++            let size = targetFile.size
++            try stagedFile.truncate(to: size)
++
++            let walk = try Walk(
++                target: targetFile,
++                reference: stagedFile,
++                referenceData: stagedFile.dataRanges(upTo: size),
++                size: size,
++                chunkSize: options.chunkSize,
++            )
++            report = try walk.compare(
++                apply: Apply(file: stagedFile, freeSpaceReserve: options.freeSpaceReserve),
++                progress: progress,
++            )
++            try stagedFile.sync()
++            try options.beforeVerify(stagedImage)
++            try verify(stagedFile, against: targetFile, chunkSize: options.chunkSize, progress: progress)
++            try stagedFile.matchAttributes(of: original)
++        }
++
++        // Every descriptor is closed here: the running check below counts
++        // any process holding the image, this one too.
++        try options.beforeSwap()
++        try VPhoneBundleActivity.requireStopped(target)
++        try VPhoneBundleActivity.requireStopped(base)
++        // A machine that started and stopped again since the comparison
++        // passes the check above but has moved the image under it.
++        guard try FileState(path: targetImage.path) == original else {
++            throw VPhoneDiskRebaseError.changedDuringRebase(machine: target.name)
++        }
++        guard rename(stagedImage.path, targetImage.path) == 0 else {
++            throw VPhoneDiskRebaseError.failed(path: targetImage.path, reason: String(cString: strerror(errno)))
++        }
++        return report
++    }
++
++    // MARK: - Checks
++
++    /// The two disk images, after checking they belong to two machines.
++    private static func images(of target: VPhoneBundle, onto base: VPhoneBundle) throws -> (URL, URL) {
++        guard target.name != base.name else {
++            throw VPhoneDiskRebaseError.sameMachine(name: target.name)
++        }
++        let targetImage = target.url.appendingPathComponent(target.manifest.diskImage)
++        let baseImage = base.url.appendingPathComponent(base.manifest.diskImage)
++        for (bundle, image) in [(target, targetImage), (base, baseImage)] {
++            guard VPhoneVirtualMachineManifest.fileKind(at: image) == .regularFile else {
++                throw VPhoneDiskRebaseError.missingImage(machine: bundle.name, path: image.path)
++            }
++        }
++        // Two names for one folder (a link in the library) would rebase an
++        // image onto itself.
++        let targetState = try FileState(path: targetImage.path)
++        let baseState = try FileState(path: baseImage.path)
++        guard targetState.device != baseState.device || targetState.inode != baseState.inode else {
++            throw VPhoneDiskRebaseError.sameMachine(name: target.name)
++        }
++        return (targetImage, baseImage)
++    }
++
++    // MARK: - Verify
++
++    /// Compares the staged image with the target's over every byte. Where
++    /// both are holes they read as zeros, so only the places where either
++    /// holds data are read.
++    private static func verify(
++        _ staged: ImageFile,
++        against target: ImageFile,
++        chunkSize: Int,
++        progress: Progress,
++    ) throws {
++        guard staged.currentSize() == target.size else {
++            throw VPhoneDiskRebaseError.verificationFailed(offset: min(staged.currentSize(), target.size))
++        }
++        let size = target.size
++        let spans = try alignedUnion(
++            target.dataRanges(upTo: size),
++            staged.dataRanges(upTo: size),
++            block: Int64(blockSize),
++            size: size,
++        )
++        let total = spans.reduce(Int64(0)) { $0 + Int64($1.count) }
++        var done: Int64 = 0
++        let left = AlignedBuffer(size: chunkSize)
++        let right = AlignedBuffer(size: chunkSize)
++        progress(.verifying, 0, total)
++        for span in spans {
++            try forEachChunk(of: span, chunkSize: chunkSize) { offset, length in
++                try target.read(into: left, length: length, at: offset)
++                try staged.read(into: right, length: length, at: offset)
++                if memcmp(left.pointer, right.pointer, length) != 0 {
++                    var first = 0
++                    while first < length, left.bytes[first] == right.bytes[first] {
++                        first += 1
++                    }
++                    throw VPhoneDiskRebaseError.verificationFailed(offset: offset + Int64(first))
++                }
++                done += Int64(length)
++                progress(.verifying, done, total)
++            }
++        }
++    }
++
++    // MARK: - Walk
++
++    /// The unit of comparison: the VM page, 16 KiB on Apple silicon, and
++    /// never less than the 4 KiB APFS block. APFS allocates 4 KiB blocks, but
++    /// a write into a cloned file replaces every page it touches: measured on
++    /// macOS 27, one 4 KiB `pwrite` (with `F_NOCACHE`) gives the clone four
++    /// new blocks, and 16 KiB written across a page boundary eight. Comparing
++    /// smaller units would count blocks as shared that the write next to them
++    /// takes away. A page is also a whole number of blocks, as `F_PUNCHHOLE`
++    /// needs.
++    static let blockSize = max(4096, Int(getpagesize()))
++
++    /// Where a staging file is written, and how much free space to keep.
++    private struct Apply {
++        let file: ImageFile
++        let freeSpaceReserve: Int64
++    }
++
++    /// One pass over the target and a reference that reads as the staging
++    /// file: the staging file itself, or for a dry run the base image cut to
++    /// the target's size.
++    private struct Walk {
++        let target: ImageFile
++        let reference: ImageFile
++        /// The reference's data ranges, sorted, within the target's size.
++        let referenceData: [Range<Int64>]
++        let size: Int64
++        let chunkSize: Int
++
++        /// Compares every block where either side holds data. With `apply`,
++        /// a block that differs is written from the target, or punched when
++        /// the target reads as zeros there; without it they are only counted.
++        func compare(apply: Apply?, progress: Progress) throws -> VPhoneDiskRebaseReport {
++            var report = VPhoneDiskRebaseReport()
++            report.logicalSize = size
++            let block = VPhoneDiskRebase.blockSize
++            let spans = try alignedUnion(target.dataRanges(upTo: size), referenceData, block: Int64(block), size: size)
++            let total = spans.reduce(Int64(0)) { $0 + Int64($1.count) }
++            let ours = AlignedBuffer(size: chunkSize)
++            let theirs = AlignedBuffer(size: chunkSize)
++            let zeros = AlignedBuffer(size: block)
++            var cursor = 0 // into referenceData; blocks are visited in order
++            var done: Int64 = 0
++            progress(.comparing, 0, total)
++
++            for span in spans {
++                try forEachChunk(of: span, chunkSize: chunkSize) { offset, length in
++                    try target.read(into: ours, length: length, at: offset)
++                    try reference.read(into: theirs, length: length, at: offset)
++                    // Runs of blocks that need the same change, as offsets
++                    // within this chunk, done in one call each.
++                    var pending: (punch: Bool, start: Int, end: Int)?
++                    var spaceChecked = false
++                    func flush() throws {
++                        guard let run = pending else { return }
++                        pending = nil
++                        guard let apply else { return }
++                        if run.punch {
++                            try apply.file.punchHole(at: offset + Int64(run.start), length: run.end - run.start)
++                            return
++                        }
++                        // Once per chunk that writes, for the whole chunk.
++                        if !spaceChecked {
++                            try apply.file.requireFreeSpace(Int64(length), reserve: apply.freeSpaceReserve)
++                            spaceChecked = true
++                        }
++                        try apply.file.write(from: ours, range: run.start ..< run.end, at: offset)
++                    }
++
++                    var start = 0
++                    while start < length {
++                        let count = min(block, length - start)
++                        let at = offset + Int64(start)
++                        while cursor < referenceData.count, referenceData[cursor].upperBound <= at {
++                            cursor += 1
++                        }
++                        let referenceHasData = cursor < referenceData.count
++                            && referenceData[cursor].lowerBound < at + Int64(count)
++                        if memcmp(ours.pointer + start, theirs.pointer + start, count) == 0 {
++                            try flush()
++                            if referenceHasData {
++                                report.sharedBytes += Int64(count)
++                            }
++                        } else {
++                            // Zeros where the reference has other bytes become
++                            // a hole, so the result stays as sparse as the
++                            // target. A short block at the end of the file is
++                            // written instead: a hole is punched in whole
++                            // blocks only.
++                            let punch = count == block && memcmp(ours.pointer + start, zeros.pointer, count) == 0
++                            if punch {
++                                report.punchedBytes += Int64(count)
++                            } else {
++                                report.writtenBytes += Int64(count)
++                            }
++                            if let run = pending, run.punch == punch, run.end == start {
++                                pending = (punch, run.start, start + count)
++                            } else {
++                                try flush()
++                                pending = (punch, start, start + count)
++                            }
++                        }
++                        start += count
++                    }
++                    try flush()
++                    done += Int64(length)
++                    report.comparedBytes += Int64(length)
++                    progress(.comparing, done, total)
++                }
++            }
++            return report
++        }
++    }
++
++    /// Calls `body` for each piece of `span`, split at multiples of
++    /// `chunkSize` so pieces of different spans never overlap a boundary.
++    private static func forEachChunk(
++        of span: Range<Int64>,
++        chunkSize: Int,
++        _ body: (Int64, Int) throws -> Void,
++    ) throws {
++        precondition(chunkSize > 0 && chunkSize % blockSize == 0)
++        let chunk = Int64(chunkSize)
++        var offset = span.lowerBound
++        while offset < span.upperBound {
++            let end = min(span.upperBound, (offset / chunk + 1) * chunk)
++            try body(offset, Int(end - offset))
++            offset = end
++        }
++    }
++
++    /// The union of two sorted range lists, widened to whole blocks (the last
++    /// one ends at `size`) and merged.
++    static func alignedUnion(_ a: [Range<Int64>], _ b: [Range<Int64>], block: Int64, size: Int64) -> [Range<Int64>] {
++        let widened = (a + b)
++            .map { range -> Range<Int64> in
++                let lower = range.lowerBound / block * block
++                let upper = min(size, (range.upperBound + block - 1) / block * block)
++                return lower ..< upper
++            }
++            .filter { !$0.isEmpty }
++            .sorted { $0.lowerBound < $1.lowerBound }
++        var merged: [Range<Int64>] = []
++        for range in widened {
++            if let last = merged.last, range.lowerBound <= last.upperBound {
++                merged[merged.count - 1] = last.lowerBound ..< max(last.upperBound, range.upperBound)
++            } else {
++                merged.append(range)
++            }
++        }
++        return merged
++    }
++}
++
++// MARK: - Files
++
++/// Identity and the attributes a rebase keeps, of one disk image. The access
++/// time is kept but not compared: reading the image moves it.
++private struct FileState: Equatable {
++    let device: dev_t
++    let inode: ino_t
++    let size: off_t
++    let accessed: timespec
++    let modified: timespec
++    let changed: timespec
++    let owner: uid_t
++    let group: gid_t
++    let mode: mode_t
++
++    init(path: String) throws {
++        var info = stat()
++        guard lstat(path, &info) == 0 else {
++            throw VPhoneDiskRebaseError.failed(path: path, reason: String(cString: strerror(errno)))
++        }
++        device = info.st_dev
++        inode = info.st_ino
++        size = info.st_size
++        accessed = info.st_atimespec
++        modified = info.st_mtimespec
++        changed = info.st_ctimespec
++        owner = info.st_uid
++        group = info.st_gid
++        mode = info.st_mode
++    }
++
++    static func == (lhs: FileState, rhs: FileState) -> Bool {
++        lhs.device == rhs.device && lhs.inode == rhs.inode && lhs.size == rhs.size
++            && lhs.modified.tv_sec == rhs.modified.tv_sec && lhs.modified.tv_nsec == rhs.modified.tv_nsec
++            && lhs.changed.tv_sec == rhs.changed.tv_sec && lhs.changed.tv_nsec == rhs.changed.tv_nsec
++            && lhs.owner == rhs.owner && lhs.group == rhs.group && lhs.mode == rhs.mode
++    }
++}
++
++/// A page-aligned buffer, which uncached reads and writes prefer.
++private final class AlignedBuffer {
++    let pointer: UnsafeMutableRawPointer
++    let size: Int
++
++    init(size: Int) {
++        self.size = size
++        pointer = UnsafeMutableRawPointer.allocate(byteCount: size, alignment: Int(getpagesize()))
++        pointer.initializeMemory(as: UInt8.self, repeating: 0, count: size)
++    }
++
++    var bytes: UnsafeMutablePointer<UInt8> {
++        pointer.assumingMemoryBound(to: UInt8.self)
++    }
++
++    deinit {
++        pointer.deallocate()
++    }
++}
++
++/// An open disk image. Reads and writes bypass the buffer cache: a rebase
++/// passes over tens of gigabytes once, and caching them would only push out
++/// what the running machines use.
++private final class ImageFile {
++    let path: String
++    let descriptor: Int32
++    let size: Int64
++    private var isOpen = true
++
++    init(path: String, writable: Bool) throws {
++        self.path = path
++        descriptor = open(path, (writable ? O_RDWR : O_RDONLY) | O_NOFOLLOW | O_CLOEXEC)
++        guard descriptor >= 0 else {
++            throw VPhoneDiskRebaseError.failed(path: path, reason: String(cString: strerror(errno)))
++        }
++        _ = fcntl(descriptor, F_NOCACHE, 1)
++        var info = stat()
++        guard fstat(descriptor, &info) == 0 else {
++            let reason = String(cString: strerror(errno))
++            Darwin.close(descriptor)
++            throw VPhoneDiskRebaseError.failed(path: path, reason: reason)
++        }
++        size = Int64(info.st_size)
++    }
++
++    func close() {
++        guard isOpen else { return }
++        isOpen = false
++        Darwin.close(descriptor)
++    }
++
++    func currentSize() -> Int64 {
++        var info = stat()
++        return fstat(descriptor, &info) == 0 ? Int64(info.st_size) : -1
++    }
++
++    private func failure(_ code: Int32 = errno) -> VPhoneDiskRebaseError {
++        .failed(path: path, reason: String(cString: strerror(code)))
++    }
++
++    /// The data ranges below `limit`, sorted, by `SEEK_DATA` and `SEEK_HOLE`.
++    /// A file system that cannot tell holes apart is all data.
++    func dataRanges(upTo limit: Int64) throws -> [Range<Int64>] {
++        var ranges: [Range<Int64>] = []
++        var offset: Int64 = 0
++        while offset < limit {
++            let data = lseek(descriptor, off_t(offset), SEEK_DATA)
++            if data < 0 {
++                if errno == ENXIO { break } // no data from here to the end
++                if errno == EINVAL { return limit > 0 ? [0 ..< limit] : [] }
++                throw failure()
++            }
++            guard Int64(data) < limit else { break }
++            let hole = lseek(descriptor, data, SEEK_HOLE)
++            guard hole >= 0 else { throw failure() }
++            let end = min(limit, Int64(hole))
++            ranges.append(Int64(data) ..< end)
++            offset = end
++        }
++        return ranges
++    }
++
++    /// Fills `length` bytes from `offset`; past the end of the file they
++    /// read as zeros, as they do in a hole.
++    func read(into buffer: AlignedBuffer, length: Int, at offset: Int64) throws {
++        var filled = 0
++        while filled < length {
++            let got = pread(descriptor, buffer.pointer + filled, length - filled, off_t(offset + Int64(filled)))
++            if got < 0 {
++                if errno == EINTR { continue }
++                throw failure()
++            }
++            if got == 0 {
++                (buffer.pointer + filled).initializeMemory(as: UInt8.self, repeating: 0, count: length - filled)
++                return
++            }
++            filled += got
++        }
++    }
++
++    func write(from buffer: AlignedBuffer, range: Range<Int>, at chunkOffset: Int64) throws {
++        var written = 0
++        while written < range.count {
++            let start = range.lowerBound + written
++            let put = pwrite(descriptor, buffer.pointer + start, range.count - written, off_t(chunkOffset + Int64(start)))
++            if put < 0 {
++                if errno == EINTR { continue }
++                throw failure()
++            }
++            written += put
++        }
++    }
++
++    func punchHole(at offset: Int64, length: Int) throws {
++        var hole = fpunchhole_t()
++        hole.fp_offset = off_t(offset)
++        hole.fp_length = off_t(length)
++        guard fcntl(descriptor, F_PUNCHHOLE, &hole) == 0 else { throw failure() }
++    }
++
++    func truncate(to size: Int64) throws {
++        guard ftruncate(descriptor, off_t(size)) == 0 else { throw failure() }
++    }
++
++    /// Flushes to the disk itself, not just to the drive's cache.
++    func sync() throws {
++        if fcntl(descriptor, F_FULLFSYNC) != 0, fsync(descriptor) != 0 {
++            throw failure()
++        }
++    }
++
++    /// Refuses a write that would leave less than `reserve` free.
++    func requireFreeSpace(_ bytes: Int64, reserve: Int64) throws {
++        var info = statfs()
++        guard fstatfs(descriptor, &info) == 0 else { throw failure() }
++        let available = Int64(info.f_bavail) * Int64(info.f_bsize)
++        guard available - bytes >= reserve else {
++            throw VPhoneDiskRebaseError.insufficientSpace(path: path, available: available, reserve: reserve)
++        }
++    }
++
++    /// The clone has the base's owner, mode and times; the result keeps the
++    /// target's, as the guest's disk has not changed.
++    func matchAttributes(of original: FileState) throws {
++        var info = stat()
++        guard fstat(descriptor, &info) == 0 else { throw failure() }
++        if info.st_uid != original.owner || info.st_gid != original.group {
++            guard fchown(descriptor, original.owner, original.group) == 0 else { throw failure() }
++        }
++        guard fchmod(descriptor, original.mode & 0o7777) == 0 else { throw failure() }
++        let times = [original.accessed, original.modified]
++        guard futimens(descriptor, times) == 0 else { throw failure() }
++    }
++}
++
++// MARK: - Error
++
++public enum VPhoneDiskRebaseError: Error, Equatable {
++    case sameMachine(name: String)
++    case missingImage(machine: String, path: String)
++    case notCloneable(path: String)
++    case insufficientSpace(path: String, available: Int64, reserve: Int64)
++    /// The staged image differs from the target's at this offset.
++    case verificationFailed(offset: Int64)
++    case changedDuringRebase(machine: String)
++    case failed(path: String, reason: String)
++}
++
++extension VPhoneDiskRebaseError: CustomStringConvertible, LocalizedError {
++    public var description: String {
++        switch self {
++        case let .sameMachine(name):
++            "Cannot rebase VM '\(name)' onto itself. Name a different VM as the base."
++        case let .missingImage(machine, path):
++            "VM '\(machine)' has no disk image at \(path)."
++        case let .notCloneable(path):
++            "Cannot clone \(path): rebasing needs both VMs on one APFS volume, and a full copy is not made."
++        case let .insufficientSpace(path, available, reserve):
++            "Not enough free space on the volume of \(path): \(available / 1_000_000) MB free, and "
++                + "\(reserve / 1_000_000) MB must stay free. Nothing was changed. Free some space, then try again."
++        case let .verificationFailed(offset):
++            "The rebased disk image differs from the original at byte \(offset). Nothing was changed."
++        case let .changedDuringRebase(machine):
++            "VM '\(machine)' changed its disk image during the rebase. Nothing was changed. Stop it, then try again."
++        case let .failed(path, reason):
++            "Rebase failed at \(path): \(reason). Nothing was changed."
++        }
++    }
++
++    public var errorDescription: String? {
++        description
++    }
++}
+diff --git a/VPhoneKit/VPhoneCoreKitTests/Bundle/DiskRebaseTests.swift b/VPhoneKit/VPhoneCoreKitTests/Bundle/DiskRebaseTests.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..9419c0a3dead9657161c5441b4cfe1ddf299ca24
+--- /dev/null
++++ b/VPhoneKit/VPhoneCoreKitTests/Bundle/DiskRebaseTests.swift
+@@ -0,0 +1,540 @@
++import Darwin
++import Foundation
++import Testing
++@testable import VPhoneCoreKit
++
++/// Re-sharing a stopped machine's disk image with another machine's.
++///
++/// The temporary directory is on the boot volume, which is APFS, so every
++/// clone and punched hole here is real, and `F_LOG2PHYS_EXT` shows which
++/// blocks two images share. The images are 64 MiB with a few megabytes of
++/// data and holes of several megabytes between extents: APFS fills the holes
++/// of a small sparse file when it flushes it (a 32 MiB file with 256 KiB of
++/// data came back all data), and a hole of about a megabyte between two
++/// extents too. They are compared in 64 KiB chunks so that extents cross
++/// chunk boundaries.
++struct DiskRebaseTests {
++    /// The unit of comparison and sharing, 16 KiB on Apple silicon.
++    private static let unit = VPhoneDiskRebase.blockSize
++    private static let chunk = 64 << 10
++    private static let size = 64 << 20
++
++    // MARK: - Fixtures
++
++    /// One run of bytes in an image.
++    private struct Extent {
++        let offset: Int
++        let bytes: [UInt8]
++
++        init(_ offset: Int, _ bytes: [UInt8]) {
++            self.offset = offset
++            self.bytes = bytes
++        }
++
++        init(_ offset: Int, seed: UInt32, count: Int) {
++            self.init(offset, DiskRebaseTests.pattern(seed: seed, count: count))
++        }
++    }
++
++    /// Bytes that differ for each seed and contain no zeros.
++    private static func pattern(seed: UInt32, count: Int) -> [UInt8] {
++        var state = seed &* 2_654_435_761 | 1
++        return (0 ..< count).map { _ in
++            state ^= state << 13
++            state ^= state >> 17
++            state ^= state << 5
++            return UInt8(truncatingIfNeeded: state) | 1
++        }
++    }
++
++    private struct Machines {
++        let root: URL
++        let target: VPhoneBundle
++        let base: VPhoneBundle
++
++        var targetImage: URL {
++            target.url.appendingPathComponent("Disk.img")
++        }
++
++        var baseImage: URL {
++            base.url.appendingPathComponent("Disk.img")
++        }
++    }
++
++    private func makeMachines() throws -> Machines {
++        let fm = FileManager.default
++        let root = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        try fm.createDirectory(at: root, withIntermediateDirectories: true)
++        let rom = root.appendingPathComponent("rom.bin")
++        try Data([0xAA]).write(to: rom)
++        let library = VPhoneLibrary(root: root)
++        func make(_ name: String) throws -> VPhoneBundle {
++            let bundle = try VPhoneBundleOperations.create(
++                .init(name: name, cpuCount: 2, memoryMB: 1024, diskSizeGB: 1, romSource: rom, sepromSource: rom),
++                in: library,
++            )
++            try Data([4, 5, 6]).write(to: bundle.url.appendingPathComponent("nvram.bin"))
++            return bundle
++        }
++        return try Machines(root: root, target: make("target"), base: make("base"))
++    }
++
++    /// Replaces the image with a sparse file of `size` bytes holding `extents`,
++    /// flushed so its blocks have physical addresses.
++    private func writeImage(_ url: URL, size: Int = DiskRebaseTests.size, _ extents: [Extent]) throws {
++        unlink(url.path)
++        let fd = open(url.path, O_RDWR | O_CREAT | O_TRUNC, 0o777)
++        try #require(fd >= 0)
++        defer { close(fd) }
++        try #require(ftruncate(fd, off_t(size)) == 0)
++        for extent in extents {
++            let put = extent.bytes.withUnsafeBytes { pwrite(fd, $0.baseAddress, $0.count, off_t(extent.offset)) }
++            try #require(put == extent.bytes.count)
++        }
++        try #require(fcntl(fd, F_FULLFSYNC) == 0)
++    }
++
++    private func options(chunk: Int = DiskRebaseTests.chunk) -> VPhoneDiskRebase.Options {
++        var options = VPhoneDiskRebase.Options()
++        options.chunkSize = chunk
++        options.freeSpaceReserve = 0
++        return options
++    }
++
++    /// Rebases after a dry run, and checks what every rebase must keep: the
++    /// target's bytes, mode and modification time, the base untouched, a dry run that
++    /// predicted the result, and no staging folder.
++    @discardableResult
++    private func rebase(_ machines: Machines, chunk: Int = DiskRebaseTests.chunk) throws -> VPhoneDiskRebaseReport {
++        // Clones: free, and they keep the old bytes for comparison.
++        let targetBefore = machines.root.appendingPathComponent("target-before")
++        let baseBefore = machines.root.appendingPathComponent("base-before")
++        try #require(clonefile(machines.targetImage.path, targetBefore.path, 0) == 0)
++        try #require(clonefile(machines.baseImage.path, baseBefore.path, 0) == 0)
++        defer {
++            unlink(targetBefore.path)
++            unlink(baseBefore.path)
++        }
++        let mode = try mode(of: machines.targetImage)
++        let modified = try modified(of: machines.targetImage)
++
++        let planned = try VPhoneDiskRebase.plan(machines.target, onto: machines.base, options: options(chunk: chunk), progress: { _, _, _ in })
++        var phases: [VPhoneDiskRebase.Phase] = []
++        let report = try VPhoneDiskRebase.rebase(machines.target, onto: machines.base, options: options(chunk: chunk)) { phase, done, total in
++            #expect(done <= total)
++            if phases.last != phase {
++                phases.append(phase)
++            }
++        }
++        #expect(report == planned)
++        #expect(phases == [.comparing, .verifying])
++        #expect(try sameBytes(machines.targetImage, targetBefore))
++        #expect(try sameBytes(machines.baseImage, baseBefore))
++        #expect(try self.mode(of: machines.targetImage) == mode)
++        #expect(try self.modified(of: machines.targetImage) == modified)
++        #expect(try report.logicalSize == Int64(size(of: machines.targetImage)))
++        try expectNoStaging(machines)
++        return report
++    }
++
++    private func mode(of url: URL) throws -> mode_t {
++        var info = stat()
++        try #require(stat(url.path, &info) == 0)
++        return info.st_mode & 0o7777
++    }
++
++    /// The modification time, in nanoseconds.
++    private func modified(of url: URL) throws -> Int {
++        var info = stat()
++        try #require(stat(url.path, &info) == 0)
++        return info.st_mtimespec.tv_sec * 1_000_000_000 + info.st_mtimespec.tv_nsec
++    }
++
++    private func size(of url: URL) throws -> Int {
++        var info = stat()
++        try #require(stat(url.path, &info) == 0)
++        return Int(info.st_size)
++    }
++
++    /// Whether two files have the same size and bytes, read a megabyte at a
++    /// time; holes read as zeros.
++    private func sameBytes(_ a: URL, _ b: URL) throws -> Bool {
++        guard try size(of: a) == size(of: b) else { return false }
++        let left = try FileHandle(forReadingFrom: a)
++        defer { try? left.close() }
++        let right = try FileHandle(forReadingFrom: b)
++        defer { try? right.close() }
++        while true {
++            let ours = try left.read(upToCount: 1 << 20) ?? Data()
++            let theirs = try right.read(upToCount: 1 << 20) ?? Data()
++            guard ours == theirs else { return false }
++            if ours.isEmpty { return true }
++        }
++    }
++
++    private func expectNoStaging(_ machines: Machines) throws {
++        let staged = try FileManager.default.contentsOfDirectory(atPath: machines.target.url.path)
++            .filter { $0.hasPrefix(VPhoneDiskRebase.stagingPrefix) }
++        #expect(staged.isEmpty)
++    }
++
++    /// The device offset of the block at `offset`, or nil in a hole.
++    private func physical(_ url: URL, at offset: Int) throws -> Int64? {
++        let fd = open(url.path, O_RDONLY)
++        try #require(fd >= 0)
++        defer { close(fd) }
++        guard lseek(fd, off_t(offset), SEEK_DATA) == off_t(offset) else { return nil }
++        var map = log2phys()
++        map.l2p_contigbytes = off_t(Self.unit)
++        map.l2p_devoffset = off_t(offset)
++        try #require(fcntl(fd, F_LOG2PHYS_EXT, &map) == 0)
++        return Int64(map.l2p_devoffset)
++    }
++
++    /// The bytes in the file's data ranges.
++    private func dataBytes(of url: URL) throws -> Int {
++        let fd = open(url.path, O_RDONLY)
++        try #require(fd >= 0)
++        defer { close(fd) }
++        let end = lseek(fd, 0, SEEK_END)
++        var total = 0
++        var offset: off_t = 0
++        while offset < end {
++            let data = lseek(fd, offset, SEEK_DATA)
++            guard data >= 0 else { break }
++            let hole = lseek(fd, data, SEEK_HOLE)
++            total += Int(hole - data)
++            offset = hole
++        }
++        return total
++    }
++
++    private func isHole(_ url: URL, at offset: Int) throws -> Bool {
++        try physical(url, at: offset) == nil
++    }
++
++    /// Whether the target's unit at `offset` is the base's, every block of it.
++    private func shares(_ machines: Machines, at offset: Int) throws -> Bool {
++        for block in stride(from: offset, to: offset + Self.unit, by: 4096) {
++            let ours = try physical(machines.targetImage, at: block)
++            guard let ours, try ours == physical(machines.baseImage, at: block) else { return false }
++        }
++        return true
++    }
++
++    // MARK: - Sharing
++
++    @Test func `identical images end up sharing every data block`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        // Extents that start and end inside chunks, one across a boundary.
++        let unit = Self.unit
++        let extents = [
++            Extent(0, seed: 1, count: 256 << 10),
++            Extent((16 << 20) + 3 * unit, seed: 2, count: 50 * unit),
++            Extent((40 << 20) - 3 * unit, seed: 3, count: 20 * unit),
++        ]
++        try writeImage(machines.baseImage, extents)
++        try writeImage(machines.targetImage, extents)
++        #expect(try !shares(machines, at: 0))
++
++        let report = try rebase(machines)
++        // Every byte the base stores, which is more than the extents: APFS
++        // fills the smaller holes between them with zeros.
++        let data = try dataBytes(of: machines.baseImage)
++        #expect(data >= extents.reduce(0) { $0 + $1.bytes.count })
++        #expect(report.sharedBytes == Int64(data))
++        #expect(report.writtenBytes == 0)
++        #expect(report.punchedBytes == 0)
++        #expect(report.comparedBytes == Int64(data))
++        for extent in extents {
++            for offset in stride(from: extent.offset, to: extent.offset + extent.bytes.count, by: unit) {
++                #expect(try shares(machines, at: offset), "unit at \(offset)")
++            }
++        }
++        #expect(try isHole(machines.targetImage, at: 32 << 20))
++    }
++
++    @Test(arguments: [16 << 10, 64 << 10, 8 << 20])
++    func `only the differing units are written`(chunk: Int) throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let unit = Self.unit
++        let data = 2 << 20
++        let base = Self.pattern(seed: 7, count: data)
++        try writeImage(machines.baseImage, [Extent(0, base)])
++
++        // One byte in each of three units, and a run of 8 units that
++        // straddles the boundary at 1 MiB, starting 5 units before it.
++        var target = base
++        let changed = [3, 50, 127] + Array(((1 << 20) / unit - 5) ..< ((1 << 20) / unit + 3))
++        for index in changed {
++            target[index * unit + 777] ^= 0xFF
++        }
++        try writeImage(machines.targetImage, [Extent(0, target)])
++
++        let report = try rebase(machines, chunk: chunk)
++        #expect(report.writtenBytes == Int64(changed.count * unit))
++        #expect(report.sharedBytes == Int64(data - changed.count * unit))
++        #expect(report.punchedBytes == 0)
++        for index in 0 ..< data / unit {
++            #expect(try shares(machines, at: index * unit) == !changed.contains(index), "unit \(index)")
++        }
++    }
++
++    // MARK: - Holes
++
++    @Test func `zeros in the target where the base has data become holes`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let unit = Self.unit
++        let base = Self.pattern(seed: 11, count: 512 << 10)
++        try writeImage(machines.baseImage, [Extent(0, base)])
++        // A hole over 128–256 KiB, and one unit written as zeros at 320 KiB.
++        let zeros = 320 << 10
++        try writeImage(machines.targetImage, [
++            Extent(0, Array(base[0 ..< 128 << 10])),
++            Extent(256 << 10, Array(base[(256 << 10) ..< zeros])),
++            Extent(zeros, [UInt8](repeating: 0, count: unit)),
++            Extent(zeros + unit, Array(base[(zeros + unit)...])),
++        ])
++
++        let report = try rebase(machines)
++        #expect(report.punchedBytes == Int64((128 << 10) + unit))
++        #expect(report.writtenBytes == 0)
++        #expect(report.sharedBytes == Int64(base.count) - report.punchedBytes)
++        #expect(try isHole(machines.targetImage, at: 128 << 10))
++        #expect(try isHole(machines.targetImage, at: (256 << 10) - unit))
++        #expect(try isHole(machines.targetImage, at: zeros))
++        #expect(try shares(machines, at: 256 << 10))
++        #expect(try shares(machines, at: zeros + unit))
++    }
++
++    @Test func `data in the target where the base has holes is written`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let head = Extent(0, seed: 21, count: 64 << 10)
++        let body = Extent(64 << 10, seed: 22, count: (1 << 20) + 3 * Self.unit)
++        try writeImage(machines.baseImage, [head])
++        try writeImage(machines.targetImage, [head, body])
++
++        let report = try rebase(machines)
++        #expect(report.sharedBytes == Int64(head.bytes.count))
++        #expect(report.writtenBytes == Int64(body.bytes.count))
++        #expect(report.punchedBytes == 0)
++        #expect(try shares(machines, at: 0))
++        #expect(try !shares(machines, at: body.offset))
++        #expect(try isHole(machines.targetImage, at: 32 << 20))
++    }
++
++    // MARK: - Sizes
++
++    @Test(arguments: [(64 << 20, 96 << 20), (96 << 20, 64 << 20)])
++    func `the result takes the target's size`(targetSize: Int, baseSize: Int) throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let common = Extent(0, seed: 31, count: 1 << 20)
++        // Each has data near its own end: the base's past the target's end
++        // when it shrinks, the target's past the base's end when it grows.
++        let baseTail = Extent(baseSize - (512 << 10), seed: 32, count: 512 << 10)
++        let targetTail = Extent(targetSize - (256 << 10), seed: 33, count: 256 << 10)
++        try writeImage(machines.baseImage, size: baseSize, [common, baseTail])
++        try writeImage(machines.targetImage, size: targetSize, [common, targetTail])
++
++        let report = try rebase(machines)
++        #expect(try size(of: machines.targetImage) == targetSize)
++        #expect(report.sharedBytes == Int64(common.bytes.count))
++        #expect(report.writtenBytes == Int64(targetTail.bytes.count))
++        // Growing, the base's tail lies inside the target, where it is a hole.
++        #expect(report.punchedBytes == (targetSize > baseSize ? Int64(baseTail.bytes.count) : 0))
++        #expect(try shares(machines, at: (1 << 20) - Self.unit))
++    }
++
++    @Test func `a partial unit at the end is compared and written, never punched`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let unit = Self.unit
++        let size = Self.size + 100
++        let common = Extent(0, seed: 41, count: 64 << 10)
++        try writeImage(machines.baseImage, size: size, [common, Extent(Self.size, seed: 42, count: 100)])
++        // The target's last 100 bytes are zeros where the base has data, and
++        // the unit before them has data where the base has a hole.
++        try writeImage(machines.targetImage, size: size, [common, Extent(Self.size - unit, seed: 43, count: unit)])
++
++        let report = try rebase(machines)
++        #expect(report.writtenBytes == Int64(unit + 100))
++        #expect(report.punchedBytes == 0)
++        #expect(report.sharedBytes == Int64(common.bytes.count))
++    }
++
++    @Test func `a base that ends inside a unit reads as zeros past its end`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let baseSize = Self.size + 1000
++        let tail = Extent(Self.size - (64 << 10), seed: 51, count: (64 << 10) + 1000)
++        try writeImage(machines.baseImage, size: baseSize, [tail])
++        // The same bytes, then zeros to the end of the unit and beyond.
++        try writeImage(machines.targetImage, size: Self.size + (1 << 20), [tail])
++
++        let report = try rebase(machines)
++        #expect(report.writtenBytes == 0)
++        #expect(report.punchedBytes == 0)
++        #expect(report.sharedBytes == Int64((64 << 10) + Self.unit))
++    }
++
++    // MARK: - Refusals
++
++    @Test func `a machine cannot be rebased onto itself`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        #expect(throws: VPhoneDiskRebaseError.sameMachine(name: "target")) {
++            try VPhoneDiskRebase.rebase(machines.target, onto: machines.target)
++        }
++        #expect(throws: VPhoneDiskRebaseError.sameMachine(name: "target")) {
++            try VPhoneDiskRebase.plan(machines.target, onto: machines.target)
++        }
++        // Another name for the same folder is the same machine.
++        let link = machines.root.appendingPathComponent("alias")
++        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: machines.target.url)
++        let alias = try VPhoneLibrary(root: machines.root).bundle(named: "alias")
++        #expect(throws: VPhoneDiskRebaseError.sameMachine(name: "alias")) {
++            try VPhoneDiskRebase.rebase(alias, onto: machines.target)
++        }
++        try expectNoStaging(machines)
++    }
++
++    @Test(arguments: ["target", "base"])
++    func `a held state file on either machine refuses`(held: String) throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        try writeImage(machines.baseImage, [Extent(0, seed: 61, count: 64 << 10)])
++        try writeImage(machines.targetImage, [Extent(0, seed: 62, count: 64 << 10)])
++        var before = stat()
++        try #require(stat(machines.targetImage.path, &before) == 0)
++
++        let bundle = held == "target" ? machines.target : machines.base
++        let fd = open(bundle.url.appendingPathComponent("SEPStorage").path, O_RDONLY)
++        try #require(fd >= 0)
++        defer { close(fd) }
++        let running = VPhoneBundleActivityError.running(name: held, pids: [getpid()])
++        #expect(throws: running) {
++            try VPhoneDiskRebase.plan(machines.target, onto: machines.base)
++        }
++        #expect(throws: running) {
++            try VPhoneDiskRebase.rebase(machines.target, onto: machines.base)
++        }
++        var after = stat()
++        try #require(stat(machines.targetImage.path, &after) == 0)
++        #expect(after.st_ino == before.st_ino)
++        try expectNoStaging(machines)
++    }
++
++    /// A rebase that fails after the staging file exists changes nothing and
++    /// leaves nothing behind.
++    @Test func `failures leave the target as it was`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let common = Extent(0, seed: 71, count: 256 << 10)
++        try writeImage(machines.baseImage, [common])
++        try writeImage(machines.targetImage, [common, Extent(512 << 10, seed: 72, count: 64 << 10)])
++        let original = machines.root.appendingPathComponent("original")
++        try #require(clonefile(machines.targetImage.path, original.path, 0) == 0)
++        var inode = stat()
++        try #require(stat(machines.targetImage.path, &inode) == 0)
++
++        func expectUnchanged() throws {
++            #expect(try sameBytes(machines.targetImage, original))
++            var now = stat()
++            try #require(stat(machines.targetImage.path, &now) == 0)
++            #expect(now.st_ino == inode.st_ino)
++            try expectNoStaging(machines)
++        }
++
++        // A staged byte that does not match is caught by verification.
++        var corrupt = options()
++        corrupt.beforeVerify = { staged in
++            let fd = open(staged.path, O_RDWR)
++            defer { close(fd) }
++            var byte: UInt8 = 0xEE
++            _ = pwrite(fd, &byte, 1, off_t(5000))
++        }
++        #expect(throws: VPhoneDiskRebaseError.verificationFailed(offset: 5000)) {
++            try VPhoneDiskRebase.rebase(machines.target, onto: machines.base, options: corrupt, progress: { _, _, _ in })
++        }
++        try expectUnchanged()
++
++        // The target starts while the staging file is checked.
++        var held: Int32 = -1
++        var started = options()
++        started.beforeSwap = { held = open(machines.targetImage.path, O_RDONLY) }
++        #expect(throws: VPhoneBundleActivityError.running(name: "target", pids: [getpid()])) {
++            try VPhoneDiskRebase.rebase(machines.target, onto: machines.base, options: started, progress: { _, _, _ in })
++        }
++        close(held)
++        try expectUnchanged()
++
++        // Writing would leave less than the reserve free.
++        var full = options()
++        full.freeSpaceReserve = Int64.max / 2
++        do {
++            try VPhoneDiskRebase.rebase(machines.target, onto: machines.base, options: full, progress: { _, _, _ in })
++            Issue.record("rebase ignored the free-space reserve")
++        } catch let VPhoneDiskRebaseError.insufficientSpace(path, _, reserve) {
++            #expect(path.hasSuffix("/Disk.img"))
++            #expect(reserve == Int64.max / 2)
++        }
++        try expectUnchanged()
++
++        // The target ran and stopped again: its image moved.
++        var ran = options()
++        ran.beforeSwap = {
++            let fd = open(machines.targetImage.path, O_RDWR)
++            defer { close(fd) }
++            var byte: UInt8 = 0x42
++            _ = pwrite(fd, &byte, 1, off_t(600 << 10))
++        }
++        #expect(throws: VPhoneDiskRebaseError.changedDuringRebase(machine: "target")) {
++            try VPhoneDiskRebase.rebase(machines.target, onto: machines.base, options: ran, progress: { _, _, _ in })
++        }
++        var now = stat()
++        try #require(stat(machines.targetImage.path, &now) == 0)
++        #expect(now.st_ino == inode.st_ino)
++        try expectNoStaging(machines)
++    }
++
++    @Test func `the target keeps its own mode and times`() throws {
++        let machines = try makeMachines()
++        defer { try? FileManager.default.removeItem(at: machines.root) }
++        let extent = Extent(0, seed: 81, count: 64 << 10)
++        try writeImage(machines.baseImage, [extent])
++        try writeImage(machines.targetImage, [extent])
++        #expect(chmod(machines.targetImage.path, 0o640) == 0)
++        #expect(chmod(machines.baseImage.path, 0o777) == 0)
++        let old = [timespec(tv_sec: 1_000_000_000, tv_nsec: 0), timespec(tv_sec: 1_000_000_000, tv_nsec: 0)]
++        #expect(utimensat(AT_FDCWD, machines.targetImage.path, old, 0) == 0)
++        try rebase(machines)
++        #expect(try mode(of: machines.targetImage) == 0o640)
++        #expect(try mode(of: machines.baseImage) == 0o777)
++        #expect(try modified(of: machines.targetImage) == 1_000_000_000 * 1_000_000_000)
++    }
++
++    // MARK: - Ranges and export
++
++    @Test func `the union of data ranges is widened to units and merged`() {
++        // 0..<10 and 4000..<4100 widen to 0..<8192. 12289..<12290 widens to
++        // the block at 12288, which touches the next one and merges with it;
++        // the last ends at the size rather than at its block's end.
++        let union = VPhoneDiskRebase.alignedUnion(
++            [0 ..< 10, 20000 ..< 20001],
++            [4000 ..< 4100, 12289 ..< 12290, 16384 ..< 16390],
++            block: 4096,
++            size: 20002,
++        )
++        #expect(union == [0 ..< 8192, 12288 ..< 20002])
++    }
++
++    @Test func `staging folders are excluded from export`() {
++        let patterns = VPhoneBundleOperations.exportExcludePatterns
++        #expect(patterns.contains { fnmatch($0, VPhoneDiskRebase.stagingPrefix + UUID().uuidString, 0) == 0 })
++    }
++}

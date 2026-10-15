@@ -1,0 +1,158 @@
+{
+  "passed": false,
+  "mode": "read",
+  "label": "kernel-v9-rollback-a",
+  "target": {
+    "process_started_at": 1791966863.564986,
+    "vm": "task8-copy",
+    "instance_id": "F8D80EFD-9D81-43E3-8103-E8B1D0910C34",
+    "pid": 79393
+  },
+  "expected": {
+    "binding": {
+      "bundle": "2.6.20261016-local",
+      "kernel": "2.6.20261021-local"
+    },
+    "binding_sha256": "dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d",
+    "receipt_sha256": "110c2bb690d282f645a7c94fbe1bcb5a382c1e2fc4958093b73ac1055e4b3a49",
+    "desired_sha256": "3ad404b6361d1989bda18be961ce72d1415f6e84025138ec6623bc0578aad949",
+    "transaction_id": "58597f0a-e94c-4f69-86af-b0fdfa9fd3f3",
+    "payload_sha256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb"
+  },
+  "requests": [
+    {
+      "command": [
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "guest",
+        "send",
+        "task8-copy",
+        "--library-root",
+        "/private/tmp/vphone-task8-acceptance-vms",
+        "--timeout",
+        "15",
+        "{\"t\":\"capabilities\",\"target\":{\"process_started_at\":1791966863.564986,\"vm\":\"task8-copy\",\"instance_id\":\"F8D80EFD-9D81-43E3-8103-E8B1D0910C34\",\"pid\":79393}}"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"rpc_methods\":[],\"guest_capabilities\":[\"hid\",\"devmode\",\"file\",\"keychain\",\"location\",\"location_owned\",\"ipa_install\",\"clipboard\",\"apps_v2\",\"apps\",\"app_launch\",\"url\",\"settings\",\"shell\",\"touch\",\"touch_edge\",\"vcam_status\",\"vcam_receipt_v3\"],\"commands\":{\"key\":true,\"environment_rollback\":false,\"app_launch\":true,\"shell\":true,\"environment_status\":false,\"location_source_status\":true,\"app_terminate\":true,\"screenshot\":false,\"camera_present\":true,\"location_source_set\":true,\"location_source_stop\":true,\"app_list\":true,\"camera_status\":true,\"location_stop\":true,\"file_get\":true,\"tap\":false,\"rpc\":false,\"file_put\":true,\"app_foreground\":true,\"location_stream_start\":true,\"capabilities\":true,\"type\":true,\"open_url\":true,\"environment_update\":false,\"camera_stop\":true,\"location_stream_push\":true,\"location_source_control\":true,\"location\":true,\"ipa_install\":true,\"swipe\":false},\"protocol_version\":1,\"boot_mode\":\"normal\",\"guest_connected\":true,\"target\":{\"process_started_at\":1791966863.564986,\"vm\":\"task8-copy\",\"instance_id\":\"F8D80EFD-9D81-43E3-8103-E8B1D0910C34\",\"pid\":79393},\"limits\":{\"command_timeout_ms\":180000,\"inline_file_bytes\":1048576,\"host_file_bytes\":67108864,\"connections\":16,\"request_bytes\":2097152},\"screen_available\":false}\n",
+      "stderr": "",
+      "response": {
+        "ok": true,
+        "rpc_methods": [],
+        "guest_capabilities": [
+          "hid",
+          "devmode",
+          "file",
+          "keychain",
+          "location",
+          "location_owned",
+          "ipa_install",
+          "clipboard",
+          "apps_v2",
+          "apps",
+          "app_launch",
+          "url",
+          "settings",
+          "shell",
+          "touch",
+          "touch_edge",
+          "vcam_status",
+          "vcam_receipt_v3"
+        ],
+        "commands": {
+          "key": true,
+          "environment_rollback": false,
+          "app_launch": true,
+          "shell": true,
+          "environment_status": false,
+          "location_source_status": true,
+          "app_terminate": true,
+          "screenshot": false,
+          "camera_present": true,
+          "location_source_set": true,
+          "location_source_stop": true,
+          "app_list": true,
+          "camera_status": true,
+          "location_stop": true,
+          "file_get": true,
+          "tap": false,
+          "rpc": false,
+          "file_put": true,
+          "app_foreground": true,
+          "location_stream_start": true,
+          "capabilities": true,
+          "type": true,
+          "open_url": true,
+          "environment_update": false,
+          "camera_stop": true,
+          "location_stream_push": true,
+          "location_source_control": true,
+          "location": true,
+          "ipa_install": true,
+          "swipe": false
+        },
+        "protocol_version": 1,
+        "boot_mode": "normal",
+        "guest_connected": true,
+        "target": {
+          "process_started_at": 1791966863.564986,
+          "vm": "task8-copy",
+          "instance_id": "F8D80EFD-9D81-43E3-8103-E8B1D0910C34",
+          "pid": 79393
+        },
+        "limits": {
+          "command_timeout_ms": 180000,
+          "inline_file_bytes": 1048576,
+          "host_file_bytes": 67108864,
+          "connections": 16,
+          "request_bytes": 2097152
+        },
+        "screen_available": false
+      }
+    },
+    {
+      "command": [
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261016-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "guest",
+        "send",
+        "task8-copy",
+        "--library-root",
+        "/private/tmp/vphone-task8-acceptance-vms",
+        "--timeout",
+        "15",
+        "{\"t\":\"file_get\",\"path\":\"/private/var/tmp/task8-kernel-rollback-682d8cbe-429b-4c4a-95fb-e6dfa945aa35\",\"target\":{\"process_started_at\":1791966863.564986,\"vm\":\"task8-copy\",\"instance_id\":\"F8D80EFD-9D81-43E3-8103-E8B1D0910C34\",\"pid\":79393}}"
+      ],
+      "exit_code": 1,
+      "stdout": "{\"error\":\"open failed: No such file or directory\",\"ok\":false}\n",
+      "stderr": "",
+      "response": {
+        "error": "open failed: No such file or directory",
+        "ok": false
+      }
+    }
+  ],
+  "marker": {
+    "path": "/private/var/tmp/task8-kernel-rollback-682d8cbe-429b-4c4a-95fb-e6dfa945aa35",
+    "content_base64": "eyJjcmVhdGVkX2J5X2luc3RhbmNlIjp7Imluc3RhbmNlX2lkIjoiQ0M2NUQ1MjUtM0NFNy00MUY0LTgzQTgtOTM3MDk1OTA3QkQ3IiwicGlkIjozNTA2MSwicHJvY2Vzc19zdGFydGVkX2F0IjoxNzkxOTYwMDMxLjUxMjQ1OCwidm0iOiJ0YXNrOC1jb3B5In0sImluc3RhbGxlZF9leHBlY3RhdGlvbnMiOnsiYmluZGluZyI6eyJidW5kbGUiOiIyLjYuMjAyNjEwMTYtbG9jYWwiLCJrZXJuZWwiOiIyLjYuMjAyNjEwMjEtbG9jYWwifSwiYmluZGluZ19zaGEyNTYiOiJkYzA4NzUxOTZmMzQzNjFiZWMwN2YyNzhjZGVkNDk2YzMyZDE0ZjJjYjYwNDE5MDQ0YWFmYzVkZmM1ZmI1NTVkIiwiZGVzaXJlZF9zaGEyNTYiOiIzYWQ0MDRiNjM2MWQxOTg5YmRhMThiZTk2MWNlNzJkMTQxNWY2ZTg0MDI1MTM4ZWM2NjIzYmMwNTc4YWFkOTQ5IiwicGF5bG9hZF9zaGEyNTYiOiJhODllMmU3ODZkYzYxZDkzYjE0ZWExMjkwNzJiYzc2MjU5NGNhNGNkMWY1NDcxOTgxMGVhMWNiZjk5YzBlMmMwIiwicmVjZWlwdF9zaGEyNTYiOiI1MThhODc4NjJkMzFkZTQ1M2RkNGZkNjg3NWYzZGMyOTM0MmYxMTQ1MmUzMGM4Y2MzOGI5NGNjYzA1ZjJlY2IwIiwidHJhbnNhY3Rpb25faWQiOiIyOTAxZDk3NS0yMzc5LTRiNTAtOTM0MC04NTgwNzg2YWFjYzEifSwicHVycG9zZSI6IlRhc2s4IGNvbW1pdHRlZCBrZXJuZWwgcm9sbGJhY2sgZ3Vlc3QgbWFya2VyIiwidXVpZCI6IjY4MmQ4Y2JlLTQyOWItNGM0YS05NWZiLWU2ZGZhOTQ1YWEzNSJ9Cg==",
+    "content_sha256": "2f30a9afeae97959ee833db90f12cdd0b4c22c932257e1d8f689ce5b5958162f",
+    "size": 742,
+    "target": {
+      "vm": "task8-copy",
+      "instance_id": "CC65D525-3CE7-41F4-83A8-937095907BD7",
+      "process_started_at": 1791960031.512458,
+      "pid": 35061
+    },
+    "expected": {
+      "binding": {
+        "bundle": "2.6.20261016-local",
+        "kernel": "2.6.20261021-local"
+      },
+      "binding_sha256": "dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d",
+      "receipt_sha256": "518a87862d31de453dd4fd6875f3dc29342f11452e30c8cc38b94ccc05f2ecb0",
+      "desired_sha256": "3ad404b6361d1989bda18be961ce72d1415f6e84025138ec6623bc0578aad949",
+      "transaction_id": "2901d975-2379-4b50-9340-8580786aacc1",
+      "payload_sha256": "a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0"
+    }
+  },
+  "created_record": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-13-task8/acceptance/kernel-v9-plan-b-resumed-marker-create.json",
+  "error": "AssertionError()"
+}

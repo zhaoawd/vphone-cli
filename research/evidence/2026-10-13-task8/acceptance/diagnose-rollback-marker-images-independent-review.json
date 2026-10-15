@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "timestamp": "2026-10-14T09:16:33.093411+00:00",
+  "passed": false,
+  "archive_static_review": "no blocker found",
+  "optional_current_documents_review": "blocked",
+  "finding": {
+    "priority": "P1",
+    "file": "diagnose-rollback-marker-images.py",
+    "line": 403,
+    "issue": "config.plist is unconditionally decoded as JSON by load()",
+    "pure_reproduction": "XML JSONDecodeError; binary UnicodeDecodeError",
+    "fix_owner": "acceptance_audit"
+  },
+  "pure_tests": {
+    "exit_code": 0,
+    "count": 23,
+    "log": "diagnose-rollback-marker-images-independent-tests.log"
+  },
+  "scope": "Static source and pure mocks only; no main, VM, guest, process inspection or real mount.",
+  "files": {
+    "diagnose-rollback-marker-images.py": "fd4df3dd4b7043809e7b47691010d14dcc0156001f19da7730dedffe57dd7395",
+    "diagnose-rollback-marker-images-tests.py": "a5f5649c56dcf30659f0f15827974e749cda1ce1279a258c6be5960e14475dd4",
+    "diagnose-rollback-marker-images.md": "e2beb89478a81c2002d404c3ac63115b0e139d14c6d3a92dfd6d2192399e97ae",
+    "diagnose-rollback-marker-images-independent-review.md": "04bf6116e6be80d79e2a894caf7761f7d81f91e8c39ec222670fbb8925ccf534",
+    "diagnose-rollback-marker-images-independent-tests.json": "2eaeb2b51191672beb570adf3686c753fdd14d4e9923074896735d68416e553b",
+    "diagnose-rollback-marker-images-independent-tests.log": "6f745affbf53965acb3d6a853df4bbc5796fe2fb8bd49de282d5575a225e7606"
+  }
+}

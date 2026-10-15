@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_unlocked_descriptor_cannot_claim_inherited_publication_lock (tests.test_firmware_worker.FirmwareWorkerTests.test_unlocked_descriptor_cannot_claim_inherited_publication_lock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_firmware_worker.py", line 173, in test_unlocked_descriptor_cannot_claim_inherited_publication_lock
+    self.assertNotEqual(result.returncode,0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 1 test in 0.108s
+
+FAILED (failures=1)

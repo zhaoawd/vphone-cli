@@ -1,0 +1,241 @@
+diff --git a/Documents/Guides/create-and-run.md b/Documents/Guides/create-and-run.md
+index 725716020175615a294a12a0d74ab097a2f8ecbf..d9d4046f7bcefa2c9428738eefa1baa966e1785c 100644
+--- a/Documents/Guides/create-and-run.md
++++ b/Documents/Guides/create-and-run.md
+@@ -21,7 +21,7 @@ By default that pipeline builds a [template](#templates) rather than the VM itse
+ 
+ `--cpu`, `--memory`, `--network` and `--unlock-at-startup` set those `vm config` settings on the new VM (defaults: 8 cores, 8192 MB, nat, off). `--skip-first-boot` leaves out the final boot, for a caller that boots the VM itself.
+ 
+-`fw prepare` creates a temporary vphone VM, starts it in DFU, and restores the selected cloudOS IPSW using this project's restore backend. It mounts the restored System volume read-only, extracts the GPU bundle, then removes the temporary VM. This first restore supplies the GPU driver for the second, hybrid iPhone restore. The extracted bundle is cached per cloudOS build in `~/.vphone/gpu-drivers/`, so later machines on the same cloudOS skip the temporary restore. `vm create` and `fw prepare` also accept `--gpu-driver-bundle /path/to/AppleParavirtGPUMetalIOGPUFamily.bundle` to reuse a previously extracted bundle without the temporary restore. The CLI checks its iPhoneOS platform version against the selected cloudOS version. Each restore obtains its own ticket online.
++`fw prepare` creates a temporary vphone VM with no network device, starts it in DFU, and restores the selected cloudOS IPSW using this project's restore backend. It mounts the restored System volume read-only, extracts the GPU bundle, then removes the temporary VM. This first restore supplies the GPU driver for the second, hybrid iPhone restore. The extracted bundle is cached per cloudOS build in `~/.vphone/gpu-drivers/`, so later machines on the same cloudOS skip the temporary restore. `vm create` and `fw prepare` also accept `--gpu-driver-bundle /path/to/AppleParavirtGPUMetalIOGPUFamily.bundle` to reuse a previously extracted bundle without the temporary restore. The CLI checks its iPhoneOS platform version against the selected cloudOS version. Each restore obtains its own ticket online.
+ 
+ The build also ships an arm64e GPU compiler plugin in the bundle. `fw prepare` copies it into the staged GPU bundle before firmware patching and installation.
+ 
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+index a7a3781d336b60abac209034b67dce6eb79258ec..246195dfdf348376b931cd4ad4a7325ec9ce4d3a 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -1663,6 +1663,9 @@ volume into the VM restore tree and removes the temporary VM. This is the
+ default path; `--gpu-driver-bundle` reuses a validated bundle instead. Both
+ cloudOS 26.1 and 26.4 PCC AEA key URLs returned HTTP 403 on 2026-09-24, so
+ the preparer no longer requests those keys before the temporary restore.
++The temporary VM has no network device (2026-10-13): the restore runs over
++the virtual USB device, and with the default `nat` NIC the Mac's shared vmnet
++network and DHCP service came up for some seconds after the restore.
+ Both the JB host-mount installer and the filesystem merge copy this staged
+ bundle into the iPhone guest. The 26.4 `23E5207q` restored bundle has
+ `DTPlatformVersion=26.4`, `CFBundleVersion=64.4.4`, and binary SHA-256
+diff --git a/Skills/vphone-guest-control/evals/evals.json b/Skills/vphone-guest-control/evals/evals.json
+index 07cb8840c8d13e53f5115290bc0b11087bfca66f..c1a511c3163bdf8c84af1b72196ba7723d05bd0d 100644
+--- a/Skills/vphone-guest-control/evals/evals.json
++++ b/Skills/vphone-guest-control/evals/evals.json
+@@ -10,7 +10,7 @@
+     {
+       "id": 2,
+       "prompt": "myphone is running. Open Settings, tell me what the screen shows, then read /etc/hosts from the guest. Show me the commands you would run; do not run them.",
+-      "expected_output": "Uses guest rpc apps.launch with bundle_id com.apple.Preferences, a screenshot to a file or ui.describe/ui.ocr (not the attached grayscale image), files.read for /etc/hosts; no ssh, no devicectl.",
++      "expected_output": "Uses guest rpc apps.launch with bundle_id com.apple.Preferences, a screenshot to a file or ui.describe/ui.ocr (not the attached small image), files.read for /etc/hosts; no ssh, no devicectl.",
+       "files": []
+     },
+     {
+diff --git a/Skills/vphone-guest-control/references/guest-socket.md b/Skills/vphone-guest-control/references/guest-socket.md
+index 7f0e40a6689ce885f3964b6ab9fb530c4a7f4f0c..a77e5c8374a34f80148cb5bddbcf3e8dcaebef56 100644
+--- a/Skills/vphone-guest-control/references/guest-socket.md
++++ b/Skills/vphone-guest-control/references/guest-socket.md
+@@ -40,10 +40,11 @@ Unknown `t`, or missing fields, give `{"ok":false,"error":"…"}`.
+ Success is `{"ok":true}`, with `result` for `rpc`, `path` for `screenshot`, and
+ `image` when a screen is attached. Failure is `{"ok":false,"error":"…"}`.
+ 
+-- `image` is a **small grayscale JPEG, base64**, meant for a quick "did
+-  something change" glance. It is not the real screen. For anything you must
+-  read (text, colors, layout), take a `screenshot` to a file and open the file,
+-  or use `ui.describe` / `ui.ocr`.
++- `image` is a **small color JPEG, base64**: the screen at a third of its
++  size and low quality, meant for a quick "did something change" glance. It is
++  not the real screen. For anything you must read (small text, exact colors,
++  layout), take a `screenshot` to a file and open the file, or use
++  `ui.describe` / `ui.ocr`.
+ - `tap`, `swipe`, `key` and `type` attach one by default, 500 ms after the
+   action. Add `"screen":false` to skip it; add `"delay":<ms>` for slow
+   animations. `rpc` attaches none unless `"screen":true` (CLI: `guest rpc … --screen`).
+diff --git a/Skills/vphone-guest-control/references/rpc-methods.md b/Skills/vphone-guest-control/references/rpc-methods.md
+index 58532eaed5e88c326b348a22b909a352fe4bd7ac..d5f29b1997051d5c90cee0384f9e76f25e1bda4f 100644
+--- a/Skills/vphone-guest-control/references/rpc-methods.md
++++ b/Skills/vphone-guest-control/references/rpc-methods.md
+@@ -7,7 +7,7 @@ for none). The reply is `{"ok":true,"result":{…}}`. On `ok:false` the CLI exit
+ (for example `guest not connected` or `Unknown method: …`) on stderr. When
+ vphoned itself refused, the last stderr line is its whole error object as JSON
+ (`code`, `message` and fields such as `results`, `reason`, `errno`,
+-`retryable`); `vphone.sock` carries the same object as `guest_error`. Add `--screen` to also get the small grayscale screen image.
++`retryable`); `vphone.sock` carries the same object as `guest_error`. Add `--screen` to also get the small screen image.
+ 
+ The complete catalog, with REST routes and result details, is
+ `Research/vphoned_http_api.md` ("Method catalog"). This file is the working
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift
+index caed5a9190362237590701f0902c2e5bd2dd1875..c16b8677a63db1c355516ddf833c696f206a31dc 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift
+@@ -32,6 +32,9 @@ enum VPhonePCCGPURecovery {
+             .appending(path: ".pcc-restoration-\(UUID().uuidString)")
+         let library = VPhoneLibrary(root: temporaryLibrary)
+         let name = "pcc-\(UUID().uuidString.lowercased())"
++        // The restore runs over the virtual USB device, so the machine needs no
++        // NIC. With the default nat one, the Mac's shared vmnet network and its
++        // DHCP service came up between the end of the restore and the stop.
+         let vm = try VPhoneBundleOperations.create(.init(
+             name: name,
+             cpuCount: 8,
+@@ -39,6 +42,7 @@ enum VPhonePCCGPURecovery {
+             diskSizeGB: 64,
+             romSource: VPhoneBundleOperations.defaultROMSource(),
+             sepromSource: VPhoneBundleOperations.defaultSEPROMSource(),
++            networkConfig: .init(mode: .off, macAddress: ""),
+         ), in: library)
+         var diskMayBeAttached = false
+         let temporaryRestore = vm.url.appending(path: "iPhonePCC_Restore")
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift
+index df9fc73c8904f501bdd7a0b7e6d9aca1d4d94d9d..478320a4d02a069c40df699d0fce96a62ea21b78 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift
+@@ -19,7 +19,7 @@ import VPhoneCoreKit
+ /// and the image comes from the guest's `screen.screenshot`.
+ ///
+ /// Every response includes an `"image"` field with a compact base64-encoded
+-/// grayscale JPEG of the current screen (unless `"screen":false` is sent).
++/// color JPEG of the current screen (unless `"screen":false` is sent).
+ ///
+ /// Supported commands:
+ ///   {"t":"screenshot"}                          → full-res save to Desktop (or explicit path)
+@@ -380,7 +380,7 @@ class VPhoneHostAutomationServer {
+         return await captureCompactScreenshot()
+     }
+ 
+-    /// Capture current screen as a small grayscale JPEG, returned as base64.
++    /// Capture current screen as a small color JPEG, returned as base64.
+     private func captureCompactScreenshot() async -> String? {
+         guard let cgImage = await captureScreenImage() else { return nil }
+         return compactJPEG(cgImage)
+@@ -390,24 +390,24 @@ class VPhoneHostAutomationServer {
+         let dstW = cgImage.width / Self.compactScale
+         let dstH = cgImage.height / Self.compactScale
+ 
+-        // Draw into grayscale context
+-        let gray = CGColorSpaceCreateDeviceGray()
+-        guard let ctx = CGContext(
+-            data: nil,
+-            width: dstW,
+-            height: dstH,
+-            bitsPerComponent: 8,
+-            bytesPerRow: dstW,
+-            space: gray,
+-            bitmapInfo: CGImageAlphaInfo.none.rawValue,
+-        ) else { return nil }
+-
+-        // High contrast: bump brightness
++        // Draw into an sRGB context; JPEG has no alpha, so none is kept
++        guard let sRGB = CGColorSpace(name: CGColorSpace.sRGB),
++              let ctx = CGContext(
++                  data: nil,
++                  width: dstW,
++                  height: dstH,
++                  bitsPerComponent: 8,
++                  bytesPerRow: 0,
++                  space: sRGB,
++                  bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue,
++              )
++        else { return nil }
++
+         ctx.setShouldAntialias(true)
+         ctx.interpolationQuality = .high
+         ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: dstW, height: dstH))
+ 
+-        guard let grayImage = ctx.makeImage() else { return nil }
++        guard let scaledImage = ctx.makeImage() else { return nil }
+ 
+         // Encode as low-quality JPEG
+         let data = NSMutableData()
+@@ -415,7 +415,7 @@ class VPhoneHostAutomationServer {
+             return nil
+         }
+         let options: [CFString: Any] = [kCGImageDestinationLossyCompressionQuality: 0.35]
+-        CGImageDestinationAddImage(dest, grayImage, options as CFDictionary)
++        CGImageDestinationAddImage(dest, scaledImage, options as CFDictionary)
+         guard CGImageDestinationFinalize(dest) else { return nil }
+ 
+         return (data as Data).base64EncodedString()
+diff --git a/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift
+index f8209cc1ffd715c06b3e34769888ebc63129404c..96d8597e197dafe2df882244c52d78f4adb18cdc 100644
+--- a/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift
++++ b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift
+@@ -9,6 +9,7 @@ public enum VPhoneBundleOperations {
+         public let diskSizeGB: UInt64
+         public let romSource: URL
+         public let sepromSource: URL
++        public let networkConfig: VPhoneVirtualMachineManifest.NetworkConfig
+ 
+         public init(
+             name: String,
+@@ -17,9 +18,11 @@ public enum VPhoneBundleOperations {
+             diskSizeGB: UInt64,
+             romSource: URL,
+             sepromSource: URL,
++            networkConfig: VPhoneVirtualMachineManifest.NetworkConfig = .default,
+         ) {
+             self.name = name; self.cpuCount = cpuCount; self.memoryMB = memoryMB
+             self.diskSizeGB = diskSizeGB; self.romSource = romSource; self.sepromSource = sepromSource
++            self.networkConfig = networkConfig
+         }
+     }
+ 
+@@ -83,6 +86,7 @@ public enum VPhoneBundleOperations {
+             let manifest = VPhoneVirtualMachineManifest(
+                 cpuCount: spec.cpuCount,
+                 memorySize: spec.memoryMB * 1024 * 1024,
++                networkConfig: spec.networkConfig,
+                 romImages: .init(avpBooter: "AVPBooter.vresearch1.bin",
+                                  avpSEPBooter: "AVPSEPBooter.vresearch1.bin"),
+             )
+diff --git a/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleOperationsTests.swift b/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleOperationsTests.swift
+index ecbae664c42d1b1b1dfdb01aab20de0628dcf49c..4ecdeefc2dbf818fd2b32b5c7b48bb5d6b22c3d4 100644
+--- a/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleOperationsTests.swift
++++ b/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleOperationsTests.swift
+@@ -45,6 +45,39 @@ struct BundleOperationsTests {
+         )
+     }
+ 
++    @Test func `creates bundle with the requested network`() throws {
++        let root = try makeRoot()
++        defer { try? FileManager.default.removeItem(at: root) }
++        let rom = try fakeROM(); let seprom = try fakeROM()
++        defer { try? FileManager.default.removeItem(at: rom); try? FileManager.default.removeItem(at: seprom) }
++        let lib = VPhoneLibrary(root: root)
++
++        let offline = try VPhoneBundleOperations.create(
++            .init(
++                name: "offline",
++                cpuCount: 2,
++                memoryMB: 2048,
++                diskSizeGB: 1,
++                romSource: rom,
++                sepromSource: seprom,
++                networkConfig: .init(mode: .off, macAddress: ""),
++            ),
++            in: lib,
++        )
++        #expect(offline.manifest.networkConfig.mode == .off)
++        // Persisted, and realized as no NIC at all.
++        let saved = try lib.bundle(named: "offline").manifest.networkConfig
++        #expect(saved.mode == .off)
++        #expect(try VPhoneNetworking.makeNetworkDevice(saved).device == nil)
++
++        // Left out, it is the default.
++        let plain = try VPhoneBundleOperations.create(
++            .init(name: "plain", cpuCount: 2, memoryMB: 2048, diskSizeGB: 1, romSource: rom, sepromSource: seprom),
++            in: lib,
++        )
++        #expect(plain.manifest.networkConfig.mode == .nat)
++    }
++
+     @Test func `rejects duplicate name`() throws {
+         let root = try makeRoot()
+         defer { try? FileManager.default.removeItem(at: root) }

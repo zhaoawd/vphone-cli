@@ -1,0 +1,90 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[5/36] Compiling log.c
+[6/36] Compiling asr.c
+[7/36] Compiling normal.c
+[7/36] Compiling download.c
+[9/36] Compiling fdr.c
+[10/36] Compiling recovery.c
+[11/36] Compiling ipsw.c
+[12/36] Compiling limera1n.c
+[13/36] Compiling ace3.c
+[14/36] Compiling dfu.c
+[15/36] Compiling img3.c
+[15/36] Compiling img4.c
+[15/36] Compiling ftab.c
+[18/36] Compiling mbn.c
+[19/36] Compiling restore.c
+[20/36] Compiling locking.c
+[21/36] Compiling fls.c
+[22/36] Compiling deviceinterfaced.c
+[23/36] Compiling vphone_zip_stub.c
+[24/36] Compiling common.c
+[25/36] Compiling vphone_restore_bridge.c
+[26/36] Compiling idevicerestore.c
+[27/36] Compiling MobileRecoveryCore libirecovery.c
+[29/42] Compiling vphone_cli VPhoneGuestWriteCoordinator.swift
+[30/42] Compiling vphone_cli VPhoneGuestEnvironmentRecovery.swift
+[31/42] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[32/42] Compiling vphone_cli VPhoneGuestEnvironment.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[33/42] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[34/42] Compiling vphone_cli VPhoneControl.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneControl.swift:1021:95: error: value of type '[String : Any]' has no member '0'
+1019 |                     }
+1020 |                     if type == "err" {
+1021 |                         pending.handler(.failure(Self.controlError(forGuestResponse: response.0)))
+     |                                                                                               `- error: value of type '[String : Any]' has no member '0'
+1022 |                     } else {
+1023 |                         pending.handler(.success((response, payload)))
+[35/64] Compiling vphone_cli VPhoneMenuLocation.swift
+[36/64] Compiling vphone_cli VPhoneTouchIDMonitor.swift
+[37/65] Compiling vphone_cli VPhoneMenuApps.swift
+[38/65] Compiling vphone_cli VPhoneMenuBattery.swift
+[39/65] Compiling vphone_cli VPhoneMenuConnect.swift
+[40/66] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[41/66] Compiling vphone_cli VPhoneWindowController.swift
+[42/66] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[43/66] Compiling vphone_cli VPhoneEntry.swift
+[44/66] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[45/66] Compiling vphone_cli VPhoneKeychainBrowserModel.swift
+[46/66] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[47/66] Compiling vphone_cli VPhoneLocationProvider.swift
+[48/66] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+[49/66] Compiling vphone_cli VPhoneGuestEnvironmentSource.swift
+[50/66] Compiling vphone_cli VPhoneFileBrowserView.swift
+[51/66] Compiling vphone_cli VPhoneHostAPICommands.swift
+[52/66] Compiling vphone_cli VPhoneHostCapabilities.swift
+[53/66] Compiling vphone_cli VPhoneHostCommandService.swift
+[54/66] Compiling vphone_cli VPhoneHostControl.swift
+[55/66] Compiling vphone_cli VPhoneKeyHelper.swift
+[56/66] Compiling vphone_cli VPhoneAppBrowserModel.swift
+[57/66] Compiling vphone_cli VPhoneAppBrowserView.swift
+[58/66] Compiling vphone_cli VPhoneAppDelegate.swift
+error: fatalError

@@ -11,7 +11,7 @@ REQUIRED = (
     'AppIcon.icns', 'build-dependencies.json', 'requirements.txt', 'debs.list', 'README.md',
     'scripts/fw_prepare.sh', 'scripts/ipsw_cache_entry.py',
     'scripts/cfw_install_host.sh', 'scripts/cfw_disk_txn.py', 'scripts/sparse_file.py',
-    'scripts/cfw_env_update.py', 'scripts/guest_environment.json',
+    'scripts/cfw_env_update.py', 'scripts/cfw_env_install.py', 'scripts/guest_environment.json',
     'scripts/cfw_install.sh', 'scripts/cfw_install_dev.sh',
     'scripts/cfw_install_jb.sh', 'scripts/cfw_install_exp.sh',
     'scripts/lib/cfw_common.sh',
@@ -56,6 +56,18 @@ def check_resources(bundle):
     return resources
 
 
+def check_kernel_update_protocol(bundle):
+    info = plistlib.loads((bundle / 'Contents/Info.plist').read_bytes())
+    if info.get('VPhoneKernelUpdateProtocol') != 'vphone.kernel-update.v1':
+        raise ValueError('Bundle does not declare the stopped kernel update protocol')
+
+
+def check_kernel_rollback_protocol(bundle):
+    info = plistlib.loads((bundle / 'Contents/Info.plist').read_bytes())
+    if info.get('VPhoneKernelRollbackProtocol') != 'vphone.kernel-rollback.v1':
+        raise ValueError('Bundle does not declare the committed kernel rollback protocol')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('bundle', type=Path)
@@ -63,6 +75,8 @@ def main():
     args = parser.parse_args()
     bundle = args.bundle.resolve()
     resources = check_resources(bundle)
+    check_kernel_update_protocol(bundle)
+    check_kernel_rollback_protocol(bundle)
     subprocess.run(['codesign', '--verify', '--strict', '--verbose=2', str(bundle)], check=True)
     subprocess.run([os.sys.executable, str(Path(__file__).resolve().parent / 'build_native_dependencies.py'),
                     str(bundle), '--check'], check=True)

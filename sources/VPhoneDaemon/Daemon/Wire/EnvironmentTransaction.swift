@@ -110,8 +110,23 @@ struct EnvironmentTransaction {
 
     /// Copies each current library to the transaction's backup directory and
     /// writes the journal. The library directory is not changed.
-    func prepare(_ entries: [(name: String, sha256: String)]) throws -> EnvironmentJournal {
-        let id = Self.newID()
+    func prepare(_ entries: [(name: String, sha256: String)], operation: String? = nil, context: [String: String]? = nil) throws -> EnvironmentJournal {
+        if FileManager.default.fileExists(atPath: stateDirectory) {
+            for id in try FileManager.default.contentsOfDirectory(atPath: stateDirectory) {
+                guard Self.isTransactionID(id), let previous = try journal(id: id),
+                      ["complete", "incomplete", "aborted", "restored", "restore_incomplete"].contains(previous.state) else {
+                    throw Failure.invalid("Unresolved environment transaction; inspect status before another install")
+                }
+                for entry in previous.libraries where ["failed", "restore_failed"].contains(entry.state) {
+                    let expected = entry.state == "failed" ? entry.previousSHA256 : entry.sha256
+                    guard previous.afterFiles?[entry.name] == expected else {
+                        throw Failure.invalid("Failed transaction has an unknown output; recovery is required")
+                    }
+                }
+            }
+        }
+        let id = operation ?? Self.newID()
+        guard Self.isTransactionID(id), !FileManager.default.fileExists(atPath: stateDirectory + "/" + id) else { throw Failure.invalid("Operation already exists or has an invalid id; read its journal, do not replay") }
         let directory = stateDirectory + "/" + id
         let backups = directory + "/backup"
         do {
@@ -119,6 +134,8 @@ struct EnvironmentTransaction {
                                                     attributes: [.posixPermissions: 0o700])
         } catch { throw Failure.io("Could not create \(backups): \(error.localizedDescription)") }
         var journal = EnvironmentJournal(id: id, created: Self.timestamp(), state: "prepared", libraries: [])
+        journal.context = context
+        journal.beforeFiles = try completeHashes()
         for entry in entries {
             let source = target(entry.name)
             let backup = backups + "/" + entry.name
@@ -129,6 +146,11 @@ struct EnvironmentTransaction {
                 try? FileManager.default.removeItem(atPath: directory)
                 throw Failure.io("Could not back up \(source): \(error.localizedDescription)")
             }
+            let backupFD = open(backup, O_RDONLY | O_CLOEXEC | O_NOFOLLOW)
+            guard backupFD >= 0 else { throw Failure.io("Cannot synchronize backup") }
+            let synchronized = fsync(backupFD) == 0
+            close(backupFD)
+            guard synchronized else { throw Failure.io("Cannot synchronize backup") }
             guard let previous = Self.sha256(atPath: backup), Self.sha256(atPath: source) == previous else {
                 try? FileManager.default.removeItem(atPath: directory)
                 throw Failure.io("\(source) changed while it was backed up")
@@ -143,7 +165,7 @@ struct EnvironmentTransaction {
 
     /// Replaces the journal's libraries in order and stops at the first
     /// failure. The journal is saved after every step.
-    func apply(_ journal: inout EnvironmentJournal, replace: (String, String) throws -> Void) {
+    func apply(_ journal: inout EnvironmentJournal, replace: (String, String) throws -> Void) throws {
         var failed = false
         for index in journal.libraries.indices {
             let name = journal.libraries[index].name
@@ -152,7 +174,16 @@ struct EnvironmentTransaction {
                 continue
             }
             do {
+                guard Self.identity(atPath: staged(name)) != nil,
+                      Self.sha256(atPath: staged(name)) == journal.libraries[index].sha256,
+                      Self.sha256(atPath: target(name)) == journal.libraries[index].previousSHA256 else {
+                    throw Failure.invalid("Environment files changed before replacement: \(name)")
+                }
                 try replace(staged(name), target(name))
+                guard Self.identity(atPath: target(name)) != nil,
+                      Self.sha256(atPath: target(name)) == journal.libraries[index].sha256 else {
+                    throw Failure.io("Installed output does not match its SHA-256: \(name)")
+                }
                 journal.libraries[index].state = "replaced"
                 unlink(staged(name))
             } catch {
@@ -160,21 +191,22 @@ struct EnvironmentTransaction {
                 journal.libraries[index].error = String(describing: error)
                 failed = true
             }
-            try? save(journal)
+            try save(journal)
         }
+        journal.afterFiles = try completeHashes()
         journal.state = failed ? "incomplete" : "complete"
-        try? save(journal)
+        try save(journal)
         prune()
     }
 
     /// Marks a prepared journal whose replacement never started.
-    func abandon(_ journal: inout EnvironmentJournal, reason: String) {
+    func abandon(_ journal: inout EnvironmentJournal, reason: String) throws {
         journal.state = "aborted"
         for index in journal.libraries.indices {
             journal.libraries[index].state = "not_attempted"
             journal.libraries[index].error = reason
         }
-        try? save(journal)
+        try save(journal)
     }
 
     // MARK: Restore
@@ -196,23 +228,59 @@ struct EnvironmentTransaction {
         return journal
     }
 
-    func applyRestore(_ journal: inout EnvironmentJournal, replace: (String, String) throws -> Void) {
+    func applyRestore(_ journal: inout EnvironmentJournal, replace: (String, String) throws -> Void) throws {
         var failed = false
         for index in journal.libraries.indices where journal.libraries[index].state == "replaced" {
             guard !failed else { continue }
             let entry = journal.libraries[index]
             do {
+                guard Self.identity(atPath: entry.backup) != nil,
+                      Self.sha256(atPath: entry.backup) == entry.previousSHA256,
+                      Self.sha256(atPath: target(entry.name)) == entry.sha256 else {
+                    throw Failure.invalid("Environment files changed before restore: \(entry.name)")
+                }
                 try replace(entry.backup, target(entry.name))
+                guard Self.identity(atPath: target(entry.name)) != nil,
+                      Self.sha256(atPath: target(entry.name)) == entry.previousSHA256 else {
+                    throw Failure.io("Restored output does not match its SHA-256: \(entry.name)")
+                }
                 journal.libraries[index].state = "restored"
             } catch {
                 journal.libraries[index].state = "restore_failed"
                 journal.libraries[index].error = String(describing: error)
                 failed = true
             }
-            try? save(journal)
+            try save(journal)
         }
+        journal.afterFiles = try completeHashes()
         journal.state = failed ? "restore_incomplete" : "restored"
-        try? save(journal)
+        try save(journal)
+    }
+
+    func completeHashes() throws -> [String: String] {
+        var result: [String: String] = [:]
+        for name in libraries {
+            guard Self.identity(atPath: target(name)) != nil, let hash = Self.sha256(atPath: target(name)) else {
+                throw Failure.invalid("Complete installed library set is unavailable: " + name)
+            }
+            result[name] = hash
+        }
+        return result
+    }
+
+    func finalize(_ journal: inout EnvironmentJournal, rootReadOnly: Bool) throws {
+        journal.rootReadOnly = rootReadOnly
+        try save(journal)
+    }
+
+    func bindRestore(_ journal: inout EnvironmentJournal, context: [String: String]) throws {
+        guard let original = journal.context,
+              ["vm_instance", "mode", "firmware_generation", "plan_sha256", "desired_sha256"].allSatisfy({ original[$0] == context[$0] }) else {
+            throw Failure.invalid("Restore journal belongs to another VM, mode or frozen generation")
+        }
+        journal.restoreContext = context
+        journal.rootReadOnly = nil
+        try save(journal)
     }
 
     // MARK: Journals
@@ -221,7 +289,23 @@ struct EnvironmentTransaction {
         guard Self.isTransactionID(id) else { throw Failure.invalid("Invalid transaction id") }
         let path = stateDirectory + "/" + id + "/journal.json"
         guard let data = FileManager.default.contents(atPath: path) else { return nil }
-        do { return try JSONDecoder().decode(EnvironmentJournal.self, from: data) } catch {
+        do {
+            let journal = try JSONDecoder().decode(EnvironmentJournal.self, from: data)
+            guard journal.id == id, !journal.libraries.isEmpty,
+                  ["prepared", "complete", "incomplete", "aborted", "restored", "restore_incomplete"].contains(journal.state) else {
+                throw Failure.invalid("Malformed environment transaction")
+            }
+            var names = Set<String>()
+            for entry in journal.libraries {
+                guard libraries.contains(entry.name), names.insert(entry.name).inserted,
+                      entry.backup == stateDirectory + "/" + id + "/backup/" + entry.name,
+                      ["pending", "replaced", "failed", "not_attempted", "restored", "restore_failed"].contains(entry.state),
+                      [entry.sha256, entry.previousSHA256].allSatisfy({ hash in
+                          hash.count == 64 && hash.allSatisfy { "0123456789abcdef".contains($0) }
+                      }) else { throw Failure.invalid("Malformed environment transaction component") }
+            }
+            return journal
+        } catch {
             throw Failure.io("Could not read \(path): \(error.localizedDescription)")
         }
     }
@@ -230,12 +314,13 @@ struct EnvironmentTransaction {
     func journals() -> [EnvironmentJournal] {
         let ids = ((try? FileManager.default.contentsOfDirectory(atPath: stateDirectory)) ?? [])
             .filter(Self.isTransactionID).sorted(by: >)
-        return ids.compactMap { try? journal(id: $0) }
+        return ids.compactMap { try? journal(id: $0) }.sorted { ($0.created, $0.id) > ($1.created, $1.id) }
     }
 
     func transactions() -> [[String: Any]] {
-        journals().map { ["id": $0.id, "state": $0.state, "created": $0.created,
-                          "journal": stateDirectory + "/" + $0.id + "/journal.json"] }
+        journals().map { journal in
+            journal.dictionary.merging(["journal": stateDirectory + "/" + journal.id + "/journal.json"]) { $1 }
+        }
     }
 
     /// Identities of library copies replaced by recorded transactions.
@@ -257,12 +342,24 @@ struct EnvironmentTransaction {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         do {
             let data = try encoder.encode(journal)
-            guard FileManager.default.createFile(atPath: temporary, contents: data, attributes: [.posixPermissions: 0o600]) else {
-                throw Failure.io("Could not write \(temporary)")
+            let fd = open(temporary, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0o600)
+            guard fd >= 0 else { throw Failure.io("Could not create exclusive journal temporary: \(temporary)") }
+            defer { close(fd) }
+            try data.withUnsafeBytes { bytes in
+                var offset = 0
+                while offset < bytes.count {
+                    let count = write(fd, bytes.baseAddress! + offset, bytes.count - offset)
+                    if count < 0 && errno == EINTR { continue }
+                    guard count > 0 else { throw Failure.io("Could not write journal temporary") }
+                    offset += count
+                }
             }
-            let fd = open(temporary, O_RDONLY | O_CLOEXEC)
-            if fd >= 0 { fsync(fd); close(fd) }
+            guard fsync(fd) == 0 else { throw Failure.io("Could not synchronize journal: \(temporary)") }
             guard rename(temporary, path) == 0 else { throw Failure.io("Could not write \(path)") }
+            let directoryFD = open(directory, O_RDONLY | O_CLOEXEC | O_DIRECTORY | O_NOFOLLOW)
+            guard directoryFD >= 0 else { throw Failure.io("Could not open journal directory: \(directory)") }
+            defer { close(directoryFD) }
+            guard fsync(directoryFD) == 0 else { throw Failure.io("Could not synchronize journal directory: \(directory)") }
         } catch let failure as Failure {
             throw failure
         } catch {
@@ -365,10 +462,33 @@ struct EnvironmentJournal: Codable {
     /// prepared, complete, incomplete, aborted, restored, restore_incomplete
     var state: String
     var libraries: [Entry]
+    var context: [String: String]?
+    var restoreContext: [String: String]?
+    var beforeFiles: [String: String]?
+    var afterFiles: [String: String]?
+    var rootReadOnly: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case id, created, state, libraries, context
+        case restoreContext = "restore_context"
+        case beforeFiles = "before_files"
+        case afterFiles = "after_files"
+        case rootReadOnly = "root_read_only"
+    }
 
     var dictionary: [String: Any] {
         guard let data = try? JSONEncoder().encode(self),
               let value = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
-        return value
+        var result = value
+        if let rootReadOnly {
+            result["root_read_only"] = rootReadOnly
+            let installed = libraries.filter { $0.state == "replaced" }.map(\.name)
+            let restored = libraries.filter { $0.state == "restored" }.map(\.name)
+            result["installed"] = installed
+            result["restored"] = restored
+            result["complete"] = state == "complete"
+            result["reboot_required"] = !rootReadOnly || (installed + restored).contains("launchdhook-vphone.dylib")
+        }
+        return result
     }
 }

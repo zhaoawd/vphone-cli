@@ -1,0 +1,129 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/12] Compiling FirmwarePatcher FirmwareTransaction.swift
+[6/12] Compiling FirmwarePatcher FirmwarePipeline.swift
+[7/19] Emitting module FirmwarePatcher
+[8/20] Compiling FirmwarePatcher FirmwareDesiredPlanStore.swift
+[9/20] Compiling FirmwarePatcher FirmwareComponentReceipt.swift
+[10/21] Compiling FirmwarePatcher VariantPlanResolver.swift
+[11/21] Compiling FirmwarePatcher FirmwarePlanBinding.swift
+[12/21] Compiling FirmwarePatcher FirmwareFilesystemEvidence.swift
+[13/21] Compiling FirmwarePatcher FirmwareFilesystemReadback.swift
+[14/21] Compiling FirmwarePatcher PatchExperimentRecorder.swift
+[15/21] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[16/21] Compiling FirmwarePatcher PatchExperimentRecord.swift
+/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[17/53] Emitting module FirmwareIntegrationTests
+[18/53] Compiling FirmwareIntegrationTests StructuredDeclarationGateTests.swift
+[19/54] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[20/54] Compiling vphone_cli VPhoneCLI.swift
+[21/54] Compiling vphone_cli VPhoneFWCLI.swift
+[22/54] Compiling vphone_cli VPhoneDoctorCLI.swift
+[23/54] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[24/54] Compiling FirmwarePatcherTests FirmwareVersionInputsTests.swift
+[25/54] Compiling FirmwarePatcherTests FrozenPipelinePlanTests.swift
+[26/54] Compiling FirmwarePatcherTests FullPipelineParityTests.swift
+[27/57] Compiling FirmwarePatcherTests ArtifactStructuredTests.swift
+[28/57] Compiling FirmwarePatcherTests DeclarationGateTests.swift
+[29/57] Compiling FirmwarePatcherTests DesiredPlanTestSupport.swift
+[30/57] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[31/57] Emitting module FirmwarePatcherTests
+[31/57] Write Objects.LinkFileList
+[34/57] Compiling FirmwarePatcherTests ExpStructuredTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+[35/57] Compiling FirmwarePatcherTests FirmwareComponentReceiptTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+[36/57] Compiling FirmwarePatcherTests FirmwareDesiredPlanStoreTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+[37/57] Compiling FirmwarePatcherTests KernelGateDiagnosisTests.swift
+[38/57] Compiling FirmwarePatcherTests KernelStructuredMergeTests.swift
+[39/57] Compiling FirmwarePatcherTests LessFilesystemAcceptanceTests.swift
+[40/57] Compiling FirmwarePatcherTests VariantPlanSerializationTests.swift
+[41/57] Compiling FirmwarePatcherTests VariantPlanTests.swift
+[42/57] Compiling FirmwarePatcherTests VersionKnowledgePlanTests.swift
+[43/57] Compiling FirmwarePatcherTests FirmwareReceiptPublicationTests.swift
+[44/57] Compiling FirmwarePatcherTests FirmwareTransactionAcceptanceTests.swift
+[45/57] Compiling FirmwarePatcherTests FirmwareTransactionTests.swift
+[46/57] Compiling FirmwarePatcherTests PatchExperimentRecordTests.swift
+[47/57] Compiling FirmwarePatcherTests RequiredDeclarationEvidenceTests.swift
+[48/57] Compiling FirmwarePatcherTests TargetCatalogTests.swift
+[48/57] Linking vphone-vm
+[49/57] Linking vphone-cli
+[50/57] Applying vphone-cli
+[50/57] Applying vphone-vm
+[53/57] Compiling FirmwarePatcherTests FirmwareGenerationTests.swift
+[54/57] Compiling FirmwarePatcherTests FirmwarePatcherTests.swift
+[55/57] Compiling FirmwarePatcherTests FirmwarePlanBindingTests.swift
+[55/57] Write Objects.LinkFileList
+[56/57] Linking vphone-cliPackageTests
+Build complete! (16.72s)
+Test Suite 'Selected tests' started at 2026-10-13 03:49:51.076.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 03:49:51.077.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 03:49:51.077.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 03:49:51.077.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareReceiptPublicationTests started.
+◇ Test completeActualOutputReceiptsPublishInSameJournal() started.
+◇ Test receiptFailureRollsBackPublication(_:) started.
+◇ Test missingRecordCannotPublishReceipt() started.
+◇ Test case passing 1 argument prior → true to receiptFailureRollsBackPublication(_:) started.
+◇ Test case passing 1 argument prior → false to receiptFailureRollsBackPublication(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test missingRecordCannotPublishReceipt() passed after 0.310 seconds.
+✔ Test receiptFailureRollsBackPublication(_:) with 2 test cases passed after 2.088 seconds.
+✔ Test completeActualOutputReceiptsPublishInSameJournal() passed after 2.396 seconds.
+✔ Suite FirmwareReceiptPublicationTests passed after 2.396 seconds.
+✔ Test run with 3 tests in 1 suite passed after 2.396 seconds.

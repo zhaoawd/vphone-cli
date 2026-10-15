@@ -25,6 +25,9 @@ if managed:
     health.update(instance_id=str(uuid.uuid4()), capabilities=['files', 'session_identity', 'file_download_identity', 'file_upload_identity'])
 if host_commands:
     health['capabilities'].append('apps')
+if behind_proxy:
+    health.setdefault('instance_id', str(uuid.uuid4()))
+    health['capabilities'].append('external_proxy_maintenance_v1')
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -72,6 +75,18 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.authorized():
             return self.reply(401, {'error': 'unauthorized'})
+        if behind_proxy and self.path == '/v1/proxy-admission':
+            nonce = self.headers.get('X-Vphone-Proxy-Nonce')
+            if self.headers.get('X-Vphone-Proxy-Class') != 'external' or not nonce:
+                return self.reply(400, {'error': 'invalid admission'})
+            value = dict(health, proxy_class='external', proxy_nonce=nonce)
+            data = json.dumps(value).encode()
+            self.send_response(200)
+            self.send_header('Content-Length', str(len(data)))
+            self.send_header('Connection', 'keep-alive')
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if urlsplit(self.path).path == '/v1/files/content':
             return self.download()
         if self.path.startswith('/redirect/'):

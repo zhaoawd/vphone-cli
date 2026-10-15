@@ -1,0 +1,129 @@
+{
+  "reviewed_at": "2026-10-14T03:28:47.013740+00:00",
+  "status": "accepted-with-scope-limits",
+  "review_scope": "Independent source/log/JSON parsing only. No repeat mount, test, VM, guest, AMFI or process operation.",
+  "evidence_sha256": {
+    "actual-plan-pair-dsc-v2.log": "f605ff18f47a6393dc5093c32878b0d0609baab067362fe8319120dd21228e59",
+    "actual-plan-pair-dsc-v2.json": "d3370f2eebf5b69416a16e849c617050a43120f4656134487b0dc65856fb3950",
+    "actual-plan-pair-dsc-v2-mount.json": "8b438112978533fe629b15c7eeb566beda5772a5f21645643daab96d001dc04b",
+    "verify-current-system-dsc-v2.py": "ff1df253306020d09356fa07847b6e7ffcd0791bf3602df796b3fff0d930612f",
+    "actual-plan-pair-dsc.log": "76380917bb844efde94f75ac53278cc4abdd1cad9860ec0434a6b32b3085056d",
+    "actual-plan-pair-dsc-mount.json": "5d8b191daa108477bcb3dc87e18fa2570754ead998ab6483b733b80a7213f2ca",
+    "dsc-path-diagnostic.json": "05c95fd830eef5e7285d456465d508bfa45af902361662c65492715d6d4c223b",
+    "diagnose-dsc-paths.py": "c523596c87788ad3fcb9dc646351c088d865934fc98094f7625100ea106b4106"
+  },
+  "source_sha256_at_review": {
+    "tests/FirmwarePatcherTests/FirmwareKernelRollbackTests.swift": "cf538e71faba6c1c8df7c7387087afc865f636b642e557db8d42c10d7c8b1457",
+    "sources/FirmwarePatcher/Pipeline/FirmwareKernelMount.swift": "00b4c9535dc8bd3d678a40433d24d7bbefb0082e017d209bf4718a2c4ff5e48e",
+    "sources/FirmwarePatcher/Pipeline/FirmwareComponentReceipt.swift": "420344494a44d4e7db56f376d98540a55c578471fa724a8d40685471dcba2bbd"
+  },
+  "production_freeze": "Not final; this is evidence review, not final production code review.",
+  "actual_pair": {
+    "inputSHA256": "b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac",
+    "payloadsDiffer": true,
+    "plans": [
+      {
+        "dsc": "passed",
+        "forceExcGuard": false,
+        "im4pSHA256": "b1f07780484d9dc88f989d6e236049050b38e50a1ddb94030dcecaed43f962db",
+        "payloadSHA256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb",
+        "planSHA256": "703f9ad46613fa819ec6460846865ba9cd3ccd389f4b03c078fbc9baae741a3c",
+        "recordCount": 119,
+        "sharedRegionBase": 6442450944,
+        "sharedRegionSize": 6442450944
+      },
+      {
+        "dsc": "passed",
+        "forceExcGuard": true,
+        "im4pSHA256": "ecbea551116fbb2d10b0196d72ecd7f52f8f145b5ecd7632159c0025fb78bf98",
+        "payloadSHA256": "a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0",
+        "planSHA256": "bb37c956b2bce344b65c6ca3fdea77065d9713f539f4a761823c2c8e5369e96c",
+        "recordCount": 120,
+        "sharedRegionBase": 6442450944,
+        "sharedRegionSize": 6442450944
+      }
+    ],
+    "variant": "exp"
+  },
+  "test": {
+    "exit_code": 0,
+    "elapsed_seconds": 97.67006725003012,
+    "swift_testing_executed": 1,
+    "swift_testing_suites": 1,
+    "skipped": false
+  },
+  "validated_relationships": [
+    "The emitted pair JSON exactly equals the pair embedded in the mount record.",
+    "The actual Swift test reproduces installed kernel component payload bytes for forceExcGuard=false and true, enforces the full kernel declaration gate and verifies every final effect.",
+    "Ordered original-byte checks and patch application reconstruct the complete actual payload, followed by actual shared region inspection and FirmwareKernelDSC.validate against mounted current System.",
+    "False and true payload SHA256 differ; corresponding IM4P SHA256 and plan SHA256 differ. Both kernel regions have base=size=6442450944.",
+    "V2 command return codes are all zero; test is actually executed once in Swift Testing, notwithstanding the separate XCTest summary of zero tests.",
+    "Mount selects the APFS container by disk10s1 physical store and the sole System-role volume disk12s1; VolumeUUID is 61706673-7575-6964-0001-766F6C756E00.",
+    "The driver uses the same VM-directory exclusive lock, attaches readonly/nomount and mounts System rdonly. Before and after test it asserts readonly volume, same mountpoint and UUID.",
+    "Driver finally detaches disk10, checks no remaining task8 attachments and both pending markers absent, and requires identical five Disk metadata fields."
+  ],
+  "readonly_evidence": {
+    "volume_device": "/dev/disk12s1",
+    "volume_uuid": "61706673-7575-6964-0001-766F6C756E00",
+    "physical_stores": [
+      {
+        "APFSPhysicalStore": "disk10s1"
+      }
+    ],
+    "initial_writable_volume": false,
+    "final_readonly_asserted_by_driver": true,
+    "remaining_attachments": [],
+    "disk_metadata_before": {
+      "st_dev": 16777233,
+      "st_ino": 589096904,
+      "st_size": 68719476736,
+      "st_mtime_ns": 1791945744927731089,
+      "st_ctime_ns": 1791945744927731089
+    },
+    "disk_metadata_after": {
+      "st_dev": 16777233,
+      "st_ino": 589096904,
+      "st_size": 68719476736,
+      "st_mtime_ns": 1791945744927731089,
+      "st_ctime_ns": 1791945744927731089
+    },
+    "pending_asserted_absent_in_finally": true
+  },
+  "retained_first_failure": {
+    "passed": false,
+    "exit_code": 1,
+    "message": "Component receipt: output escapes publication root",
+    "cleanup_error": null,
+    "remaining_attachments": [],
+    "disk_metadata_unchanged": true
+  },
+  "path_diagnostic": {
+    "passed": true,
+    "foundation_path_rows": 84,
+    "all_rows_private_tmp_to_tmp": true,
+    "filesystem_paths": {
+      "/private/tmp/task8-plan-pair-dsc-80ly2r2c/system": {
+        "realpath": "/private/tmp/task8-plan-pair-dsc-80ly2r2c/system",
+        "is_symlink": false
+      },
+      "/private/tmp/task8-plan-pair-dsc-80ly2r2c/system/System/Cryptexes/OS": {
+        "realpath": "/private/tmp/task8-plan-pair-dsc-80ly2r2c/system/System/Cryptexes/OS",
+        "is_symlink": false
+      },
+      "/private/tmp/task8-plan-pair-dsc-80ly2r2c/system/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld": {
+        "realpath": "/private/tmp/task8-plan-pair-dsc-80ly2r2c/system/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld",
+        "is_symlink": false
+      }
+    },
+    "fixture_change": "URL(fileURLWithPath: path).standardizedFileURL.resolvingSymlinksInPath() before invoking production DSC validation",
+    "production_gate_relaxed": false
+  },
+  "limitations": [
+    "The pair proves actual pure-file producer output differs and passes current-System DSC validation. It does not prove verified Store-installed Bundle publication, schema4 rollback, or normal boot of the true payload.",
+    "This fixture directly invokes FirmwarePipeline producer code in the test binary; it does not execute the trusted installed-origin producer session or signature/resource verification.",
+    "Disk preservation here is five metadata fields, not a fresh full Disk SHA256 comparison. Six-file offline boundary and guest marker preservation belong to later operation/boot acceptance.",
+    "DSC success applies to this mounted current test-copy System and the recorded two regions. It is not a claim about a different System volume or firmware generation.",
+    "Readonly post-test volume state and final pending absence are assertions in the reviewed driver whose successful completion is reflected in passed=true; the JSON separately stores the initial full volume-info dictionary.",
+    "Different payload update and committed kernel-only rollback acceptance remain outstanding."
+  ]
+}

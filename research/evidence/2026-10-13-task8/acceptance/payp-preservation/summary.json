@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-14",
+  "scope": "Pure production helper/file tests only; no VM, mount or AMFI actions.",
+  "red": {
+    "logs": [
+      "red.log",
+      "red-repeat.log"
+    ],
+    "symptom": "Fixed description and missing PAYP; repaired target differs from pristine expected IMG4.",
+    "count": 3
+  },
+  "green": {
+    "log": "green-real-supported.log",
+    "exit_code": 0,
+    "summary": "9 tests in 2 suites passed; includes 13 parameterized refusal cases and actual exported-file reconstruction"
+  },
+  "final_targeted": {
+    "log": "task8-targeted-green.log",
+    "exit_code": 0,
+    "summary": "37 tests in 6 suites passed after 16.272 seconds",
+    "skips": [
+      "actualCandidateRegionUsesSourceFlow"
+    ],
+    "actual_metadata_fixture_ran": true
+  },
+  "source_compression_scope": [
+    "NONE",
+    "LZFSE"
+  ],
+  "unsupported": [
+    "LZSS"
+  ],
+  "non_regression_failure": {
+    "log": "green-real.log",
+    "signal": 5,
+    "cause": "Existing vendor LZSS compressor traps while constructing test source at maxLookback=0 (1...0); repack helper not reached. Production vendor source unchanged; LZSS now refused before vendor decoder."
+  },
+  "source_provenance": {
+    "generation": "d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62",
+    "reported_relative_path": "originals/iPhone17,3_26.1_23B85_Restore/kernelcache.research.vphone600",
+    "export": "/private/tmp/task8-pristine-kernel.im4p",
+    "sha256": "b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac",
+    "proof_input_sha_matches": true
+  },
+  "real_reconstruction": {
+    "matches_baseline_bytes": true,
+    "img4_sha256": "5b90c5a0ee87bf810c7e90795d537265f39774fbf85c430263fd2f61fc41ce7a",
+    "source_description_and_payp_match_baseline": true
+  },
+  "commit_verification": "Candidate and published readback compare whole IM4P to replacement; proof records im4pSHA256.",
+  "limitations": [
+    "Previous boot failure cause remains unknown.",
+    "Pure-file regression does not establish real update, boot or committed kernel-only rollback acceptance."
+  ]
+}

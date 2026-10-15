@@ -57,6 +57,7 @@ class VPhoneControl {
 
     /// Path to the signed vphoned binary. When set, enables auto-update.
     var guestBinaryURL: URL?
+    var guestWrites = VPhoneGuestWriteCoordinator()
 
     /// Called when guest is ready (not updating). Receives guest capabilities.
     var onConnect: (([String]) -> Void)?
@@ -238,6 +239,7 @@ class VPhoneControl {
     /// The same connected-descriptor entry used by socketpair integration tests.
     /// The caller retains ownership of fd; this client owns a duplicate.
     func connect(fileDescriptor: Int32) throws {
+        loadGuestBinary()
         disconnect()
         cancelReconnect()
         device = nil
@@ -345,7 +347,17 @@ class VPhoneControl {
                 }
 
                 if needUpdate && self.variant != .less {
-                    self.pushUpdate(fd: fd)
+                    Task { @MainActor in
+                        do {
+                            try await self.guestWrites.run {
+                                do { try await self.pushUpdate(fd: fd) }
+                                catch { self.guestWrites.retainForRecovery(); throw error }
+                            }
+                        } catch {
+                            print("[control] guest update refused or failed: \(error)")
+                            self.disconnect(ifCurrentAttempt: attemptToken)
+                        }
+                    }
                 } else {
                     self.startReadLoop(fd: fd, attemptToken: attemptToken)
                     self.startHeartbeat()
@@ -357,7 +369,7 @@ class VPhoneControl {
 
     // MARK: - Auto-update Push
 
-    private func pushUpdate(fd: Int32) {
+    private func pushUpdate(fd: Int32) async throws {
         guard let data = guestBinaryData else {
             print("[control] update requested but no binary available")
             startReadLoop(fd: fd, attemptToken: connectionAttemptToken)
@@ -375,22 +387,31 @@ class VPhoneControl {
             disconnect()
             return
         }
-        // Header + binary payload as one indivisible writer task.
-        beginTransfer()
         let attemptToken = connectionAttemptToken
-        enqueueWrite([headerFrame, data], fd: fd) { [weak self] ok in
-            Task { @MainActor in
-                guard let self, self.isCurrentAttempt(attemptToken, fd: fd) else { return }
-                self.endTransfer()
-                if !ok {
-                    print("[control] update: failed to send")
-                    self.disconnect()
+        guard isCurrentAttempt(attemptToken, fd: fd) else { throw ControlError.notConnected }
+        let requestID = String(nextRequestId, radix: 16)
+        beginTransfer()
+        defer { endTransfer() }
+        startReadLoop(fd: fd, attemptToken: attemptToken)
+        startHeartbeat()
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            addPending(id: requestID) { result in
+                switch result {
+                case let .success(response):
+                    if response.0["t"] as? String == "ok" { continuation.resume() }
+                    else { continuation.resume(throwing: Self.controlError(forGuestResponse: response.0)) }
+                case let .failure(error): continuation.resume(throwing: error)
+                }
+            }
+            enqueueWrite([headerFrame, data], fd: fd) { [weak self] ok in
+                Task { @MainActor in
+                    guard let self, self.isCurrentAttempt(attemptToken, fd: fd) else { return }
+                    if ok { self.armRequestTimeout(id: requestID, type: "update", timeout: self.timing.transfer) }
+                    else { self.disconnect(ifCurrentAttempt: attemptToken) }
                 }
             }
         }
-        print("[control] update queued, waiting for ack...")
-        startReadLoop(fd: fd, attemptToken: connectionAttemptToken)
-        startHeartbeat()
+
     }
 
     // MARK: - Send Commands

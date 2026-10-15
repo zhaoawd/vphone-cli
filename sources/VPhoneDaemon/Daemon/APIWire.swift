@@ -19,10 +19,10 @@ enum APIWire {
         try APIRequest.decode(data)
     }
 
-    static func execute(_ request: APIRequest) -> APIReply {
+    static func execute(_ request: APIRequest, externalProxy: Bool) -> APIReply {
         autoreleasepool { () -> APIReply in
             do {
-                let result = try GuestAPI.execute(method: request.method, params: request.params)
+                let result = try GuestAPI.execute(method: request.method, params: request.params, externalProxy: externalProxy)
                 return .json(["type": "response", "id": request.id ?? NSNull(), "result": result])
             } catch {
                 let (code, message): (String, String) =

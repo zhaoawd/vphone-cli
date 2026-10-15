@@ -1,0 +1,115 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/12] Compiling FirmwarePatcher FirmwareTransaction.swift
+[7/12] Emitting module FirmwarePatcher
+[8/17] Compiling FirmwarePatcher FirmwareFilesystemReadback.swift
+[9/17] Compiling FirmwarePatcher FirmwarePipeline.swift
+[10/17] Compiling FirmwarePatcher FirmwareFilesystemEvidence.swift
+[11/17] Compiling FirmwarePatcher PatchExperimentRecorder.swift
+[12/17] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[13/32] Emitting module FirmwareIntegrationTests
+[14/33] Compiling FirmwarePatcherTests PatchExperimentRecordTests.swift
+[15/34] Compiling FirmwarePatcherTests FirmwareTransactionAcceptanceTests.swift
+[16/34] Compiling FirmwarePatcherTests FirmwareReceiptPublicationTests.swift
+[17/34] Compiling FirmwarePatcherTests FirmwareTransactionTests.swift
+[18/34] Compiling FirmwarePatcherTests FirmwareDesiredPlanStoreTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+[19/34] Compiling FirmwarePatcherTests FirmwareFilesystemPublicationTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+[20/34] Compiling FirmwarePatcherTests FirmwareGenerationTests.swift
+[21/34] Compiling FirmwarePatcherTests FirmwarePlanBindingTests.swift
+[22/34] Emitting module FirmwarePatcherTests
+[23/34] Compiling FirmwarePatcherTests DeclarationGateTests.swift
+[24/34] Compiling FirmwarePatcherTests FirmwareComponentReceiptTests.swift
+[25/34] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[25/34] Write Objects.LinkFileList
+[28/34] Compiling FirmwarePatcherTests RequiredDeclarationEvidenceTests.swift
+[28/34] Write Objects.LinkFileList
+[29/34] Linking vphone-vm
+[30/34] Linking vphone-cli
+[31/34] Applying vphone-vm
+[32/34] Applying vphone-cli
+[33/34] Linking vphone-cliPackageTests
+Build complete! (11.34s)
+Test Suite 'Selected tests' started at 2026-10-13 04:08:56.922.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 04:08:56.924.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 04:08:56.924.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 04:08:56.924.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareReceiptPublicationTests started.
+◇ Test receiptMustCoverTheExactSavedReportRecords() started.
+◇ Test installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test committedJournalFsyncFailureRetainsRecovery() started.
+◇ Test case passing 1 argument fault → "generated" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "wrong-transaction" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "lost-qualification" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "stale-binding" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "success" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "rollback" to installedOriginHookRequiresLiveTargetProof(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument fault → "wrong-layer" to installedOriginHookRequiresLiveTargetProof(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✘ Test receiptMustCoverTheExactSavedReportRecords() recorded an issue at FirmwareReceiptPublicationTests.swift:240:9: Expectation failed: an error was expected but none was thrown and "file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-AD95CF04-9A67-496C-9372-BCFFC215596A/vm/.firmware-history/9f07dd23-1b42-47fb-ad99-5ca484bb487c" was returned
+✘ Test receiptMustCoverTheExactSavedReportRecords() recorded an issue at FirmwareReceiptPublicationTests.swift:241:9: Expectation failed: (t.journalSnapshot.phase → .committed) != .committed
+✘ Test receiptMustCoverTheExactSavedReportRecords() failed after 3.530 seconds with 2 issues.
+✘ Test committedJournalFsyncFailureRetainsRecovery() recorded an issue at FirmwareReceiptPublicationTests.swift:221:9: Expectation failed: an error was expected but none was thrown and "file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-9E083218-5989-412D-BA84-BF70EEFE0EA1/vm/.firmware-history/e93d9a1e-6fb8-499e-a985-f33eb07f18b1" was returned
+✘ Test committedJournalFsyncFailureRetainsRecovery() recorded an issue at FirmwareReceiptPublicationTests.swift:222:9: Expectation failed: (t.journalSnapshot.phase → .committed) != .committed
+✘ Test committedJournalFsyncFailureRetainsRecovery() recorded an issue at FirmwareReceiptPublicationTests.swift:223:9: Expectation failed: try FirmwareTransaction.recover(vmDirectory: f.vm, mounts: { _, _ in }) != nil
+✘ Test committedJournalFsyncFailureRetainsRecovery() recorded an issue at FirmwareReceiptPublicationTests.swift:224:9: Expectation failed: try Data(contentsOf: f.file) == Data("original boot rom".utf8)
+✘ Test committedJournalFsyncFailureRetainsRecovery() failed after 3.551 seconds with 4 issues.
+✘ Test installedOriginHookRequiresLiveTargetProof(_:) recorded an issue with 1 argument fault → "wrong-layer" at FirmwareReceiptPublicationTests.swift:187:13: Expectation failed: an error was expected but none was thrown and "file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-CB2783B8-3CBA-483D-BA2E-F33D18A6F683/vm/.firmware-history/5ee3a55b-b3b2-4225-8bb2-9715965280a6" was returned
+✘ Test installedOriginHookRequiresLiveTargetProof(_:) recorded an issue with 1 argument fault → "wrong-layer" at FirmwareReceiptPublicationTests.swift:188:13: Expectation failed: (t.journalSnapshot.phase → .committed) != .committed
+✘ Test installedOriginHookRequiresLiveTargetProof(_:) recorded an issue with 1 argument fault → "wrong-layer" at FirmwareReceiptPublicationTests.swift:191:17: Expectation failed: try Data(contentsOf: bindingURL) == originalBytes
+✘ Test installedOriginHookRequiresLiveTargetProof(_:) with 7 test cases failed after 4.418 seconds with 3 issues.
+✘ Suite FirmwareReceiptPublicationTests failed after 4.419 seconds with 9 issues.
+✘ Test run with 3 tests in 1 suite failed after 4.419 seconds with 9 issues.

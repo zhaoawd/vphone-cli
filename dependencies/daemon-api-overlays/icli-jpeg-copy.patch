@@ -1,6 +1,6 @@
 --- a/Sources/IcliPrivate/IcliPrivate.m
 +++ b/Sources/IcliPrivate/IcliPrivate.m
-@@ -751,6 +751,30 @@
+@@ -736,6 +736,30 @@
      return baked ?: raw;
  }
  
@@ -29,19 +29,14 @@
 +}
 +
  bool icli_screenshot_jpeg(const char *path, float quality, int max_bytes, bool native_resolution) {
-     icli_private_init();
      if (!path) {
-@@ -769,15 +793,15 @@
+         return false;
+@@ -753,11 +777,11 @@
          if (!image) return false;
      }
      float q = quality > 0 ? quality : 0.7f;
 -    NSData *data = UIImageJPEGRepresentation(image, q);
 +    NSData *data = icliJPEGRepresentation(image, q);
-     while (data.length == 0 && q > 0.2f) {
-         q -= 0.1f;
--        data = UIImageJPEGRepresentation(image, q);
-+        data = icliJPEGRepresentation(image, q);
-     }
      if (max_bytes > 0) {
          while (data.length > (NSUInteger)max_bytes && q > 0.15f) {
              q -= 0.1f;

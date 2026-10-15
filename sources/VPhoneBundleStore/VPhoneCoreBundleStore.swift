@@ -1,6 +1,7 @@
 import CryptoKit
 import Darwin
 import Foundation
+import VPhoneKernelIOTrace
 import VPhoneArchiveKit
 
 /// Shared by the explicit sudo CLI and the future authorized helper service.
@@ -73,7 +74,7 @@ public struct VPhoneCoreBundleStore: Sendable {
             guard fd >= 0 else { throw failure("create receipt", receiptURL) }
             let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
             try output.write(contentsOf: receipt.encoded())
-            try output.synchronize()
+            try KernelIOTrace.measure("VPhoneCoreBundleStore.fileHandleSynchronize", aggregate: true) { _ in try output.synchronize() }
             try output.close()
             try secureTree(publication, normalize: true)
             // One atomic, exclusive rename publishes both bundle and receipt.
@@ -106,6 +107,42 @@ public struct VPhoneCoreBundleStore: Sendable {
         }
     }
 
+    /// Package consumers can revalidate within the existing shared lock. The
+    /// callback must finish its complete operation here; retained closures expire.
+    package func withRevalidatedExecutable<T>(version: String, executable: VPhoneBundleExecutable,
+        body: (URL, @escaping () throws -> Void) throws -> T) throws -> T {
+        try withVerifiedExecutable(version: version, executable: executable) { url in
+            var active = true
+            defer { active = false }
+            return try body(url, {
+                guard active else { throw VPhoneBundleStoreError("Core Bundle verification callback expired") }
+                _ = try verifiedReceipt(version)
+            })
+        }
+    }
+
+    /// Online operations already own a VM lifetime lease. Acquisition must stay
+    /// nonblocking, including this shared Store lock; no reverse-order waiting.
+    @MainActor
+    package func withRevalidatedExecutableAsync<T>(version: String, executable: VPhoneBundleExecutable,
+        body: (URL, @escaping @MainActor () throws -> Void) async throws -> T) async throws -> T {
+        try VPhoneBundleVersion.require(version)
+        try requireRoot()
+        let descriptor = try acquireLock(exclusive: false)
+        defer { flock(descriptor, LOCK_UN); close(descriptor) }
+        var active = true
+        defer { active = false }
+        let recheck: @MainActor () throws -> Void = {
+            try Task.checkCancellation()
+            guard active else { throw VPhoneBundleStoreError("Core Bundle verification callback expired") }
+            _ = try verifiedReceipt(version)
+        }
+        try recheck()
+        let value = try await body(executableURL(directory(version).appendingPathComponent("VPhone.bundle"), executable), recheck)
+        try recheck()
+        return value
+    }
+
     private func unavailableExecutable(version: String, cause: any Error) -> VPhoneBundleStoreError {
         VPhoneBundleStoreError("Core Bundle \(version) is unavailable or failed verification. \(cause.localizedDescription) "
             + "Restore this exact verified version with bundle install, or explicitly select another verified version with vm bind-core-bundle. "
@@ -113,29 +150,31 @@ public struct VPhoneCoreBundleStore: Sendable {
     }
 
     private func verifiedReceipt(_ version: String) throws -> VPhoneBundleReceipt {
-        let directory = directory(version)
-        try secureTree(directory, normalize: false)
-        let receiptURL = directory.appendingPathComponent("receipt.json")
-        let info = try requireEntry(receiptURL, type: S_IFREG)
-        guard info.st_size > 0, info.st_size <= 65536 else {
-            throw VPhoneBundleStoreError("Invalid Core Bundle receipt size \(info.st_size) (1–65536 bytes): \(receiptURL.path)")
-        }
-        let receipt: VPhoneBundleReceipt
-        do { receipt = try VPhoneBundleReceipt.decode(Data(contentsOf: receiptURL)) } catch {
-            throw VPhoneBundleStoreError("Invalid Core Bundle receipt: expected JSON with version, sha256, installedAt and cdhashes: \(receiptURL.path)")
-        }
-        try Self.requireReceipt(receipt, version: version)
-        let bundle = directory.appendingPathComponent("VPhone.bundle")
-        try requireBundleLayout(bundle, version: version)
-        try VPhoneBundleCodeSignature.verify(bundle)
-        for executable in VPhoneBundleExecutable.allCases {
-            let expected = receipt.cdhashes[executable.rawValue]!
-            let actual = try VPhoneBundleCodeSignature.cdhash(executableURL(bundle, executable))
-            guard actual == expected else {
-                throw VPhoneBundleStoreError("Installed \(executable.rawValue) cdhash \(actual) differs from its receipt (\(expected)).")
+        return try KernelIOTrace.measure("store.verifiedReceipt") { _ in
+            let directory = directory(version)
+            try KernelIOTrace.measure("store.secureTree") { _ in try secureTree(directory, normalize: false) }
+            let receiptURL = directory.appendingPathComponent("receipt.json")
+            let info = try requireEntry(receiptURL, type: S_IFREG)
+            guard info.st_size > 0, info.st_size <= 65536 else {
+                throw VPhoneBundleStoreError("Invalid Core Bundle receipt size \(info.st_size) (1–65536 bytes): \(receiptURL.path)")
             }
+            let receipt: VPhoneBundleReceipt
+            do { receipt = try KernelIOTrace.measure("store.receiptReadDecode", labels: ["byte_semantics": "unknown"]) { _ in try VPhoneBundleReceipt.decode(Data(contentsOf: receiptURL)) } } catch {
+                throw VPhoneBundleStoreError("Invalid Core Bundle receipt: expected JSON with version, sha256, installedAt and cdhashes: \(receiptURL.path)")
+            }
+            try Self.requireReceipt(receipt, version: version)
+            let bundle = directory.appendingPathComponent("VPhone.bundle")
+            try KernelIOTrace.measure("store.requireBundleLayout") { _ in try requireBundleLayout(bundle, version: version) }
+            try VPhoneBundleCodeSignature.verify(bundle)
+            for executable in VPhoneBundleExecutable.allCases {
+                let expected = receipt.cdhashes[executable.rawValue]!
+                let actual = try VPhoneBundleCodeSignature.cdhash(executableURL(bundle, executable))
+                guard actual == expected else {
+                    throw VPhoneBundleStoreError("Installed \(executable.rawValue) cdhash \(actual) differs from its receipt (\(expected)).")
+                }
+            }
+            return receipt
         }
-        return receipt
     }
 
     /// Receipt fields checked before any signature work, one reason per failure.
@@ -301,6 +340,12 @@ public struct VPhoneCoreBundleStore: Sendable {
     }
 
     private func withLock<T>(exclusive: Bool, _ body: () throws -> T) throws -> T {
+        let fd = try acquireLock(exclusive: exclusive)
+        defer { flock(fd, LOCK_UN); close(fd) }
+        return try body()
+    }
+
+    private func acquireLock(exclusive: Bool) throws -> Int32 {
         let url = root.appendingPathComponent(".store.lock")
         let flags = O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK
         var fd: Int32
@@ -315,7 +360,8 @@ public struct VPhoneCoreBundleStore: Sendable {
             fd = open(url.path, O_RDONLY | flags)
         }
         guard fd >= 0 else { throw failure("open store lock", url) }
-        defer { close(fd) }
+        var transferred = false
+        defer { if !transferred { close(fd) } }
         var info = stat()
         guard fstat(fd, &info) == 0, info.st_mode & S_IFMT == S_IFREG, info.st_uid == owner,
               info.st_nlink == 1, info.st_mode & 0o7022 == 0 else { throw VPhoneBundleStoreError("Unsafe store lock.") }
@@ -323,8 +369,8 @@ public struct VPhoneCoreBundleStore: Sendable {
         guard flock(fd, (exclusive ? LOCK_EX : LOCK_SH) | LOCK_NB) == 0 else {
             throw VPhoneBundleStoreError("Core Bundle store is busy.")
         }
-        defer { flock(fd, LOCK_UN) }
-        return try body()
+        transferred = true
+        return fd
     }
 
     /// Read-only: reports the first property that fails and never repairs it.

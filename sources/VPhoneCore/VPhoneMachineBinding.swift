@@ -11,6 +11,17 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
     public let kernel: String?
     public let bootChain: String?
 
+    public enum Layer: String, Codable, CaseIterable, Sendable {
+        case host, guestEnvironment, kernel, bootChain
+    }
+
+    public func replacingOrigin(_ layer: Layer, with version: String) throws -> Self {
+        try Self(bundle: layer == .host ? version : bundle,
+                 guestEnvironment: layer == .guestEnvironment ? version : guestEnvironment,
+                 kernel: layer == .kernel ? version : kernel,
+                 bootChain: layer == .bootChain ? version : bootChain)
+    }
+
     public enum Read: Equatable, Sendable {
         case missing
         case invalid(String)
@@ -30,7 +41,7 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
     /// Changes only the recorded host selection. It performs no file write,
     /// executable selection, kernel update or guest environment replacement.
     public func replacingHost(with bundle: String) throws -> Self {
-        try Self(bundle: bundle, guestEnvironment: guestEnvironment, kernel: kernel, bootChain: bootChain)
+        try replacingOrigin(.host, with: bundle)
     }
 
     /// One validated file read. Consumers can freeze a selection before work,
@@ -68,6 +79,39 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
 
     // Deterministic test seam: a real same-size in-place write between read and fstat.
     package static func snapshot(_ machine: URL, afterRead: () throws -> Void) throws -> Snapshot? {
+        try withCommittedOriginsRead(machine) { try transactionSnapshot(machine, afterRead: afterRead) }
+    }
+
+    /// Read-only package consumers share the same pending publication boundary.
+    package static func withCommittedOriginsRead<T>(_ machine: URL, body: () throws -> T) throws -> T {
+        let before = try committedDirectoryRevision(machine)
+        let result = try body()
+        let after = try committedDirectoryRevision(machine)
+        guard sameRevision(before, after) else {
+            throw VPhoneMachineBindingError("VM directory changed while reading origins")
+        }
+        return result
+    }
+
+    /// Only the transaction implementation may inspect transitional metadata.
+    /// This raw snapshot carries no committed-state or source qualification.
+    package static func transactionSnapshot(_ machine: URL) throws -> Snapshot? {
+        try transactionSnapshot(machine, afterRead: {})
+    }
+
+    private static func committedDirectoryRevision(_ machine: URL) throws -> stat {
+        var directory = stat(), pending = stat()
+        guard lstat(machine.path, &directory) == 0, directory.st_mode & S_IFMT == S_IFDIR else {
+            throw VPhoneMachineBindingError("Cannot inspect VM directory for committed origins")
+        }
+        guard lstat(machine.appendingPathComponent(".firmware-transaction").path, &pending) != 0,
+              errno == ENOENT else {
+            throw VPhoneMachineBindingError("Pending firmware transaction; component origins are unavailable until recovery")
+        }
+        return directory
+    }
+
+    private static func transactionSnapshot(_ machine: URL, afterRead: () throws -> Void) throws -> Snapshot? {
         let url = machine.appendingPathComponent("launchpad.json")
         let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
         guard fd >= 0 else {

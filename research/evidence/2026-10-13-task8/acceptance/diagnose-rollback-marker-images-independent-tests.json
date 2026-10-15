@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-10-14T09:15:50.748726+00:00",
+  "scope": "Independent pure mock/ordinary-file test only. No main invocation, VM, guest, process inspection or actual mount.",
+  "test_exit_code": 0,
+  "tests": 23,
+  "config_plist_load_reproducer": [
+    {
+      "format": "xml",
+      "valid_plist": true,
+      "decode_json_result": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "format": "binary",
+      "valid_plist": true,
+      "decode_json_result": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd1 in position 8: invalid continuation byte"
+    }
+  ],
+  "files": {
+    "diagnose-rollback-marker-images.py": "fd4df3dd4b7043809e7b47691010d14dcc0156001f19da7730dedffe57dd7395",
+    "diagnose-rollback-marker-images-tests.py": "a5f5649c56dcf30659f0f15827974e749cda1ce1279a258c6be5960e14475dd4",
+    "diagnose-rollback-marker-images.md": "e2beb89478a81c2002d404c3ac63115b0e139d14c6d3a92dfd6d2192399e97ae",
+    "diagnose-rollback-marker-images-independent-tests.log": "6f745affbf53965acb3d6a853df4bbc5796fe2fb8bd49de282d5575a225e7606"
+  }
+}

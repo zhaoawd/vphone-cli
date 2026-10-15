@@ -1,0 +1,102 @@
+{
+  "fixBase": "5a666ca55e5cc3b6d033152296c3cab4e2ba2495",
+  "sources": [
+    {
+      "path": "scripts/patchers/component_effects.py",
+      "sha256": "a47adacf79e11c8bbc3646c987ff6f64ccd67bd30ce709a60faf97ab5f167055"
+    },
+    {
+      "path": "tests/test_component_effects.py",
+      "sha256": "6da44a2a43617bfa78dca1a491b162155436275e7a9c0c6930e5dd4ed37cf6a6"
+    }
+  ],
+  "loaderReferences": [
+    {
+      "path": ".tools/bin/insert_dylib",
+      "sha256": "a5d8a1b22a1252f224faa543d8e2cd0f7521e909f08c886fc8cd039897c77cac"
+    }
+  ],
+  "logs": [
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-red.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-red.log.gz",
+      "rawSHA256": "455373f001596fdb3bcbe48981b779f9f2767bf0e5edd42b0abc1645ecbf91bf",
+      "gzipSHA256": "1dfe43ecc1414a721a7e038671d118a14fad1d78805036b5ec92e85780c1b40d",
+      "command": ".venv/bin/python3 -m unittest tests.test_component_effects.EffectsReviewRegressionTests.test_existing_dylib_fields_can_change_without_changing_order_identity tests.test_component_effects.EffectsReviewRegressionTests.test_duplicate_dylib_order_identity_is_rejected_even_when_fields_differ",
+      "exitCode": 1,
+      "result": "2 tests; 2 failures and 5 errors"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-green.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-green.log.gz",
+      "rawSHA256": "ed14ca622fbf69d093a444d56a4063118df4b7be7dc453a1220f76473438ae22",
+      "gzipSHA256": "cba7a0c3ad3d892489421465a8161041988fc93aff056172493e626f329129b4",
+      "command": ".venv/bin/python3 -m unittest -v tests.test_component_effects",
+      "exitCode": 0,
+      "result": "23 tests passed; initial order identity fix"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-final-python.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-final-python.log.gz",
+      "rawSHA256": "14d5ac6b8b7a64baa1c5531b1e569c3395d816fa12528619243c0d77bd396f2d",
+      "gzipSHA256": "b900d803606949ac52395bc1212486a435ea342c7e886835e87db8a7133eee44",
+      "command": ".venv/bin/python3 -m unittest -v tests.test_component_effects tests.test_component_signatures tests.test_patch_plan_gate",
+      "exitCode": 0,
+      "result": "50 tests passed; before independent field composition fix"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-fields-red.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-fields-red.log.gz",
+      "rawSHA256": "a4a8caf130495bc96508ac168602bef443202ee00c2961f1ccd240e155276c0e",
+      "gzipSHA256": "c7625726dc7055634de1bc2bdc94d18ed2072c1a6c8601fc7f96274bbe42b5d5",
+      "command": ".venv/bin/python3 -m unittest tests.test_component_effects.EffectsReviewRegressionTests.test_disjoint_existing_dylib_fields_compose_but_earlier_field_cannot_revert",
+      "exitCode": 1,
+      "result": "1 test; 2 errors"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-fields-green.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-fields-green.log.gz",
+      "rawSHA256": "3f6b48c90e7a937bd5861b340a9792f4a6795e11cfffc93acec94b9c4a17f916",
+      "gzipSHA256": "cf78ca9e25d5d9f9d94301a53d1b1a62706cd8db735745eecb9c3e2fed0cdd2b",
+      "command": ".venv/bin/python3 -m unittest -v tests.test_component_effects",
+      "exitCode": 0,
+      "result": "24 tests passed"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-final-python-v2.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-final-python-v2.log.gz",
+      "rawSHA256": "c2617c9a024829d8e0c1b2e2d841cff89eda772b99a4f2eb81f6e09e8f7386ae",
+      "gzipSHA256": "8beeb897fb6e21af98d99a5d2bdde5345ea8b8c94e98587ccc16e4278ecc1e21",
+      "command": ".venv/bin/python3 -m unittest -v tests.test_component_effects tests.test_component_signatures tests.test_patch_plan_gate",
+      "exitCode": 0,
+      "result": "51 tests passed; before complete numeric-field value refinement"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-field-value-red.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-field-value-red.log.gz",
+      "rawSHA256": "835e817e8837aee027ee8b0beb48760ed0b64b53e22d53b9988a801c7bc3a257",
+      "gzipSHA256": "f822785cf8e6507bc65c4c15c9cc90b598e88dd3df15832431ceee9e58b31b38",
+      "command": ".venv/bin/python3 -m unittest tests.test_component_effects.EffectsReviewRegressionTests.test_existing_dylib_numeric_field_preserves_its_entire_value",
+      "exitCode": 1,
+      "result": "1 test; 1 failure"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-final-python-v3.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-final-python-v3.log.gz",
+      "rawSHA256": "7e22cb951abe96ec410d9d7bb310512dc5ab4f2aec60aff5340bee3c388faa22",
+      "gzipSHA256": "4c9e25aa7135acb542c94d30c8ef63b375a6e688c064b3467494080879d6a509",
+      "command": ".venv/bin/python3 -m unittest -v tests.test_component_effects tests.test_component_signatures tests.test_patch_plan_gate",
+      "exitCode": 0,
+      "result": "52 tests passed; final source; no skips"
+    },
+    {
+      "rawPath": "/private/tmp/vphone-task6-evidence/t06a1-fix2-diff-check.log",
+      "gzipPath": "research/evidence/2026-10-13-task6a1-fix2/t06a1-fix2-diff-check.log.gz",
+      "rawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzipSHA256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "no output"
+    }
+  ]
+}

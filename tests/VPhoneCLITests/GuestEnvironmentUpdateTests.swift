@@ -2,7 +2,9 @@ import ArgumentParser
 import CryptoKit
 import Foundation
 @testable import VPhoneAPIKit
+@testable import VPhoneDaemonWire
 import XCTest
+import VPhoneCore
 @testable import vphone_cli
 
 // MARK: - API daemon stand-in
@@ -12,8 +14,19 @@ import XCTest
 @MainActor
 final class EnvironmentDaemonFake: VPhoneHostAPISession {
     var caps = ["session_identity", "files", "file_upload_identity", "processes",
-                "environment_update", "environment_transaction", "environment_activation"]
+                "environment_update", "environment_transaction", "environment_transaction_v2", "environment_activation"]
+    var sourceContext: [String: String] = [:]
+    var journalOverride: [String: VPhoneJSONValue]?
+    var mutateOriginal: ((inout [String: VPhoneJSONValue]) -> Void)?
+    var performRestore: (([String: VPhoneJSONValue]) throws -> VPhoneJSONValue)?
+    var hideInstallJournal = false
+    var workerIdle = true
+    var instanceID = "6A5A4D0B-6D53-4A4B-8F2B-0B8E7E3F7A11"
+    var loseInstallReply = false
+    var installJournal: [String: VPhoneJSONValue]?
+    var eligible = true
     var generation = UUID()
+    var vmInstanceID = "fixture"
     var installed: [String: String?] = [:]
     var staged: [String: String] = [:]
     var aliasTarget: String? = "/usr/lib/launchdhook-vphone.dylib"
@@ -25,6 +38,9 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
     var rootStaysWritable = false
     var mutateInstall: ((inout [String: VPhoneJSONValue]) -> Void)?
     var invalidInstallValue: VPhoneJSONValue?
+    var beforeUpload: (() async -> Void)?
+    var beforeStatus: (() async -> Void)?
+    var mutateRestore: ((inout [String: VPhoneJSONValue]) -> Void)?
     /// pid -> (name, [library: stale?]); nil stale means current.
     var processes: [Int: (name: String, maps: [String: Bool])] = [:]
     var uninspected: [[String: VPhoneJSONValue]] = []
@@ -32,19 +48,23 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
     var uploads: [String] = []
     var killed: [Int] = []
 
-    init() {
-        for name in VPhoneGuestEnvironmentTestSupport.names { installed[name] = "old-" + name }
+    init(restoreFixture: Bool = false) {
+        for name in VPhoneGuestEnvironmentTestSupport.names { installed[name] = Self.digest(Data(("old-" + name).utf8)) }
+        if restoreFixture {
+            for name in ["libcamfix.dylib", "libvlocation.dylib"] { installed[name] = Self.digest(Data(("new-" + name).utf8)) }
+        }
     }
 
     var snapshot: VPhoneAPISession.Snapshot {
-        let health: [String: Any] = ["apiVersion": 1, "binaryHash": String(repeating: "b", count: 64),
-                                     "capabilities": caps, "instanceID": "6A5A4D0B-6D53-4A4B-8F2B-0B8E7E3F7A11"]
-        let value: [String: Any] = ["vmInstanceID": "fixture", "state": "ready",
+        let health: [String: Any] = ["apiVersion": 1, "binaryHash": Self.digest(Data("daemon".utf8)),
+                                     "capabilities": caps, "instanceID": instanceID]
+        let value: [String: Any] = ["vmInstanceID": vmInstanceID, "state": "ready",
                                     "generation": generation.uuidString, "health": health]
         return try! JSONDecoder().decode(VPhoneAPISession.Snapshot.self, from: JSONSerialization.data(withJSONObject: value))
     }
 
     func uploadFile(_ source: VPhoneAPIUpload, path: String, permissions: String) async throws {
+        if let beforeUpload { await beforeUpload() }
         uploads.append(path)
         let name = (path as NSString).lastPathComponent
         XCTAssertEqual((path as NSString).deletingLastPathComponent, "/var/root/Library/Caches/vphone-environment")
@@ -60,18 +80,23 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
         calls.append((method, params))
         switch method {
         case "environment.status":
+            if let beforeStatus { await beforeStatus() }
             return .object([
                 "libraries": .array(daemonLibraries.map { name in
                     .object(["name": .string(name), "sha256": (installed[name] ?? nil).map { .string($0) } ?? .null,
                              "staged_sha256": staged[name].map { .string($0) } ?? .null])
                 }),
+                "worker_idle": .bool(workerIdle), "daemon_instance": .string(instanceID),
+                "eligibility": .object(["eligible": .bool(eligible), "mode": .string(eligible ? "regular-v2" : "unknown"), "daemon_sha256": .string(Self.digest(Data("daemon".utf8)))]),
                 "staging": .string("/var/root/Library/Caches/vphone-environment"),
-                "root_read_only": .bool(true),
+                "root_read_only": .bool(!rootStaysWritable),
                 "load_alias": .object(["path": .string("/vh"), "target": aliasTarget.map { .string($0) } ?? .null]),
-                "transactions": .array([]),
+                "transactions": .array([.object(restoreJournal)] + (hideInstallJournal ? [] : (installJournal.map { [.object($0)] } ?? []))),
             ])
         case "environment.install":
             guard case let .array(entries)? = params["libraries"] else { throw apiError("invalid_operation", "libraries") }
+            let id = { if case let .string(value)? = params["operation"] { return value }; return "T1" }()
+            let beforeFiles = installed.compactMapValues { $0 }
             var rows: [VPhoneJSONValue] = []
             var failed = false
             for (index, entry) in entries.enumerated() {
@@ -80,7 +105,7 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
                 guard staged[name] == sha else { throw apiError("invalid_operation", "\(name) does not match its SHA-256") }
                 var row: [String: VPhoneJSONValue] = ["name": .string(name), "sha256": .string(sha),
                     "previous_sha256": .string((installed[name] ?? nil) ?? ""),
-                    "backup": .string("/var/root/Library/Caches/vphone-environment/transactions/T1/backup/\(name)")]
+                    "backup": .string("/var/root/Library/Caches/vphone-environment/transactions/\(id)/backup/\(name)")]
                 if failed {
                     row["state"] = .string("not_attempted")
                 } else if index == failReplacementAt {
@@ -100,17 +125,38 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
                 return name
             }
             var response: [String: VPhoneJSONValue] = [
-                "id": .string("T1"), "state": .string(failed ? "incomplete" : "complete"), "complete": .bool(!failed),
+                "id": .string(id), "state": .string(failed ? "incomplete" : "complete"), "complete": .bool(!failed),
                 "libraries": .array(rows), "installed": .array(replaced.map { .string($0) }),
-                "journal": .string("/var/root/Library/Caches/vphone-environment/transactions/T1/journal.json"),
+                "journal": .string("/var/root/Library/Caches/vphone-environment/transactions/\(id)/journal.json"),
                 "reboot_required": .bool(rootStaysWritable || replaced.contains("launchdhook-vphone.dylib")),
                 "root_read_only": .bool(!rootStaysWritable), "restarted_pids": .array([]),
             ]
+            response["context"] = params["context"]
+            response["before_files"] = .object(beforeFiles.mapValues(VPhoneJSONValue.string))
+            response["after_files"] = .object(installed.compactMapValues { $0 }.mapValues(VPhoneJSONValue.string))
             mutateInstall?(&response)
+            installJournal = response
+            if loseInstallReply { throw URLError(.networkConnectionLost) }
             return invalidInstallValue ?? .object(response)
         case "environment.restore":
-            return .object(["id": params["transaction"] ?? .null, "state": .string("restored"),
-                            "libraries": .array([.object(["name": .string("libcamfix.dylib"), "state": .string("restored")])])])
+            if let performRestore { return try performRestore(params) }
+            var result = restoreJournal
+            result["state"] = .string("restored")
+            result["restored"] = .array([.string("libcamfix.dylib"), .string("libvlocation.dylib")])
+            result["reboot_required"] = .bool(false)
+            result["root_read_only"] = .bool(true)
+            if case let .array(rows)? = result["libraries"] {
+                result["libraries"] = .array(rows.map { row in
+                    guard case var .object(fields) = row, case let .string(name)? = fields["name"] else { return row }
+                    fields["state"] = .string("restored")
+                    if case let .string(hash)? = fields["previous_sha256"] { installed[name] = hash }
+                    return .object(fields)
+                })
+            }
+            result["restore_context"] = params["context"]
+            result["after_files"] = .object(installed.compactMapValues { $0 }.mapValues(VPhoneJSONValue.string))
+            mutateRestore?(&result)
+            return .object(result)
         case "environment.loaded":
             return .object([
                 "processes": .array(processes.keys.sorted().map { pid in
@@ -136,6 +182,45 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
         default:
             throw apiError("invalid_operation", "unexpected \(method)")
         }
+    }
+
+    var restoreJournal: [String: VPhoneJSONValue] {
+        if journalOverride == nil { journalOverride = makeRestoreJournal() }
+        var value = journalOverride!
+        mutateOriginal?(&value)
+        return value
+    }
+
+    private func makeRestoreJournal() -> [String: VPhoneJSONValue] {
+        // Persist real old/new temporary bytes through the production journal before exposing fixture evidence.
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("restore-fixture-" + UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        do {
+            let libs = root.appendingPathComponent("lib"), stage = root.appendingPathComponent("stage")
+            try FileManager.default.createDirectory(at: libs, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: stage, withIntermediateDirectories: true)
+            let names = VPhoneGuestEnvironmentTestSupport.names
+            for name in names {
+                try Data(("old-" + name).utf8).write(to: libs.appendingPathComponent(name))
+                try Data(("new-" + name).utf8).write(to: stage.appendingPathComponent(name))
+            }
+            let tx = EnvironmentTransaction(libraries: names, libraryDirectory: libs.path, stagingDirectory: stage.path)
+            let id = "0000018f-2a3b-4c5d-a123-00001a2b3c4d"
+            var context = sourceContext
+            context["operation"] = id
+            context["generation"] = generation.uuidString
+            context["daemon_instance"] = instanceID
+            var journal = try tx.prepare(try tx.validate(["libcamfix.dylib", "libvlocation.dylib"].map {
+                ["name": $0, "sha256": EnvironmentTransaction.sha256(atPath: tx.staged($0))!]
+            }), operation: id, context: context)
+            try tx.apply(&journal) { input, output in try Data(contentsOf: URL(fileURLWithPath: input)).write(to: URL(fileURLWithPath: output)) }
+            try tx.finalize(&journal, rootReadOnly: true)
+            var value = try XCTUnwrap(tx.journal(id: id)).dictionary
+            var rows = value["libraries"] as! [[String: Any]]
+            for index in rows.indices { rows[index]["backup"] = "/var/root/Library/Caches/vphone-environment/transactions/" + id + "/backup/" + (rows[index]["name"] as! String) }
+            value["libraries"] = rows
+            return try JSONDecoder().decode([String: VPhoneJSONValue].self, from: JSONSerialization.data(withJSONObject: value))
+        } catch { XCTFail("cannot produce fixture journal: \(error)"); return [:] }
     }
 
     var methods: [String] { calls.map(\.method) }
@@ -186,18 +271,33 @@ enum VPhoneGuestEnvironmentTestSupport {
 @MainActor
 final class GuestEnvironmentUpdateTests: XCTestCase {
     private var stage: URL!
+    private var sourceFixture: GuestEnvironmentSourceFixture!
     private var candidates: [String: String] = [:]
 
     override func setUp() async throws {
-        stage = FileManager.default.temporaryDirectory.appendingPathComponent("vphone-env-stage-\(UUID())")
+        sourceFixture = try GuestEnvironmentSourceFixture()
+        stage = sourceFixture.stage
         candidates = try VPhoneGuestEnvironmentTestSupport.stage(at: stage)
     }
 
     override func tearDown() async throws {
-        try? FileManager.default.removeItem(at: stage)
+        sourceFixture = nil
     }
 
     private func run(_ api: EnvironmentDaemonFake, _ fields: [String: Any]) async throws -> [String: Any] {
+        if let command = fields["t"] as? String, ["environment_update", "environment_rollback"].contains(command) {
+            api.vmInstanceID = sourceFixture.runtime.state.instanceID
+            do {
+                return try await sourceFixture.withSource { source in
+                    api.sourceContext = source.context
+                    let outcome = await VPhoneGuestEnvironmentUpdater(session: api, manifestURL: source.manifest, source: source).execute(command, request: fields)
+                    return outcome.fields.merging(["ok": outcome.ok]) { $1 }
+                }
+            } catch let refusal as VPhoneGuestEnvironmentRefusal {
+                return refusal.fields.merging(["ok": false, "code": refusal.code]) { $1 }
+            }
+
+        }
         let executor = VPhoneHostCommandExecutor(apiSession: api,
                                                  environmentManifest: VPhoneGuestEnvironmentTestSupport.manifestURL)
         let data = await executor.execute(try JSONSerialization.data(withJSONObject: fields))
@@ -222,6 +322,211 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
     }
 
     // MARK: Files
+
+    func testPendingRecoveryRetainsStopLeaseUntilActualWorkerMountAndHashesConverge() async throws {
+        let api = EnvironmentDaemonFake()
+        api.vmInstanceID = sourceFixture.runtime.state.instanceID
+        current(api, except: ["libcamfix.dylib"])
+        api.loseInstallReply = true
+        api.hideInstallJournal = true
+        let writes = VPhoneGuestWriteCoordinator(directory: sourceFixture.machine)
+        let outcome = try await writes.run {
+            try await sourceFixture.withSource { source in
+                let result = await VPhoneGuestEnvironmentUpdater(session: api, manifestURL: source.manifest, source: source)
+                    .execute("environment_update", request: ["components": stage.path])
+                if let recovery = result.recovery { writes.retainForRecovery(recovery) }
+                return result
+            }
+        }
+        XCTAssertFalse(outcome.ok)
+        XCTAssertTrue(writes.pendingRecovery)
+        XCTAssertThrowsError(try VPhoneOnlineOperationLock(directory: sourceFixture.machine))
+        api.hideInstallJournal = false
+        api.workerIdle = false
+        await writes.reconcile(api)
+        XCTAssertTrue(writes.pendingRecovery)
+        api.workerIdle = true
+        api.rootStaysWritable = true
+        await writes.reconcile(api)
+        XCTAssertTrue(writes.pendingRecovery)
+        api.rootStaysWritable = false
+        let original = api.instanceID
+        api.instanceID = UUID().uuidString
+        await writes.reconcile(api)
+        XCTAssertTrue(writes.pendingRecovery)
+        api.instanceID = original
+        await writes.reconcile(api)
+        XCTAssertFalse(writes.pendingRecovery)
+        let stopped = try VPhoneOnlineOperationLock(directory: sourceFixture.machine)
+        withExtendedLifetime(stopped) {}
+        XCTAssertEqual(api.methods.filter { $0 == "environment.install" }.count, 1)
+    }
+
+    func testConcurrentOldReconciliationCannotReleaseNewWriterLease() async throws {
+        let api = EnvironmentDaemonFake()
+        api.vmInstanceID = sourceFixture.runtime.state.instanceID
+        current(api, except: ["libcamfix.dylib"])
+        api.loseInstallReply = true
+        api.hideInstallJournal = true
+        let writes = VPhoneGuestWriteCoordinator(directory: sourceFixture.machine)
+        try await writes.run {
+            try await sourceFixture.withSource { source in
+                let outcome = await VPhoneGuestEnvironmentUpdater(session: api, manifestURL: source.manifest, source: source)
+                    .execute("environment_update", request: ["components": stage.path])
+                writes.retainForRecovery(try XCTUnwrap(outcome.recovery))
+            }
+        }
+        api.hideInstallJournal = false
+        var reads: [CheckedContinuation<Void, Never>] = []
+        api.beforeStatus = { await withCheckedContinuation { reads.append($0) } }
+        let first = Task { await writes.reconcile(api) }
+        while reads.count < 1 { await Task.yield() }
+        let second = Task { await writes.reconcile(api) }
+        while reads.count < 2 { await Task.yield() }
+        reads[0].resume()
+        await first.value
+        XCTAssertFalse(writes.pendingRecovery)
+        var finishWriter: CheckedContinuation<Void, Never>?
+        let writer = Task { try await writes.run { await withCheckedContinuation { finishWriter = $0 } } }
+        while finishWriter == nil { await Task.yield() }
+        reads[1].resume()
+        await second.value
+        var signals = 0
+        let stop = VPhoneVMStopper(listTargets: { [123] },
+            identity: { _ in VPhoneProcessIdentity(pid: 123, startedAt: 1, uid: getuid()) },
+            send: { _, _ in signals += 1; return 0 }, lockHeld: { true }, sleep: { _ in },
+            acquireOnlineOperation: { try VPhoneOnlineOperationLock(directory: self.sourceFixture.machine) })
+        for force in [false, true] { XCTAssertEqual(stop.stop(timeout: 0, force: force).exitCode, 1) }
+        XCTAssertEqual(signals, 0, "stale reconciliation released the active writer's Stop lease")
+        XCTAssertThrowsError(try VPhoneOnlineOperationLock(directory: sourceFixture.machine))
+        finishWriter?.resume()
+        try await writer.value
+        let released = try VPhoneOnlineOperationLock(directory: sourceFixture.machine)
+        withExtendedLifetime(released) {}
+    }
+
+    func testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback() async throws {
+        for repeated in [false, true] {
+            let api = EnvironmentDaemonFake()
+            api.vmInstanceID = sourceFixture.runtime.state.instanceID
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent("restore-journal-" + UUID().uuidString)
+            defer { try? FileManager.default.removeItem(at: root) }
+            let libs = root.appendingPathComponent("usr/lib"), stage = root.appendingPathComponent("stage")
+            try FileManager.default.createDirectory(at: libs, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: stage, withIntermediateDirectories: true)
+            let names = VPhoneGuestEnvironmentTestSupport.names
+            for name in names {
+                try Data(("old-" + name).utf8).write(to: libs.appendingPathComponent(name))
+                try Data(("new-" + name).utf8).write(to: stage.appendingPathComponent(name))
+            }
+            let transaction = EnvironmentTransaction(libraries: names, libraryDirectory: libs.path, stagingDirectory: stage.path)
+            func replace(_ input: String, _ output: String) throws { try Data(contentsOf: URL(fileURLWithPath: input)).write(to: URL(fileURLWithPath: output)) }
+            let writes = VPhoneGuestWriteCoordinator(directory: sourceFixture.machine)
+            let outcome = try await writes.run {
+                try await sourceFixture.withSource { source in
+                    var context = source.context
+                    context["operation"] = UUID().uuidString.lowercased()
+                    context["generation"] = api.generation.uuidString
+                    context["daemon_instance"] = api.instanceID
+                    context["daemon_sha256"] = api.snapshot.health!.binaryHash
+                    var journal = try transaction.prepare(try transaction.validate(names.map { ["name": $0, "sha256": EnvironmentTransaction.sha256(atPath: transaction.staged($0))!] }), operation: context["operation"], context: context)
+                    var index = 0
+                    try transaction.apply(&journal) { input, output in
+                        defer { index += 1 }
+                        if !repeated && index == 2 { throw URLError(.cannotWriteToFile) }
+                        try replace(input, output)
+                    }
+                    if repeated {
+                        try transaction.bindRestore(&journal, context: context)
+                        var index = 0
+                        try transaction.applyRestore(&journal) { input, output in
+                            defer { index += 1 }
+                            if index == 1 { throw URLError(.cannotWriteToFile) }
+                            try replace(input, output)
+                        }
+                    }
+                    try transaction.finalize(&journal, rootReadOnly: true)
+                    @MainActor func publish() throws {
+                        // Project only the controlled root path; every hash/state comes from the persisted daemon journal.
+                        var value = try XCTUnwrap(transaction.journal(id: journal.id)).dictionary
+                        var rows = value["libraries"] as! [[String: Any]]
+                        for i in rows.indices { rows[i]["backup"] = "/var/root/Library/Caches/vphone-environment/transactions/" + journal.id + "/backup/" + (rows[i]["name"] as! String) }
+                        value["libraries"] = rows
+                        api.journalOverride = try JSONDecoder().decode([String: VPhoneJSONValue].self, from: JSONSerialization.data(withJSONObject: value))
+                        api.installed = try transaction.completeHashes().mapValues { Optional($0) }
+                    }
+                    try publish()
+                    api.performRestore = { params in
+                        let contextValue = try XCTUnwrap(params["context"])
+                        let data = try JSONEncoder().encode(contextValue)
+                        let restoreContext = try JSONDecoder().decode([String: String].self, from: data)
+                        journal = try transaction.prepareRestore(id: journal.id)
+                        try transaction.bindRestore(&journal, context: restoreContext)
+                        try transaction.applyRestore(&journal, replace: replace)
+                        try transaction.finalize(&journal, rootReadOnly: true)
+                        try publish()
+                        throw URLError(.networkConnectionLost)
+                    }
+                    let outcome = await VPhoneGuestEnvironmentUpdater(session: api, manifestURL: source.manifest, source: source)
+                        .execute("environment_rollback", request: ["transaction": journal.id])
+                    writes.retainForRecovery(try XCTUnwrap(outcome.recovery))
+                    return outcome
+                }
+            }
+            XCTAssertFalse(outcome.ok)
+            XCTAssertThrowsError(try VPhoneOnlineOperationLock(directory: sourceFixture.machine))
+            let correct = try XCTUnwrap(api.journalOverride)
+            api.journalOverride?.removeValue(forKey: "before_files")
+            await writes.reconcile(api)
+            XCTAssertTrue(writes.pendingRecovery, "missing original before_files released lease")
+            api.journalOverride = correct
+            api.journalOverride?["context"] = .object([:])
+            await writes.reconcile(api)
+            XCTAssertTrue(writes.pendingRecovery, "changed original context released lease")
+            api.journalOverride = correct
+            await writes.reconcile(api)
+            XCTAssertFalse(writes.pendingRecovery, "repeated=\(repeated)")
+            do {
+                let released = try VPhoneOnlineOperationLock(directory: sourceFixture.machine)
+                withExtendedLifetime(released) {}
+            } catch { XCTFail("completed restore retained lease: \(error), repeated=\(repeated)") }
+            XCTAssertEqual(api.methods.filter { $0 == "environment.restore" }.count, 1)
+        }
+    }
+
+    func testDaemonInstanceChangeAfterUploadRefusesInstall() async throws {
+        let api = EnvironmentDaemonFake()
+        api.beforeUpload = { api.instanceID = UUID().uuidString }
+        let result = try await update(api)
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertFalse(api.methods.contains("environment.install"))
+    }
+
+    func testLostInstallReplyRecoversOnlyExactJournalAndFullFilesWithoutReplay() async throws {
+        let api = EnvironmentDaemonFake()
+        current(api, except: ["libcamfix.dylib"])
+        api.loseInstallReply = true
+        let result = try await update(api)
+        XCTAssertEqual(result["ok"] as? Bool, true)
+        XCTAssertEqual(result["reply_recovered"] as? Bool, true)
+        XCTAssertEqual(api.methods.filter { $0 == "environment.install" }.count, 1)
+        let call = try XCTUnwrap(api.calls.first { $0.method == "environment.install" })
+        XCTAssertNotNil(call.params["operation"])
+        XCTAssertNotNil(call.params["context"])
+    }
+
+    func testUnknownModeRefusesBeforeUploadAndRechecksAfterUpload() async throws {
+        let api = EnvironmentDaemonFake()
+        api.eligible = false
+        let refused = try await update(api)
+        XCTAssertEqual(refused["ok"] as? Bool, false)
+        XCTAssertEqual(api.uploads, [])
+        api.eligible = true
+        api.beforeUpload = { api.eligible = false }
+        let changed = try await update(api)
+        XCTAssertEqual(changed["ok"] as? Bool, false)
+        XCTAssertFalse(api.methods.contains("environment.install"))
+    }
 
     func testAllCurrentUploadsAndInstallsNothing() async throws {
         let api = EnvironmentDaemonFake()
@@ -326,6 +631,74 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         XCTAssertFalse(api.methods.contains("environment.loaded"))
     }
 
+    func testProductionEnvironmentWriterRequiresRuntimeSourceAuthority() async throws {
+        let api = EnvironmentDaemonFake()
+        current(api, except: ["libcamfix.dylib"])
+        let executor = VPhoneHostCommandExecutor(apiSession: api, environmentManifest: VPhoneGuestEnvironmentTestSupport.manifestURL)
+        let data = await executor.execute(try JSONSerialization.data(withJSONObject: ["t": "environment_update", "components": stage.path]))
+        let result = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "source_unqualified")
+        XCTAssertTrue(api.uploads.isEmpty)
+    }
+
+    func testConcurrentEnvironmentUpdatesShareOneWriter() async throws {
+        let api = EnvironmentDaemonFake()
+        current(api, except: ["libcamfix.dylib"])
+        var entered = false
+        var resume: CheckedContinuation<Void, Never>?
+        api.beforeUpload = {
+            if !entered {
+                entered = true
+                await withCheckedContinuation { resume = $0 }
+            }
+        }
+        let coordinator = VPhoneGuestWriteCoordinator()
+        let execute: @MainActor () async throws -> Data = {
+            try await coordinator.run { try JSONSerialization.data(withJSONObject: await self.update(api)) }
+        }
+        let first = Task { try await execute() }
+        while !entered { await Task.yield() }
+        let second = Task { try await execute() }
+        for _ in 0..<100 { await Task.yield() }
+        XCTAssertTrue(api.uploads.isEmpty, "second update wrote while first update awaited upload")
+        resume?.resume()
+        _ = try await first.value
+        _ = try await second.value
+        XCTAssertEqual(api.methods.filter { $0 == "environment.install" }.count, 1)
+    }
+
+    func testInstallRequiresPreviousHashAndCompleteReadback() async throws {
+        let mutations: [(inout [String: VPhoneJSONValue]) -> Void] = [
+            { value in
+                if case let .array(rows)? = value["libraries"], case var .object(row) = rows[0] {
+                    row.removeValue(forKey: "previous_sha256"); value["libraries"] = .array([.object(row)])
+                }
+            },
+            { value in
+                if case let .array(rows)? = value["libraries"], case var .object(row) = rows[0] {
+                    row["previous_sha256"] = .string(String(repeating: "0", count: 64)); value["libraries"] = .array([.object(row)])
+                }
+            },
+        ]
+        for mutate in mutations {
+            let api = EnvironmentDaemonFake()
+            current(api, except: ["libcamfix.dylib"])
+            api.mutateInstall = mutate
+            let result = try await update(api)
+            XCTAssertEqual(result["ok"] as? Bool, false)
+            XCTAssertEqual(result["code"] as? String, "api_protocol")
+            XCTAssertFalse(api.methods.contains("environment.loaded"))
+        }
+        let api = EnvironmentDaemonFake()
+        current(api, except: ["libcamfix.dylib"])
+        api.mutateInstall = { [weak api] _ in api?.installed["libvlocation.dylib"] = "changed outside request" }
+        let result = try await update(api)
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "api_protocol")
+        XCTAssertFalse(api.methods.contains("environment.loaded"))
+    }
+
     func testInstalledReadbackMismatchDoesNotReachActivation() async throws {
         let api = EnvironmentDaemonFake()
         current(api, except: ["libcamfix.dylib"])
@@ -348,7 +721,7 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         XCTAssertEqual(result["code"] as? String, "staged_digest_mismatch")
         XCTAssertEqual(result["library"] as? String, "libvlocation.dylib")
         XCTAssertFalse(api.methods.contains("environment.install"))
-        XCTAssertEqual(api.installed["libcamfix.dylib"], "old-libcamfix.dylib")
+        XCTAssertEqual(api.installed["libcamfix.dylib"], EnvironmentDaemonFake.digest(Data("old-libcamfix.dylib".utf8)))
         XCTAssertEqual(try library(result["files"], "libcamfix.dylib")["result"] as? String, "not_attempted")
     }
 
@@ -361,18 +734,18 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         XCTAssertEqual(result["code"] as? String, "partial_failure")
         XCTAssertEqual(result["outcome"] as? String, "partial_failure")
         let recovery = try XCTUnwrap(result["recovery"] as? [String: Any])
-        XCTAssertEqual(recovery["transaction"] as? String, "T1")
+        let id = try XCTUnwrap(recovery["transaction"] as? String)
         XCTAssertEqual(recovery["journal"] as? String,
-                       "/var/root/Library/Caches/vphone-environment/transactions/T1/journal.json")
+                       "/var/root/Library/Caches/vphone-environment/transactions/\(id)/journal.json")
         let replaced = try XCTUnwrap(recovery["replaced"] as? [[String: Any]])
         XCTAssertEqual(replaced.map { $0["name"] as? String }, ["SystemHook-vphone.dylib"])
         XCTAssertEqual(replaced.first?["backup"] as? String,
-                       "/var/root/Library/Caches/vphone-environment/transactions/T1/backup/SystemHook-vphone.dylib")
-        XCTAssertEqual(replaced.first?["previous_sha256"] as? String, "old-SystemHook-vphone.dylib")
+                       "/var/root/Library/Caches/vphone-environment/transactions/\(id)/backup/SystemHook-vphone.dylib")
+        XCTAssertEqual(replaced.first?["previous_sha256"] as? String, EnvironmentDaemonFake.digest(Data("old-SystemHook-vphone.dylib".utf8)))
         XCTAssertEqual((recovery["failed"] as? [String: Any])?["name"] as? String, "libcamfix.dylib")
         XCTAssertEqual(recovery["not_attempted"] as? [String], ["libvlocation.dylib"])
         let steps = try XCTUnwrap(recovery["steps"] as? [String])
-        XCTAssertTrue(steps.contains { $0.contains("guest env rollback") && $0.contains("T1") })
+        XCTAssertTrue(steps.contains { $0.contains("guest env rollback") && $0.contains(id) })
         XCTAssertTrue(steps.contains { $0.contains("guest env update") })
         XCTAssertEqual(try library(result["files"], "SystemHook-vphone.dylib")["result"] as? String, "replaced")
         XCTAssertEqual(try library(result["files"], "libcamfix.dylib")["result"] as? String, "failed")
@@ -403,7 +776,7 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: unsigned) }
         _ = try VPhoneGuestEnvironmentTestSupport.stage(at: unsigned, signature: false)
         var result = try await run(api, ["t": "environment_update", "components": unsigned.path])
-        XCTAssertEqual(result["code"] as? String, "candidate_invalid")
+        XCTAssertEqual(result["code"] as? String, "source_unqualified")
         try Data("tampered".utf8).write(to: stage.appendingPathComponent("camfix/libcamfix.dylib"))
         result = try await update(api)
         XCTAssertEqual(result["code"] as? String, "candidate_invalid")
@@ -498,7 +871,7 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         let result = try await run(api, ["t": "environment_status"])
         XCTAssertEqual(result["ok"] as? Bool, true)
         let camfix = try library(result["files"], "libcamfix.dylib")
-        XCTAssertEqual(camfix["guest"] as? String, "old-libcamfix.dylib")
+        XCTAssertEqual(camfix["guest"] as? String, EnvironmentDaemonFake.digest(Data("old-libcamfix.dylib".utf8)))
         XCTAssertNil(camfix["candidate"])
         XCTAssertEqual(api.methods, ["environment.status", "environment.loaded"])
     }
@@ -526,14 +899,86 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         XCTAssertEqual(commands["environment_rollback"], true)
     }
 
+    func testRestoreRejectsMissingOrTamperedOriginalAndReplyEvidence() async throws {
+        let mutations: [(inout [String: VPhoneJSONValue]) -> Void] = [
+            { $0.removeValue(forKey: "before_files") },
+            { value in if case var .object(hashes)? = value["before_files"] { hashes["libcamfix.dylib"] = .string(String(repeating: "0", count: 64)); value["before_files"] = .object(hashes) } },
+            { value in if case var .object(hashes)? = value["before_files"] { hashes.removeValue(forKey: "libvcamcaptured.dylib"); value["before_files"] = .object(hashes) } },
+            { $0.removeValue(forKey: "context") },
+            { value in if case var .object(context)? = value["context"] { context["generation"] = .string("invalid-generation"); value["context"] = .object(context) } },
+        ]
+        for reply in [false, true] {
+            for (index, mutation) in mutations.enumerated() {
+                let api = EnvironmentDaemonFake(restoreFixture: true)
+                if reply { api.mutateRestore = mutation } else { api.mutateOriginal = mutation }
+                let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
+                XCTAssertEqual(result["ok"] as? Bool, false, "reply=\(reply), mutation=\(index)")
+                XCTAssertEqual(result["code"] as? String, "api_protocol")
+                if !reply { XCTAssertFalse(api.methods.contains("environment.restore"), "invalid original evidence must refuse before mutation") }
+            }
+        }
+    }
+
+    func testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering() async throws {
+        for key in ["before_files", "after_files"] {
+            let api = EnvironmentDaemonFake(restoreFixture: true)
+            api.mutateOriginal = { value in
+                if case var .object(hashes)? = value[key] {
+                    hashes["libvcamcaptured.dylib"] = .string(String(repeating: "0", count: 64))
+                    value[key] = .object(hashes)
+                }
+            }
+            let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
+            XCTAssertEqual(result["ok"] as? Bool, false, key)
+            XCTAssertFalse(api.methods.contains("environment.restore"), key)
+        }
+    }
+
+    func testRollbackMissingComponentEvidenceIsRefused() async throws {
+        let api = EnvironmentDaemonFake(restoreFixture: true)
+        api.mutateRestore = { $0.removeValue(forKey: "libraries") }
+        let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "api_protocol")
+        XCTAssertFalse(api.methods.contains("environment.loaded"))
+    }
+
+    func testRollbackRejectsDuplicateMissingAndWrongHashComponents() async throws {
+        let mutations: [(inout [String: VPhoneJSONValue]) -> Void] = [
+            { $0["id"] = .string("deadbeef") },
+            { $0.removeValue(forKey: "root_read_only") },
+            { $0["restored"] = .array([]) },
+            { value in
+                if case let .array(rows)? = value["libraries"] { value["libraries"] = .array(rows + [rows[0]]) }
+            },
+            { value in
+                if case let .array(rows)? = value["libraries"] { value["libraries"] = .array([rows[0]]) }
+            },
+            { value in
+                if case var .array(rows)? = value["libraries"], case var .object(row) = rows[0] {
+                    row["previous_sha256"] = .string(String(repeating: "0", count: 64))
+                    rows[0] = .object(row); value["libraries"] = .array(rows)
+                }
+            },
+        ]
+        for mutate in mutations {
+            let api = EnvironmentDaemonFake(restoreFixture: true)
+            api.mutateRestore = mutate
+            let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
+            XCTAssertEqual(result["ok"] as? Bool, false)
+            XCTAssertEqual(result["code"] as? String, "api_protocol")
+            XCTAssertFalse(api.methods.contains("environment.loaded"))
+        }
+    }
+
     func testRollbackNamesTheTransaction() async throws {
-        let api = EnvironmentDaemonFake()
-        let id = "0000018f2a3b4c5d-1a2b3c4d"
+        let api = EnvironmentDaemonFake(restoreFixture: true)
+        let id = "0000018f-2a3b-4c5d-a123-00001a2b3c4d"
         var result = try await run(api, ["t": "environment_rollback", "transaction": id])
         XCTAssertEqual(result["ok"] as? Bool, true, "\(result)")
-        XCTAssertEqual(api.calls.first?.method, "environment.restore")
-        XCTAssertEqual(api.calls.first?.params["transaction"], .string(id))
-        XCTAssertEqual(result["restored"] as? [String], ["libcamfix.dylib"])
+        XCTAssertEqual(api.calls.first?.method, "environment.status")
+        XCTAssertEqual(api.calls.first(where: { $0.method == "environment.restore" })?.params["transaction"], .string(id))
+        XCTAssertEqual(result["restored"] as? [String], ["libcamfix.dylib", "libvlocation.dylib"])
         result = try await run(api, ["t": "environment_rollback", "transaction": "../x"])
         XCTAssertEqual(result["code"] as? String, "invalid_argument")
     }
@@ -566,9 +1011,9 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         let statusRequest = try XCTUnwrap(JSONSerialization.jsonObject(with: status.request()) as? [String: Any])
         XCTAssertEqual(statusRequest["t"] as? String, "environment_status")
         XCTAssertNotNil(statusRequest["components"] as? String)
-        let rollback = try VPhoneGuestEnvRollbackCommand.parse(["vm", "0000018f2a3b4c5d-1a2b3c4d"])
+        let rollback = try VPhoneGuestEnvRollbackCommand.parse(["vm", "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
         let rollbackRequest = try XCTUnwrap(JSONSerialization.jsonObject(with: rollback.request()) as? [String: Any])
-        XCTAssertEqual(rollbackRequest["transaction"] as? String, "0000018f2a3b4c5d-1a2b3c4d")
+        XCTAssertEqual(rollbackRequest["transaction"] as? String, "0000018f-2a3b-4c5d-a123-00001a2b3c4d")
         XCTAssertThrowsError(try VPhoneGuestEnvRollbackCommand.parse(["vm", "../x"]))
     }
 

@@ -1,0 +1,213 @@
+{
+  "reviewed_at": "2026-10-14T03:38:49.038126+00:00",
+  "status": "no-blocking-findings; may-proceed-to-signed-v9-build-and-scoped-real-acceptance",
+  "scope": "Independent frozen-source, requirement and evidence review. No production/test modifications, no signed build, no VM/mount/guest/AMFI, and no repeated test execution.",
+  "frozen_at_utc": "2026-10-14T03:31:38.166905+00:00",
+  "manifest_sha256": "2c6e85fad90e1f43682ce06258d6d3b85b2e343daa34d2beb6542d629313a0e4",
+  "manifest_checks": [
+    {
+      "group": "sourceFiles",
+      "count": 16,
+      "matched": true
+    },
+    {
+      "group": "evidenceFiles",
+      "count": 23,
+      "matched": true
+    },
+    {
+      "group": "inputFiles",
+      "count": 3,
+      "matched": true
+    }
+  ],
+  "frozen_source_files": [
+    {
+      "path": "sources/FirmwarePatcher/Binary/VPhoneKernelcacheSwap.swift",
+      "size": 11001,
+      "sha256": "d766cf84be812900f46e53897bd72b6d53e5e5c3b825942f0e3c3e0c0bc207d5"
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwareKernelRollback.swift",
+      "size": 17777,
+      "sha256": "691be976269f9d6332515e1c47528304af259d1291f60f347421674e0637292b"
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwareKernelUpdate.swift",
+      "size": 15744,
+      "sha256": "09037d03d2a1e2165659206e676d21cc533b92e9f7f316f17824a45f69abbb4f"
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwareInstalledOrigin.swift",
+      "size": 15928,
+      "sha256": "11e4db329fec3fd6664082b05ac51cbd751a16e31833d62202d2b3411d00fac2"
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+      "size": 64968,
+      "sha256": "ae0b7b8f2bea2269c5e34feee66189f2f0fea8d20beafab3e95901d468c93d10"
+    },
+    {
+      "path": "sources/Info.plist",
+      "size": 1292,
+      "sha256": "8574bcd6abc97b98446aa26eabf3cfda71e8adb6f855eb3673d6ab5e06a831e5"
+    },
+    {
+      "path": "sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift",
+      "size": 3457,
+      "sha256": "70edf3348c473facfda6bfd4e506b9141ca2b4b6e7dcf8a9646942411411b827"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadLauncherEntry/main.swift",
+      "size": 2245,
+      "sha256": "198eadef44b138dcf8e6413fa82c174fbeec93d4944af951b88998907d8d6f14"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMCLI.swift",
+      "size": 9207,
+      "sha256": "49e478d819512d57ffb6b093c0752730b132498a1b8e3636b78153bc00027e04"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMRollbackKernelCLI.swift",
+      "size": 3719,
+      "sha256": "e39422639f08a249b0709a821ccc16e1dc82b1dddc68214d0b6393dcf328b019"
+    },
+    {
+      "path": "scripts/check_bundle.py",
+      "size": 6263,
+      "sha256": "044f71744886d343f51e8f521839727648acc7abb16c1f358542658bb2577df2"
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareKernelRollbackTests.swift",
+      "size": 30772,
+      "sha256": "cf538e71faba6c1c8df7c7387087afc865f636b642e557db8d42c10d7c8b1457"
+    },
+    {
+      "path": "tests/VPhoneCLITests/KernelUpdateCLITests.swift",
+      "size": 1795,
+      "sha256": "2aa4959f2e607d4227ab655fbfe447ebdcc9a83cad60de9d8efdacc85735ae8d"
+    },
+    {
+      "path": "tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift",
+      "size": 4990,
+      "sha256": "72e9c3f527c71fd571b15c7be7d64e795830a371902b0130aca1e2ce6e7afbe0"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift",
+      "size": 5096,
+      "sha256": "e571ef7d414b8f60d39cd382c3aeb2a5a2e6994d8ddc54e4abb3fc1ee2c3aabe"
+    },
+    {
+      "path": "tests/test_bundle_validation.py",
+      "size": 3501,
+      "sha256": "cc3dadfe5e8de3e20ab69ce48a83ece370696535dd1c4d083dcae6d4856f6d5d"
+    }
+  ],
+  "blocking_findings": [],
+  "requirements": [
+    {
+      "requirement": "可信实际 producer 与资格作用域",
+      "result": "covered",
+      "evidence": "withTrustedStore retains the Store callback, verifies the actual running executable, then holds VM lock. Session.active expires on callback exit; source code digest and Store verification are rechecked. Rollback requires historical version and executable SHA equal the live Session. Session.produceBinary independently reconstructs pristine ordered records and requires complete actual payload equality."
+    },
+    {
+      "requirement": "锁顺序与活跃期",
+      "result": "covered",
+      "evidence": "Production publish takes Store -> VM -> transaction worker. Worker remains held across producer, candidate, Disk publication, installed readback, metadata/origin commit and archive. Prepared is data only; public publish reacquires authority and checks actual expected binding equals preview."
+    },
+    {
+      "requirement": "schema 4 双计划与 binding CAS",
+      "result": "covered",
+      "evidence": "rollbackSelection.targetDesired determines journal plan/options desiredSHA and receipt target selection. liveDesiredSHA is separate and revalidated through read/requireCompatible. bindingSHA is compared to InstalledOrigin.expected, then actual transactionSnapshot is checked at candidate/published/metadata windows. readJournal rejects schema/selection mismatches; normal schema3 still checks live desired == journal plan."
+    },
+    {
+      "requirement": "VM/generation/catalog/非内核选择",
+      "result": "covered",
+      "evidence": "PlanBinding validates stable firmware identity and original generation. Desired validates current catalog, version gates and original generation. requireCompatible retains generation/identity/catalog/upstreamTarget/variant and every non-kernel selected/excluded/notImplemented/enabledSteps set plus non-kernel context gates."
+    },
+    {
+      "requirement": "历史 reader 范围",
+      "result": "covered",
+      "evidence": "Canonical UUID, ordinary history directories and nlink1 ordinary files, committed kernel journal, report Gate, receipt/proof association, complete raw artifact and effect ownership are checked. The history reader does not compare old whole-disk SHA to the post-boot current disk. History creates selection data only. Fresh producer must reproduce target actual payload and complete pristine metadata IM4P before publication."
+    },
+    {
+      "requirement": "当前磁盘与 envelope",
+      "result": "covered",
+      "evidence": "prepare freezes current full Disk SHA. Candidate copies current Disk and must equal that SHA. Only unique ordinary Preboot kernel is written; System/hardware remain readonly in the volume adapter. Current IMG4 bytes outside IM4P are captured and compared in candidate and published callbacks; full IM4P, actual payload and every effect are also compared."
+    },
+    {
+      "requirement": "原件 metadata 与当前 DSC",
+      "result": "covered",
+      "evidence": "Replacement comes from verified producer input with input SHA rechecked; raw description/PAYP retained and unsupported metadata refused. FirmwareKernelDSC.validate runs on candidate and installed current System with actual produced kernel region. Envelope equality does not establish manifest signature validity or boot compatibility."
+    },
+    {
+      "requirement": "新事务恢复边界",
+      "result": "covered",
+      "evidence": "Rollback reuses dedicated kernelDisk durable publication cursor and identity-preserving writes. Uncommitted recovery reverses the current operation to its beginning and restores current binding/receipt. Committed recovery verifies outputs and archives. Recovery does not re-run producer or publish historical desired. Unknown external Disk edits refuse with pending retained."
+    },
+    {
+      "requirement": "公开 CLI 与 sealed launcher",
+      "result": "covered",
+      "evidence": "vm rollback-kernel requires --list or canonical explicit --to-transaction UUID; --preview has selection-only scope. Launcher accepts this explicit route only under verified Store CLI and exact VPhoneKernelRollbackProtocol marker. Child runs within the verified callback; ordinary launch remains on its existing local wrapper. Info.plist and distribution check declare/enforce capability."
+    },
+    {
+      "requirement": "旧 v8 / 跨 Bundle 范围",
+      "result": "explicitly refused",
+      "evidence": "History requires the new rollbackProtocol, artifact, IM4P/payload/code/input and container-envelope evidence. prepare refuses target producer version other than bound host source, live Session refuses executable SHA mismatch. This marker is routing capability, not an implemented cross-bundle producer-only subprocess protocol."
+    },
+    {
+      "requirement": "schema 3 回归",
+      "result": "covered by reviewed existing targeted evidence",
+      "evidence": "No rollbackSelection retains schema3 publisher and desired checks. FirmwareKernelUpdateTests, disk/recovery, InstalledOrigin/Readback, PlanBinding, transaction, metadata/swap and launcher/CLI suites pass in targeted-01.log."
+    }
+  ],
+  "validation": {
+    "swift_targeted": {
+      "exitCode": 0,
+      "selectedFunctions": 101,
+      "passedFunctions": 98,
+      "skippedFunctions": [
+        "actualPublicForceExcGuardPlansProduceDifferentPayloads()",
+        "actualCandidateRegionUsesSourceFlow()",
+        "actualPristineMetadataRestoresBaselineContainerExactly()"
+      ],
+      "suites": 13,
+      "elapsedSeconds": 112.116,
+      "log": "targeted-01.log"
+    },
+    "rollback_suite": {
+      "passedFunctions": 9,
+      "parameterScenariosIncludingNonparameterTests": 34,
+      "elapsedSeconds": 90.82,
+      "actualProducerFixtureInThisRun": "skipped; independently passed in actual-plan-pair-02 and actual-plan-pair-dsc-v2"
+    },
+    "python_bundle_protocol": {
+      "exitCode": 0,
+      "passedTests": 7,
+      "elapsedSeconds": 0.158,
+      "log": "bundle-protocol-python.log"
+    },
+    "actual_pair_with_dsc_review": "actual-plan-pair-dsc-independent-review.md/json; pure actual producer + current System DSC only",
+    "reviewer_test_execution": "None; existing passing frozen targeted evidence was inspected rather than rerun."
+  },
+  "test_boundaries": [
+    "Firmware-free rollback tests substitute signature/Store verifier, patch algorithm, region reveal and mount adapter, while exercising real Session reconstruction, declaration rules, containers, DSC parser, Disk block publication, metadata/origin and recovery.",
+    "The 9 executed rollback functions cover 34 scenarios, including post-boot non-kernel sentinel preservation, changed desired/binding/Disk/history/code/expired callback/fresh unexplained output/missing required records, 6 failure windows, forged self-consistent history, incompatible associations, schema4 contract, encoded artifacts, changed envelope and unknown external Disk edits.",
+    "Targeted summary is 101 selected functions / 13 suites, with 98 executed passes and 3 skips: actualPublicForceExcGuardPlansProduceDifferentPayloads, actualCandidateRegionUsesSourceFlow, actualPristineMetadataRestoresBaselineContainerExactly.",
+    "The actual two-plan fixture and DSC test were separately executed and independently reviewed; their evidence does not turn the 3 skips into passes in the targeted summary.",
+    "Normal schema3 and shared transaction regressions are represented in the targeted evidence. This review does not assert a new complete project or firmware suite run."
+  ],
+  "remaining_acceptance": [
+    "Build/sign/package/install/reverify final V9 and associate its exact executable/signature/resource closure with subsequent operations.",
+    "Official A and B commits from the same verified producer, with actual differing payload and complete IM4P receipt/proof/archive/readback chain.",
+    "Authorized V4 normal boots for A, B and rollback A, with three new instances and strict guest state commands.",
+    "Public explicit UUID rollback to A from post-boot current Disk, independent offline six-file/non-kernel-source/current-desired comparison, then guest marker readback after rollback boot.",
+    "Keep publication/recovery, normal boot, different-payload rollback and marker preservation as distinct acceptance conclusions."
+  ],
+  "nonblocking_notes": [
+    "list eligible is explicitly historical-selection-only and can be true for self-consistent rewritten history; publication authority remains fresh verified reproduction.",
+    "The CLI does not itself display a before/after payload comparison for a same-content target; final acceptance must not infer a content change from a new transaction or successful rollback message.",
+    "Repeated generation qualification intentionally rehashes originals; production rollback duration remains unmeasured.",
+    "Manifest preservation is exact bytes only. Signature validity and actual boot suitability require their separate verification and acceptance evidence."
+  ]
+}

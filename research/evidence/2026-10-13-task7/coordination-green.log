@@ -1,0 +1,428 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[5/41] Write swift-version--58304C5D6DBC2206.txt
+[7/20] Compiling VPhoneCore VPhoneVMStopper.swift
+[8/20] Emitting module VPhoneCore
+[8/23] Write Objects.LinkFileList
+[11/27] Linking vphone-helper
+[12/27] Linking vphone-launchpad-launcher
+[13/27] Linking vphone-launchpad
+[14/27] Applying vphone-helper
+[15/27] Applying vphone-launchpad-launcher
+[16/27] Applying vphone-launchpad
+[18/27] Emitting module VPhoneLaunchpadKitTests
+[19/27] Emitting module FirmwarePatcher
+[20/32] Compiling VPhoneCoreTests VMStopTests.swift
+[21/32] Emitting module VPhoneCoreTests
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+[22/32] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[23/32] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:30:17: error: main actor-isolated default value in a nonisolated context
+ 28 | class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
+ 29 |     private var vmLock: VPhoneVMLock?
+ 30 |     private var guestWrites = VPhoneGuestWriteCoordinator()
+    |                 `- error: main actor-isolated default value in a nonisolated context
+ 31 |     private var stopWaitingForWriter = false
+ 32 |     private let cli: VPhoneBootCLI
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[24/32] Compiling vphone_cli VPhoneControl.swift
+[25/32] Compiling vphone_cli VPhoneAppDelegate.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:30:17: error: main actor-isolated default value in a nonisolated context
+ 28 | class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
+ 29 |     private var vmLock: VPhoneVMLock?
+ 30 |     private var guestWrites = VPhoneGuestWriteCoordinator()
+    |                 `- error: main actor-isolated default value in a nonisolated context
+ 31 |     private var stopWaitingForWriter = false
+ 32 |     private let cli: VPhoneBootCLI
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:415:24: error: call to main actor-isolated instance method 'stop()' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+    |                        `- error: call to main actor-isolated instance method 'stop()' in a synchronous nonisolated context [#ActorIsolatedCall]
+416 |         guard let vm else {
+417 |             NSApp.terminate(nil)
+
+/Users/qcz3840/github/vphone-cli/sources/VPhoneAPIKit/VPhoneStartupUnlock.swift:42:17: note: calls to instance method 'stop()' from outside of its actor context are implicitly asynchronous
+ 40 |     }
+ 41 | 
+ 42 |     public func stop() {
+    |                 `- note: calls to instance method 'stop()' from outside of its actor context are implicitly asynchronous
+ 43 |         stopped = true
+ 44 |         invalidate()
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:417:19: warning: call to main actor-isolated instance method 'terminate' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+417 |             NSApp.terminate(nil)
+    |                   `- warning: call to main actor-isolated instance method 'terminate' in a synchronous nonisolated context [#ActorIsolatedCall]
+418 |             return
+419 |         }
+
+AppKit.NSApplication.terminate:2:22: note: calls to instance method 'terminate' from outside of its actor context are implicitly asynchronous
+1 | class NSApplication {
+2 | @MainActor open func terminate(_ sender: Any?)}
+  |                      |- note: calls to instance method 'terminate' from outside of its actor context are implicitly asynchronous
+  |                      `- note: main actor isolation inferred from inheritance from class 'NSResponder'
+3 | 
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:417:13: warning: main actor-isolated var 'NSApp' can not be referenced from a nonisolated context
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+417 |             NSApp.terminate(nil)
+    |             `- warning: main actor-isolated var 'NSApp' can not be referenced from a nonisolated context
+418 |             return
+419 |         }
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk/System/Library/Frameworks/AppKit.framework/Headers/NSApplication.h:191:58: note: var declared here
+189 | @interface NSApplication : NSResponder <NSUserInterfaceValidations, NSMenuItemValidation, NSAccessibilityElement, NSAccessibility>
+190 | 
+191 | APPKIT_EXTERN __kindof NSApplication * _Null_unspecified NSApp NS_SWIFT_UI_ACTOR;
+    |                                                          `- note: var declared here
+192 | 
+193 | @property (class, readonly, strong) __kindof NSApplication *sharedApplication;
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:423:13: error: call to main actor-isolated instance method 'forceStopAndExit(action:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+421 |             // Second SIGINT while waiting — skip the rest of the wait.
+422 |             print("[vphone] second SIGINT — stopping now")
+423 |             forceStopAndExit(action: shutdownPlan.abortWait())
+    |             `- error: call to main actor-isolated instance method 'forceStopAndExit(action:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+424 |             return
+425 |         }
+    :
+488 | 
+489 |     @MainActor
+490 |     private func forceStopAndExit(action: VPhoneShutdownPlan.Action) {
+    |                  `- note: calls to instance method 'forceStopAndExit(action:)' from outside of its actor context are implicitly asynchronous
+491 |         guard action == .forceStop else { return }
+492 |         shutdownTimeoutTask?.cancel()
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:428:27: error: main actor-isolated property 'isRunning' can not be referenced from a nonisolated context
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+426 | 
+427 |         let action = shutdownPlan.start(VPhoneShutdownPlan.Conditions(
+428 |             vmRunning: vm.isRunning,
+    |                           `- error: main actor-isolated property 'isRunning' can not be referenced from a nonisolated context
+429 |             guestShellAvailable: apiCanShutdown || (control?.canHaltGuest ?? false),
+430 |             canRequestStop: vm.canRequestStop))
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneVirtualMachine.swift:361:9: note: property declared here
+359 |     // MARK: - Stop
+360 | 
+361 |     var isRunning: Bool { virtualMachine.state == .running }
+    |         `- note: property declared here
+362 | 
+363 |     var canRequestStop: Bool { virtualMachine.canRequestStop }
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:429:34: error: main actor-isolated property 'apiCanShutdown' can not be referenced from a nonisolated context
+394 |     // MARK: - Shutdown
+395 | 
+396 |     @MainActor private var apiCanShutdown: Bool {
+    |                            `- note: property declared here
+397 |         apiSession?.snapshot.state == .ready && apiSession?.snapshot.health?.capabilities.contains("system_shutdown") == true
+398 |     }
+    :
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+427 |         let action = shutdownPlan.start(VPhoneShutdownPlan.Conditions(
+428 |             vmRunning: vm.isRunning,
+429 |             guestShellAvailable: apiCanShutdown || (control?.canHaltGuest ?? false),
+    |                                  `- error: main actor-isolated property 'apiCanShutdown' can not be referenced from a nonisolated context
+430 |             canRequestStop: vm.canRequestStop))
+431 | 
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:429:62: error: main actor-isolated property 'canHaltGuest' can not be referenced from a nonisolated autoclosure
+427 |         let action = shutdownPlan.start(VPhoneShutdownPlan.Conditions(
+428 |             vmRunning: vm.isRunning,
+429 |             guestShellAvailable: apiCanShutdown || (control?.canHaltGuest ?? false),
+    |                                                              `- error: main actor-isolated property 'canHaltGuest' can not be referenced from a nonisolated autoclosure
+430 |             canRequestStop: vm.canRequestStop))
+431 | 
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneControl.swift:844:9: note: property declared here
+ 842 |     /// Whether the guest OS can be asked to power itself off over this
+ 843 |     /// connection (needs vphoned's `shell`, i.e. a `/bin/sh` in the guest).
+ 844 |     var canHaltGuest: Bool { isConnected && guestCaps.contains("shell") }
+     |         `- note: property declared here
+ 845 | 
+ 846 |     /// Ask the guest OS to power itself off.
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:430:32: error: main actor-isolated property 'canRequestStop' can not be referenced from a nonisolated context
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+428 |             vmRunning: vm.isRunning,
+429 |             guestShellAvailable: apiCanShutdown || (control?.canHaltGuest ?? false),
+430 |             canRequestStop: vm.canRequestStop))
+    |                                `- error: main actor-isolated property 'canRequestStop' can not be referenced from a nonisolated context
+431 | 
+432 |         switch action {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneVirtualMachine.swift:363:9: note: property declared here
+361 |     var isRunning: Bool { virtualMachine.state == .running }
+362 | 
+363 |     var canRequestStop: Bool { virtualMachine.canRequestStop }
+    |         `- note: property declared here
+364 | 
+365 |     /// Ask the guest to power off through the framework's stop request.
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:435:19: warning: call to main actor-isolated instance method 'terminate' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+433 |         case .exitImmediately:
+434 |             print("[vphone] VM is not running — exiting")
+435 |             NSApp.terminate(nil)
+    |                   `- warning: call to main actor-isolated instance method 'terminate' in a synchronous nonisolated context [#ActorIsolatedCall]
+436 |         case .guestCommand:
+437 |             print("[vphone] graceful shutdown via guest power-off command over vsock")
+
+AppKit.NSApplication.terminate:2:22: note: calls to instance method 'terminate' from outside of its actor context are implicitly asynchronous
+1 | class NSApplication {
+2 | @MainActor open func terminate(_ sender: Any?)}
+  |                      |- note: calls to instance method 'terminate' from outside of its actor context are implicitly asynchronous
+  |                      `- note: main actor isolation inferred from inheritance from class 'NSResponder'
+3 | 
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:435:13: warning: main actor-isolated var 'NSApp' can not be referenced from a nonisolated context
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+433 |         case .exitImmediately:
+434 |             print("[vphone] VM is not running — exiting")
+435 |             NSApp.terminate(nil)
+    |             `- warning: main actor-isolated var 'NSApp' can not be referenced from a nonisolated context
+436 |         case .guestCommand:
+437 |             print("[vphone] graceful shutdown via guest power-off command over vsock")
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk/System/Library/Frameworks/AppKit.framework/Headers/NSApplication.h:191:58: note: var declared here
+189 | @interface NSApplication : NSResponder <NSUserInterfaceValidations, NSMenuItemValidation, NSAccessibilityElement, NSAccessibility>
+190 | 
+191 | APPKIT_EXTERN __kindof NSApplication * _Null_unspecified NSApp NS_SWIFT_UI_ACTOR;
+    |                                                          `- note: var declared here
+192 | 
+193 | @property (class, readonly, strong) __kindof NSApplication *sharedApplication;
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:438:13: error: call to main actor-isolated instance method 'startGracefulTimeout()' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+436 |         case .guestCommand:
+437 |             print("[vphone] graceful shutdown via guest power-off command over vsock")
+438 |             startGracefulTimeout()
+    |             `- error: call to main actor-isolated instance method 'startGracefulTimeout()' in a synchronous nonisolated context [#ActorIsolatedCall]
+439 |             Task { @MainActor in
+440 |                 let api: (() async throws -> Bool)? = self.apiCanShutdown ? {
+    :
+478 | 
+479 |     @MainActor
+480 |     private func startGracefulTimeout() {
+    |                  `- note: calls to instance method 'startGracefulTimeout()' from outside of its actor context are implicitly asynchronous
+481 |         shutdownTimeoutTask = Task { @MainActor in
+482 |             try? await Task.sleep(for: .seconds(VPhoneShutdownPolicy.gracefulTimeout))
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:455:13: error: call to main actor-isolated instance method 'startGracefulTimeout()' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+453 |         case .requestStop:
+454 |             print("[vphone] graceful shutdown via VZVirtualMachine.requestStop()")
+455 |             startGracefulTimeout()
+    |             `- error: call to main actor-isolated instance method 'startGracefulTimeout()' in a synchronous nonisolated context [#ActorIsolatedCall]
+456 |             if !vm.requestGuestStop() {
+457 |                 forceStopAndExit(action: shutdownPlan.gracefulAttemptFailed())
+    :
+478 | 
+479 |     @MainActor
+480 |     private func startGracefulTimeout() {
+    |                  `- note: calls to instance method 'startGracefulTimeout()' from outside of its actor context are implicitly asynchronous
+481 |         shutdownTimeoutTask = Task { @MainActor in
+482 |             try? await Task.sleep(for: .seconds(VPhoneShutdownPolicy.gracefulTimeout))
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:456:20: error: call to main actor-isolated instance method 'requestGuestStop()' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+454 |             print("[vphone] graceful shutdown via VZVirtualMachine.requestStop()")
+455 |             startGracefulTimeout()
+456 |             if !vm.requestGuestStop() {
+    |                    `- error: call to main actor-isolated instance method 'requestGuestStop()' in a synchronous nonisolated context [#ActorIsolatedCall]
+457 |                 forceStopAndExit(action: shutdownPlan.gracefulAttemptFailed())
+458 |             }
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneVirtualMachine.swift:367:10: note: calls to instance method 'requestGuestStop()' from outside of its actor context are implicitly asynchronous
+365 |     /// Ask the guest to power off through the framework's stop request.
+366 |     /// Returns false when the framework refuses it; the caller then force-stops.
+367 |     func requestGuestStop() -> Bool {
+    |          `- note: calls to instance method 'requestGuestStop()' from outside of its actor context are implicitly asynchronous
+368 |         guard virtualMachine.canRequestStop else { return false }
+369 |         do {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:457:17: error: call to main actor-isolated instance method 'forceStopAndExit(action:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+455 |             startGracefulTimeout()
+456 |             if !vm.requestGuestStop() {
+457 |                 forceStopAndExit(action: shutdownPlan.gracefulAttemptFailed())
+    |                 `- error: call to main actor-isolated instance method 'forceStopAndExit(action:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+458 |             }
+459 |         case .waitForStop:
+    :
+488 | 
+489 |     @MainActor
+490 |     private func forceStopAndExit(action: VPhoneShutdownPlan.Action) {
+    |                  `- note: calls to instance method 'forceStopAndExit(action:)' from outside of its actor context are implicitly asynchronous
+491 |         guard action == .forceStop else { return }
+492 |         shutdownTimeoutTask?.cancel()
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:463:13: error: call to main actor-isolated instance method 'forceStopAndExit(action:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+412 |     }
+413 | 
+414 |     private func handleDrainedInterrupt() {
+    |                  `- note: add '@MainActor' to make instance method 'handleDrainedInterrupt()' part of global actor 'MainActor'
+415 |         startupUnlock?.stop()
+416 |         guard let vm else {
+    :
+461 |         case .forceStop:
+462 |             print("[vphone] no graceful shutdown path available; stopping")
+463 |             forceStopAndExit(action: action)
+    |             `- error: call to main actor-isolated instance method 'forceStopAndExit(action:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+464 |         }
+465 |     }
+    :
+488 | 
+489 |     @MainActor
+490 |     private func forceStopAndExit(action: VPhoneShutdownPlan.Action) {
+    |                  `- note: calls to instance method 'forceStopAndExit(action:)' from outside of its actor context are implicitly asynchronous
+491 |         guard action == .forceStop else { return }
+492 |         shutdownTimeoutTask?.cancel()
+
+[#ActorIsolatedCall]: <https://docs.swift.org/compiler/documentation/diagnostics/actor-isolated-call>
+[26/57] Compiling vphone_cli VPhoneClipboardMacWriter.swift
+[27/57] Compiling vphone_cli VPhoneClipboardShortcutSync.swift
+[28/57] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[29/57] Compiling vphone_cli VPhoneEntry.swift
+[30/60] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[31/63] Compiling vphone_cli VPhoneMenuLocation.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[32/63] Compiling vphone_cli VPhoneMenuRecord.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[33/63] Compiling vphone_cli VPhoneScreenRecorder.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[34/63] Compiling vphone_cli VPhoneAppBrowserModel.swift
+[35/63] Compiling vphone_cli VPhoneAppBrowserView.swift
+[36/63] Compiling vphone_cli VPhoneAppWindowController.swift
+[37/63] Compiling vphone_cli VPhoneClipboardFocusSync.swift
+[38/63] Compiling vphone_cli VPhoneHostScreenAdapter.swift
+[39/63] Compiling vphone_cli VPhoneKeyHelper.swift
+[40/63] Compiling vphone_cli VPhoneKeychainBrowserModel.swift
+[41/63] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[42/63] Compiling vphone_cli VPhoneTouchIDMonitor.swift
+[43/63] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[44/63] Compiling vphone_cli VPhoneWindowController.swift
+[45/63] Compiling vphone_cli VPhoneVMCLI.swift
+[46/63] Compiling vphone_cli VPhoneMenuCamera.swift
+[47/63] Compiling vphone_cli VPhoneMenuConnect.swift
+[48/63] Compiling vphone_cli VPhoneMenuController.swift
+[49/63] Compiling vphone_cli VPhoneMenuKeys.swift
+[50/63] Compiling vphone_cli VPhoneKeychainWindowController.swift
+[51/63] Compiling vphone_cli VPhoneLocationProvider.swift
+[52/63] Compiling vphone_cli VPhoneMenuApps.swift
+[53/63] Compiling vphone_cli VPhoneMenuBattery.swift
+[54/63] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[55/63] Compiling vphone_cli VPhoneFileBrowserView.swift
+[56/63] Compiling vphone_cli VPhoneFileWindowController.swift
+[57/63] Compiling vphone_cli VPhoneHostCapabilities.swift
+error: fatalError

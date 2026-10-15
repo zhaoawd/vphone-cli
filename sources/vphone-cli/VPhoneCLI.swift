@@ -234,7 +234,7 @@ struct PatchFirmwareCLI: ParsableCommand {
 
     @Flag(
         name: .customLong("allow-ablation-output"),
-        help: "Write the (partially-patched) firmware back even on an ablation run. Off by default."
+        help: "Write firmware on an ablation run only when all required declarations have execution evidence. Off by default."
     )
     var allowAblationOutput: Bool = false
 
@@ -309,12 +309,12 @@ struct PatchFirmwareCLI: ParsableCommand {
             if allowAblationOutput {
                 print("[patch-firmware] ABLATION RUN: \(report.ablation.count) step(s) ablated; firmware written (--allow-ablation-output)")
             } else {
-                print("[patch-firmware] ABLATION RUN (dry): \(report.ablation.count) step(s) ablated; firmware NOT written (pass --allow-ablation-output to write)")
+                print("[patch-firmware] ABLATION RUN (dry): \(report.ablation.count) step(s) ablated; firmware NOT written (--allow-ablation-output also requires complete required declaration evidence)")
             }
         }
 
         if recordsOut == nil {
-            print("[patch-firmware] applied \(records.count) patches for \(variant.rawValue)")
+            print("[patch-firmware] recorded \(records.count) byte records (including verified unchanged outputs) for \(variant.rawValue)")
         }
 
         if !report.failedRequired.isEmpty {
@@ -474,7 +474,7 @@ struct PatchComponentCLI: ParsableCommand {
             try result.data.write(to: output)
         }
         if !quiet {
-            print("[patch-component] applied \(result.report.records.count) patches for \(component.rawValue)")
+            print("[patch-component] recorded \(result.report.records.count) byte records (including verified unchanged outputs) for \(component.rawValue)")
             print(dry ? "[patch-component] ABLATION dry-run: payload NOT written"
                 : "[patch-component] wrote patched payload to \(output.path)")
         }

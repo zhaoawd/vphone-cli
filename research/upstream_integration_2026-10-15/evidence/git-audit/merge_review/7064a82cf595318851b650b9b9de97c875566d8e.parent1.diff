@@ -1,0 +1,57 @@
+diff --git a/Research/vphoned_http_api.md b/Research/vphoned_http_api.md
+index 5df613824759724e1a38e313e657d0aaa5139271..fd98a1a4ab3e3201adfdff70050381dfc41c37d5 100644
+--- a/Research/vphoned_http_api.md
++++ b/Research/vphoned_http_api.md
+@@ -95,6 +95,9 @@ notch and cutout drawn by the host VM window.
+ `apps.install` accepts IPA and TIPA archives. IcliKit 0.6.8 validates and
+ extracts the archive, then calls vphone's signer on the temporary app bundle
+ before IcliKit copies it into a container, registers it, and owns rollback.
++Since icli 0.7.18 an archive may expand to 8 GiB, in one entry or in all,
++across up to 400,000 entries; a larger one is refused with the size it
++expands to.
+ `apps.uninstall` delegates removal to IcliKit and requires `force=true`.
+ `POST /v1/bootstrap/install` (or RPC method `bootstrap.install`) accepts
+ `{"layout":"rootless"}` or `{"layout":"roothide"}` and installs the latest
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index f919bf36460c659d840dba00ce1742568ad39c00..c6ad389f49b4caf77c4bd408323c5ad2893d8481 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "6f4e14249aa40f9e54d6031a7e3395918b3e3abd",
+-        "version" : "0.7.17"
++        "revision" : "4470bd43b57bbfc413e6ea8642a9c100029cbe83",
++        "version" : "0.7.18"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index eff29a85ea4a2494e0d258cb5564e61c529635e3..90a3b76916fe3851f92052c9a434542e77bb4e2f 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.17;
++				minimumVersion = 0.7.18;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 0f602755d45c9f900c0c62faece63aa4e44097e8..163ddb563c8a844b30ef8eff49306c1e478fa576 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "6f4e14249aa40f9e54d6031a7e3395918b3e3abd",
+-        "version" : "0.7.17"
++        "revision" : "4470bd43b57bbfc413e6ea8642a9c100029cbe83",
++        "version" : "0.7.18"
+       }
+     },
+     {

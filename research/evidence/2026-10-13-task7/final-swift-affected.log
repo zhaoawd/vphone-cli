@@ -1,0 +1,713 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/12] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:47:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 45 |     let code: String
+ 46 |     let message: String
+ 47 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 48 | 
+ 49 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[6/12] Compiling vphone_cli VPhoneGuestEnvironment.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:47:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 45 |     let code: String
+ 46 |     let message: String
+ 47 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 48 | 
+ 49 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[7/12] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[8/14] Compiling vphone_cli VPhoneGuestEnvironmentRecovery.swift
+[9/14] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+[9/17] Write Objects.LinkFileList
+[12/19] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[13/19] Emitting module VPhoneCLITests
+[13/19] Write Objects.LinkFileList
+[14/19] Linking vphone-vm
+[15/19] Linking vphone-cli
+[16/19] Applying vphone-cli
+[17/19] Applying vphone-vm
+[18/19] Linking vphone-cliPackageTests
+Build complete! (9.07s)
+Test Suite 'Selected tests' started at 2026-10-13 06:06:51.357.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 06:06:51.358.
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-13 06:06:51.358.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testAllCurrentUploadsAndInstallsNothing]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testAllCurrentUploadsAndInstallsNothing]' passed (0.186 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCandidateStageIsVerifiedBeforeGuestContact]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCandidateStageIsVerifiedBeforeGuestContact]' passed (0.162 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCapabilityGates]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCapabilityGates]' passed (0.131 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCLIRequestsAndRestartValidation]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCLIRequestsAndRestartValidation]' passed (0.118 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testConcurrentEnvironmentUpdatesShareOneWriter]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testConcurrentEnvironmentUpdatesShareOneWriter]' passed (0.333 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testDaemonInstanceChangeAfterUploadRefusesInstall]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testDaemonInstanceChangeAfterUploadRefusesInstall]' passed (0.175 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testFailedReplacementReturnsRecoveryRecordAndNoOverallSuccess]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testFailedReplacementReturnsRecoveryRecordAndNoOverallSuccess]' passed (0.273 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstalledReadbackMismatchDoesNotReachActivation]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstalledReadbackMismatchDoesNotReachActivation]' passed (0.228 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstallRequiresPreviousHashAndCompleteReadback]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstallRequiresPreviousHashAndCompleteReadback]' passed (0.489 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testLostInstallReplyRecoversOnlyExactJournalAndFullFilesWithoutReplay]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testLostInstallReplyRecoversOnlyExactJournalAndFullFilesWithoutReplay]' passed (0.246 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMalformedInstallResponsesHaveUnknownOutcomeAndNeverRestart]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMalformedInstallResponsesHaveUnknownOutcomeAndNeverRestart]' passed (1.776 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMissingGuestLibraryOrAliasNeedsFullMigration]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMissingGuestLibraryOrAliasNeedsFullMigration]' passed (0.300 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testNonObjectInstallReplyRetainsUnknownSideEffect]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testNonObjectInstallReplyRetainsUnknownSideEffect]' passed (0.216 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testOnlyDifferingLibrariesAreUploadedVerifiedAndReplaced]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testOnlyDifferingLibrariesAreUploadedVerifiedAndReplaced]' passed (0.261 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testPendingRecoveryRetainsStopLeaseUntilActualWorkerMountAndHashesConverge]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testPendingRecoveryRetainsStopLeaseUntilActualWorkerMountAndHashesConverge]' passed (0.218 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testProductionEnvironmentWriterRequiresRuntimeSourceAuthority]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testProductionEnvironmentWriterRequiresRuntimeSourceAuthority]' passed (0.087 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRebootRequiredFalseIsNotReportedAsLoaded]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRebootRequiredFalseIsNotReportedAsLoaded]' passed (0.232 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRespringIsReportedButNeverPerformed]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRespringIsReportedButNeverPerformed]' passed (0.287 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestartOutsideTheWhitelistIsRefusedBeforeGuestContact]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestartOutsideTheWhitelistIsRefusedBeforeGuestContact]' passed (0.383 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused]' passed (0.188 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackNamesTheTransaction]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackNamesTheTransaction]' passed (0.262 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackRejectsDuplicateMissingAndWrongHashComponents]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackRejectsDuplicateMissingAndWrongHashComponents]' passed (0.698 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRPCStillRefusesGuestLibraryReplacement]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRPCStillRefusesGuestLibraryReplacement]' passed (0.088 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStagedDigestMismatchIsRefusedBeforeInstall]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStagedDigestMismatchIsRefusedBeforeInstall]' passed (0.204 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStatusWithoutComponentsReportsGuestDigestsOnly]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStatusWithoutComponentsReportsGuestDigestsOnly]' passed (0.087 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testSummaryNamesRequiredActionsAndRecovery]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testSummaryNamesRequiredActionsAndRecovery]' passed (0.459 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUninspectedProcessesMakeLoadStatePartial]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUninspectedProcessesMakeLoadStatePartial]' passed (0.089 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownLoadStateFallsBackToManifestActions]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownLoadStateFallsBackToManifestActions]' passed (0.246 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownModeRefusesBeforeUploadAndRechecksAfterUpload]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownModeRefusesBeforeUploadAndRechecksAfterUpload]' passed (0.319 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' passed at 2026-10-13 06:07:00.101.
+	 Executed 29 tests, with 0 failures (0 unexpected) in 8.740 (8.743) seconds
+Test Suite 'GuestTransportTests' started at 2026-10-13 06:07:00.101.
+Test Case '-[VPhoneCLITests.GuestTransportTests testCancelledQueuedRequestIsNotWrittenAfterUpload]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testCancelledQueuedRequestIsNotWrittenAfterUpload]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testClipboardRejectsOversizedAndEmptyOutboundPayloadsBeforeConnection]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testClipboardRejectsOversizedAndEmptyOutboundPayloadsBeforeConnection]' passed (0.017 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testClipboardTextBoundsAndUnreliableChangeCounts]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testClipboardTextBoundsAndUnreliableChangeCounts]' passed (0.019 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testConcurrentRequestsCompleteByIDInReverseOrder]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testConcurrentRequestsCompleteByIDInReverseOrder]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testExplicitCancelAllAndTruncatedTransferFinishEachRequest]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testExplicitCancelAllAndTruncatedTransferFinishEachRequest]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testFourMiBResponseIsAcceptedLikeGuestProtocol]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testFourMiBResponseIsAcceptedLikeGuestProtocol]' passed (0.099 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testHandshakeTimeoutAndMalformedFramesDisconnect]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testHandshakeTimeoutAndMalformedFramesDisconnect]' passed (0.196 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testInvalidPayloadSizesDisconnectWithoutAllocating]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testInvalidPayloadSizesDisconnectWithoutAllocating]' passed (0.023 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testMouseTouchCoordinatesAndEdgeFlagSurviveWindowScaling]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testMouseTouchCoordinatesAndEdgeFlagSurviveWindowScaling]' passed (0.131 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testOldWriterBacklogAndCallbacksCannotAffectReplacementConnection]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testOldWriterBacklogAndCallbacksCannotAffectReplacementConnection]' passed (0.059 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testOutgoingOversizeIsRejectedBeforeAnyBytes]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testOutgoingOversizeIsRejectedBeforeAnyBytes]' passed (0.053 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testOversizedClipboardImagesDisconnectBeforeReadingPayload]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testOversizedClipboardImagesDisconnectBeforeReadingPayload]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testPartialPayloadKeepsRequestTimeoutAndBoundsReaderLifetime]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testPartialPayloadKeepsRequestTimeoutAndBoundsReaderLifetime]' passed (0.410 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testRawFileAndClipboardPayloadsIncludeEmptyFiles]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testRawFileAndClipboardPayloadsIncludeEmptyFiles]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testStalledUploadDisconnectsWithinWriteDeadline]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testStalledUploadDisconnectsWithinWriteDeadline]' passed (0.202 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testTaskCancellationReturnsBeforeTimeoutAndLatePayloadIsDrained]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testTaskCancellationReturnsBeforeTimeoutAndLatePayloadIsDrained]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testTouchCapabilityAndConnectionMatrix]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testTouchCapabilityAndConnectionMatrix]' passed (0.007 seconds).
+Test Case '-[VPhoneCLITests.GuestTransportTests testUnknownPayloadAndDuplicateIDDoNotCorruptNextResponse]' started.
+Test Case '-[VPhoneCLITests.GuestTransportTests testUnknownPayloadAndDuplicateIDDoNotCorruptNextResponse]' passed (0.007 seconds).
+Test Suite 'GuestTransportTests' passed at 2026-10-13 06:07:01.357.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 1.253 (1.256) seconds
+Test Suite 'GuestWriteCoordinationTests' started at 2026-10-13 06:07:01.357.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testActualRPCBootstrapAndShutdownQueueBehindWriterWhileReadsProceed]' passed (0.011 seconds).
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testIndependentVMWriterDoesNotWaitForOtherVM]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testIndependentVMWriterDoesNotWaitForOtherVM]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testOnlineLockExcludesStopWithoutSignalling]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testOnlineLockExcludesStopWithoutSignalling]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testOnlineLockRejectsLinksAndConflictsWithOtherProcess]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testOnlineLockRejectsLinksAndConflictsWithOtherProcess]' passed (0.112 seconds).
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testStopSealsQueuedWritersAndWaitsForActiveWriter]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testStopSealsQueuedWritersAndWaitsForActiveWriter]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testSubmittedRPCFailureRetainsLeaseAndSealsNewWriters]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testSubmittedRPCFailureRetainsLeaseAndSealsNewWriters]' passed (0.001 seconds).
+Test Suite 'GuestWriteCoordinationTests' passed at 2026-10-13 06:07:01.488.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.129 (0.131) seconds
+Test Suite 'HostControlClientTests' started at 2026-10-13 06:07:01.488.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseAfterBytesWithoutLF]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseAfterBytesWithoutLF]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseWithoutBytes]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseWithoutBytes]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testDefaultLimitCoversWorstCaseInlineFile]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testDefaultLimitCoversWorstCaseInlineFile]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testPathChecksBeforeConnecting]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testPathChecksBeforeConnecting]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseLimitExcludesLF]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseLimitExcludesLF]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseSplitAcrossWritesAndTrailingBytesIgnored]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseSplitAcrossWritesAndTrailingBytesIgnored]' passed (0.113 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testRoundTripSendsPayloadPlusLF]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testRoundTripSendsPayloadPlusLF]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSilentServerHitsDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSilentServerHitsDeadline]' passed (0.303 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSocketOwnedByAnotherUserIsRefused]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSocketOwnedByAnotherUserIsRefused]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testStaleSocketIsRefused]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testStaleSocketIsRefused]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testTricklingBytesDoNotExtendDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testTricklingBytesDoNotExtendDeadline]' passed (0.338 seconds).
+Test Suite 'HostControlClientTests' passed at 2026-10-13 06:07:02.248.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.759 (0.760) seconds
+Test Suite 'HostControlIOTests' started at 2026-10-13 06:07:02.248.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEmptyConnectionAndMalformedJSON]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEmptyConnectionAndMalformedJSON]' passed (0.024 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFAndPartialRequestTimeout]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFAndPartialRequestTimeout]' passed (0.024 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFCompletesRequest]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFCompletesRequest]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testFileLimitAndNonRegularFile]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testFileLimitAndNonRegularFile]' passed (0.004 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testLimitExcludesTerminatorAndFollowingRequests]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testLimitExcludesTerminatorAndFollowingRequests]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testNonReadingPeerHasWriteDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testNonReadingPeerHasWriteDeadline]' passed (0.024 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testOversizeIsRejectedWithoutEOF]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testOversizeIsRejectedWithoutEOF]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testRequestBeyondOldBoundaryAndUTF8]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testRequestBeyondOldBoundaryAndUTF8]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testSplitUTF8AndSlowConnectionDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testSplitUTF8AndSlowConnectionDeadline]' passed (0.201 seconds).
+Test Suite 'HostControlIOTests' passed at 2026-10-13 06:07:02.533.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.281 (0.285) seconds
+Test Suite 'HostControlLifecycleTests' started at 2026-10-13 06:07:02.533.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testActiveSocketCannotBeReplacedAndOtherInstanceStopDoesNotRemoveIt]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testActiveSocketCannotBeReplacedAndOtherInstanceStopDoesNotRemoveIt]' passed (0.007 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testConnectionsBeyondTheLimitAreClosedWithoutAffectingAcceptedOnes]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testConnectionsBeyondTheLimitAreClosedWithoutAffectingAcceptedOnes]' passed (0.013 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testExitedTargetRefusesConnectionsAndStopCancelsInFlightCommands]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testExitedTargetRefusesConnectionsAndStopCancelsInFlightCommands]' passed (0.013 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testGUISocketKeepsScreenAndDFUOnlyExposesDiscovery]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testGUISocketKeepsScreenAndDFUOnlyExposesDiscovery]' passed (0.010 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testHeadlessSocketRoutesGuestCommandsAndReportsConnectionChanges]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testHeadlessSocketRoutesGuestCommandsAndReportsConnectionChanges]' passed (0.015 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testInvalidDirectoryAndOversizedPathFailWithoutLeavingSocket]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testInvalidDirectoryAndOversizedPathFailWithoutLeavingSocket]' passed (0.002 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testRequestsReachOnlyTheSocketOwnerAndWrongTargetIsRefused]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testRequestsReachOnlyTheSocketOwnerAndWrongTargetIsRefused]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testRestartedVMRejectsRequestsBoundToThePreviousBoot]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testRestartedVMRejectsRequestsBoundToThePreviousBoot]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testSlowCommandAndSlowPeerDoNotBlockOtherClients]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testSlowCommandAndSlowPeerDoNotBlockOtherClients]' passed (0.011 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testStaleSocketIsReplacedAndNormalFilesArePreserved]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testStaleSocketIsReplacedAndNormalFilesArePreserved]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testStopClosesSlowClientsAndDoesNotAffectAnotherEndpoint]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testStopClosesSlowClientsAndDoesNotAffectAnotherEndpoint]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testStopPreservesReplacementPathAndRejectsRestartOfStoppedService]' started.
+Test Case '-[VPhoneCLITests.HostControlLifecycleTests testStopPreservesReplacementPathAndRejectsRestartOfStoppedService]' passed (0.002 seconds).
+Test Suite 'HostControlLifecycleTests' passed at 2026-10-13 06:07:02.625.
+	 Executed 12 tests, with 0 failures (0 unexpected) in 0.089 (0.091) seconds
+Test Suite 'HostControlProtocolTests' started at 2026-10-13 06:07:02.625.
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testInvalidJSONReturnsStableCode]' started.
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testInvalidJSONReturnsStableCode]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testListeningSocketWorksWithoutViewAndCleansUp]' started.
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testListeningSocketWorksWithoutViewAndCleansUp]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testOversizedInlineFileReturnsStableCode]' started.
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testOversizedInlineFileReturnsStableCode]' passed (0.061 seconds).
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testRequestBeyond4096BytesReachesCommandHandler]' started.
+Test Case '-[VPhoneCLITests.HostControlProtocolTests testRequestBeyond4096BytesReachesCommandHandler]' passed (0.001 seconds).
+Test Suite 'HostControlProtocolTests' passed at 2026-10-13 06:07:02.691.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.066 (0.066) seconds
+Test Suite 'HostRPCTests' started at 2026-10-13 06:07:02.691.
+Test Case '-[VPhoneCLITests.HostRPCTests testCancelledQueuedInputDoesNotRun]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testCancelledQueuedInputDoesNotRun]' passed (0.016 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testCapabilitiesReportForwardableMethodsAndTarget]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testCapabilitiesReportForwardableMethodsAndTarget]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testForwardedInputWaitsForAnEarlierSocketGestureToFinish]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testForwardedInputWaitsForAnEarlierSocketGestureToFinish]' passed (0.010 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testForwardsDeclaredMethodWithParamsAndReturnsResult]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testForwardsDeclaredMethodWithParamsAndReturnsResult]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testInstanceChangeWithoutGenerationChangeRejectsLateReply]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testInstanceChangeWithoutGenerationChangeRejectsLateReply]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testKeyForwardsKeyboardNamesOnlyThroughTheAPISession]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testKeyForwardsKeyboardNamesOnlyThroughTheAPISession]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testManualUnlockRequiresCapabilityAndUsesInputQueue]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testManualUnlockRequiresCapabilityAndUsesInputQueue]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testMethodTableMatchesLocalDaemonSourcesAndDeclaredCapabilities]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testMethodTableMatchesLocalDaemonSourcesAndDeclaredCapabilities]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testNestedDiagnosticPassesAndFlatDefaultRemainsAvailable]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testNestedDiagnosticPassesAndFlatDefaultRemainsAvailable]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testNestedRequestRejectsLegacyFlatAndInvalidDiagnosticFlags]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testNestedRequestRejectsLegacyFlatAndInvalidDiagnosticFlags]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testReadinessCapabilityAndBootModeGateBeforeDispatch]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testReadinessCapabilityAndBootModeGateBeforeDispatch]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testRPCScreenIsOptInAndUsesTheScreenAdapter]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testRPCScreenIsOptInAndUsesTheScreenAdapter]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testServiceDeadlineAndCancellationApplyToForwardedCalls]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testServiceDeadlineAndCancellationApplyToForwardedCalls]' passed (0.061 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testShutdownUsesDedicatedCapabilityAndPreservesForce]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testShutdownUsesDedicatedCapabilityAndPreservesForce]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testStaleGenerationGuestErrorsAndTransportErrorsKeepUncertainty]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testStaleGenerationGuestErrorsAndTransportErrorsKeepUncertainty]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testTargetChecksRejectBeforeAnyCommandRuns]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testTargetChecksRejectBeforeAnyCommandRuns]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.HostRPCTests testUnknownBlockedAndInvalidRequestsNeverDispatch]' started.
+Test Case '-[VPhoneCLITests.HostRPCTests testUnknownBlockedAndInvalidRequestsNeverDispatch]' passed (0.001 seconds).
+Test Suite 'HostRPCTests' passed at 2026-10-13 06:07:02.796.
+	 Executed 17 tests, with 0 failures (0 unexpected) in 0.104 (0.106) seconds
+Test Suite 'LocationHostControlParsingTests' started at 2026-10-13 06:07:02.796.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testGuestErrorResponsePreservesStructuredCode]' started.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testGuestErrorResponsePreservesStructuredCode]' passed (0.000 seconds).
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testLocationCommandOptionsKeepJSONTypesDistinct]' started.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testLocationCommandOptionsKeepJSONTypesDistinct]' passed (0.000 seconds).
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testProducerSequenceRejectsJSONIntegersOutsideExactRange]' started.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testProducerSequenceRejectsJSONIntegersOutsideExactRange]' passed (0.000 seconds).
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStreamFixParsesFractionalISO8601Deterministically]' started.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStreamFixParsesFractionalISO8601Deterministically]' passed (0.002 seconds).
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStreamFixRejectsBooleanAndWrongTypedNumbersFromJSON]' started.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStreamFixRejectsBooleanAndWrongTypedNumbersFromJSON]' passed (0.000 seconds).
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStreamFixRejectsInvalidTimestamp]' started.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStreamFixRejectsInvalidTimestamp]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStructuredGuestErrorCodeSurvivesLocationAdapterMapping]' started.
+Test Case '-[VPhoneCLITests.LocationHostControlParsingTests testStructuredGuestErrorCodeSurvivesLocationAdapterMapping]' passed (0.000 seconds).
+Test Suite 'LocationHostControlParsingTests' passed at 2026-10-13 06:07:02.801.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 06:07:02.801.
+	 Executed 114 tests, with 0 failures (0 unexpected) in 11.425 (11.443) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 06:07:02.801.
+	 Executed 114 tests, with 0 failures (0 unexpected) in 11.425 (11.444) seconds
+[control] connected to test v1, caps: ["file", "shell"]
+[control] vphoned binary: classic-update-045FB643-C77F-43DF-96D4-64D8697D6491 (17 bytes, df268a5d992b...)
+[control] connected to unknown v1, caps: ["file"]
+[control] pushing update (17 bytes)...
+[control] vphoned binary: classic-update-D0451044-5199-4D77-9345-5D662084918C (17 bytes, df268a5d992b...)
+[control] connected to unknown v1, caps: ["file"]
+[control] pushing update (17 bytes)...
+[control] read loop ended
+[control] guest update refused or failed: not connected to vphoned
+[control] connected to test v1, caps: ["clipboard"]
+[control] connected to test v1, caps: ["file", "shell"]
+[control] connected to test v1, caps: ["file", "shell"]
+[vphoned] build: late
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] handshake timed out after 0s
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["touch", "touch_edge"]
+[control] guest-side touch injection enabled (iOS ?)
+[control] connected to test v1, caps: ["file", "shell"]
+[control] connected to test v1, caps: ["file", "shell"]
+[control] connected to test v1, caps: ["file", "shell"]
+[control] connected to test v1, caps: ["clipboard"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] connected to test v1, caps: ["file", "shell"]
+[control] read loop ended
+[control] connected to test v1, caps: ["file", "shell"]
+[control] connected to test v1, caps: ["file", "shell"]
+[control] connected to test v1, caps: ["touch", "touch_edge"]
+[control] guest-side touch injection enabled (iOS ?)
+[control] connected to test v1, caps: ["file", "shell"]
+[hostctl] listening on /tmp/vp-e3-FCFCA0C7/vphone.sock
+[hostctl] listening on /tmp/vp-e3-91052E3E/vphone.sock
+[hostctl] listening on /tmp/vp-e3-043B2325/vphone.sock
+[hostctl] listening on /tmp/vp-e3-870B1CF1/vphone.sock
+[hostctl] listening on /tmp/vp-e3-FB9EC5EA/vphone.sock
+[hostctl] listening on /tmp/vp-e3-611BAFD7/vphone.sock
+[hostctl] listening on /tmp/vp-e3-A59BC524/vphone.sock
+[hostctl] listening on /tmp/vp-e3-D7CA952E/vphone.sock
+[hostctl] listening on /tmp/vp-e3-77FF8DCB/vphone.sock
+[hostctl] listening on /tmp/vp-e3-77FF8DCB/vphone.sock
+[hostctl] listening on /tmp/vp-e3-23C43641/vphone.sock
+[hostctl] listening on /tmp/vp-e3-DB167DCA/vphone.sock
+[hostctl] listening on /tmp/vp-e3-1E2588B1/vphone.sock
+[hostctl] listening on /tmp/vp-e3-D087CB80/vphone.sock
+[hostctl] listening on /tmp/vp-e3-DD855F6C/vphone.sock
+[hostctl] listening on /tmp/vp-e2-F7E6BC04/vphone.sock
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite GuestEnvironmentEntryTests started.
+◇ Suite CreateLeftoverTests started.
+◇ Suite GuestEnvironmentSourceTests started.
+◇ Suite GuestShutdownTests started.
+◇ Suite EnvironmentTransactionTests started.
+◇ Suite CoreBundleRuleTests started.
+◇ Suite EnvironmentEligibilityTests started.
+◇ Suite GuestEnvironmentCheckpointTests started.
+◇ Suite StartupUnlockCLITests started.
+◇ Suite CoreBundleVerifyMappingTests started.
+◇ Suite APIFileUploadTests started.
+◇ Suite APIRequestTests started.
+◇ Suite CoreBundleStoreTests started.
+◇ Suite VMStopTests started.
+◇ Suite RestoreInfoTests started.
+◇ Suite CoreBundleStoreTests started.
+◇ Test vmChildGetsTheShutdownGraceAndDeletesItsSocket() started.
+◇ Suite EnvironmentOperationTests started.
+◇ Test standaloneInstallRequiresMatchingRecordedEnvironment() started.
+◇ Test sourceCannotSurviveFrozenPlanOrDaemonMutation() started.
+◇ Test unsupportedV2VariantsAreRejectedBeforeExecution() started.
+◇ Test liveSourceRequiresActualRuntimePlanAndFilesAndExpires() started.
+◇ Test liveSourceRejectsMutationAndOutsideStage() started.
+◇ Test linkedCandidateParentCannotQualifyCurrentBundle() started.
+◇ Test createAndInstallAcceptGuestEnvironmentOption() started.
+◇ Test mountExperimentRequiresExplicitRegularV2() started.
+◇ Test replacementRequiresActualOutputReadback() started.
+◇ Test restoreRefusesAFileChangedAfterTheTransaction() started.
+◇ Suite ShutdownPolicyTests started.
+◇ Test missingOrRefusedGuestMethodsRequestFrameworkFallback() started.
+◇ Test journalTemporarySymlinkCannotOverwriteExternalFile() started.
+◇ Test mappingsAreCurrentOrStaleByFileIdentity() started.
+◇ Test restoreJournalSaveFailureStopsBeforeNextReplacement() started.
+◇ Test apiFailureFallsBackToClassicOnlyWhileVMIsRunning() started.
+◇ Test completeInstallKeepsBackupsAndJournal() started.
+◇ Test corruptRestoreComponentSetIsRefusedBeforeReplacement() started.
+◇ Test validationRejectsBeforeAnyWrite() started.
+◇ Test apiAcceptanceWaitsForVMStopWithoutAlsoSendingClassicHalt() started.
+◇ Test statusReportsInstalledAndStagedDigests() started.
+◇ Test failedReplacementStopsAndRecordsRecovery() started.
+◇ Test retentionKeepsIncompleteTransactions() started.
+◇ Test journalSaveFailureStopsBeforeNextReplacement() started.
+◇ Test completeActualInstallationQualifiesExistingLibrariesOnly() started.
+◇ Test unresolvedJournalRefusesAnotherInstall() started.
+◇ Test actualInspectionFailsClosed(_:) started.
+◇ Test storePathAndMinimumMatchTheStore() started.
+◇ Test distinctLocalBuildNamesAreAcceptedAndReleaseIsPreserved() started.
+◇ Test configOptionIsExplicitAndLaunchForwardingKeepsAPIListener() started.
+◇ Test defaultOffAndOptInRequiresAPISurface() started.
+◇ Test v2IsAcceptedOnlyForRegular() started.
+◇ Test commitsExactBytesAndModeWithoutFollowingDestinationSymlink() started.
+◇ Test identityAndSizeAreCheckedBeforeStaging() started.
+◇ Test receiptPrintedByVerifyDecodes() started.
+◇ Test boundHostExecutionDoesNotOfferPackagedDaemonForAutoUpdate() started.
+◇ Test cancellationShortAndOverlongBodiesPreserveDestinationAndCleanStaging() started.
+◇ Test refusalsCarryTheCLIReason() started.
+◇ Test rejectsInvalidRequestShapes(input:) started.
+◇ Test historicalOptionsKeepDigestAndEnvironmentChangesBeginAtCFW() started.
+◇ Test nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test preservesMethodParametersAndIdentifier() started.
+◇ Test reportsStableInvalidEnvelopeMessage() started.
+◇ Test preservesNumericIDWithoutStringConversion() started.
+◇ Test reportsProgressBeforeTheWaits() started.
+◇ Test unknownFailedOutputCannotAuthorizeAnotherInstall() started.
+◇ Test locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test methodLengthBoundary() started.
+◇ Test forceKillsAProcessThatIgnoresSIGINT() started.
+◇ Test reportsFailureWhenTheTargetSurvives() started.
+◇ Test identityDescribesLiveProcessAndDropsReapedOne() started.
+◇ Test omittedParametersAndIdentifierRemainOptional() started.
+◇ Test reportsNotRunningWhenNothingHoldsTheLock() started.
+◇ Test forceSkipsSIGINTButStillConfirms() started.
+◇ Test exitedTargetAndReleasedLockStillRequireDiskRelease() started.
+◇ Test variantRecordingPreservesGuestEnvironment() started.
+◇ Test refusesToSignalAForeignLockHolder() started.
+◇ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test mapsOutcomesToExitCodes() started.
+◇ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() started.
+◇ Test diskInspectionFailureCannotReportStopped() started.
+◇ Test emptyArgvZeroCannotReadConfigFromEnvironment() started.
+◇ Test treatsAReusedPIDAsExitedAndNeverKillsIt() started.
+◇ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() started.
+◇ Test reportsSignalErrorsSeparately() started.
+◇ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test refreshVerifiesEachVersionAndNothingElse() started.
+◇ Test absentStoreRunsNoCommand() started.
+◇ Test listingSkipsHiddenEntriesAndReportsAbsentOrUnusableRoots() started.
+◇ Test case passing 1 argument mutation → "loader" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "signature" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "mixed" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "missing" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "symlink" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "job" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "key" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "daemon" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "pending" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument mutation → "marker" to actualInspectionFailsClosed(_:) started.
+◇ Test case passing 1 argument input → "[]" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "null" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":1}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":""}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":"health","params":[]}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":"health","params":null}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument name → "2.2.3" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument input → "{"method":"health","id":[]}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument name → "2.2.0-local" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument input → "{"method":"health","id":{}}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument name → "2.2.3-ci.abcdef0" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument input → "{"method":"health","id":null}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument name → "10.0.0-ci.0123456789abcdef0123456789abcdef01234567" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.0.8" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "1.0.0-local" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "x" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument input → "not-json" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument name → "2.2" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3.4" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "v2.2.3" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3-beta" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument name → "2.2.3-ci.ABCDEF0" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument name → "2.2.3-ci.abc" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3-local-local" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "../2.2.3" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3/.." to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "--help" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3 " to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "1234567890.0.0" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test guestGateExcludesConcurrentWritersWithoutBlockingOrdinaryReads() started.
+◇ Test operationRequiresAllBindingsAndJournalPersistsFullCollection() started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+✔ Test standaloneInstallRequiresMatchingRecordedEnvironment() passed after 0.581 seconds.
+◇ Test guestCommandWinsWhenShellIsAvailable() started.
+◇ Test stopTimeoutOutlivesGracefulWait() started.
+◇ Test requestStopIsTheFallbackAndForceStopIsTheLastResort() started.
+◇ Test lateFailureAndRepeatedInterruptDoNotIssueAnotherForceStop() started.
+◇ Test guestHaltCommandIsPOSIXShellAndReportsMissingBinary() started.
+◇ Test repeatedInterruptAndTimeoutBothForceStop() started.
+◇ Test stoppedVMNeedsNoShutdown() started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+✔ Test createAndInstallAcceptGuestEnvironmentOption() passed after 0.688 seconds.
+✔ Test journalTemporarySymlinkCannotOverwriteExternalFile() passed after 0.688 seconds.
+✔ Test replacementRequiresActualOutputReadback() passed after 0.688 seconds.
+✔ Test mappingsAreCurrentOrStaleByFileIdentity() passed after 0.688 seconds.
+✔ Test restoreRefusesAFileChangedAfterTheTransaction() passed after 0.689 seconds.
+✔ Test validationRejectsBeforeAnyWrite() passed after 0.688 seconds.
+✔ Test statusReportsInstalledAndStagedDigests() passed after 0.688 seconds.
+✔ Test completeInstallKeepsBackupsAndJournal() passed after 0.689 seconds.
+✔ Test restoreJournalSaveFailureStopsBeforeNextReplacement() passed after 0.689 seconds.
+✔ Test journalSaveFailureStopsBeforeNextReplacement() passed after 0.688 seconds.
+✔ Test mountExperimentRequiresExplicitRegularV2() passed after 0.689 seconds.
+✔ Test storePathAndMinimumMatchTheStore() passed after 0.689 seconds.
+✔ Test distinctLocalBuildNamesAreAcceptedAndReleaseIsPreserved() passed after 0.689 seconds.
+✔ Test completeActualInstallationQualifiesExistingLibrariesOnly() passed after 0.689 seconds.
+✔ Test failedReplacementStopsAndRecordsRecovery() passed after 0.689 seconds.
+✔ Test unresolvedJournalRefusesAnotherInstall() passed after 0.689 seconds.
+✔ Test unsupportedV2VariantsAreRejectedBeforeExecution() passed after 0.689 seconds.
+✔ Test actualInspectionFailsClosed(_:) with 10 test cases passed after 0.689 seconds.
+✔ Test configOptionIsExplicitAndLaunchForwardingKeepsAPIListener() passed after 0.689 seconds.
+✔ Test defaultOffAndOptInRequiresAPISurface() passed after 0.689 seconds.
+✔ Test v2IsAcceptedOnlyForRegular() passed after 0.689 seconds.
+✔ Test corruptRestoreComponentSetIsRefusedBeforeReplacement() passed after 0.689 seconds.
+✔ Test receiptPrintedByVerifyDecodes() passed after 0.689 seconds.
+✔ Test identityAndSizeAreCheckedBeforeStaging() passed after 0.689 seconds.
+✔ Test refusalsCarryTheCLIReason() passed after 0.689 seconds.
+◇ Test asyncVerificationKeepsLockAndExpiresRecheck() started.
+✔ Test commitsExactBytesAndModeWithoutFollowingDestinationSymlink() passed after 0.689 seconds.
+✔ Test rejectsInvalidRequestShapes(input:) with 11 test cases passed after 0.689 seconds.
+✔ Test preservesMethodParametersAndIdentifier() passed after 0.689 seconds.
+✔ Test reportsStableInvalidEnvelopeMessage() passed after 0.689 seconds.
+✔ Test nameFilterMatchesTheStoreFormat(_:) with 20 test cases passed after 0.689 seconds.
+✔ Test preservesNumericIDWithoutStringConversion() passed after 0.689 seconds.
+✔ Test historicalOptionsKeepDigestAndEnvironmentChangesBeginAtCFW() passed after 0.689 seconds.
+✔ Test methodLengthBoundary() passed after 0.689 seconds.
+✔ Test cancellationShortAndOverlongBodiesPreserveDestinationAndCleanStaging() passed after 0.689 seconds.
+✔ Test retentionKeepsIncompleteTransactions() passed after 0.689 seconds.
+✔ Test identityDescribesLiveProcessAndDropsReapedOne() passed after 0.689 seconds.
+✔ Test reportsFailureWhenTheTargetSurvives() passed after 0.697 seconds.
+✔ Test omittedParametersAndIdentifierRemainOptional() passed after 0.697 seconds.
+✔ Test boundHostExecutionDoesNotOfferPackagedDaemonForAutoUpdate() passed after 0.698 seconds.
+✔ Test unknownFailedOutputCannotAuthorizeAnotherInstall() passed after 0.697 seconds.
+✔ Test exitedTargetAndReleasedLockStillRequireDiskRelease() passed after 0.697 seconds.
+✔ Test locatorFindsTheFakeBootProcess(executableName:) with 2 test cases passed after 0.697 seconds.
+✔ Test variantRecordingPreservesGuestEnvironment() passed after 0.697 seconds.
+✔ Test mapsOutcomesToExitCodes() passed after 0.697 seconds.
+✔ Test reportsNotRunningWhenNothingHoldsTheLock() passed after 0.697 seconds.
+✔ Test refusesToSignalAForeignLockHolder() passed after 0.697 seconds.
+✔ Test diskInspectionFailureCannotReportStopped() passed after 0.697 seconds.
+✔ Test forceSkipsSIGINTButStillConfirms() passed after 0.697 seconds.
+✔ Test treatsAReusedPIDAsExitedAndNeverKillsIt() passed after 0.697 seconds.
+✔ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() passed after 0.697 seconds.
+✔ Test reportsSignalErrorsSeparately() passed after 0.697 seconds.
+✔ Test emptyArgvZeroCannotReadConfigFromEnvironment() passed after 0.697 seconds.
+✔ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() passed after 0.698 seconds.
+[launchpad] core bundle store: absent
+✔ Test operationRequiresAllBindingsAndJournalPersistsFullCollection() passed after 0.856 seconds.
+✔ Test sourceCannotSurviveFrozenPlanOrDaemonMutation() passed after 0.941 seconds.
+✔ Suite GuestEnvironmentEntryTests passed after 0.941 seconds.
+✔ Test guestCommandWinsWhenShellIsAvailable() passed after 0.359 seconds.
+✔ Test stopTimeoutOutlivesGracefulWait() passed after 0.359 seconds.
+✔ Test requestStopIsTheFallbackAndForceStopIsTheLastResort() passed after 0.359 seconds.
+✔ Test lateFailureAndRepeatedInterruptDoNotIssueAnotherForceStop() passed after 0.359 seconds.
+✔ Test guestHaltCommandIsPOSIXShellAndReportsMissingBinary() passed after 0.359 seconds.
+✔ Test repeatedInterruptAndTimeoutBothForceStop() passed after 0.359 seconds.
+✔ Test stoppedVMNeedsNoShutdown() passed after 0.359 seconds.
+✔ Test liveSourceRejectsMutationAndOutsideStage() passed after 0.941 seconds.
+✔ Suite EnvironmentTransactionTests passed after 0.942 seconds.
+✔ Suite CoreBundleRuleTests passed after 0.942 seconds.
+✔ Suite EnvironmentEligibilityTests passed after 0.942 seconds.
+✔ Suite StartupUnlockCLITests passed after 0.942 seconds.
+✔ Suite GuestEnvironmentCheckpointTests passed after 0.942 seconds.
+✔ Suite CoreBundleVerifyMappingTests passed after 0.942 seconds.
+✔ Suite APIFileUploadTests passed after 0.942 seconds.
+✔ Suite APIRequestTests passed after 0.942 seconds.
+✔ Suite RestoreInfoTests passed after 0.942 seconds.
+✔ Test linkedCandidateParentCannotQualifyCurrentBundle() passed after 0.942 seconds.
+✔ Test missingOrRefusedGuestMethodsRequestFrameworkFallback() passed after 0.942 seconds.
+✔ Test apiFailureFallsBackToClassicOnlyWhileVMIsRunning() passed after 0.942 seconds.
+✔ Test apiAcceptanceWaitsForVMStopWithoutAlsoSendingClassicHalt() passed after 0.942 seconds.
+✔ Test absentStoreRunsNoCommand() passed after 0.927 seconds.
+✔ Suite ShutdownPolicyTests passed after 0.942 seconds.
+✔ Test guestGateExcludesConcurrentWritersWithoutBlockingOrdinaryReads() passed after 0.857 seconds.
+✔ Suite GuestShutdownTests passed after 0.942 seconds.
+✔ Suite EnvironmentOperationTests passed after 0.942 seconds.
+✔ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) with 2 test cases passed after 0.986 seconds.
+✔ Test liveSourceRequiresActualRuntimePlanAndFilesAndExpires() passed after 1.431 seconds.
+✔ Suite GuestEnvironmentSourceTests passed after 1.432 seconds.
+✔ Test asyncVerificationKeepsLockAndExpiresRecheck() passed after 0.766 seconds.
+◇ Test asyncVerificationCancellationInvalidatesAndReleasesStore() started.
+✔ Test listingSkipsHiddenEntriesAndReportsAbsentOrUnusableRoots() passed after 2.041 seconds.
+✔ Test asyncVerificationCancellationInvalidatesAndReleasesStore() passed after 0.616 seconds.
+◇ Test asyncVerificationRejectsSourceMutationBeforeReturn() started.
+[launchpad] core bundle store: 3 entries, 1 verified
+✔ Test refreshVerifiesEachVersionAndNothingElse() passed after 2.614 seconds.
+✔ Suite CoreBundleStoreTests passed after 2.629 seconds.
+✔ Test forceKillsAProcessThatIgnoresSIGINT() passed after 2.636 seconds.
+✔ Test reportsProgressBeforeTheWaits() passed after 2.636 seconds.
+✔ Test asyncVerificationRejectsSourceMutationBeforeReturn() passed after 0.565 seconds.
+◇ Test unavailableExecutableExplainsExplicitRecoveryWithoutRunningOrCreatingStore() started.
+✔ Test unavailableExecutableExplainsExplicitRecoveryWithoutRunningOrCreatingStore() passed after 0.003 seconds.
+◇ Test installsSignedBundleAndVerifiesReceipt() started.
+✔ Test installsSignedBundleAndVerifiesReceipt() passed after 0.470 seconds.
+◇ Test distinctBuildsOfOneReleaseCoexistWithoutReplacingExistingFiles() started.
+✔ Test vmChildGetsTheShutdownGraceAndDeletesItsSocket() passed after 3.240 seconds.
+✔ Suite CreateLeftoverTests passed after 3.240 seconds.
+✔ Test distinctBuildsOfOneReleaseCoexistWithoutReplacingExistingFiles() passed after 0.941 seconds.
+◇ Test acceptsUpstreamResourceBundleLayout() started.
+✔ Test acceptsUpstreamResourceBundleLayout() passed after 0.319 seconds.
+◇ Test invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "../2.0.8", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8/other", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8
+", reason → "Invalid Core Bundle version "2.0.8\n"" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8-local/", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "-2.0.8", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "9999999999999999999999.0.0", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-ci.XYZ1234", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-ci.abc", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-beta", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.1.9-local", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.1.7-ci.0123abc", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+✔ Test invalidVersionRefusedBeforeStoreCreation(_:_:) with 12 test cases passed after 0.041 seconds.
+◇ Test versionNamesFollowUpstreamStoreSuffixes() started.
+✔ Test versionNamesFollowUpstreamStoreSuffixes() passed after 0.001 seconds.
+◇ Test ciArtifactNameInstallsAgainstReleaseInfoPlist() started.
+✔ Test ciArtifactNameInstallsAgainstReleaseInfoPlist() passed after 0.453 seconds.
+◇ Test digestMismatchLeavesNoPublishedVersion() started.
+✔ Test digestMismatchLeavesNoPublishedVersion() passed after 0.432 seconds.
+◇ Test duplicateInstallPreservesOriginalReceiptAndModes() started.
+✔ Test duplicateInstallPreservesOriginalReceiptAndModes() passed after 0.465 seconds.
+◇ Test refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "digest" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✔ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) with 2 test cases passed after 5.819 seconds.
+✔ Suite VMStopTests passed after 5.820 seconds.
+◇ Test case passing 1 argument mutation → "old-version" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "plist-version" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "x86_64" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "non-regular" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✔ Test refusedInstallLeavesExistingStoreUnchanged(_:) with 5 test cases passed after 3.108 seconds.
+◇ Test productionStoreRefusesNonRootBeforeAnyHostAccess() started.
+✔ Test productionStoreRefusesNonRootBeforeAnyHostAccess() passed after 0.001 seconds.
+◇ Test receiptFieldsAreRefusedWithSeparateReasons() started.
+✔ Test receiptFieldsAreRefusedWithSeparateReasons() passed after 0.001 seconds.
+◇ Test machOReaderReportsSlices() started.
+✔ Test machOReaderReportsSlices() passed after 0.001 seconds.
+◇ Test refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "receipt" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "receipt-version" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "cdhash" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "resource" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "binary" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "writable" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "acl" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "hardlink" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "symlink" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "resigned" to refusesModifiedInstallation(_:) started.
+✔ Test refusesModifiedInstallation(_:) with 10 test cases passed after 5.885 seconds.
+◇ Test rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "absolute" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "climb" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "indirect-climb" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "hardlink" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "setuid" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "fifo" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "wrong-version" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "unsigned" to rejectsUnsafeArchive(_:) started.
+✔ Test rejectsUnsafeArchive(_:) with 8 test cases passed after 0.110 seconds.
+◇ Test rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "symlink" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "writable" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "acl" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "lock-symlink" to rejectsUnsafeStore(_:) started.
+✔ Test rejectsUnsafeStore(_:) with 4 test cases passed after 2.451 seconds.
+◇ Test heldLeaseRefusesConcurrentInstall() started.
+✔ Test heldLeaseRefusesConcurrentInstall() passed after 0.652 seconds.
+◇ Test descriptorCopyIgnoresSharedSeekOffset() started.
+✔ Test descriptorCopyIgnoresSharedSeekOffset() passed after 0.544 seconds.
+◇ Test rejectsNonRegularDescriptor() started.
+✔ Test rejectsNonRegularDescriptor() passed after 0.006 seconds.
+◇ Test archiveReaderEntryLimit() started.
+✔ Test archiveReaderEntryLimit() passed after 0.495 seconds.
+◇ Test revalidationUsesLiveStoreAndExpiresWithCallback() started.
+✔ Test revalidationUsesLiveStoreAndExpiresWithCallback() passed after 0.690 seconds.
+◇ Test revalidationRefusesInvalidStoreReceipt(_:) started.
+◇ Test case passing 1 argument fault → "missing" to revalidationRefusesInvalidStoreReceipt(_:) started.
+◇ Test case passing 1 argument fault → "corrupt" to revalidationRefusesInvalidStoreReceipt(_:) started.
+◇ Test case passing 1 argument fault → "old" to revalidationRefusesInvalidStoreReceipt(_:) started.
+◇ Test case passing 1 argument fault → "wrong-version" to revalidationRefusesInvalidStoreReceipt(_:) started.
+✔ Test revalidationRefusesInvalidStoreReceipt(_:) with 4 test cases passed after 2.118 seconds.
+✔ Suite CoreBundleStoreTests passed after 21.834 seconds.
+✔ Test run with 103 tests in 18 suites passed after 21.834 seconds.

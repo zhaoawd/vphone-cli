@@ -60,6 +60,7 @@ enum GuestAPI {
             "ip": ip ?? "",
             "capabilities": [
                 APISessionIdentity.capability,
+                GuestProxyAdmission.capability,
                 "touch",
                 "hid",
                 "apps",
@@ -95,6 +96,7 @@ enum GuestAPI {
                 "environment_update",
                 // T17: install journals with backups, environment.restore.
                 "environment_transaction",
+                EnvironmentOperation.capability,
                 // T17: environment.loaded (mapped library copies per process).
                 "environment_activation",
             ],
@@ -107,7 +109,13 @@ enum GuestAPI {
         return result
     }
 
-    static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
+    static let maintenance = GuestMaintenanceGate()
+
+    static func execute(method: String, params: [String: Any], externalProxy: Bool = false) throws -> [String: Any] {
+        try maintenance.run(method: method, externalProxy: externalProxy) { try executeUncoordinated(method: method, params: params) }
+    }
+
+    private static func executeUncoordinated(method: String, params: [String: Any]) throws -> [String: Any] {
         if (!cameraEnabled && method.hasPrefix("camera.")) || (apiOnly && method == "agent.apply_update") {
             throw GuestAPIError.unsupportedMethod(method)
         }

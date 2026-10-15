@@ -1,5 +1,29 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-14 kernel-only IM4P 字段保留修复（Task 8）
+
+第七版实际容器对照确认，固定 description 重建 IM4P 删除了原始 PAYP，并将 `KernelManagement_host-487.0.4` 改为 `kernelcache`。更新前后解码 payload 相同，IM4M 原字节相同；该差异与 guest 未就绪的因果关系尚未验证。新增回归已在现有生产封装路径两次复现字段丢失。修复从摘要匹配的可信 generation 原始 IM4P 保留 description/PAYP 原始 TLV；未压缩输出移除原 LZFSE 压缩元数据，未知或不一致结构拒绝，LZSS 原件明确拒绝。候选和发布后均核验完整 IM4P，proof 增加其摘要。37 项定向测试汇总退出 0，含 1 个独立 region fixture 入口跳过；实际元数据回归执行并将错误容器恢复为与基线逐字节一致。独立审查未发现阻断问题，见 [修复证据](evidence/2026-10-13-task8/acceptance/payp-preservation/diagnosis.md)。内核补丁算法未改变。第八版及第九版计划 A 的实际更新、读回和已授权第四版 guest 启动通过；description/PAYP 同时恢复，不能单独确定此前启动异常的原因。提交后回退实现与回归已通过独立审查，不同 payload 的 B 更新、读回及第四版 guest 启动已通过，公开回退 A 的实际验收继续执行，见 [验收进度](evidence/2026-10-13-task8/acceptance/acceptance-progress.md)。
+
+## 2026-10-13 kernel-only 停机更新（Task 8 / T34）
+
+新增从可信 generation 原件执行冻结内核计划的停机更新路径、候选 Preboot 载荷替换、内核共享区域与已安装 DSC 容量检查，以及 schema 3 磁盘/receipt/kernel 来源共同恢复。复用现有内核补丁与 IMG4 payload swap；未新增内核补丁算法，未修改 DSC maxSlide 或其他组件。kernel-only 报告保留完整计划摘要，只检查内核操作范围的必需声明并拒绝其他组件记录；普通事务继续检查完整计划。验证结果及真实 VM 未验证范围见 [Task 8 实施记录](evidence/2026-10-13-task8/implementation.md)。
+
+## 2026-10-12 稳定身份与可信 generation（T11/T12）
+
+新增严格 machineIdentifier 与磁盘文件身份、新 schema 的改名恢复、由已验证 prepare 产生的完整原件 generation，以及 create prepare/patch 接入。generation 内容身份不包含计划摘要；计划关联单独记录为 prepared。native 和真实 script/less 小型档案来源验证通过，430 项相关 Swift 回归与 20 项 prepare Python 回归通过。未改变补丁算法、写入字节或五模式声明成员；真实固件及 VM 行为未验证。来源边界、旧 schema、完整首批测试的环境失败及后续生命周期要求见 [generation 记录](upstream_integration_2026-10-06/T11_T12_firmware_generation_2026-10-12.md)。
+
+## 2026-10-12 逐声明执行证据门（T10）
+
+发布门新增冻结声明的显式记录归属、完整必需声明检查及 alreadyApplied 当前载荷读回证据。缺单项或缺整个组件均拒绝提交，全组件 ablation 保留只读报告。未改变补丁算法或字节。独立 scratch 的 FirmwarePatcherTests 与完整历史固件对照共 313 个测试通过；五模式完整证据及缺单项不改变原固件的故障测试通过。证据、接口边界和未验证行为见 [执行证据记录](upstream_integration_2026-10-06/T10_execution_evidence_2026-10-12.md)。这些结果不建立固定上游字节等价或 VM 验收。
+
+## 2026-10-12 固定上游声明目录（T09）
+
+声明目录现对应固定上游 `2d21d21fbdd4f51f013616273ceda9b35a3e0789` 的全部 141 个 ID，并保留 2 个本地 less ID。原有 119 个声明的执行步骤、模式成员、版本规则和显式选项保持原值；24 个新增目标 ID 均标记 `notImplemented`，各自记录原因，显式选择时拒绝。决定及五模式版本矩阵见 [T09_target_applicability.json](upstream_integration_2026-10-06/T09_target_applicability.json)。本轮未新增二进制补丁或修改匹配及写入逻辑。声明身份和步骤成员关系不建立上游字节等价；真实固件、恢复和 VM 启动行为未验证。
+
+## 2026-10-02 regular-v2 MAC mount 实验候选
+
+用户批准独立对照实验。显式 `vm create --guest-environment v2 --experimental-v2-root-remount` 仅为 regular 追加现有 `kernel-boot-mac_mount`，不采用其他 JB 步骤。23B85 原始 vphone600 的内存输出比较通过：默认 regular 的 28 项内核记录逐项相同，实验候选额外两项 4 字节写入，完整输出与预期一致。匹配沿用当前映像语义锚点与 ARM64Encoder，不使用固定地址。默认 regular/classic 选择保持原范围；真实重挂、在线更新及回退尚未验证。详见 [实验记录](t17_mount_rejection_diagnosis_2026-10-02.md)。
+
 ## 2026-10-01 DSC maxSlide 选项层对齐（T13a）
 
 `FORCE_DSC_MAXSLIDE=1` 与 `vm create`、`cfw install` 的 `--force-dsc-maxslide` 已删除，与上游 `d930e50` 一致。`cfw_install.sh` 只在 `27.*` 基线调用 `patch-dsc-maxslide`，且不传 `--force`；是否清零由补丁器按缓存头判断（`sharedRegionSize + maxSlide > 0x180000000` 时清零，已为 0 或可容纳时不写）。补丁器增加与上游 `DyldSharedCacheMaxSlidePatcher.swift` 等价的缓存头校验（0x100 字节头部、`mappingOffset` 覆盖 `maxSlide`、主分块存在文件偏移 0 的映射、`sharedRegionStart` 等于最低映射地址、`sharedRegionSize` 覆盖映射跨度、64 位求和不溢出），校验失败时报错且不写入。`cfw_install_host.sh` 对所有变体识别到旧环境变量时打印已移除提示，并且不再转发。清零写入的字段、字节和写入方式不变；独立命令 `cfw.py patch-dsc-maxslide --force` 保留供手动使用。记录见 `research/t13a_dsc_maxslide_option_2026-10-01.md`。本轮未新增二进制补丁，本文既有计数不变；真实 iOS 27 缓存与启动未验证。
@@ -1253,3 +1277,239 @@ B38 保留 classic `/usr/bin/vphoned`、1337 控制和 256 字节相机头。新
 ## 2026-10-11：T24 本地 Bundle 布局
 
 B39将已知签名local-bound协议的CLI/VM布局与旧版含escalator布局区分；未知协议和错误主程序拒绝，store所有权、签名、receipt和锁定执行检查保持。没有新增firmware/kernel/CFW指令替换或二进制补丁，补丁数量保持。52项定向Swift回归、实际签名宿主归档private testRoot安装复验1项及5项脱敏回归通过；实际系统store与完整TCC路线等待本轮批准，不增加运行验收结论。证据见research/upstream_integration_2026-10-06/evidence/B39/T24/REPORT.md。
+
+## 2026-10-02 — v2 环境 B3 的 launchd 修改范围
+
+新增离线 v2 profile 安装器，仅接受 regular。首次安装对暂存 System 卷的 `/sbin/launchd` 添加 `LC_LOAD_WEAK_DYLIB /vh`，保留原 entitlements 后用已有 ldid/证书流程重签；重装已有加载命令时不重复注入。库、别名和 API 守护进程属于用户态安装范围，regular 的内核、TXM、DSC、设备树补丁集合未改变。
+
+合成目录树安装后判定 already_current；真实 insert_dylib 对 clang 编译的 macOS 合成文件添加弱加载命令的测试通过。这些证据不建立真实 iOS launchd 可启动或 regular 内核可加载该库的结论；R4 与 D6 仍待用户授权后的真实验收。拒绝条件、写入范围和验证限制见 [B3 记录](v2_guest_environment_b3_2026-10-02.md)。
+
+### 2026-10-02 v2 regular 真实验收 R1–R4
+
+独立签名产物在测试 VM `lp-v2-accept-20261002` 完成创建、恢复、CFW、首次启动和启动验证。launchd 的 /vh 弱加载命令经离线安装后可启动；R2 只读判定 already_current、bootstrap.kind v2、disk.unchanged true。R3 经典/API daemon 并行连接，API device.info 成功。R4 扫描 282 个进程、无 uninspected，pid 1 映射当前 launchdhook，SystemHook 在所有扫描进程中 not_mapped；运行中的 cameracaptured 未映射它。注入失败原因未查明，不能据此确定 regular 内核补丁不足。按 D6 停止后续验收，未新增任何内核、TXM 或 DSC 补丁。详见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
+
+### 2026-10-02 R4 用户态注入修正候选（未安装）
+
+实际 launchd 的反汇编包含 posix_spawnp 调用，本地 launchdhook 的 interpose 表未覆盖该入口。直接 cameracaptured 路径也不符合既有目标筛选。真实源码和插桩表边界测试修改前两项失败；修正增加 posix_spawnp 插桩及精确相机路径，两种 spawn 共用环境逻辑。Python 590 项通过，iOS 候选检查通过；仅 launchdhook 库摘要变化为 `157beaed8168fa53df58cdcf2d6181152bb4a5409a7ec1b093af21c394073027`，其余四个库不变。未新增 kernel、TXM、DSC 或 MIS 补丁；候选尚未写入客户机，真实因果验证等待批准。后续诊断发现 App 扩展已有 SystemHook 映射，早期无映射结果仅适用于原扫描时刻。详见 `v2_injection_diagnosis_2026-10-02.md`。
+
+### 2026-10-02 launchdhook 修正的真实复核
+
+用户批准后，T16 事务 `20261002T064301Z-rFaRcKXJ` 仅替换 launchdhook，旧盘保留，七项身份摘要在重启前核对一致。重启后原失败反馈两次通过，pid 1 映射新 launchdhook；cameracaptured 的 SystemHook 与 libvcamcaptured 均 current，App 与扩展亦有映射。日志显示相机服务经 xpcproxy 注入。没有增加 kernel/TXM/DSC/MIS 补丁。本次 regular 26.1 组合的 R4 加载复核通过，不证明功能验收或其他组合支持。详见 `v2_injection_diagnosis_2026-10-02.md`。
+
+## 2026-10-12：handoff 合入固定上游开发线
+
+以 `2c119ae6` 为基线合入 `959acfc0`。保留 B38 默认 classic 1337/1338 与固定依赖现代 API 1339；显式 regular-v2 使用单独 plist 候选、相机关闭配置及 handoff 用户态安装流程。API 更新标记保持最新实现。创建流程冻结两类 v2 输入，安装前核对固定 pins、overlay 声明与二进制 marker。
+
+root-remount 仅在显式 regular-v2 实验路径启用，默认关闭，调用已有 `KernelJBPatcher.mountOnly` 路径。固件事务同时记录实验选项、冻结 plan、versionInputs 和 planBinding；未改写既有内核补丁算法。旧检查点省略新增可选字段时保持摘要兼容。
+
+本轮 `make test_python`（679 项、无跳过）、`make test_swift`、现代组件构建及完整签名 app 构建通过；完整夹具下的 `make test_firmware` 共 15 项、12 个 suite 通过；不能据此确定恢复、启动、重挂或应用功能。Python 最终复跑与签名构建结果记录在 `research/handoff_merge_2026-10-12.md`。本轮未部署候选或启动 VM，历史验收保留原日期和组合范围。
+
+## 2026-10-13：Task 5 guest 写入使用冻结计划
+
+固定上游仍为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。Swift 向现有 CFW Python/zsh 入口传递当前已验证 desired record 的原始字节摘要、semantic planDigest、VM/磁盘/generation/catalog 身份及实际 variant/profile。写入入口再次验证同一记录、写锁、私有暂存目录和证据文件；未知声明、未声明目标、变更计划、模式覆盖和旧 nil profile 均拒绝新增写入。直接 Python 写入也拒绝符号链接父目录。
+
+本轮新增 9 个本地 guest 安装声明，保留固定上游 141 个声明及 2 个 local less 声明的来源区分，共 152 个 canonical ID。安装目标表由 `scripts/generate_guest_target_rules.py` 从明确路径及内置归档成员生成，SHA256 为 `7ac7230b7c075388d0d0dd2822acf896a82244e95f844e3faff451c3f190ba2f`；摘要进入冻结 recordRules。`guestEnvironmentV2` 为可选冻结字段，旧 nil 保持原编码但不获得新执行资格。less 仅通过已选 filesystem 声明授权已有三个 Python 子操作。EXP 专属声明继续受 EXP 范围约束；既有二进制补丁算法未改变。
+
+Cryptex OS/App 分别作为两个精确完整目录树目标：原始镜像绑定 generation，未知来源缓存通过受控生成过程重建，挂载关系及完整拷贝成员读回需一致。操作证据记录声明、精确目标、实际前后摘要及同一 planDigest。该证据不等同于 Task6 component receipt 或最终应用结果；atomic Disk.img 交换后的身份重绑仍依赖 Task10。
+
+最终命令、源码清单及原始日志的 gzip/SHA256 索引见 `research/evidence/2026-10-13-task5-frozen-guest/manifest.json`。合成目录树和命令替身测试不能证明真实镜像安装、恢复或启动成功。本轮未进行真实 mount、VM、AMFI/TCC 或系统安装操作；最终冻结工件的真实验收仍属 Task12。
+
+本轮相关 Swift 58 项/5套通过，最终受影响 Python 41 项通过，三个生成器及六个 zsh 语法检查通过。完整 Python 运行 704 项，保留 3 个旧夹具失败和 3 个环境跳过的原始结果；三个失败在随后受影响 41 项测试中修正并通过，完整套件未重复。不能将该记录表述为完整标准套件全通过。
+
+### Task5 审查修正 1
+
+修正 build-version 的参数解析：缺少 build 参数时拒绝，合法 `--dry-run` 使用同一解析结果决定只读分派。DSC 写入前拒绝末级符号链接、非普通文件和底层枚举器可能接受的未声明同前缀成员。bootstrap 成员转换现在将 `var` 精确映射为 `procursus`，保留第二次 `procursus/jb/*` 移动所需的目录目标；未增加任意后代授权。目标表新 SHA256 为 `b8ec0af0c1628ac963a0aaa39429e097985c09c6e11af83840972d7ac38fad0c`，旧摘要对应计划不能取得新规则资格。
+
+失败回归实际复现了未授权 plist 修改、DSC 外部链接目标修改和 JB/EXP 根目录移动拒绝。修正后 Python 54 项通过；Swift catalog/计划序列化/CFW 集成等 76 项、7套通过，三个生成器检查和六个 zsh 检查通过。JB/EXP 测试使用内置真实归档的 apt 文件字节及目录结构，执行各安装脚本的两条移动命令；未挂载镜像或执行完整安装。原始失败和成功日志及摘要见 `research/evidence/2026-10-13-task5-fix1/manifest.json`。
+
+
+## 2026-10-13：Task 6A1 最终效果证据与 less 加密顺序
+
+`CryptexFilesystemPatcher` 原先在 `mergeFilesystems` 内加密，随后 `apply` 才删除指定系统文件并生成 mtree、DigestDB 和封印。本次将加密移到这些最终明文修改之后，并在事务模式下解密最终 AEA，以只读挂载回调核验 producer 目录树及嵌套操作效果。安全文件替身回归复现了原顺序输出缺少最终修改；修正后的顺序为 prepare → encrypt → verify。该修改未新增二进制补丁规则或改变 variant 选择。
+
+操作证据在现有 Task5 JSONL 中增加可选 `effect`，保留 generation、desired 原始摘要、plan 摘要及声明归属。证据保存实际前后状态和按 SHA256 寻址的流式文件快照。新增读回比较字节范围、plist 修改键与删除、Mach-O 新增加载项和非结构字节，以及 DeviceTree 声明中的节点/属性身份。Manifest 读回复用现有 `patchIm4pTypeTag` 摘要语义及引用工件验证。IM4P payload 先转成零起点 Data，避免容器切片索引被当成 payload 偏移。
+
+6A1 的初始 receipt 仅表示 generated/committed 工件证据模型；本次未接入事务发布或 origin 写入。签名结构与 CodeDirectory 解析器仅为后续组合验证提供基础。shell 签名调用、Campo 嵌入 entitlement、DSC 同页摘要及 archive/move/消费关系由 6A2 接续。未完成的消费验证不会被调用来阻断现有受控写入；显式请求最终验证时，缺少上述关系的记录拒绝证明。Task6A 及 Task6 整体仍未完成。
+
+最终聚焦测试命令、结果、源文件 SHA256 和全部 RED/GREEN 日志的原始/gzip 摘要见 `research/evidence/2026-10-13-task6a1/manifest.json`。本轮只使用安全合成文件、目录和命令替身；没有执行真实 mount、VM、sudo、AMFI/TCC 或系统安装。真实加密工具、挂载和 OS 签名接受行为仍需 Task12 验证。
+
+
+## 2026-10-13：Task 6A2 签名、DSC 摘要和安装成员效果组合
+
+固定上游仍为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。本轮将已有 ldid 调用接入显式生产操作，记录实际输入、输出、参数和 entitlement 来源。签名验证解析每个 Mach-O/FAT slice 的结构和 CodeDirectory，保留先前代码及加载命令效果，并检查最终被覆盖页摘要。Campo 源 plist 的修改通过显式签名关系核对最终二进制内的 entitlement。该验证不证明 OS 接受签名。
+
+`cfw_patch_dsc_maxslide.py` 的数值选择、默认 6 GiB 门槛、dry-run/no-op 和模式保持不变。当实际修改的头部页被已识别 CodeDirectory 覆盖时，操作先检查该页原摘要，再从现有 DSC mapping 推导修改页 VMA，并调用已有 `reattest_modified_pages` 更新对应槽。该变化新增 CodeDirectory 槽字节输出差异；此前只有 maxSlide 头部字段变化。未覆盖页不增加槽写入，坏的原页摘要拒绝修改。最终组合验证保留各次原始代码修改，并按最终页内容检查共享槽，拒绝恢复先前代码或写入错误页摘要。
+
+固定上游二进制比较须将“maxSlide 字段变化”和“本地新增 CodeDirectory 槽更新”分别列出；不能把新增槽差异计为固定上游逐字节一致。本轮使用带 CodeDirectory 的安全合成缓存运行实际 maxSlide 入口，未重新执行真实固件对照或真实镜像验收。
+
+归档、复制、两段 bootstrap 移动及删除容器通过实际来源成员和操作标识组合。EXP 在源 Cryptex 挂载上的 DSC 修改记录镜像身份、前后摘要、原始成员清单和操作行摘要；只读重挂载核验成员后，复制到最终 System 根。JB/EXP 的两个 LaunchDaemon plist 注入复用已有算法并增加显式效果记录。正常安装在 installer/v2 结束后、cleanup 前，只读挂载同一 staged Disk.img 并验证最终目标；该阶段早于后续 `apfs_snap_rename.py` 和 Disk.img 发布。此证据不能作为发布后磁盘摘要、receipt、origin 或启动验收。
+
+最终受影响测试和失败日志、源码 SHA256、原始及 gzip 日志 SHA256 见本轮 `research/evidence/2026-10-13-task6a2/manifest.json`。本轮没有执行真实挂载、VM、sudo 系统安装或 AMFI/TCC 修改。Task6B/C 及真实系统验收仍由后续任务完成。
+
+
+## 2026-10-13：Task 6B 同一事务日志发布 component receipt
+
+FirmwarePipeline 将实际组件输出和完整 PatchRecord 集合交给最终效果验证。现有 FirmwareTransaction 日志同时管理输出目录、`.firmware-component-receipts.json` 和受限的 `launchpad.json` 元数据；发布后重新读取实际字节，核验通过后才写入 committed 日志。可选元数据保留原始字节或真实缺失状态，恢复过程拒绝覆盖未知字节。旧 nil 字段和旧日志恢复兼容；旧记录不因此获得新执行资格。未新增二进制补丁或改变既有算法。
+
+less 的发布读回通过实际 CLI、Python proof 验证和同一事务锁执行；writer 仍限 building 阶段。测试替换解密及只读挂载操作，验证最终目录效果丢失或 detach 失败时拒绝提交。锁描述符继承保留同一 open-file-description，并核对事务目录身份；父进程退出后，worker/tool 在结束前保留恢复排他锁。
+
+generated Restore/AVP 输出不更新已安装 VM origins。供 Task6C 使用的内部 hook 要求活跃的来源资格回调、精确目标及 proof 关联，并在元数据 rename 前和 committed 日志前复验；B 未提供生产 installed-component adapter。A2 的一般 CFW 最终验证仍位于 cleanup/snapshot 之前，不构成永久发布后授权。
+
+较早受影响 Swift 132 项、16 套通过，DeviceTree 真实固件 parity 选择器关闭；Python 36 项通过。最后的 origin 资格窗口修正后，直接受影响 Swift 48 项、4 套通过。原始日志、gzip、命令、退出码及最终源码摘要见 `research/evidence/2026-10-13-task6b/manifest.json`。本轮只使用安全合成字节、目录和故障注入；未执行真实镜像挂载、VM、sudo、AMFI/TCC 或系统安装。Task6B 待独立审查，Task6C 和 Task12 验收尚未完成。
+
+
+### Task6B 审查修正 1
+
+最终 callbacks 和效果读回结束后、写入 committed journal 前，重新比较全部输出根与 journal 摘要，覆盖未列入 component receipt 的保留文件、新增成员和未变化的根。启动 worker 后发生 I/O 故障时，父进程先处理输出并等待 worker，再离开共享锁作用域；pipe 描述符由运行函数明确拥有，FileHandle 包装不重复关闭。真实 subprocess 故障测试中，工具存活期间的实际 recovery 被拒绝，stdout/stderr 共 4 MiB 输出完成后才返回原 I/O 错误。
+
+两项审查问题均有实际 RED/GREEN；最终受影响 Swift 50 项、4 套和 Python worker 8 项通过。证据与最终源码摘要见 `research/evidence/2026-10-13-task6b-fix1/manifest.json`。C 生产来源资格和 legacy import 仍属下一步骤，真实固件/VM 与全标准验收仍属 Task12。本次未新增二进制补丁或执行真实挂载和 VM 操作。
+
+
+## 2026-10-13：Task 6C1 来源资格、已安装读回与旧格式导入
+
+C1 新增实际 Store 回调内的 kernelcache 来源适配器。当前有效 Bundle 可执行文件从 generation pristine 输入调用实际 Swift producer 重算，关联完整输入、输出及逐项记录；只读 Disk.img 的唯一 Preboot 目标须与完整重算 payload 一致。实际 B 事务日志同时提交 kernel 来源及 receipt，保留 host、guestEnvironment、bootChain。单个 bootChain 组件拒绝层来源晋升。没有新增二进制补丁或改变现有补丁算法。
+
+外部 binding/receipt 读取拒绝 pending 事务及读期间目录变化；B 仅在事务内部读取过渡 binding。fixed 2d21d21 的 PatchReceipt.plist/原 PatchPlan.plist 以实际字段导入，保留原始字节、缺失、损坏、不支持及未知 part；导入不产生 applied 或 origin 资格。guest 最终效果和 live Bundle source 检查只返回 inspected-unqualified-producer。
+
+Ruling21 将真实 CFW producer 捕获、sudo/VM 锁交接、Disk.img 身份转换、发布后 guest 资格及完整四层路由保留为 C2，并与 Task10 集成；C1 不构成 Task6 或原五项完成。最终 affected Swift 122 项/15 套通过；自审后仅补充测试并重跑直接受影响 10 项/2 套通过。Python 74 项在普通工具提权下通过；首次沙箱执行的合成 CFW 克隆 EPERM 失败日志保留。全部命令、原始/gzip 日志、源码摘要见 research/evidence/2026-10-13-task6c/manifest.json。未执行真实 VM、挂载、sudo、AMFI/TCC 或系统安装；实际固件、固定上游 producer 和完整标准验收仍属 Task12。
+
+### 2026-10-13 Task 8 真实 VM 验收准备
+
+本轮创建 `vm-new` 的隔离 APFS 副本，源与副本关键文件完整 SHA-256 一致。最终本地 Core Bundle `2.6.20261013-local` 已签名、安装并复验；本轮未改变内核补丁声明或补丁逻辑。新增从真实 IPSW 准备 generation 的入口；实际准备发现的目录 URL 比较问题已修复，49 项相关测试通过，修正版 `2.6.20261014-local` 的真实 IPSW 准备与 EXP desired plan 发布成功。最终 VM `--help` 预检退出 137，不能据此声明启动通过。已提交内核更新的精确回退尚无公开入口；`--recover` 只处理未提交事务。验收详细进度及证据见 `evidence/2026-10-13-task8/acceptance/acceptance-progress.md`。
+
+### 2026-10-13 Task 8：JB 已应用输出证据
+
+cloudOS 26.1 23B85 research vphone600 原件 payload SHA-256 为 `b6846048f3a60eab5f360fcc0f3dcb5198aa0476c86fb06eb42f6267cdbfcae0`。基础 KernelPatcher 先在文件偏移 23332268 修改 postValidation 比较，在 16177504 修改 bsd_init rootvp 分支。后续 JB 方法识别相同位置的已应用状态，但原实现未记录具体输出，严格声明门因此拒绝两条必需声明。
+
+修复保留原有语义定位流程。唯一已应用位置通过只读 `emitVerifiedOutput` 核对当前字节并记录原字节等于输出字节的观察；不执行写入，结果仍为 `alreadyApplied`。StructuredExecution 将观察关联当前输入及输出摘要。声明门未放宽。基础阶段仍有两条真实修改，JB 阶段新增两条已验证观察、零条字节修改。摘要输出改为 byte records，避免将观察数量表述为写入次数。
+
+离线重现命令和日志：`research/evidence/2026-10-13-task8/already-applied-red.*`、`already-applied-green.*`。最小真实 fixture 重现由失败转为通过；既有必需声明证据测试同时通过。真实 VM 更新和启动验收另行记录，离线通过不建立启动结论。
+
+### 2026-10-14 Task 8：磁盘扫描内存诊断
+
+第五版 `2.6.20261017-local` 的离线更新在 699.816 秒后 SIGKILL，未触发注入，日志为 building 且无 kernelDisk。正式恢复退出 0；六个关键文件完整 SHA-256、inode 与第五版绑定保持一致。SIGKILL 原因未查明，系统查询没有提供明确终止原因。
+
+真实 `FirmwareKernelDisk.capture/validate` 的安全 64 MiB+3 稀疏文件回归确认逐块读取临时对象累积：重复 RED 的 RSS 增量约 137.7/204.1 MB；逐块 autoreleasepool 后 GREEN 为约 1.7 MB/64 KiB。该修改调整磁盘扫描临时对象释放，不改变二进制补丁算法、块比较或恢复资格。发布与反向恢复循环仍在单独复核。原始证据保存在 `evidence/2026-10-13-task8/acceptance/capture-memory/`；合成回归不证明真实磁盘发布、启动或提交后回退通过。
+
+补充：发布及反向恢复循环亦以真实 helper、安全 16 MiB+3 全差异磁盘复现，RED RSS 增量分别 42,106,880 与 59,129,856 字节；逐轮释放后均为 196,608 字节。四条循环采用同一生命周期修正；写前 pending 日志、写入/fsync、afterWrite、游标保存及最终 SHA 校验顺序保持。独立源码审查无阻断发现，第六版签名工件正在准备，真实验收结果另行记录。
+
+### 2026-10-14 Task 8：候选 payload 效果索引
+
+第六版正式更新完成磁盘变更块扫描，但首次 candidate commit 读回拒绝 `kernel.apfs_root_snapshot`，发布游标 0、无 pending，未修改配置磁盘。正式恢复已退出 0。最小回归通过实际 IM4P/IMG4 API 复现：解码 payload 内容一致、Data.startIndex 非零，旧 `verifyEffect` 将相对文件偏移当作 Data 绝对索引，导致比较错误。
+
+修正仅在通用效果检查中从 payload.startIndex 推导记录的相对偏移，保留原有 count 边界及字节相等检查，未改变内核补丁算法。12 个合法场景和 28 个非法效果拒绝场景通过。扩大定向 Swift Testing 汇总 82 项，4 个真实 fixture 入口未启用并跳过；四个隔离内存子操作均实际通过。证据见 `evidence/2026-10-13-task8/acceptance/effect-index/manifest.json`。真实候选提交、发布恢复及启动仍待新冻结工件验收。
+
+### 2026-10-14 Task 8：第七版提交与真实启动范围
+
+第七版正式更新退出 0，完整发布 10,159 个块并提交。journal/receipt/proof/报告及实际只读 Preboot 读回一致，原始 IM4M 保持；同一副本实际发布 5 块后的中断恢复和完整基线/身份/元数据核验通过，独立审查通过。新旧解码 kernel payload 同为 `d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb`，因此没有不同 payload 的更新或启动验收结论。
+
+正式切回已授权第四版 host 后，VM 框架进入 running，但 guest 未连接，uname/sysctl 查询未执行成功，串口只取得 iBoot 输出；正常启动未通过，原因未查明，VM 已正式停止。只读完整容器对照确认 description 变化和原 IM4P PAYP 附加元素未保留；这不是启动根因结论，尚未据此修改算法。提交后回退入口未实现。临时 AMFI driver/debugserver 清理的精确系统暂停操作被自动审批拒绝，用户授权请求待回复；未修改 TCC 或持久 AMFI 配置。详细原始证据见 `evidence/2026-10-13-task8/acceptance/`。
+
+### 2026-10-14 Task 8：临时 AMFI 状态收尾
+
+用户授权一次暂停并恢复 amfid 88460 后，执行前复查确认旧 amfid、限定 driver89299 和 debugserver89316 均已退出。原驱动记录目标以内存问题终止且 detach 失败；当前新 amfid35998 由系统运行。没有执行暂停或恢复信号。本轮 VM 已停止，无临时进程、镜像挂载或 pending，未修改 TCC 或持久配置。该收尾不改变启动未通过、不同 payload 未验证及提交后回退未实现的结论。
+
+## 2026-10-14 第八版提交与第四版启动结果
+
+- 第八版无注入更新已正式提交，退出码 0，用时 3430.296 秒，事务 `2b52edcf-ac9b-4515-bb80-338d94bcbd2b`。`committed-readback-v8.json` 与 `v8-commit-independent-review.md/json` 验证 journal、receipt、proof、报告、实际 Preboot 和磁盘摘要关系通过；六文件 inode 保持，更新时其他五文件内容保持，无 pending 或挂载。
+- 实际完整 IMG4 恢复为基线摘要 `5b90c5a0ee87bf810c7e90795d537265f39774fbf85c430263fd2f61fc41ce7a`。原 description、315 字节 PAYP 和 IM4M 保留。解码 payload 仍为 `d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb`，不能计为不同 payload 更新验收。
+- 正式重绑为 host `2.6.20261016-local`、kernel `2.6.20261020-local`，receipt/proof/journal 保持。只执行已授权第四版 VM；本轮 `--help` 直接退出 0，没有启动临时 AMFI 驱动，没有扩大授权。
+- 第四版 VM 实际启动通过 guest 状态验证，PID `22914`，实例 `D46D87C2-A877-4348-BA7F-A9410522C493`。guest 已连接，使用实际绝对路径执行 `uname`/`sysctl`，返回 `Darwin 25.1.0`、`iPhone17,3`，code=0，无超时或截断。证据为 `boot-v8-guest-state-absolute.json`；实际 argv 与绑定摘要见 `boot-v8-guest-command-discovery-retry.json`。
+- 原 `boot-watch-v4-kernel-v8.json` 保留 passed=false：guest 已连接，但默认 PATH 不包含 `/var/jb/usr/bin` 和 `/var/jb/usr/sbin`，探针的两个命令返回 127。绝对路径查询补充成功，不覆盖原失败结果。description 和 PAYP 同时恢复；本次启动通过不能单独确定 PAYP 是前次启动异常的原因。
+- 正式停止退出 0，用时 4.675 秒，日志记录 guest 优雅关机。`post-boot-v8-cleanup-v2.json` 验证无本轮 VM/临时驱动、无挂载或 pending，binding/receipt 保持；源 VM 六文件 device/inode/size/mtime/ctime 保持。未重新计算源 VM 全量内容摘要。第一次清理探针因裸历史 PID 已复用而误判，失败记录保留；v2 按实际命令身份核对，未向该进程发送信号。
+- 暂停事务恢复及读回已通过，见 `kernel-update-v8-pause-recovery-readback.json`、`v8-pause-recovery-independent-review.md/json`。暂停时游标 0，不能作为写入后恢复证据；此前第七版实际发布 5 块后的中断恢复证据保持。
+- 提交后 kernel-only 回退现已开始实施及回归。候选基于当前启动后的磁盘，只替换内核；目标须重新取得真实 producer 资格。初版限定同可信 producer、同 generation/catalog/版本上下文的不同内核计划，保留当前 desired 和非内核来源。旧第八版缺少 producer-only 实际产物协议，不能仅凭历史 JSON 或备份取得回退资格。
+- Task 8/T34 尚未完整验收：不同 payload 更新与启动、提交后的公开回退及 guest marker 保留仍待完成。保留所有未提交修改，未提交 Git。
+
+## 2026-10-14 不同内核计划与实际 DSC 校验
+
+实际纯文件 EXP producer 对同一原始 IM4P（`b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac`）执行两组公开计划，完整 kernel Gate 与 ordered records 重建等于实际 payload。测试副本的实际 System 卷在目录锁内只读挂载；两组产物均通过现有生产 DSC 校验器。第二轮测试退出 0，用时 97.670 秒；该时间包含 16.07 秒构建。证据为 `acceptance/kernel-rollback/actual-plan-pair-dsc-v2.json`、对应 log 及 mount.json。
+
+| 实验设置 | 计划 SHA-256 | payload SHA-256 | IM4P SHA-256 | 记录数 | DSC 结果 |
+| --- | --- | --- | --- | --- | --- |
+| EXP，forceExcGuard=false | `703f9ad46613fa819ec6460846865ba9cd3ccd389f4b03c078fbc9baae741a3c` | `d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb` | `b1f07780484d9dc88f989d6e236049050b38e50a1ddb94030dcecaed43f962db` | 119 | 通过 |
+| EXP，forceExcGuard=true | `bb37c956b2bce344b65c6ca3fdea77065d9713f539f4a761823c2c8e5369e96c` | `a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0` | `ecbea551116fbb2d10b0196d72ecd7f52f8f145b5ecd7632159c0025fb78bf98` | 120 | 通过 |
+
+两组共享区域 base/size 均为 `6442450944` 字节。payload 摘要确实不同，未人工修改内核字节。这里建立实际生产算法、记录重建、区域与 DSC 兼容性证据；尚未通过第九版可信 Store 的正式更新提交，也未进行这两组内核的实际 A/B/回退启动。
+
+首次 pair 因测试 gateSnapshot 的 guestEnvironmentV2=nil 与实际 false 不同而在补丁前拒绝；仅修测试参数，生产检查保持。首次挂载 DSC 重跑因路径拒绝而失败；挂载存活时的独立 Foundation 诊断确认 `/private/tmp/...` 标准化为 `/tmp/...`。仅规范化 fixture URL，未放宽生产 relative 检查。失败 log/mount.json 及 `dsc-path-diagnostic.json` 保留。两次只读 DSC 挂载和路径诊断均完成卸载，最终无 Task8 附件或 pending，Disk.img 的 device/inode/size/mtime/ctime 保持；该观察不包含新全盘内容摘要。
+
+## 2026-10-14 提交后回退实现与独立代码审查
+
+新增公开 `vm rollback-kernel NAME --list`、`--to-transaction UUID --preview` 和明确目标的发布入口。初版限定同一可信 producer 的版本与实际 executable SHA、同一 VM/generation/catalog/固件上下文及非内核选择。新 schema 4 单独记录 targetDesired 和 live desired/binding CAS；current desired 保持，候选来自回退开始时的当前磁盘。新正常更新与回退保存完整 installed-kernel.im4p；历史数据仅提供选择与预期摘要，发布重新运行活跃 Store → VM → worker 作用域中的真实 producer。旧第八版与跨 Bundle 回退明确拒绝。当前 IMG4 的 IM4M/IM4R 外围原字节在 candidate/published callback 重验；该检查只建立字节保留。
+
+源码与测试共 16 项已冻结，`acceptance/kernel-rollback/manifest.json` 逐项摘要核对通过，独立代码/需求审查无阻断，见 `code-independent-review.md/json`。最终 Swift 定向汇总 101 个测试函数、13 个 suite：98 个通过，3 个实际 fixture 入口跳过；这些 fixture 的实际结果单独保存。新回退 suite 的 9 个通过函数覆盖 34 个参数场景及非参数场景。Python Bundle 协议 7 项通过。初次无效编译 RED、有效路由 RED、实际 fixture 参数/路径失败均保留。
+
+第九版 `2.6.20261021-local` 的完整构建、签名与打包正在进行，之前八版工件保持。此时尚未正式安装第九版、执行新事务或进行 A/B/回退启动，不能将代码审查与纯文件测试写成真实回退通过。
+
+## 2026-10-14 第九版 B 提交、启动及回退准备
+
+B 事务 `2901d975-2379-4b50-9340-8580786aacc1` 正式更新退出 0、3389.396 秒，独立实际读回退出 0、110.513 秒。实际 payload `a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0` 与 A 的 `d2b90150…` 不同；原 description、PAYP、IM4M 和 envelope 保持。六文件身份及其他五文件内容保持，独立提交审查通过。
+
+B 首次 guest 观察 361.804 秒超时，无 VM target/socket，原失败保留。采样定位宿主 preflight 等待；原固定驱动虽记录 Detach(False)/CLEANUP_DONE，同 amfid95240 实际仍为 SSTOP4/xstatus17、非 traced。严格核对同 PID/path/UID/PPID/start 后仅发 SIGCONT，状态恢复运行，原正式 launch 继续，第四版 guest 系统查询通过。detach 后仍停止原因未查明。补充观察使用新标签 `kernel-v9-plan-b-resumed`，原/新 boot expectations 原始摘要一致；0.355 秒仅为补充观察时间，不是完整启动耗时。742 字节唯一 guest 标记实际创建及 file_get 读回通过，正式停止、清理和独立启动审查通过。
+
+公开回退列表及预览允许明确选择 A 事务 `c0a0a7a8-3677-4a44-aa36-f370bb67b5ca`，旧第八版因缺少回退协议证据拒绝。当前 B 启动及标记后的六文件摘要已冻结，Disk.img 与 B 离线提交摘要不同。正式 `vm rollback-kernel --to-transaction` 正在执行，current desired B 保持；尚未确认回退提交、第三次启动或标记保留。性能[只读分析](evidence/2026-10-13-task8/acceptance/kernel-rollback/performance-analysis.md)已保存；未修改冻结 V9 以降低校验。
+
+
+### 2026-10-14 回退 A 与独立性能工作覆盖状态
+
+第九版公开回退 A 正式提交退出 0（4370.196 秒），独立实际读回（115.825 秒）及第四版 guest 启动通过；目标 A kernel 的 IMG4/IM4P/payload/119 条记录匹配，live desired B 保持。原 tmp 标记回退后 file_get 返回 ENOENT，数据保留验收未通过，原因未查明。新 Documents 标记已显式 sync 并同实例实际读回，正式停止及清理通过；停机落盘和跨回退保持仍待验证。旧失败证据保留。amfid 残留停止问题单独跟踪，回退 A 后实测已运行且未发送恢复信号。
+
+用户授权独立优化工件先增加分项计时，再验证 capture/validate 的约 1 MiB 读取等价性和收益。冻结 V9、原 Task 8 工件及 AMFI 范围保持，不热替换、不在验收磁盘运行竞争性基准。SHA 合并、摘要/比较融合和 metadata 重验跳过均后置单独设计审查，不预先认定语义等价。见 `research/evidence/2026-10-14-kernel-io-performance/execution.md`。保留现有未提交修改，未提交 Git。
+
+### 2026-10-14 独立 I/O 优化验证结果
+
+仅在独立副本增加 opt-in 分项计时并将 capture/validate 底层读取改为 1 MiB，内存仍按 4096 字节比较。持久块、发布/恢复/写入/sync 代码段保持；没有新增内核指令补丁。尾部增长回归实际 RED 后补齐 EOF 检查；10 项读取、7 项差异/恢复、9 项计时器和 4 个内存子操作通过。更新/回退定向测试实际通过 18 项，真实 fixture 跳过 2 项。
+
+三版本 24 次独立合成调用全部通过，预热 6 次排除。512 MiB+3 字节、暖缓存、三次计入测量中，完整 capture 中位数 1.908→1.661 秒（减少 12.9%）、validate 1.369→0.722 秒（减少 47.3%），相对未计时基线。范围不覆盖完整 64 GiB 发布或真实 VM，不外推全程加速与 SHA 占比。见 [performance-results.md](evidence/2026-10-14-kernel-io-performance/performance-results.md)。冻结 V9 未替换；Task 8 的旧数据标记失败和 amfid 停止继续分别记录，原因未查明。
+
+
+### 2026-10-14 Documents 停机重启及跨回退验收结果
+
+新 Documents 标记的两项持久性检查均通过：同 A 内核正式停机重启后读取原标记；再通过冻结 V9 的公开 `rollback-kernel` 回退到历史 B 并由第四版 VM 启动后读取原标记。两次实际内容均与原创建的 1254 字节一致，SHA-256 `a8faa4e5b805fd5a0ee0f8330296d168bb85f33c674748595d176df3714e418e`；未重新创建标记。
+
+新回退事务 `0d6d197a-8b24-4944-bb38-16a60ed24fb0` 正式提交退出 0（4283.968 秒），schema 4、49/49 块、pending=false；目标历史 B 为 `2901d975-2379-4b50-9340-8580786aacc1`。独立实际 Preboot 读回退出 0（108.183 秒），B 的 IMG4/IM4P/payload、120 条记录、原 description/PAYP/IM4M/envelope 保持。live desired B 保持。第四版 guest 系统查询、正式优雅停机及清理通过。完整保存证据关联校验 `task8-final-documents-persistence.json` 通过；冻结 V9 的 16 源文件和已安装 CLI、第四版 CLI/VM 摘要保持。
+
+旧 tmp 标记 ENOENT 失败记录和摘要保留，原因未查明。新结果仅建立这个 Documents 标记的持久性，不证明全部用户文件内容一致。旧失败汇总工具未改写或提升为通过。第一次 B 启动观察的证据文件权限失败、所有者修正及停机短标签的逐字节归档说明均保留。amfid 停止问题单独跟踪，原因未查明；本轮两次 preflight 均为 0，未运行临时驱动或发送 amfid 信号。AMFI 授权范围保持，优化不合入，保留现有未提交修改，未提交 Git，未推进 Task 9/10。
+
+详见 `research/evidence/2026-10-13-task8/acceptance/documents-persistence.md` 及同目录 `amfid-stop-tracking.md`。前述历史待完成和失败状态保留为当时证据。
+
+
+### 2026-10-14 已验证 I/O 优化合入源码
+
+按用户本轮授权，将独立工件的 opt-in 分项计时和 capture/validate 约 1 MiB 读取合入当前源码。16 个非 Package 文件逐字节匹配已验证工件，完整生产 Package 仅新增计时 target/依赖；内存仍逐 4 KiB 比较，短读/EINTR/EOF、pending、外部修改拒绝、内存及恢复回归通过。原 SHA 次数、资格校验、4 KiB 持久块和同步顺序保持。没有新增内核指令补丁。
+
+相关合成回归：XCTest 28 通过/3 跳过，Swift Testing 主组128通过/2真实fixture跳过，补充封装/DSC/效果/读回组7通过/2真实fixture跳过；4内存子操作实际通过。Python Bundle协议7项、trace分析器10项通过。合入二进制显式计时重复4个测试通过，两份trace共13962事件完整；6次capture各5SHA、17次validate各2SHA。未重新测性能，不推算完整64GiB发布或52次SHA耗时占比。
+
+冻结V9归档/候选/安装产物、第四版CLI/VM及266份旧证据摘要保持，原证据树1181项元数据保持。原V9的16份源码另存精确快照；本轮只修改当前源码，不重建/安装/热替换冻结产物，不操作VM或AMFI。863个其他既有源码/测试摘要保持，现有未提交修改保留。其他优化继续后置，旧tmp标记失败和amfid停止原因仍未查明。独立审查及具体回归见 `research/evidence/2026-10-14-kernel-io-integration/README.md`。未提交Git。
+
+### 2026-10-14 内核 I/O 第二、三项优化
+
+第二项局部合并 kernelUpdate 候选摘要比较与 kernelMount 挂载前 SHA，published 单次整盘 SHA 由 5 次降至 4 次，candidate 回调由 3 次降至 2 次。保留事务入口、尾部、来源、计划、report、binding 及 metadata 循环校验。没有实现 published 5→2；任意并发修改后恢复的所有时间窗口与旧实现等价，尚未证明。
+
+第三项将 capture 的两份备份 SHA 与 4 KiB 差异比较融合为同步后的 1 MiB 双流扫描。仍计算 5 次完整 SHA，显式逻辑读取由 7 倍镜像长度降至 5 倍，不含复制内部 I/O。源文件初始 SHA、扫描后的 live disk SHA、文件类型/单链接/路径关联/长度/时间检查保持；比较扫描移至同步后。发布、反向恢复、写块及同步实现保持。没有新增内核指令补丁。
+
+最终定向 XCTest 35 项实际通过、1 项内存子进程入口跳过，4 个内存子操作通过；Swift Testing 28 项实际通过、2 项真实 fixture 跳过。补充事务/来源/generation/receipt 回归 63 项通过；新增 7 项 XCTest 在最终版本再次通过。detach 后来源复核期间的未知磁盘修改被事务尾部 SHA 拒绝，恢复拒绝覆盖该字节。动态 trace 核对 6 次 candidate 各 2 次 SHA、18 次 published 各 4 次 SHA；16 MiB+3 字节 capture 的 3 次独立 SHA、2 次融合 SHA 和 5 倍逻辑读取通过。未执行对照性能基准，不推算完整发布加速。
+
+266 个冻结证据文件和 3 个已安装可执行文件摘要保持。仅修改工作区源码及测试，未提交或安装，未操作 VM、真实挂载或 AMFI。具体范围、失败记录、实际回归与计数见 [第二、三项结果](evidence/2026-10-14-kernel-io-fusion/results.md)。metadata 重验删减和 generation 验证复用仍未实施。
+
+### 2026-10-14 第二、三项隔离对照性能基准
+
+四份相同参数 release 产物分别为保留第 1 项的基线、仅第 2 项、仅第 3 项和组合版。使用完整写入的 512 MiB+3 字节暖缓存合成文件，新 XCTest 进程按四轮平衡顺序执行；40 次调用全部退出 0，8 次预热排除、32 次计入。此前 8 次小输入校验通过，5 项测量协议拒绝回归通过。四版只在 KernelDisk、KernelMount、KernelUpdate 三个生产文件按预定因素变化；工作区生产算法保持。
+
+仅第 2 项的 6 次 published 校验累计中位数 8.002→6.482 秒（减少 19.0%），2 次 candidate 累计 1.625→1.103 秒（减少 32.1%）；此项仍为 published 5→4、candidate 3→2 的局部合并。仅第 3 项完整 capture 中位数 1.683→1.439 秒（减少 14.5%），SHA 计算仍为 5 次，显式逻辑读取由 7 倍降至 5 倍。其一次 1.832 秒测量保留，原因未查明。
+
+组合版合成 publish helper 中位数 14.504→12.576 秒（减少 13.3%），略高于仅第二项版本的 12.526 秒。各比例对应不同范围，不能相加；未建立叠加收益结论。合成发布使用实际 publish/verifyOrigin 和模拟 producer/卷工具，模拟挂载仅读首个 4 KiB。prepare、文件生成和最终独立 SHA 读回在计时范围外。所有输入/输出摘要、块偏移、metadata、SHA 次数/字节、同步顺序和 trace 完整性通过动态核对；自动复核重新计算四轮统计，通过。结果不表示完整更新、真实 VM 或 64 GiB 镜像的加速比例。
+
+266 个冻结证据文件、3 个已安装可执行文件和 16 个冻结 V9 源码快照摘要保持；文档更新前 1134 个既有源码/测试/脚本/文档摘要保持。未操作 VM、真实挂载、AMFI 或验收镜像，未安装或提交。全部范围、最小值/最大值、原始记录及源码/产物摘要见[隔离对照结果](evidence/2026-10-14-kernel-io-factorial/performance-results.md)。
+
+
+## 2026-10-15：8a75092 声明与 IcliKit 适配
+
+固定上游目标为 `8a75092013eda87a4e30ed029b72028cb9279ac4`。声明从 141 项变为 148 项：140 个原 ID 的声明元数据不变，ProMotion 发布 ID 更名，新增 7 项。保留 140 项本地 declaration/五模式适用性和 11 项 local-only；新增能力仍为 notImplemented，不据上游预设扩大执行范围。
+
+`kernel-exp-display_refresh_120hz` 映射到 `kernel-cfw-display_promotion`，显式开关意图保留，重复/矛盾 alias 拒绝。本地 ProMotion 默认关闭，当前没有授权该声明执行的实现。当前目标绑定使用 catalog 唯一目标；旧目标日志只在通过原内容与身份核验后用于恢复，不取得新执行资格。
+
+IcliKit 固定到 `0.8.5 / 815ef234df5461b8eb9455931d38cb1c37992fe6`，原 B22 JPEG 独立 bitmap 复制 overlay 重新绑定并校验源/补丁摘要。Release iOS 候选构建、签名、架构、部署目标、依赖与权限校验通过，未安装或激活。没有新增 kernel、DSC 或 Mach-O 指令补丁，没有执行固件比较或 VM 验收；同 ID 的上游实现变化仍需后续单独审查。
+
+详细来源、适用性、默认值、相关验证与保留的全量失败记录见 [T08/T09 本轮记录](upstream_integration_2026-10-15/T08_T09_adaptation.md)。

@@ -1,0 +1,758 @@
+diff --git a/Research/Guest/signin_and_vm_feature_hiding.md b/Research/Guest/signin_and_vm_feature_hiding.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..447dad85f532f968193ee27e5712cfaf5bbfbfda
+--- /dev/null
++++ b/Research/Guest/signin_and_vm_feature_hiding.md
+@@ -0,0 +1,230 @@
++# Hiding Apple-ID sign-in surfaces and VM-unavailable features
++
++Feasibility study (2026-10-07) on an iOS 27.0 guest (iPhone17,3, 24A435), never
++signed in, no Apple ID. Two questions:
++
++1. Can every Apple-ID / iCloud sign-in surface across the system apps be hidden?
++2. For features the VM does not provide, can the matching Settings entry be hidden?
++
++Static analysis of the 27.0 dyld shared cache
++(`/private/tmp/va-analysis/dsc27/24A435__iPhone17,3/dyld_shared_cache_arm64e`),
++app binaries extracted from the IPSW, `Preferences.bin`, and the guest device
++tree. Companion to `settings_app_row_hiding.md` (the SwiftUI Settings-row binary
++patch, a separate work-stream) and `post_setup_signin_and_appstore.md`.
++
++## The one finding that shapes everything: ENTRY ≠ SHEET
++
++The sign-in **sheet** (the credential UI) is drawn **out of process** by remote
++view-service apps (`AuthKitUIService.app`, `AppleIDSetupUIService.app`,
++`AAUIViewService.app`, `AMSUIAuthenticationViewService`, `StoreKitUIService.app`,
++`GameCenterUIService.app`). An app only hosts it. So:
++
++- **Suppressing the shared sign-in machinery kills the *sheet*** — tapping any
++  "Sign in" does nothing — **but does not remove the *entry* banner/cell** the
++  app itself draws. The banner stays; it just becomes inert.
++- **Removing the entry** (the banner/row the user sees) is per-app work, except
++  where the entry *is* an embedded shared controller (Settings' Apple-Account
++  card; the App Store account tab) — those vanish with the sheet hook.
++
++And there are **two independent shared sheet paths**, not one:
++
++| Path | Frameworks | Used by |
++| --- | --- | --- |
++| Apple-ID / iCloud | AuthKit, AuthKitUI, AppleAccountUI (`AAUISignInController`, `AKAppleIDAuthenticationController`, `AKTapToSignInViewController`) | Settings card, Find My, Fitness, Freeform, Home, FaceTime, Mail(iCloud), Game Center |
++| **Media & Purchases (store)** | **`AMSUIAuthenticationViewService` + `StoreKitUIService`** (brokered by StoreKit) | **Music, TV, Podcasts, Books, App Store, iTunes Store, News** |
++
++A hook that only covers AuthKit/AppleAccountUI **misses the "Sign in to iTunes
++Store / Media & Purchases" sheet** — the store path needs its own hook.
++
++## Sign-in SHEET suppression — BUILT and verified (`libsigninfix.dylib`)
++
++Shipped as `libsigninfix.dylib` (`VPhoneGuestComponents/SignInFix/libsigninfix.m`),
++loaded by SystemHook into **app processes only** (`vpIsAppPath`, never daemons, so
++background AuthKit auth is untouched); wired into `VPhoneGuestEnvironment.libraries`,
++`GuestAPI+Environment.environmentLibraries`, `StageBundle.sh` and `ValidateBundle.sh`
++like the other hook dylibs. Resolves every class+selector by name at load (the
++`libhapticsfix` pattern); re-runs on `_dyld_register_func_for_add_image` so the
++lazily-loaded frameworks (AuthKitUI, AppleIDSetupUI, GameCenterUI, AMSUI) get
++hooked when they map. Verified on `signintest-iphone27` (iOS 27.0, iPhone17,3).
++
++**The iOS 27 reality that the earlier plan got wrong.** The Settings "Apple
++Account" card does **not** present a plain ObjC `AAUISignInController`, and
++`prepareInViewController:completion:` is **not** the seam. Tapping the card
++presents a **SwiftUI `.sheet`**: a `_TtGC7SwiftUI29PresentationHostingControllerVS_7AnyView_`
++is presented through the normal UIKit present funnels, and the real controller —
++`AppleIDSetupUI.SignInOptionsViewController` (the "Choose the method to sign
++in… / Use Another Apple Device / Sign in Manually" chooser), wrapped by
++`AppleIDSetupUI.NavigationControllerReader.Reader<…SignInOptionsViewWrapper…>` —
++is a **SwiftUI-hosted child that is not attached to the host when `present:` is
++called**. So a present-time block sees only the opaque `AnyView` host and cannot
++decide. (Confirmed by logging all present funnels + `loadViewIfNeeded`: the host
++always logged "pass".)
++
++iOS 27's UIKit present funnels, for reference (from a runtime
++`class_copyMethodList` dump): the public `presentViewController:animated:completion:`
++→ `_presentViewController:animated:completion:` →
++`_presentViewController:withAnimationController:completion:` → the lowest funnel
++`_presentViewController:modalSourceViewController:presentationController:animationController:interactionController:handoffData:completion:`.
++(The older guessed `_presentViewController:withAnimationController:interactionController:completion:`
++does **not** exist on 27.)
++
++**What the dylib actually does (two seams):**
++
++| Hook | Covers |
++| --- | --- |
++| swizzle `-[UIViewController presentViewController:animated:completion:]` **and** the lowest funnel `_presentViewController:modalSource…:handoffData:completion:` → drop the present when the presented controller, or a UIKit child one–three levels in, is a sign-in controller | plain-UIKit sign-in sheets: the AuthKitUI `AK*`/`AAUI*` modal controllers, Game Center's `GKSignInViewController` |
++| own-method swizzle `-[AppleIDSetupUI.SignInOptionsViewController viewWillAppear:]` → hide its view, then `dismissViewControllerAnimated:NO` the presenting sheet on the next tick | the Settings SwiftUI "Apple Account" sheet (the present seam can't reach it) |
++| no-op `+[AMSAuthenticationViewServiceLauncher launchWithClientInfo:action:xpcEndpoint:]` | the out-of-process "Media & Purchases" store sheet |
++| no-op `authenticationShowSignInUIForLocalPlayer:origin:dismiss:` on `GKLocalPlayer` and `_TtC12GameCenterUI34LocalPlayerAuthenticationPresenter` | in-game Game Center sign-in (belt; the present seam also catches `GKSignInViewController`) |
++
++Recognition is name-based (`kSignInVCClasses` + strong substrings `SignIn`,
++`AppleIDSetup`, `TapToSignIn`, `DeviceToDevice`, …), so new sign-in classes are
++caught without new addresses. The own-method swizzle uses `class_addMethod`-first
++so it overrides **only** `SignInOptionsViewController`, never a shared superclass.
++
++**Known limitation (characterised, not a bug).** For the SwiftUI Settings sheet
++the block is a *dismiss-as-it-appears*, not a *never-present*: the sheet is torn
++down before it finishes animating in, so a **blank panel flashes** (the content
++view is hidden first, so the sign-in chooser itself is never shown). The
++present-seam block for plain-UIKit sheets *is* a clean never-present.
++
++A truly zero-flicker kill of that one card means **hiding the row**, not blocking
++the sheet — and the lever is **not** an MDM restriction. Live RE (see
++`settings_app_row_hiding.md:30-40`) proved the `primaryAppleAccount` card
++consults **no** ManagedConfiguration feature: on root render Settings queries
++only `allowBluetoothModification` and `allowWritingTools`, never
++account-modification. `allowAccountModification` / `MCFeatureAccountModificationAllowed`
++gates the **Setup Assistant** Apple-ID pane (`setup_assistant_pane_gating.md`),
++not this card, and there is no supervision-free restriction (and no
++`applyRestrictionDictionary:` helper in-repo) that hides it. The card is produced
++by the pure-Swift provider `_TtC11SettingsApp35PrimaryAppleAccountListItemProvider`,
++bound to account availability, not to a restriction. The one lever that cleanly
++removes the row (verified durable across reboot) is the existing **Preferences
++binary patch** `cfw patch-settings-root-rows` (patch `system-preferences-exp-root_rows`,
++`CustomFirmwareSettingsRows.swift`), which forces that provider Optional empty —
++the Settings-row work-stream, not this dylib.
++
++**Store / Game Center hooks — verified present.** On `signintest-iphone27`,
++os_log confirmed the hooks install in the relevant processes:
++`+[AMSAuthenticationViewServiceLauncher launchWithClientInfo:action:xpcEndpoint:]`
++in Settings, Music and Games; and both Game Center seams
++(`-[GKLocalPlayer authenticationShowSignInUIForLocalPlayer:origin:dismiss:]` and
++`-[_TtC12GameCenterUI34LocalPlayerAuthenticationPresenter authenticationShowSignInUIForLocalPlayer:origin:dismiss:]`)
++in the Games app. The interactive store/Game-Center sheets could not be
++force-triggered on a signed-out, content-less guest (the apps do silent
++background token auth and sit in onboarding), but the no-ops are confirmed
++in place and will fire when those methods are invoked. libsigninfix emits one
++`installed …` os_log line per hook per process for this observability.
++
++**What this does and does not do:** it makes the sign-in flows inert guest-wide
++(one small dylib). It does **not** remove the entry banners — see below. There is
++**no** shared "sign-in unavailable" flag to flip to hide banners: they render
++*because* no account exists, and faking an account is disallowed (AuthKit's
++`shieldSignInOrCreateFlows` is age/teen-attestation-specific, not a device "no
++sign-in" switch, and triggers its own replacement UI).
++
++**Deploy on a sealed-APFS guest:** `env.install`/the fast loop live-writes
++`/usr/lib`, but new launches load the sealed snapshot and a reboot reverts the
++live write — so an existing-lib update does **not** take that way. Use
++`vphone-launchpad-cli bundle install-local <bundle> --keep-default` then
++`vphone-launchpad-cli vm set-bundle <vm> <version> --update-environment` (VM
++stopped), which bakes the dylib into the snapshot through the helper.
++
++## Sign-in ENTRY (banner/cell) removal — per-app, uneven
++
++| App | Entry point | Entry UI | How to hide the ENTRY |
++| --- | --- | --- | --- |
++| App Store, TV, FaceTime, Messages, News, iTunes Store, Camera, Home | various | — | **Removable** (the simplest hide; already removed on the guest) |
++| Settings "Apple Account" card | top card | SwiftUI `.sheet` hosting `AppleIDSetupUI.SignInOptionsViewController` (NOT ObjC `AAUISignInController`) | **sheet made inert** by `libsigninfix` (dismiss-as-appears, blank flash); a zero-flicker hide is the Preferences row binary patch `system-preferences-exp-root_rows` (other work-stream) — **not** MDM (the card consults no managed-config feature) |
++| Game Center (in-game) | `GKLocalPlayer.authenticate` sheet | GameCenterUIService (ObjC) | **covered by the sheet hook** |
++| **Mail** | `OBWelcomeController` "Welcome to Mail" → AccountsUI iCloud row | **ObjC/UIKit** | **easy ObjC hook** — swizzle the OBWelcome path or drop iCloud/Apple from the AccountsUI account-type list |
++| **Books** | store "Account / Sign In" cell | **ObjC** `BK*` store controllers | **easy ObjC hook** on the `BK*` controllers |
++| **Find My** | full-screen **sign-in wall on launch** | SwiftUI | **binary patch** — highest value (hard gate), removable |
++| **Fitness** | **iCloud sign-in page on launch** | SwiftUI (FitnessUI) | **binary patch** — highest value (hard gate), removable |
++| Freeform | "Sign in to iCloud to use Freeform" use-gate | SwiftUI | binary patch (removable) |
++| Music | account button + soft "Media & Purchases" prompts | SwiftUI (MusicKit) | binary patch (removable); soft, not a gate |
++| Photos | `SIGN_INTO_ICLOUD` upsell banner (deep-links to Settings) | SwiftUI | binary patch; soft banner |
++| Health | iCloud-sync upsell cell | SwiftUI | binary patch; soft |
++| Podcasts | "View Apple Account" cell | SwiftUI | binary patch (removable); soft |
++| Wallet | — (no Apple-ID sign-in banner; only Apple-Pay onboarding) | ObjC thin | **nothing to hide** |
++| Camera | — (no Apple-ID entry at all) | — | nothing to hide |
++
++**Net for entries:** 8 apps handled by *removal*; 2 (Settings card, Game Center)
++by the sheet hook / Settings patch; Wallet/Camera have none; the real per-app
++work is **2 easy ObjC swizzles (Mail, Books)** and **7 SwiftUI binary patches**,
++of which **Find My and Fitness** are the only hard launch gates (do these first
++if the SwiftUI route is pursued).
++
++## VM-unavailable features → Settings rows
++
++**The lever is the device tree, not `libmisfix`.** `libmisfix` is not injected
++into Settings, and dyld `__interpose` does not reach MobileGestalt calls made
++from inside the shared cache (where the `SettingsApp` providers run). Instead,
++the guest's device-tree `/product` leaves hardware properties as `syscfg/xxxx`
++placeholders, **MobileGestalt reads a placeholder as absent**, and Settings'
++`gestalt` visibility rules drop the row for free. This already works and is
++maintained by the `cfw` device-tree patchers (`DeviceTreeGuestDevicePatches.swift`,
++`CustomFirmwarePostRestoreDeviceTree.swift`). Settings' rule kinds (from
++`Preferences.bin` `SettingsSidebarListItemVisibilityRule`): `gestalt`,
++`biometricKitIsUnavailable`, `restrictedByManagedConfigurationFeature`,
++`applicationRestricted`, `featureFlag`, `boolean`, `pluginExists`, `sharedPad`,
++`personaEnrollmentIsDisabled`.
++
++Guest hardware (live device tree): present = `bluetooth`, `sep`, `isp`/`ispRtb`;
++**absent** = baseband/modem, NFC/stockholm, UWB/Rose, wifi-chipset, biometric
++(Pearl/Mesa).
++
++| Feature | Settings row | Status | Action |
++| --- | --- | --- | --- |
++| Cellular / mobile data | `com.apple.settings.cellular` | **already hidden** (no baseband) | none |
++| Personal Hotspot | `com.apple.settings.personalHotspot` | **already hidden** | none |
++| Carrier / SIM / eSIM | (under Cellular) | **already hidden** | none |
++| Satellite / SOS-via-satellite | `com.apple.settings.satellite` | **already hidden** | none (Emergency SOS root row stays — baseline) |
++| Face ID / Touch ID | `com.apple.settings.passcodeAndBiometrics` | biometric content **auto-gone** (`biometricKitIsUnavailable` → row reads "Passcode") | none (passcode-set is infeasible anyway) |
++| NFC / UWB / True Tone / ProMotion / System Haptics | sub-content of various rows | **already absent** | none |
++| **Bluetooth** | `com.apple.settings.bluetooth` | **shows** (baseline row, no "no-BT-hw" gate) | **MDM restriction** (`restrictedByManagedConfigurationFeature`) or binary patch |
++| **Camera** | `com.apple.settings.camera` | **shows** (device-class cap present) | MDM restriction, or `devicetree-cfw-arm_io_isp_*camera*` caps, or binary patch |
++| **AirDrop** | `com.apple.settings.general.airDrop` | **shows** | **MDM restriction** `allowAirDrop` (clean) or binary patch |
++| **AirPlay & Continuity** | `…general.airPlayAndContinuity` | **shows** | binary patch / restriction |
++| **CarPlay** | `com.apple.settings.general.carPlay` | **shows** | binary patch / restriction |
++| Apple Account / iCloud / Wallet & Apple Pay / Game Center / Software Update | account/service rows | **show** (no hardware gate) | **the Settings SwiftUI row patch** (`settings_app_row_hiding.md`, other work-stream) |
++| Wi-Fi, Ethernet | `…wifi` / `…ethernet` | show | **do not hide** — networking is functional (virtio-net surfaces here) |
++| Emergency SOS, Sounds & Haptics, Passcode | baseline rows | show | do not hide (only their hardware sub-content is/should be suppressed) |
++
++**Clean wins (no work):** cellular, hotspot, carrier, satellite, biometric
++content — already auto-hidden by the device-tree capability-absent mechanism;
++just keep the device-tree patcher from ever filling those hardware caps.
++**Patch-free next tier:** Bluetooth / Camera / AirDrop via ManagedConfiguration
++restrictions. **Binary-patch tier (other work-stream):** the account/service
++rows and AirPlay/CarPlay.
++
++## Recommended plan
++
++1. **Ship one guest "sign-in suppressor" dylib** (SystemHook `dlopen`, ObjC
++   swizzle) covering **both** shared sheet paths — AuthKit/AppleAccountUI **and**
++   AMSUI/StoreKitUI, plus GameCenterUI. Highest value, lowest cost: every
++   Apple-ID / iCloud / store sign-in flow becomes inert guest-wide. Also fold in
++   the two easy ObjC **entry** hooks (**Mail** `OBWelcomeController`/AccountsUI,
++   **Books** `BK*` controllers) since they live in the same dylib pattern.
++2. **Keep removing the removable apps** (already done) — the cheapest entry hide
++   for App Store, TV, FaceTime, Messages, News, iTunes Store, Camera, Home.
++3. **VM-feature rows:** rely on the existing device-tree capability-absent
++   mechanism (already hides cellular/hotspot/satellite/biometric). Add
++   **ManagedConfiguration restrictions** for Bluetooth / Camera / AirDrop
++   (patch-free). Leave Wi-Fi/Ethernet/Emergency SOS/Passcode.
++4. **SwiftUI entry banners + account/service Settings rows** (Find My, Fitness,
++   Freeform, Music, Photos, Health, Podcasts; Apple Account / iCloud / Wallet /
++   Game Center / Software Update) need **binary patches** — expensive, and the
++   Settings-row half is the separate `settings_app_row_hiding.md` work-stream
++   (now unblocked: Ghidra is installed). Prioritise **Find My + Fitness** (hard
++   launch gates) if the app-side SwiftUI patching is pursued.
++
++## Artifacts / cross-refs
++
++Scratch (read-only research outputs): `/private/tmp/signin-a1/` (AuthKit /
++AuthKitUI / AppleAccountUI / Accounts class dumps + disass), `/private/tmp/signin-a2/`
++(per-app binary classification), `/private/tmp/vmfeat-b/` (ioreg + decoded MG
++cache). Settings-row binary-patch work (separate session): `settings_app_row_hiding.md`,
++`Research/Guest/2026-10-07_reverse-settings-rows-report.md`, `/private/tmp/prefs-audit/`.
++Device-tree capability mechanism: `Research/0_binary_patch_comparison.md`
++§"An iPhone guest's product description from D47AP".
+diff --git a/VPhoneDaemon/Daemon/GuestAPI+Environment.swift b/VPhoneDaemon/Daemon/GuestAPI+Environment.swift
+index ffac3b9b93d680fed9b0844144052a84274283b8..cf660668f67b7d19d3bbe90ef3c65d89c5d500fd 100644
+--- a/VPhoneDaemon/Daemon/GuestAPI+Environment.swift
++++ b/VPhoneDaemon/Daemon/GuestAPI+Environment.swift
+@@ -19,6 +19,8 @@ extension GuestAPI {
+         "libbatteryhealthfix.dylib",
+         "libdevicehubfix.dylib",
+         "libdevicename.dylib",
++        "libprefsfix.dylib",
++        "libsigninfix.dylib",
+     ]
+     static let environmentStaging = "/var/root/Library/Caches/vphone-environment"
+ 
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh b/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
+index 4b880122e483152132de0f403edb776791874edd..5e6b1e900f4ae87c602e0b8f111eff0fde3923f2 100755
+--- a/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
++++ b/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
+@@ -77,6 +77,8 @@ fi
+ /bin/cp "$guest_products/batteryhealthfix/libbatteryhealthfix.dylib" "$guest/libbatteryhealthfix.dylib"
+ /bin/cp "$guest_products/devicehubfix/libdevicehubfix.dylib" "$guest/libdevicehubfix.dylib"
+ /bin/cp "$guest_products/devicename/libdevicename.dylib" "$guest/libdevicename.dylib"
++/bin/cp "$guest_products/prefsfix/libprefsfix.dylib" "$guest/libprefsfix.dylib"
++/bin/cp "$guest_products/signinfix/libsigninfix.dylib" "$guest/libsigninfix.dylib"
+ /bin/cp "$guest_products/gpu/libAppleParavirtCompilerPluginIOGPUFamily.dylib" \
+     "$guest/libAppleParavirtCompilerPluginIOGPUFamily.dylib"
+ # The HAL plugin is a bundle, signed whole by the Makefile; copied as a tree so
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh b/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh
+index fa6b78451dae6b461a1da55269fb1483756027eb..718f4bc34dca2903eac32de6fd53344ca483072b 100755
+--- a/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh
++++ b/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh
+@@ -89,7 +89,7 @@ done
+ 
+ for name in vphoned launchdhook-vphone.dylib SystemHook-vphone.dylib libcamfix.dylib \
+     libvcamcaptured.dylib libmisfix.dylib libhapticsfix.dylib libbatteryhealthfix.dylib libdevicehubfix.dylib libdevicename.dylib \
+-    libAppleParavirtCompilerPluginIOGPUFamily.dylib; do
++    libprefsfix.dylib libsigninfix.dylib libAppleParavirtCompilerPluginIOGPUFamily.dylib; do
+     require_signed_macho "$guest/$name"
+ done
+ for name in vphoned.plist libcamfix.plist libvcamcaptured.plist libmisfix.plist; do
+diff --git a/VPhoneGuestComponents/Makefile b/VPhoneGuestComponents/Makefile
+index 810d6ab72f1cce0a091139252f144778156f1c47..bb03f34f22038e9e483cb8b4eab090952264f42a 100644
+--- a/VPhoneGuestComponents/Makefile
++++ b/VPhoneGuestComponents/Makefile
+@@ -72,6 +72,16 @@ DEVICEHUBFIX_DYNAMIC_LOOKUP_SYMS := \
+ DEVICENAME := $(STAGE)/devicename/libdevicename.dylib
+ DEVICENAME_SOURCES := $(wildcard DeviceName/*.c)
+ DEVICENAME_INCLUDES := $(wildcard DeviceName/*.h)
++# Foundation and the ObjC runtime for the Settings follow-up swizzle; CoreFollowUp
++# is reached through the runtime at runtime, so it needs nothing at link time.
++PREFSFIX := $(STAGE)/prefsfix/libprefsfix.dylib
++PREFSFIX_SOURCES := $(wildcard PrefsFix/*.m PrefsFix/*.c)
++PREFSFIX_INCLUDES := $(wildcard PrefsFix/*.h)
++# Foundation + ObjC runtime for the sign-in presentation swizzles; AppleAccountUI
++# etc. are reached through the runtime at runtime, so nothing is needed at link.
++SIGNINFIX := $(STAGE)/signinfix/libsigninfix.dylib
++SIGNINFIX_SOURCES := $(wildcard SignInFix/*.m SignInFix/*.c)
++SIGNINFIX_INCLUDES := $(wildcard SignInFix/*.h)
+ GPU_PLUGIN := $(STAGE)/gpu/libAppleParavirtCompilerPluginIOGPUFamily.dylib
+ GPU_PLUGIN_SOURCES := $(wildcard GraphicLoader/*.mm)
+ GPU_PLUGIN_INCLUDES := $(wildcard GraphicLoader/*.h GraphicLoader/*.hpp GraphicLoader/*.inc)
+@@ -105,7 +115,7 @@ GPU_DYNAMIC_LOOKUP_SYMS := \
+ VIRTIOSOUND := $(STAGE)/virtiosound/VPhoneVirtIOSound.driver
+ VIRTIOSOUND_SOURCES := $(wildcard VirtIOSound/*.m VirtIOSound/*.c)
+ VIRTIOSOUND_INCLUDES := $(wildcard VirtIOSound/*.h) VirtIOSound/Info.plist VirtIOSound/AudioServerDriver.tbd
+-ARTIFACTS := $(CAMFIX) $(VCAMCAPTURED) $(LAUNCHHOOK) $(SYSTEMHOOK) $(MISFIX) $(HAPTICSFIX) $(BATTERYHEALTHFIX) $(DEVICEHUBFIX) $(DEVICENAME) $(GPU_PLUGIN) $(VIRTIOSOUND)
++ARTIFACTS := $(CAMFIX) $(VCAMCAPTURED) $(LAUNCHHOOK) $(SYSTEMHOOK) $(MISFIX) $(HAPTICSFIX) $(BATTERYHEALTHFIX) $(DEVICEHUBFIX) $(DEVICENAME) $(PREFSFIX) $(SIGNINFIX) $(GPU_PLUGIN) $(VIRTIOSOUND)
+ PLISTS := $(STAGE)/camfix/libcamfix.plist $(STAGE)/vcamcaptured/libvcamcaptured.plist \
+ 	$(STAGE)/misfix/libmisfix.plist
+ GPU_PROVENANCE := $(STAGE)/gpu/README.md
+@@ -120,7 +130,7 @@ gpu: $(GPU_PLUGIN)
+ 
+ package: all
+ 	@rm -f $(ARCHIVE)
+-	@/usr/bin/tar -cf $(ARCHIVE) -C $(STAGE) camfix vcamcaptured launchhook systemhook misfix hapticsfix batteryhealthfix devicehubfix devicename gpu virtiosound
++	@/usr/bin/tar -cf $(ARCHIVE) -C $(STAGE) camfix vcamcaptured launchhook systemhook misfix hapticsfix batteryhealthfix devicehubfix devicename prefsfix signinfix gpu virtiosound
+ 	@echo "Packaged $(ARCHIVE)"
+ 
+ test-loader-links:
+@@ -180,7 +190,7 @@ test-vcam-dataplane:
+ 		-framework CoreGraphics
+ 	@$(OUT)/VCamDataPlaneTests
+ 
+-$(STAGE)/camfix $(STAGE)/vcamcaptured $(STAGE)/launchhook $(STAGE)/systemhook $(STAGE)/misfix $(STAGE)/hapticsfix $(STAGE)/batteryhealthfix $(STAGE)/devicehubfix $(STAGE)/devicename $(STAGE)/gpu $(STAGE)/virtiosound:
++$(STAGE)/camfix $(STAGE)/vcamcaptured $(STAGE)/launchhook $(STAGE)/systemhook $(STAGE)/misfix $(STAGE)/hapticsfix $(STAGE)/batteryhealthfix $(STAGE)/devicehubfix $(STAGE)/devicename $(STAGE)/prefsfix $(STAGE)/signinfix $(STAGE)/gpu $(STAGE)/virtiosound:
+ 	@mkdir -p $@
+ 
+ $(CAMFIX): $(CAMFIX_SOURCES) $(CAMFIX_INPUTS) | $(STAGE)/camfix
+@@ -251,6 +261,22 @@ $(DEVICENAME): $(DEVICENAME_SOURCES) $(DEVICENAME_INCLUDES) DeviceName | $(STAGE
+ 		-Wl,-not_for_dyld_shared_cache
+ 	@codesign --force --sign - $@
+ 
++$(PREFSFIX): $(PREFSFIX_SOURCES) $(PREFSFIX_INCLUDES) PrefsFix | $(STAGE)/prefsfix
++	$(CLANG) $(COMMON_FLAGS) -dynamiclib \
++		-install_name /usr/lib/libprefsfix.dylib \
++		-o $@ $(PREFSFIX_SOURCES) \
++		-framework Foundation -lobjc \
++		-Wl,-not_for_dyld_shared_cache
++	@codesign --force --sign - $@
++
++$(SIGNINFIX): $(SIGNINFIX_SOURCES) $(SIGNINFIX_INCLUDES) SignInFix | $(STAGE)/signinfix
++	$(CLANG) $(COMMON_FLAGS) -dynamiclib \
++		-install_name /usr/lib/libsigninfix.dylib \
++		-o $@ $(SIGNINFIX_SOURCES) \
++		-framework Foundation -lobjc \
++		-Wl,-not_for_dyld_shared_cache
++	@codesign --force --sign - $@
++
+ $(STAGE)/misfix/libmisfix.plist: MISFix/libmisfix.plist | $(STAGE)/misfix
+ 	@cp $< $@
+ 
+diff --git a/VPhoneGuestComponents/PrefsFix/libprefsfix.m b/VPhoneGuestComponents/PrefsFix/libprefsfix.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..0a88f1a28ad16e4b8f9a4f4e7888b24161d32b4e
+--- /dev/null
++++ b/VPhoneGuestComponents/PrefsFix/libprefsfix.m
+@@ -0,0 +1,83 @@
++// libprefsfix.m — hide the CoreFollowUp suggestion/upsell groups in Settings.
++//
++// A research guest has no Apple account, so the follow-up "suggestions" Settings
++// surfaces are all sign-in / purchase / upsell prompts: "Apple Account
++// Suggestions" (`com.apple.followup.group.account`), "Services Included with
++// Purchase" (`.services`), "Add AppleCare Coverage" (`.ndo`), "More for Your
++// iPhone" (`.device`), "Updates to Your Screen Time" (`.screentime`). They are
++// driven by CoreFollowUp, which Settings reads through the category method
++// -[FLTopLevelViewModel sapp_groupsWithQueue:completion:] ("FL" = FollowUp).
++//
++// This hook swizzles that method and forwards an empty group array to Settings'
++// completion, so none of the follow-up groups are shown. Settings' own root
++// list (account banner, General, …) is built by the SwiftUI SettingsApp module
++// and is untouched by this — see Research/Guest/settings_app_row_hiding.md.
++//
++// SystemHook dlopens this into com.apple.Preferences only (vpIsPreferences),
++// the same route it uses for libhapticsfix in SpringBoard. It swizzles rather
++// than interposes, because Preferences' framework classes live in the dyld
++// shared cache, which dyld interposing does not rebind.
++
++#import <Foundation/Foundation.h>
++#import <objc/runtime.h>
++#import <os/log.h>
++#import <dlfcn.h>
++#include <mach-o/dyld.h>
++
++#define VP_CORE_FOLLOWUP \
++    "/System/Library/PrivateFrameworks/CoreFollowUp.framework/CoreFollowUp"
++
++static void vpLog(NSString *message) {
++    os_log(OS_LOG_DEFAULT, "VPPrefsFix %{public}s", message.UTF8String ?: "(nil)");
++}
++
++typedef void (*VPGroupsIMP)(id, SEL, id, id);
++static VPGroupsIMP vpOriginalGroups = NULL;
++
++// Settings asks the FollowUp model for its groups, then renders them. Forward an
++// empty array to the completion so no follow-up group reaches the UI. The
++// original is still called so the model runs its own work unchanged.
++static void vpHiddenGroups(id self, SEL _cmd, id queue, id completion) {
++    void (^forward)(id) = completion;
++    void (^wrapper)(id) = ^(id groups) {
++        if (forward)
++            forward(@[]);
++    };
++    if (vpOriginalGroups)
++        vpOriginalGroups(self, _cmd, queue, wrapper);
++}
++
++static void vpInstall(void) {
++    if (vpOriginalGroups)
++        return;
++    Class model = objc_getClass("FLTopLevelViewModel");
++    if (!model)
++        return;
++    SEL selector = sel_registerName("sapp_groupsWithQueue:completion:");
++    Method method = class_getInstanceMethod(model, selector);
++    if (!method) {
++        vpLog(@"sapp_groupsWithQueue:completion: not found");
++        return;
++    }
++    vpOriginalGroups = (VPGroupsIMP)method_getImplementation(method);
++    method_setImplementation(method, (IMP)vpHiddenGroups);
++    vpLog(@"follow-up groups hidden");
++}
++
++// CoreFollowUp may not be loaded yet when the constructor runs; install when its
++// class appears.
++static void vpImageAdded(const struct mach_header *header, intptr_t slide) {
++    (void)header;
++    (void)slide;
++    if (!vpOriginalGroups && objc_getClass("FLTopLevelViewModel"))
++        vpInstall();
++}
++
++__attribute__((constructor)) static void vpInitialize(void) {
++    dlopen(VP_CORE_FOLLOWUP, RTLD_LAZY | RTLD_LOCAL);
++    vpInstall();
++    if (!vpOriginalGroups)
++        _dyld_register_func_for_add_image(vpImageAdded);
++}
++
++int vphone_prefsfix_version(void) { return 1; }
+diff --git a/VPhoneGuestComponents/SignInFix/libsigninfix.m b/VPhoneGuestComponents/SignInFix/libsigninfix.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..b772c677f87556a2190bac5da5ec57d8b494d927
+--- /dev/null
++++ b/VPhoneGuestComponents/SignInFix/libsigninfix.m
+@@ -0,0 +1,254 @@
++// libsigninfix.m — suppress Apple-ID / iCloud / store sign-in *sheets* on a
++// research guest that has no Apple account.
++//
++// Two kinds of sign-in UI exist, and each needs its own seam:
++//
++//  1. Plain-UIKit sign-in controllers presented modally (the AuthKitUI sign-in
++//     controllers, Game Center's GKSignInViewController, …). We swizzle the
++//     public present and the lowest UIKit modal funnel and DROP the present when
++//     the presented controller — or a controller nested one or two levels inside
++//     it — is a sign-in controller.
++//
++//  2. The Settings "Apple Account" sheet, which on iOS 27 is a SwiftUI `.sheet`:
++//     a _TtGC7SwiftUI29PresentationHostingcontrollerVS_7AnyView_ is presented,
++//     and the real controller, AppleIDSetupUI.SignInOptionsViewController, is a
++//     SwiftUI-hosted child that is NOT attached when present: is called, so the
++//     present seam above cannot see it. For this one we hook the controller's
++//     own -viewWillAppear:, hide its view and dismiss the sheet its presenter
++//     put up. (The sheet is dismissed before it finishes animating in; what
++//     shows is a blank panel, not the sign-in chooser.)
++//
++//  3. The store "Media & Purchases" sheet is spawned out of process by a view
++//     service launcher, which we no-op.
++//
++// Nothing here touches account state or fakes a signed-in account, and it does
++// NOT remove the entry banners (they render because no account exists). See
++// Research/Guest/signin_and_vm_feature_hiding.md for the full map.
++//
++// SCOPE: loaded by SystemHook into app processes only (vpIsAppPath), NOT
++// daemons, so background AuthKit auth is untouched.
++
++#import <Foundation/Foundation.h>
++#import <objc/runtime.h>
++#import <objc/message.h>
++#import <dlfcn.h>
++#import <os/log.h>
++#include <mach-o/dyld.h>
++
++static void vpLog(NSString *message) {
++    os_log(OS_LOG_DEFAULT, "VPSignInFix %{public}s", message.UTF8String ?: "(nil)");
++}
++
++static NSString *vpClassName(id obj) { return obj ? NSStringFromClass([obj class]) : @"nil"; }
++
++// MARK: - sign-in controller recognition
++
++// Plain-UIKit sign-in controllers to block when presented.
++static const char *const kSignInVCClasses[] = {
++    "AAUISignInController", "AAUIServiceSignInController", "AAUIOnboardingSignInController",
++    "AKModalSignInViewController", "AKSignInViewController", "AKBaseSignInViewController",
++    "AKAppleIDSetupViewController", "AKTapToSignInViewController",
++    "GKSignInViewController", "GKHostedAuthenticateViewController", NULL,
++};
++
++// High-confidence class-name substrings: a controller whose class name contains
++// one of these is a sign-in surface even when it is not in the list above (the
++// exact class varies by iOS).
++static BOOL vpNameStrongSignIn(NSString *name) {
++    if (!name) return NO;
++    static NSArray *needles;
++    static dispatch_once_t once;
++    dispatch_once(&once, ^{
++        needles = @[ @"SignIn", @"AppleIDSetup", @"TapToSignIn", @"AppleAccountSignIn",
++                     @"AppleAccountSetup", @"DeviceToDevice", @"AppleIDLogin", @"iCloudLogin" ];
++    });
++    for (NSString *n in needles)
++        if ([name rangeOfString:n].location != NSNotFound) return YES;
++    return NO;
++}
++
++static BOOL vpVCMatches(id vc) {
++    if (!vc) return NO;
++    for (int i = 0; kSignInVCClasses[i]; i++) {
++        Class c = objc_getClass(kSignInVCClasses[i]);
++        if (c && [vc isKindOfClass:c]) return YES;
++    }
++    return vpNameStrongSignIn(NSStringFromClass([vc class]));
++}
++
++// A presented sign-in controller is often wrapped in a navigation/container
++// controller; check the controller and a couple of levels of children it has
++// already attached (UIKit nav/tab children, not SwiftUI-hosted ones).
++static BOOL vpIsSignInVC(id vc, int depth) {
++    if (!vc || depth > 3) return NO;
++    if (vpVCMatches(vc)) return YES;
++    SEL lists[] = { @selector(children), @selector(viewControllers) };
++    for (unsigned i = 0; i < 2; i++) {
++        if (![vc respondsToSelector:lists[i]]) continue;
++        id kids = ((id (*)(id, SEL))objc_msgSend)(vc, lists[i]);
++        if ([kids isKindOfClass:[NSArray class]])
++            for (id child in (NSArray *)kids)
++                if (vpIsSignInVC(child, depth + 1)) return YES;
++    }
++    return NO;
++}
++
++// MARK: - UIViewController presentViewController:animated:completion: (public)
++typedef void (*VPPresentIMP)(id, SEL, id, BOOL, id);
++static VPPresentIMP gPresentOrig = NULL;
++static int gPresent = 0;
++static void vp_present(id self, SEL _cmd, id vc, BOOL animated, id completion) {
++    if (vpIsSignInVC(vc, 0)) {
++        vpLog([NSString stringWithFormat:@"blocked present %@", vpClassName(vc)]);
++        if (completion) { void (^c)(void) = completion; c(); }
++        return;
++    }
++    if (gPresentOrig) gPresentOrig(self, _cmd, vc, animated, completion);
++}
++
++// MARK: - the lowest iOS 27 modal funnel, for presents that bypass the public
++// entry. _presentViewController:modalSourceViewController:presentationController:
++//   animationController:interactionController:handoffData:completion:
++typedef void (*VPPresentFunnelIMP)(id, SEL, id, id, id, id, id, id, id);
++static VPPresentFunnelIMP gPresentFunnelOrig = NULL;
++static int gPresentFunnel = 0;
++static void vp_presentFunnel(id self, SEL _cmd, id vc, id modalSource, id presentationController,
++                             id anim, id interaction, id handoffData, id completion) {
++    if (vpIsSignInVC(vc, 0)) {
++        vpLog([NSString stringWithFormat:@"blocked present(funnel) %@", vpClassName(vc)]);
++        if (completion) { void (^c)(void) = completion; c(); }
++        return;
++    }
++    if (gPresentFunnelOrig)
++        gPresentFunnelOrig(self, _cmd, vc, modalSource, presentationController, anim,
++                           interaction, handoffData, completion);
++}
++
++// MARK: - the Settings SwiftUI "Apple Account" sheet. Its content controller is
++// AppleIDSetupUI.SignInOptionsViewController, hosted inside a SwiftUI sheet and
++// not reachable at present: time, so we dismiss it as it is about to appear.
++typedef void (*VPWillAppearIMP)(id, SEL, BOOL);
++static VPWillAppearIMP gSignInWillAppearOrig = NULL;
++static int gSignInWillAppear = 0;
++static void vp_signinWillAppear(id self, SEL _cmd, BOOL animated) {
++    vpLog([NSString stringWithFormat:@"dismissing %@", vpClassName(self)]);
++    // Hide the content before it is drawn, so the sheet that briefly slides in
++    // while we dismiss is a blank panel, not the sign-in chooser.
++    @try {
++        id view = ((id (*)(id, SEL))objc_msgSend)(self, @selector(viewIfLoaded));
++        if (view) ((void (*)(id, SEL, BOOL))objc_msgSend)(view, @selector(setHidden:), YES);
++    } @catch (__unused NSException *e) {}
++    if (gSignInWillAppearOrig) gSignInWillAppearOrig(self, _cmd, animated);
++    id presenting = ((id (*)(id, SEL))objc_msgSend)(self, @selector(presentingViewController));
++    if (presenting) {
++        dispatch_async(dispatch_get_main_queue(), ^{
++            ((void (*)(id, SEL, BOOL, id))objc_msgSend)(
++                presenting, @selector(dismissViewControllerAnimated:completion:), NO, nil);
++        });
++    }
++}
++
++// MARK: - AppleMediaServices: the out-of-process "Media & Purchases" store sheet
++// +[AMSAuthenticationViewServiceLauncher launchWithClientInfo:action:xpcEndpoint:]
++// is the one ObjC class method that spawns the store sign-in sheet app. No-op.
++static id vp_amsLaunchNoop(id self, SEL _cmd, id clientInfo, id action, id xpcEndpoint) {
++    (void)self; (void)_cmd; (void)clientInfo; (void)action; (void)xpcEndpoint;
++    vpLog(@"blocked AMSAuthenticationViewServiceLauncher");
++    return nil;
++}
++static int gAMSLaunch = 0;
++
++// MARK: - Game Center: the in-process sign-in sheet presenter (belt; the present
++// swizzle also catches the GKSignInViewController it would show).
++static void vp_gkAuthShowNoop(id self, SEL _cmd, id player, unsigned long long origin, id dismiss) {
++    (void)self; (void)_cmd; (void)player; (void)origin; (void)dismiss;
++    vpLog(@"blocked GKLocalPlayer authenticationShowSignInUIForLocalPlayer");
++}
++static int gGKAuthShow = 0;
++static int gGKAuthShowSwift = 0;
++
++// MARK: - swizzle helpers
++
++static void vpSwizzle(const char *className, const char *selName, IMP imp,
++                      int *installed, IMP *saveOrig) {
++    if (*installed) return;
++    Class cls = objc_getClass(className);
++    if (!cls) return;
++    SEL sel = sel_registerName(selName);
++    Method m = class_getInstanceMethod(cls, sel);
++    if (!m) return;
++    if (saveOrig) *saveOrig = method_getImplementation(m);
++    method_setImplementation(m, imp);
++    *installed = 1;
++    vpLog([NSString stringWithFormat:@"installed -[%s %s]", className, selName]);
++}
++
++static void vpSwizzleClassMethod(const char *className, const char *selName, IMP imp, int *installed) {
++    if (*installed) return;
++    Class cls = objc_getClass(className);
++    if (!cls) return;
++    SEL sel = sel_registerName(selName);
++    Method m = class_getClassMethod(cls, sel);
++    if (!m) return;
++    method_setImplementation(m, imp);
++    *installed = 1;
++    vpLog([NSString stringWithFormat:@"installed +[%s %s]", className, selName]);
++}
++
++// Override an instance method on exactly `className`, never on a shared
++// superclass: if the class does not implement the selector itself,
++// class_addMethod installs our override and the saved original is the inherited
++// IMP to chain to; otherwise we swap the class's own IMP. `className` may be a
++// Swift "Module.Class" name. Used for the leaf sign-in controller.
++static void vpSwizzleOwn(const char *className, const char *selName, IMP imp,
++                         IMP *saveOrig, int *installed) {
++    if (*installed) return;
++    Class cls = NSClassFromString([NSString stringWithUTF8String:className]);
++    if (!cls) cls = objc_getClass(className);
++    if (!cls) return;
++    SEL sel = sel_registerName(selName);
++    Method m = class_getInstanceMethod(cls, sel);
++    if (!m) return;
++    IMP orig = method_getImplementation(m);
++    if (class_addMethod(cls, sel, imp, method_getTypeEncoding(m))) {
++        if (saveOrig) *saveOrig = orig;
++    } else {
++        IMP prev = method_setImplementation(class_getInstanceMethod(cls, sel), imp);
++        if (saveOrig) *saveOrig = prev;
++    }
++    *installed = 1;
++    vpLog([NSString stringWithFormat:@"installed(own) -[%s %s]", className, selName]);
++}
++
++static void vpInstall(void) {
++    vpSwizzle("UIViewController", "presentViewController:animated:completion:",
++              (IMP)vp_present, &gPresent, (IMP *)&gPresentOrig);
++    vpSwizzle("UIViewController",
++              "_presentViewController:modalSourceViewController:presentationController:animationController:interactionController:handoffData:completion:",
++              (IMP)vp_presentFunnel, &gPresentFunnel, (IMP *)&gPresentFunnelOrig);
++    vpSwizzleOwn("AppleIDSetupUI.SignInOptionsViewController", "viewWillAppear:",
++                 (IMP)vp_signinWillAppear, (IMP *)&gSignInWillAppearOrig, &gSignInWillAppear);
++    vpSwizzleClassMethod("AMSAuthenticationViewServiceLauncher",
++                         "launchWithClientInfo:action:xpcEndpoint:",
++                         (IMP)vp_amsLaunchNoop, &gAMSLaunch);
++    vpSwizzle("GKLocalPlayer", "authenticationShowSignInUIForLocalPlayer:origin:dismiss:",
++              (IMP)vp_gkAuthShowNoop, &gGKAuthShow, NULL);
++    vpSwizzle("_TtC12GameCenterUI34LocalPlayerAuthenticationPresenter",
++              "authenticationShowSignInUIForLocalPlayer:origin:dismiss:",
++              (IMP)vp_gkAuthShowNoop, &gGKAuthShowSwift, NULL);
++}
++
++// Frameworks (AuthKitUI, AppleIDSetupUI, GameCenterUI, AMSUI) load lazily; keep
++// installing until each class it owns has been hooked.
++static void vpImageAdded(const struct mach_header *header, intptr_t slide) {
++    (void)header; (void)slide;
++    if (!gPresent || !gPresentFunnel || !gSignInWillAppear || !gAMSLaunch ||
++        !gGKAuthShow || !gGKAuthShowSwift) vpInstall();
++}
++
++__attribute__((constructor)) static void vpInitialize(void) {
++    vpInstall();
++    _dyld_register_func_for_add_image(vpImageAdded);
++}
++
++int vphone_signinfix_version(void) { return 8; }
+diff --git a/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c b/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
+index 70931afd4f1ec97b92fb91c50d5c7b0500f607dd..8071130e9cf14a548a770b97329c44ca26199e5f 100644
+--- a/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
++++ b/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
+@@ -149,6 +149,16 @@ static int vpExecve(const char *path, char *const argv[], char *const envp[]) {
+ // HapticsFix/libhapticsfix.c for what it answers and why SpringBoard is the
+ // target.
+ #define VP_HAPTICS_FIX "/usr/lib/libhapticsfix.dylib"
++// The Settings follow-up-group hider. Rides the same dlopen route; it swizzles
++// (Preferences' classes are in the shared cache, so interposing would not reach
++// them) and hides the CoreFollowUp suggestion/upsell groups. See
++// PrefsFix/libprefsfix.m.
++#define VP_PREFS_FIX "/usr/lib/libprefsfix.dylib"
++// The sign-in suppressor. Loaded into every app (not daemons) and swizzles the
++// in-process Apple-ID / iCloud / store sign-in presentation controllers so no
++// app can present a sign-in sheet. Self-gates on each class being present.
++// See SignInFix/libsigninfix.m.
++#define VP_SIGNIN_FIX "/usr/lib/libsigninfix.dylib"
+ 
+ // The one UIKit process measured creating a CHHapticEngine without first
+ // asking CoreHaptics whether the hardware exists. Suffix-matched, like the
+@@ -157,6 +167,11 @@ static int vpIsSpringBoard(const char *path) {
+     return vpPathHasSuffix(path, "/SpringBoard.app/SpringBoard");
+ }
+ 
++// Settings. Suffix-matched like the other targets.
++static int vpIsPreferences(const char *path) {
++    return vpPathHasSuffix(path, "/Preferences.app/Preferences");
++}
++
+ // A missing library is expected and stays quiet; anything else is logged.
+ static void vpLoadLibrary(const char *kind, const char *library) {
+     if (access(library, R_OK) != 0) {
+@@ -217,8 +232,17 @@ __attribute__((constructor)) static void vpLogProcess(void) {
+     // first asks CoreHaptics for an engine.
+     if (vpIsSpringBoard(path))
+         vpLoadLibrary("haptics-fix", VP_HAPTICS_FIX);
++    // Loaded before the app gate too: the swizzle must be in place before
++    // Settings builds its follow-up section.
++    if (vpIsPreferences(path))
++        vpLoadLibrary("prefs-fix", VP_PREFS_FIX);
+     if (!vpInBootstrap && !vpIsAppPath(path))
+         return;
++    // Every app gets the sign-in suppressor; it self-gates on the sign-in
++    // presentation classes being present (daemons are excluded by the app gate
++    // above, so background AuthKit auth is untouched).
++    if (vpIsAppPath(path))
++        vpLoadLibrary("signin-fix", VP_SIGNIN_FIX);
+     if (vpIsAppPath(path) && dlopen(VP_AVFOUNDATION, RTLD_LAZY | RTLD_NOLOAD))
+         vpLoadLibrary("camera-hook", VP_CAMERA_APP_HOOK);
+     const char *root = getenv("VPHONE_JB_ROOT");
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift
+index 553913835a1584dba8c0e72b0c4252810aa46345..914375575e198605035f4eb647f13f8f342f2584 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift
+@@ -16,5 +16,7 @@ public enum VPhoneGuestEnvironment {
+         "libbatteryhealthfix.dylib",
+         "libdevicehubfix.dylib",
+         "libdevicename.dylib",
++        "libprefsfix.dylib",
++        "libsigninfix.dylib",
+     ]
+ }

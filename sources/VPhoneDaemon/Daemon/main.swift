@@ -29,7 +29,8 @@ let hub = APIEventHub()
 let eventPublisher = GuestEventPublisher(hub: hub)
 
 @Sendable func initializeAPIChannel(_ channel: Channel) -> EventLoopFuture<Void> {
-    let http = GuestHyperTextHandler(hub: hub, fileIO: fileIO)
+    let proxyAdmission = GuestProxyAdmission()
+    let http = GuestHyperTextHandler(hub: hub, fileIO: fileIO, proxyAdmission: proxyAdmission)
     let upgrader = NIOWebSocketServerUpgrader(
         maxFrameSize: 1 << 20,
         shouldUpgrade: { channel, request in
@@ -38,7 +39,7 @@ let eventPublisher = GuestEventPublisher(hub: hub)
             // request then reaches GuestHyperTextHandler, which replies 403.
             let allowed = GuestHyperTextHandler.isLocalClient(request.headers) &&
                 (request.uri == "/v1/events" || GuestPortForwardHandler.port(from: request.uri) != nil)
-            guard allowed else { return channel.eventLoop.makeSucceededFuture(nil) }
+            guard allowed, proxyAdmission.consumeRequest() else { return channel.eventLoop.makeSucceededFuture(nil) }
             // A client that gave the host proxy its token as a WebSocket
             // subprotocol expects the server to select that protocol.
             var headers = HTTPHeaders()
@@ -73,7 +74,7 @@ let eventPublisher = GuestEventPublisher(hub: hub)
                             maxAccumulatedFrameCount: 32,
                             maxAccumulatedFrameSize: 1 << 20,
                         ),
-                        GuestWebSocketHandler(hub: hub),
+                        GuestWebSocketHandler(hub: hub, externalProxy: proxyAdmission.external),
                     ])
                 }
             }
@@ -81,7 +82,12 @@ let eventPublisher = GuestEventPublisher(hub: hub)
     )
     return channel.pipeline.configureHTTPServerPipeline(
         withServerUpgrade: (upgraders: [upgrader], completionHandler: { _ in }),
-    ).flatMap { channel.pipeline.addHandler(http) }
+    ).flatMapThrowing {
+        let sync = channel.pipeline.syncOperations
+        let upgrade = try sync.handler(type: HTTPServerUpgradeHandler.self)
+        try sync.addHandler(GuestProxyAdmissionHandler(admission: proxyAdmission, health: GuestAPI.health), position: .before(upgrade))
+        try sync.addHandler(http)
+    }
 }
 
 // NIO owns independent pipes. The native relay keeps AF_VSOCK blocking and

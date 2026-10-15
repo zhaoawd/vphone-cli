@@ -1,0 +1,543 @@
+{
+  "metadata": {
+    "date": "2026-10-14",
+    "upstream": "Lakr233/vphone-cli",
+    "base_exclusive": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+    "target_inclusive": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+    "evidence": "GitHub paginated history; release count cross-check; selected primary code and documentation",
+    "git_object_audit_performed": false,
+    "local_fork_read": false,
+    "local_merge_performed": false,
+    "total_observed": 194,
+    "merge_records_observed": 51,
+    "other_records_observed": 143,
+    "endpoint_changed_paths": null,
+    "endpoint_additions": null,
+    "endpoint_deletions": null,
+    "order": "GitHub history listing, newest first; NOT a cherry-pick execution order"
+  },
+  "preserves_existing_task_ids": [
+    "T00",
+    "T01",
+    "T02",
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07",
+    "T08",
+    "T09",
+    "T10",
+    "T11",
+    "T12",
+    "T13",
+    "T14",
+    "T15",
+    "T16",
+    "T17",
+    "T18",
+    "T19",
+    "T20",
+    "T21",
+    "T22",
+    "T23",
+    "T24",
+    "T25",
+    "T26",
+    "T27",
+    "T28",
+    "T29",
+    "T30",
+    "T31",
+    "T32",
+    "T33",
+    "T34",
+    "T35",
+    "T36",
+    "T37",
+    "T38",
+    "T39",
+    "T40",
+    "T41",
+    "T42",
+    "T43",
+    "T44",
+    "T45",
+    "T46"
+  ],
+  "proposed_new_task_count": 14,
+  "proposed_total_management_units": 61,
+  "existing_task_statuses": "preserve; do not reset",
+  "constraints": [
+    "regular/dev/jb/exp/less retained",
+    "auth/Hook/Irisin retained",
+    "strict local permission/path policy retained",
+    "prepare/generation/transaction evidence retained",
+    "standard != regular; experimental != exp",
+    "T45 stays explicit policy"
+  ],
+  "tasks": [
+    {
+      "id": "T47",
+      "title": "身份克隆与密钥继承边界",
+      "suggested_batch": "B4",
+      "priority": "P1",
+      "scope": "新增受控能力",
+      "depends_on": [
+        "T03",
+        "T10",
+        "T19",
+        "T21",
+        "T41",
+        "T52"
+      ],
+      "extends_existing": [
+        "T03",
+        "T19",
+        "T21",
+        "T41"
+      ],
+      "proposed_work": "分别定义保身份恢复克隆与新身份并行克隆；清理独占网络设置；复制前后停机验证；明确 SEP/Data 密钥继承。",
+      "acceptance": [
+        "源机器运行/启动时拒绝",
+        "复制前后检测状态漂移",
+        "新 ECID/MAC/UDID 与网络设置符合选项",
+        "文档与 API 不宣称密钥独立",
+        "模板不得扩散本地 auth/账号状态"
+      ],
+      "rollback_unit": "删除未发布副本；原机器全程保持不变；已发布副本按独立 VM 生命周期处置。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T48",
+      "title": "快照、来源与整组恢复",
+      "suggested_batch": "B4",
+      "priority": "P0",
+      "scope": "新增恢复能力",
+      "depends_on": [
+        "T03",
+        "T11",
+        "T15",
+        "T32",
+        "T40",
+        "T52"
+      ],
+      "extends_existing": [
+        "T03",
+        "T11",
+        "T15",
+        "T31",
+        "T32",
+        "T40"
+      ],
+      "proposed_work": "成组保存/恢复 Disk、SEP、NVRAM 和实际记录；区分未捕获配置；恢复后 desired/applied/source 重新对账。",
+      "acceptance": [
+        "损坏/越界/缺少核心文件时拒绝",
+        "可选 Receipt 不存在时恢复后仍不存在",
+        "CLI 无来源时显示 unknown",
+        "异常补偿与崩溃重启分别验证",
+        "快照不会被当成全量配置备份"
+      ],
+      "rollback_unit": "由本地事务日志恢复一致文件集；恢复失败禁止启动；配置和工件按独立备份恢复。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T49",
+      "title": "模板键、构建、冻结与创建流水线",
+      "suggested_batch": "B5",
+      "priority": "P1",
+      "scope": "架构扩展，先显式启用",
+      "depends_on": [
+        "T09",
+        "T10",
+        "T12",
+        "T32",
+        "T40",
+        "T47",
+        "T50",
+        "T52"
+      ],
+      "extends_existing": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_work": "模板 key 与 Build 分离；引入五模式隔离；boot 覆盖入 key，guest 覆盖作用于 clone；复用构建/prepare 事务，不另建不受控流水线。",
+      "acceptance": [
+        "同 key 并发构建只发布一个完整模板",
+        "模式、固件和 boot digest 错配不命中",
+        "guest 覆盖不污染模板",
+        "冻结模板拒绝普通及 DFU 启动",
+        "删除 IPSW 后仍能命中合法模板",
+        "同 ID 重建与 old Build 区分"
+      ],
+      "rollback_unit": "未冻结构建隔离；已发布模板禁止原地变更；记录消费者 Build；保留独立 restore 入口。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T50",
+      "title": "系统精简、首启稳定与可恢复维护",
+      "suggested_batch": "B5",
+      "priority": "P1",
+      "scope": "有副作用能力，模式受控",
+      "depends_on": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T37",
+        "T52"
+      ],
+      "extends_existing": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_work": "服务 profile、系统应用备份/移除/恢复、orig-fs 快照删除、setup settle 成组迁移；区分 GUI/CLI 默认行为。",
+      "acceptance": [
+        "iOS 26/27 使用正确清单",
+        "owned-set 回退不解除用户禁用",
+        "慢首启不误判稳定",
+        "移除应用有完整可恢复备份",
+        "iOS 27 重启后服务确实禁用",
+        "精简步骤与模板 key 相符才可冻结"
+      ],
+      "rollback_unit": "按 owned-set 恢复服务；恢复应用备份/注册；无法撤销的系统裁剪从受控原件或整组快照恢复。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T51",
+      "title": "磁盘 rebase 与物理共享计量",
+      "suggested_batch": "B4（可延后）",
+      "priority": "P2",
+      "scope": "可选维护能力",
+      "depends_on": [
+        "T03",
+        "T15",
+        "T52"
+      ],
+      "extends_existing": [
+        "T03",
+        "T15",
+        "T26",
+        "T31"
+      ],
+      "proposed_work": "引入 byte-preserving 磁盘块重整，验证后替换；计量区分 newly/already shared；不把它称为系统升级。",
+      "acceptance": [
+        "目标逻辑字节完整不变",
+        "SEP/NVRAM/身份不变",
+        "同模板几乎无新增共享时报告正确",
+        "跨卷/非 APFS 拒绝",
+        "低空间/外置盘故障不发布半成品",
+        "快照保留块的影响显示清楚"
+      ],
+      "rollback_unit": "发布前删除 staging；发布后内容应逐字节相等；异常由原磁盘备份和事务日志恢复。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T52",
+      "title": "磁盘操作互斥、进程归属与 CFW 工作区",
+      "suggested_batch": "B2",
+      "priority": "P0",
+      "scope": "所有磁盘写入的共同门槛",
+      "depends_on": [
+        "T02",
+        "T15",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "extends_existing": [
+        "T03",
+        "T13",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_work": "每机锁与 generation 统一；区分运行 VM、普通持有者和可发信号对象；不同 VM 可并行；work-parent 遵守本地路径策略。",
+      "acceptance": [
+        "同 VM install/update/snapshot/rebase 不并发写",
+        "普通持有者不被 stop 杀死",
+        "PID 复用重新确认",
+        "取消只影响目标操作",
+        "绑定更新顺序与日志真实一致",
+        "mkdtemp/devfs/长 socket/外置盘路径覆盖"
+      ],
+      "rollback_unit": "只中止本 operation；释放所持锁/挂载；按 journal 恢复，不能扩大清理到其他 VM。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T53",
+      "title": "Xcode、DeviceHub、Flutter 组合兼容",
+      "suggested_batch": "B3",
+      "priority": "P1",
+      "scope": "完整兼容组件",
+      "depends_on": [
+        "T08",
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "extends_existing": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_work": "组合 DeviceHub 载荷、条件 force-kern、旧 Undo 迁移、persona、AOT RX 与 DSC 头页证明；覆盖真开发工具链。",
+      "acceptance": [
+        "同 patch ID 旧实现可检测迁移",
+        "无可靠 Undo 不伪报可安全迁移",
+        "DDI/配对/屏幕与多流验证分开",
+        "CoreDevice 真安装与 apps.install 分开",
+        "LLDB/Flutter debug/AOT 分别验收",
+        "原 guest 启动与恢复不退化"
+      ],
+      "rollback_unit": "guest dylib/补丁/Undo/Receipt 与 DSC 证明成组恢复；不只回退宿主 Bundle。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T54",
+      "title": "陀螺仪与姿态模拟",
+      "suggested_batch": "B6",
+      "priority": "P2",
+      "scope": "新增可选模拟能力",
+      "depends_on": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "extends_existing": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_work": "Host UI、HID、motion RPC、guest hook 成组接入，并包含 Core Motion 锁顺序修正。",
+      "acceptance": [
+        "不触发 SpringBoard 死锁或重启",
+        "开关与重新连接正确",
+        "方向与数值映射正确",
+        "headless 不依赖 UI",
+        "迟到样本不更新新实例"
+      ],
+      "rollback_unit": "停止模拟并撤销该会话资源；保持已有输入链与 guest 可用。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T55",
+      "title": "VM 名称到 guest 设备名",
+      "suggested_batch": "B3",
+      "priority": "P1",
+      "scope": "扩展现有身份展示",
+      "depends_on": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "extends_existing": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_work": "采用最终 daemon 文件/RPC 路线，不恢复中间 NVRAM 实现；区分设备显示名与真正身份。",
+      "acceptance": [
+        "无效名称处理",
+        "重命名与下次连接同步",
+        "多 VM 不串名",
+        "本地 Hook/auth 路径不被重定向",
+        "旧 guest 无能力时显式降级"
+      ],
+      "rollback_unit": "恢复原名称记录和注入选择；不能通过改名字重建身份。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T56",
+      "title": "宿主时钟同步",
+      "suggested_batch": "B3",
+      "priority": "P1",
+      "scope": "新增协议与生命周期任务",
+      "depends_on": [
+        "T06",
+        "T36"
+      ],
+      "extends_existing": [
+        "T06",
+        "T36"
+      ],
+      "proposed_work": "同步连接/周期/唤醒/宿主改钟；保留 guest 手动时间；区分绝对时间和时区。",
+      "acceptance": [
+        "自动时间关闭时不覆盖",
+        "宿主睡眠后恢复",
+        "NTP 不通也可恢复自动时间",
+        "旧 guest capability 缺失安全处理",
+        "连接 generation 校验"
+      ],
+      "rollback_unit": "停止宿主任务，保留或恢复 guest 自动时间设置；操作有可读回证据。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T57",
+      "title": "多连接固件下载与缓存发布",
+      "suggested_batch": "B1/B5",
+      "priority": "P1",
+      "scope": "扩展原有缓存，不新建重复缓存",
+      "depends_on": [
+        "T13",
+        "T14"
+      ],
+      "extends_existing": [
+        "T13",
+        "T14"
+      ],
+      "proposed_work": "Range 分段、ETag、续传、单流回退与统一进度；缓存只能在完整校验后发布。",
+      "acceptance": [
+        "Range 不支持回退",
+        "远端 ETag 改变拒绝混合文件",
+        "分段短读和重试",
+        "同 URL 并发安全",
+        "取消不发布坏缓存",
+        "权限/路径约束不放宽"
+      ],
+      "rollback_unit": "隔离/清理本次 partial；不删除其他任务合法缓存；保留最后完整校验版本。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T58",
+      "title": "登录提示及 Settings 隐藏策略",
+      "suggested_batch": "B6（需决策）",
+      "priority": "P2",
+      "scope": "策略项，默认不扩大启用范围",
+      "depends_on": [
+        "T09",
+        "T10",
+        "T21",
+        "T32",
+        "T43"
+      ],
+      "extends_existing": [
+        "T09",
+        "T10",
+        "T21",
+        "T32",
+        "T43"
+      ],
+      "proposed_work": "引入 libsigninfix/libprefsfix 及 build 特定 Settings 行隐藏，但每模式显式授权；不把 UI 抑制当功能支持。",
+      "acceptance": [
+        "明确版本/build 适用范围",
+        "不修改未选择模式",
+        "依赖登录能力的测试单列",
+        "可撤销与 Receipt 一致",
+        "与 ProMotion T45 策略分开"
+      ],
+      "rollback_unit": "撤销该模式选择和对应组件；保留原用户配置/账户状态。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T59",
+      "title": "按需轮询与空闲性能预算",
+      "suggested_batch": "B6",
+      "priority": "P1",
+      "scope": "性能与正确性同时验收",
+      "depends_on": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "extends_existing": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_work": "事件轮询、相机扫描/帧、陀螺仪及 speaker timer 按需求开启，摘要缓存按文件失效。",
+      "acceptance": [
+        "零订阅停止，有订阅恢复",
+        "重复启停不泄漏",
+        "替换 daemon 后摘要失效",
+        "CPU/wakeups 与首响应延迟同测",
+        "重连不复活旧实例任务"
+      ],
+      "rollback_unit": "逐组件切回原调度策略；不回退协议/状态正确性修复。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    },
+    {
+      "id": "T60",
+      "title": "导入导出、队列、取消与退出收尾",
+      "suggested_batch": "B6",
+      "priority": "P1",
+      "scope": "前后端一起落地",
+      "depends_on": [
+        "T05",
+        "T25",
+        "T26",
+        "T37",
+        "T40",
+        "T46",
+        "T52"
+      ],
+      "extends_existing": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_work": "区分进度 reader 断开和真正取消；队列依次导入；退出等待收尾；归档排除 socket/快照/物理共享来源。",
+      "acceptance": [
+        "EPIPE 不触发数据操作取消",
+        "SIGINT/TERM 清理正确",
+        "退出中止/等待有最终状态",
+        "未完成导入不入库",
+        "Unicode/坏归档/路径越界",
+        "旧 VM 缺 Bundle 时删除仍受权限和占用约束"
+      ],
+      "rollback_unit": "只清理本次 staging；保留原 archive/原 VM；恢复绑定和队列状态，不删除未知残留。",
+      "local_audit_status": "pending_local_audit",
+      "implementation_status": "not_assessed"
+    }
+  ]
+}

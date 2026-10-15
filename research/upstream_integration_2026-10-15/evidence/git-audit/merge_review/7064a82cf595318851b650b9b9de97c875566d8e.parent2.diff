@@ -1,0 +1,404 @@
+diff --git a/Documents/Downloads/README.md b/Documents/Downloads/README.md
+index 7d6fe02171a61d4ba26202ae2ed400c499032c31..a5c027ce673d2f8d6233f8568298bfe8871123be 100644
+--- a/Documents/Downloads/README.md
++++ b/Documents/Downloads/README.md
+@@ -32,6 +32,7 @@ Use a `VPhone.bundle` from the same series as Launchpad. The series is the first
+ 
+ | Launchpad | VPhone.bundle |
+ | --- | --- |
++| 2.9.x | 2.9.x |
+ | 2.8.x | 2.8.x |
+ | 2.7.x | 2.7.x |
+ | 2.6.x | 2.6.x |
+diff --git a/Documents/Guides/create-and-run.md b/Documents/Guides/create-and-run.md
+index e9dc22017707c525f5574670edbb7dea5e7afba1..f3a4de911fed5f02582591f3d9c880e0350abbd2 100644
+--- a/Documents/Guides/create-and-run.md
++++ b/Documents/Guides/create-and-run.md
+@@ -84,7 +84,7 @@ vphone-cli vm import myphone.tzst --name restored
+ 
+ Do not swap `SEPStorage`, `nvram.bin` or the disk image between machines: they were made together by one restore, and a guest whose SEP storage does not match its disk panics at boot.
+ 
+-Run resource-heavy creations **one at a time**. Both the IPSWs and temporary restore tree consume substantial disk space, and patching large caches can be memory intensive. Check free space before starting a second VM.
++Run resource-heavy creations **one at a time**. Both the IPSWs and temporary restore tree consume substantial disk space, and patching large caches can be memory intensive. Check free space before starting a second VM. Launchpad places CFW scratch files on the VM library's mounted external volume when applicable; standalone `vphone-cli cfw install` defaults to `/private/var/tmp` and accepts `--work-parent` for a root-owned private directory.
+ 
+ ### Sharing disk space between VMs
+ 
+diff --git a/Documents/Guides/launchpad-cli.md b/Documents/Guides/launchpad-cli.md
+index dea232f81c0bb9d4fc8ee68b8ffa7e62a3b9b749..4ffa0a9b083d59468da802cfa80df2775a6e9c26 100644
+--- a/Documents/Guides/launchpad-cli.md
++++ b/Documents/Guides/launchpad-cli.md
+@@ -116,7 +116,7 @@ version while a machine is bound to it; rebind or delete those machines first.
+ | `vm create <name> [--bundle <version>] [...] [--device <product-type>] [--from <step>]` | The New Machine pipeline, bound to `--bundle` or the default; `--device` makes an iPad guest, `--from` retries from a step |
+ | `vm set-bundle <name> <version> [--update-environment]` | Bind a machine to another installed version. `--update-environment` also redeploys that version's guest environment and needs a stopped machine |
+ | `vm leases [--release]` | DHCP leases on the shared NAT network and the machine that owns each. `--release` frees the ones no machine in any library uses, through the helper (see [Networking](networking.md#addresses-held-by-old-macs)) |
+-| `cfw install <name>` | Install CFW into a stopped machine with its own bundle, through the helper |
++| `cfw install <name>` | Install CFW into a stopped machine with its own bundle, through the helper. The helper puts temporary work files on the VM library's external volume when applicable. |
+ | `cfw update-environment <name>` | Redeploy the machine's own bundle's guest resources (vphoned, hook dylibs) into it while stopped, through the helper; nothing else changes |
+ | `cfw update-kernel <name>` | Re-patch the kernelcache from the machine's current selection and swap it into Preboot, keeping the data (VM off); the data-preserving way to change a kernel patch on an installed VM, no restore tree needed |
+ | `guest send <name> <json>` | One raw `vphone.sock` request (tap, swipe, key, screenshot) |
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+index 038d178f6d4cd35b1c25a5be9c5275f64999fd68..df1b0b48b756a064951095b55a97801d71e861de 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+@@ -68,6 +68,7 @@ struct VPhoneCustomFirmwareInstaller {
+     let bundle: URL
+     let resources: VPhoneResources
+     var mode: Mode = .full
++    let workParent: String
+ 
+     /// Guest system files belong to root:wheel.
+     private static let guestOwner: (uid: uid_t, gid: gid_t) = (0, 0)
+@@ -86,7 +87,7 @@ struct VPhoneCustomFirmwareInstaller {
+ 
+     /// Root-owned and sticky, outside every user's tree. The work folder is
+     /// made here with `mkdtemp`, so its name cannot be predicted or claimed.
+-    private static let workParent = "/private/var/tmp"
++    static let defaultWorkParent = "/private/var/tmp"
+ 
+     private var executable: URL {
+         VPhoneResources.runningExecutable()
+@@ -107,9 +108,15 @@ struct VPhoneCustomFirmwareInstaller {
+         bundle: URL,
+         resources: VPhoneResources,
+         mode: Mode = .full,
++        workParent: String = defaultWorkParent,
+     ) throws -> Int32 {
+         if geteuid() == 0 {
+-            try VPhoneCustomFirmwareInstaller(bundle: bundle, resources: resources, mode: mode).run()
++            try VPhoneCustomFirmwareInstaller(
++                bundle: bundle,
++                resources: resources,
++                mode: mode,
++                workParent: workParent,
++            ).run()
+             return 0
+         }
+         throw ValidationError("\(mode.summary.capitalized) needs root. Run this command with sudo.")
+@@ -2552,7 +2559,14 @@ struct VPhoneCustomFirmwareInstaller {
+     // MARK: - Cleanup
+ 
+     private func makeWorkDirectory() throws -> WorkDirectory {
+-        var template = Array("\(Self.workParent)/vphone-cfw.XXXXXXXX".utf8CString)
++        let parent = try VPhoneConfinedDirectory.pin(absolutePath: workParent, requireOwner: 0)
++        let parentMode = try parent.metadata().st_mode & 0o7777
++        let privateDirectory = parentMode & 0o077 == 0
++        let stickySharedDirectory = parentMode & 0o1777 == 0o1777
++        guard privateDirectory || stickySharedDirectory else {
++            throw ValidationError("The CFW work folder parent \(workParent) must be root-owned and private or sticky.")
++        }
++        var template = Array("\(workParent)/vphone-cfw.XXXXXXXX".utf8CString)
+         // mkdtemp returns a pointer into the template. `&template` lends only a
+         // temporary buffer that ends with the call, and the array is dead after
+         // it, so read the name while the buffer is still pinned.
+@@ -2560,7 +2574,7 @@ struct VPhoneCustomFirmwareInstaller {
+             mkdtemp(buffer.baseAddress!).map { String(cString: $0) }
+         }
+         guard let path = created else {
+-            throw ValidationError("Unable to create a private work folder in \(Self.workParent): \(String(cString: strerror(errno)))")
++            throw ValidationError("Unable to create a private work folder in \(workParent): \(String(cString: strerror(errno)))")
+         }
+         // mkdtemp creates the folder 0700 for its caller, root. Re-check it
+         // through a no-follow walk before mounting anything under it.
+@@ -2594,7 +2608,7 @@ struct VPhoneCustomFirmwareInstaller {
+         else {
+             throw ValidationError("A CFW volume is still mounted under \(work.url.path). Eject it, then try again.")
+         }
+-        try VPhoneConfinedDirectory.pin(absolutePath: Self.workParent).removeItem(work.name)
++        try VPhoneConfinedDirectory.pin(absolutePath: workParent).removeItem(work.name)
+     }
+ 
+     private func detachImage(at mount: URL) throws {
+@@ -2641,11 +2655,14 @@ struct VPhoneCustomFirmwareInstallRootCommand: ParsableCommand {
+ 
+     @Argument(help: "VM bundle path") var bundle: String
+     @Option(help: "Resource base") var resources: String
++    @Option(name: .customLong("work-parent"), help: "Root-owned private CFW temporary directory")
++    var workParent = VPhoneCustomFirmwareInstaller.defaultWorkParent
+ 
+     func run() throws {
+         try VPhoneCustomFirmwareInstaller(
+             bundle: URL(fileURLWithPath: bundle),
+             resources: VPhoneResources(base: URL(fileURLWithPath: resources)),
++            workParent: workParent,
+         ).run()
+     }
+ }
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift
+index 9b5ec5202a8830063e5bdb4d757890cd10a53095..c7ec1a7e2bcdf59fc1a71b3ca3513fe2c922bbfc 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift
+@@ -317,6 +317,8 @@ struct VPhoneCustomFirmwareInstallCommand: ParsableCommand {
+         help: "Keep the extracted firmware after install (default: removed to save space)",
+     )
+     var keepArtifacts = false
++    @Option(name: .customLong("work-parent"), help: "Root-owned private CFW temporary directory")
++    var workParent = VPhoneCustomFirmwareInstaller.defaultWorkParent
+ 
+     func run() throws {
+         let name = try VPhoneVirtualMachineSelection.resolveExisting(name, in: lib.library)
+@@ -326,6 +328,7 @@ struct VPhoneCustomFirmwareInstallCommand: ParsableCommand {
+         let code = try VPhoneCustomFirmwareInstaller.elevate(
+             bundle: bundle.url,
+             resources: resources,
++            workParent: workParent,
+         )
+         if code == 0 {
+             try recordInstall(in: bundle)
+@@ -400,6 +403,8 @@ struct VPhoneCustomFirmwareUpdateKernelCommand: ParsableCommand {
+ 
+     @OptionGroup var lib: VPhoneLibraryOption
+     @Argument(help: "VM name") var name: String?
++    @Option(name: .customLong("work-parent"), help: "Root-owned private CFW temporary directory")
++    var workParent = VPhoneCustomFirmwareInstaller.defaultWorkParent
+ 
+     func run() throws {
+         let name = try VPhoneVirtualMachineSelection.resolveExisting(name, in: lib.library)
+@@ -408,6 +413,7 @@ struct VPhoneCustomFirmwareUpdateKernelCommand: ParsableCommand {
+             bundle: bundle.url,
+             resources: VPhoneResources.resolve(),
+             mode: .kernelUpdate,
++            workParent: workParent,
+         )
+         throw ExitCode(code)
+     }
+@@ -446,6 +452,8 @@ struct VPhoneCustomFirmwareUpdateEnvironmentCommand: ParsableCommand {
+ 
+     @OptionGroup var lib: VPhoneLibraryOption
+     @Argument(help: "VM name") var name: String?
++    @Option(name: .customLong("work-parent"), help: "Root-owned private CFW temporary directory")
++    var workParent = VPhoneCustomFirmwareInstaller.defaultWorkParent
+ 
+     func run() throws {
+         let name = try VPhoneVirtualMachineSelection.resolveExisting(name, in: lib.library)
+@@ -454,6 +462,7 @@ struct VPhoneCustomFirmwareUpdateEnvironmentCommand: ParsableCommand {
+             bundle: bundle.url,
+             resources: VPhoneResources.resolve(),
+             mode: .environmentOnly,
++            workParent: workParent,
+         )
+         throw ExitCode(code)
+     }
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index c9d58434a08a62e8327c42337dca6ec723147627..a6e96e5118be846383457b20bb972553965ed9a3 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -11,7 +11,7 @@
+ 	<key>CFBundleVersion</key>
+ 	<string>35</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.8.0</string>
++	<string>2.9.0</string>
+ 	<key>NSMicrophoneUsageDescription</key>
+ 	<string>Shares this Mac's microphone with the virtual iPhone so apps running inside it can record.</string>
+ </dict>
+diff --git a/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleActivity.swift b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleActivity.swift
+index 7ed95f898b3a63229a22632bfda000e08bbb727d..1d66e821233a7a05a1f8d60ed1f97ab84bfd84e8 100644
+--- a/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleActivity.swift
++++ b/VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleActivity.swift
+@@ -71,7 +71,10 @@ public enum VPhoneBundleActivity {
+             let got = proc_pidfdinfo(pid, fd.proc_fd, PROC_PIDFDVNODEINFO, &info, Int32(MemoryLayout<vnode_fdinfo>.size))
+             guard got == Int32(MemoryLayout<vnode_fdinfo>.size) else { continue }
+             let st = info.pvi.vi_stat
+-            if targets.contains(FileID(device: dev_t(st.vst_dev), inode: ino_t(st.vst_ino))) {
++            // vst_dev is unsigned and dev_t signed: devfs can be numbered past
++            // Int32.max (0xC6B21E7F on macOS 27), and every process holds
++            // /dev/null, so a plain conversion traps on any scan.
++            if targets.contains(FileID(device: dev_t(bitPattern: st.vst_dev), inode: ino_t(st.vst_ino))) {
+                 return true
+             }
+         }
+diff --git a/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleActivityTests.swift b/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleActivityTests.swift
+index 6bad38df2d6dba6519c3ab13bf4c29cb03e416e6..e3f0df83958936a36bcdb8a4a00691fd83c3aa3e 100644
+--- a/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleActivityTests.swift
++++ b/VPhoneKit/VPhoneCoreKitTests/Bundle/BundleActivityTests.swift
+@@ -37,6 +37,15 @@ struct BundleActivityTests {
+         #expect(!VPhoneBundleActivity.processesHolding([disk]).contains(getpid()))
+     }
+ 
++    @Test func `finds a holder on a device numbered past Int32.max`() throws {
++        // /dev is such a device on macOS 27; the scan must match it, not trap.
++        let null = URL(fileURLWithPath: "/dev/null")
++        let fd = open(null.path, O_RDONLY)
++        try #require(fd >= 0)
++        defer { close(fd) }
++        #expect(VPhoneBundleActivity.processesHolding([null]).contains(getpid()))
++    }
++
+     @Test func `a missing file has no holders`() {
+         let missing = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+         #expect(VPhoneBundleActivity.processesHolding([missing]).isEmpty)
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index 5bc48b7cd4f29f2981fa1396b3cdc1b1eb34add9..5973746ca08f3df6a50fe34821306680cfc2106a 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.8.0
++MARKETING_VERSION = 2.9.0
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+-CURRENT_PROJECT_VERSION = 15
++CURRENT_PROJECT_VERSION = 16
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift
+index 69f28306cc6e959e363834c5a6b30abe3df634b5..69d5b098a8e7cfac55bb95716b8258702a235c72 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift
+@@ -17,9 +17,10 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+ 
+     typealias MachineKey = VPhoneLaunchpadHelperFirmwareAdmission.MachineKey
+ 
+-    /// The installer's work parent, `VPhoneCustomFirmwareInstaller.workParent`:
+-    /// every run makes its private work folder there.
+-    static let workParent = "/private/var/tmp"
++    /// CFW keeps its scratch files beside the VM when that VM is on a mounted
++    /// external volume. The child directory is root-owned and private. Internal
++    /// libraries retain the system temporary directory.
++    static let defaultWorkParent = "/private/var/tmp"
+ 
+     let executable: URL
+     let arguments: [String]
+@@ -58,22 +59,30 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+         let folder = try Self.requireMachine(libraryRoot: libraryRoot, machineName: machineName, ownedBy: callerUID)
+         let machine = URL(fileURLWithPath: libraryRoot, isDirectory: true)
+             .appendingPathComponent(machineName, isDirectory: true)
++        let workParent = try Self.resolveWorkParent(
++            libraryRoot: libraryRoot,
++            callerUID: callerUID,
++            callerGID: callerGID,
++        )
+         var work = stat()
+-        guard stat(Self.workParent, &work) == 0 else {
+-            throw VPhoneLaunchpadHelperError("Unable to read \(Self.workParent): \(String(cString: strerror(errno)))")
++        guard stat(workParent, &work) == 0 else {
++            throw VPhoneLaunchpadHelperError("Unable to read \(workParent): \(String(cString: strerror(errno)))")
+         }
+ 
+         var arguments: [String]
+         switch operation {
+         case let .install(keepArtifacts):
+-            arguments = ["cfw", "install", machineName, "--library-root", libraryRoot]
++            arguments = ["cfw", "install", machineName, "--library-root", libraryRoot,
++                         "--work-parent", workParent]
+             if keepArtifacts {
+                 arguments.append("--keep-artifacts")
+             }
+         case .updateEnvironment:
+-            arguments = ["cfw", "update-environment", machineName, "--library-root", libraryRoot]
++            arguments = ["cfw", "update-environment", machineName, "--library-root", libraryRoot,
++                         "--work-parent", workParent]
+         case .updateKernel:
+-            arguments = ["cfw", "update-kernel", machineName, "--library-root", libraryRoot]
++            arguments = ["cfw", "update-kernel", machineName, "--library-root", libraryRoot,
++                         "--work-parent", workParent]
+         }
+ 
+         self.executable = executable
+@@ -81,7 +90,7 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+         workingDirectory = machine
+         machineKey = MachineKey(device: folder.st_dev, inode: folder.st_ino)
+         // Not one literal: equal keys in a dictionary literal trap.
+-        var volumes = [work.st_dev: Self.workParent]
++        var volumes = [work.st_dev: workParent]
+         volumes[folder.st_dev] = machine.path
+         self.volumes = volumes
+         // The same environment `sudo vphone-cli cfw install` sees: SUDO_UID
+@@ -90,6 +99,83 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+         environment = try VPhoneLaunchpadHelperLibraryPath.environment(callerUID: callerUID, callerGID: callerGID)
+     }
+ 
++    /// Selects a protected scratch directory on the VM's mounted external
++    /// volume. A user-writable volume root is refused: root must not create a
++    /// directory where the caller can race or replace it.
++    private static func resolveWorkParent(
++        libraryRoot: String,
++        callerUID: uid_t,
++        callerGID: gid_t,
++    ) throws -> String {
++        let library = try VPhoneLaunchpadHelperLibraryPath.openDirectory(libraryRoot)
++        defer { close(library) }
++        var filesystem = statfs()
++        guard fstatfs(library, &filesystem) == 0 else {
++            throw VPhoneLaunchpadHelperError("Unable to determine the VM library's volume.")
++        }
++        let mountPoint = withUnsafePointer(to: &filesystem.f_mntonname) {
++            $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXPATHLEN)) { String(cString: $0) }
++        }
++        guard mountPoint.hasPrefix("/Volumes/"), mountPoint != "/Volumes" else {
++            return defaultWorkParent
++        }
++
++        let volume = try VPhoneLaunchpadHelperLibraryPath.openDirectory(mountPoint)
++        defer { close(volume) }
++        var volumeInfo = stat()
++        guard fstat(volume, &volumeInfo) == 0, volumeInfo.st_uid == 0 else {
++            throw VPhoneLaunchpadHelperError("The external volume root must be owned by root before CFW can use it for temporary files.")
++        }
++        guard try !callerCanWrite(volumeInfo, callerUID: callerUID, callerGID: callerGID) else {
++            throw VPhoneLaunchpadHelperError("The external volume root is writable by your account; refusing to place privileged CFW temporary files there.")
++        }
++
++        let leaf = ".vphone-cfw-work"
++        if mkdirat(volume, leaf, 0o700) != 0, errno != EEXIST {
++            throw VPhoneLaunchpadHelperError("Unable to create the CFW work directory on \(mountPoint): \(String(cString: strerror(errno)))")
++        }
++        let work = openat(volume, leaf, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
++        guard work >= 0 else {
++            throw VPhoneLaunchpadHelperError("The CFW work directory on \(mountPoint) is not a real directory.")
++        }
++        defer { close(work) }
++        var workInfo = stat()
++        guard fstat(work, &workInfo) == 0,
++              workInfo.st_uid == 0,
++              (workInfo.st_mode & S_IFMT) == S_IFDIR,
++              (workInfo.st_mode & 0o077) == 0
++        else {
++            throw VPhoneLaunchpadHelperError("\(mountPoint)/\(leaf) must be a root-owned private directory.")
++        }
++        return mountPoint + "/" + leaf
++    }
++
++    private static func callerCanWrite(
++        _ directory: stat,
++        callerUID: uid_t,
++        callerGID: gid_t,
++    ) throws -> Bool {
++        let mode = directory.st_mode & 0o777
++        if callerUID == directory.st_uid {
++            return mode & 0o200 != 0
++        }
++        guard let account = getpwuid(callerUID) else {
++            throw VPhoneLaunchpadHelperError("Unable to find the user account for the CFW request.")
++        }
++        var groups = [Int32](repeating: 0, count: 256)
++        var count = Int32(groups.count)
++        let found = String(cString: account.pointee.pw_name).withCString {
++            getgrouplist($0, Int32(callerGID), &groups, &count)
++        }
++        guard found >= 0 else {
++            throw VPhoneLaunchpadHelperError("Unable to check permissions on the external volume root.")
++        }
++        if groups.prefix(Int(count)).contains(Int32(directory.st_gid)) {
++            return mode & 0o020 != 0
++        }
++        return mode & 0o002 != 0
++    }
++
+     /// The machine a cancel names. It checks no ownership: the operation
+     /// found under the key is stopped only for the user who started it.
+     static func machineKey(libraryRoot: String, machineName: String) throws -> MachineKey {
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
+index 21d9b19f34aba3923abe3d32cfb12291d84d95a6..c29e6ebfad886615182d70e052c7a3c25c596e13 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
+@@ -80,8 +80,10 @@ nonisolated enum VPhoneLaunchpadNames {
+     /// `vm config --unlock-at-startup`, which a machine's Settings pass. 2.7.0
+     /// added `vm clone --new-identity`, which Clone passes, and
+     /// `vm snapshot`, which the Snapshots sheet runs. 2.8.0 added `vm config
+-    /// --sync-host-location`, which a machine's Settings pass.
+-    private static let minimumBundleComponents = (2, 8, 0)
++    /// --sync-host-location`, which a machine's Settings pass. 2.9.0 added
++    /// `--work-parent` on `cfw install`, `update-environment` and
++    /// `update-kernel`, which the helper passes.
++    private static let minimumBundleComponents = (2, 9, 0)
+     static let minimumBundleVersion =
+         "\(minimumBundleComponents.0).\(minimumBundleComponents.1).\(minimumBundleComponents.2)"
+ 

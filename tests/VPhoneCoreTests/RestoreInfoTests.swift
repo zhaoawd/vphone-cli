@@ -124,6 +124,19 @@ struct RestoreInfoTests {
         #expect(loaded?.device == "iPhone17,3")
     }
 
+    @Test func variantRecordingPreservesGuestEnvironment() throws {
+        let b = try makeBundle()
+        defer { try? FileManager.default.removeItem(at: b.url) }
+        let data = Data(#"{"ios":{"version":"26.1","build":"23B85"},"cloudOS":{"version":"26.1","build":"23B85"},"variant":"regular","guest_environment":"v2"}"#.utf8)
+        try data.write(to: VPhoneRestoreInfo.url(forBundle: b))
+        let merged = try VPhoneBundleGuard.withBundleLock(directory: b.url, operation: VPhoneVMOperation.cfwRecord) {
+            try VPhoneRestoreInfo.recordVariant("regular", toBundle: b, holding: $0)
+        }
+        #expect(merged != nil)
+        let object = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: VPhoneRestoreInfo.url(forBundle: b))) as? [String: Any])
+        #expect(object["guest_environment"] as? String == "v2")
+    }
+
     @Test func recordVariantNilWithoutVersions() throws {
         let b = try makeBundle()
         defer { try? FileManager.default.removeItem(at: b.url) }

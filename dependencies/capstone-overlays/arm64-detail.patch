@@ -1,0 +1,48 @@
+diff --git a/Sources/Capstone/Instruction.swift b/Sources/Capstone/Instruction.swift
+index 51764ff..bb52cae 100644
+--- a/Sources/Capstone/Instruction.swift
++++ b/Sources/Capstone/Instruction.swift
+@@ -9,6 +9,7 @@ public struct Instruction: Sendable {
+     public let mnemonic: String
+     public let operandString: String
+     public let isAlias: Bool
++    public let writeback: Bool
+ 
+     public let regsRead: [UInt16]
+     public let regsWritten: [UInt16]
+@@ -32,6 +33,7 @@ public struct Instruction: Sendable {
+ 
+         if let detail = raw.detail {
+             let d = detail.pointee
++            writeback = d.writeback
+             regsRead = withUnsafeBytes(of: d.regs_read) { buf in
+                 let p = buf.baseAddress!.assumingMemoryBound(to: UInt16.self)
+                 return Array(UnsafeBufferPointer(start: p, count: Int(d.regs_read_count)))
+@@ -47,6 +49,7 @@ public struct Instruction: Sendable {
+             aarch64 = AArch64Detail(d.aarch64)
+             x86 = X86Detail(d.x86)
+         } else {
++            writeback = false
+             regsRead = []
+             regsWritten = []
+             groups = []
+@@ -88,6 +91,9 @@ public struct AArch64Detail: Sendable {
+ public struct AArch64Operand: Sendable {
+     public let type: aarch64_op_type
+     public let access: cs_ac_type
++    public let shiftType: aarch64_shifter
++    public let shiftValue: UInt32
++    public let extender: aarch64_extender
+     public let reg: aarch64_reg
+     public let imm: Int64
+     public let fp: Double
+@@ -96,6 +102,9 @@ public struct AArch64Operand: Sendable {
+     init(_ raw: cs_aarch64_op) {
+         type = raw.type
+         access = raw.access
++        shiftType = raw.shift.type
++        shiftValue = raw.shift.value
++        extender = raw.ext
+         reg = raw.reg
+         imm = raw.imm
+         fp = raw.fp

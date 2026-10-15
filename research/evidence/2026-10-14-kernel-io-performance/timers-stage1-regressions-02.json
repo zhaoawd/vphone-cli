@@ -1,0 +1,22 @@
+{
+  "command": [
+    "swift",
+    "test",
+    "--package-path",
+    "/private/tmp/vphone-kernel-io-optimization-20261014",
+    "--scratch-path",
+    "/private/tmp/vphone-kernel-io-optimization-20261014/.build",
+    "--cache-path",
+    "/private/tmp/vphone-kernel-io-optimization-20261014/.swiftpm-cache",
+    "--disable-automatic-resolution",
+    "-c",
+    "release",
+    "--filter",
+    "KernelIOTraceTests|FirmwareKernelUpdateTests|FirmwareKernelRollbackTests|FirmwareGenerationTests|CoreBundleStoreTests/installsSignedBundleAndVerifiesReceipt"
+  ],
+  "environment_overrides": {},
+  "exit_code": 0,
+  "elapsed_seconds": 30.826558917062357,
+  "log": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/timers-stage1-regressions-02.log",
+  "acceptance_directory_lock_held": false
+}

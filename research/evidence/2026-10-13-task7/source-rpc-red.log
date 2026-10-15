@@ -1,0 +1,61 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[5/38] Compiling fls.c
+[6/38] Compiling locking.c
+[6/38] Compiling log.c
+[8/38] Compiling deviceinterfaced.c
+[9/38] Compiling ipsw.c
+[10/38] Compiling idevicerestore.c
+[11/38] Compiling asr.c
+[12/38] Compiling recovery.c
+[13/38] Compiling fdr.c
+[14/38] Compiling download.c
+[15/38] Compiling normal.c
+[16/38] Compiling restore.c
+[17/38] Compiling limera1n.c
+[18/38] Compiling dfu.c
+[18/38] Compiling img3.c
+[20/38] Compiling img4.c
+[21/38] Compiling ace3.c
+[22/38] Compiling mbn.c
+[23/38] Compiling ftab.c
+[24/38] Compiling vphone_zip_stub.c
+[25/38] Compiling common.c
+[26/38] Compiling vphone_restore_bridge.c
+[28/38] Emitting module VPhoneDaemonWireTests
+[29/38] Compiling VPhoneDaemonWireTests EnvironmentOperationTests.swift
+macro expansion #require:2:3: error: call can throw, but it is not marked with 'try' and the error is not handled
+`- /Users/qcz3840/github/vphone-cli/tests/VPhoneDaemonWireTests/EnvironmentOperationTests.swift:27:86: note: expanded code originates here
+25 |         #expect(journal.rootReadOnly == nil)
+26 |         try guest.transaction.finalize(&journal, rootReadOnly: true)
+27 |         let stored = try #require(guest.transaction.journal(id: valid["operation"]!))
+   |                          `- note: in expansion of macro 'require' here
+   +--- macro expansion #require ---------------------------------------
+   |1 | Testing.__checkFunctionCall(guest.transaction.self,calling: {
+   |2 |   $0.journal(id: $1)
+   |  |   `- error: call can throw, but it is not marked with 'try' and the error is not handled
+   |3 | },valid["operation"]!,expression: .__fromFunctionCall(.__fromSyntaxNode("guest.transaction"),"journal",("id",.__fromSyntaxNode(#"valid["operation"]!"#))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+   +--------------------------------------------------------------------
+28 |         #expect(stored.context == valid)
+29 |         #expect(stored.beforeFiles?.count == 5 && stored.afterFiles?.count == 5)
+
+/Users/qcz3840/github/vphone-cli/tests/VPhoneDaemonWireTests/EnvironmentOperationTests.swift:43:53: error: instance method 'wait' is unavailable from asynchronous contexts; Await a Task handle instead
+41 |             }
+42 |         }
+43 |         let started = await Task.detached { entered.wait(timeout: .now() + 5) == .success }.value
+   |                                                     `- error: instance method 'wait' is unavailable from asynchronous contexts; Await a Task handle instead
+44 |         #expect(started)
+45 |         for method in ["environment.restore", "bootstrap.install", "system.shutdown", "environment.status"] {
+
+Dispatch.DispatchSemaphore.wait:2:13: note: 'wait(timeout:)' declared here
+1 | class DispatchSemaphore {
+2 | public func wait(timeout: DispatchTime) -> DispatchTimeoutResult}
+  |             `- note: 'wait(timeout:)' declared here
+3 | 
+[29/38] Compiling MobileRecoveryCore libirecovery.c
+error: fatalError

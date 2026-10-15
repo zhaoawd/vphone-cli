@@ -1,5 +1,9 @@
 # T16 旧 VM 停机更新资格
 
+2026-10-02 R6 补充：用户已批准的 v2 测试 VM 单库替换通过事务 `20261002T101052Z-Oakm5X1p` 发布，仅 libcamfix 摘要变化；7 项身份文件摘要不变，after.classification already_current，旧盘保留。启动后加载复核受宿主预检 exit 137 阻塞，尚未验证。具体命令、证据与执行顺序见 [R5–R9 记录](v2_remaining_acceptance_plan_2026-10-02.md)。
+
+后续 R6 启动复核已完成：用户保持 amfidont 前台运行后，签名预检退出 0；原 R4 反馈脚本通过，完整扫描中的 5 库均 current，cameracaptured PID 70 映射当前 SystemHook。R6 当前满足停机更新、身份不变、already_current 和启动加载的验收要求；应用相机行为未验证。
+
 日期：2026-10-01。基线提交 `18ae989`。范围：上游整合清单 T16 的代码与无 VM 测试。本项没有对任何真实 VM 执行判定或替换，没有读写 `~/.vphone/VMs`、`~/vphone-b4-accept`、`/Volumes/vphone-t03-restore`，没有使用 sudo，没有对 `vm-2607`、`vm-new` 执行命令或发信号。日志位于 `research/artifacts/t16-offline-update-eligibility-2026-10-01/`（Git 忽略）。环境：worktree 的 `.venv` 为指向主仓库 `.venv` 的符号链接；递归初始化 `vendor/*` 子模块；按 Makefile 格式生成被忽略的 `sources/vphone-cli/VPhoneBuildInfo.swift`。
 
 ## 1. 对照表
@@ -302,3 +306,26 @@ Swift 命令环境同 `scripts/run_tests.py`（`--disable-sandbox --cache-path .
 - 只读复核：检查前后 `Disk.img` 的 inode/size/mtime（147451698 / 68719476736 / 1790859187）、身份文件 SHA-256、bundle 的 `ls -la` 列表均一致；`hdiutil info` 中无该磁盘，无 `vphone-env-check` 挂载与临时目录，脚本目录下无 root 所有的 `__pycache__`。
 - 发现的缺陷：`--check` 的 stdout 在 JSON 之前输出两行进度文字（`[*] read-only guest environment check as uid 0 ...` 与 `[cfw] the read-only check runs as root ...`），直接解析 stdout 会失败。应改为输出到 stderr。
 - 未覆盖：sudo 路径（非 root-popup）；`offline_update` 类在真实 VM 上的替换（需要带 v2 环境的 VM）。
+
+## 11. `--check` 输出修复（Codex，2026-10-01）
+
+问题：第 10 节记录的两行进度文字写入 stdout，使 JSON 解析失败。
+
+修改：`cfw_install_host.sh` 的检查进度使用 `>&2`；CLI 的提权提示写入 `FileHandle.standardError`。报告仍通过 stdout 输出。
+
+复现与验证：
+
+- 新增 `ElevatedCheckTests.test_check_progress_is_on_stderr_and_stdout_is_empty`。修改前检查退出 0，但 stdout 非空，断言失败。修改后 `make test_python`：559 项通过（139.884 秒）。
+- 新增 `CFWEnvironmentOutputTests.checkStdoutContainsOnlyJSON`。独立 CLI 进程运行，驱动为不提权的替身。修改前报告 JSON 解析报 `Invalid value around line 1, column 1`；修改后报告为 `already_current`，进度文字出现在 stderr。
+- `swift test --disable-sandbox --cache-path .build/test-cache --filter CFWEnvironment`：9 项测试通过。
+- `zsh -n scripts/cfw_install_host.sh`、`git diff --check`：通过。
+
+限制：未运行真实 sudo 或 root-popup，未挂载真实 VM 磁盘。Python 测试需要 `ps` 进程查询权限；受限运行先因该权限失败，获准运行后才取得上述修改前失败证据。
+
+## 2026-10-02 v2 测试 VM 停机替换成功路径
+
+用户批准对象 `/Users/kolar/vphone-v2-accept-20261002/VMs/lp-v2-accept-20261002`，仅替换 launchdhook 候选并重启复核 R4。提权 --check 为 offline_update，replace 仅 launchdhook-vphone.dylib，disk.unchanged true。普通用户 CLI --root-popup 更新退出 0，事务 `20261002T064301Z-rFaRcKXJ` published，environment-update.json result replaced、after already_current、identity_unchanged true。旧盘保留；七项身份文件在更新前后、重启前核对 SHA-256 不变。
+
+候选 launchdhook `157beaed8168fa53df58cdcf2d6181152bb4a5409a7ec1b093af21c394073027`，其余四个环境库摘要不变。重启后两次原反馈脚本通过，pid 1 映射新 launchdhook，cameracaptured 映射 SystemHook 和 libvcamcaptured；5 个库文件符合候选。测试 VM 已停止。
+
+这验证 T16 对 launchdhook 的真实成功路径，不等于设计 R6 的仅 libcamfix 组合、R7/T17 在线更新、回退或功能验收。详见 `v2_injection_diagnosis_2026-10-02.md`。

@@ -1,0 +1,27 @@
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+remerge CONFLICT (content): Merge conflict in Research/0_binary_patch_comparison.md
+index 7959e65e..6c75747c 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -2813,7 +2813,6 @@ verified ineffective on the running guest and has been removed. IDA analysis
+ of this guest's launchd confirms the bootstrap lookup gate and name filters
+ 2, 3 and 12. See [evidence, implementation and validation](Guest/ios27_xcode_persona_lookup.md).
+ 
+-<<<<<<< 07686400 (Replace deprecated hdiutil calls with diskutil)
+ ## Host disk-image command migration (2026-10-08)
+ 
+ The migration replaces `hdiutil` because macOS 27 marks it as deprecated.
+@@ -2841,7 +2840,7 @@ before deleting its temporary library instead of querying `hdiutil info`.
+ `VPhone` bundle build and bundle admission pass on macOS 27.0.1 / Xcode 27.1.
+ Real image attachment and execution on macOS 15 still require live validation;
+ no VM disk is modified by the validation tests.
+-=======
++
+ ## Flutter AOT executable-remap compatibility
+ 
+ The existing guest SystemHook component has a guarded `vm_remap` fallback for
+@@ -2850,4 +2849,3 @@ with the actual read-only destination. The fallback creates a private RW copy,
+ then changes it to RX; other calls pass through. No kernel patch or protection
+ policy change is added. See `Research/Guest/flutter_aot_remap_compatibility.md`
+ for exact guards, failure semantics, reproduction and validation limits.
+->>>>>>> 1cc651a7 (Merge pull request #627 from 0xJacky/codex/flutter-aot-remap-compat)

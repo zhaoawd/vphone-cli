@@ -1,0 +1,92 @@
+{
+  "reviewed_at": "2026-10-14T03:55:06.487498+00:00",
+  "scope": "Static independent review only; no VM, mount, guest, AMFI or script execution. AST parsing only.",
+  "status": "no-blocker-for-controlled-acceptance-use; final-production-schema-reconciled",
+  "reviewed_sha256": {
+    "snapshot-kernel-operation.py": "b7841badaa65976ba874c04ae5e8dc47e45d07005d42b98ced328d17e32a9f04",
+    "readback-kernel-operation.py": "6ec11470f4a6285e33d2d812d485f96f447f71108afc7e0c7025618f13576af6",
+    "container-format/compare-containers.py": "32979bde3287e7732a054bcbeb73a9a94c550f197d85ddc85adb8c179c73f5ae"
+  },
+  "production_schema_status": "Reconciled against final frozen production schema3/4 and proof, including containerEnvelopeSHA256.",
+  "recommendations": [
+    "Move preflight input reads and VM open/flock into a guarded failure-recording scope after the exclusive output handle is acquired. Current early failures exit nonzero but can leave an empty output file without a structured error.",
+    "Freeze the before.json digest in readback evidence and require the same label. This strengthens linkage when artifacts are reused in later acceptance aggregation."
+  ],
+  "confirmed_relationships": [
+    "VM directory flock matches the production VPhoneVMLock inode lock and is held across hashing and readonly export.",
+    "Current production emits producer=current-bundle-kernel-update for both operations; rollback additionally emits operation=kernel-rollback. Journal schema is 3 for update and 4 for rollback.",
+    "Archive receipt bytes equal live receipt; report/proof/receipt hashes link to journal/publication; receipt effects equal report flattened ordered records.",
+    "Rollback target plan and target desired digest are distinct from the unchanged live desired digest. Selection/proof/expectation target UUID and actual payload/IM4P digests are compared.",
+    "Actual readonly Preboot IM4P equals archived installed-kernel.im4p and proof hash. Decoded payload equals proof; ordered pristine-source reconstruction must equal all actual payload bytes.",
+    "Baseline IMG4 trailing raw elements and source description/PAYP are compared byte for byte. Preserved IM4R includes preserved absence when the fixed baseline contains no IM4R.",
+    "Export uses readonly attachment/mount, device-to-image and APFS physical-store association, volume UUID and mount directory identity, unique regular kernel target, traversal-error rejection, and final Disk full SHA.",
+    "Once export enters its try block, detach failures or residual Disk attachments prevent success. Fallback discovery covers attach results that fail before device assignment. The DER helper main is guarded and import does not run its evidence-writing main.",
+    "Both scripts now require the exact six-file inventory. Snapshot and readback entry/exit reject both pending markers and task8 root attachments.",
+    "Snapshot finally rechecks binding, desired and receipt hashes. Readback finally observes residual attachments/pending; before success it rechecks binding, receipt and all four archive JSON hashes.",
+    "Final readback adds canonical UUID, publication/receipt/proof/before-desired schemaVersion==1, and duplicate metadata-name rejection. AST passes; SHA256 a46958cda5d8dd0e1a3f77bfa35f33cbb1a32229ff9f03c4db59094924d20d09.",
+    "Independent DER envelope is concatenated raw IMG4 magic TLV plus all trailing TLVs outside IM4P, matching production container.leading + container.trailing exactly. Its SHA256 must equal containerEnvelopeSHA256 and is recorded in kernel output. Outer sequence framing is excluded on both sides."
+  ],
+  "limitations": [
+    "No actual operation or mount has been executed by this review.",
+    "DSC and declaration-rule semantic enforcement remain official production validation. Selected declaration ID membership and full byte reconstruction do not independently reproduce those validators.",
+    "Frozen executableSHA256 is compared to proof; this script does not independently verify Bundle signatures or reproduce the trusted producer session.",
+    "Different payload A/B, three distinct boot instances and marker persistence require the joint final acceptance evidence. These tools alone do not establish normal boot or general guest filesystem preservation.",
+    "Rollback target evidence hash is compared between selection and proof; eligibility and historical archive validation remain production responsibilities unless separately audited in the final target evidence."
+  ],
+  "previous_reviewed_sha256": {
+    "snapshot-kernel-operation.py": "b7841badaa65976ba874c04ae5e8dc47e45d07005d42b98ced328d17e32a9f04",
+    "readback-kernel-operation.py": "d971db90e93faaa195e6b29b53feeb088e0fe198dba200bc197aeda2367e7ca0",
+    "container-format/compare-containers.py": "32979bde3287e7732a054bcbeb73a9a94c550f197d85ddc85adb8c179c73f5ae"
+  },
+  "resolved_findings": [
+    {
+      "id": "R1",
+      "file": "readback-kernel-operation.py",
+      "problem": "Initial/final guards omit .firmware-desired-pending.json and only inspect Disk.img attachments. A desired pending marker or leftover candidate/backup attachment can coexist with passed=true.",
+      "required_change": "At entry and exit reject both pending markers and all attachments beneath the task8 VM root; retain exact Disk.img attachment/device checks inside the single temporary readonly export."
+    },
+    {
+      "id": "R2",
+      "file": "snapshot-kernel-operation.py; readback-kernel-operation.py",
+      "problem": "The file inventory is trusted from clone.target_files/before.files without an exact six-file guard. Missing non-Disk entries reduce checks without preventing passed=true.",
+      "required_change": "Require exactly Disk.img, nvram.bin, SEPStorage, config.plist, AVPBooter.vresearch1.bin, AVPSEPBooter.vresearch1.bin in both inventories before hashing/comparing."
+    }
+  ],
+  "blocking_findings": [],
+  "verification": {
+    "ast": "pass for both reviewed scripts",
+    "runtime": "not executed by reviewer"
+  },
+  "preflight_failure_policy": "Parent retains exclusive empty output on side-effect-free preflight failure; execution uses complete frozen expectations and a fresh label after any failure. No passed result is emitted on that path.",
+  "host_rebind_review": {
+    "status": "accepted-for-controlled-root-serial-use; recorded-source9-rebind-boundary-confirmed",
+    "script_sha256": "58cbba690911ce1c7cbbe273915ea984e653a1f0e9d51bd2ed58f865ea65a083",
+    "record_sha256": "e04121510a7bc3ffd2926e505ecf72e130291e84b5bfea8e78da45324d5a5e87",
+    "actual_passed": true,
+    "actual_exit_code": 0,
+    "target_version": "2.6.20261021-local",
+    "before_binding": {
+      "bundle": "2.6.20261016-local",
+      "kernel": "2.6.20261020-local"
+    },
+    "after_binding": {
+      "bundle": "2.6.20261021-local",
+      "kernel": "2.6.20261020-local"
+    },
+    "preserved": [
+      "receipt SHA256",
+      "desired SHA256",
+      "current receipt transaction journal SHA256",
+      "current receipt transaction proof SHA256",
+      "six host file dev/inode/size/mtime/ctime"
+    ],
+    "actual_binding_artifact_matches_after_sha256": true,
+    "scope_notes": [
+      "The helper executes only the fixed V9 formal bind-core-bundle CLI and allows target V4 or V9; it does not launch a VM or directly edit binding.",
+      "Entry/exit observe refuses both pending markers and all task8 attachments. Output and binding evidence files are created exclusively.",
+      "The helper observations themselves do not hold the VM directory lock. The formal binder owns its mutation lock; before/after evidence is suitable for root serial scheduling, not general concurrent snapshot guarantees.",
+      "digest uses ordinary read_bytes; six host file comparison is metadata only, not full content hashes. Current actual binding artifact was separately checked to match the after binding JSON and SHA256.",
+      "For later reuse, keeping root operations serial and checking saved binding artifact SHA against after.binding_sha256 avoids claiming stronger consistency than the helper establishes."
+    ]
+  }
+}

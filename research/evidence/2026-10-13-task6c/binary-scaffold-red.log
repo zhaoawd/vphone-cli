@@ -1,0 +1,15 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Emitting module FirmwarePatcherTests
+[6/7] Compiling FirmwarePatcherTests FirmwareInstalledOriginTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:54:29: error: value of type 'FirmwareInstalledOrigin.Session' has no member 'produceBinary'
+52 |             effectiveExecutable: executable, recheck: {}) { session in
+53 |             #expect(throws: (any Error).self) {
+54 |                 try session.produceBinary(component: "kernelcache", transaction: transaction)
+   |                             `- error: value of type 'FirmwareInstalledOrigin.Session' has no member 'produceBinary'
+55 |             }
+56 |         }
+error: fatalError

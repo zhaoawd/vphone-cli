@@ -1,0 +1,163 @@
+{
+  "schema": "vphone.handoff-merge-validation/1",
+  "date": "2026-10-12",
+  "generated_at": "2026-10-12T03:05:45.014375+00:00",
+  "base": "2c119ae60996ddd59783327b063a2a4aeeb297b1",
+  "incoming": "959acfc0b08d433520c976c693a0a2076499dfbf",
+  "python": {
+    "command": "make test_python",
+    "exit_code": 0,
+    "tests": 679,
+    "skipped": 0
+  },
+  "swift": {
+    "command": "make test_swift",
+    "exit_code": 0,
+    "xctest": 254,
+    "xctest_skipped": 3,
+    "swift_testing_regular": 1311,
+    "swift_testing_latency": 9,
+    "memory_and_guest_component_checks": "passed"
+  },
+  "firmware": {
+    "command": "VPHONE_TEST_FIXTURES=/Users/qcz3840/github/vphone-cli/ipsws/patch_refactor_input make test_firmware",
+    "exit_code": 0,
+    "tests": 15,
+    "suites": 12,
+    "fixture_files": 17
+  },
+  "build": {
+    "commands": [
+      "make guest_components_build",
+      "make build"
+    ],
+    "exit_codes": [
+      0,
+      0
+    ],
+    "signed_host_images": 7,
+    "candidate_profiles": [
+      "classic",
+      "v2"
+    ]
+  },
+  "review": {
+    "findings_fixed": [
+      "v2 inputs missing from create snapshot",
+      "v2 installer missing fixed pins and overlay validation"
+    ],
+    "remaining_P1_P2": 0
+  },
+  "bundle_snapshot": {
+    "checks": "CLI resources, strict signature, fingerprint and frozen external inputs passed",
+    "guest_input_entries": 22,
+    "vm_help_exit": 9,
+    "source_vm_help_exit": 9,
+    "default_python_probe": false,
+    "project_venv_python_probe": true
+  },
+  "limits": {
+    "vm_started": false,
+    "vm_runtime_help_failure_cause": "not established",
+    "real_vm_acceptance": "not performed",
+    "remote_push": false
+  },
+  "logs": [
+    {
+      "file": "evidence/bundle-snapshot-project-python.json.gz",
+      "gzip_sha256": "a42986489391ce373f41865f409a825f35cc31003bd7c9ae021eb01cfc0b5c83",
+      "log_sha256": "53697acb46280846f24a3c070ca5fbef15f80755bf0fd0ed59bb2cdb0a8256da",
+      "bytes": 67565
+    },
+    {
+      "file": "evidence/bundle-snapshot-project-python.log.gz",
+      "gzip_sha256": "3e0379cb5d0b3928de07eba6df93dfa4d6c07cfb14151837b53b2778d57b20c4",
+      "log_sha256": "0f6c6a4d8ee9e3c89af97e0ec369f84ce4406fb8a5c49575d0b7a85ce778b8c1",
+      "bytes": 1707
+    },
+    {
+      "file": "evidence/bundle-snapshot.json.gz",
+      "gzip_sha256": "1f2ee4d7e927ccfdc41862ba545fe802f47bbb152c4b4559afe8408803315283",
+      "log_sha256": "8724627412feb7bd61b8adbd1780257e71aa82a584b4c6bd9c60b706325096ef",
+      "bytes": 67566
+    },
+    {
+      "file": "evidence/bundle-snapshot.log.gz",
+      "gzip_sha256": "371cef3ff5f22560e525bc1c4f9fc6f91b8cbb1c4896f9e351a3174ad98b7e6c",
+      "log_sha256": "b1e3be1c596f614f90d310edd31514261513599e801e1ba8990588628837d911",
+      "bytes": 1707
+    },
+    {
+      "file": "evidence/candidate-profiles-green.log.gz",
+      "gzip_sha256": "b105b59fe40bc23c78c803586a517263703c393a5525fd76a59dce955a3a0c88",
+      "log_sha256": "ca02955fbb95cdd5b18e4cb8a56675b35cb4e1317b82c9b4e5ea2ebadb9c3e47",
+      "bytes": 1485
+    },
+    {
+      "file": "evidence/experiment-transaction-green.log.gz",
+      "gzip_sha256": "0345ab8ac4c06e1728fd565b67b1251fc0163868405eef615318f7848a8a16be",
+      "log_sha256": "f3c689fa5c43f780cc0d7c577e7e44769b47f1d8dc906c35938827279a647af4",
+      "bytes": 53419
+    },
+    {
+      "file": "evidence/final-python.log.gz",
+      "gzip_sha256": "8dd67921810c08bd4eba33ac8c7b8b30af1f01eead9209e48685b91e8d742d8e",
+      "log_sha256": "2437284bcef11140b2eeb9769c763e8b64ff97ab8f5bd9b6beccb6d055b62c03",
+      "bytes": 104113
+    },
+    {
+      "file": "evidence/firmware.log.gz",
+      "gzip_sha256": "36314a26c402cb88d8098660d13538a571744e8186c97319514e15787b0a43ab",
+      "log_sha256": "3e62cdabb0287815686a01a1f79b2b522b54975643179b6d761dc76fd4becc35",
+      "bytes": 8353
+    },
+    {
+      "file": "evidence/full-swift.log.gz",
+      "gzip_sha256": "aefc191515938b4d9ca92a8fedd961fcba8545721a4e795ecc04498af2c5267d",
+      "log_sha256": "cba169e1bb4bcfe4cf2dfc5fb1ab99d942e87305d9156be0b9a7beb6fe991e80",
+      "bytes": 480474
+    },
+    {
+      "file": "evidence/guest-components-build.log.gz",
+      "gzip_sha256": "9d8e87634afc2ff68760f216470ccdf409292f2ccfa0dcd771581940ce18a5f8",
+      "log_sha256": "325d782a7d2a8819560053335c5773fbb24ea5e449d513f494da1cfe9a780fab",
+      "bytes": 3361
+    },
+    {
+      "file": "evidence/signed-build.log.gz",
+      "gzip_sha256": "05b388fe085b0cab8373ffa08677053e906f6b6258153ff2a88682d560f349db",
+      "log_sha256": "fc577dbc00c9baefa7f847a38a0f707e450e0ec9dd75c66bc3cf02a28ca8fbb0",
+      "bytes": 1656477
+    },
+    {
+      "file": "evidence/syntax.log.gz",
+      "gzip_sha256": "a2e5cc5a693a21fb357f421c658a98ceea5f377da395abfd0dddda7ffe2d75d2",
+      "log_sha256": "8b0ab07fafdf3ae9d64804992985edbc2b0d38d6f36486c8916cef6b0508e800",
+      "bytes": 62
+    },
+    {
+      "file": "evidence/v2-api-validation-green.log.gz",
+      "gzip_sha256": "715f3ad7dc1b3dc49aac18d3f3e02d25ecc1db78e54447aa59eeb4927b0f5031",
+      "log_sha256": "b8633ce58a4783cd3aa23d6abf7ec0338cb54cc6992fb521258ab5b5c1df4a2e",
+      "bytes": 116
+    },
+    {
+      "file": "evidence/v2-api-validation-red.log.gz",
+      "gzip_sha256": "d7c0cb58b1ca24b24e7e418d7ac18565be22ad48aafb7ec558736819d0862867",
+      "log_sha256": "44d995d0162125c0463e01ccae5d31758981389cfb4d5f56a2239da98cfa21d4",
+      "bytes": 2171
+    },
+    {
+      "file": "evidence/v2-camera-red.log.gz",
+      "gzip_sha256": "eca6445a8b936ce32980f9363d8a611b3f30a3cfe9ba71123254478241e8ca06",
+      "log_sha256": "0326e882144f32976e204d558b936f2376a3abdf751d264e604e1582c44d7399",
+      "bytes": 915
+    },
+    {
+      "file": "evidence/v2-snapshot-red.log.gz",
+      "gzip_sha256": "deedd2d8ae9fd2e8b4741b2883532f39d5008824e24380614e2754fb6db5230f",
+      "log_sha256": "ed4bca64c1325bc09bee6fd32ba5c45a2b7548a3680877c35d196da215cf62f3",
+      "bytes": 3439
+    }
+  ]
+}

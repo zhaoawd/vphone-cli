@@ -46,6 +46,7 @@ case "${0:t}:$1" in
  hdiutil:detach|diskutil:eject) [[ ${FAIL_CLEANUP:-0} == 1 ]] && exit 1; if [[ -f "$TEST_MOUNTS" ]]; then "$TEST_PYTHON" -c 'import os,pathlib,sys; p=pathlib.Path(os.environ["TEST_MOUNTS"]); p.write_text("".join(l for l in p.read_text().splitlines(True) if " on "+sys.argv[1]+" (" not in l))' "$2"; fi; exit 0;;
  python:*) if [[ "$1" == */vm_lock.py || "$1" == -c ]]; then exec "$TEST_PYTHON" "$@"; fi
    if [[ "$1" == */cfw_disk_txn.py ]]; then exec "$TEST_PYTHON" "$TEST_TXN_HARNESS" "$@"; fi
+   if [[ "$1" == */patchers/plan_gate.py && "$2" == verify-final ]]; then exit ${FAIL_FINAL_EFFECT:-0}; fi
    if [[ "$1" == */apfs_snap_rename.py ]]; then [[ ${FAIL_SNAP:-0} == 1 ]] && exit 5; exec "$TEST_PYTHON" -c 'import sys; f=open(sys.argv[1],"r+b"); f.seek(1024); f.write(b"SNAPSHOT-FLIPPED")' "$2"; fi
    exit 0;;
 esac
@@ -55,7 +56,7 @@ exit 0
         for name in ('lsof', 'hdiutil', 'diskutil', 'umount', 'python', 'chown'):
             (bins / name).symlink_to(stub)
         self.env = dict(os.environ, TEST_LOG=str(self.root / 'calls'),
-                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable,
+                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_CFW_VARIANT='regular', VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable,
                         TEST_TXN_HARNESS=str(ROOT / 'tests/cfw_disk_txn_faults.py'))
         for name in ('REAL_LSOF', 'FAIL_SNAP', 'CFW_TXN_FAULTS', 'VPHONE_VM_LOCK_FD', 'VPHONE_CFW_LOCK_REEXEC'):
             self.env.pop(name, None)
@@ -104,7 +105,7 @@ exit ${INSTALL_EXIT:-0}
     # Variables the doubles and the driver need on the authentication-dialog
     # path, where vphone-cli passes every variable inline (see bare_env).
     INLINE_KEYS = ('TEST_LOG', 'VPHONE_PYTHON', 'VPHONE_KEEP_ARTIFACTS', 'TEST_PYTHON', 'TEST_TXN_HARNESS',
-                   'TEST_ATTACH_PLIST', 'ZDOTDIR')
+                   'TEST_ATTACH_PLIST', 'ZDOTDIR', 'VPHONE_CFW_VARIANT')
 
     def bare_env(self):
         """Environment of `do shell script ... with administrator privileges`.
@@ -124,7 +125,7 @@ exit ${INSTALL_EXIT:-0}
             (vm / 'Disk.img').touch()
         base = self.bare_env() if bare else self.env
         proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', variant, str(vm)],
-                                    env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+                                    env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **dict(env, VPHONE_CFW_VARIANT=variant)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         def stop():
             try:
                 os.killpg(proc.pid, signal.SIGKILL)
@@ -423,6 +424,16 @@ class HostIsolationTests(HostDriverFixture):
         rc, _ = self.finish(p)
         self.assertNotEqual(rc, 0)
         self.assertNotIn('apfs_snap_rename.py', (self.root / 'calls').read_text())
+
+    def test_final_effect_failure_prevents_snapshot_and_publish(self):
+        _, process = self.start(FAIL_FINAL_EFFECT='43')
+        rc, output = self.finish(process)
+        self.assertEqual(rc, 43, output)
+        calls = (self.root / 'calls').read_text()
+        self.assertIn('verify-final', calls)
+        self.assertNotIn('apfs_snap_rename.py', calls)
+        self.assertNotIn(' publish ', calls)
+        self.assertIn('hdiutil detach /dev/disk91', calls)
 
     def test_installer_failure_survives_cleanup_failure(self):
         _, p = self.start(INSTALL_EXIT='37', FAIL_CLEANUP='1')

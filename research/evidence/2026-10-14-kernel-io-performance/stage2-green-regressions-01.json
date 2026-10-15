@@ -1,0 +1,29 @@
+{
+  "command": [
+    "swift",
+    "test",
+    "--package-path",
+    "/private/tmp/vphone-kernel-io-optimization-20261014",
+    "--scratch-path",
+    "/private/tmp/vphone-kernel-io-optimization-20261014/.build",
+    "--cache-path",
+    "/private/tmp/vphone-kernel-io-optimization-20261014/.swiftpm-cache",
+    "--disable-automatic-resolution",
+    "-c",
+    "release",
+    "--filter",
+    "FirmwareKernelIOReaderTests|FirmwareKernelIOEquivalenceTests|FirmwareKernelDiskMemoryTests|KernelIOTraceTests|FirmwareKernelUpdateTests|FirmwareKernelRollbackTests"
+  ],
+  "environment_overrides": {},
+  "exit_code": 1,
+  "elapsed_seconds": 1.0833290410228074,
+  "log": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/stage2-green-regressions-01.log",
+  "acceptance_directory_lock_held": false,
+  "artifact_directory_lock_held": "/private/tmp/vphone-kernel-io-optimization-20261014",
+  "child_pid": 49061,
+  "child_start_new_session": true,
+  "timeout_seconds": 600.0,
+  "timed_out": false,
+  "interrupted": null,
+  "cleanup_signals_to_owned_child_group": []
+}

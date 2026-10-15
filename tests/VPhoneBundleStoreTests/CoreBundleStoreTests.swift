@@ -97,6 +97,49 @@ private final class BundleFixture {
 
 @Suite(.serialized)
 struct CoreBundleStoreTests {
+    @Test @MainActor func asyncVerificationKeepsLockAndExpiresRecheck() async throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        var retained: (() throws -> Void)?
+        try await fixture.store.withRevalidatedExecutableAsync(version: "2.2.3-local", executable: .vm) { executable, recheck in
+            #expect(executable.lastPathComponent == "vphone-vm")
+            retained = recheck
+            await Task.yield()
+            let descriptor = open(fixture.store.root.appendingPathComponent(".store.lock").path, O_RDWR)
+            defer { close(descriptor) }
+            #expect(flock(descriptor, LOCK_EX | LOCK_NB) != 0)
+            try recheck()
+        }
+        #expect(throws: Error.self) { try retained?() }
+    }
+
+    @Test @MainActor func asyncVerificationCancellationInvalidatesAndReleasesStore() async throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        let operation = Task { @MainActor in
+            try await fixture.store.withRevalidatedExecutableAsync(version: "2.2.3-local", executable: .vm) { _, recheck in
+                withUnsafeCurrentTask { $0?.cancel() }
+                #expect(throws: Error.self) { try recheck() }
+            }
+        }
+        do { try await operation.value; Issue.record("cancelled source returned normally") } catch {}
+        let fd = open(fixture.store.root.appendingPathComponent(".store.lock").path, O_RDWR)
+        defer { flock(fd, LOCK_UN); close(fd) }
+        #expect(flock(fd, LOCK_EX | LOCK_NB) == 0)
+    }
+
+    @Test @MainActor func asyncVerificationRejectsSourceMutationBeforeReturn() async throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        do {
+            try await fixture.store.withRevalidatedExecutableAsync(version: "2.2.3-local", executable: .vm) { _, _ in
+                try Data("changed".utf8).write(to: fixture.installed.appendingPathComponent("VPhone.bundle/Contents/Resources/data"))
+                await Task.yield()
+            }
+            Issue.record("changed source escaped verification")
+        } catch {}
+    }
+
     @Test func unavailableExecutableExplainsExplicitRecoveryWithoutRunningOrCreatingStore() throws {
         let fixture = try BundleFixture()
         var invoked = false
@@ -521,5 +564,35 @@ struct FrozenLocalHostBundleTests {
         let bundle = fixture.store.root.appendingPathComponent(version).appendingPathComponent("VPhone.bundle")
         #expect(!FileManager.default.fileExists(atPath: bundle.appendingPathComponent("Contents/MacOS/vphone-escalator").path))
         #expect(FileManager.default.fileExists(atPath: bundle.appendingPathComponent("Contents/Resources/guest-resources/api/manifest.json").path))
+    }
+}
+
+extension CoreBundleStoreTests {
+    @Test func revalidationUsesLiveStoreAndExpiresWithCallback() throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        var escaped: (() throws -> Void)?
+        try fixture.store.withRevalidatedExecutable(version: "2.2.3-local", executable: .cli) { _, recheck in
+            escaped = recheck
+            try recheck()
+            try Data("changed resource".utf8).write(to: fixture.installed.appendingPathComponent("VPhone.bundle/Contents/Resources/data"))
+            #expect(throws: (any Error).self) { try recheck() }
+        }
+        #expect(throws: (any Error).self) { try escaped?() }
+    }
+
+    @Test(arguments: ["missing", "corrupt", "old", "wrong-version"])
+    func revalidationRefusesInvalidStoreReceipt(_ fault: String) throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        let receipt = fixture.installed.appendingPathComponent("receipt.json")
+        if fault == "missing" { try FileManager.default.removeItem(at: receipt) }
+        if fault == "corrupt" { try Data("invalid".utf8).write(to: receipt) }
+        if fault == "old" { try Data(#"{"version":"2.2.3-local"}"#.utf8).write(to: receipt) }
+        var called = false
+        #expect(throws: (any Error).self) {
+            try fixture.store.withRevalidatedExecutable(version: fault == "wrong-version" ? "2.6.9" : "2.2.3-local", executable: .cli) { _, _ in called = true }
+        }
+        #expect(!called)
     }
 }

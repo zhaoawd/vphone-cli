@@ -1,0 +1,217 @@
+{
+  "passed": true,
+  "pid": 96165,
+  "events": 10,
+  "limitations": [
+    "Inclusive measurements overlap; do not sum across phases.",
+    "Consumer and child stream bytes may describe the same reads.",
+    "Logical bytes are returned user-space bytes, not physical disk I/O.",
+    "Aggregate child counters are summaries, not additional independent work."
+  ],
+  "roots": [
+    "bf348da2-2f13-4092-bc44-688034f9fef9",
+    "10c3ab41-1a31-4f84-8251-aabfe1426f13",
+    "624389ef-7385-4475-9c9d-69ba11756b9c"
+  ],
+  "groups": [
+    {
+      "phase": "generation.fileSHA256",
+      "caller_file": "FirmwarePatcher/FirmwareKernelDisk.swift",
+      "caller_line": 75,
+      "caller_function": "validate(directory:root:)",
+      "role": "original_disk_snapshot",
+      "byte_semantics": "consumer_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 969458,
+      "counts": {
+        "bytes": 1048579
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 969458
+      }
+    },
+    {
+      "phase": "generation.fileSHA256",
+      "caller_file": "FirmwarePatcher/FirmwareKernelDisk.swift",
+      "caller_line": 76,
+      "caller_function": "validate(directory:root:)",
+      "role": "candidate_disk_snapshot",
+      "byte_semantics": "consumer_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 864958,
+      "counts": {
+        "bytes": 1048579
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 864958
+      }
+    },
+    {
+      "phase": "generation.fileSHA256",
+      "caller_file": "FirmwarePatcherTests/FirmwareKernelIOBenchmarkTests.swift",
+      "caller_line": 84,
+      "caller_function": "benchmark(_:)",
+      "role": "candidate_image",
+      "byte_semantics": "consumer_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 597167,
+      "counts": {
+        "bytes": 1048579
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 597167
+      }
+    },
+    {
+      "phase": "generation.fileSHA256",
+      "caller_file": "FirmwarePatcherTests/FirmwareKernelIOBenchmarkTests.swift",
+      "caller_line": 84,
+      "caller_function": "benchmark(_:)",
+      "role": "live_disk",
+      "byte_semantics": "consumer_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 1739917,
+      "counts": {
+        "bytes": 1048579
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 1739917
+      }
+    },
+    {
+      "phase": "generation.readFile",
+      "caller_file": "FirmwarePatcher/FirmwareGeneration.swift",
+      "caller_line": 303,
+      "caller_function": "fileSHA256(_:file:line:function:)",
+      "role": "candidate_disk_snapshot",
+      "byte_semantics": "stream_read_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 827167,
+      "counts": {
+        "bytes": 1048579,
+        "read_calls": 3
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 827167
+      }
+    },
+    {
+      "phase": "generation.readFile",
+      "caller_file": "FirmwarePatcher/FirmwareGeneration.swift",
+      "caller_line": 303,
+      "caller_function": "fileSHA256(_:file:line:function:)",
+      "role": "candidate_image",
+      "byte_semantics": "stream_read_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 557917,
+      "counts": {
+        "bytes": 1048579,
+        "read_calls": 3
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 557917
+      }
+    },
+    {
+      "phase": "generation.readFile",
+      "caller_file": "FirmwarePatcher/FirmwareGeneration.swift",
+      "caller_line": 303,
+      "caller_function": "fileSHA256(_:file:line:function:)",
+      "role": "live_disk",
+      "byte_semantics": "stream_read_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 1360792,
+      "counts": {
+        "bytes": 1048579,
+        "read_calls": 3
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 1360792
+      }
+    },
+    {
+      "phase": "generation.readFile",
+      "caller_file": "FirmwarePatcher/FirmwareGeneration.swift",
+      "caller_line": 303,
+      "caller_function": "fileSHA256(_:file:line:function:)",
+      "role": "original_disk_snapshot",
+      "byte_semantics": "stream_read_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 824084,
+      "counts": {
+        "bytes": 1048579,
+        "read_calls": 3
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 824084
+      }
+    },
+    {
+      "phase": "kernelDisk.validate",
+      "caller_file": "FirmwarePatcher/FirmwareKernelDisk.swift",
+      "caller_line": 70,
+      "caller_function": "validate(directory:root:)",
+      "role": null,
+      "byte_semantics": null,
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 3985500,
+      "counts": {},
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 3985500
+      }
+    },
+    {
+      "phase": "kernelDisk.validate.compare",
+      "caller_file": "FirmwarePatcher/FirmwareKernelDisk.swift",
+      "caller_line": 89,
+      "caller_function": "validate(directory:root:)",
+      "role": null,
+      "byte_semantics": "comparison_stream_actual",
+      "calls": 1,
+      "success": 1,
+      "error": 0,
+      "cumulative_inclusive_ns": 1409875,
+      "counts": {
+        "blocks": 257,
+        "disk_bytes": 1048579,
+        "disk_read_calls": 258,
+        "logical_bytes": 1048579,
+        "new_bytes": 1048579,
+        "new_read_calls": 257,
+        "old_bytes": 1048579,
+        "old_read_calls": 257
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 1409875
+      }
+    }
+  ]
+}

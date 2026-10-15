@@ -320,7 +320,8 @@ final class APIProxyTests: XCTestCase {
         defer { close(fd) }
         var bufferSize: Int32 = 4096
         setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufferSize, socklen_t(MemoryLayout<Int32>.size))
-        let data = request("Authorization: Bearer \(token)\r\nContent-Length: 4194304\r\n") + Data(repeating: 65, count: 4 * 1024 * 1024)
+        // This is the already-qualified internal transport; the external admission refusal has separate coverage.
+        let data = request("Authorization: Bearer \(proxy.internalToken)\r\nContent-Length: 4194304\r\n") + Data(repeating: 65, count: 4 * 1024 * 1024)
         XCTAssertFalse(proxyWrite(fd, data), "The guest never drains its socket; forwarding must terminate")
         XCTAssertTrue(proxyRead(fd).isEmpty)
     }

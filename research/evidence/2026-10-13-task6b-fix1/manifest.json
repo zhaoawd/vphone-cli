@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "task": "6B Fix1",
+  "base": "afd2b930c158e6317479387de68cf26b9f328bfa",
+  "targetRulesSHA256": "5f259f42583bb7b1f1426b986a86801fc421e17921fc157fe4a74bd596771213",
+  "environment": {
+    "cwd": "/Users/qcz3840/github/vphone-cli",
+    "python": ".venv/bin/python3",
+    "swiftScratch": "/private/tmp/vphone-five-tasks-swift-20261012",
+    "clearedPrefixes": [
+      "VPHONE_TEST_",
+      "VPHONE_LESS_",
+      "VPHONE_C4_"
+    ],
+    "realMountOrVM": false
+  },
+  "finalSources": [
+    {
+      "path": "scripts/firmware_worker.py",
+      "sha256": "1681d2bc50a61545849e29fb418bc28ba07d8fbfce0f42ee8a943d5fd97fcba0",
+      "bytes": 3626
+    },
+    {
+      "path": "sources/FirmwarePatcher/Filesystem/FirmwareFilesystemEvidence.swift",
+      "sha256": "96c0e95d40d708975d6f722e24b0b278121ded63b042d5a5f74249b79a68c29f",
+      "bytes": 4215
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+      "sha256": "74de5432d299634f497dc570d522990aecebe74e506336c1ce4dc5c41f2e0128",
+      "bytes": 52498
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+      "sha256": "b8a060f77545d9d5c37582bfa3fe870e52fb089f292644447c06193750a5a6d8",
+      "bytes": 57732
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift",
+      "sha256": "30100f5d558d6f9094d6cc0dda5c74edeea30c2b8d6b8f30a2055e06fba0d371",
+      "bytes": 15270
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareFilesystemPublicationTests.swift",
+      "sha256": "ba29701cd936762c970390cc5ea5202c94a2fc4fd60aecfb189e7d67810470d3",
+      "bytes": 7596
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareReceiptPublicationTests.swift",
+      "sha256": "3d8b90f80a676f9153c12f4b2d09d8a051a3f72caddbd96d4ab05a261cff13be",
+      "bytes": 23119
+    },
+    {
+      "path": "tests/test_firmware_worker.py",
+      "sha256": "934f3eaa8a6535729bb30360a79a267e3d04a389a586590ebe1c39b7a764f99f",
+      "bytes": 11690
+    },
+    {
+      "path": "research/0_binary_patch_comparison.md",
+      "sha256": "df710f0dc859eab17d8d3ed0897a08b8a8254dbe42b7b6ea80eb885b1e7ce3dc",
+      "bytes": 180502
+    }
+  ],
+  "logs": [
+    {
+      "name": "final-diff",
+      "raw": {
+        "path": "final-diff.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "gzip": {
+        "path": "final-diff.log.gz",
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "bytes": 20
+      },
+      "command": "final-diff.command.json",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "seconds": 0.13718605041503906,
+      "exitCode": 0
+    },
+    {
+      "name": "final-root-green",
+      "raw": {
+        "path": "final-root-green.log",
+        "sha256": "1bc20eaff36f00ce2df0531e14719c065de62d1c5e8d7c14594ed50f0fee8396",
+        "bytes": 1950
+      },
+      "gzip": {
+        "path": "final-root-green.log.gz",
+        "sha256": "396703e79d914afc5276bbf0b4ce28f22f9ff008c8bcd4eadc9d17197057b314",
+        "bytes": 690
+      },
+      "command": "final-root-green.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "finalWindowMutationOfJournalRootCannotCommit"
+      ],
+      "seconds": 11.571599245071411,
+      "exitCode": 0
+    },
+    {
+      "name": "final-root-red",
+      "raw": {
+        "path": "final-root-red.log",
+        "sha256": "5e2bbbd75acee1d60705c00991ba76995e224f9533a315e8f795b90715d16b06",
+        "bytes": 6533
+      },
+      "gzip": {
+        "path": "final-root-red.log.gz",
+        "sha256": "ba7c62377ed398f07dc6d5c9a6198a3b0130664e9ec563c1dd845d719e7ebfa8",
+        "bytes": 1230
+      },
+      "command": "final-root-red.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "finalWindowMutationOfJournalRootCannotCommit"
+      ],
+      "seconds": 10.266179084777832,
+      "exitCode": 1
+    },
+    {
+      "name": "final-swift",
+      "raw": {
+        "path": "final-swift.log",
+        "sha256": "34feadbd61427de6a3a90bd87f7fef9c6d32e45dfb4ebc2d5d12f159c8992f23",
+        "bytes": 16422
+      },
+      "gzip": {
+        "path": "final-swift.log.gz",
+        "sha256": "fa2d50e0e461b2ec8d7622022490400e95cbcfa28425f6e33df19fc70eee7799",
+        "bytes": 2534
+      },
+      "command": "final-swift.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests|FirmwareFilesystemPublicationTests|FirmwareTransactionTests|FirmwarePlanBindingTests"
+      ],
+      "seconds": 27.618038177490234,
+      "exitCode": 0
+    },
+    {
+      "name": "final-worker",
+      "raw": {
+        "path": "final-worker.log",
+        "sha256": "9fafa5039c8387f367cb4b1f66f6afedf363878a4d701c465721e5b4bcb6aab9",
+        "bytes": 1426
+      },
+      "gzip": {
+        "path": "final-worker.log.gz",
+        "sha256": "c07c849ffb0314903c72fccc9a04d11a54c5878c75c5bf3f14b253cd1b2635cd",
+        "bytes": 339
+      },
+      "command": "final-worker.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_firmware_worker"
+      ],
+      "seconds": 1.210486888885498,
+      "exitCode": 0
+    },
+    {
+      "name": "worker-io-green",
+      "raw": {
+        "path": "worker-io-green.log",
+        "sha256": "5abbf51fbbba0da6ccc18ff6a9f888c07a75d8949f9eedfe55cae8cc8974b714",
+        "bytes": 1764
+      },
+      "gzip": {
+        "path": "worker-io-green.log.gz",
+        "sha256": "4e4eadeb30454066b4f6b57f9da466c77c45b37f468d941a4be7f0e22102c80f",
+        "bytes": 672
+      },
+      "command": "worker-io-green.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "startedWorkerIOFailureWaitsAndDrainsBeforeUnlock"
+      ],
+      "seconds": 10.457549095153809,
+      "exitCode": 0
+    },
+    {
+      "name": "worker-io-red",
+      "raw": {
+        "path": "worker-io-red.log",
+        "sha256": "98be2de0cb08c86ee96dcd2cfaa688479ba97e6347712ed788377857c3ed3e5b",
+        "bytes": 8216
+      },
+      "gzip": {
+        "path": "worker-io-red.log.gz",
+        "sha256": "a2561af63df6ba5ad53e48f294e62d408ef2ff667f08de76a0feec704be11b95",
+        "bytes": 1974
+      },
+      "command": "worker-io-red.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "startedWorkerIOFailureWaitsAndDrainsBeforeUnlock"
+      ],
+      "seconds": 16.621428966522217,
+      "exitCode": 1
+    }
+  ],
+  "results": {
+    "final-root-red": "exit1: all 3 final-window mutations wrongly committed",
+    "final-root-green": "exit0: all 3 reject commit and retain unknown bytes/pending journal",
+    "worker-io-red": "exit1: both stdout destinations return before worker and allow actual recovery; pipe output incomplete",
+    "worker-io-green": "exit0: both destinations hold recovery lock through 4MiB output and worker exit, then return original EIO",
+    "final-swift": "exit0: 50 tests / 4 suites",
+    "final-worker": "exit0: 8 tests",
+    "final-diff": "exit0 before raw log staging"
+  },
+  "scope": [
+    "Only final root revalidation and post-spawn output/wait lifecycle changes.",
+    "I/O fault is injected at afterToolStart; worker and tool subprocess, recovery, locking and output writes are real.",
+    "Unchanged root case uses existing manual transaction semantics; other root mutations use generated receipts.",
+    "C installed adapter/trusted Store/legacy import and Task12 full standard/real firmware/VM acceptance remain pending."
+  ]
+}

@@ -1,0 +1,53 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Emitting module FirmwarePatcherTests
+[6/7] Compiling FirmwarePatcherTests RequiredDeclarationEvidenceTests.swift
+[7/9] Compiling FirmwarePatcherTests FrozenStepExecutionTests.swift
+[8/9] Compiling FirmwarePatcherTests FrozenDeclarationGateTests.swift
+[8/10] Write Objects.LinkFileList
+[9/10] Linking vphone-cliPackageTests
+Build complete! (8.21s)
+Test Suite 'Selected tests' started at 2026-10-12 21:04:19.811.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-12 21:04:19.813.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-12 21:04:19.813.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-12 21:04:19.813.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite RequiredDeclarationEvidenceTests started.
+◇ Test recordRulesAreEncodedInCatalogAndFrozenPlan() started.
+◇ Test unknownRecordInEnabledStepIsRefused() started.
+◇ Test alreadyAppliedNeedsVerifiedOutput() started.
+◇ Test offsetSuffixMustEqualRecordOffset() started.
+◇ Test combinedStepCannotHideMissingRequiredDeclaration() started.
+◇ Test completeRequiredEvidencePasses(_:) started.
+◇ Test alreadyAppliedReadsCurrentPayload(_:) started.
+◇ Test missingEntireComponentIsRefused() started.
+◇ Test legacyJournalWithoutRulesRemainsRecoverable() started.
+◇ Test missingOneRequiredRecordLeavesOriginalFirmwareUnchanged() started.
+◇ Test legacyBoundJournalPreservesDigestAndRecovery() started.
+◇ Test case passing 1 argument containsOutput → false to alreadyAppliedReadsCurrentPayload(_:) started.
+◇ Test case passing 1 argument containsOutput → true to alreadyAppliedReadsCurrentPayload(_:) started.
+◇ Test case passing 1 argument variant → "regular" to completeRequiredEvidencePasses(_:) started.
+◇ Test case passing 1 argument variant → "dev" to completeRequiredEvidencePasses(_:) started.
+◇ Test case passing 1 argument variant → "jb" to completeRequiredEvidencePasses(_:) started.
+◇ Test case passing 1 argument variant → "less" to completeRequiredEvidencePasses(_:) started.
+◇ Test case passing 1 argument variant → "exp" to completeRequiredEvidencePasses(_:) started.
+✔ Test offsetSuffixMustEqualRecordOffset() passed after 0.012 seconds.
+✔ Test alreadyAppliedReadsCurrentPayload(_:) with 2 test cases passed after 0.012 seconds.
+✔ Test combinedStepCannotHideMissingRequiredDeclaration() passed after 0.012 seconds.
+✔ Test alreadyAppliedNeedsVerifiedOutput() passed after 0.012 seconds.
+✔ Test unknownRecordInEnabledStepIsRefused() passed after 0.012 seconds.
+✔ Test recordRulesAreEncodedInCatalogAndFrozenPlan() passed after 0.014 seconds.
+✔ Test missingEntireComponentIsRefused() passed after 0.014 seconds.
+✔ Test completeRequiredEvidencePasses(_:) with 5 test cases passed after 0.021 seconds.
+✔ Test missingOneRequiredRecordLeavesOriginalFirmwareUnchanged() passed after 0.030 seconds.
+✔ Test legacyJournalWithoutRulesRemainsRecoverable() passed after 0.038 seconds.
+✔ Test legacyBoundJournalPreservesDigestAndRecovery() passed after 0.123 seconds.
+✔ Suite RequiredDeclarationEvidenceTests passed after 0.124 seconds.
+✔ Test run with 11 tests in 1 suite passed after 0.124 seconds.

@@ -1,0 +1,65 @@
+{
+  "reviewed_at": "2026-10-14T07:22:12.277764+00:00",
+  "status": "no-blocking-findings-for-exact-qualified-same-daemon-SIGCONT-restoration; not-live-executed-by-reviewer",
+  "scope": "Static helper/mock/SDK review plus12 independent pure mocks. No real PID observation or signal; native process and kill functions are mocked. Ordinary temporary-file fgetattrlist only.",
+  "evidence_sha256": {
+    "restore-acceptance-amfid.py": "527a804644b4db0873996179bbf4c255db94df750834422b713da30e336d0eae",
+    "restore-acceptance-amfid-mock.py": "7f3a919c43424bd292eaa84eefbfa05a352bd098ef2f835f8fd1617e74cddcd6",
+    "restore-acceptance-amfid-green-proc-flags.log": "0f43d0540a05efddaae1ec2ac25d43d26bffbd1b2b6467b99656e75962b37a4c",
+    "restore-acceptance-amfid-red-wrong-proc-flag.log": "aa81bf5171bf91708e9981c12fb53e12551592525632c77f79c8a655fd57c037",
+    "restore-acceptance-amfid-red.log": "328723f8e4914cbce3e3ce88bfe3270f6ffe3fbcaddf8137a6485e4f5cd2e08c",
+    "scoped-amfi-v4-once.py": "f99f3c92d6ef68d3cf0f18d295622603ed72991950da9c39fdecd8a0da37c219"
+  },
+  "sdk": {
+    "path": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/proc_info.h",
+    "sha256": "e427fa96b348537b21552b9de71e01039410bcad2cedee5584c5e5fddafd70fc",
+    "PROC_FLAG_TRACED": 2,
+    "PROC_PIDTBSDINFO": 3,
+    "ctypes_struct_size": 136,
+    "field_offsets": {
+      "flags": 0,
+      "bsd_state": 4,
+      "xstatus": 8,
+      "pid": 12,
+      "ppid": 16,
+      "uid": 20,
+      "start_seconds": 120,
+      "start_microseconds": 128
+    }
+  },
+  "blocking_findings": [],
+  "qualified_action": [
+    "No PID argument: daemon PID comes only from one strict READY event associated with the exact fixedF99 driver wrapper/result/log.",
+    "Root euid, bounded ordinary nlink1 NOFOLLOW files, exact driver/runtime SHA, strict JSON duplicate/NaN rejection and byte/metadata/birthtime rechecks are required.",
+    "Driver command is exactly sudo or /usr/bin/sudo -n /usr/bin/python3 fixeddriver --run. Exactscope is fixedV4 binary hash/CDHash, paths=[], allow_allfalse, no persistentconfig; precisely two matching hooks and successful stopped-state breakpoint deletion/DetachFalse/CLEANUP_DONE are required.",
+    "Native process info reads PROC_PIDTBSDINFO twice around proc_pidpath, rejects short/path/identity change and correct TRACE bit2 in both reads.",
+    "Native identity must be READYpid, /usr/libexec/amfid, UID0, PPID1; positive valid start time must satisfy start_ns<=original driver log birth_ns. This direction rejects a later process reusing the PID; a process starting after log creation is conservatively refused.",
+    "Before action all source/evidence blobs are re-read for exact dataclass equality, then final native identity/state is checked again. A traced/gone/reused/changed daemon causes failure without signal.",
+    "Already SRUN2 emits no signal. Only SSTOP4 with xstatusSIGSTOP17 qualifies for a single SIGCONT; no Stop, debugger/attach, new hash/allowlist, process termination or persistent configuration API exists.",
+    "After one attempted SIGCONT, at most20 native observations with0.05s waits require same identity and SRUN2. Still stopped, traced, changed or gone fails without another signal. attempted/sent distinctions are preserved.",
+    "Exclusive NOFOLLOW mode0600 result is acquired before restore, written/fsynced with passedfalse errors and exit1 on failure; existing output refuses before any qualification/action."
+  ],
+  "validation": {
+    "reviewer_command": ".venv/bin/python3 -B research/evidence/2026-10-13-task8/acceptance/restore-acceptance-amfid-mock.py -v",
+    "reviewer_exit_code": 0,
+    "reviewer_tests": 12,
+    "reviewer_seconds": 0.018,
+    "root_green_log": "restore-acceptance-amfid-green-proc-flags.log",
+    "controlled_mutant_log": "restore-acceptance-amfid-red-wrong-proc-flag.log",
+    "controlled_mutant_result": "Three selected negative test functions fail when constant is reverted to0x800; negative observations use independent literal2. No real process calls/signals.",
+    "legacy_detach_red": "restore-acceptance-amfid-red.log demonstrates successful DetachFalse mock does not itself establish native SRUN."
+  },
+  "mock_coverage": [
+    "successSSTOP->SRUN; already-running no-op; evidence scope/source/wrapper/exit/type/hook/detach/finalrecord rejections withzero signals",
+    "first/final native identity/path/UID/PPID/start/TRACE/state refusals; unavailable process; post-signal failure withno resend; bounded wait; signal-error attempted-vs-sent",
+    "136-byte native API request/flavor/path/identity andtrace behavior withctypesDLL mocked; os.kill patched and exactSIGCONT assertion",
+    "exclusive output600/failedrecord/no-overwrite-beforeaction; invalidlabels/duplicateJSON/NaN; actualordinarytempfile birth metadata andsymlink/hardlink refusals"
+  ],
+  "limits": [
+    "No live helper run or actual same-daemon SRUN restoration is established by these mocks. Later real invocation must produce its own successful qualified record.",
+    "Start/birthtime and before/final/after checks reduce PID reuse risk; PID-based observation and kill are separate syscalls, not an atomic process-handle transaction.",
+    "SRUN here means native status2, not proof that the process is consuming CPU or that host preflight/VM boot succeeds.",
+    "The helper restores this fixed-driver attached daemon only; it cannot authorize another pause, attach, hash or different VM. VM selection itself remains the formal fixedV4 task8-copy launch argv.",
+    "Why successful DetachFalse previously left native SSTOP remains unknown. No fixedF99 or V9 production change is made."
+  ]
+}

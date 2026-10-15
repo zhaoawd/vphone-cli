@@ -14,11 +14,12 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
     private var body = Data()
     private var exceededLimit = false
     private var upload: GuestFileUpload?
-    private var requestStarted = false
+    private let proxyAdmission: GuestProxyAdmission
     private let maximumJSONBody = 1 << 20
 
-    init(hub: APIEventHub, fileIO: NonBlockingFileIO) {
+    init(hub: APIEventHub, fileIO: NonBlockingFileIO, proxyAdmission: GuestProxyAdmission) {
         self.hub = hub
+        self.proxyAdmission = proxyAdmission
         self.fileIO = fileIO
     }
 
@@ -28,12 +29,11 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
             // The host proxy checks only the first request head on a
             // connection, and replies no longer close the connection first.
             // A later request is answered with an error and not executed.
-            guard !requestStarted else {
+            guard proxyAdmission.consumeRequest() else {
                 head = nil
                 Self.send(APIWire.error("One request per connection"), on: context.channel)
                 return
             }
-            requestStarted = true
             head = request
             body.removeAll(keepingCapacity: true)
             exceededLimit = false
@@ -166,7 +166,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
                 }
                 request = APIRequest(method: method, params: params, id: nil)
             }
-            let job = HTTPJob(channel: channel, request: request, hub: hub)
+            let job = HTTPJob(channel: channel, request: request, hub: hub, externalProxy: proxyAdmission.external)
             GuestAPI.queue.async { job.run() }
         } catch {
             Self.send(APIWire.error(String(describing: error)), on: channel)
@@ -323,16 +323,18 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
 private final class HTTPJob: @unchecked Sendable {
     let channel: Channel
     let request: APIRequest
+    let externalProxy: Bool
     let hub: APIEventHub
 
-    init(channel: Channel, request: APIRequest, hub: APIEventHub) {
+    init(channel: Channel, request: APIRequest, hub: APIEventHub, externalProxy: Bool) {
         self.channel = channel
         self.request = request
+        self.externalProxy = externalProxy
         self.hub = hub
     }
 
     func run() {
-        let reply = APIWire.execute(request)
+        let reply = APIWire.execute(request, externalProxy: externalProxy)
         if reply.status == 200 {
             hub.broadcast(name: "operation.completed", data: ["method": request.method])
         }

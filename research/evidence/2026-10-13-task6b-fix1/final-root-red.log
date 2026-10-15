@@ -1,0 +1,48 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Compiling FirmwarePatcherTests FirmwareReceiptPublicationTests.swift
+[6/7] Emitting module FirmwarePatcherTests
+[6/8] Write Objects.LinkFileList
+[7/8] Linking vphone-cliPackageTests
+Build complete! (6.22s)
+Test Suite 'Selected tests' started at 2026-10-13 04:33:06.277.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 04:33:06.278.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 04:33:06.278.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 04:33:06.278.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareReceiptPublicationTests started.
+◇ Test finalWindowMutationOfJournalRootCannotCommit(_:) started.
+◇ Test case passing 1 argument fault → "preserved-file" to finalWindowMutationOfJournalRootCannotCommit(_:) started.
+◇ Test case passing 1 argument fault → "new-member" to finalWindowMutationOfJournalRootCannotCommit(_:) started.
+◇ Test case passing 1 argument fault → "unchanged-root" to finalWindowMutationOfJournalRootCannotCommit(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "unchanged-root" at FirmwareReceiptPublicationTests.swift:309:9: Expectation failed: an error was expected but none was thrown and "file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-498AEA06-BE0F-408D-A686-DEA40EB232A0/vm/.firmware-history/4e046bc9-1bd8-42c9-9518-003d56d8e3d6" was returned
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "unchanged-root" at FirmwareReceiptPublicationTests.swift:310:9: Expectation failed: (t.journalSnapshot.phase → .committed) == .publishing
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "unchanged-root" at FirmwareReceiptPublicationTests.swift:311:9: Expectation failed: an error was expected but none was thrown and "nil" was returned
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "unchanged-root" at FirmwareReceiptPublicationTests.swift:313:9: Expectation failed: (FileManager.default → <NSFileManager: 0x1031041a0>).fileExists(atPath: t.root.appendingPathComponent("journal.json").path → "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-498AEA06-BE0F-408D-A686-DEA40EB232A0/vm/.firmware-transaction/journal.json")
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "unchanged-root" at FirmwareReceiptPublicationTests.swift:287:6: Caught error: .missing
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "new-member" at FirmwareReceiptPublicationTests.swift:309:9: Expectation failed: an error was expected but none was thrown and "file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-86616939-A07D-4CBE-9AF1-8429FA0DB4FF/vm/.firmware-history/71c27171-221a-4069-8288-0d4996c7bdbe" was returned
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "new-member" at FirmwareReceiptPublicationTests.swift:310:9: Expectation failed: (t.journalSnapshot.phase → .committed) == .publishing
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "preserved-file" at FirmwareReceiptPublicationTests.swift:309:9: Expectation failed: an error was expected but none was thrown and "file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-3F2FD7A1-520F-488E-9AEE-918E436D4C36/vm/.firmware-history/883dc1e6-71bd-47dd-81cc-6fe2c8e18fb3" was returned
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "new-member" at FirmwareReceiptPublicationTests.swift:311:9: Expectation failed: an error was expected but none was thrown and "nil" was returned
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "preserved-file" at FirmwareReceiptPublicationTests.swift:310:9: Expectation failed: (t.journalSnapshot.phase → .committed) == .publishing
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "preserved-file" at FirmwareReceiptPublicationTests.swift:311:9: Expectation failed: an error was expected but none was thrown and "nil" was returned
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "new-member" at FirmwareReceiptPublicationTests.swift:313:9: Expectation failed: (FileManager.default → <NSFileManager: 0x1031041a0>).fileExists(atPath: t.root.appendingPathComponent("journal.json").path → "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-86616939-A07D-4CBE-9AF1-8429FA0DB4FF/vm/.firmware-transaction/journal.json")
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "preserved-file" at FirmwareReceiptPublicationTests.swift:313:9: Expectation failed: (FileManager.default → <NSFileManager: 0x1031041a0>).fileExists(atPath: t.root.appendingPathComponent("journal.json").path → "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-3F2FD7A1-520F-488E-9AEE-918E436D4C36/vm/.firmware-transaction/journal.json")
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "new-member" at FirmwareReceiptPublicationTests.swift:287:6: Caught error: .missing
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) recorded an issue with 1 argument fault → "preserved-file" at FirmwareReceiptPublicationTests.swift:287:6: Caught error: .missing
+✘ Test finalWindowMutationOfJournalRootCannotCommit(_:) with 3 test cases failed after 2.199 seconds with 15 issues.
+✘ Suite FirmwareReceiptPublicationTests failed after 2.200 seconds with 15 issues.
+✘ Test run with 1 test in 1 suite failed after 2.200 seconds with 15 issues.

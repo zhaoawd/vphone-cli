@@ -205,6 +205,10 @@ struct BundleOpsTests {
         try Data([5]).write(to: src.url.appendingPathComponent("ABC123.shsh"))
         let withID = src.manifest.updating(machineIdentifier: Data([9, 9]))
         try withID.write(to: src.configURL)
+        let history = src.url.appendingPathComponent(".cfw-history/transaction")
+        try fm.createDirectory(at: history, withIntermediateDirectories: true)
+        try Data([6, 7]).write(to: history.appendingPathComponent("Disk.img"))
+        try Data("published".utf8).write(to: history.appendingPathComponent("transaction.json"))
         let clone = try VPhoneBundleOps.clone(bundleNamed: "src", to: "dst", in: lib)
         // Copy happened (disk + ROMs present in the clone).
         #expect(fm.fileExists(atPath: clone.url.appendingPathComponent("Disk.img").path))
@@ -217,6 +221,9 @@ struct BundleOpsTests {
         }
         #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent(VPhoneVMRuntimeState.filename).path))
         #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("vphone.sock").path))
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent(".cfw-history").path))
+        #expect(try Data(contentsOf: history.appendingPathComponent("Disk.img")) == Data([6, 7]))
+        #expect(try Data(contentsOf: history.appendingPathComponent("transaction.json")) == Data("published".utf8))
         // Original untouched.
         #expect(fm.fileExists(atPath: src.url.appendingPathComponent("nvram.bin").path))
         #expect(try lib.bundle(named: "src").manifest.machineIdentifier == Data([9, 9]))
