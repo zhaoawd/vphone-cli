@@ -1,0 +1,24 @@
+import Darwin
+import Foundation
+
+/// Owns this process's shutdown signal registrations. Callbacks run on main.
+final class VPhoneShutdownSignals {
+    private let registrations: [(number: Int32, previous: sig_t?, source: DispatchSourceSignal)]
+
+    init(receive: @escaping @MainActor @Sendable (Int32) -> Void) {
+        registrations = [SIGINT].map { number in
+            let previous = Darwin.signal(number, SIG_IGN)
+            let source = DispatchSource.makeSignalSource(signal: number, queue: .main)
+            source.setEventHandler { MainActor.assumeIsolated { receive(number) } }
+            source.activate()
+            return (number, previous, source)
+        }
+    }
+
+    deinit {
+        for registration in registrations {
+            registration.source.cancel()
+            Darwin.signal(registration.number, registration.previous)
+        }
+    }
+}

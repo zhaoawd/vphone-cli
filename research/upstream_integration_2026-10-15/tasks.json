@@ -3410,13 +3410,15 @@
       "historical_status_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
       "target_review": {
         "target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
-        "status": "source_delta_identified",
+        "status": "shutdown_signal_and_primary_window_routes_implemented_runtime_pending",
         "required_delta": "覆盖窗口关闭、Cmd-Q、CLI、信号退出；磁盘持有者、运行 VM、可发信号 PID 分别判断。",
-        "assessment": "existing_foundation_delta_pending",
+        "assessment": "partial_common_exit_boundary_implemented",
         "evidence": [
-          "local_reconciliation.json#T37"
+          "local_reconciliation.json#T37",
+          "T37_exit_routing.md",
+          "evidence/T37-exit-routing/manifest.json"
         ],
-        "finding": "本地 Stopper 通过 ps/boot identity 定位 VM，diskHolders 仅确认释放且不发信号；SIGINT/Cmd-Q 已进入 handleInterrupt。当前源码未见 AppDelegate 注册 SIGTERM；窗口关闭仅在 windowWillClose 清理输入资源，仍需核对完整退出链。",
+        "finding": "AppDelegate 的 SIGINT/SIGTERM、Cmd-Q、菜单与主窗口关闭均接入现有停止入口；主窗口关闭不依赖辅助窗口数量。原生信号、窗口 delegate、写入等待、CLI 进程归属与停止回退的宿主回归通过。启动中竞态和真实 VM 全矩阵仍未验收。",
         "reverification_2026_10_15": {
           "result": "stop_refusal_fixture_directory_restored_regression_passed",
           "evidence": [
@@ -4945,7 +4947,8 @@
     "merge_review": "evidence/merge-review.json",
     "wip": "evidence/wip-before.json",
     "T08_T09_adaptation": "T08_T09_adaptation.md",
-    "T59_event_polling": "T59_event_polling.md"
+    "T59_event_polling": "T59_event_polling.md",
+    "T37_exit_routing": "T37_exit_routing.md"
   },
   "initial_plan_authorization": "plan_and_evidence_documentation_only"
 }

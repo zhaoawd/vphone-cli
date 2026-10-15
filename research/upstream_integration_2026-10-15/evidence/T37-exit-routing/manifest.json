@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-15",
+  "timezone": "Asia/Shanghai",
+  "branch": "codex/upstream-2d21d21-integration",
+  "local_base": "94d6ca0ed6b926cf928657af992ea75b7384e80d",
+  "upstream_target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+  "upstream_semantic_port_claim": false,
+  "scope": "T37 local shutdown entry gaps under U2 common boundary",
+  "uncommitted_at_collection": true,
+  "sources": {
+    "sources/vphone-cli/VPhoneAppDelegate.swift": "686e998d89240554a6fe30bc68053faae2ddb630e2b12e9b1ad67b7e02ca7aa2",
+    "sources/vphone-cli/VPhoneWindowController.swift": "3ec7bc797faf0acc15349f6cc0b98f8066af1092b6ea5939f5f46d21945db9d9",
+    "sources/vphone-cli/VPhoneShutdownSignals.swift": "e587649defb33a4c19bb8686bb33c4475326bd0208c107a05387f4298aae1bb1",
+    "tests/VPhoneCLITests/VMWindowCloseTests.swift": "d6f1a5b1457c3fb40e0bd2dbd864da9455fc4298182ef10a1fcc63b720265d09",
+    "tests/fixtures/shutdown_signals/main.swift": "48ddf04e29c7ad1fc4c8284759ffe075274e73ac989772d78526083563cd5933",
+    "tests/test_shutdown_signals.py": "d32c32f7b2593df69b097beb55efff7f2b1f7c7bef4ad484662d085bb0b4c5d1"
+  },
+  "baseline_signals": {
+    "path": "baseline-signals.swift.txt",
+    "sha256": "43a9c92e6dd68e24752431f5c8765fbeefc537a11bfdec3ddaf9a75b38d3b97b",
+    "difference_from_final": "SIGINT-only registration list; actor-correct callback and final native fixture used in saved control"
+  },
+  "tracked_source_diff": {
+    "path": "tracked-source.diff",
+    "sha256": "5313cf712bf5273c989d89f33374f57613d084f8901a1728fb86061d24545b9c",
+    "new_untracked_files_bound_by_sources": true
+  },
+  "commands": {
+    "signals": ".venv/bin/python3 -B -m unittest discover -s tests -p test_shutdown_signals.py -v",
+    "related_swift": "swift test --disable-sandbox --cache-path .build/test-cache --filter 'VMWindowCloseTests|GuestWriteCoordinationTests|GuestShutdownTests|ShutdownPolicyTests|VMStopTests|StopRefusalTests|VMLaunchDiagnosticsTests'",
+    "python": "VPHONE_DAEMON_SOURCE_PACKAGES=\"$PWD/.build/daemon-api-t59-20261015/Xcode/SourcePackages\" make test_python",
+    "standard_swift": "make test_swift",
+    "latency": "swift test --disable-sandbox --skip-build --cache-path .build/test-cache --filter <scripts/run_tests.py LATENCY_TESTS>"
+  },
+  "validation": {
+    "native_signals": {
+      "python_tests": 1,
+      "signal_sequences": 4,
+      "result": "passed",
+      "main_thread_callback": true,
+      "previous_handlers_restored": true,
+      "fixture_only_exit_status": 74
+    },
+    "baseline_native_control": {
+      "missing_callbacks": 3,
+      "successful_sequences": [
+        "INT -> INT"
+      ],
+      "expected_failures_confirmed": true,
+      "wrapper_exit_code": 0
+    },
+    "window_red": {
+      "tests": 3,
+      "assertion_failures": 7,
+      "phase": "preliminary callback fixture"
+    },
+    "related_swift": {
+      "xctest": 9,
+      "swift_testing": 35,
+      "total": 44,
+      "result": "passed"
+    },
+    "final_window": {
+      "tests": 3,
+      "result": "passed_in_final_standard_build",
+      "actual_app_delegate_writer_wait": true,
+      "post_drain_shutdown_handler_replaced": true
+    },
+    "python": {
+      "tests": 786,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 198.527,
+      "result": "passed"
+    },
+    "standard_swift": {
+      "regular_swift_testing_tests": 1510,
+      "issues": 1,
+      "runner_exit_code": 1,
+      "make_exit_code": 2,
+      "result": "failed",
+      "failure": "postValidationRecognizesIdempotenceWithoutEmitting: first emittedRecords 2, expected 1",
+      "previous_record": "../../T08_T09_adaptation.md"
+    },
+    "latency": {
+      "tests": 9,
+      "result": "passed_against_final_build"
+    },
+    "ledger": {
+      "unique_tasks": 61,
+      "historical_statuses_and_acceptance_counts_preserved": true,
+      "commit_ledger_byte_identical_to_base": true
+    },
+    "firmware": {
+      "executed": false,
+      "reason": "no firmware/patch algorithm change"
+    },
+    "vm": {
+      "executed": false
+    },
+    "signed_app_build": {
+      "executed": false
+    },
+    "standard_memory_and_guest_tail": {
+      "executed": false,
+      "reason": "unchanged paths; standard entry stops at existing kernel issue"
+    }
+  },
+  "limitations": [
+    "No actual VM stop, disk-free acceptance or full startup/panic/unready/timeout/permission matrix.",
+    "No full signed App build, deployment, system Store, AMFI or TCC operation.",
+    "Signal subprocess tests do not by themselves prove the complete AppDelegate/Virtualization.framework lifecycle.",
+    "Window tests exercise actual admission, replacing only the post-drain handoff to prevent VM/framework termination.",
+    "T37 remains unaccepted; the standard Swift failure has not been fixed or weakened.",
+    "Existing generated Capstone overlay retained; gitlink unchanged."
+  ],
+  "logs": [
+    {
+      "name": "signals-red",
+      "path": "signals-red.log.gz",
+      "original_bytes": 4020,
+      "original_sha256": "c19445c6f10b1c978ed3f98b9a45e4accae820f0b010d9913bb4f9f73342eddc",
+      "gzip_bytes": 483,
+      "gzip_sha256": "9e2c155c99f47fdc054933dc282ca20ade94767e0ff18323ac0e3f168cdaff2b",
+      "command_exit_code": 1,
+      "phase": "SIGINT-only extraction; preliminary native fixture; three missing SIGTERM callbacks"
+    },
+    {
+      "name": "window-red",
+      "path": "window-red.log.gz",
+      "original_bytes": 23274,
+      "original_sha256": "56b15de299f5abbb8e5a50d55113de9b4388942e6c2fc1f1bd2d454c63d9825f",
+      "gzip_bytes": 4206,
+      "gzip_sha256": "f7bc250d13fac0eecd14f854990369b5e9c1ec905c7f7e609f451383d7637256",
+      "command_exit_code": 1,
+      "phase": "preliminary build failure from Swift actor isolation; not a behavior reproduction"
+    },
+    {
+      "name": "window-red-retry",
+      "path": "window-red-retry.log.gz",
+      "original_bytes": 98491,
+      "original_sha256": "8a94236cc6d5d0ec202002ae7601f481ad69703f8ef201d666934711e5633601",
+      "gzip_bytes": 5610,
+      "gzip_sha256": "5b1f6ef40d30c4768875fb824bfc103d46f6b52c2daac7dddc257e38be42fef7",
+      "command_exit_code": 1,
+      "phase": "preliminary window tests; three tests/seven assertions failed before close routing"
+    },
+    {
+      "name": "signals-green",
+      "path": "signals-green.log.gz",
+      "original_bytes": 284,
+      "original_sha256": "9618044d80d50ea16ca14a91daaed722b92673dd1755d93e62995c27206784e7",
+      "gzip_bytes": 145,
+      "gzip_sha256": "9a46dc2531f0340b50da0603a206f255a82989bf17fab499c730a46366e1f589",
+      "command_exit_code": 0,
+      "phase": "four native signal sequences and handler restoration"
+    },
+    {
+      "name": "green",
+      "path": "green.log.gz",
+      "original_bytes": 100482,
+      "original_sha256": "b7651e183900d93230e0e0e3944f30ded90a4d1bb366700af5a48a9bac240f17",
+      "gzip_bytes": 6226,
+      "gzip_sha256": "0b2b31bbc2950687df3d87be5b0c5a955d84439c09a382d258cedc9a5e6e9f3b",
+      "command_exit_code": 0,
+      "phase": "initial window/write/shutdown regression"
+    },
+    {
+      "name": "related-swift",
+      "path": "related-swift.log.gz",
+      "original_bytes": 103508,
+      "original_sha256": "7ad4266fc2ab28faa2991f8e95416ab463087cc53210361b262a865fd8293448",
+      "gzip_bytes": 6669,
+      "gzip_sha256": "3f8bc35dc2ed297267bd4108df7637c0ccc5c011199c5f0ffd868bfba3779d0c",
+      "command_exit_code": 0,
+      "phase": "44 related tests; before final strengthening to actual AppDelegate writer admission"
+    },
+    {
+      "name": "python",
+      "path": "python.log.gz",
+      "original_bytes": 122894,
+      "original_sha256": "ded49d7331e3e1922db69b22638819877dddefb4d33a0d1f1ebed4c753532e6d",
+      "gzip_bytes": 20696,
+      "gzip_sha256": "e4d0b06d8e77893f60fe792e66c14d69cd6434911c6cc64f50ba9e60120a87f8",
+      "command_exit_code": 0,
+      "phase": "786 tests, no skips, including production native signal registrations"
+    },
+    {
+      "name": "full-swift",
+      "path": "full-swift.log.gz",
+      "original_bytes": 559770,
+      "original_sha256": "32507da71ce1f02b084626a588eeb1f9ff0d985b44e806c1423529b85cd0b447",
+      "gzip_bytes": 83990,
+      "gzip_sha256": "ae652ce1c0965ae969a633b34102da34767027af4a925f17a82dcc4ab08ccfd7",
+      "command_exit_code": 2,
+      "phase": "initial standard Swift; one previously recorded kernel idempotence issue"
+    },
+    {
+      "name": "final-swift",
+      "path": "final-swift.log.gz",
+      "original_bytes": 569058,
+      "original_sha256": "da624b45b3455eaa7110a1495fd9178c62ac481a96e40d2e4c4cda761c7c651c",
+      "gzip_bytes": 85678,
+      "gzip_sha256": "ab3364a02ed95b15f06c616bd2c743512a66c8ffcab0d3661f9046f376f9616a",
+      "command_exit_code": 2,
+      "phase": "final production source and strengthened actual-AppDelegate window tests; same kernel issue"
+    },
+    {
+      "name": "latency",
+      "path": "latency.log.gz",
+      "original_bytes": 83672,
+      "original_sha256": "15a0b78a92fc77dc571ec5e7ae3aff1a9fe01573d508e82f5e5a221b658d3fbf",
+      "gzip_bytes": 3233,
+      "gzip_sha256": "3a84f2cf31efac4dc13df4a8bf197da3cbb8fed1fe523a143d8474b973263877",
+      "command_exit_code": 0,
+      "phase": "nine tests from standard LATENCY_TESTS, against final build"
+    },
+    {
+      "name": "signals-baseline-control",
+      "path": "signals-baseline-control.log.gz",
+      "original_bytes": 4107,
+      "original_sha256": "2d8bd0a7649e40e732b46dda8732247606040064bc27c0212092a02211e81384",
+      "gzip_bytes": 542,
+      "gzip_sha256": "652dcd0965b74c632c27abe1f0ee0b31849464cb30af87920ce37b0b5dd53f52",
+      "command_exit_code": 0,
+      "phase": "expected three SIGTERM subtest failures confirmed against saved baseline and final fixture"
+    },
+    {
+      "name": "ledger",
+      "path": "ledger.log.gz",
+      "original_bytes": 328,
+      "original_sha256": "2dbc4e8ba38a701c458bb7c7f6d380b18382f36f1052a6b5532c7ab2995ddff2",
+      "gzip_bytes": 251,
+      "gzip_sha256": "611f958c48f2848b9b0a8d33b7a0b18e1ad7850d7b161b576198e0ac22e9dec9",
+      "command_exit_code": 0,
+      "phase": "historical ledger, dependency graph and Capstone overlay preservation"
+    }
+  ]
+}

@@ -25,9 +25,10 @@ enum VPhoneExitStatus {
     }
 }
 
+@MainActor
 class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var vmLock: VPhoneVMLock?
-    private var guestWrites = VPhoneGuestWriteCoordinator()
+    private(set) var guestWrites = VPhoneGuestWriteCoordinator()
     private var stopWaitingForWriter = false
     private let cli: VPhoneBootCLI
     private var vm: VPhoneVirtualMachine?
@@ -44,7 +45,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var startupUnlock: VPhoneStartupUnlock?
     private let hostInputQueue = VPhoneHostInputQueue()
     private var cameraServer: VPhoneCameraServer?
-    private var sigintSource: DispatchSourceSignal?
+    private var shutdownSignals: VPhoneShutdownSignals?
     private var hostSleepActivity: NSObjectProtocol?
     private var didAttemptAutoInstall = false
     private var shutdownPlan = VPhoneShutdownPlan()
@@ -58,14 +59,10 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         NSApp.setActivationPolicy(cli.noGraphics ? .prohibited : .regular)
 
-        signal(SIGINT, SIG_IGN)
-        let src = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
-        src.setEventHandler { [weak self] in
-            print("\n[vphone] SIGINT — shutting down")
+        shutdownSignals = VPhoneShutdownSignals { [weak self] number in
+            print("\n[vphone] \(VPhoneChildCancellation.name(of: number)) — shutting down")
             self?.handleInterrupt()
         }
-        src.activate()
-        sigintSource = src
 
         Task { @MainActor in
             do {
@@ -188,7 +185,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         var hostScreen: (any VPhoneHostScreen)?
         if !cli.noGraphics {
             let keyHelper = VPhoneKeyHelper(vm: vm, control: control)
-            let wc = VPhoneWindowController()
+            let wc = makeWindowController()
             wc.showWindow(
                 for: vm.virtualMachine,
                 screenWidth: options.screenWidth,
@@ -397,11 +394,17 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Shutdown
 
+    func makeWindowController() -> VPhoneWindowController {
+        let controller = VPhoneWindowController()
+        controller.onCloseRequested = { [weak self] in self?.handleInterrupt() }
+        return controller
+    }
+
     @MainActor private var apiCanShutdown: Bool {
         apiSession?.snapshot.state == .ready && apiSession?.snapshot.health?.capabilities.contains("system_shutdown") == true
     }
 
-    /// SIGINT: ask the guest to power off, wait a bounded time for
+    /// Ask the guest to power off, wait a bounded time for
     /// `guestDidStop`, then force-stop the VM through the framework so the
     /// teardown is the framework's and not this process dying.
     @MainActor
@@ -417,15 +420,15 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @MainActor
-    private func handleDrainedInterrupt() {
+    func handleDrainedInterrupt() {
         startupUnlock?.stop()
         guard let vm else {
             NSApp.terminate(nil)
             return
         }
         if shutdownPlan.didStart {
-            // Second SIGINT while waiting — skip the rest of the wait.
-            print("[vphone] second SIGINT — stopping now")
+            // Another shutdown request while waiting skips the remaining wait.
+            print("[vphone] repeated shutdown request — stopping now")
             forceStopAndExit(action: shutdownPlan.abortWait())
             return
         }
@@ -527,6 +530,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         }
         // The VM delegate records a failure status before terminating; AppKit
         // would otherwise always exit 0.
+        shutdownSignals = nil
         exit(VPhoneExitStatus.pending)
     }
 
