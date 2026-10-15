@@ -27,6 +27,7 @@ public enum VPhoneVMOperation {
     public static let importArchive = "import"
     public static let create = "create"
     public static let fwPatch = "fw-patch"
+    public static let fwReceipts = "fw-receipts"
     public static let cfwRecord = "cfw-record"
     public static let restoreDecrypt = "restore-decrypt"
     public static let cleanupFirmware = "cleanup-firmware"
@@ -52,7 +53,7 @@ public enum VPhoneVMOperation {
     /// Complete vocabulary, for tests and diagnostics.
     public static let all: [String] = [
         boot, dfu, stageVphoned, config, rename, clone, delete, export, importArchive, create,
-        fwPrepare, fwPatch, cfw, cfwRecord, restoreDecrypt, cleanupFirmware, createCheckpoint,
+        fwPrepare, fwPatch, fwReceipts, cfw, cfwRecord, restoreDecrypt, cleanupFirmware, createCheckpoint,
         backup, restoreBackup, switchVM, package,
     ]
 }

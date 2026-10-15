@@ -317,8 +317,8 @@ def main():
         from .final_guest import run
         result=run(plan)
         destination=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'guest-effects-final.json'
-        if destination.is_symlink(): raise ValueError('linked final evidence destination')
-        destination.write_bytes(canonical(result))
+        from cfw_guest_evidence import write_final
+        write_final(destination, canonical(result))
         return
     if len(sys.argv) == 3 and sys.argv[1] == 'entry':
         validate_entry(plan, Path(sys.argv[2]).name)

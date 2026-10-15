@@ -19,6 +19,8 @@ spec = importlib.util.spec_from_file_location('cfw_disk_txn', script)
 txn = importlib.util.module_from_spec(spec)
 sys.modules['cfw_disk_txn'] = txn
 spec.loader.exec_module(txn)
+from cfw_guest_publication_fixture import plan_for
+txn.current_guest_plan = lambda: plan_for(Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent)
 faults = set(filter(None, os.environ.get('CFW_TXN_FAULTS', '').split(',')))
 
 
@@ -58,6 +60,9 @@ if 'excl-publish' in faults:
     txn.move_exclusive = move
 
 status = txn.main(sys.argv[2:])
+if status == 0 and sys.argv[2:3] == ['publish'] and 'corrupt-after-publish' in faults:
+    work = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent
+    (work / 'guest-plan.json').write_bytes(b'corrupted after image swap')
 if status == 0 and sys.argv[2:3] == ['stage'] and 'replace-after-stage' in faults:
     vm = Path(os.environ['TEST_MOUNTS']).parent
     os.rename(vm / 'Disk.img', vm / 'Disk.img.moved')

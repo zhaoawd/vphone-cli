@@ -3219,7 +3219,16 @@
         ],
         "next_action": "复用当前可信状态与读回，逐实现代际补迁移资格；未知或无可信 Undo 时拒绝。"
       },
-      "runtime_validation_this_turn": false
+      "runtime_validation_this_turn": false,
+      "execution_2026_10_15_receipt_undo": {
+        "baseline": "2df4be8c",
+        "finding": "已提交 Receipt 读取核对归档 producer report 的完整记录、原计划、generation 和输出；desired 改变仍保留旧应用事实。新增 fw receipts 检查入口。guest 磁盘交换与 Receipt/Undo/来源的同 journal 发布尚未完成。",
+        "evidence": [
+          "T32_T33_receipt_undo.md",
+          "evidence/T32-T33-undo/manifest.json"
+        ],
+        "runtime_validation": false
+      }
     },
     {
       "id": "T33",
@@ -3299,7 +3308,16 @@
         ],
         "next_action": "复用当前可信状态与读回，逐实现代际补迁移资格；未知或无可信 Undo 时拒绝。"
       },
-      "runtime_validation_this_turn": false
+      "runtime_validation_this_turn": false,
+      "execution_2026_10_15_receipt_undo": {
+        "baseline": "2df4be8c",
+        "finding": "已接入从已提交 Receipt/report 恢复撤销预检，重复应用保留首次原件；核对保留补丁当前字节，撤销/重打只返回新副本与剩余日志。IOMFB 同 ID 仅判定记录形状，未移植新指令；DSC/Mach-O/Preboot 的签名及磁盘发布、真实 VM 验收仍待完成。",
+        "evidence": [
+          "T32_T33_receipt_undo.md",
+          "evidence/T32-T33-undo/manifest.json"
+        ],
+        "runtime_validation": false
+      }
     },
     {
       "id": "T34",

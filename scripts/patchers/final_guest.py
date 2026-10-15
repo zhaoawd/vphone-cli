@@ -22,6 +22,9 @@ def attachments(image):
     if len(matches)!=1: raise ValueError('final image has no unique live attachment')
     bases={entry.get('dev-entry') for entry in matches[0].get('system-entities',[])
            if re.fullmatch('/dev/disk[0-9]+',entry.get('dev-entry',''))}
+    physical={entry.get('dev-entry') for entry in matches[0].get('system-entities',[])
+              if entry.get('content-hint') in ('GUID_partition_scheme','FDisk_partition_scheme','Apple_partition_scheme')}
+    if physical: bases &= physical
     if len(bases)!=1: raise ValueError('final image has no unique base device')
     physical=next(iter(bases)).removeprefix('/dev/')+'s1'
     listing=plistlib.loads(subprocess.check_output(['/usr/sbin/diskutil','apfs','list','-plist']))
@@ -43,7 +46,7 @@ def run(plan):
     evidence=Path(os.environ['VPHONE_GUEST_EVIDENCE']);work=evidence.parent
     image=gate.private_path(plan,work/'Disk.img')
     record=json.loads(gate.strict_bytes(work/'transaction.json'))
-    if record.get('version')!=1 or record.get('status')!='staged' or record.get('vm')!=plan.context['vmDirectory']:
+    if record.get('version') not in (1,2) or record.get('status')!='staged' or record.get('vm')!=plan.context['vmDirectory']:
         raise ValueError('final reader requires this VM staged transaction')
     transaction.require_staged(work,record['staged'])
     rows=[json.loads(line) for line in gate.strict_bytes(evidence).splitlines()]
@@ -91,7 +94,7 @@ def run(plan):
         raise ValueError('final volume lost readonly state')
     if any((root.lstat().st_dev,root.lstat().st_ino)!=identities[volume] for volume,root in roots.items() if volume!='dsc'):
         raise ValueError('final mount identity changed during readback')
-    return {'schemaVersion':1,'planDigest':plan.record['planSHA256'],'desiredSHA256':plan.raw_sha256,
+    return {'schemaVersion':1,'transactionID':record.get('id'),'planDigest':plan.record['planSHA256'],'desiredSHA256':plan.raw_sha256,
             'generationID':plan.context['generationID'],'operationsSHA256':evidence_sha,
             'stagedImage':str(image),'stagedIdentity':image_before,'outputs':outputs,
             'roots':{volume:str(root) for volume,root in roots.items()}}

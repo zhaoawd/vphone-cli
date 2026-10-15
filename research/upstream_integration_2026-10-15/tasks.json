@@ -2966,13 +2966,26 @@
       "historical_status_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
       "target_review": {
         "target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
-        "status": "source_delta_identified",
+        "status": "committed_report_and_saved_plan_qualification_implemented_guest_publication_pending",
         "required_delta": "同 patch ID 不代表同实现；增加实现标识或可信实际字节/Undo 形状与来源判定，按组件发布 Receipt。",
-        "assessment": "existing_foundation_delta_pending",
+        "assessment": "partial_receipt_and_undo_preparation_implemented",
         "evidence": [
-          "local_reconciliation.json#T32"
+          "local_reconciliation.json#T32",
+          "T32_T33_receipt_undo.md",
+          "evidence/T32-T33-undo/manifest.json"
         ],
-        "finding": "未提交源码已有 VM/generation/desired 关联、分组件 Receipt、实际效果和 Undo 当前字节校验。上游 installer 使用 hasOutdatedImplementation 识别同 ID 旧实现再撤销重打；现有通用 Undo 不能据此认定已覆盖该迁移。"
+        "finding": "已提交 Receipt 读取核对归档 producer report 的完整记录、原计划、generation 和输出；desired 改变仍保留旧应用事实。新增 fw receipts 检查入口。guest 磁盘交换与 Receipt/Undo/来源的同 journal 发布尚未完成。",
+        "execution_2026_10_15": {
+          "baseline": "2df4be8c",
+          "production_scope": "committed evidence inspection and generated payload undo/replacement preview",
+          "guest_disk_publication": false,
+          "actual_VM_acceptance": false,
+          "accepted": false,
+          "evidence": [
+            "T32_T33_receipt_undo.md",
+            "evidence/T32-T33-undo/manifest.json"
+          ]
+        }
       }
     },
     {
@@ -3041,13 +3054,26 @@
       "historical_status_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
       "target_review": {
         "target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
-        "status": "source_delta_identified",
+        "status": "qualified_undo_and_replacement_preview_implemented_guest_adapters_pending",
         "required_delta": "旧实现迁移先验证 Undo 和来源，再撤销重打；缺可信记录时受控迁移或拒绝。",
-        "assessment": "existing_foundation_delta_pending",
+        "assessment": "partial_receipt_and_undo_preparation_implemented",
         "evidence": [
-          "local_reconciliation.json#T33"
+          "local_reconciliation.json#T33",
+          "T32_T33_receipt_undo.md",
+          "evidence/T32-T33-undo/manifest.json"
         ],
-        "finding": "未提交源码已有 VM/generation/desired 关联、分组件 Receipt、实际效果和 Undo 当前字节校验。上游 installer 使用 hasOutdatedImplementation 识别同 ID 旧实现再撤销重打；现有通用 Undo 不能据此认定已覆盖该迁移。"
+        "finding": "已接入从已提交 Receipt/report 恢复撤销预检，重复应用保留首次原件；核对保留补丁当前字节，撤销/重打只返回新副本与剩余日志。IOMFB 同 ID 仅判定记录形状，未移植新指令；DSC/Mach-O/Preboot 的签名及磁盘发布、真实 VM 验收仍待完成。",
+        "execution_2026_10_15": {
+          "baseline": "2df4be8c",
+          "production_scope": "committed evidence inspection and generated payload undo/replacement preview",
+          "guest_disk_publication": false,
+          "actual_VM_acceptance": false,
+          "accepted": false,
+          "evidence": [
+            "T32_T33_receipt_undo.md",
+            "evidence/T32-T33-undo/manifest.json"
+          ]
+        }
       }
     },
     {

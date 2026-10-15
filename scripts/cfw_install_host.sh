@@ -405,7 +405,11 @@ else
 fi
 # zsh does not run the EXIT trap when ERR_EXIT fires inside a function, so
 # every failing txn call exits explicitly at top level.
-CFW_STAGED_IMG=$(txn stage) || exit $?
+if [[ "$MODE" == environment ]]; then
+  CFW_STAGED_IMG=$(txn stage) || exit $?
+else
+  CFW_STAGED_IMG=$(txn stage --guest-evidence) || exit $?
+fi
 TXN_STATE=staged
 echo "[*] staged copy: $CFW_STAGED_IMG (the original $IMG is not written)"
 txn check --phase pre-mount || exit $?
@@ -460,6 +464,24 @@ CLEANUP_DONE=1
 if [[ "$MODE" != environment ]]; then
   echo "[*] flipping boot snapshot offline on the staged copy (com.apple.os.update -> live volume)..."
   "$PY" "$PROJ/tools/apfs_snap_rename.py" "$CFW_STAGED_IMG"
+
+  # Verify the actual post-snapshot image. Its final attachment and all volume
+  # mounts are read-only; no writer runs after this boundary.
+  CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
+  export CFW_HOST_MNT
+  CLEANUP_DONE=0
+  hdiutil attach -plist -nomount -readonly -imagekey diskimage-class=CRawDiskImage "$CFW_STAGED_IMG" > "$CFW_HOST_MNT/attach.log" {DISK_FD}<&-
+  BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || { echo "[-] cannot identify final read-only attachment" >&2; BASEDISK=""; exit 1; }
+  echo "[*] verifying final guest effects after snapshot modification..."
+  "$PY" "$SCRIPT_DIR/patchers/plan_gate.py" verify-final || exit $?
+  if ! cleanup; then
+    CLEANUP_DONE=1
+    CLEANUP_FAILED=1
+    echo "[-] final read-only attachment cleanup failed; nothing published" >&2
+    exit 1
+  fi
+  CLEANUP_DONE=1
+  txn seal || exit $?
 fi
 
 echo "[*] publishing the staged copy as $IMG (exchange rename)..."
@@ -468,15 +490,22 @@ txn publish || exit $?
 TXN_STATE=published
 trap - EXIT INT TERM HUP
 IDENTITY_STATUS=0
+FINALIZE_STATUS=0
 if [[ "$MODE" == environment ]]; then
   # Configuration, device identity and variant records are not written by
   # this run; compare them with the digests taken before replacement.
   "$PY" "$SCRIPT_DIR/cfw_env_update.py" identity --compare "$ENV_REPORT" "$VM_DIR" || IDENTITY_STATUS=$?
 fi
 if ! txn finish --exit-code 0 >/dev/null; then
+  FINALIZE_STATUS=1
   echo "[!] the installed disk is published, but its transaction record or the previous-disk check did not complete; inspect $CFW_DISK_WORK and $VM_DIR/.cfw-history" >&2
 fi
 exec {DISK_FD}<&-
+if (( FINALIZE_STATUS != 0 )); then
+  hand_back_artifacts || true
+  echo "[-] publication finalization is incomplete; inspect retained evidence before starting the VM" >&2
+  exit "$FINALIZE_STATUS"
+fi
 
 # Drop the extracted CFW input dirs (source .tar.zst re-extracts). VPHONE_KEEP_ARTIFACTS opts out.
 if [[ "$MODE" != environment && -z "${VPHONE_KEEP_ARTIFACTS:-}" ]]; then

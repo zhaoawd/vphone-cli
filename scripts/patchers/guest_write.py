@@ -398,7 +398,7 @@ def signing_transaction(plan, transaction_id):
     work=gate.private_path(plan,Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent)
     raw=gate.strict_bytes(work/'transaction.json');record=json.loads(raw)
     if (not isinstance(transaction_id,str) or not transaction_id or record.get('id')!=transaction_id
-            or record.get('version')!=1 or record.get('status')!='staged'
+            or record.get('version') not in (1,2) or record.get('status')!='staged'
             or record.get('vm')!=plan.context['vmDirectory']):
         raise ValueError('signing requires the current staged transaction')
     fd=os.open(Path(plan.context['vmDirectory'])/'Disk.img',os.O_RDONLY|os.O_NOFOLLOW)
