@@ -3416,7 +3416,15 @@
         "evidence": [
           "local_reconciliation.json#T37"
         ],
-        "finding": "本地 Stopper 通过 ps/boot identity 定位 VM，diskHolders 仅确认释放且不发信号；SIGINT/Cmd-Q 已进入 handleInterrupt。当前源码未见 AppDelegate 注册 SIGTERM；窗口关闭仅在 windowWillClose 清理输入资源，仍需核对完整退出链。"
+        "finding": "本地 Stopper 通过 ps/boot identity 定位 VM，diskHolders 仅确认释放且不发信号；SIGINT/Cmd-Q 已进入 handleInterrupt。当前源码未见 AppDelegate 注册 SIGTERM；窗口关闭仅在 windowWillClose 清理输入资源，仍需核对完整退出链。",
+        "reverification_2026_10_15": {
+          "result": "stop_refusal_fixture_directory_restored_regression_passed",
+          "evidence": [
+            "T59_event_polling.md",
+            "evidence/T59-event-polling/manifest.json"
+          ],
+          "limitation": "仅修正夹具目录前置条件，不新增完整停止矩阵或真实 VM 验收。"
+        }
       }
     },
     {
@@ -4856,8 +4864,8 @@
         "重连不复活旧实例任务"
       ],
       "rollback_unit": "逐组件切回原调度策略；不回退协议/状态正确性修复。",
-      "local_audit_status": "pending_local_audit",
-      "implementation_status": "not_assessed",
+      "local_audit_status": "partial_semantic_review",
+      "implementation_status": "device_state_polling_only",
       "dependencies": [
         "T06",
         "T22",
@@ -4865,16 +4873,18 @@
         "T36",
         "T42"
       ],
-      "status": "pending_local_audit",
+      "status": "device_state_polling_implemented_other_components_and_runtime_pending",
       "historical_status_target": null,
       "target_review": {
         "target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
-        "status": "source_delta_identified",
-        "assessment": "existing_foundation_delta_pending",
+        "status": "partial_semantic_port_with_host_regression_and_ios_candidate",
+        "assessment": "device_state_polling_ported_runtime_pending",
         "evidence": [
-          "local_reconciliation.json#T59"
+          "local_reconciliation.json#T59",
+          "T59_event_polling.md",
+          "evidence/T59-event-polling/manifest.json"
         ],
-        "finding": "本地 GuestEventPublisher 初始化后每 3 秒轮询，缺目标 onSubscribedChange/updatePolling；camera timer 已有启停但切换源时会继续运行并空转。binaryHash 已静态缓存，不能再登记为全新能力。"
+        "finding": "APIEventHub 已接入首/末订阅通知；GuestEventPublisher 无订阅时停用定时器，恢复时立即调度，并处理快速重连摘要、回调乱序和释放。生产源码调度夹具和独立 iOS Release 候选通过；客户机 CPU/wakeups/首响应、实例切换及其他组件仍待验收。"
       },
       "release_scope": "candidate"
     },
@@ -4934,7 +4944,8 @@
     "local_reconciliation": "local_reconciliation.json",
     "merge_review": "evidence/merge-review.json",
     "wip": "evidence/wip-before.json",
-    "T08_T09_adaptation": "T08_T09_adaptation.md"
+    "T08_T09_adaptation": "T08_T09_adaptation.md",
+    "T59_event_polling": "T59_event_polling.md"
   },
   "initial_plan_authorization": "plan_and_evidence_documentation_only"
 }

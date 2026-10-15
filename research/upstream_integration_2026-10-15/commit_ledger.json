@@ -3176,20 +3176,28 @@
       ],
       "proposed_disposition": "semantic_port_final_behavior",
       "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
-      "local_status": "pending_local_audit",
+      "local_status": "semantic_port_implemented_runtime_pending",
       "source_url": "https://github.com/Lakr233/vphone-cli/commit/afc62ef",
       "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34",
       "target_review": {
-        "disposition": null,
-        "equivalent_local_sha_or_path": null,
-        "code_change_needed": null,
-        "validation": [],
-        "evidence": [
-          "evidence/git-audit/git_commits.json"
+        "disposition": "semantic_port_with_local_reconnect_and_lifetime_guards",
+        "equivalent_local_sha_or_path": [
+          "sources/VPhoneDaemon/Daemon/APIWire.swift",
+          "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift"
         ],
-        "reviewer": null,
+        "code_change_needed": true,
+        "validation": [
+          "生产 Swift 6 调度夹具通过；旧实现和缺少快速重连重置的对照分别失败。",
+          "独立 iOS Release 构建及两类签名候选校验通过；未部署。"
+        ],
+        "evidence": [
+          "evidence/git-audit/git_commits.json",
+          "T59_event_polling.md",
+          "evidence/T59-event-polling/manifest.json"
+        ],
+        "reviewer": "Codex current session; no independent review",
         "git_range_status": "verified_in_exact_range",
-        "semantic_status": "pending_semantic_review"
+        "semantic_status": "reviewed_and_ported_runtime_pending"
       },
       "git_sha": "afc62ef0d783afd0c1dd0dca4e1cad1ad45917c0",
       "git_parents": [
