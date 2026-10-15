@@ -1,3 +1,14 @@
+# Dependency preparation
+
+The pinned Capstone submodule needs the nine-line ARM64 detail overlay in
+`capstone-overlays/` (writeback, operand shift and extender fields). Its base,
+result and patch SHA-256 digests are recorded in the manifest. `make build`,
+`make patcher_build` and the Swift test runner prepare it automatically. Run
+`make prepare_vendor` before invoking SwiftPM directly after a recursive clone.
+Preparation accepts only the exact base or already-patched source and refuses
+unrecognized local edits. The submodule gitlink remains at the public base;
+the expected local submodule diff is fully represented by the committed patch.
+
 # Python dependency locks
 
 The macOS app and `scripts/setup_venv.sh` use the same environment manager. Supported locked environments are macOS ARM64 with CPython 3.13 or 3.14. Each `.lock` contains exact versions and SHA-256 hashes for the artifacts resolved on that platform. Its `.json` records download URLs, interpreter/platform identity and the hash of `requirements.txt` used during resolution. Linux and other Python/platform combinations are not covered by these locks; the existing Linux setup script remains outside this validation.
