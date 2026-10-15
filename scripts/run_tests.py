@@ -82,7 +82,6 @@ LATENCY_TESTS = "|".join((
 
 
 def run_swift(firmware=False):
-    run([sys.executable, ROOT / "scripts/prepare_vendor.py"])
     env = os.environ.copy()
     # Real firmware selectors must not activate acceptance tests in a fast run.
     # The fixture suite also starts clean, then enables only its declared target.
@@ -97,6 +96,7 @@ def run_swift(firmware=False):
     modules.mkdir(parents=True, exist_ok=True)
     env.setdefault("CLANG_MODULE_CACHE_PATH", str(modules))
     env.setdefault("SWIFT_MODULECACHE_PATH", str(modules))
+    run([sys.executable, ROOT / "scripts/prepare_vendor.py"], env=env)
     # Separate targets prevent new fixture tests from leaking into the fast suite.
     command = ["swift", "test", "--disable-sandbox", "--cache-path", cache]
     if firmware:
