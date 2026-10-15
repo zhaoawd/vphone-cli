@@ -1,0 +1,184 @@
+已整理出 **`2d21d21` 之后的上游提交台账、功能变更报告，以及对原合并计划的增量修订建议**。
+
+**本轮建议把新整合目标冻结为 `8a75092`，不要直接以持续变化的 `main` 作为实施目标。** 截至 2026 年 10 月 14 日本轮核对时，它是上游公开历史的最新提交，也是 **2.9.4** 发布锚点。[GitHub](https://github.com/Lakr233/vphone-cli/commits)
+
+## 一、报告与清单
+
+| 文件 | 内容 |
+|---|---|
+| **report.md[完整变动报告](sandbox:/mnt/data/vphone_upstream_2d21d21_to_8a75092/report.md)** | 17 类功能增量、关键风险、旧任务映射、合并顺序、验收要求，以及 **194 条提交的完整附录** |
+| **plan_delta.md[合并计划增量修订建议](sandbox:/mnt/data/vphone_upstream_2d21d21_to_8a75092/plan_delta.md)** | 对旧计划的调整，以及建议新增的 T47–T60；每项包含依赖、接受条件和恢复单位 |
+| **commits.csv[逐提交台账 CSV](sandbox:/mnt/data/vphone_upstream_2d21d21_to_8a75092/commits.csv)** | 每条提交的 SHA、中文概要、模块、旧任务关联、建议处置和来源 |
+| **vphone_upstream_2d21d21_to_8a75092.zip[完整资料包 ZIP](sandbox:/mnt/data/vphone_upstream_2d21d21_to_8a75092.zip)** | 上述文件、JSON 台账、Git 审计脚本、脚本自测结果及校验值 |
+
+固定比较范围是：
+
+```text
+基线，不包含：
+2d21d21fbdd4f51f013616273ceda9b35a3e0789
+
+目标，包含：
+8a75092013eda87a4e30ed029b72028cb9279ac4
+```
+
+按 GitHub 公开提交历史逐页枚举，这一范围有 **194 条新增记录，其中 51 条为 merge 记录、143 条为其他记录**；也用发布页计数作了交叉核对。这里的数字是公开历史枚举结果，**不是本轮执行 `git rev-list` 得到的结果**。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.6.1)
+
+需要明确一个边界：**本轮没有取得你的实时 fork，也没有取得能够在当前环境执行完整 Git 审计的上游对象。** 因此报告没有虚报全范围文件数、增删行数、完整 patch，或声称所有 merge 的独立冲突解决都已审查。资料包中的审计脚本用于补齐这些机械证据；当前交付是上游增量分析及计划更新依据，不是已经执行的代码合并。
+
+---
+
+## 二、这轮变化的总体判断
+
+**这不是一次“再追加几个修复”的升级，而是从现有 VM 运行和更新能力，扩展到了模板、克隆、快照、磁盘维护和系统精简等生命周期管理能力。** 上游在 2.7 引入新身份克隆和快照，在 2.9 引入模板化创建及相关维护流程，随后又连续修正首启、精简、进程判断和开发工具兼容问题。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.7.0)
+
+你原来计划中的五模式 `regular/dev/jb/exp/less`、Hook/auth/Irisin、严格路径权限、prepare/generation/事务恢复仍应保留。原计划本身也明确要求按能力和最终行为整合，而不是覆盖本地实现。vphone_upstream_merge_plan_2026… vphone_upstream_merge_plan_2026…
+
+**我的建议是：先完成现有 VM 的稳定升级与安全边界，再引入克隆、快照和模板；上游的新默认值单独决策，不随代码同步自动接受。**
+
+## 三、`2d21d21` 之后的功能变动总览
+
+下表按最终行为归类。每一类的详细解释和对应提交都在完整报告中。
+
+| 模块 | 新增或调整的主要内容 | 对合并计划的影响 |
+|---|---|---|
+| **依赖、版本与构建** | daemon 的 IcliKit 从 **0.7.16 升到 0.8.5**；涉及应用注册、解包、截图、RootHide 根目录和前台应用识别等修正。目标依赖 revision 为 `815ef234df5461b8eb9455931d38cb1c37992fe6`。[GitHub](https://raw.githubusercontent.com/Lakr233/vphone-cli/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved) | 更新 T08，不能只改版本数字；按完整 host/guest 组合复验。 |
+| **新身份克隆** | 新增 `vm clone --new-identity`，重建设备身份和 MAC，清理不宜继承的固定网络设置；磁盘、SEPStorage、NVRAM 仍成组继承。[GitHub](https://github.com/Lakr233/vphone-cli/pull/605) | 区分“保身份恢复克隆”和“新身份并行克隆”，新增 T47。 |
+| **停机快照** | 新增快照创建、列表、恢复、删除；保存 Disk、SEP、NVRAM 和存在时的安装记录，但不保存全部配置、补丁选择和固件原件。[GitHub](https://raw.githubusercontent.com/Lakr233/vphone-cli/8a75092013eda87a4e30ed029b72028cb9279ac4/Documents/Guides/snapshots.md) | 新增 T48；不能代替原有整组备份和恢复机制。 |
+| **模板化创建** | `vm create` 默认查找或构建模板，再克隆目标机；增加模板键、构建锁、冻结状态、Build UUID 和来源记录；保留 `--no-template` 独立恢复路径。[GitHub](https://raw.githubusercontent.com/Lakr233/vphone-cli/8a75092013eda87a4e30ed029b72028cb9279ac4/Research/Host/machine_templates.md) | 新增 T49。需要重新设计本地模板隔离键，而不是把它当作普通缓存。 |
+| **系统精简和首启** | 增加 System 裁剪、服务配置、系统应用移除/恢复、Setup 等待、APFS 快照维护；后续补上慢机器首启、iOS 26 专属服务配置及 iOS 27 jetsam 修正。[GitHub](https://github.com/Lakr233/vphone-cli/pull/633) | 新增 T50；按 OS/build 和本地模式准入，不能把精简直接等同于 `less`。 |
+| **磁盘 rebase** | 新增磁盘块共享重整：保持目标磁盘字节内容，以基盘克隆和差异写入提高共享率；要求同 APFS 卷，并校验结果。它不是系统升级。[GitHub](https://raw.githubusercontent.com/Lakr233/vphone-cli/8a75092013eda87a4e30ed029b72028cb9279ac4/Research/Host/disk_rebase.md) | 新增可延后 T51；不放入普通环境升级必经链。 |
+| **CFW、锁和工作目录** | 不同 VM 可并行执行 CFW 操作，同一 VM 继续互斥；增加外置工作目录支持，调整挂载工具，修复临时目录及设备号处理问题。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.8.0) | 新增 T52，强化 T15/T24；所有写盘入口共用操作互斥规则。 |
+| **停止与退出** | 统一窗口关闭、Cmd-Q、CLI 和信号退出的有序关机流程；进一步区分真实 VM 进程和普通磁盘读取者。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.7.0) | 扩充 T37，而不是重新登记“首次支持有序关机”；不得误杀备份、索引或计量进程。 |
+| **Xcode、DeviceHub、Flutter** | 新增 DeviceHub 修复链，涉及 DDI、显示捕获、IOMFB；后续处理 GPU stream、安装 persona、Flutter AOT，以及 DSC 头页签名导致的 LLDB/Flutter debug 问题。[GitHub](https://github.com/Lakr233/vphone-cli/pull/604) | 新增 T53，按完整修复链合入；不能停在最初 DeviceHub 实现。 |
+| **应用、RootHide、Irisin** | 多库注入、安装后应用注册、bootstrap 探测、实际 jbroot 路径与 dpkg 数据库定位等调整。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.8.0) | 扩充 T18/T21/T43；保留本地认证和 Hook 门控，分别验证真实安装路径。 |
+| **定位、设备名、时钟** | 定位改为按 VM 控制并修正 locationd 问题；设备名实现从早期 NVRAM 方案转向 daemon 文件/RPC 配合；增加宿主时钟同步，并保留用户手动关闭自动时间的选择。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.8.0) | 更新 T20，新增 T55/T56；移植最终实现，不保留被替代的中间路径。 |
+| **相机与运动传感器** | 前摄、分辨率、方向/镜像和录像链路调整；增加姿态/陀螺仪模拟及面板，随后修复姿态锁和 SpringBoard 重启问题。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.9.3) | 更新 T22/T42/T44，新增 T54；固件、Hook、daemon 和 UI 成组验收。 |
+| **输入、剪贴板、截图和错误协议** | 改进 guest 应用复制、右键语义、截图/前台应用判断、控制响应附图；增强结构化错误信息。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.9.1) | 复验现有自动化脚本，尤其依赖右键、截图尺寸和错误格式的调用方。 |
+| **空闲性能** | 按实际使用控制轮询、事件订阅、相机/运动/音频活动，缓存 daemon 摘要等。[GitHub](https://github.com/Lakr233/vphone-cli/pull/643) | 新增 T59；不仅测空闲资源，还要验证重新启用后的恢复和实例切换。 |
+| **固件下载与缓存** | 多连接分段下载、Range/ETag 恢复、无 Range 时单连接回退及进度汇总；默认 4 连接，可配置 1–16。[GitHub](https://github.com/Lakr233/vphone-cli/commit/fc6456f) | 新增 T57，与 T13/T14 对接，保留缓存发布和来源保护。 |
+| **补丁与默认策略** | 增加登录提示和部分 Settings 行处理；standard 预设默认开启 ProMotion。[GitHub](https://github.com/Lakr233/vphone-cli/pull/620) | 新增 T58；T45 仍需保留显式决定，不能跟随上游默认自动开启。 |
+| **Launchpad、导入导出和 UI** | 重组新建界面、菜单、表格及日志；增加导入队列、传输退出收尾；进度读取端断开不再等同取消；归档排除不应携带的运行状态。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.9.1) | 新增 T60，扩充 T05/T25–T27/T46；取消与“失去进度消费者”必须分开。 |
+
+另外，**Core Bundle 与 Launchpad 的版本不能强行对齐**：2.9.4 发布说明要求继续使用已公证的 **Launchpad 2.9.2**；CI 中名为 2.9.4 的 Launchpad ZIP 是相同应用、未签名，应用自身仍报告 2.9.2。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.9.4)
+
+## 四、更新合并计划时，最需要防止的五个问题
+
+### 1. 新身份不等于独立密钥
+
+模板和新身份克隆可以生成不同的设备标识，但克隆仍继承 SEP 根秘密和 Data 卷密钥。**不同 UDID 不能用作密码学隔离的证明。**[GitHub](https://raw.githubusercontent.com/Lakr233/vphone-cli/8a75092013eda87a4e30ed029b72028cb9279ac4/Research/Host/machine_templates.md)
+
+因此建议明确两种路线：
+
+- 并行测试、快速批量创建：允许受控模板/克隆，但必须清理不应扩散的账号、认证和业务状态。
+- 要求独立密钥的实例：保留独立 restore 路线。
+
+这也意味着模板应由受控、干净的构建流程产生，不能直接把现有工作 VM 冻结成公共模板。
+
+### 2. 快照恢复后，配置与实际安装状态可能不一致
+
+上游快照不保存 `config.plist`、`PatchSelection.plist`、固件原件等；恢复磁盘与 Receipt 后，当前配置仍可能是较新的选择。[GitHub](https://raw.githubusercontent.com/Lakr233/vphone-cli/8a75092013eda87a4e30ed029b72028cb9279ac4/Documents/Guides/snapshots.md)
+
+本地应在恢复后重新核对：
+
+```text
+用户期望的配置/补丁
+        与
+恢复后的真实磁盘、Receipt、来源记录
+```
+
+**不能因为 snapshot revert 成功，就显示“整机配置和版本全部回退成功”。** 原来的 T11、T15、T32、T40 需要覆盖这个状态差异。
+
+### 3. 补丁 ID 未变，仍可能必须迁移
+
+DeviceHub 相关修复保留了原补丁 ID，但改变了实现；上游增加旧实现识别，以及依据 Undo 撤销后重打的逻辑。**只检查 Receipt 中“该 ID 已应用”，会漏掉这类升级。**[GitHub](https://github.com/Lakr233/vphone-cli/pull/604)
+
+所以 T32/T33 应新增“实现代际”的判断依据，例如实现标识、实际字节特征、可信 Undo 形状与来源。缺少可信撤销记录时，要进入受控迁移或拒绝，而不是直接覆盖。
+
+### 4. 模板键必须容纳你的本地差异
+
+上游模板键包含固件 build、preset、启动链计划、Bundle series、磁盘及精简选项，guest 补丁覆盖则在克隆后处理。[GitHub](https://raw.githubusercontent.com/Lakr233/vphone-cli/8a75092013eda87a4e30ed029b72028cb9279ac4/Research/Host/machine_templates.md)
+
+针对你的 fork，我建议再明确：**五模式、auth/Hook/Irisin 策略、补丁实现代际如何参与模板隔离与准入。** 否则不同策略可能错误复用同一模板。该项是本地整合要求，不是上游已经替你完成的能力。
+
+### 5. 默认行为变化应独立于功能合入
+
+上游 standard 默认开启 ProMotion，而你的 T45 原来是可选延后项；这两者存在明确冲突。[GitHub](https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34) vphone_upstream_merge_plan_2026…
+
+此外，新建界面与 CLI 对系统应用保留/移除的默认选择也不能混为一谈。[GitHub](https://github.com/Lakr233/vphone-cli/releases/tag/2.9.1)
+
+我的建议是继续保持以下原则：**功能可以合入，但模板默认化、系统精简、系统应用删除、登录提示抑制和 ProMotion 开启分别审批、显式配置。**
+
+---
+
+## 五、原来的 47 项任务应怎样调整
+
+**保留 T00–T46 的编号和历史状态，不把已有成果全部改回待执行。** 原文档也明确区分了历史验收、当前目标核对和本地实际完成状态。vphone_upstream_merge_plan_2026…
+
+建议重点修改这些旧任务：
+
+| 原任务 | 本轮修订内容 |
+|---|---|
+| **T00–T02** | 目标更新为固定 `8a75092`；新增 194 条提交范围与本地等价实现对账。 |
+| **T08** | IcliKit 终点改为 **0.8.5 / `815ef234…`**，加入实际调用行为回归。 |
+| **T09–T14** | 加入模板与模式隔离、补丁实现代际、多连接下载，以及临时 PCC 准备机变化。 |
+| **T15–T17** | 统一 CFW、clone、snapshot、rebase、模板构建的互斥和恢复边界；不让新入口绕过旧事务。 |
+| **T18–T23、T42–T44** | 接入开发工具、RootHide、定位、相机、设备等最终修复链。 |
+| **T32–T33** | 增加“同 ID、不同实现”的识别和撤销迁移。 |
+| **T37、T40** | 扩大停止入口覆盖；准确识别 VM 进程；模板来源与四层版本来源分开。 |
+| **T45** | 保留可选状态，明确拒绝静默继承新的 standard 默认值。 |
+| **T46** | 保留原 console/ACK 成果；追加进度断开、取消和退出清理语义。 |
+| **T28–T31** | 更新文档、候选清单、回归矩阵和整组恢复验证。 |
+
+建议追加 **14 个候选工作单元**：
+
+```text
+T47  新身份克隆与密钥继承边界
+T48  快照、来源和恢复
+T49  模板键、构建、冻结与创建流水线
+T50  系统精简、首启和可恢复维护
+T51  磁盘 rebase 与物理共享计量
+T52  磁盘互斥、进程归属和 CFW 工作区
+T53  Xcode / DeviceHub / Flutter 组合兼容
+T54  陀螺仪与姿态模拟
+T55  VM 名称到 guest 设备名
+T56  宿主时钟同步
+T57  多连接固件下载与缓存发布
+T58  登录提示及 Settings 隐藏策略
+T59  按需轮询与空闲性能
+T60  导入导出、队列、取消与退出收尾
+```
+
+这样是 **61 个候选管理单元**，不是“61 项都未完成”，也不是全部自动进入必做范围。T51 可延后，T58 需要策略决定，模板成为默认创建方式也应单独决定。
+
+## 六、建议的合并顺序
+
+| 批次 | 内容 | 退出条件 |
+|---|---|---|
+| **B0：冻结与对账** | 固定目标，保存本地 WIP，核对旧任务和 194 条新提交 | 本地 HEAD、分叉点、已有等价实现和恢复样本明确。 |
+| **B1：依赖与基础修复** | IcliKit、独立小修复、下载基础能力 | 构建完整，既有基础通信和安装行为不回退。 |
+| **B2：安全与生命周期** | T52、T15、T24、T37、T40 | 同 VM 操作互斥、进程归属、取消、停机和临时目录约束统一。 |
+| **B3：现有 VM 升级** | DeviceHub/Flutter、RootHide、定位、名称、时钟、既有媒体修复 | 不依赖模板，也能稳定升级原有 VM，并有明确回退路径。 |
+| **B4：克隆与快照** | T47、T48；按需 T51 | 身份、密钥继承、快照遗漏项和恢复后的状态差异有验证。 |
+| **B5：精简与模板** | 先 T50 精简/首启基础，再 T49 模板创建；结合 T57 | 五模式隔离、构建冻结、来源、失败恢复均成立。 |
+| **B6：体验和维护入口** | 姿态、空闲优化、UI、导入导出 | 后端行为已稳定；界面显示真实状态，不掩盖部分完成。 |
+| **B7：候选验收** | T28–T31 | 固定代码和产物摘要，完成支持范围回归及至少一次整组恢复。 |
+
+这里最重要的取舍是：
+
+> **先把“原有 VM 能安全地更新并继续使用”做稳，再把“新 VM 能通过模板更快创建”接进来。**
+
+同时，不建议把 194 条记录按页面顺序逐条 cherry-pick。台账保留所有记录用于追溯，但实施时应以固定目标的最终行为为准：被后续替代的中间实现不重复引入，merge 记录另外核查冲突解决，格式化和功能变更分开处理。
+
+## 七、补齐完整 Git 差异的入口
+
+资料包里的 `audit_upstream.py` 在**已具备两个固定提交及完整历史的本地仓库**上运行，会导出完整端点 patch、文件变化、逐提交父关系、各 merge 相对父提交的差异，并检查这 194 条公开记录是否与真实 Git 范围一致：
+
+```bash
+python3 audit_upstream.py \
+  --repo /path/to/vphone-cli \
+  --out /tmp/vphone-audit-20261014-8a75092
+```
+
+脚本不执行 fetch、checkout、merge、cherry-pick 或 VM 操作，输出必须放在仓库外的新目录。已用临时 Git 样本测试合并父关系、重命名、中文/空格文件名、二进制 patch、集合对账和危险输出路径拒绝；**该测试不代表真实上游或你的 VM 已通过验收。**
+
+**更新计划时，建议以这次的完整报告为变更依据，以增量任务文件追加到旧 47 项之后；先完成 B0–B3，再决定模板、精简和新默认策略的正式交付范围。**

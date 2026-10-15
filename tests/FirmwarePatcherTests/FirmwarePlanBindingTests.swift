@@ -38,7 +38,7 @@ import Virtualization
         #expect((binding["planSHA256"] as? String)?.count == 64)
         #expect((binding["contextSHA256"] as? String)?.count == 64)
         let payload = try #require(binding["payload"] as? [String: Any])
-        #expect(payload["upstreamTarget"] as? String == "2d21d21fbdd4f51f013616273ceda9b35a3e0789")
+        #expect(payload["upstreamTarget"] as? String == "8a75092013eda87a4e30ed029b72028cb9279ac4")
         #expect((payload["catalogSHA256"] as? String)?.count == 64)
         #expect(payload["stableIdentity"] != nil)
         #expect(payload["configSHA256"] == nil)
@@ -60,6 +60,33 @@ import Virtualization
         #expect(throws: (any Error).self) { try f.recover() }
         #expect(try Data(contentsOf: f.file) == Data("original".utf8))
         #expect(FileManager.default.fileExists(atPath: f.journal.path))
+    }
+
+    @Test(arguments: [false, true])
+    func historicalTargetIsRecoveryOnly(historicalCatalog: Bool) throws {
+        let f = try Fixture(); _ = try f.begin()
+        var object = try f.object()
+        var binding = try #require(object["planBinding"] as? [String: Any])
+        var payload = try #require(binding["payload"] as? [String: Any])
+        let previous = "2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+        payload["upstreamTarget"] = previous
+        if historicalCatalog { payload["catalogRevision"] = previous }
+        let decoded = try JSONDecoder().decode(FirmwarePlanBinding.Payload.self,
+            from: JSONSerialization.data(withJSONObject: payload))
+        binding["payload"] = payload
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        binding["contextSHA256"] = DeclarationExecutionEvidence.digest(try encoder.encode(decoded))
+        object["planBinding"] = binding
+        try f.write(object)
+        let journal = try JSONDecoder().decode(FirmwareTransaction.Journal.self,
+            from: Data(contentsOf: f.journal))
+        let historical = try #require(journal.planBinding)
+        #expect(throws: (any Error).self) {
+            try historical.validate(journal: journal, directory: f.root, currentCatalog: true)
+        }
+        #expect(try f.recover() != nil)
+        #expect(try Data(contentsOf: f.file) == Data("original".utf8))
     }
 
     @Test func missingBindingIsNotTreatedAsLegacyVersionTwo() throws {

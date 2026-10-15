@@ -1,0 +1,1057 @@
+diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
+index 4bbb4fa9bee13bc2d00f8d037588338afa0cf238..e8633e20199630f2fe33ae6e11434f5ea21bc101 100644
+--- a/.github/workflows/build.yml
++++ b/.github/workflows/build.yml
+@@ -62,3 +62,4 @@ jobs:
+           make -C VPhoneGuestComponents test-vcam-dataplane
+           make -C VPhoneGuestComponents test-vcam-prewarm
+           make -C VPhoneGuestComponents test-vcam-drive-gate
++          make -C VPhoneGuestComponents test-camfix-geometry
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+index b1a0b2ca9293527631587ec2dc3d7baff22e4a35..40b4723fe107ca1bfaf8662da55fab2d52fedb7f 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -246,6 +246,13 @@
+ > `cameracaptured`, `vphone-systemhook.log` records `camera-hook=... result=loaded`
+ > for its PID, and `vcamcaptured.log` shows the hook installing its source.
+ 
++> **Camera hook: front lookups and data-output frames (2026-10-10):** no new
++> patch and no new library; `libcamfix.dylib` changes behaviour only. It
++> answers front-camera lookups with the single vcam device and delivers
++> data-output frames at the session preset's size, orientation and pixel
++> format with device exposure values. Details and validation:
++> [`Guest/virtual_camera_transport.md`](Guest/virtual_camera_transport.md#front-camera-clients-and-data-output-frames-2026-10-10).
++
+ > **3D gyroscope core (2026-10-08; guest acceptance pending):**
+ > `system-backboardd-cfw-gyroscope`, declared in the Guest System set and
+ > selected by both presets on iOS 18+, installs `/usr/lib/libvphonegyro.dylib`.
+diff --git a/Research/Guest/virtual_camera_transport.md b/Research/Guest/virtual_camera_transport.md
+index 327467d747f535d2283cd4426e503c5b968ad042..f060cd9a886fef161a5200d49e2503c93359209f 100644
+--- a/Research/Guest/virtual_camera_transport.md
++++ b/Research/Guest/virtual_camera_transport.md
+@@ -143,3 +143,46 @@ publishes no synthetic camera at all (`libvcamcaptured` logs `_sSourceList not
+ located` on every boot), so nothing can start the drive there. That is a
+ separate open item ([iOS 27 capture sources](ios27_capture_microphone_source.md#4-the-virtual-camera-does-not-change-this)).
+ On 26.6.2 the synthetic source is published and the Camera app starts.
++
++## Front-camera clients and data-output frames (2026-10-10)
++
++The synthetic source is published once, as a back camera
++(`kFigCaptureSourceAttributeKey_Position = 1`). Checked on a 26.6.2 guest with
++an app that asks for the front camera, records its
++`AVCaptureVideoDataOutput` frames with `AVAssetWriter`, and serializes the
++device's exposure numbers to JSON:
++
++| Symptom | Cause |
++| --- | --- |
++| Preview shows frames, the sample buffer delegate gets none | The front lookup returned no device, so the session had no input; `cfx_session_is_for_vcam()` never matched and delivery skipped it. The preview layer pump draws every adopted layer regardless of its session, which hides this. `camfix.log` shows `forVcam=0` and no `[video delivery] tracking session`. |
++| Delivered frames are 1280x720 landscape BGRA whatever the client asked for | Delivery ignored the connection's rotation and mirroring, the output's pixel format and the session preset. |
++| `AVAssetWriter` fails with `-11800` (`-19642`) on the first frame | `-recommendedVideoSettingsForAssetWriterWithOutputFileType:` answers width, height and bit rate 0 because the graph never negotiated a format, and the delivered buffers were not IOSurface-backed. |
++| `Invalid number value (infinite) in JSON write` | `lensAperture`, `ISO` and `exposureDuration` are 0 on the vcam device, so EV = log2(N²/t) − log2(ISO/100) is −inf. |
++
++`libcamfix` now:
++
++- answers an empty front or back lookup (`+defaultDeviceWithDeviceType:mediaType:position:`,
++  `AVCaptureDeviceDiscoverySession.devices`) with the vcam device and reports
++  its `position` as the side the process asked for last. A client that
++  enumerates `+devicesWithMediaType:` and filters on position never says which
++  side it wants; the `position` key of `SimulatedCamera/camfix-video.plist`
++  (`front` / `back`) decides for it.
++- delivers data-output frames the way a real camera would for that session:
++  the preset's size (`AVCaptureSessionPreset640x480` → 640x480, 480x640 for a
++  portrait connection), a centre crop of the upright shm frame, turned for
++  180 / 270 and mirrored when the connection is, in the output's pixel format
++  (BGRA, or 420v for 420v / 420f), in IOSurface-backed buffers carrying an
++  `{Exif}` attachment. The crop and size plan is
++  `CamFix/Frame/CamFixFrameGeometry.c`, covered by
++  `make -C VPhoneGuestComponents test-camfix-geometry`.
++- answers the recommended writer settings with H.264 at that size.
++- reports aperture 2.2, ISO 100, exposure 1/30 s and 1/30 s frame durations,
++  and stamps the same numbers, with a brightness value that follows the
++  frame's mean luma, into each delivered frame's `{Exif}`.
++
++With these, the app's front-camera session received frames, recorded and
++uploaded its clip, and its back-camera photo capture still worked in the same
++process. Limits: a 420f request gets 420v; delivery does not consult camera
++authorization (the fallback calls the delegate directly, as before), so a
++denied-permission path cannot be exercised; an iPhone 27.0 guest still
++publishes no synthetic source.
+diff --git a/VPhoneGuestComponents/CamFix/CamFixPrivate.h b/VPhoneGuestComponents/CamFix/CamFixPrivate.h
+index 22b5a3c6796ad6f2080dc6f0c092a95697ffc9f6..d338eacbef166df24c8a6a08e82ecba5d53bcadb 100644
+--- a/VPhoneGuestComponents/CamFix/CamFixPrivate.h
++++ b/VPhoneGuestComponents/CamFix/CamFixPrivate.h
+@@ -25,19 +25,28 @@
+ // MARK: - support (CamFixSupport.m)
+ 
+ CFX_HIDDEN void cfxlog(NSString *fmt, ...);
++CFX_HIDDEN NSDictionary *cfx_overrides(void);
+ CFX_HIDDEN BOOL cfx_session_is_for_vcam(AVCaptureSession *session);
+ CFX_HIDDEN BOOL cfx_output_is_for_vcam(id self);
+ 
+ // MARK: - frame source (Frame/CamFixFrameSource.m)
+ 
+ CFX_HIDDEN CMSampleBufferRef cfx_build_cmsb(void);
++CFX_HIDDEN CMSampleBufferRef cfx_build_oriented_cmsb(uint32_t fmt_out, uint32_t preset_w,
++                                                     uint32_t preset_h, int angle, double zoom,
++                                                     int extra_turns, BOOL mirror,
++                                                     uint32_t *outW, uint32_t *outH);
++CFX_HIDDEN BOOL cfx_shm_frame_size(uint32_t *w, uint32_t *h);
+ CFX_HIDDEN CGImageRef cfx_build_cgimage_from_shm(void) CF_RETURNS_RETAINED;
+ CFX_HIDDEN NSData *cfx_jpeg_from_cgimage(CGImageRef img);
+ CFX_HIDDEN IOSurfaceRef cfx_build_iosurface_from_shm(uint32_t *outW, uint32_t *outH) CF_RETURNS_RETAINED;
+ 
+-// MARK: - device (Device/CamFixActiveFormat.m)
++// MARK: - device (Device/)
+ 
+ CFX_HIDDEN void cfx_install_setActiveFormat_hook(void);
++CFX_HIDDEN void cfx_install_front_camera_alias(void);
++CFX_HIDDEN void cfx_install_exposure_hooks(void);
++CFX_HIDDEN void cfx_stamp_exif(CMSampleBufferRef sb, double meanLuma);
+ 
+ // MARK: - photos (Photo/)
+ 
+@@ -70,5 +79,7 @@ CFX_HIDDEN void cfx_deliver_video_frames_once(void);
+ CFX_HIDDEN void cfx_install_session_guards(void);
+ CFX_HIDDEN void cfx_install_input_diagnostics(void);
+ CFX_HIDDEN void cfx_install_session_state_lies(void);
++CFX_HIDDEN void cfx_install_asset_writer_settings(void);
++CFX_HIDDEN BOOL cfx_output_frame_size(id out, uint32_t *w, uint32_t *h);
+ 
+ #endif
+diff --git a/VPhoneGuestComponents/CamFix/CamFixSupport.m b/VPhoneGuestComponents/CamFix/CamFixSupport.m
+index de29e6761366051929758cb18b5b245e0dbd94d4..4143638c3060911abf410b40b0150027971b5873 100644
+--- a/VPhoneGuestComponents/CamFix/CamFixSupport.m
++++ b/VPhoneGuestComponents/CamFix/CamFixSupport.m
+@@ -18,6 +18,37 @@ void cfxlog(NSString *fmt, ...) {
+   }
+ }
+ 
++// MARK: - runtime overrides
++
++// Optional knobs, read at most once a second from
++// VPHONE_VCAM_DIRECTORY/camfix-video.plist so a guest can be tuned without
++// redeploying the dylib (vphoned files.write can put it there). Absent keys
++// keep the default behaviour.
++//   position  (string) "front" / "back": the side the vcam device reports
++//   zoom      (number) >= 1, crops data-output frames further into the centre
++//   turns     (int)    extra clockwise quarter turns for data-output frames
++//   mirror    (bool)   replaces the connection's videoMirrored
++//   dumpFrame (bool)   every 3 s, saves a delivered frame as delivered.jpg
++NSDictionary *cfx_overrides(void) {
++  static NSDictionary *cached = nil;
++  static CFAbsoluteTime readAt = 0;
++  static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
++  pthread_mutex_lock(&lock);
++  CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
++  if (now - readAt > 1.0) {
++    readAt = now;
++    NSDictionary *d = [NSDictionary
++        dictionaryWithContentsOfFile:@VPHONE_VCAM_DIRECTORY "/camfix-video.plist"];
++    if (!(d == cached || [d isEqual:cached])) {
++      cfxlog(@"[overrides] %@", d ?: @"(none)");
++    }
++    cached = d;
++  }
++  NSDictionary *d = cached;
++  pthread_mutex_unlock(&lock);
++  return d;
++}
++
+ // MARK: - vcam binding probes
+ 
+ BOOL cfx_session_is_for_vcam(AVCaptureSession *session) {
+diff --git a/VPhoneGuestComponents/CamFix/Device/CamFixExposure.m b/VPhoneGuestComponents/CamFix/Device/CamFixExposure.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..133647b579d2c8198c06a4f8bdf10c4074045ac6
+--- /dev/null
++++ b/VPhoneGuestComponents/CamFix/Device/CamFixExposure.m
+@@ -0,0 +1,91 @@
++// Exposure state for the virtual camera.
++//
++// A real camera reports its lens aperture, exposure duration and ISO on the
++// device, and stamps the same numbers into every frame's {Exif} attachment.
++// The vcam device answers zero for all of them, so a client that computes
++// an exposure value, EV = log2(N^2 / t) - log2(ISO / 100), gets -inf, which
++// NSJSONSerialization refuses with an exception. Report the numbers a phone
++// camera shows indoors, and stamp them onto delivered frames.
++
++#import "CamFixPrivate.h"
++
++#define CFX_APERTURE 2.2f
++#define CFX_ISO 100.0f
++#define CFX_EXPOSURE CMTimeMake(1, 30)
++#define CFX_FRAME_DURATION CMTimeMake(1, 30)
++
++static BOOL cfx_is_vcam_device(id dev) {
++  NSString *uid = nil;
++  @try { uid = [dev valueForKey:@"uniqueID"]; } @catch (NSException *e) {}
++  return [uid isEqualToString:VCAM_UID];
++}
++
++static IMP cfx_orig_aperture, cfx_orig_iso, cfx_orig_exposure;
++static IMP cfx_orig_min_frame, cfx_orig_max_frame;
++
++static float cfx_aperture_hook(id self, SEL _cmd) {
++  if (cfx_is_vcam_device(self)) return CFX_APERTURE;
++  return ((float (*)(id, SEL))cfx_orig_aperture)(self, _cmd);
++}
++
++static float cfx_iso_hook(id self, SEL _cmd) {
++  if (cfx_is_vcam_device(self)) return CFX_ISO;
++  return ((float (*)(id, SEL))cfx_orig_iso)(self, _cmd);
++}
++
++static CMTime cfx_exposure_hook(id self, SEL _cmd) {
++  if (cfx_is_vcam_device(self)) return CFX_EXPOSURE;
++  return ((CMTime (*)(id, SEL))cfx_orig_exposure)(self, _cmd);
++}
++
++static CMTime cfx_min_frame_hook(id self, SEL _cmd) {
++  CMTime real = ((CMTime (*)(id, SEL))cfx_orig_min_frame)(self, _cmd);
++  if (cfx_is_vcam_device(self) && !CMTIME_IS_NUMERIC(real)) return CFX_FRAME_DURATION;
++  return real;
++}
++
++static CMTime cfx_max_frame_hook(id self, SEL _cmd) {
++  CMTime real = ((CMTime (*)(id, SEL))cfx_orig_max_frame)(self, _cmd);
++  if (cfx_is_vcam_device(self) && !CMTIME_IS_NUMERIC(real)) return CFX_FRAME_DURATION;
++  return real;
++}
++
++static void cfx_hook_getter(Class cls, SEL sel, IMP hook, IMP *orig) {
++  Method m = class_getInstanceMethod(cls, sel);
++  if (!m) return;
++  *orig = method_setImplementation(m, hook);
++  cfxlog(@"installed exposure getter %@", NSStringFromSelector(sel));
++}
++
++void cfx_install_exposure_hooks(void) {
++  Class cls = NSClassFromString(@"AVCaptureFigVideoDevice");
++  if (!cls) return;
++  cfx_hook_getter(cls, @selector(lensAperture), (IMP)cfx_aperture_hook, &cfx_orig_aperture);
++  cfx_hook_getter(cls, @selector(ISO), (IMP)cfx_iso_hook, &cfx_orig_iso);
++  cfx_hook_getter(cls, @selector(exposureDuration), (IMP)cfx_exposure_hook, &cfx_orig_exposure);
++  cfx_hook_getter(cls, @selector(activeVideoMinFrameDuration), (IMP)cfx_min_frame_hook,
++                  &cfx_orig_min_frame);
++  cfx_hook_getter(cls, @selector(activeVideoMaxFrameDuration), (IMP)cfx_max_frame_hook,
++                  &cfx_orig_max_frame);
++}
++
++// {Exif} for a delivered frame. BrightnessValue (APEX Bv = Av + Tv - Sv)
++// follows the frame's mean luma so "too dark / too bright" checks still see
++// the picture: mid-grey (118) gives the Bv of the fixed exposure above.
++void cfx_stamp_exif(CMSampleBufferRef sb, double meanLuma) {
++  double t = CMTimeGetSeconds(CFX_EXPOSURE);
++  double av = log2(CFX_APERTURE * CFX_APERTURE);
++  double tv = -log2(t);
++  double sv = log2(CFX_ISO / 3.125);
++  double bv = av + tv - sv + log2(fmax(meanLuma, 1.0) / 118.0);
++  NSDictionary *exif = @{
++    (NSString *)kCGImagePropertyExifFNumber: @(CFX_APERTURE),
++    (NSString *)kCGImagePropertyExifApertureValue: @(av),
++    (NSString *)kCGImagePropertyExifExposureTime: @(t),
++    (NSString *)kCGImagePropertyExifShutterSpeedValue: @(tv),
++    (NSString *)kCGImagePropertyExifISOSpeedRatings: @[@(CFX_ISO)],
++    (NSString *)kCGImagePropertyExifBrightnessValue: @(bv),
++  };
++  CMSetAttachment(sb, kCGImagePropertyExifDictionary, (__bridge CFDictionaryRef)exif,
++                  kCMAttachmentMode_ShouldPropagate);
++}
+diff --git a/VPhoneGuestComponents/CamFix/Device/CamFixFrontCamera.m b/VPhoneGuestComponents/CamFix/Device/CamFixFrontCamera.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..32644f3173ea4000d06354c3f43ea6d8c3d71451
+--- /dev/null
++++ b/VPhoneGuestComponents/CamFix/Device/CamFixFrontCamera.m
+@@ -0,0 +1,172 @@
++// Front-camera alias for the single virtual camera.
++//
++// The synthetic source is published once, as a back camera
++// (kFigCaptureSourceAttributeKey_Position = 1). A client that asks for the
++// front camera gets no device, its session has no input,
++// cfx_session_is_for_vcam() never matches and its AVCaptureVideoDataOutput
++// starves. Only the preview layer pump still draws frames, so the screen
++// looks alive while nothing reaches the client's sample buffer delegate.
++//
++// The alias answers an empty front or back lookup with the vcam device, and
++// reports the vcam device's position as the side the process asked for last.
++// One process uses one side at a time, which is what a phone with two
++// cameras looks like to it. A client that enumerates devicesWithMediaType:
++// and filters on position never says which side it wants; for those the
++// `position` override decides (CamFixSupport.m).
++
++#import "CamFixPrivate.h"
++
++static _Atomic long cfx_vcam_reported_position = AVCaptureDevicePositionBack;
++static const void *kCfxRequestedPositionKey = &kCfxRequestedPositionKey;
++static int cfx_front_alias_logged = 0;
++
++static AVCaptureDevice *cfx_vcam_device(void) {
++  return [AVCaptureDevice deviceWithUniqueID:VCAM_UID];
++}
++
++static BOOL cfx_is_video_request(NSString *mediaType) {
++  return mediaType == nil || [mediaType isEqualToString:AVMediaTypeVideo];
++}
++
++static void cfx_note_requested_position(long position, NSString *via) {
++  if (position != AVCaptureDevicePositionFront &&
++      position != AVCaptureDevicePositionBack) {
++    return;
++  }
++  long previous = cfx_vcam_reported_position;
++  cfx_vcam_reported_position = position;
++  if (previous != position) {
++    cfxlog(@"[front alias] %@ asked for %@; vcam now reports that side", via,
++           position == AVCaptureDevicePositionFront ? @"front" : @"back");
++  }
++}
++
++// MARK: - -[AVCaptureDevice position]
++
++static IMP cfx_orig_device_position = NULL;
++
++static long cfx_device_position_hook(id self, SEL _cmd) {
++  typedef long (*Fn)(id, SEL);
++  long real = ((Fn)cfx_orig_device_position)(self, _cmd);
++  NSString *uid = nil;
++  @try { uid = [self valueForKey:@"uniqueID"]; } @catch (NSException *e) {}
++  if (![uid isEqualToString:VCAM_UID]) return real;
++  // A client that enumerates devicesWithMediaType: and filters on position
++  // never says which side it wants; the override decides for it.
++  NSString *forced = cfx_overrides()[@"position"];
++  if ([forced isEqualToString:@"front"]) return AVCaptureDevicePositionFront;
++  if ([forced isEqualToString:@"back"]) return AVCaptureDevicePositionBack;
++  return cfx_vcam_reported_position;
++}
++
++// MARK: - +[AVCaptureDevice devicesWithMediaType:] diagnostics
++
++static IMP cfx_orig_devices_with_media = NULL;
++static int cfx_devices_diag_logged = 0;
++
++static NSArray *cfx_devices_with_media_hook(id self, SEL _cmd, NSString *mediaType) {
++  typedef NSArray *(*Fn)(id, SEL, NSString *);
++  NSArray *devices = ((Fn)cfx_orig_devices_with_media)(self, _cmd, mediaType);
++  if (cfx_devices_diag_logged++ < 4) {
++    NSMutableArray *desc = [NSMutableArray array];
++    for (AVCaptureDevice *d in devices) {
++      [desc addObject:[NSString stringWithFormat:@"%@(pos=%ld)", d.uniqueID, (long)d.position]];
++    }
++    cfxlog(@"[front alias] devicesWithMediaType:%@ -> %@", mediaType, desc);
++  }
++  return devices;
++}
++
++// MARK: - +[AVCaptureDevice defaultDeviceWithDeviceType:mediaType:position:]
++
++static IMP cfx_orig_default_device = NULL;
++
++static id cfx_default_device_hook(id self, SEL _cmd, NSString *deviceType,
++                                  NSString *mediaType, long position) {
++  cfx_note_requested_position(position, @"defaultDeviceWithDeviceType");
++  typedef id (*Fn)(id, SEL, NSString *, NSString *, long);
++  id dev = ((Fn)cfx_orig_default_device)(self, _cmd, deviceType, mediaType, position);
++  // The vcam is the only camera, so an empty answer for either side gets it:
++  // with the `position` override set, the device reports one side and AVF's
++  // own position match would otherwise lose the other.
++  if (dev || !cfx_is_video_request(mediaType) ||
++      (position != AVCaptureDevicePositionFront && position != AVCaptureDevicePositionBack)) {
++    return dev;
++  }
++  AVCaptureDevice *vcam = cfx_vcam_device();
++  if (vcam && cfx_front_alias_logged++ < 8) {
++    cfxlog(@"[front alias] defaultDevice(%@, %ld) empty -> %@", deviceType, position, VCAM_UID);
++  }
++  return vcam;
++}
++
++// MARK: - AVCaptureDeviceDiscoverySession
++
++static IMP cfx_orig_discovery_make = NULL;
++static IMP cfx_orig_discovery_devices = NULL;
++
++static id cfx_discovery_make_hook(id self, SEL _cmd, NSArray *deviceTypes,
++                                  NSString *mediaType, long position) {
++  cfx_note_requested_position(position, @"discoverySession");
++  typedef id (*Fn)(id, SEL, NSArray *, NSString *, long);
++  id session = ((Fn)cfx_orig_discovery_make)(self, _cmd, deviceTypes, mediaType, position);
++  if (session && cfx_is_video_request(mediaType)) {
++    objc_setAssociatedObject(session, kCfxRequestedPositionKey, @(position),
++                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++  }
++  return session;
++}
++
++static NSArray *cfx_discovery_devices_hook(id self, SEL _cmd) {
++  typedef NSArray *(*Fn)(id, SEL);
++  NSArray *devices = ((Fn)cfx_orig_discovery_devices)(self, _cmd);
++  NSNumber *requested = objc_getAssociatedObject(self, kCfxRequestedPositionKey);
++  long side = requested.longValue;
++  if (devices.count > 0 ||
++      (side != AVCaptureDevicePositionFront && side != AVCaptureDevicePositionBack)) {
++    return devices;
++  }
++  AVCaptureDevice *vcam = cfx_vcam_device();
++  if (!vcam) return devices;
++  if (cfx_front_alias_logged++ < 8) {
++    cfxlog(@"[front alias] discovery(%ld).devices empty -> [%@]", side, VCAM_UID);
++  }
++  return @[vcam];
++}
++
++// MARK: - install
++
++void cfx_install_front_camera_alias(void) {
++  Class devCls = NSClassFromString(@"AVCaptureDevice");
++  Class figCls = NSClassFromString(@"AVCaptureFigVideoDevice");
++  Class discCls = NSClassFromString(@"AVCaptureDeviceDiscoverySession");
++
++  // The vcam device is an AVCaptureFigVideoDevice; hook position where that
++  // class (or its superclass) answers it.
++  Method pos = figCls ? class_getInstanceMethod(figCls, @selector(position)) : NULL;
++  if (pos) {
++    cfx_orig_device_position = method_setImplementation(pos, (IMP)cfx_device_position_hook);
++    cfxlog(@"installed front alias: position");
++  }
++  Method def = devCls ? class_getClassMethod(
++                            devCls, @selector(defaultDeviceWithDeviceType:mediaType:position:))
++                      : NULL;
++  if (def) {
++    cfx_orig_default_device = method_setImplementation(def, (IMP)cfx_default_device_hook);
++    cfxlog(@"installed front alias: defaultDeviceWithDeviceType");
++  }
++  Method dwm = devCls ? class_getClassMethod(devCls, @selector(devicesWithMediaType:)) : NULL;
++  if (dwm) {
++    cfx_orig_devices_with_media = method_setImplementation(dwm, (IMP)cfx_devices_with_media_hook);
++    cfxlog(@"installed devicesWithMediaType diag");
++  }
++  Method make = discCls ? class_getClassMethod(
++                              discCls, @selector(discoverySessionWithDeviceTypes:mediaType:position:))
++                        : NULL;
++  Method devs = discCls ? class_getInstanceMethod(discCls, @selector(devices)) : NULL;
++  if (make && devs) {
++    cfx_orig_discovery_make = method_setImplementation(make, (IMP)cfx_discovery_make_hook);
++    cfx_orig_discovery_devices = method_setImplementation(devs, (IMP)cfx_discovery_devices_hook);
++    cfxlog(@"installed front alias: discovery session");
++  }
++}
+diff --git a/VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.c b/VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..b090aadc37d147ad93f58aa91643c8ad4275fea6
+--- /dev/null
++++ b/VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.c
+@@ -0,0 +1,48 @@
++// A real camera delivers what the session preset and the connection ask for:
++// 640x480 at angle 0, 480x640 for a portrait connection, upside down at 180.
++// The shm frame is already the upright picture, so a portrait connection gets
++// a portrait crop of it rather than a rotated landscape frame, and 180 / 270
++// turn that picture over.
++
++#include "CamFixFrameGeometry.h"
++
++#include <stddef.h>
++
++int cfx_frame_plan(uint32_t frame_w, uint32_t frame_h, uint32_t preset_w,
++                   uint32_t preset_h, int angle, double zoom,
++                   cfx_frame_plan_t *plan) {
++  if (!plan || !frame_w || !frame_h) return -1;
++  int a = ((angle % 360) + 360) % 360;
++  int portrait = (a == 90 || a == 270);
++
++  // Aspect of the delivered picture: the preset turned for the connection,
++  // or the frame's own (turned for portrait) when the preset pins none.
++  uint32_t aw = preset_w ? preset_w : frame_w;
++  uint32_t ah = preset_h ? preset_h : frame_h;
++  if (portrait) {
++    uint32_t t = aw;
++    aw = ah;
++    ah = t;
++  }
++
++  // Largest aw:ah rectangle inside the frame, shrunk by zoom, kept even for
++  // 4:2:0 output and centred.
++  if (zoom < 1) zoom = 1;
++  double sx = (double)frame_w / aw, sy = (double)frame_h / ah;
++  double s = (sx < sy ? sx : sy) / zoom;
++  uint32_t cw = (uint32_t)(aw * s) & ~1u;
++  uint32_t ch = (uint32_t)(ah * s) & ~1u;
++  if (cw < 2) cw = 2;
++  if (ch < 2) ch = 2;
++  if (cw > frame_w) cw = frame_w & ~1u;
++  if (ch > frame_h) ch = frame_h & ~1u;
++
++  plan->crop_w = cw;
++  plan->crop_h = ch;
++  plan->crop_x = ((frame_w - cw) / 2) & ~1u;
++  plan->crop_y = ((frame_h - ch) / 2) & ~1u;
++  plan->out_w = preset_w ? (portrait ? preset_h : preset_w) : cw;
++  plan->out_h = preset_h ? (portrait ? preset_w : preset_h) : ch;
++  plan->turns = (a >= 180) ? 2 : 0;
++  return 0;
++}
+diff --git a/VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.h b/VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..3a6cbfb57f0db63ff2596a07a031acfdc3b20d29
+--- /dev/null
++++ b/VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.h
+@@ -0,0 +1,25 @@
++// Where a data-output frame comes from in the shm frame, and what size it
++// is delivered at. Pure arithmetic, so the host test can check it.
++
++#ifndef CAMFIX_FRAME_GEOMETRY_H
++#define CAMFIX_FRAME_GEOMETRY_H
++
++#include <stdint.h>
++
++typedef struct {
++  uint32_t crop_x, crop_y, crop_w, crop_h;  // region of the shm frame
++  uint32_t out_w, out_h;                    // delivered size, before rotation
++  int turns;                                // clockwise quarter turns, 0...3
++} cfx_frame_plan_t;
++
++// frame_w x frame_h: the shm frame, upright as a viewer sees it.
++// preset_w x preset_h: the landscape size the session preset delivers on a
++//   real camera, 0 x 0 when the preset pins none (the crop is delivered as is).
++// angle: the connection's clockwise rotation angle in degrees.
++// zoom: >= 1 crops further into the centre; values below 1 count as 1.
++// Returns 0 on success, -1 when the frame is empty.
++int cfx_frame_plan(uint32_t frame_w, uint32_t frame_h, uint32_t preset_w,
++                   uint32_t preset_h, int angle, double zoom,
++                   cfx_frame_plan_t *plan);
++
++#endif
+diff --git a/VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m b/VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m
+index 9c6451743e50ff520bc76db2bc9b5140a88df5a2..00652d2161e796da7cf5c5fbea42c4fdace689bf 100644
+--- a/VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m
++++ b/VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m
+@@ -6,6 +6,8 @@
+ #include <fcntl.h>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
++#include <Accelerate/Accelerate.h>
++#include "CamFixFrameGeometry.h"
+ 
+ // MARK: - shm reader
+ 
+@@ -124,6 +126,163 @@ CMSampleBufferRef cfx_build_cmsb(void) {
+   return sb;
+ }
+ 
++// MARK: - data-output sample buffers
++
++// The size of the current shm frame, from its header alone.
++BOOL cfx_shm_frame_size(uint32_t *w, uint32_t *h) {
++  vcc_frame_desc_t frame;
++  if (!cfx_shm_frame(&frame)) return NO;
++  *w = frame.width;
++  *h = frame.height;
++  return YES;
++}
++
++// Same format, size and attachments, in an IOSurface-backed buffer: camera
++// buffers are IOSurfaces, and video encoders expect that, while the data
++// plane's buffers are plain memory.
++static CVPixelBufferRef cfx_iosurface_copy(CVPixelBufferRef src) {
++  size_t w = CVPixelBufferGetWidth(src), h = CVPixelBufferGetHeight(src);
++  OSType fmt = CVPixelBufferGetPixelFormatType(src);
++  NSDictionary *attrs = @{(NSString *)kCVPixelBufferIOSurfacePropertiesKey: @{}};
++  CVPixelBufferRef dst = NULL;
++  if (CVPixelBufferCreate(kCFAllocatorDefault, w, h, fmt, (__bridge CFDictionaryRef)attrs,
++                          &dst) != kCVReturnSuccess || !dst) {
++    return NULL;
++  }
++  CVPixelBufferLockBaseAddress(src, kCVPixelBufferLock_ReadOnly);
++  CVPixelBufferLockBaseAddress(dst, 0);
++  BOOL planar = CVPixelBufferIsPlanar(src);
++  size_t planes = planar ? CVPixelBufferGetPlaneCount(src) : 1;
++  for (size_t p = 0; p < planes; p++) {
++    const uint8_t *s = planar ? CVPixelBufferGetBaseAddressOfPlane(src, p)
++                              : CVPixelBufferGetBaseAddress(src);
++    uint8_t *d = planar ? CVPixelBufferGetBaseAddressOfPlane(dst, p)
++                        : CVPixelBufferGetBaseAddress(dst);
++    size_t sbpr = planar ? CVPixelBufferGetBytesPerRowOfPlane(src, p)
++                         : CVPixelBufferGetBytesPerRow(src);
++    size_t dbpr = planar ? CVPixelBufferGetBytesPerRowOfPlane(dst, p)
++                         : CVPixelBufferGetBytesPerRow(dst);
++    size_t rows = planar ? CVPixelBufferGetHeightOfPlane(src, p) : h;
++    size_t n = MIN(sbpr, dbpr);
++    for (size_t y = 0; y < rows; y++) memcpy(d + y * dbpr, s + y * sbpr, n);
++  }
++  CVPixelBufferUnlockBaseAddress(dst, 0);
++  CVPixelBufferUnlockBaseAddress(src, kCVPixelBufferLock_ReadOnly);
++  CVBufferPropagateAttachments(src, dst);
++  return dst;
++}
++
++// Crop, scale, turn and mirror packed BGRA with vImage; returns a malloc'd
++// buffer of *w x *h, or NULL. extra_turns adds clockwise quarter turns.
++static uint8_t *cfx_bgra_shape(const uint8_t *src, uint32_t sw, const cfx_frame_plan_t *p,
++                               int extra_turns, BOOL mirror, uint32_t *w, uint32_t *h) {
++  uint32_t ow = p->out_w, oh = p->out_h;
++  uint8_t *scaled = malloc((size_t)ow * 4 * oh);
++  if (!scaled) return NULL;
++  vImage_Buffer in = {(void *)(src + ((size_t)p->crop_y * sw + p->crop_x) * 4), p->crop_h,
++                      p->crop_w, (size_t)sw * 4};
++  vImage_Buffer out = {scaled, oh, ow, (size_t)ow * 4};
++  if (vImageScale_ARGB8888(&in, &out, NULL, kvImageHighQualityResampling) != kvImageNoError) {
++    free(scaled);
++    return NULL;
++  }
++  int turns = ((p->turns + extra_turns) % 4 + 4) % 4;
++  if (turns) {
++    BOOL swap = turns & 1;
++    uint32_t rw = swap ? oh : ow, rh = swap ? ow : oh;
++    uint8_t *rotated = malloc((size_t)rw * 4 * rh);
++    static const uint8_t clockwise[4] = {kRotate0DegreesClockwise, kRotate90DegreesClockwise,
++                                         kRotate180DegreesClockwise,
++                                         kRotate270DegreesClockwise};
++    vImage_Buffer r = {rotated, rh, rw, (size_t)rw * 4};
++    const Pixel_8888 black = {0, 0, 0, 0xff};
++    if (!rotated ||
++        vImageRotate90_ARGB8888(&out, &r, clockwise[turns], black, kvImageNoFlags) !=
++            kvImageNoError) {
++      free(rotated);
++      free(scaled);
++      return NULL;
++    }
++    free(scaled);
++    scaled = rotated;
++    out = r;
++    ow = rw;
++    oh = rh;
++  }
++  if (mirror) vImageHorizontalReflect_ARGB8888(&out, &out, kvImageNoFlags);
++  *w = ow;
++  *h = oh;
++  return scaled;
++}
++
++// Mean luma over a sparse grid, for the {Exif} brightness value.
++static double cfx_bgra_mean_luma(const uint8_t *px, uint32_t w, uint32_t h) {
++  double sum = 0;
++  uint32_t n = 0;
++  for (uint32_t y = 0; y < h; y += 8) {
++    for (uint32_t x = 0; x < w; x += 8) {
++      const uint8_t *p = px + ((size_t)y * w + x) * 4;  // B, G, R, A
++      sum += 0.0722 * p[0] + 0.7152 * p[1] + 0.2126 * p[2];
++      n++;
++    }
++  }
++  return n ? sum / n : 118;
++}
++
++CMSampleBufferRef cfx_build_oriented_cmsb(uint32_t fmt_out, uint32_t preset_w,
++                                          uint32_t preset_h, int angle, double zoom,
++                                          int extra_turns, BOOL mirror, uint32_t *outW,
++                                          uint32_t *outH) {
++  uint32_t fw = 0, fh = 0;
++  uint8_t *frame_px = cfx_bgra_from_shm(&fw, &fh);
++  if (!frame_px) return NULL;
++  cfx_frame_plan_t plan;
++  uint32_t w = 0, h = 0;
++  uint8_t *px = NULL;
++  if (cfx_frame_plan(fw, fh, preset_w, preset_h, angle, zoom, &plan) == 0) {
++    px = cfx_bgra_shape(frame_px, fw, &plan, extra_turns, mirror, &w, &h);
++  }
++  free(frame_px);
++  if (!px) return NULL;
++  double luma = cfx_bgra_mean_luma(px, w, h);
++
++  vcc_frame_desc_t frame;
++  memset(&frame, 0, sizeof(frame));
++  frame.width = w;
++  frame.height = h;
++  frame.bytes_per_row = w * 4;
++  frame.pixel_format = VCC_FMT_BGRA;
++  frame.timestamp_ns = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
++  frame.pixels = px;
++  frame.pixels_length = (size_t)w * 4 * h;
++  CVPixelBufferRef plain = vcc_pixel_buffer_from_frame(&frame, fmt_out);
++  free(px);
++  if (!plain) return NULL;
++  CVPixelBufferRef pb = cfx_iosurface_copy(plain);
++  CVPixelBufferRelease(plain);
++  if (!pb) return NULL;
++  CMVideoFormatDescriptionRef desc = NULL;
++  if (vcc_format_description_create_for_pb(pb, &desc) != noErr || !desc) {
++    CVPixelBufferRelease(pb);
++    return NULL;
++  }
++  pthread_mutex_lock(&cfx_cmsb_lock);
++  if (!cfx_cmsb_timing_ready) {
++    vcc_timing_init(&cfx_cmsb_timing);
++    cfx_cmsb_timing_ready = YES;
++  }
++  CMTime pts, dur;
++  vcc_timing_advance(&cfx_cmsb_timing, frame.timestamp_ns, &pts, &dur);
++  pthread_mutex_unlock(&cfx_cmsb_lock);
++  CMSampleBufferRef sb = vcc_cmsb_create(pb, desc, pts, dur, w, h);
++  if (sb) cfx_stamp_exif(sb, luma);
++  CFRelease(desc);
++  CVPixelBufferRelease(pb);
++  if (outW) *outW = w;
++  if (outH) *outH = h;
++  return sb;
++}
++
+ // MARK: - JPEG + CGImage + IOSurface builders
+ 
+ NSData *cfx_jpeg_from_cgimage(CGImageRef img) {
+diff --git a/VPhoneGuestComponents/CamFix/Session/CamFixAssetWriterSettings.m b/VPhoneGuestComponents/CamFix/Session/CamFixAssetWriterSettings.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..2bfbffaa9de42bd380b7fe74bdd60086134efa45
+--- /dev/null
++++ b/VPhoneGuestComponents/CamFix/Session/CamFixAssetWriterSettings.m
+@@ -0,0 +1,44 @@
++// AVCaptureVideoDataOutput's recommended asset-writer settings for vcam
++// outputs.
++//
++// A client that records its data output's frames builds an
++// AVAssetWriterInput from -recommendedVideoSettingsForAssetWriterWithOutputFileType:.
++// The output derives those settings from the capture graph's negotiated
++// format; a vcam session's graph never runs, so the real answer has width,
++// height and bit rate 0 and the writer fails on its first frame. Answer with
++// H.264 at the size video delivery produces for this output.
++
++#import "CamFixPrivate.h"
++
++static IMP cfx_orig_recommended = NULL;
++
++static NSDictionary *cfx_recommended_hook(id self, SEL _cmd, NSString *fileType) {
++  typedef NSDictionary *(*Fn)(id, SEL, NSString *);
++  NSDictionary *real = ((Fn)cfx_orig_recommended)(self, _cmd, fileType);
++  if (!cfx_output_is_for_vcam(self)) return real;
++  uint32_t w = 0, h = 0;
++  if (!cfx_output_frame_size(self, &w, &h)) return real;
++  NSDictionary *ours = @{
++    AVVideoCodecKey: AVVideoCodecTypeH264,
++    AVVideoWidthKey: @(w),
++    AVVideoHeightKey: @(h),
++    AVVideoCompressionPropertiesKey: @{
++      AVVideoAverageBitRateKey: @(2000000),
++      AVVideoExpectedSourceFrameRateKey: @(30),
++      AVVideoMaxKeyFrameIntervalKey: @(30),
++      AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
++    },
++  };
++  cfxlog(@"[writer settings] %@ -> %ux%u H.264", fileType, w, h);
++  return ours;
++}
++
++void cfx_install_asset_writer_settings(void) {
++  Class out = NSClassFromString(@"AVCaptureVideoDataOutput");
++  Method m = out ? class_getInstanceMethod(
++                       out, @selector(recommendedVideoSettingsForAssetWriterWithOutputFileType:))
++                 : NULL;
++  if (!m) return;
++  cfx_orig_recommended = method_setImplementation(m, (IMP)cfx_recommended_hook);
++  cfxlog(@"installed recommendedVideoSettings hook");
++}
+diff --git a/VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m b/VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m
+index 934cd36458bef3980b5a87c6b7f3876c829d7639..e6bb6c7dc2bb113851d3fc94f3969572c7e9f8a4 100644
+--- a/VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m
++++ b/VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m
+@@ -2,6 +2,7 @@
+ // sessions whose capture graph never runs.
+ 
+ #import "CamFixPrivate.h"
++#include "CamFixFrameGeometry.h"
+ 
+ // MARK: - client-side video delivery for vcam sessions
+ //
+@@ -35,6 +36,116 @@ void cfx_track_vcam_session(id session) {
+   dispatch_async(dispatch_get_main_queue(), ^{ cfx_preview_start_timer(); });
+ }
+ 
++// MARK: - per-connection frame shape
++
++// The pixel format the client asked for; the data plane produces BGRA or
++// 420v, so a 420f request gets 420v (logged once).
++static uint32_t cfx_output_pixel_format(id out) {
++  NSDictionary *settings = nil;
++  @try { settings = [out valueForKey:@"videoSettings"]; } @catch (NSException *e) {}
++  uint32_t want = [settings[(NSString *)kCVPixelBufferPixelFormatTypeKey] unsignedIntValue];
++  if (want == VCC_FMT_BGRA) return VCC_FMT_BGRA;
++  if (want == VCC_FMT_420V || want == VCC_FMT_420F) {
++    static int logged = 0;
++    if (want == VCC_FMT_420F && logged++ == 0) {
++      cfxlog(@"[video delivery] client asked for 420f; delivering 420v");
++    }
++    return VCC_FMT_420V;
++  }
++  return VCC_FMT_BGRA;
++}
++
++// Clockwise angle the connection wants, 0 being the landscape frame.
++static int cfx_connection_angle(id conn) {
++  double a = 0;
++  @try { a = [[conn valueForKey:@"videoRotationAngle"] doubleValue]; } @catch (NSException *e) {}
++  return ((int)lround(a / 90.0) & 3) * 90;
++}
++
++// Landscape size a session preset delivers on a real camera; 0 x 0 when the
++// preset does not pin one (Photo, High, InputPriority), so the frame's own
++// size is kept.
++static void cfx_preset_size(id out, uint32_t *w, uint32_t *h) {
++  NSString *preset = nil;
++  @try { preset = [[out valueForKey:@"session"] valueForKey:@"sessionPreset"]; }
++  @catch (NSException *e) {}
++  static NSDictionary *sizes = nil;
++  static dispatch_once_t once;
++  dispatch_once(&once, ^{
++    sizes = @{
++      AVCaptureSessionPreset352x288: @[@352, @288],
++      AVCaptureSessionPreset640x480: @[@640, @480],
++      AVCaptureSessionPreset1280x720: @[@1280, @720],
++      AVCaptureSessionPreset1920x1080: @[@1920, @1080],
++      AVCaptureSessionPresetiFrame960x540: @[@960, @540],
++      AVCaptureSessionPresetiFrame1280x720: @[@1280, @720],
++    };
++  });
++  NSArray *wh = preset ? sizes[preset] : nil;
++  *w = [wh[0] unsignedIntValue];
++  *h = [wh[1] unsignedIntValue];
++}
++
++static id cfx_first_video_connection(id out) {
++  NSArray *conns = nil;
++  @try { conns = [out valueForKey:@"connections"]; } @catch (NSException *e) {}
++  return conns.firstObject;
++}
++
++// The size this output's frames will have: the preset turned for the
++// connection, or the portrait / landscape crop of the shm frame.
++BOOL cfx_output_frame_size(id out, uint32_t *w, uint32_t *h) {
++  uint32_t pw = 0, ph = 0, fw = 0, fh = 0;
++  cfx_preset_size(out, &pw, &ph);
++  if (!cfx_shm_frame_size(&fw, &fh)) return NO;
++  cfx_frame_plan_t plan;
++  double zoom = [cfx_overrides()[@"zoom"] doubleValue];
++  if (cfx_frame_plan(fw, fh, pw, ph, cfx_connection_angle(cfx_first_video_connection(out)),
++                     zoom, &plan) != 0) {
++    return NO;
++  }
++  *w = plan.out_w;
++  *h = plan.out_h;
++  return YES;
++}
++
++static CMSampleBufferRef cfx_build_cmsb_for(id out, id conn) {
++  NSDictionary *ov = cfx_overrides();
++  uint32_t fmt = cfx_output_pixel_format(out);
++  int angle = cfx_connection_angle(conn);
++  BOOL mirror = NO;
++  @try { mirror = [[conn valueForKey:@"videoMirrored"] boolValue]; } @catch (NSException *e) {}
++  if (ov[@"mirror"]) mirror = [ov[@"mirror"] boolValue];
++  int turns = [ov[@"turns"] intValue];
++  double zoom = [ov[@"zoom"] doubleValue];
++  uint32_t pw = 0, ph = 0;
++  cfx_preset_size(out, &pw, &ph);
++
++  uint32_t w = 0, h = 0;
++  CMSampleBufferRef sb =
++      cfx_build_oriented_cmsb(fmt, pw, ph, angle, zoom, turns, mirror, &w, &h);
++  // Override `dumpFrame`: every 3 s, save what the client receives.
++  static CFAbsoluteTime dumpedAt = 0;
++  if (sb && [ov[@"dumpFrame"] boolValue] && CFAbsoluteTimeGetCurrent() - dumpedAt > 3) {
++    dumpedAt = CFAbsoluteTimeGetCurrent();
++    CGImageRef img = vcc_cgimage_from_pixel_buffer(CMSampleBufferGetImageBuffer(sb));
++    NSData *jpg = cfx_jpeg_from_cgimage(img);
++    if (img) CGImageRelease(img);
++    [jpg writeToFile:@VPHONE_VCAM_DIRECTORY "/delivered.jpg" atomically:YES];
++  }
++  static uint64_t shapeKey = 0;
++  uint64_t key = ((uint64_t)fmt << 32) ^ ((uint64_t)(angle & 0x3ff) << 20) ^
++                 ((uint64_t)(turns & 3) << 16) ^ ((uint64_t)mirror << 15) ^
++                 ((uint64_t)w << 40) ^ (uint64_t)h;
++  if (sb && key != shapeKey) {
++    shapeKey = key;
++    cfxlog(@"[video delivery] shape fmt=%.4s preset=%ux%u angle=%d turns=%d mirror=%d -> %ux%u",
++           (char *)&(uint32_t){CFSwapInt32HostToBig(fmt)}, pw, ph, angle, turns & 3, mirror,
++           w, h);
++  }
++  return sb;
++}
++
+ void cfx_deliver_video_frames_once(void) {
+   pthread_mutex_lock(&cfx_vcam_sessions_lock);
+   NSArray *sessions = cfx_vcam_sessions.allObjects;
+@@ -59,7 +170,7 @@ void cfx_deliver_video_frames_once(void) {
+         BOOL enabled = NO;
+         @try { enabled = [[conn valueForKey:@"enabled"] boolValue]; } @catch (NSException *e) {}
+         if (!enabled) continue;
+-        CMSampleBufferRef sb = cfx_build_cmsb();
++        CMSampleBufferRef sb = cfx_build_cmsb_for(out, conn);
+         if (!sb) continue;
+         cfx_video_deliver_count++;
+         dispatch_async(q ?: dispatch_get_main_queue(), ^{
+diff --git a/VPhoneGuestComponents/CamFix/libcamfix.m b/VPhoneGuestComponents/CamFix/libcamfix.m
+index 4c092c7b5d7db51754b8dc99f0aca61deb18b59d..51b6ba8e0cfef1c4c7eb07e997446fede6a30d15 100644
+--- a/VPhoneGuestComponents/CamFix/libcamfix.m
++++ b/VPhoneGuestComponents/CamFix/libcamfix.m
+@@ -47,7 +47,21 @@
+  *    (Photo/CamFixMomentCapture.m)
+  *
+  * 8. AVCaptureVideoDataOutput delivery for vcam sessions whose capture graph
+- *    never runs. (Session/CamFixVideoDelivery.m)
++ *    never runs, at the size, orientation and pixel format the session and
++ *    connection ask for. (Session/CamFixVideoDelivery.m,
++ *    Frame/CamFixFrameGeometry.c)
++ *
++ * 9. Front-camera alias: an empty front or back device lookup gets the vcam
++ *    device, whose position follows the side asked for.
++ *    (Device/CamFixFrontCamera.m)
++ *
++ * 10. Exposure state: aperture, ISO, exposure and frame durations on the vcam
++ *     device, and the same numbers in each delivered frame's {Exif}.
++ *     (Device/CamFixExposure.m)
++ *
++ * 11. -[AVCaptureVideoDataOutput recommendedVideoSettingsForAssetWriterWithOutputFileType:]:
++ *     H.264 at the delivered size instead of 0x0.
++ *     (Session/CamFixAssetWriterSettings.m)
+  *
+  * Frames come from the vphoned shared frame file through the shared data
+  * plane (Frame/CamFixFrameSource.m). Diagnostics go to the shared camera
+@@ -73,6 +87,9 @@ static void cfx_install_all_hooks(void) {
+     cfxlog(@"installing hooks (process=%@, pid=%d)",
+            NSProcessInfo.processInfo.processName ?: @"?", getpid());
+     cfx_install_setActiveFormat_hook();
++    cfx_install_front_camera_alias();
++    cfx_install_exposure_hooks();
++    cfx_install_asset_writer_settings();
+     cfx_install_capturePhoto_hook();
+     cfx_install_moment_capture_hooks();
+     cfx_install_session_guards();
+diff --git a/VPhoneGuestComponents/Makefile b/VPhoneGuestComponents/Makefile
+index 80a14b5812343b64d386e71d325307184188d15a..8a3d8cbb945c8e5a2406ddcfa12503843cf776e5 100644
+--- a/VPhoneGuestComponents/Makefile
++++ b/VPhoneGuestComponents/Makefile
+@@ -206,7 +206,7 @@ $(CAMFIX): $(CAMFIX_SOURCES) $(CAMFIX_INPUTS) | $(STAGE)/camfix
+ 		-o $@ $(CAMFIX_SOURCES) \
+ 		-framework Foundation -framework AVFoundation -framework ImageIO \
+ 		-framework IOSurface -framework CoreMedia -framework CoreVideo \
+-		-framework CoreGraphics -framework QuartzCore
++		-framework CoreGraphics -framework QuartzCore -framework Accelerate
+ 	@codesign --force --sign - $@
+ 
+ $(VCAMCAPTURED): $(VCAMCAPTURED_SOURCES) $(VCAMCAPTURED_INPUTS) | $(STAGE)/vcamcaptured
+@@ -384,6 +384,16 @@ test-vcam-drive-gate:
+ 		Tests/VCamDriveGateTests.c VCamCaptured/Frames/VCamDriveGate.c
+ 	@$(OUT)/VCamDriveGateTests
+ 
++# Host proof harness for the crop, size and turn plan libcamfix uses for
++# AVCaptureVideoDataOutput frames.
++.PHONY: test-camfix-geometry
++test-camfix-geometry:
++	@mkdir -p $(OUT)
++	xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -ICamFix/Frame \
++		-o $(OUT)/CamFixFrameGeometryTests \
++		Tests/CamFixFrameGeometryTests.c CamFix/Frame/CamFixFrameGeometry.c
++	@$(OUT)/CamFixFrameGeometryTests
++
+ .PHONY: test-installcoordination-persona
+ test-installcoordination-persona:
+ 	@mkdir -p $(OUT)
+diff --git a/VPhoneGuestComponents/Tests/CamFixFrameGeometryTests.c b/VPhoneGuestComponents/Tests/CamFixFrameGeometryTests.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c1fc817809f234df24d7fcd686df266d4409eab
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/CamFixFrameGeometryTests.c
+@@ -0,0 +1,97 @@
++/*
++ * Host proof harness for the crop / size / turn plan libcamfix uses when it
++ * delivers frames to an AVCaptureVideoDataOutput
++ * (CamFix/Frame/CamFixFrameGeometry.c).
++ *
++ * Build/run:  make -C VPhoneGuestComponents test-camfix-geometry
++ */
++
++#include "CamFixFrameGeometry.h"
++
++#include <stdio.h>
++
++static int g_checks = 0;
++static int g_fails = 0;
++
++#define CHECK(cond, ...)                          \
++  do {                                            \
++    g_checks++;                                   \
++    if (!(cond)) {                                \
++      g_fails++;                                  \
++      printf("FAIL %s:%d: ", __FILE__, __LINE__); \
++      printf(__VA_ARGS__);                        \
++      printf("\n");                               \
++    }                                             \
++  } while (0)
++
++static cfx_frame_plan_t plan(uint32_t fw, uint32_t fh, uint32_t pw, uint32_t ph, int angle,
++                             double zoom) {
++  cfx_frame_plan_t p = {0};
++  CHECK(cfx_frame_plan(fw, fh, pw, ph, angle, zoom, &p) == 0, "plan failed");
++  return p;
++}
++
++static void check_inside(cfx_frame_plan_t p, uint32_t fw, uint32_t fh) {
++  CHECK(p.crop_x + p.crop_w <= fw && p.crop_y + p.crop_h <= fh,
++        "crop %u,%u %ux%u outside %ux%u", p.crop_x, p.crop_y, p.crop_w, p.crop_h, fw, fh);
++  CHECK(p.crop_w % 2 == 0 && p.crop_h % 2 == 0, "odd crop %ux%u", p.crop_w, p.crop_h);
++  CHECK(p.crop_x % 2 == 0 && p.crop_y % 2 == 0, "odd origin %u,%u", p.crop_x, p.crop_y);
++}
++
++int main(void) {
++  // Landscape connection, preset matching the frame aspect: whole frame.
++  cfx_frame_plan_t p = plan(1280, 720, 1280, 720, 0, 1);
++  CHECK(p.crop_w == 1280 && p.crop_h == 720 && p.crop_x == 0 && p.crop_y == 0,
++        "1280x720 landscape crop %ux%u", p.crop_w, p.crop_h);
++  CHECK(p.out_w == 1280 && p.out_h == 720 && p.turns == 0, "1280x720 landscape out");
++
++  // 640x480 landscape: 4:3 centre of a 16:9 frame, scaled to the preset.
++  p = plan(1280, 720, 640, 480, 0, 1);
++  CHECK(p.crop_w == 960 && p.crop_h == 720 && p.crop_x == 160, "4:3 crop %ux%u@%u",
++        p.crop_w, p.crop_h, p.crop_x);
++  CHECK(p.out_w == 640 && p.out_h == 480, "640x480 out %ux%u", p.out_w, p.out_h);
++  check_inside(p, 1280, 720);
++
++  // Portrait connection: 3:4 crop, delivered at 480x640, not turned.
++  p = plan(1280, 720, 640, 480, 90, 1);
++  CHECK(p.crop_w == 540 && p.crop_h == 720 && p.crop_x == 370, "3:4 crop %ux%u@%u",
++        p.crop_w, p.crop_h, p.crop_x);
++  CHECK(p.out_w == 480 && p.out_h == 640 && p.turns == 0, "portrait out %ux%u turns %d",
++        p.out_w, p.out_h, p.turns);
++  check_inside(p, 1280, 720);
++
++  // Upside down portrait and landscape-left turn the picture over.
++  CHECK(plan(1280, 720, 640, 480, 270, 1).turns == 2, "270 turns");
++  CHECK(plan(1280, 720, 640, 480, 180, 1).turns == 2, "180 turns");
++  CHECK(plan(1280, 720, 640, 480, -90, 1).out_h == 640, "-90 is portrait");
++
++  // No preset: deliver the crop at its own size, portrait aspect for portrait.
++  p = plan(1280, 720, 0, 0, 90, 1);
++  CHECK(p.out_w == p.crop_w && p.out_h == p.crop_h && p.crop_h == 720 && p.crop_w == 404,
++        "no-preset portrait %ux%u", p.out_w, p.out_h);
++  p = plan(1280, 720, 0, 0, 0, 1);
++  CHECK(p.out_w == 1280 && p.out_h == 720, "no-preset landscape %ux%u", p.out_w, p.out_h);
++
++  // Zoom crops further in around the centre; below 1 counts as 1.
++  p = plan(1280, 720, 640, 480, 90, 2);
++  CHECK(p.crop_w == 270 && p.crop_h == 360 && p.crop_x == 504 && p.crop_y == 180,
++        "zoom 2 crop %ux%u@%u,%u", p.crop_w, p.crop_h, p.crop_x, p.crop_y);
++  CHECK(p.out_w == 480 && p.out_h == 640, "zoom keeps the delivered size");
++  CHECK(plan(1280, 720, 640, 480, 90, 0.5).crop_w == 540, "zoom below 1");
++
++  // Odd frame sizes stay even and inside.
++  for (uint32_t w = 101; w < 140; w += 7) {
++    for (uint32_t h = 61; h < 120; h += 11) {
++      for (int a = 0; a < 360; a += 90) {
++        check_inside(plan(w, h, 640, 480, a, 1.3), w, h);
++        check_inside(plan(w, h, 0, 0, a, 1), w, h);
++      }
++    }
++  }
++
++  cfx_frame_plan_t q;
++  CHECK(cfx_frame_plan(0, 720, 640, 480, 0, 1, &q) == -1, "empty frame");
++
++  printf("%d checks, %d failures\n", g_checks, g_fails);
++  return g_fails ? 1 : 0;
++}

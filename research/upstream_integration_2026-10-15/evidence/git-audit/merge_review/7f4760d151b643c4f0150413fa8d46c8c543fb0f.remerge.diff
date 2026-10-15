@@ -1,0 +1,26 @@
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+remerge CONFLICT (content): Merge conflict in Research/0_binary_patch_comparison.md
+index 9f067445..0ddff6f3 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -2791,7 +2791,10 @@ DeviceTree are also in Preboot and could follow the same path later.
+ 
+ Two standard-blocked declarations hide Apple Account, Game Center, iCloud and Wallet in Preferences (`system-preferences-exp-root_rows`) and Software Update in GeneralSettingsUI (`dyld-exp-settings_software_update_row`). Native discovery is restricted to reviewed 24A435 inputs. The installer uses pristine executable backups and cache undo records with page re-attestation. All five rows passed guest rollback, reapplication and reboot checks. See [research report](Guest/2026-10-07_reverse-settings-rows-report.md). Broader firmware coverage and bundled deployment remain WIP; no kernel/SEP or runtime hook changes are included.
+ 
+-<<<<<<< 15a5af7e (Fix Xcode installation persona lookup on iOS 27 guests)
++## Pinned guest device name (2026-10-07)
++
++Row 27. `libdevicename.dylib` makes configd publish the VM's name, which `vphone-vm` hands to vphoned after every connect and vphoned keeps in `/var/db/vphone/devicename.plist`, as the device name, and makes lockdownd refuse every rename; without the file it passes everything through. NVRAM was tried first and does not reach the guest: iBoot drops variables it does not know. It is the first library a process receives beside another: lockdownd already took `libmisfix.dylib`, so `vpInsertedLibrariesFor` in `Shared/InjectionEnvironment.h` now returns every installed library for a path and `vpInsertHookLibraries` adds each one an environment lacks. Single-library targets and their spawn log lines are unchanged. `preferences.plist` is never written: the pin is applied to configd's `SCDynamicStoreSetMultiple` publication, because the `SCPreferencesGetValue(kSCPrefSystem)` it flattens is also read and written back on configd's model-change path. Verified on iOS 27.0 (24A435) on 2026-10-07; iOS 26.x not run yet. See `Research/Guest/device_name_pinning.md` for the flow, the measurements and the verification.
++
+ ## CoreDevice install proxy persona lookup (2026-10-07)
+ 
+ `system-installcoordination_proxy-cfw-persona_lookup` is an iOS-27 guest
+@@ -2809,8 +2812,3 @@ persona-fetch authorization. Adding a temporary exception entitlement was
+ verified ineffective on the running guest and has been removed. IDA analysis
+ of this guest's launchd confirms the bootstrap lookup gate and name filters
+ 2, 3 and 12. See [evidence, implementation and validation](Guest/ios27_xcode_persona_lookup.md).
+-=======
+-## Pinned guest device name (2026-10-07)
+-
+-Row 27. `libdevicename.dylib` makes configd publish the VM's name, which `vphone-vm` hands to vphoned after every connect and vphoned keeps in `/var/db/vphone/devicename.plist`, as the device name, and makes lockdownd refuse every rename; without the file it passes everything through. NVRAM was tried first and does not reach the guest: iBoot drops variables it does not know. It is the first library a process receives beside another: lockdownd already took `libmisfix.dylib`, so `vpInsertedLibrariesFor` in `Shared/InjectionEnvironment.h` now returns every installed library for a path and `vpInsertHookLibraries` adds each one an environment lacks. Single-library targets and their spawn log lines are unchanged. `preferences.plist` is never written: the pin is applied to configd's `SCDynamicStoreSetMultiple` publication, because the `SCPreferencesGetValue(kSCPrefSystem)` it flattens is also read and written back on configd's model-change path. Verified on iOS 27.0 (24A435) on 2026-10-07; iOS 26.x not run yet. See `Research/Guest/device_name_pinning.md` for the flow, the measurements and the verification.
+->>>>>>> 289f46a3 (Merge pull request #618 from nekohasekai/jetsam-multiplier)

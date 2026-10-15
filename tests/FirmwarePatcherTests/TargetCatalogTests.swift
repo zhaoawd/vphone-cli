@@ -17,7 +17,7 @@ import Testing
     }
 
     static func decisions() throws -> Decisions {
-        let url = root.appendingPathComponent("research/upstream_integration_2026-10-06/T09_target_applicability.json")
+        let url = root.appendingPathComponent("research/upstream_integration_2026-10-15/T09_target_applicability.json")
         return try JSONDecoder().decode(Decisions.self, from: Data(contentsOf: url))
     }
 
@@ -26,7 +26,7 @@ import Testing
             struct Row: Decodable { let id: String }
             let declarations: [Row]
         }
-        let url = root.appendingPathComponent("research/upstream_integration_2026-10-06/evidence/2026-10-12-five-task-audit/fixed-target-source-manifest.json")
+        let url = root.appendingPathComponent("research/upstream_integration_2026-10-15/evidence/target-declarations-8a75092/fixed-target-source-manifest.json")
         return try JSONDecoder().decode(Manifest.self, from: Data(contentsOf: url)).declarations.map(\.id)
     }
 
@@ -34,9 +34,9 @@ import Testing
     @Test func targetIDsHaveExactlyOneDecision() throws {
         let expected = Set(try Self.sourceIDs())
         let actual = PatchDeclarationCatalog.all.flatMap(\.upstreamIDs)
-        #expect(expected.count == 141)
-        #expect(Set(actual).count == 141)
-        #expect(actual.count == 141)
+        #expect(expected.count == 148)
+        #expect(Set(actual).count == 148)
+        #expect(actual.count == 148)
         #expect(expected.subtracting(actual).sorted() == [])
         #expect(Set(actual).subtracting(expected).isEmpty)
         try PatchDeclarationCatalog.validateStructure()
@@ -51,7 +51,7 @@ import Testing
             excGuardActive: base == 18 || variant == "dev", applyIOS27: base == 27, applyFrida: false)
         let plan = try VariantPlanResolver.resolve(variant: mode, gates: gates)
         let decisions = try Self.decisions()
-        #expect(decisions.target == "2d21d21fbdd4f51f013616273ceda9b35a3e0789")
+        #expect(decisions.target == "8a75092013eda87a4e30ed029b72028cb9279ac4")
         let entries = plan.selected + plan.excludedByVersion + plan.excludedByOptIn
             + plan.excludedByVariant + plan.notImplemented + plan.guestUncovered
         for row in decisions.decisions {

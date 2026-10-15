@@ -1,0 +1,1819 @@
+diff --git a/Documents/Guides/create-and-run.md b/Documents/Guides/create-and-run.md
+index 2f5b80a0429a5b5834dacf36cb4de7e93c33f31b..7c4e67c65518dc452d4839d311cf076681c9d9af 100644
+--- a/Documents/Guides/create-and-run.md
++++ b/Documents/Guides/create-and-run.md
+@@ -67,6 +67,8 @@ The online restore obtains its ticket in process. For an offline restore, see `v
+ 
+ `VPHONE_ROOT` relocates the VM library and both caches. `VPHONE_LIBRARY_ROOT` takes precedence for the library alone, and `--ipsw-cache <dir>` on `vm create` and `fw prepare` for the IPSW cache alone. Downloaded IPSWs stay cached until you delete them (in Launchpad, with File > Downloaded IPSWs…), so a second VM from the same URL downloads nothing; the prepared restore tree is removed after a successful `vm create` unless `--keep-artifacts` is set. VMs prepared by an earlier build may still hold a `.ipsw-cache/` directory; it is safe to delete, and `vm export` leaves it out.
+ 
++A remote IPSW downloads over four connections at once when its server answers HTTP range requests, as Apple's CDN does; each connection fetches 32 MB segments in turn and resumes a dropped segment where it stopped. `--download-connections <n>` on `fw prepare` sets the count (1 to 16); 1 downloads the IPSW as a single stream, which is also what a server that ignores ranges gets.
++
+ ```sh
+ vphone-cli vm list
+ vphone-cli vm info myphone
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+index 3ee90ebc9422a9b1db6d7b40ac087c4c23c4a85d..6c75747c865a08685665091b6cb3e255282970c9 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -2812,3 +2812,40 @@ persona-fetch authorization. Adding a temporary exception entitlement was
+ verified ineffective on the running guest and has been removed. IDA analysis
+ of this guest's launchd confirms the bootstrap lookup gate and name filters
+ 2, 3 and 12. See [evidence, implementation and validation](Guest/ios27_xcode_persona_lookup.md).
++
++## Host disk-image command migration (2026-10-08)
++
++The migration replaces `hdiutil` because macOS 27 marks it as deprecated.
++The system's `hdiutil(1)` manual recommends `diskutil image`, and command help
++prints deprecation warnings directing attach, detach and convert operations
++to `diskutil image attach`, `diskutil eject` and `diskutil image create from`.
++
++No guest binary patch or preset change. On macOS 15+, CFW install and kernel
++update, PCC GPU recovery, seal-tool extraction and Cryptex filesystem attachment
++use `diskutil image attach`. Writable conversion uses `diskutil image create
++from -format RAW`, which `diskutil(8)` identifies as the former UDRW format.
++There is no hdiutil fallback or new disk-image tool abstraction: calls stay in
++their existing functions. The macOS 15 `diskutil(8)` system manual already
++documents image attach, create and resize. Single-hyphen options
++preserve compatibility with older diskutil versions; conversion supplies
++`-source` on macOS 15 and a positional source on macOS 26+. Existing function
++names and CLI arguments are preserved. Eject uses `diskutil eject`; a busy image is
++retried after `diskutil unmountDisk force`, avoiding the newer `eject force`
++syntax on older systems. Attachment parsing retains the physical APFS store's
++parent disk even when a synthesized container is reported first, and keeps
++mount points containing spaces intact. PCC recovery tracks successful eject
++before deleting its temporary library instead of querying `hdiutil info`.
++
++`CryptexFileOpsTests`: all 12 existing tests pass. The
++`VPhone` bundle build and bundle admission pass on macOS 27.0.1 / Xcode 27.1.
++Real image attachment and execution on macOS 15 still require live validation;
++no VM disk is modified by the validation tests.
++
++## Flutter AOT executable-remap compatibility
++
++The existing guest SystemHook component has a guarded `vm_remap` fallback for
++an observed Flutter AOT callback layout whose returned RX permission disagrees
++with the actual read-only destination. The fallback creates a private RW copy,
++then changes it to RX; other calls pass through. No kernel patch or protection
++policy change is added. See `Research/Guest/flutter_aot_remap_compatibility.md`
++for exact guards, failure semantics, reproduction and validation limits.
+diff --git a/Research/Guest/flutter_aot_remap_compatibility.md b/Research/Guest/flutter_aot_remap_compatibility.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..be6f92a316a5276ba2c340f2225f4ae3be5dba86
+--- /dev/null
++++ b/Research/Guest/flutter_aot_remap_compatibility.md
+@@ -0,0 +1,68 @@
++# Flutter AOT callback remap compatibility
++
++## Failure and scope
++
++On a tested iPadOS 26.6.2 guest using cloudOS 26.4, an executable page remap
++returned success and RX protection while the destination was actually read-only.
++Executing a callback in that mapping caused `CODESIGNING / Invalid Page`.
++A crash reporter could subsequently fail with `EXC_GUARD`, masking the first fault.
++
++A standalone signed Swift probe reproduced the mismatch without Flutter or an
++injected script. Disabling optional tweaks for that probe did not change it.
++`vm_remap_new` and changing the destination to RX afterwards did not recover it.
++Allocating RW memory, copying bytes, then setting RX did work. The precise
++responsible kernel-policy branch has not been established; this change is a
++bounded guest compatibility fallback, not a kernel fix.
++
++## Runtime behavior
++
++SystemHook provides the interpose before application initialization. It first
++calls the original `vm_remap` and leaves all normal outcomes unchanged. Repair
++requires every condition below:
++
++- The executable and both images resolve to the same canonical `.app` bundle.
++- The source is its `Frameworks/App.framework/App`; the caller is its
++  `Frameworks/Flutter.framework/Flutter`.
++- Same-task, private-copy, fixed-overwrite remap of 32 KiB, with source image
++  offset 16 KiB: the observed AOT callback layout, not an arbitrary code copy.
++- Original success with reported RX/current and RWX/maximum; source actually RX.
++- An exact destination mapping that is read-only with maximum RW, and no overlap
++  with the source.
++
++The fallback atomically overwrites the newly created, not-yet-published target
++with private RW memory, honors inheritance, copies the bytes, changes it to RX,
++and verifies the result. It never requests simultaneous writable/executable
++access and does not change signing or kernel protection policy. Allocation,
++inheritance or protection failures propagate as errors with cleanup of owned
++replacement mappings. Unrecognized layouts continue through the native path.
++
++This interpose is linked into the existing SystemHook component; it needs no
++new firmware patch selector or public command. An old host bundle will resync
++its old library on guest reconnect, so the guest must be bound to the bundle
++containing the fix to keep it across restarts.
++
++## Validation
++
++Host checks:
++
++```sh
++make -C VPhoneGuestComponents test-flutter-remap test-flutter-remap-repair test-injection-environment
++make -C VPhoneGuestComponents build-executable-remap-probe
++```
++
++`ExecutableRemapProbe` is a standalone guest test binary, not shipped runtime
++code. It duplicates its own constant-returning function. Default mode reports
++the permission mismatch and exits3 without executing a non-executable mapping;
++`--copy` exercises the alternate path and expects42. Stage and run it only on
++an existing authorized test guest.
++
++The core fallback was exercised with a Flutter AOT guest workload: two cold
++launches remained alive for60seconds each, followed by another60second same-PID
++check after a full VM restart and bundle rebinding. The interface rendered
++normally and the deployed library hash remained unchanged after reconnect.
++
++That live acceptance used an earlier application-filtered prototype. This PR
++replaces that filter with canonical same-bundle image checks, covered by host
++positive/negative tests. Broad Flutter/application/version coverage and live
++acceptance of that generalized selector are still pending. Keep this change
++in draft until that additional coverage is reviewed.
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherDiskImage.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherDiskImage.swift
+index 09995f680fd479e0b2a952c36b5317b5b5087fb4..29e475027ff362d0a25421c91157d906018da7aa 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherDiskImage.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherDiskImage.swift
+@@ -1,6 +1,6 @@
+ // CryptexFilesystemPatcherDiskImage.swift — Disk image attach, convert and copy helpers.
+ //
+-// Split out of CryptexFilesystemPatcher.swift. The hdiutil/diskutil layer: attaching and
++// Split out of CryptexFilesystemPatcher.swift. The diskutil layer: attaching and
+ // detaching images, converting between RAW and UDRW, resizing, unmounting, and the
+ // copyfile-based volume copy used to merge a cryptex into the target volume.
+ 
+@@ -65,11 +65,12 @@ extension CryptexFilesystemPatcher {
+     }
+ 
+     func convertToRawImage(input: URL, output: URL) throws {
+-        _ = try runProcess("/usr/sbin/diskutil", [
+-            "image", "create", "from",
+-            "--format", "RAW", input.path,
+-            output.path,
+-        ])
++        let arguments = if #available(macOS 26, *) {
++            ["image", "create", "from", "-format", "RAW", input.path, output.path]
++        } else {
++            ["image", "create", "from", "-format", "RAW", "-source", input.path, output.path]
++        }
++        _ = try runProcess("/usr/sbin/diskutil", arguments)
+ 
+         // Resize to max. Asking diskutil how big it may get returns a plist, and
+         // reading one value out of it used to be `/bin/sh -c "… | plutil -extract
+@@ -77,11 +78,11 @@ extension CryptexFilesystemPatcher {
+         // can read directly — and a pipeline whose stdout is also where diskutil's
+         // own warnings land, so a noisy run produced a "size" that was a sentence.
+         let sizes = try runProcess("/usr/sbin/diskutil", [
+-            "image", "resize", "--plist", output.path,
++            "image", "resize", "-plist", output.path,
+         ])
+         let maxsize = try Self.maxResizeSize(fromDiskutilPlist: sizes)
+         _ = try runProcess("/usr/sbin/diskutil", [
+-            "image", "resize", "--size", maxsize, output.path,
++            "image", "resize", "-size", maxsize, output.path,
+         ])
+     }
+ 
+@@ -114,19 +115,20 @@ extension CryptexFilesystemPatcher {
+         if FileManager.default.fileExists(atPath: output.path) {
+             try FileManager.default.removeItem(at: output)
+         }
+-        _ = try runProcess("/usr/bin/hdiutil", [
+-            "convert",
+-            input.path,
+-            "-format", "UDRW",
+-            "-o", output.path,
+-        ])
++        // diskutil calls the former UDRW read-write format RAW.
++        let arguments = if #available(macOS 26, *) {
++            ["image", "create", "from", "-format", "RAW", input.path, output.path]
++        } else {
++            ["image", "create", "from", "-format", "RAW", "-source", input.path, output.path]
++        }
++        _ = try runProcess("/usr/sbin/diskutil", arguments)
+     }
+ 
+     func shrinkImage(dmg: URL) throws {
+         _ = try runProcess("/usr/sbin/diskutil", [
+             "image",
+             "resize",
+-            "--size", "min",
++            "-size", "min",
+             dmg.path,
+         ])
+     }
+@@ -138,18 +140,16 @@ extension CryptexFilesystemPatcher {
+     /// attachImage returns the device and mount point
+     func attachImage(path: URL, readonly: Bool = false, forceRW: Bool = false) throws -> (String, String) {
+         let process = Process()
+-        process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
++        process.executableURL = URL(fileURLWithPath: "/usr/sbin/diskutil")
+         process.arguments = if readonly {
+             [
+-                "attach",
+-                "-readonly",
+-                "-plist",
++                "image", "attach",
++                "-readOnly",
+                 path.path,
+             ]
+         } else {
+             [
+-                "attach",
+-                "-plist",
++                "image", "attach",
+                 path.path,
+             ]
+         }
+@@ -168,27 +168,15 @@ extension CryptexFilesystemPatcher {
+             throw ProcessError.failed(process.terminationStatus, output)
+         }
+ 
+-        let root: PlistDict
+-        do {
+-            root = try parsePlist(data: data)
+-        } catch {
+-            detachReportedImage(in: String(data: data, encoding: .utf8) ?? "")
+-            throw error
+-        }
+-        guard let entries = root["system-entities"] as? [Any] else {
+-            detachReportedImage(in: String(data: data, encoding: .utf8) ?? "")
+-            throw FirmwareManifest.ManifestError.missingKey("system-entities")
+-        }
+-        for entry in entries {
+-            guard let entry = entry as? PlistDict,
+-                  let volumeKind = entry["volume-kind"] as? String,
+-                  volumeKind == "apfs" || volumeKind == "hfs"
+-            else {
++        let output = String(decoding: data, as: UTF8.self)
++        for line in output.split(whereSeparator: \.isNewline) {
++            let fields = line.split(separator: "\t", omittingEmptySubsequences: false)
++                .map { $0.trimmingCharacters(in: .whitespaces) }
++            guard fields.count >= 3, fields[0].hasPrefix("/dev/disk"), fields[2].hasPrefix("/") else {
+                 continue
+             }
+-            let device = entry["dev-entry"] as? String ?? ""
+-            let mountPoint = entry["mount-point"] as? String ?? ""
+-            guard !device.isEmpty, !mountPoint.isEmpty else { continue }
++            let device = fields[0]
++            let mountPoint = fields[2]
+ 
+             attachedDevices.insert(device)
+             if forceRW {
+@@ -216,9 +204,10 @@ extension CryptexFilesystemPatcher {
+ 
+     func detachImage(deviceNode: String) throws {
+         do {
+-            _ = try runProcess("/usr/bin/hdiutil", ["detach", deviceNode])
++            _ = try runProcess("/usr/sbin/diskutil", ["eject", deviceNode])
+         } catch {
+-            _ = try runProcess("/usr/bin/hdiutil", ["detach", "-force", deviceNode])
++            _ = try runProcess("/usr/sbin/diskutil", ["unmountDisk", "force", deviceNode])
++            _ = try runProcess("/usr/sbin/diskutil", ["eject", deviceNode])
+         }
+         attachedDevices.remove(deviceNode)
+     }
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherProcess.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherProcess.swift
+index 659b2714309faae1d8b8ede91a6ff18b6a283dad..a6498570953248943c011ca84de77a377e602944 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherProcess.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherProcess.swift
+@@ -1,6 +1,6 @@
+ // CryptexFilesystemPatcherProcess.swift — Subprocess execution for the filesystem patcher.
+ //
+-// Split out of CryptexFilesystemPatcher.swift. Every external tool the merge drives — hdiutil,
++// Split out of CryptexFilesystemPatcher.swift. Every external tool the merge drives —
+ // diskutil, ipsw, aa, cryptexctl, apfs_sealvolume — runs through runProcess, and ProcessError
+ // is what it throws. What no longer runs through it: tar (VPhoneArchiveKit), and chmod, chown, ln
+ // and find (CryptexFilesystemPatcherFileOps.swift).
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+index 8c519df04d66a7b0f205a8f81bee5f12c9b2585f..43285d91d8dccb066c16490ccb823c9e8643db06 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+@@ -218,9 +218,9 @@ struct VPhoneCustomFirmwareInstaller {
+         } else {
+             // Another volume, or no clone support: attach the caller's file
+             // in place. Confirm the name still refers to the inode verified
+-            // above immediately before hdiutil opens it. A swap in the moment
+-            // between this check and hdiutil's own open remains possible,
+-            // and hdiutil then works on the caller's own replacement. The
++            // above immediately before diskutil opens it. A swap in the moment
++            // between this check and diskutil's own open remains possible,
++            // and diskutil then works on the caller's own replacement. The
+             // snapshot rename below writes only the verified inode. The clone
+             // path, the normal case on APFS, has no such window.
+             guard try bundleDirectory.refersTo("Disk.img", file: disk) else {
+@@ -233,12 +233,12 @@ struct VPhoneCustomFirmwareInstaller {
+         }
+ 
+         let attached = try tool(
+-            "/usr/bin/hdiutil",
++            "/usr/sbin/diskutil",
+             [
+-                "attach", "-nomount", "-imagekey", "diskimage-class=CRawDiskImage", image.path,
++                "image", "attach", "-noMount", image.path,
+             ],
+         )
+-        // `hdiutil attach` prints the image's own disk and, on macOS 27, the APFS
++        // `diskutil image attach` prints the image's own disk and, on macOS 27, the APFS
+         // container it synthesizes over it before that disk, so its first line is
+         // no longer the image: the container's line carries the container's type
+         // and taking it would make every later device reference point at the
+@@ -256,16 +256,18 @@ struct VPhoneCustomFirmwareInstaller {
+         } ?? wholeDisk ?? devices.first?.device
+         guard let baseDisk, baseDisk.hasPrefix("/dev/disk") else {
+             if let range = attached.range(of: #"/dev/disk[0-9]+"#, options: .regularExpression) {
+-                _ = try? tool("/usr/bin/hdiutil", ["detach", "-force", String(attached[range])], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["unmountDisk", "force", String(attached[range])], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["eject", String(attached[range])], quiet: true)
+             }
+             throw ValidationError("Unable to attach the VM disk image. Try again.")
+         }
+         var diskAttached = true
+         defer {
+             if diskAttached,
+-               (try? tool("/usr/bin/hdiutil", ["detach", baseDisk], quiet: true)) == nil
++               (try? tool("/usr/sbin/diskutil", ["eject", baseDisk], quiet: true)) == nil
+             {
+-                _ = try? tool("/usr/bin/hdiutil", ["detach", "-force", baseDisk], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["unmountDisk", "force", baseDisk], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["eject", baseDisk], quiet: true)
+             }
+         }
+ 
+@@ -414,7 +416,7 @@ struct VPhoneCustomFirmwareInstaller {
+         xartMounted = false
+         _ = try tool("/sbin/umount", [system.path])
+         systemMounted = false
+-        _ = try tool("/usr/bin/hdiutil", ["detach", baseDisk], quiet: true)
++        _ = try tool("/usr/sbin/diskutil", ["eject", baseDisk], quiet: true)
+         diskAttached = false
+         if mode == .full {
+             if cloned {
+@@ -510,8 +512,8 @@ struct VPhoneCustomFirmwareInstaller {
+         }
+ 
+         let attached = try tool(
+-            "/usr/bin/hdiutil",
+-            ["attach", "-nomount", "-imagekey", "diskimage-class=CRawDiskImage", image.path],
++            "/usr/sbin/diskutil",
++            ["image", "attach", "-noMount", image.path],
+         )
+         let devices = attached.split(whereSeparator: \.isNewline).compactMap { line -> (device: String, type: String)? in
+             let fields = line.split(whereSeparator: \.isWhitespace)
+@@ -525,16 +527,18 @@ struct VPhoneCustomFirmwareInstaller {
+         } ?? wholeDisk ?? devices.first?.device
+         guard let baseDisk, baseDisk.hasPrefix("/dev/disk") else {
+             if let range = attached.range(of: #"/dev/disk[0-9]+"#, options: .regularExpression) {
+-                _ = try? tool("/usr/bin/hdiutil", ["detach", "-force", String(attached[range])], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["unmountDisk", "force", String(attached[range])], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["eject", String(attached[range])], quiet: true)
+             }
+             throw ValidationError("Unable to attach the VM disk image. Try again.")
+         }
+         var diskAttached = true
+         defer {
+             if diskAttached,
+-               (try? tool("/usr/bin/hdiutil", ["detach", baseDisk], quiet: true)) == nil
++               (try? tool("/usr/sbin/diskutil", ["eject", baseDisk], quiet: true)) == nil
+             {
+-                _ = try? tool("/usr/bin/hdiutil", ["detach", "-force", baseDisk], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["unmountDisk", "force", baseDisk], quiet: true)
++                _ = try? tool("/usr/sbin/diskutil", ["eject", baseDisk], quiet: true)
+             }
+         }
+ 
+@@ -599,7 +603,7 @@ struct VPhoneCustomFirmwareInstaller {
+ 
+         _ = try tool("/sbin/umount", [mount.path])
+         prebootMounted = false
+-        _ = try tool("/usr/bin/hdiutil", ["detach", baseDisk], quiet: true)
++        _ = try tool("/usr/sbin/diskutil", ["eject", baseDisk], quiet: true)
+         diskAttached = false
+         // No snapshot rename: the kernelcache is read from Preboot, not from the
+         // System volume's root snapshot, so nothing on System changed.
+@@ -1656,17 +1660,16 @@ struct VPhoneCustomFirmwareInstaller {
+         return work.file(name)
+     }
+ 
+-    /// Cryptex images are only read from. hdiutil applies nosuid to disk
+-    /// image mounts itself and does not take mount options, so the other
+-    /// guards are the read-only attach, the mount point inside the root-only
++    /// Cryptex images are only read from. Keep noowners and nosuid mount
++    /// options, the read-only attach, the mount point inside the root-only
+     /// work folder, and `copyTree`, which never follows a link and refuses
+     /// device nodes.
+     private func attachCryptex(_ image: URL, at mountPoint: URL) throws {
+         try tool(
+-            "/usr/bin/hdiutil",
++            "/usr/sbin/diskutil",
+             [
+-                "attach", "-readonly", "-noautoopen", "-nobrowse", "-owners", "off",
+-                "-mountpoint", mountPoint.path, image.path,
++                "image", "attach", "-readOnly", "-nobrowse", "-mountOptions", "noowners,nosuid",
++                "-mountPoint", mountPoint.path, image.path,
+             ],
+             quiet: true,
+         )
+@@ -2556,9 +2559,10 @@ struct VPhoneCustomFirmwareInstaller {
+ 
+     private func detachImage(at mount: URL) throws {
+         do {
+-            _ = try tool("/usr/bin/hdiutil", ["detach", mount.path], quiet: true)
++            _ = try tool("/usr/sbin/diskutil", ["eject", mount.path], quiet: true)
+         } catch {
+-            _ = try tool("/usr/bin/hdiutil", ["detach", "-force", mount.path], quiet: true)
++            _ = try tool("/usr/sbin/diskutil", ["unmountDisk", "force", mount.path], quiet: true)
++            _ = try tool("/usr/sbin/diskutil", ["eject", mount.path], quiet: true)
+         }
+     }
+ 
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareCommand.swift
+index 2fb8502717fff352eff55a117fa4a8166ce52282..9b1a444c5f05c1ae38c1eedf01003758f59adb62 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareCommand.swift
+@@ -1,6 +1,7 @@
+ import ArgumentParser
+ import FirmwarePatcher
+ import Foundation
++import VPhoneArchiveKit
+ import VPhoneCoreKit
+ import VPhonePatchKit
+ 
+@@ -221,6 +222,8 @@ struct VPhoneFirmwarePrepareCommand: ParsableCommand {
+     var gpuDriverBundle: String?
+     @Option(help: "Directory for downloaded IPSWs, shared by every VM (default: ~/.vphone/ipsws or $VPHONE_ROOT/ipsws)")
+     var ipswCache: String?
++    @Option(help: "Connections each IPSW downloads over when its server answers range requests; 1 downloads it as one stream")
++    var downloadConnections = VPhoneIPSWCache.defaultDownloadConnections
+     @Option(help: "iPhone version to resolve to an IPSW") var iphoneVersion: String?
+     @Option(help: "iPhone build to resolve to an IPSW") var iphoneBuild: String?
+     @Option(help: ArgumentHelp(
+@@ -243,6 +246,9 @@ struct VPhoneFirmwarePrepareCommand: ParsableCommand {
+         if let device, VPhoneGuestDevice.named(device) == nil {
+             throw ValidationError("vphone runs \(VPhoneGuestDevice.known.map(\.productType).joined(separator: ", ")) guests, not \(device).")
+         }
++        guard (1 ... 16).contains(downloadConnections) else {
++            throw ValidationError("--download-connections takes 1 to 16, not \(downloadConnections).")
++        }
+         let chosenDevice = device
+         let device = device ?? VPhoneFirmwareCatalog.device
+         let urls = if needsCatalog {
+@@ -301,6 +307,7 @@ struct VPhoneFirmwarePrepareCommand: ParsableCommand {
+             ipswCacheDirectory: ipswCache.map {
+                 URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath, isDirectory: true)
+             } ?? VPhoneResources.ipswCacheDirectory(),
++            downloadConnections: downloadConnections,
+             device: chosenDevice,
+             bundle: bundle,
+             resources: resources,
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareDownloadCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareDownloadCommand.swift
+index 1fde18f492f04ecd082eee41bffb2243ab71ddc4..eafcd2fe7f03a5f4e4bd9f3984ee778e69211a59 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareDownloadCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareDownloadCommand.swift
+@@ -4,7 +4,7 @@
+ //
+ //     ipsw download ipsw --device D --urls        ->  vphone-cli fw urls --device D
+ //     ipsw download appledb --os macOS … +
+-//       ipsw img4 im4p extract + hdiutil          ->  vphone-cli fw seal-tool
++//       ipsw img4 im4p extract + diskutil          ->  vphone-cli fw seal-tool
+ //
+ // The second was five steps in shell: resolve a macOS build for the iOS
+ // version, range-fetch BuildManifest.plist out of an 18 GB remote zip, read the
+@@ -158,24 +158,25 @@ struct VPhoneFirmwareSealToolCommand: ParsableCommand {
+ 
+     /// Mount the ramdisk read-only and take the one file out of it.
+     private static func copyOut(of dmg: URL, to destination: URL, attached: inout Bool) throws {
+-        let output = try run("/usr/bin/hdiutil",
+-                             ["attach", "-readonly", "-nobrowse", "-plist", dmg.path])
++        let output = try run("/usr/sbin/diskutil",
++                             ["image", "attach", "-readOnly", "-nobrowse", dmg.path])
+         attached = true
+-        guard let plist = try PropertyListSerialization.propertyList(
+-            from: Data(output.utf8),
+-            format: nil,
+-        ) as? [String: Any],
+-            let entities = plist["system-entities"] as? [[String: Any]]
+-        else { throw VPhoneRemoteZip.Error.malformed("hdiutil returned no disk information") }
+-        let mount = entities.compactMap { $0["mount-point"] as? String }.first
+-        let device = entities.compactMap { $0["dev-entry"] as? String }.first
++        let entities = output.split(whereSeparator: \.isNewline).compactMap { line -> (device: String, mount: String?)? in
++            let fields = line.split(separator: "\t", omittingEmptySubsequences: false)
++                .map { $0.trimmingCharacters(in: .whitespaces) }
++            guard let device = fields.first, device.hasPrefix("/dev/disk") else { return nil }
++            let mount = fields.count > 2 && fields[2].hasPrefix("/") ? fields[2] : nil
++            return (device, mount)
++        }
++        let mount = entities.compactMap(\.mount).first
++        let device = entities.first?.device
+         guard let target = device ?? mount else {
+-            throw VPhoneRemoteZip.Error.malformed("hdiutil attached nothing that can be detached")
++            throw VPhoneRemoteZip.Error.malformed("diskutil attached nothing that can be detached")
+         }
+ 
+         let copied: Result<Void, Swift.Error> = Result {
+             guard let mount else {
+-                throw VPhoneRemoteZip.Error.malformed("hdiutil attached nothing with a mount point")
++                throw VPhoneRemoteZip.Error.malformed("diskutil attached nothing with a mount point")
+             }
+             let source = URL(fileURLWithPath: mount).appending(
+                 path: "System/Library/Filesystems/apfs.fs/Contents/Resources/apfs_sealvolume",
+@@ -185,9 +186,10 @@ struct VPhoneFirmwareSealToolCommand: ParsableCommand {
+                                                   ofItemAtPath: destination.path)
+         }
+         do {
+-            try run("/usr/bin/hdiutil", ["detach", target])
++            try run("/usr/sbin/diskutil", ["eject", target])
+         } catch {
+-            try run("/usr/bin/hdiutil", ["detach", "-force", target])
++            try run("/usr/sbin/diskutil", ["unmountDisk", "force", target])
++            try run("/usr/sbin/diskutil", ["eject", target])
+         }
+         attached = false
+         try copied.get()
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift
+index 770022893b81a93d64956bfd36abf3b90b1380c0..97183d279092c978abff29c7f791082c459fce46 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift
+@@ -34,6 +34,7 @@ enum VPhoneFirmwarePreparer {
+         cloudOSSource: String,
+         gpuDriverBundle: URL? = nil,
+         ipswCacheDirectory: URL = VPhoneResources.ipswCacheDirectory(),
++        downloadConnections: Int = VPhoneIPSWCache.defaultDownloadConnections,
+         device productType: String? = nil,
+         bundle: VPhoneBundle,
+         resources: VPhoneResources,
+@@ -66,9 +67,13 @@ enum VPhoneFirmwarePreparer {
+         // inside the machine downloaded both again for each new one (#513).
+         // Local IPSWs are read in place and are never copied into the cache.
+         print("[*] Resolving iPhone IPSW...")
+-        let phone = try resolve(iPhoneSource, in: ipswCacheDirectory, label: "downloading iPhone IPSW")
++        let phone = try resolve(
++            iPhoneSource, in: ipswCacheDirectory, connections: downloadConnections, label: "downloading iPhone IPSW",
++        )
+         print("[*] Resolving cloudOS IPSW...")
+-        let cloud = try resolve(cloudOSSource, in: ipswCacheDirectory, label: "downloading cloudOS IPSW")
++        let cloud = try resolve(
++            cloudOSSource, in: ipswCacheDirectory, connections: downloadConnections, label: "downloading cloudOS IPSW",
++        )
+         try VPhoneIPSWCache.checkPair(iPhone: phone, cloudOS: cloud)
+         let device = VPhoneIPSWCache.guestDevice(for: phone, preferring: productType) ?? .default
+         if let productType, VPhoneGuestDevice.named(productType) != device {
+@@ -155,10 +160,15 @@ enum VPhoneFirmwarePreparer {
+     /// Resolves one source, with a progress bar while it downloads. Launchpad
+     /// reads the bar as `progress` lines and shows the percentage on its
+     /// firmware step (#590).
+-    private static func resolve(_ source: String, in cacheDirectory: URL, label: String) throws -> VPhoneIPSWCache.Archive {
++    private static func resolve(
++        _ source: String,
++        in cacheDirectory: URL,
++        connections: Int,
++        label: String,
++    ) throws -> VPhoneIPSWCache.Archive {
+         let bar = VPhoneProgressBar(label: label)
+         let archive = try vphoneRunBlocking {
+-            try await VPhoneIPSWCache.resolve(source, in: cacheDirectory) { done, total in
++            try await VPhoneIPSWCache.resolve(source, in: cacheDirectory, connections: connections) { done, total in
+                 bar.update(done: done, total: total)
+             }
+         }
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift
+index af6134096099400d6b1c4c2ef9e8c70b28b31a2b..caed5a9190362237590701f0902c2e5bd2dd1875 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift
+@@ -40,12 +40,10 @@ enum VPhonePCCGPURecovery {
+             romSource: VPhoneBundleOperations.defaultROMSource(),
+             sepromSource: VPhoneBundleOperations.defaultSEPROMSource(),
+         ), in: library)
++        var diskMayBeAttached = false
+         let temporaryRestore = vm.url.appending(path: "iPhonePCC_Restore")
+         defer {
+-            let diskImage = vm.url.appendingPathComponent("Disk.img")
+-            if let info = try? run("/usr/bin/hdiutil", ["info"]),
+-               !info.contains(diskImage.path)
+-            {
++            if !diskMayBeAttached {
+                 try? fm.removeItem(at: temporaryLibrary)
+             } else {
+                 fputs("warning: PCC disk image may still be attached; left \(temporaryLibrary.path)\n", stderr)
+@@ -98,6 +96,7 @@ enum VPhonePCCGPURecovery {
+         try stageFromSystemDisk(
+             vm.url.appending(path: "Disk.img"),
+             into: restoreDirectory, expectedPlatformVersion: expectedPlatformVersion,
++            diskMayBeAttached: &diskMayBeAttached,
+         )
+     }
+ 
+@@ -105,15 +104,17 @@ enum VPhonePCCGPURecovery {
+         _ diskImage: URL,
+         into restoreDirectory: URL,
+         expectedPlatformVersion: String,
++        diskMayBeAttached: inout Bool,
+     ) throws {
+         let fm = FileManager.default
+-        let attached = try run("/usr/bin/hdiutil", [
+-            "attach", "-readonly", "-nomount", "-imagekey",
+-            "diskimage-class=CRawDiskImage", diskImage.path,
++        // A failed attach can still leave a device. Only a successful eject
++        // permits deleting the temporary VM library.
++        diskMayBeAttached = true
++        let attached = try run("/usr/sbin/diskutil", [
++            "image", "attach", "-readOnly", "-noMount", diskImage.path,
+         ])
+-        // macOS 27 prints the synthesized APFS container before the image's own
+-        // disk, so the first line is not the disk to detach later; take the disk
+-        // that carries the store partition. See VPhoneCustomFirmwareInstaller.
++        // The synthesized APFS container can precede the image disk. Take
++        // the parent of the store partition, as the CFW installer does.
+         let devices = attached.split(whereSeparator: \.isNewline).compactMap { line -> (device: String, type: String)? in
+             let fields = line.split(whereSeparator: \.isWhitespace)
+             guard fields.count >= 2, fields[0].hasPrefix("/dev/disk") else { return nil }
+@@ -126,26 +127,35 @@ enum VPhonePCCGPURecovery {
+             ?? devices.first?.device
+         guard let baseDisk, baseDisk.hasPrefix("/dev/disk") else {
+             if let range = attached.range(of: #"/dev/disk[0-9]+"#, options: .regularExpression) {
+-                _ = try? run("/usr/bin/hdiutil", ["detach", "-force", String(attached[range])])
++                _ = try? run("/usr/sbin/diskutil", ["unmountDisk", "force", String(attached[range])])
++                if (try? run("/usr/sbin/diskutil", ["eject", String(attached[range])])) != nil {
++                    diskMayBeAttached = false
++                }
+             }
+-            throw Error.toolFailed("hdiutil", "could not attach the PCC disk image. Try again.")
++            throw Error.toolFailed("diskutil", "could not attach the PCC disk image. Try again.")
+         }
+         var mountToClean: URL?
+         var diskAttached = true
+         defer {
+-            if diskAttached, (try? run("/usr/bin/hdiutil", ["detach", baseDisk])) == nil {
+-                _ = try? run("/usr/bin/hdiutil", ["detach", "-force", baseDisk])
++            if diskAttached {
++                if (try? run("/usr/sbin/diskutil", ["eject", baseDisk])) != nil {
++                    diskMayBeAttached = false
++                } else if (try? run("/usr/sbin/diskutil", ["unmountDisk", "force", baseDisk])) != nil,
++                          (try? run("/usr/sbin/diskutil", ["eject", baseDisk])) != nil
++                {
++                    diskMayBeAttached = false
++                }
+             }
+             if let mountToClean {
+                 do {
+                     guard let mounts = fm.mountedVolumeURLs(
+                         includingResourceValuesForKeys: nil, options: [],
+                     ) else {
+-                        throw Error.toolFailed("hdiutil", "could not verify detached volumes")
++                        throw Error.toolFailed("diskutil", "could not verify detached volumes")
+                     }
+                     let root = mountToClean.resolvingSymlinksInPath().path
+                     guard !mounts.contains(where: { $0.resolvingSymlinksInPath().path == root }) else {
+-                        throw Error.toolFailed("hdiutil", "PCC volume is still mounted")
++                        throw Error.toolFailed("diskutil", "PCC volume is still mounted")
+                     }
+                     try fm.removeItem(at: mountToClean)
+                 } catch {
+@@ -191,11 +201,13 @@ enum VPhonePCCGPURecovery {
+         }
+         mounted = false
+         do {
+-            try run("/usr/bin/hdiutil", ["detach", baseDisk])
++            try run("/usr/sbin/diskutil", ["eject", baseDisk])
+         } catch {
+-            try run("/usr/bin/hdiutil", ["detach", "-force", baseDisk])
++            try run("/usr/sbin/diskutil", ["unmountDisk", "force", baseDisk])
++            try run("/usr/sbin/diskutil", ["eject", baseDisk])
+         }
+         diskAttached = false
++        diskMayBeAttached = false
+         print("[+] GPU driver staged from cloudOS restored by vphone-cli")
+     }
+ 
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Support/VPhoneProgressBar.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Support/VPhoneProgressBar.swift
+index e89c74f6dfdab3626de016d77e948e1b024fcfb3..c0112ff5c70f9bcd65d32a39f47d5236b320307c 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Support/VPhoneProgressBar.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Support/VPhoneProgressBar.swift
+@@ -11,9 +11,9 @@ import Foundation
+ /// stderr instead, at most a few per second.
+ ///
+ /// Unchecked Sendable so a transfer's callback can drive it from another
+-/// thread: every caller reports serially (URLSession calls one task's
+-/// delegate one at a time) and calls `finish()` only after the transfer has
+-/// returned.
++/// thread: every caller reports serially (`VPhoneIPSWCache` reports one at a
++/// time even across several connections) and calls `finish()` only after the
++/// transfer has returned.
+ final class VPhoneProgressBar: @unchecked Sendable {
+     private enum Mode {
+         case off, bar, lines
+diff --git a/VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h b/VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c3880861d3385f51ab4f279418725e43364f554
+--- /dev/null
++++ b/VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h
+@@ -0,0 +1,33 @@
++#ifndef VP_FLUTTER_REMAP_POLICY_H
++#define VP_FLUTTER_REMAP_POLICY_H
++#include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <string.h>
++
++// Inputs are canonical paths (realpath at the runtime boundary). Only images
++// inside the executable's own app bundle may participate in the fallback.
++static inline bool vpFlutterBundleImages(const char *process, const char *source,
++                                         const char *caller) {
++    if (!process || !source || !caller) return false;
++    const char *program = strrchr(process, '/');
++    if (!program || !program[1]) return false;
++    size_t root = (size_t)(program - process);
++    if (root < 4 || memcmp(process + root - 4, ".app", 4) != 0) return false;
++    const char *aot = "/Frameworks/App.framework/App";
++    const char *engine = "/Frameworks/Flutter.framework/Flutter";
++    return strlen(source) == root + strlen(aot) &&
++        strlen(caller) == root + strlen(engine) &&
++        memcmp(process, source, root) == 0 && memcmp(process, caller, root) == 0 &&
++        strcmp(source + root, aot) == 0 && strcmp(caller + root, engine) == 0;
++}
++
++// Limited to the observed 16 KiB-page AOT callback layout. Unknown layouts,
++// writable sources, cross-task remaps and shared mappings remain unsupported.
++static inline bool vpFlutterRemapCandidate(const char *process, const char *source,
++    const char *caller, uintptr_t offset, uint64_t size, int flags, int copy,
++    bool sameTask) {
++    return sameTask && copy == 1 && flags == 0x4000 && size == 32768 && offset == 16384 &&
++        vpFlutterBundleImages(process, source, caller);
++}
++#endif
+diff --git a/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c b/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..7eab343c36f1bc131c8acdc252baa53fd18f3189
+--- /dev/null
++++ b/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c
+@@ -0,0 +1,108 @@
++#include "FlutterRemapPolicy.h"
++#include <dlfcn.h>
++#include <limits.h>
++#include <mach/mach.h>
++#include <mach-o/dyld.h>
++#include <os/log.h>
++#include <pthread.h>
++#include <stdatomic.h>
++#include <stdlib.h>
++#include <string.h>
++
++static char executable[PATH_MAX];
++static pthread_once_t executableOnce = PTHREAD_ONCE_INIT;
++static _Atomic unsigned loggedRepairs;
++static void readExecutable(void) {
++    char path[PATH_MAX];
++    uint32_t size = sizeof(path);
++    if (_NSGetExecutablePath(path, &size) != 0 || !realpath(path, executable))
++        executable[0] = 0;
++}
++
++static bool region(vm_address_t address, vm_size_t length, vm_prot_t *protection,
++                   vm_prot_t *maximum, bool exact) {
++    vm_address_t start = address;
++    vm_size_t size = 0;
++    vm_region_basic_info_data_64_t info = {0};
++    mach_msg_type_number_t count = VM_REGION_BASIC_INFO_COUNT_64;
++    mach_port_t object = MACH_PORT_NULL;
++    kern_return_t result = vm_region_64(mach_task_self(), &start, &size,
++        VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &count, &object);
++    if (object != MACH_PORT_NULL) mach_port_deallocate(mach_task_self(), object);
++    if (result != KERN_SUCCESS || start > address || address - start > size ||
++        length > size - (address - start) || (exact && (start != address || size != length)))
++        return false;
++    *protection = info.protection;
++    *maximum = info.max_protection;
++    return true;
++}
++
++static kern_return_t repair(vm_address_t target, vm_address_t source, vm_size_t size, vm_inherit_t inheritance) {
++    vm_address_t address = target;
++    // The caller has not published this just-created mapping yet. Overwrite it
++    // atomically, avoiding a deallocate/allocate race with other threads.
++    kern_return_t result = vm_allocate(mach_task_self(), &address, size,
++        VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE);
++    if (result != KERN_SUCCESS) return result;
++    if (address != target) {
++        vm_deallocate(mach_task_self(), address, size);
++        return KERN_FAILURE;
++    }
++    result = vm_inherit(mach_task_self(), target, size, inheritance);
++    if (result != KERN_SUCCESS) { vm_deallocate(mach_task_self(), target, size); return result; }
++    memcpy((void *)target, (const void *)source, size);
++    result = vm_protect(mach_task_self(), target, size, false, VM_PROT_READ | VM_PROT_EXECUTE);
++    vm_prot_t current = 0, maximum = 0;
++    if (result == KERN_SUCCESS && (!region(target, size, &current, &maximum, false) ||
++        current != (VM_PROT_READ | VM_PROT_EXECUTE))) result = KERN_PROTECTION_FAILURE;
++    if (result != KERN_SUCCESS) vm_deallocate(mach_task_self(), target, size);
++    return result;
++}
++
++static kern_return_t vpFlutterRemap(vm_map_t targetTask, vm_address_t *target,
++    vm_size_t size, vm_address_t mask, int flags, vm_map_read_t sourceTask,
++    vm_address_t source, boolean_t copy, vm_prot_t *current, vm_prot_t *maximum,
++    vm_inherit_t inheritance) {
++    // dyld does not apply an image's own interposition to its imports: this is
++    // the original vm_remap, not recursion into this wrapper.
++    kern_return_t result = vm_remap(targetTask, target, size, mask, flags,
++        sourceTask, source, copy, current, maximum, inheritance);
++    if (result != KERN_SUCCESS || !target || !current || !maximum ||
++        *current != (VM_PROT_READ | VM_PROT_EXECUTE) || *maximum != VM_PROT_ALL ||
++        targetTask != mach_task_self() || sourceTask != mach_task_self() ||
++        size != 32768 || copy != 1 || flags != (VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE)) return result;
++
++    pthread_once(&executableOnce, readExecutable);
++    Dl_info sourceInfo = {0}, callerInfo = {0};
++    char sourcePath[PATH_MAX], callerPath[PATH_MAX];
++    if (!dladdr((void *)source, &sourceInfo) ||
++        !dladdr(__builtin_return_address(0), &callerInfo) ||
++        !sourceInfo.dli_fname || !callerInfo.dli_fname ||
++        !realpath(sourceInfo.dli_fname, sourcePath) || !realpath(callerInfo.dli_fname, callerPath) ||
++        !vpFlutterRemapCandidate(executable, sourcePath, callerPath,
++            source - (uintptr_t)sourceInfo.dli_fbase, size, flags, copy, true)) return result;
++    vm_prot_t sourceProtection = 0, sourceMaximum = 0, actual = 0, actualMaximum = 0;
++    if (!region(source, size, &sourceProtection, &sourceMaximum, false) ||
++        sourceProtection != (VM_PROT_READ | VM_PROT_EXECUTE) ||
++        !region(*target, size, &actual, &actualMaximum, true) || actual != VM_PROT_READ || actualMaximum != (VM_PROT_READ | VM_PROT_WRITE) ||
++        (*target <= source ? source - *target < size : *target - source < size)) return result;
++
++    result = repair(*target, source, size, inheritance);
++    if (result != KERN_SUCCESS) {
++        os_log_error(OS_LOG_DEFAULT, "vphone Flutter remap repair failed: %{public}d", result);
++        return result; // Never report success for an unusable mapping.
++    }
++    // Preserve the successful original result; actual current protection is RX.
++    if (atomic_fetch_add(&loggedRepairs, 1) < 8)
++        os_log(OS_LOG_DEFAULT, "vphone Flutter remap repaired: %{public}llu bytes, RW then RX",
++            (unsigned long long)size);
++    return KERN_SUCCESS;
++}
++
++#ifndef VP_REMAP_FIX_NO_INTERPOSE
++__attribute__((used, section("__DATA,__interpose")))
++static const struct { const void *replacement; const void *original; } interposition = {
++    (const void *)&vpFlutterRemap, (const void *)&vm_remap
++};
++
++#endif
+diff --git a/VPhoneGuestComponents/Makefile b/VPhoneGuestComponents/Makefile
+index a47bef0349c1422ce466034d9b175eb56a924ad8..53188f7b83bc49708b0e2a6c942fb1cee9735720 100644
+--- a/VPhoneGuestComponents/Makefile
++++ b/VPhoneGuestComponents/Makefile
+@@ -38,8 +38,8 @@ LAUNCHHOOK := $(STAGE)/launchhook/launchdhook-vphone.dylib
+ LAUNCHHOOK_SOURCES := $(wildcard LaunchHook/*.c) Shared/RootHideLoaderLinks.c
+ LAUNCHHOOK_INCLUDES := $(wildcard LaunchHook/*.h LaunchHook/*.inc Shared/*.h)
+ SYSTEMHOOK := $(STAGE)/systemhook/SystemHook-vphone.dylib
+-SYSTEMHOOK_SOURCES := $(wildcard SystemHook/*.c) Shared/RootHideLoaderLinks.c
+-SYSTEMHOOK_INCLUDES := $(wildcard SystemHook/*.h SystemHook/*.inc Shared/*.h)
++SYSTEMHOOK_SOURCES := $(wildcard SystemHook/*.c) $(wildcard FlutterRemapFix/*.c) Shared/RootHideLoaderLinks.c
++SYSTEMHOOK_INCLUDES := $(wildcard SystemHook/*.h SystemHook/*.inc FlutterRemapFix/*.h Shared/*.h)
+ # libmis is not a framework and has no header; the iPhoneOS SDK does ship
+ # libmis.tbd, so the interposed symbols bind two-level like any other import
+ # rather than through flat dynamic lookup.
+@@ -326,3 +326,20 @@ test-installcoordination-persona:
+ 	xcrun --sdk macosx clang -Wall -Wextra -Werror \
+ 		-o $(OUT)/InstallCoordinationPersonaTests Tests/InstallCoordinationPersonaTests.c
+ 	@$(OUT)/InstallCoordinationPersonaTests
++
++.PHONY: test-flutter-remap test-flutter-remap-repair
++test-flutter-remap:
++	@mkdir -p $(OUT)
++	xcrun --sdk macosx clang -Wall -Wextra -Werror -o $(OUT)/FlutterRemapPolicyTests Tests/FlutterRemapPolicyTests.c
++	@$(OUT)/FlutterRemapPolicyTests
++
++test-flutter-remap-repair:
++	@mkdir -p $(OUT)
++	xcrun --sdk macosx clang -Wall -Wextra -Werror -Wno-unused-function -o $(OUT)/FlutterRemapRepairTests Tests/FlutterRemapRepairTests.c
++	@$(OUT)/FlutterRemapRepairTests
++
++.PHONY: build-executable-remap-probe
++build-executable-remap-probe:
++	@mkdir -p $(OUT)
++	xcrun --sdk iphoneos swiftc -target arm64-apple-ios26.0 -O Tests/ExecutableRemapProbe.swift -module-cache-path $(OUT)/probe-module-cache -o $(OUT)/ExecutableRemapProbe
++	codesign --force --sign - --timestamp=none $(OUT)/ExecutableRemapProbe
+diff --git a/VPhoneGuestComponents/README.md b/VPhoneGuestComponents/README.md
+index 35bda090894e8bf417ac52f925e822d7c314f5b9..0c47428e4d3d20aad3d3862f8a01268d5ec8daa4 100644
+--- a/VPhoneGuestComponents/README.md
++++ b/VPhoneGuestComponents/README.md
+@@ -64,3 +64,9 @@ which iOS ships no driver for. audiomxd loads it when the kernel publishes
+ `make test-virtiosound` checks its format choice, its rings and how captured
+ frames are served, on the host. See `Research/Guest/virtio_sound.md` and
+ `Research/Guest/virtio_sound_microphone.md`.
++
++`FlutterRemapFix` is linked into SystemHook for early handling of a specific
++Flutter AOT callback remap permission mismatch. It checks canonical same-bundle
++images, native parameters and actual permissions before making a private copy
++and transitioning RW to RX. It does not alter kernel policy. Tests and coverage
++limits are in `Research/Guest/flutter_aot_remap_compatibility.md`.
+diff --git a/VPhoneGuestComponents/Tests/ExecutableRemapProbe.swift b/VPhoneGuestComponents/Tests/ExecutableRemapProbe.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..1042a9e5169e7cd11ccc048805be32fb4994859d
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/ExecutableRemapProbe.swift
+@@ -0,0 +1,54 @@
++import Darwin
++
++// Standalone guest probe: no app dependencies, injected scripts or kernel writes.
++// The default mode reports the remap mismatch without executing an NX mapping.
++// --copy exercises the RW-copy-then-RX alternative.
++@_cdecl("remap_probe_marker") public func remapProbeMarker() -> Int32 { 42 }
++
++func protection(at value: vm_address_t) -> vm_prot_t? {
++    var address = value, size: vm_size_t = 0
++    var info = vm_region_basic_info_data_64_t()
++    var count = mach_msg_type_number_t(MemoryLayout<vm_region_basic_info_data_64_t>.size / 4)
++    var object: mach_port_t = 0
++    let result = withUnsafeMutablePointer(to: &info) { pointer in
++        pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
++            vm_region_64(mach_task_self_, &address, &size, VM_REGION_BASIC_INFO_64, $0, &count, &object)
++        }
++    }
++    if object != 0 { mach_port_deallocate(mach_task_self_, object) }
++    guard result == KERN_SUCCESS, address <= value, value - address < size else { return nil }
++    return info.protection
++}
++
++let marker: @convention(c) () -> Int32 = remapProbeMarker
++let source = vm_address_t(UInt(bitPattern: unsafeBitCast(marker, to: UnsafeRawPointer.self)))
++let page = source & ~vm_address_t(vm_page_size - 1)
++let offset = source - page
++let rx = VM_PROT_READ | VM_PROT_EXECUTE
++var target: vm_address_t = 0, current: vm_prot_t = 0, maximum: vm_prot_t = 0
++print("original marker", marker(), "protection", protection(at: source) ?? -1)
++let result: kern_return_t
++if CommandLine.arguments.contains("--copy") {
++    result = vm_allocate(mach_task_self_, &target, vm_size_t(vm_page_size), VM_FLAGS_ANYWHERE)
++    if result == KERN_SUCCESS {
++        memcpy(UnsafeMutableRawPointer(bitPattern: UInt(target))!, UnsafeRawPointer(bitPattern: UInt(page))!, Int(vm_page_size))
++        let changed = vm_protect(mach_task_self_, target, vm_size_t(vm_page_size), 0, rx)
++        print("copy protection result", changed)
++    }
++} else {
++    result = vm_remap(mach_task_self_, &target, vm_size_t(vm_page_size), 0, VM_FLAGS_ANYWHERE,
++                     mach_task_self_, page, 1, &current, &maximum, VM_INHERIT_NONE)
++    print("remap result", result, "reported protections", current, maximum)
++}
++guard result == KERN_SUCCESS else { exit(2) }
++let actual = protection(at: target)
++print("actual protection", actual ?? -1)
++guard actual == rx else {
++    vm_deallocate(mach_task_self_, target, vm_size_t(vm_page_size))
++    exit(3)
++}
++let copied = unsafeBitCast(UnsafeRawPointer(bitPattern: UInt(target + offset))!, to: (@convention(c) () -> Int32).self)
++let answer = copied()
++print("copied marker", answer)
++vm_deallocate(mach_task_self_, target, vm_size_t(vm_page_size))
++exit(answer == 42 ? 0 : 4)
+diff --git a/VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c b/VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..16a5a11f66ab783141765e328f88b94779d8c064
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c
+@@ -0,0 +1,29 @@
++#include "../FlutterRemapFix/FlutterRemapPolicy.h"
++#include <assert.h>
++#include <stdio.h>
++
++int main(void) {
++    const char *app = "/private/var/containers/Bundle/Application/id/Probe.app/Probe";
++    const char *src = "/private/var/containers/Bundle/Application/id/Probe.app/Frameworks/App.framework/App";
++    const char *caller = "/private/var/containers/Bundle/Application/id/Probe.app/Frameworks/Flutter.framework/Flutter";
++    assert(vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 0x4000, 1, true));
++    assert(vpFlutterBundleImages("/Applications/Other.app/Runner", "/Applications/Other.app/Frameworks/App.framework/App", "/Applications/Other.app/Frameworks/Flutter.framework/Flutter"));
++    assert(!vpFlutterBundleImages(app, "/Applications/Other.app/Frameworks/App.framework/App", caller));
++    assert(!vpFlutterBundleImages(app, src, "/Applications/Other.app/Frameworks/Flutter.framework/Flutter"));
++    assert(!vpFlutterBundleImages("/tmp/Probe", src, caller));
++    assert(!vpFlutterBundleImages("/tmp/not.appx/Probe", src, caller));
++    assert(!vpFlutterBundleImages("/tmp/.app/", src, caller));
++    assert(!vpFlutterBundleImages("Probe", src, caller));
++    assert(!vpFlutterBundleImages(app, "/tmp/App", caller));
++    assert(!vpFlutterBundleImages(NULL, src, caller));
++    assert(!vpFlutterBundleImages(app, NULL, caller));
++    assert(!vpFlutterBundleImages(app, src, NULL));
++    // Policy receives canonical paths; a different/unresolved root is rejected.
++    assert(!vpFlutterBundleImages("/var/containers/Bundle/Application/id/Probe.app/Probe", src, caller));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 0, 32768, 0x4000, 1, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 65536, 0x4000, 1, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 1, 1, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 0x4000, 0, true));
++    assert(!vpFlutterRemapCandidate(app, src, caller, 16384, 32768, 0x4000, 1, false));
++    puts("FlutterRemapPolicyTests: bundle isolation and remap boundaries passed");
++}
+diff --git a/VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c b/VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..106b106517caf0b8b8e86870f8af79a056fde6c7
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c
+@@ -0,0 +1,43 @@
++#include <mach/mach.h>
++#include <assert.h>
++#include <stdio.h>
++#include <string.h>
++static unsigned char targetBytes[32768], sourceBytes[32768];
++static int allocateError, inheritError, protectError, queryProtection, wrongAddress, frees, copies;
++static kern_return_t testAllocate(vm_map_t task, vm_address_t *address, vm_size_t size, int flags) {
++ (void)task;assert(size==32768);assert(flags==(VM_FLAGS_FIXED|VM_FLAGS_OVERWRITE));
++ if(wrongAddress)*address+=32768;
++ return allocateError;
++}
++static kern_return_t testInherit(vm_map_t task, vm_address_t address, vm_size_t size, vm_inherit_t inheritance) {
++ (void)task;(void)address;assert(size==32768);assert(inheritance==VM_INHERIT_NONE);return inheritError;
++}
++static kern_return_t testProtect(vm_map_t task, vm_address_t address, vm_size_t size, boolean_t maximum, vm_prot_t protection) {
++ (void)task;(void)address;assert(size==32768);assert(!maximum);assert(protection==(VM_PROT_READ|VM_PROT_EXECUTE));copies++;return protectError;
++}
++static kern_return_t testDeallocate(vm_map_t task, vm_address_t address, vm_size_t size) {
++ (void)task;(void)address;assert(size==32768);frees++;return KERN_SUCCESS;
++}
++static kern_return_t testRegion(vm_map_read_t task, vm_address_t *address, vm_size_t *size, vm_region_flavor_t flavor,
++ vm_region_info_t info, mach_msg_type_number_t *count, mach_port_t *object) {
++ (void)task;(void)address;(void)count;assert(flavor==VM_REGION_BASIC_INFO_64);*size=32768;*object=MACH_PORT_NULL;
++ vm_region_basic_info_64_t output=(vm_region_basic_info_64_t)info;memset(output,0,sizeof(*output));output->protection=queryProtection;output->max_protection=7;return KERN_SUCCESS;
++}
++#define vm_allocate testAllocate
++#define vm_inherit testInherit
++#define vm_protect testProtect
++#define vm_deallocate testDeallocate
++#define vm_region_64 testRegion
++#define VP_REMAP_FIX_NO_INTERPOSE
++#include "../FlutterRemapFix/libflutterremapfix.c"
++static void reset(void){allocateError=inheritError=protectError=wrongAddress=frees=copies=0;queryProtection=5;memset(targetBytes,0,sizeof(targetBytes));memset(sourceBytes,42,sizeof(sourceBytes));}
++static int perform(void){return repair((vm_address_t)targetBytes,(vm_address_t)sourceBytes,32768,VM_INHERIT_NONE);}
++int main(void){
++ reset();assert(perform()==0);assert(memcmp(targetBytes,sourceBytes,32768)==0);assert(copies==1&&frees==0);
++ reset();allocateError=KERN_NO_SPACE;assert(perform()==KERN_NO_SPACE);assert(copies==0&&frees==0&&targetBytes[0]==0);
++ reset();wrongAddress=1;assert(perform()==KERN_FAILURE);assert(copies==0&&frees==1);
++ reset();inheritError=KERN_INVALID_ARGUMENT;assert(perform()==KERN_INVALID_ARGUMENT);assert(copies==0&&frees==1);
++ reset();protectError=KERN_PROTECTION_FAILURE;assert(perform()==KERN_PROTECTION_FAILURE);assert(frees==1);
++ reset();queryProtection=VM_PROT_READ;assert(perform()==KERN_PROTECTION_FAILURE);assert(frees==1);
++ puts("FlutterRemapRepairTests: atomic overwrite, exact copy, RX-only transition and failure cleanup passed");
++}
+diff --git a/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift b/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift
+index 0ab1465dbe41d2b8403afe35f525d136ca6bf3a8..2aeb5f0d39e35c39f6993083cb1672f3e59e8747 100644
+--- a/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift
++++ b/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift
+@@ -1,5 +1,7 @@
+ import CryptoKit
++import Darwin
+ import Foundation
++import Synchronization
+ import VPhoneCoreKit
+ 
+ /// Resolves a local IPSW or downloads one into a reusable, validated cache.
+@@ -22,6 +24,7 @@ public enum VPhoneIPSWCache {
+         case invalidManifest(URL)
+         case unexpectedHTTP(URL, Int)
+         case incompleteDownload(URL, expected: Int64, actual: Int64)
++        case changedDuringDownload(URL)
+         case swappedSources(iPhone: URL, cloudOS: URL)
+         case notIPhoneSource(URL, productTypes: [String])
+         case notCloudOSSource(URL)
+@@ -35,6 +38,8 @@ public enum VPhoneIPSWCache {
+             case let .unexpectedHTTP(url, _): "Unable to download the IPSW from \(url). Try again later."
+             case let .incompleteDownload(url, expected, actual):
+                 "The IPSW download from \(url) is incomplete (\(actual) of \(expected) bytes). Try again."
++            case let .changedDuringDownload(url):
++                "The IPSW at \(url) changed on the server while it downloaded. Try again."
+             case let .swappedSources(iPhone, cloudOS):
+                 "The iPhone and cloudOS IPSWs are swapped: \(iPhone.lastPathComponent) is a cloudOS IPSW and \(cloudOS.lastPathComponent) is an iPhone IPSW. Swap the two sources, then try again."
+             case let .notIPhoneSource(file, productTypes):
+@@ -49,11 +54,16 @@ public enum VPhoneIPSWCache {
+ 
+     /// `progress` is called with `(bytesDone, totalBytes)` while a remote
+     /// IPSW downloads, only when the server states the size. A local source
+-    /// or a cache hit never calls it.
++    /// or a cache hit never calls it. Reports come one at a time, even while
++    /// several connections download.
++    ///
++    /// `connections` is how many range requests download the IPSW at once when
++    /// its server answers them; 1 downloads it as one GET.
+     public static func resolve(
+         _ source: String,
+         in cacheDirectory: URL,
+         session: URLSession = URLSession(configuration: .ephemeral),
++        connections: Int = defaultDownloadConnections,
+         progress: (@Sendable (Int64, Int64) -> Void)? = nil,
+     ) async throws -> Archive {
+         guard let url = URL(string: source), let scheme = url.scheme?.lowercased() else {
+@@ -77,27 +87,12 @@ public enum VPhoneIPSWCache {
+             return valid
+         }
+ 
+-        var request = URLRequest(url: url)
+-        request.timeoutInterval = 3 * 60 * 60
+         let pending = cacheDirectory.appendingPathComponent(".\(cache.lastPathComponent).\(UUID().uuidString).partial")
+         defer { try? fm.removeItem(at: pending) }
+         guard fm.createFile(atPath: pending.path, contents: nil) else {
+             throw CocoaError(.fileWriteUnknown)
+         }
+-        let output = try FileHandle(forWritingTo: pending)
+-        defer { try? output.close() }
+-        let (response, size) = try await download(request, into: output, session: session, progress: progress)
+-        try output.close()
+-        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+-            throw Error.unexpectedHTTP(url, (response as? HTTPURLResponse)?.statusCode ?? 0)
+-        }
+-        if response.expectedContentLength > 0, size != response.expectedContentLength {
+-            throw Error.incompleteDownload(
+-                url,
+-                expected: response.expectedContentLength,
+-                actual: size,
+-            )
+-        }
++        try await download(url, into: pending, session: session, connections: connections, progress: progress)
+ 
+         let metadata = try inspect(pending)
+         do {
+@@ -182,22 +177,318 @@ public enum VPhoneIPSWCache {
+ 
+     // MARK: - Download
+ 
+-    /// Writes the body into `output` chunk by chunk as URLSession delivers it,
+-    /// so the IPSW lands in the cache's own volume with no temporary copy.
+-    /// Iterating `bytes(for:)` one byte at a time was CPU-bound (issue #524),
+-    /// and `download(for:)` stages the file in the system temporary directory,
+-    /// which may be another volume. A non-200 response returns before any body.
+-    private static func download(
+-        _ request: URLRequest,
+-        into output: FileHandle,
++    /// Connections one remote IPSW downloads over when its server answers
++    /// range requests. Apple's CDN holds each connection well below a fast
++    /// link: four measured about 2.7 times the throughput of one.
++    public static let defaultDownloadConnections = 4
++
++    /// Bytes each range request asks for. Connections take segments in order,
++    /// so the partial file grows from the front, and a dropped connection
++    /// fetches again only what it had not yet written of one segment.
++    static let segmentSize: Int64 = 32 * 1024 * 1024
++
++    /// Range requests that make no progress this many times in a row fail the
++    /// download. Progress resets the count, so a long transfer survives any
++    /// number of dropped connections that each moved it forward.
++    static let segmentAttempts = 5
++
++    /// Writes the IPSW into `file`, which exists and is empty, in place on the
++    /// cache's own volume with no temporary copy. `download(for:)` would stage
++    /// it in the system temporary directory, which may be another volume, and
++    /// iterating `bytes(for:)` one byte at a time was CPU-bound (issue #524).
++    ///
++    /// With more than one connection and a server that answers range requests,
++    /// the file downloads as segments over that many connections at once.
++    /// Otherwise it is one GET, as a server that ignores ranges requires.
++    static func download(
++        _ url: URL,
++        into file: URL,
+         session: URLSession,
++        connections: Int,
++        segmentSize: Int64 = segmentSize,
+         progress: (@Sendable (Int64, Int64) -> Void)?,
+-    ) async throws -> (URLResponse, Int64) {
++    ) async throws {
++        let fd = open(file.path, O_WRONLY)
++        guard fd >= 0 else {
++            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
++        }
++        defer { close(fd) }
++        let counter = ProgressCounter(progress)
++        if connections > 1, let resource = await probeRanges(url, session: session), resource.size > segmentSize {
++            try await downloadSegments(
++                resource,
++                into: fd,
++                configuration: session.configuration,
++                connections: connections,
++                segmentSize: segmentSize,
++                counter: counter,
++            )
++        } else {
++            try await downloadStream(url, into: fd, session: session, counter: counter)
++        }
++    }
++
++    /// One GET for the whole body. A non-200 response returns before any body.
++    private static func downloadStream(
++        _ url: URL,
++        into fd: Int32,
++        session: URLSession,
++        counter: ProgressCounter,
++    ) async throws {
++        var request = URLRequest(url: url)
++        request.timeoutInterval = 3 * 60 * 60
++        let outcome = await transfer(
++            request,
++            session: session,
++            into: fd,
++            at: 0,
++            accept: { $0.statusCode == 200 },
++            received: { count, response in counter.add(count, of: response.expectedContentLength) },
++        )
++        try Task.checkCancellation()
++        if let error = outcome.writeError {
++            throw error
++        }
++        guard let response = outcome.response else {
++            throw outcome.transportError ?? URLError(.badServerResponse)
++        }
++        guard outcome.accepted else {
++            throw Error.unexpectedHTTP(url, response.statusCode)
++        }
++        if let error = outcome.transportError {
++            throw error
++        }
++        if response.expectedContentLength > 0, outcome.written != response.expectedContentLength {
++            throw Error.incompleteDownload(url, expected: response.expectedContentLength, actual: outcome.written)
++        }
++    }
++
++    // MARK: Segments
++
++    struct RangedResource: Sendable {
++        let url: URL
++        let size: Int64
++        /// The ETag, else Last-Modified, sent as If-Range so a file replaced
++        /// on the server midway fails instead of mixing two files' bytes.
++        let validator: String?
++    }
++
++    /// Asks for the first byte and cancels at the headers. A server that
++    /// answers ranges says 206 and gives the full size in Content-Range; one
++    /// that ignores them says 200. Apple's CDN answers range requests without
++    /// advertising Accept-Ranges, so that header is not consulted. Any failure
++    /// returns nil, and the single GET that follows reports it.
++    static func probeRanges(_ url: URL, session: URLSession) async -> RangedResource? {
++        let outcome = await transfer(
++            rangeRequest(url, 0 ... 0, validator: nil),
++            session: session,
++            into: -1,
++            at: 0,
++            accept: { _ in false },
++            received: { _, _ in },
++        )
++        guard let response = outcome.response, response.statusCode == 206,
++              let range = contentRange(of: response), range.start == 0, range.total > 0
++        else {
++            return nil
++        }
++        let etag = response.value(forHTTPHeaderField: "ETag").flatMap { $0.hasPrefix("W/") ? nil : $0 }
++        return RangedResource(
++            url: url,
++            size: range.total,
++            validator: etag ?? response.value(forHTTPHeaderField: "Last-Modified"),
++        )
++    }
++
++    private static func downloadSegments(
++        _ resource: RangedResource,
++        into fd: Int32,
++        configuration: URLSessionConfiguration,
++        connections: Int,
++        segmentSize: Int64,
++        counter: ProgressCounter,
++    ) async throws {
++        let segments = SegmentQueue(size: resource.size, segmentSize: segmentSize)
++        try await withThrowingTaskGroup(of: Void.self) { group in
++            for _ in 0 ..< min(connections, segments.count) {
++                group.addTask {
++                    // A session of its own: one session sends every request to
++                    // a host over a single HTTP/2 connection, which would leave
++                    // the workers sharing one connection's throughput.
++                    let session = URLSession(configuration: configuration)
++                    defer { session.invalidateAndCancel() }
++                    while let segment = segments.next() {
++                        try await downloadSegment(segment, of: resource, into: fd, session: session, counter: counter)
++                    }
++                }
++            }
++            try await group.waitForAll()
++        }
++        var info = stat()
++        guard fstat(fd, &info) == 0 else {
++            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
++        }
++        guard info.st_size == resource.size else {
++            throw Error.incompleteDownload(resource.url, expected: resource.size, actual: info.st_size)
++        }
++    }
++
++    /// Fetches one segment, resuming from the last byte written whenever a
++    /// connection drops or a server error comes back.
++    private static func downloadSegment(
++        _ segment: ClosedRange<Int64>,
++        of resource: RangedResource,
++        into fd: Int32,
++        session: URLSession,
++        counter: ProgressCounter,
++    ) async throws {
++        var offset = segment.lowerBound
++        var failures = 0
++        while offset <= segment.upperBound {
++            let start = offset
++            let outcome = await transfer(
++                rangeRequest(resource.url, start ... segment.upperBound, validator: resource.validator),
++                session: session,
++                into: fd,
++                at: start,
++                limit: segment.upperBound - start + 1,
++                accept: { response in
++                    let range = contentRange(of: response)
++                    return response.statusCode == 206 && range?.start == start && range?.total == resource.size
++                },
++                received: { count, _ in counter.add(count, of: resource.size) },
++            )
++            try Task.checkCancellation()
++            if let error = outcome.writeError {
++                throw error
++            }
++            offset += outcome.written
++            if let response = outcome.response, !outcome.accepted {
++                switch response.statusCode {
++                case 408, 429, 500...:
++                    break
++                case 200, 206, 412:
++                    // 200 is the whole body: If-Range no longer matches.
++                    throw Error.changedDuringDownload(resource.url)
++                default:
++                    throw Error.unexpectedHTTP(resource.url, response.statusCode)
++                }
++            }
++            guard offset <= segment.upperBound else { return }
++            failures = outcome.written > 0 ? 1 : failures + 1
++            guard failures < segmentAttempts else {
++                throw outcome.transportError ?? Error.incompleteDownload(
++                    resource.url,
++                    expected: segment.upperBound + 1,
++                    actual: offset,
++                )
++            }
++            try await Task.sleep(for: .seconds(failures))
++        }
++    }
++
++    private static func rangeRequest(_ url: URL, _ range: ClosedRange<Int64>, validator: String?) -> URLRequest {
++        var request = URLRequest(url: url)
++        // An idle connection gives up after a minute and the segment resumes
++        // on a new one, instead of hanging the download.
++        request.timeoutInterval = 60
++        request.setValue("bytes=\(range.lowerBound)-\(range.upperBound)", forHTTPHeaderField: "Range")
++        // Byte offsets must index the file itself, not a compressed encoding.
++        request.setValue("identity", forHTTPHeaderField: "Accept-Encoding")
++        if let validator {
++            request.setValue(validator, forHTTPHeaderField: "If-Range")
++        }
++        return request
++    }
++
++    /// `bytes <start>-<end>/<total>`; nil for any other shape, including an
++    /// unknown total.
++    static func contentRange(of response: HTTPURLResponse) -> (start: Int64, end: Int64, total: Int64)? {
++        guard let value = response.value(forHTTPHeaderField: "Content-Range") else { return nil }
++        let parts = value.trimmingCharacters(in: .whitespaces).split(separator: " ", maxSplits: 1)
++        guard parts.count == 2, parts[0].lowercased() == "bytes" else { return nil }
++        let spanAndTotal = parts[1].split(separator: "/")
++        guard spanAndTotal.count == 2, let total = Int64(spanAndTotal[1]) else { return nil }
++        let span = spanAndTotal[0].split(separator: "-")
++        guard span.count == 2, let start = Int64(span[0]), let end = Int64(span[1]),
++              start <= end, end < total
++        else {
++            return nil
++        }
++        return (start, end, total)
++    }
++
++    /// Hands out the file's segments in order to every connection.
++    private final class SegmentQueue: Sendable {
++        let count: Int
++        private let size: Int64
++        private let segmentSize: Int64
++        private let nextIndex = Mutex(0)
++
++        init(size: Int64, segmentSize: Int64) {
++            self.size = size
++            self.segmentSize = segmentSize
++            count = Int((size + segmentSize - 1) / segmentSize)
++        }
++
++        func next() -> ClosedRange<Int64>? {
++            nextIndex.withLock { index -> ClosedRange<Int64>? in
++                guard index < count else { return nil }
++                let start = Int64(index) * segmentSize
++                index += 1
++                return start ... min(start + segmentSize, size) - 1
++            }
++        }
++    }
++
++    /// Adds up the bytes every connection writes and reports the sum one
++    /// report at a time, so a progress bar that is not thread-safe can take it.
++    private final class ProgressCounter: Sendable {
++        private let progress: (@Sendable (Int64, Int64) -> Void)?
++        private let done = Mutex<Int64>(0)
++
++        init(_ progress: (@Sendable (Int64, Int64) -> Void)?) {
++            self.progress = progress
++        }
++
++        func add(_ count: Int64, of total: Int64) {
++            guard let progress else { return }
++            done.withLock { done in
++                done += count
++                if total > 0 {
++                    progress(done, total)
++                }
++            }
++        }
++    }
++
++    // MARK: Transfer
++
++    struct TransferOutcome {
++        var response: HTTPURLResponse?
++        /// Whether `accept` took the response; a refused one has no body.
++        var accepted = false
++        var written: Int64 = 0
++        var writeError: Swift.Error?
++        var transportError: Swift.Error?
++    }
++
++    /// One request whose body is written at `offset` onward as it arrives.
++    /// Never throws: the caller decides from the outcome whether to resume.
++    private static func transfer(
++        _ request: URLRequest,
++        session: URLSession,
++        into fd: Int32,
++        at offset: Int64,
++        limit: Int64 = .max,
++        accept: @escaping @Sendable (HTTPURLResponse) -> Bool,
++        received: @escaping @Sendable (Int64, HTTPURLResponse) -> Void,
++    ) async -> TransferOutcome {
+         let task = session.dataTask(with: request)
+-        let writer = DownloadWriter(output: output, progress: progress)
++        let writer = TransferWriter(fd: fd, offset: offset, limit: limit, accept: accept, received: received)
+         task.delegate = writer
+-        return try await withTaskCancellationHandler {
+-            try await withCheckedThrowingContinuation { continuation in
++        return await withTaskCancellationHandler {
++            await withCheckedContinuation { continuation in
+                 writer.continuation = continuation
+                 task.resume()
+             }
+@@ -208,17 +499,27 @@ public enum VPhoneIPSWCache {
+ 
+     /// URLSession calls one task's delegate serially, and `continuation` is set
+     /// before the task resumes, so the mutable state is never shared.
+-    private final class DownloadWriter: NSObject, URLSessionDataDelegate, @unchecked Sendable {
+-        let output: FileHandle
+-        let progress: (@Sendable (Int64, Int64) -> Void)?
+-        var continuation: CheckedContinuation<(URLResponse, Int64), Swift.Error>?
+-        private var response: URLResponse?
+-        private var written: Int64 = 0
+-        private var writeError: Swift.Error?
+-
+-        init(output: FileHandle, progress: (@Sendable (Int64, Int64) -> Void)?) {
+-            self.output = output
+-            self.progress = progress
++    private final class TransferWriter: NSObject, URLSessionDataDelegate, @unchecked Sendable {
++        let fd: Int32
++        let offset: Int64
++        let limit: Int64
++        let accept: @Sendable (HTTPURLResponse) -> Bool
++        let received: @Sendable (Int64, HTTPURLResponse) -> Void
++        var continuation: CheckedContinuation<TransferOutcome, Never>?
++        private var outcome = TransferOutcome()
++
++        init(
++            fd: Int32,
++            offset: Int64,
++            limit: Int64,
++            accept: @escaping @Sendable (HTTPURLResponse) -> Bool,
++            received: @escaping @Sendable (Int64, HTTPURLResponse) -> Void,
++        ) {
++            self.fd = fd
++            self.offset = offset
++            self.limit = limit
++            self.accept = accept
++            self.received = received
+         }
+ 
+         func urlSession(
+@@ -227,38 +528,54 @@ public enum VPhoneIPSWCache {
+             didReceive response: URLResponse,
+             completionHandler: @escaping @Sendable (URLSession.ResponseDisposition) -> Void,
+         ) {
+-            self.response = response
+-            let ok = (response as? HTTPURLResponse)?.statusCode == 200
+-            completionHandler(ok ? .allow : .cancel)
++            outcome.response = response as? HTTPURLResponse
++            outcome.accepted = outcome.response.map(accept) ?? false
++            completionHandler(outcome.accepted ? .allow : .cancel)
+         }
+ 
+         func urlSession(_: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+-            guard writeError == nil else { return }
++            guard outcome.writeError == nil, let response = outcome.response else { return }
+             do {
+-                try output.write(contentsOf: data)
+-                written += Int64(data.count)
+-                if let progress, let total = response?.expectedContentLength, total > 0 {
+-                    progress(written, total)
++                // A segment's bytes may never reach the next segment's, which
++                // another connection is writing.
++                guard Int64(data.count) <= limit - outcome.written else {
++                    throw Error.unexpectedHTTP(
++                        dataTask.originalRequest?.url ?? response.url ?? URL(fileURLWithPath: "/"),
++                        response.statusCode,
++                    )
+                 }
++                try write(data, at: offset + outcome.written)
++                outcome.written += Int64(data.count)
++                received(Int64(data.count), response)
+             } catch {
+-                writeError = error
++                outcome.writeError = error
+                 dataTask.cancel()
+             }
+         }
+ 
+         func urlSession(_: URLSession, task _: URLSessionTask, didCompleteWithError error: Swift.Error?) {
+-            defer { continuation = nil }
+-            if let writeError {
+-                continuation?.resume(throwing: writeError)
+-            } else if let response, (response as? HTTPURLResponse)?.statusCode != 200 {
+-                // Cancelled on purpose in didReceive; the caller reports the status.
+-                continuation?.resume(returning: (response, 0))
+-            } else if let error {
+-                continuation?.resume(throwing: error)
+-            } else if let response {
+-                continuation?.resume(returning: (response, written))
+-            } else {
+-                continuation?.resume(throwing: URLError(.badServerResponse))
++            // A refused response was cancelled on purpose; the caller reads its status.
++            if outcome.accepted || outcome.response == nil {
++                outcome.transportError = error
++            }
++            continuation?.resume(returning: outcome)
++            continuation = nil
++        }
++
++        private func write(_ data: Data, at position: Int64) throws {
++            try data.withUnsafeBytes { buffer in
++                guard let base = buffer.baseAddress else { return }
++                var done = 0
++                while done < buffer.count {
++                    let count = pwrite(fd, base + done, buffer.count - done, off_t(position) + off_t(done))
++                    if count < 0 {
++                        if errno == EINTR {
++                            continue
++                        }
++                        throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
++                    }
++                    done += count
++                }
+             }
+         }
+     }
+diff --git a/VPhoneKit/VPhoneArchiveKitTests/IPSWCacheTests.swift b/VPhoneKit/VPhoneArchiveKitTests/IPSWCacheTests.swift
+index 9f1d19da2224c2faf998958ea32a06b676544cbb..600378d895f72fc51c7e60e1e6942886055755fd 100644
+--- a/VPhoneKit/VPhoneArchiveKitTests/IPSWCacheTests.swift
++++ b/VPhoneKit/VPhoneArchiveKitTests/IPSWCacheTests.swift
+@@ -42,6 +42,95 @@ private final class ProgressReports: @unchecked Sendable {
+     }
+ }
+ 
++/// A server that answers range requests, as Apple's CDN does, and can close a
++/// connection partway through a segment or replace the file between requests.
++private final class RangeServer: @unchecked Sendable {
++    private let lock = NSLock()
++    private var payload = Data()
++    private var etag = "\"v1\""
++    private var cutShortOnce: Set<Int64> = []
++    private var replaceAfterProbe = false
++    private var ranges: [String] = []
++
++    func reset(payload: Data, cutShortOnce: Set<Int64> = [], replaceAfterProbe: Bool = false) {
++        lock.withLock {
++            self.payload = payload
++            etag = "\"v1\""
++            self.cutShortOnce = cutShortOnce
++            self.replaceAfterProbe = replaceAfterProbe
++            ranges = []
++        }
++    }
++
++    var requestedRanges: [String] {
++        lock.withLock { ranges }
++    }
++
++    /// The response to `range` and `ifRange`, and whether to end it halfway.
++    func answer(range: String?, ifRange: String?) -> (status: Int, headers: [String: String], body: Data, cutShort: Bool) {
++        lock.withLock {
++            ranges.append(range ?? "")
++            let current = etag
++            if range == "bytes=0-0", replaceAfterProbe {
++                etag = "\"v2\""
++            }
++            guard let range, ifRange == nil || ifRange == current,
++                  let bounds = Self.bounds(range, size: payload.count)
++            else {
++                return (200, ["Content-Length": "\(payload.count)", "ETag": current], payload, false)
++            }
++            let body = payload.subdata(in: bounds.lowerBound ..< bounds.upperBound + 1)
++            let headers = [
++                "Content-Length": "\(body.count)",
++                "Content-Range": "bytes \(bounds.lowerBound)-\(bounds.upperBound)/\(payload.count)",
++                "ETag": current,
++            ]
++            let cutShort = cutShortOnce.remove(Int64(bounds.lowerBound)) != nil
++            return (206, headers, body, cutShort)
++        }
++    }
++
++    private static func bounds(_ range: String, size: Int) -> ClosedRange<Int>? {
++        guard range.hasPrefix("bytes=") else { return nil }
++        let parts = range.dropFirst(6).split(separator: "-")
++        guard parts.count == 2, let start = Int(parts[0]), let end = Int(parts[1]), start <= end, start < size else {
++            return nil
++        }
++        return start ... min(end, size - 1)
++    }
++}
++
++private final class RangeStubProtocol: URLProtocol {
++    static let server = RangeServer()
++
++    override class func canInit(with _: URLRequest) -> Bool {
++        true
++    }
++
++    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
++        request
++    }
++
++    override func startLoading() {
++        let answer = Self.server.answer(
++            range: request.value(forHTTPHeaderField: "Range"),
++            ifRange: request.value(forHTTPHeaderField: "If-Range"),
++        )
++        let response = HTTPURLResponse(
++            url: request.url!,
++            statusCode: answer.status,
++            httpVersion: "HTTP/1.1",
++            headerFields: answer.headers,
++        )!
++        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
++        // Cut short: the connection closes after half the stated length.
++        client?.urlProtocol(self, didLoad: answer.cutShort ? answer.body.prefix(answer.body.count / 2) : answer.body)
++        client?.urlProtocolDidFinishLoading(self)
++    }
++
++    override func stopLoading() {}
++}
++
+ @Suite("IPSW cache", .serialized)
+ struct IPSWCacheTests {
+     private func fixture(in root: URL) throws -> URL {
+@@ -205,6 +294,145 @@ struct IPSWCacheTests {
+         #expect(FileManager.default.fileExists(atPath: live.path))
+     }
+ 
++    // MARK: - Concurrent download
++
++    private func rangeSession() -> URLSession {
++        let configuration = URLSessionConfiguration.ephemeral
++        configuration.protocolClasses = [RangeStubProtocol.self]
++        return URLSession(configuration: configuration)
++    }
++
++    private func randomPayload(_ count: Int) -> Data {
++        Data((0 ..< count).map { _ in UInt8.random(in: 0 ... 255) })
++    }
++
++    private func emptyFile(in root: URL) throws -> URL {
++        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
++        let file = root.appendingPathComponent("download.partial")
++        #expect(FileManager.default.createFile(atPath: file.path, contents: nil))
++        return file
++    }
++
++    /// Several connections write their segments into one file; the bytes must
++    /// land exactly where they belong, and progress must add up across them.
++    @Test func `segments over several connections reassemble the file`() async throws {
++        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: root) }
++        let payload = randomPayload(1_000_003)
++        RangeStubProtocol.server.reset(payload: payload)
++        let session = rangeSession()
++        defer { session.invalidateAndCancel() }
++        let file = try emptyFile(in: root)
++        let reports = ProgressReports()
++
++        try await VPhoneIPSWCache.download(
++            #require(URL(string: "https://example.invalid/input.ipsw")),
++            into: file,
++            session: session,
++            connections: 4,
++            segmentSize: 64 * 1024,
++            progress: { done, total in reports.append(done, total) },
++        )
++
++        #expect(try Data(contentsOf: file) == payload)
++        let ranges = RangeStubProtocol.server.requestedRanges
++        #expect(ranges.first == "bytes=0-0")
++        #expect(ranges.count == 1 + 16)
++        #expect(ranges.contains("bytes=983040-1000002"))
++        let values = reports.values
++        #expect(values.allSatisfy { $0.total == Int64(payload.count) })
++        #expect(values.last?.done == Int64(payload.count))
++        #expect(zip(values, values.dropFirst()).allSatisfy { $0.done < $1.done })
++    }
++
++    @Test func `a segment cut short resumes where it stopped`() async throws {
++        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: root) }
++        let payload = randomPayload(300_000)
++        RangeStubProtocol.server.reset(payload: payload, cutShortOnce: [100_000])
++        let session = rangeSession()
++        defer { session.invalidateAndCancel() }
++        let file = try emptyFile(in: root)
++
++        try await VPhoneIPSWCache.download(
++            #require(URL(string: "https://example.invalid/input.ipsw")),
++            into: file,
++            session: session,
++            connections: 3,
++            segmentSize: 100_000,
++            progress: nil,
++        )
++
++        #expect(try Data(contentsOf: file) == payload)
++        // Half of 100000-199999 arrived before the connection closed; only the rest is asked again.
++        #expect(RangeStubProtocol.server.requestedRanges.contains("bytes=150000-199999"))
++    }
++
++    /// If-Range carries the probe's ETag, so a file replaced on the server
++    /// fails the download instead of mixing two files' bytes.
++    @Test func `a file replaced during the download fails it`() async throws {
++        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: root) }
++        RangeStubProtocol.server.reset(payload: randomPayload(200_000), replaceAfterProbe: true)
++        let session = rangeSession()
++        defer { session.invalidateAndCancel() }
++        let file = try emptyFile(in: root)
++
++        await #expect {
++            try await VPhoneIPSWCache.download(
++                #require(URL(string: "https://example.invalid/input.ipsw")),
++                into: file,
++                session: session,
++                connections: 2,
++                segmentSize: 50000,
++                progress: nil,
++            )
++        } throws: { error in
++            if case .changedDuringDownload? = error as? VPhoneIPSWCache.Error {
++                true
++            } else {
++                false
++            }
++        }
++    }
++
++    /// One connection, or a server that ignores ranges, downloads as one GET.
++    @Test func `one connection downloads the file as a single request`() async throws {
++        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: root) }
++        let payload = randomPayload(200_000)
++        RangeStubProtocol.server.reset(payload: payload)
++        let session = rangeSession()
++        defer { session.invalidateAndCancel() }
++        let file = try emptyFile(in: root)
++
++        try await VPhoneIPSWCache.download(
++            #require(URL(string: "https://example.invalid/input.ipsw")),
++            into: file,
++            session: session,
++            connections: 1,
++            segmentSize: 50000,
++            progress: nil,
++        )
++
++        #expect(try Data(contentsOf: file) == payload)
++        #expect(RangeStubProtocol.server.requestedRanges == [""])
++    }
++
++    @Test func `content range parses only a complete byte range`() {
++        func parse(_ value: String) -> [Int64]? {
++            let url = URL(string: "https://example.invalid/")!
++            let response = HTTPURLResponse(url: url, statusCode: 206, httpVersion: nil, headerFields: ["Content-Range": value])!
++            return VPhoneIPSWCache.contentRange(of: response).map { [$0.start, $0.end, $0.total] }
++        }
++        #expect(parse("bytes 0-0/12343857610") == [0, 0, 12_343_857_610])
++        #expect(parse("bytes 100-199/1000") == [100, 199, 1000])
++        #expect(parse("bytes 0-0/*") == nil)
++        #expect(parse("bytes */1000") == nil)
++        #expect(parse("bytes 10-5/1000") == nil)
++        #expect(parse("bytes 0-1000/1000") == nil)
++    }
++
+     // MARK: - Pairing
+ 
+     private func ipsw(in root: URL, _ name: String, productTypes: [String], deviceClasses: [String]) throws -> VPhoneIPSWCache.Archive {

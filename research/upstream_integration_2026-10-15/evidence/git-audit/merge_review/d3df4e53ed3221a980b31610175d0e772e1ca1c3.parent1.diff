@@ -1,0 +1,3220 @@
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+index 6c75747c865a08685665091b6cb3e255282970c9..694423bfe508151b8f07797639c804c12a49224c 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -232,6 +232,41 @@
+ > `cameracaptured`, `vphone-systemhook.log` records `camera-hook=... result=loaded`
+ > for its PID, and `vcamcaptured.log` shows the hook installing its source.
+ 
++> **3D gyroscope core (2026-10-08; guest acceptance pending):**
++> `system-backboardd-cfw-gyroscope`, declared in the Guest System set and
++> selected by both presets on iOS 18+, installs `/usr/lib/libvphonegyro.dylib`.
++> SystemHook loads it into backboardd through the same no-bootstrap daemon
++> route as the camera hook. It publishes a virtual HID gyro (page `0xff00`,
++> usage `9`); vphoned's `motion.gyroscope.set/get/clear` sends an atomic
++> three-axis rad/s configuration through mobile's backboardd preferences and
++> a Darwin notification. There is no system executable, kernel or DSC byte
++> change. Disabling the patch removes the added library; live environment
++> sync cannot reinstall an absent selected library. A provider/library update
++> needs a reboot, without silently restarting backboardd. The VM display app's
++> Features → Motion Sensors → 3D Gyroscope panel sends valid three-axis edits immediately,
++> with a simulation checkbox that retains values and a reset that zeros all
++> axes. `motion.gyroscope.set` accepts an optional Boolean `enabled` (default
++> true); the panel checks `motion_gyroscope_toggle` support. Writes serialize
++> and coalesce, preserve the latest values across old acknowledgements, and
++> retry pending state after reconnect. HID enumeration
++> and dispatch are observable separately from CoreMotion app acceptance; the
++> platform capability gate and optional IMU match still require guest proof.
++> Reveal evidence and manual acceptance: `Research/Guest/virtual_gyroscope.md`.
++
++> **Device attitude (2026-10-08; guest acceptance pending):**
++> `system-apps-cfw-attitude` in Guest System is selected by both presets on
++> iOS 18+. It adds `/usr/lib/libvphoneattitude.dylib`, loaded by SystemHook
++> into apps, with no system executable, kernel or DSC byte change. Public
++> CMMotionManager methods supply a stationary XArbitraryZVertical pose through
++> polling/callbacks. vphoned persists degrees and publishes one packed Darwin
++> notify state; apps receive radians, quaternion, matrix and matching gravity.
++> Disabling restores the native path; removing the library and relaunching apps
++> reverts injection. Live sync cannot reinstall an absent selected library.
++> Features → Motion Sensors → Device Attitude provides live angle editing,
++> a simulation checkbox and zero reset. Native host subscription tests and
++> guest cross-compilation passed; manual guest acceptance remains.
++> Contract and validation: `Research/Guest/virtual_attitude.md`.
++
+ > **Current launchd hook (2026-09-25; isolated VM verification):**
+ > `cfw install` now places `launchdhook-vphone.dylib` and a diagnostic
+ > `SystemHook-vphone.dylib` in `/usr/lib`, links `/vh` to the launchd hook,
+diff --git a/Research/Guest/virtual_attitude.md b/Research/Guest/virtual_attitude.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..ef765f0a9b411403c9f89d20cbef23854e8dfec7
+--- /dev/null
++++ b/Research/Guest/virtual_attitude.md
+@@ -0,0 +1,93 @@
++# Device attitude simulation
++
++## Contract and panel
++
++vphoned capability `motion_attitude` exposes `motion.attitude.get`,
++`motion.attitude.set {roll,pitch,yaw,enabled?}` and `motion.attitude.clear`.
++Set requires finite JSON numbers: roll/yaw in [-180,180] degrees, pitch in
++[-90,90]. Booleans, strings, missing/non-finite/out-of-range angles are rejected.
++`enabled` must be a Boolean and defaults to true. Clear disables and zeros;
++set with enabled=false retains angles.
++
++**Features → Motion Sensors → Device Attitude** (Chinese:
++**功能 → 运动传感器 → 设备姿态**) offers immediate edits, a simulation checkbox
++and zero reset preserving the checkbox. The gyro panel is in the same submenu.
++Both share the serialized/coalesced writer and retry/reconnect model.
++UI/RPC use degrees; Core Motion uses radians. Zero is face-up, gravity (0,0,-1)
++g. Pitch is about X, roll about Y, yaw about Z: R = Rz(yaw) Rx(pitch) Ry(roll).
++Pitch ±90° makes Euler roll/yaw singular; quaternion/matrix remain well-defined.
++
++This is a stationary pose, independent of raw gyro simulation. Device motion
++supplies attitude, corresponding gravity, zero rotation rate/user acceleration,
++an uncalibrated zero magnetic field and invalid heading (-1). Changing angles
++does not synthesize angular velocity or UIKit/display orientation changes.
++
++## Injection and transport
++
++Guest System declares `system-apps-cfw-attitude`, selected by both presets on
++iOS 18+. It adds `/usr/lib/libvphoneattitude.dylib`. SystemHook loads it into
++apps before the optional tweak loader; no bootstrap or new daemon is required.
++Safe-mode/injection-disable flags still apply. No system executable, kernel or
++DSC bytes change. This intercepts the app's public Core Motion boundary;
++it does not claim that raw gyro HID events are fused attitude samples.
++
++All four CMMotionManager device-motion start methods, stop, interval, polling,
++availability, active state and reference-frame getters are covered. Only
++XArbitraryZVertical is simulated/advertised. Corrected/magnetic/true-north
++requests keep the native path. Enable simulation before launching an app whose
++availability check would otherwise prevent subscription.
++
++Per-manager timers honor intervals at 1–200 Hz (unset: 60 Hz). Callbacks run on
++the app's NSOperationQueue, outside session locks. At most one simulated
++delivery is queued; a suspended queue cannot accumulate samples. Generations
++discard deliveries after stop/restart/mode changes. Samples support independent
++copies, secure coding and relative quaternion multiplication. Weak timer
++captures and cancellation prevent a timer retaining a released manager.
++Enabling/disabling an existing subscription switches between simulation and
++retained native implementations, including native availability when disabled.
++
++vphoned serializes publication/readback and persists one dictionary,
++`VPhoneAttitudeConfiguration`, in mobile's `com.apple.backboardd` preferences.
++It packs angles and enabled in one 64-bit Darwin notification state,
++`com.vphone.motion.attitude.changed`. Apps read this atomic state without
++cross-sandbox preferences/file access. Transport quantizes to 0.001° (maximum
++0.0005° error); persisted/RPC values retain input precision. vphoned seeds
++notifyd at startup; new app readers immediately read the latest state.
++
++`provider_installed` only reports the dylib's presence. It does not prove a
++target app loaded the hook or received samples. Check SystemHook's app-PID
++`attitude-hook=... result=loaded` log and the actual Core Motion consumer.
++
++## Selection and verification
++
++cfw install/update-environment follows selection and records the guest receipt.
++No-plan legacy VMs do not opt in. Blocking removes the added file; live hash
++sync replaces installed selected copies only. Relaunch apps after changing the
++library. A changed SystemHook still requires reboot; no UI daemon is restarted
++for attitude updates.
++
++Host checks: `make -C VPhoneGuestComponents test-attitude` tests malformed
++configuration, packed-state boundaries, quaternion/matrix/gravity, copy,
++relative attitude and secure coding. Its real host Core Motion runtime test
++covers all start overloads, polling, callback delivery, live toggle, snapshots,
++interval setting, bounded backlog and suppression after stop, using a separate
++Darwin notification name. The shared editor harness
++`zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-gyroscope-tests.sh` covers
++sequencing/retry/reconnect and attitude-specific bounds. Catalogue tests cover
++version gating, blocking, preset reachability and manifest invariants.
++
++2026-10-08: sample and live hook tests passed, shared editor tests passed,
++55 catalogue/model tests in seven suites passed, and the full VPhone Debug
++bundle built successfully. Bundle admission and strict deep signature verification
++passed; the built zh-Hans strings include 设备姿态 and 俯仰.
++
++Guest acceptance is manual, as requested: update guest, relaunch a consumer,
++enable simulation, compare polling/callback Euler radians, quaternion and
++gravity at zero and single-axis 90° poses. Check reset/disable while subscribed,
++stopped-manager silence, and relaunch after blocking the patch. Host runtime
++checks do not establish guest injection/sandbox acceptance or every app's API.
++
++ABI sources: Xcode iPhoneOS SDK CMMotionManager.h, CMAttitude.h, CMDeviceMotion.h,
++system notify.h, Apple [CMAttitude](https://developer.apple.com/documentation/coremotion/cmattitude)
++and [CMDeviceMotion](https://developer.apple.com/documentation/coremotion/cmdevicemotion).
++No Hopper-derived offset or private initializer is used.
+diff --git a/Research/Guest/virtual_gyroscope.md b/Research/Guest/virtual_gyroscope.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..76ceefd4a5006c340bff374076d530a20bd672da
+--- /dev/null
++++ b/Research/Guest/virtual_gyroscope.md
+@@ -0,0 +1,179 @@
++# Virtual 3D gyroscope
++
++## Core boundary (2026-10-08)
++
++The core adds raw three-axis angular velocity, in **radians per second**. It
++does not represent Euler angles or synthesize accelerometer, compass, attitude,
++or fused `CMDeviceMotion`.
++
++`vphoned` exposes `motion.gyroscope.set {x,y,z,enabled?}`, `motion.gyroscope.get`, and
++`motion.gyroscope.clear` over the existing VSOCK 1339 RPC transport. Set requires
++all three finite JSON numbers in [-1000,1000]; strings, Booleans, missing axes,
++and out-of-range values are refused before any state is changed. Clear disables
++the configured rotation and writes zero on every axis. Set's optional `enabled`
++must be a JSON Boolean and defaults to true, preserving existing clients. False
++keeps the configured axes but makes the provider emit stationary samples.
++
++One dictionary, `VPhoneGyroscopeConfiguration`, is written through cfprefsd to
++the mobile user's `com.apple.backboardd` domain and then
++`com.vphone.motion.gyroscope.changed` is posted. This avoids a separate port or
++new daemon sandbox file permissions. A running provider reads the whole
++dictionary on its serial queue; malformed stored state becomes stationary.
++Configuration persists across guest restarts until changed or cleared.
++
++As with the camera daemon hook, SystemHook loads a guest dylib without ElleKit
++or a bootstrap. `/usr/lib/libvphonegyro.dylib` is loaded only into
++`/usr/libexec/backboardd`, the HID server, after its constructors return. The
++library publishes a `HIDVirtualEventService` with Apple vendor usage page
++`0xff00`, usage `9`, and `IMULocationID = 0`. It creates each event through
++`+[HIDEvent gyroEvent:x:y:z:options:]`, with `mach_absolute_time()` and an
++incrementing gyro sequence. No system instruction is overwritten, no app's
++`CMMotionManager` methods are swizzled, and there are no kernel/DSC edits.
++
++HID report/batch interval requests are handled on that same queue. The provider
++advertises aggregate sensor control so one client stopping does not cancel
++other clients. A zero report interval stops the timer; nonzero requests are
++bounded to 5,000–1,000,000 microseconds (1–200 Hz). There is no FIFO batching.
++Clear leaves the service and subscriptions alive and emits stationary samples.
++After a HID reset, the old service is cancelled and released only from its
++cancel handler, then a new service is registered after five seconds.
++
++`VPhoneGyroscopeStatus` is updated at configuration and service transitions and
++every two seconds. The RPC result includes `provider` and `provider_running`;
++the latter requires an enumerated service and a heartbeat younger than ten
++seconds. The status includes service ID, PID, report interval, dispatched event
++count, dispatch failures, last error, and the configuration consumed by the
++provider. **Enumeration and dispatch do not prove CoreMotion acceptance.**
++
++## Host panel
++
++The VM display app's **Features → Motion Sensors → 3D Gyroscope** menu opens a native
++SwiftUI panel (Chinese: **功能 → 运动传感器 → 3D 陀螺仪**). Each axis has a text field
++and a 0.1 rad/s stepper. Valid edits are sent immediately; partial, non-finite
++and out-of-range text stays in the field with a validation message and is not
++sent. The checkbox enables/disables simulation without discarding axis values.
++**Reset** zeros all fields and sends the zero configuration, preserving the
++checkbox. Reset also repairs partially typed/invalid fields.
++
++The panel uses capability `motion_gyroscope_toggle`, so an older daemon which
++would ignore `enabled` cannot silently apply the wrong checkbox state. It reads
++the stored configuration on opening/reconnect, and keeps accepted local edits
++when reconnecting after a failed send. A single in-flight RPC and one pending
++full configuration coalesce rapid edits; disable and reset replace that pending
++state, and stale acknowledgements never replace newer field text. Failed writes
++remain unsynced with a retry action. Closing the panel does not drop a write
++already accepted by the UI. The existing window controller retains the model
++and uses `isReleasedWhenClosed = false`.
++
++The shared `VPhoneMotionModel` / `VPhoneMotionView` also powers the independent
++degree-based attitude editor; see `virtual_attitude.md`. Gyro configuration
++remains raw rad/s and does not drive the attitude simulation.
++
++The model test harness (`zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-gyroscope-tests.sh`)
++exercises delayed acknowledgements, coalescing, reset/disable while a write is
++pending, invalid text, retry, reconnect, stale reads and decimal-comma input.
++On 2026-10-08 these tests, the disabled-state property-list round trip and HID
++event factory tests passed; the full `VPhone` bundle build also passed with the
++Chinese menu/panel strings compiled into its resources. Native UI interaction
++was not run after the local preview compilation request was declined.
++
++## Patch selection and installation
++
++`system-backboardd-cfw-gyroscope` is declared in the Guest System patch set and
++selected by both shipped presets on iOS 18 and newer. The dylib is built for
++arm64e with an iOS 18 deployment target. Missing runtime APIs produce a provider
++error and leave backboardd running. A legacy install with no patch plan does
++not enable this new provider; resolve an explicit selection first.
++
++The mounted `cfw install` and `cfw update-environment` steps install this library
++when selected and remove it when blocked. The general environment redeploy
++does not own this file. A live hash sync may replace an already installed copy
++but cannot add an absent copy, so it cannot undo a user's patch selection.
++Updating the gyro library or its loading SystemHook asks for a reboot; it does
++not restart backboardd, which would interrupt the guest UI.
++
++To test a local build, install it with `vphone-launchpad-cli bundle install-local`
++and bind the stopped test machine using `vm set-bundle <name> <version>
++--update-environment`, as described in `Documents/Guides/launchpad-cli.md`.
++The mounted update adds this newly selected patch to an older machine too.
++Reboot before testing. To turn it off, use the patch editor to block
++`system-backboardd-cfw-gyroscope`, update the stopped machine's environment,
++and boot again.
++
++## Reveal evidence
++
++Apple's primary interface sources:
++
++- [HIDVirtualEventService](https://github.com/apple-oss-distributions/IOHIDFamily/blob/main/HID/PrivateHeaders/HIDVirtualEventService.h): requires the HID event-dispatch entitlement; enumerated/terminated notifications and explicit cancel lifecycle.
++- [HIDEventAccessors](https://github.com/apple-oss-distributions/IOHIDFamily/blob/main/HID/Headers/HIDEventAccessors.h) and [implementation](https://github.com/apple-oss-distributions/IOHIDFamily/blob/main/HID/HIDEventAccessors.m): typed gyro factory and sequence accessor, signed 16.16 axis representation.
++- [IOHIDEventServiceTypes](https://github.com/apple-oss-distributions/IOHIDFamily/blob/main/IOHIDFamily/IOHIDEventServiceTypes.h): sensor control aggregation, decimation, and dispatch gating.
++
++The user-opened CoreMotion cache image in Hopper was inspected read-only. Its
++cache/build identity was not supplied, so the addresses below are **reveal
++evidence only**, not a claim that every iOS base has been verified and never
++runtime offsets:
++
++1. `-[CMMotionManager isGyroAvailable]` at `0x1af9a662c` checks the CoreMotion
++   initialization gate and its shared object before calling a query outside
++   the imported image. That external query was not resolved.
++2. The string `Setting Gyro matching properties with IMULocationID %d` reveals
++   `CLGyro::openHidDevice` at `0x1af9ff8b0`. Its lookup key at `0x1afc68e38`
++   contains `00 ff 00 00 09 00 00 00`: page `0xff00`, usage `9`. The adjacent
++   accelerometer key uses page `0xff00`, usage `3`.
++3. The gyro event callback beginning at `0x1af9ffb58` checks type `0x14`, reads
++   X/Y/Z fields `0x140000`, `0x140001`, `0x140002`, timestamp and subtype.
++4. `CLIoHidInterface` construction was traced through `0x1af9a9fec`,
++   `0x1af9b5218`, `0x1af9b52b4`, and `0x1afad5780`; its callback registration
++   goes through `0x1afad5ac0` on the motion thread.
++5. `openHidDevice` also checks bit 1 of the platform capability mask returned
++   by `0x1af977bb4`. That mask comes from a platform-indexed table. The virtual
++   board's result has **not** been measured, nor has its optional IMU matching
++   constraint. Publishing a HID service does not bypass this gate. If a guest
++   still reports unavailable, capture that guest's CoreMotion image/platform
++   result before adding any capability repair.
++
++The demo edition allowed inspection but refused assembly export. No Hopper
++scripting, interpreter, or generated instruction bytes were added to the repo.
++
++## Verification and manual acceptance
++
++Host transport test: `make -C VPhoneGuestComponents test-gyroscope`. It checks a
++binary property-list round trip, invalid types/non-finite values, incomplete
++axis dictionaries, clear state, and subscriber interval bounds. The full
++`VPhone` scheme validates the packaged signed dylib and vphoned.
++The host test also calls the real HID event factory without publishing a host
++service, verifying its selector ABI, timestamp, sequence, signed axes and
++16.16 quantization. The seven patch model/catalogue suites passed (55 tests),
++including default selection, explicit blocking, iOS 18+ and unknown/older-base
++gates. These checks do not substitute for the guest acceptance below.
++
++Guest runtime acceptance is delegated to the user; it has **not yet run**:
++
++```sh
++vphone-launchpad-cli guest rpc <name> motion.gyroscope.get
++vphone-launchpad-cli guest rpc <name> motion.gyroscope.set '{"x":1.25,"y":-2.5,"z":0.125}'
++vphone-launchpad-cli guest rpc <name> motion.gyroscope.get
++vphone-launchpad-cli guest rpc <name> motion.gyroscope.clear
++```
++
++1. Verify `vphone-systemhook.log` records `gyroscope-hook=... result=loaded` for
++   backboardd, then `provider_running = true` and a nonzero service ID.
++2. Open a foreground app that uses `CMMotionManager`. Confirm `isGyroAvailable`
++   and test **both** `startGyroUpdatesToQueue:withHandler:` and polling
++   `gyroData` after `startGyroUpdates`. Record rotationRate and timestamps.
++3. Set one axis at a time (including negatives), then all three. Compare the
++   readings with configured rad/s within 1/65536 quantization; timestamps must
++   advance. `provider.configuration` must match the latest RPC and the event
++   counter must increase while a client subscribes.
++4. Keep two clients subscribed; stop one and verify the other keeps receiving
++   samples. Stop both and verify no report timer remains active. Clear while
++   subscribed and verify zero rates, then set again without restarting the app.
++5. Test app restart, guest restart, and provider recovery after a HID reset.
++   Check backboardd crash reports and dispatch failures. Block the patch,
++   update the stopped machine, boot, and confirm the dylib stays absent after
++   the host's automatic environment sync.
++
++If step 1 passes but step 2 does not, core acceptance remains incomplete. The
++HID provider status must not be presented as proof that an app receives gyro
++data. Possible next reveal points are the platform mask, IMU match, and service
++interval requests in that guest's CoreMotion build.
+diff --git a/Research/vphoned_http_api.md b/Research/vphoned_http_api.md
+index 2b125c432f0aec555a2dedd865a326b301530ebe..5df613824759724e1a38e313e657d0aaa5139271 100644
+--- a/Research/vphoned_http_api.md
++++ b/Research/vphoned_http_api.md
+@@ -295,7 +295,9 @@ request carries `"force": true`.
+ | System | `system.uicache`, `system.system_apps {visible?}`, `system.respring` **force**, `system.reboot {userspace?}` **force**, `system.shutdown` **force**, `developer_mode.status`, `developer_mode.enable`, `power.low_power_mode`, `time.timezone {identifier?, automatic?}` (see below), `diagnostics.self_test` |
+ | Files | `files.list`, `mkdir`, `remove`, `rename`, `read {binary?, limit?}`, `write`, `find`, `copy`, `symlink`, `chmod`, `chown`, `plist`, `plist_set {value \| remove}` |
+ | Preferences, clipboard, location | `settings.get/set/delete`, `clipboard.get/set/clear`, `location.set/clear/current` |
++| Motion | `motion.gyroscope.get`, `motion.gyroscope.set {x,y,z,enabled?}`, `motion.gyroscope.clear` (capability `motion_gyroscope`; finite JSON numbers in [-1000,1000] rad/s, all axes required; `enabled` defaults to true and must be a JSON Boolean; capability `motion_gyroscope_toggle` supports disabling while retaining configured axes; returns configuration, `units`, `provider`, and `provider_running`; HID provider status is not proof of CoreMotion app delivery) |
+ | Keychain | `keychain.list {class?}`, `add`, `delete`, `get`, `update`, `database` |
++| Device attitude | `motion.attitude.get`, `motion.attitude.set {roll,pitch,yaw,enabled?}`, `motion.attitude.clear` (capability `motion_attitude`; degrees: roll/yaw [-180,180], pitch [-90,90], all finite JSON numbers required; `enabled` defaults to true, false retains angles; clear disables and zeros; returns configuration, `units`, `reference_frame`, `provider_installed`; stationary XArbitraryZVertical Core Motion pose; library presence does not prove app delivery; see `Guest/virtual_attitude.md`) |
+ | Packages (read-only) | `packages.list`, `status`, `info {path}`, `compare`, `tweaks`, `repos` |
+ | Bootstrap | `bootstrap.install {layout}`, `bootstrap.status`, `bootstrap.inspect`, `bootstrap.uninstall {jbroot, force}`, `bootstrap.firmware` (see above) |
+ | Environment | `environment.status` (SHA-256 of each vphone library in `/usr/lib`, or null when absent, plus the staging directory), `environment.install {libraries: [{name, sha256}]}` (see below) |
+diff --git a/VPhoneDaemon/Daemon/GuestAPI+Attitude.swift b/VPhoneDaemon/Daemon/GuestAPI+Attitude.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..abd5db552293899712ca1ec7d14839aba2776fe2
+--- /dev/null
++++ b/VPhoneDaemon/Daemon/GuestAPI+Attitude.swift
+@@ -0,0 +1,39 @@
++import CoreFoundation
++import Foundation
++import VphonedNative
++
++// MARK: - Device Attitude
++
++extension GuestAPI {
++    private static let attitudeLock = NSLock()
++
++    static func executeAttitude(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
++        guard ["motion.attitude.get", "motion.attitude.set", "motion.attitude.clear"].contains(method) else { return nil }
++        attitudeLock.lock()
++        defer { attitudeLock.unlock() }
++        if method != "motion.attitude.get" {
++            var angles = [Double](repeating: 0, count: 3)
++            var enabled = method == "motion.attitude.set"
++            if method == "motion.attitude.set" {
++                if let flag = params["enabled"] {
++                    guard let number = flag as? NSNumber, CFGetTypeID(number) == CFBooleanGetTypeID() else {
++                        throw GuestAPIError.invalidRequest("enabled must be a boolean")
++                    }
++                    enabled = number.boolValue
++                }
++                for (index, key) in ["roll", "pitch", "yaw"].enumerated() {
++                    let limit = index == 1 ? 90.0 : 180.0
++                    guard let number = params[key] as? NSNumber,
++                          CFGetTypeID(number) != CFBooleanGetTypeID(), number.doubleValue.isFinite,
++                          abs(number.doubleValue) <= limit
++                    else { throw GuestAPIError.invalidRequest("\(key) must be a number between -\(limit) and \(limit) degrees") }
++                    angles[index] = number.doubleValue
++                }
++            }
++            guard vp_attitude_set(angles[0], angles[1], angles[2], enabled) else {
++                throw GuestAPIError.operationFailed("Could not publish the attitude configuration")
++            }
++        }
++        return vp_attitude_get() as? [String: Any] ?? [:]
++    }
++}
+diff --git a/VPhoneDaemon/Daemon/GuestAPI+Environment.swift b/VPhoneDaemon/Daemon/GuestAPI+Environment.swift
+index cf660668f67b7d19d3bbe90ef3c65d89c5d500fd..4f180c76951f96532e3872177e1b96699dc5e237 100644
+--- a/VPhoneDaemon/Daemon/GuestAPI+Environment.swift
++++ b/VPhoneDaemon/Daemon/GuestAPI+Environment.swift
+@@ -21,6 +21,8 @@ extension GuestAPI {
+         "libdevicename.dylib",
+         "libprefsfix.dylib",
+         "libsigninfix.dylib",
++        "libvphonegyro.dylib",
++        "libvphoneattitude.dylib",
+     ]
+     static let environmentStaging = "/var/root/Library/Caches/vphone-environment"
+ 
+@@ -57,6 +59,9 @@ extension GuestAPI {
+             guard environmentLibraries.contains(name) else {
+                 throw GuestAPIError.invalidRequest("\(name) is not part of the vphone environment")
+             }
++            if ["libvphonegyro.dylib", "libvphoneattitude.dylib"].contains(name), !FileManager.default.fileExists(atPath: "/usr/lib/" + name) {
++                throw GuestAPIError.invalidRequest("Enable the motion sensor patch with cfw install or cfw update-environment first")
++            }
+             let staged = URL(fileURLWithPath: environmentStaging + "/" + name)
+             guard let data = try? Data(contentsOf: staged, options: .mappedIfSafe) else {
+                 throw GuestAPIError.invalidRequest("Upload \(name) to \(environmentStaging) first")
+@@ -96,7 +101,10 @@ extension GuestAPI {
+             "installed": names,
+             "restarted_pids": restarted,
+             // launchd loaded its hook at boot and keeps the old copy mapped.
+-            "reboot_required": !rootReadOnly || names.contains("launchdhook-vphone.dylib"),
++            // backboardd owns the UI's HID connection. Do not restart it here:
++            // a new gyro hook (or SystemHook which loads it) needs a reboot.
++            "reboot_required": !rootReadOnly || names.contains("launchdhook-vphone.dylib")
++                || names.contains("libvphonegyro.dylib") || names.contains("SystemHook-vphone.dylib"),
+             "root_read_only": rootReadOnly,
+         ]
+     }
+diff --git a/VPhoneDaemon/Daemon/GuestAPI+Extended.swift b/VPhoneDaemon/Daemon/GuestAPI+Extended.swift
+index dd61a0770ffbe90bf175e0259b5f185448582fd3..28f91e8286f35363f00616f7003807c1183ffa21 100644
+--- a/VPhoneDaemon/Daemon/GuestAPI+Extended.swift
++++ b/VPhoneDaemon/Daemon/GuestAPI+Extended.swift
+@@ -18,6 +18,8 @@ extension GuestAPI {
+             executeSetupAssistant,
+             executeTimeZone,
+             executeAudioLatency,
++            executeGyroscope,
++            executeAttitude,
+         ]
+         for area in areas {
+             if let result = try area(method, params) {
+diff --git a/VPhoneDaemon/Daemon/GuestAPI+Gyroscope.swift b/VPhoneDaemon/Daemon/GuestAPI+Gyroscope.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..4cbe932ac480158971d17da1f62aae8367952290
+--- /dev/null
++++ b/VPhoneDaemon/Daemon/GuestAPI+Gyroscope.swift
+@@ -0,0 +1,44 @@
++import CoreFoundation
++import Foundation
++import VphonedNative
++
++// MARK: - Virtual Gyroscope
++
++extension GuestAPI {
++    private static let gyroscopeLock = NSLock()
++
++    static func executeGyroscope(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
++        guard ["motion.gyroscope.get", "motion.gyroscope.set", "motion.gyroscope.clear"].contains(method) else {
++            return nil
++        }
++        // The API queue is concurrent. Serialize publication and readback so
++        // the response contains the dictionary this request actually wrote.
++        gyroscopeLock.lock()
++        defer { gyroscopeLock.unlock() }
++        if method != "motion.gyroscope.get" {
++            var axes = [Double](repeating: 0, count: 3)
++            var enabled = method == "motion.gyroscope.set"
++            if method == "motion.gyroscope.set" {
++                if let flag = params["enabled"] {
++                    guard let value = flag as? NSNumber, CFGetTypeID(value) == CFBooleanGetTypeID() else {
++                        throw GuestAPIError.invalidRequest("enabled must be a boolean")
++                    }
++                    enabled = value.boolValue
++                }
++                for (index, key) in ["x", "y", "z"].enumerated() {
++                    guard let value = params[key] as? NSNumber,
++                          CFGetTypeID(value) != CFBooleanGetTypeID(),
++                          value.doubleValue.isFinite, abs(value.doubleValue) <= 1000
++                    else {
++                        throw GuestAPIError.invalidRequest("\(key) must be a number between -1000 and 1000 rad/s")
++                    }
++                    axes[index] = value.doubleValue
++                }
++            }
++            guard vp_gyro_set(axes[0], axes[1], axes[2], enabled) else {
++                throw GuestAPIError.operationFailed("Could not publish the gyroscope configuration")
++            }
++        }
++        return vp_gyro_get() as? [String: Any] ?? [:]
++    }
++}
+diff --git a/VPhoneDaemon/Daemon/GuestAPI.swift b/VPhoneDaemon/Daemon/GuestAPI.swift
+index 1b9d8b7bc64ea04362a6501e448430f3375ea30a..9178e084061f926ebbe69a9c354203aa54d9e119 100644
+--- a/VPhoneDaemon/Daemon/GuestAPI.swift
++++ b/VPhoneDaemon/Daemon/GuestAPI.swift
+@@ -140,6 +140,9 @@ enum GuestAPI {
+                 "network_resolve",
+                 "timezone",
+                 "audio_host_latency",
++                "motion_gyroscope",
++                "motion_gyroscope_toggle",
++                "motion_attitude",
+             ],
+         ]
+     }
+diff --git a/VPhoneDaemon/Native/Include/VphonedNative.h b/VPhoneDaemon/Native/Include/VphonedNative.h
+index b273c184cd273a9ff96ae0b2548fad4cf8aef13d..b45c5a7e443e65e4e3d16488067cac1ca8465c97 100644
+--- a/VPhoneDaemon/Native/Include/VphonedNative.h
++++ b/VPhoneDaemon/Native/Include/VphonedNative.h
+@@ -57,6 +57,12 @@ char *vp_usb_set_serial(const char *serial, bool force, bool *changed);
+ char *vp_usb_own_serial(void);
+ 
+ #ifdef __OBJC__
++/// The configured radians/second and the injected HID provider's heartbeat.
++NSDictionary *vp_gyro_get(void);
++BOOL vp_gyro_set(double x, double y, double z, bool enabled);
++NSDictionary *vp_attitude_get(void);
++BOOL vp_attitude_set(double roll, double pitch, double yaw, bool enabled);
++
+ /// Snapshot-local nested accessibility tree, using actual private iOS child links.
+ NSDictionary *vp_ax_hierarchy(int pid, int maxElements, int maxDepth, int timeoutMS);
+ 
+diff --git a/VPhoneDaemon/Native/vphoned_attitude.m b/VPhoneDaemon/Native/vphoned_attitude.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69f58fb0e7ed38335db8f52e9793bef4fab881a
+--- /dev/null
++++ b/VPhoneDaemon/Native/vphoned_attitude.m
+@@ -0,0 +1,47 @@
++#import "Include/VphonedNative.h"
++#import "../../VPhoneGuestComponents/Attitude/VPhoneAttitudeState.h"
++#include <notify.h>
++#include <unistd.h>
++
++static VPhoneAttitudeState VPhoneAttitudeRead(void) {
++    CFPreferencesSynchronize(CFSTR(VP_ATTITUDE_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost);
++    id value = CFBridgingRelease(CFPreferencesCopyValue(CFSTR(VP_ATTITUDE_CONFIGURATION),
++        CFSTR(VP_ATTITUDE_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost));
++    VPhoneAttitudeState state;
++    VPhoneAttitudeDecode(value, &state);
++    return state;
++}
++
++static BOOL VPhoneAttitudePublish(VPhoneAttitudeState state) {
++    static int token, registration = NOTIFY_STATUS_FAILED;
++    static dispatch_once_t once;
++    dispatch_once(&once, ^{ registration = notify_register_check(VP_ATTITUDE_NOTIFICATION, &token); });
++    return registration == NOTIFY_STATUS_OK &&
++           notify_set_state(token, VPhoneAttitudePack(state)) == NOTIFY_STATUS_OK &&
++           notify_post(VP_ATTITUDE_NOTIFICATION) == NOTIFY_STATUS_OK;
++}
++
++NSDictionary *vp_attitude_get(void) {
++    VPhoneAttitudeState state = VPhoneAttitudeRead();
++    VPhoneAttitudePublish(state);
++    NSMutableDictionary *result = [VPhoneAttitudeEncode(state) mutableCopy];
++    result[@"units"] = @"degrees";
++    result[@"reference_frame"] = @"xArbitraryZVertical";
++    result[@"provider_installed"] = @(access("/usr/lib/libvphoneattitude.dylib", R_OK) == 0);
++    return result;
++}
++
++BOOL vp_attitude_set(double roll, double pitch, double yaw, bool enabled) {
++    VPhoneAttitudeState state = {enabled, roll, pitch, yaw}, checked;
++    NSDictionary *value = VPhoneAttitudeEncode(state);
++    if (!VPhoneAttitudeDecode(value, &checked)) return NO;
++    CFPreferencesSetValue(CFSTR(VP_ATTITUDE_CONFIGURATION), (__bridge CFDictionaryRef)value,
++                          CFSTR(VP_ATTITUDE_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost);
++    return CFPreferencesSynchronize(CFSTR(VP_ATTITUDE_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost) &&
++           VPhoneAttitudePublish(state);
++}
++
++// Re-seed notifyd after boot/daemon restart before any host editor is opened.
++__attribute__((constructor)) static void VPhoneAttitudeInitialize(void) {
++    @autoreleasepool { VPhoneAttitudePublish(VPhoneAttitudeRead()); }
++}
+diff --git a/VPhoneDaemon/Native/vphoned_gyro.m b/VPhoneDaemon/Native/vphoned_gyro.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..e49b560886cd9f5ce00f153b401c3d3f19230d32
+--- /dev/null
++++ b/VPhoneDaemon/Native/vphoned_gyro.m
+@@ -0,0 +1,40 @@
++#import "Include/VphonedNative.h"
++#import "../../VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeState.h"
++#include <notify.h>
++
++static id VPhoneGyroscopeRead(CFStringRef key) {
++    return CFBridgingRelease(CFPreferencesCopyValue(key, CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"),
++                                                  kCFPreferencesAnyHost));
++}
++
++NSDictionary *vp_gyro_get(void) {
++    CFPreferencesSynchronize(CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost);
++    VPhoneGyroscopeState state;
++    VPhoneGyroscopeDecode(VPhoneGyroscopeRead(CFSTR(VP_GYRO_CONFIGURATION)), &state);
++    NSMutableDictionary *result = [VPhoneGyroscopeEncode(state) mutableCopy];
++    result[@"units"] = @"rad/s";
++    id status = VPhoneGyroscopeRead(CFSTR(VP_GYRO_STATUS));
++    if ([status isKindOfClass:NSDictionary.class] &&
++        [status[@"updated_at"] isKindOfClass:NSNumber.class] &&
++        [status[@"enumerated"] isKindOfClass:NSNumber.class]) {
++        result[@"provider"] = status;
++        double age = [NSDate date].timeIntervalSince1970 - [status[@"updated_at"] doubleValue];
++        result[@"provider_running"] = @([status[@"enumerated"] boolValue] && age >= 0 && age < 10);
++    } else {
++        result[@"provider"] = NSNull.null;
++        result[@"provider_running"] = @NO;
++    }
++    return result;
++}
++
++BOOL vp_gyro_set(double x, double y, double z, bool enabled) {
++    VPhoneGyroscopeState state = {enabled, x, y, z}, checked;
++    NSDictionary *value = VPhoneGyroscopeEncode(state);
++    if (!VPhoneGyroscopeDecode(value, &checked))
++        return NO;
++    CFPreferencesSetValue(CFSTR(VP_GYRO_CONFIGURATION), (__bridge CFDictionaryRef)value,
++                          CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost);
++    if (!CFPreferencesSynchronize(CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost))
++        return NO;
++    return notify_post(VP_GYRO_NOTIFICATION) == NOTIFY_STATUS_OK;
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
+index 017c0a785cd3ff07f4fec7a070a5ccc569482a99..a12c3f9cd817e46b66deb5d9286843fb0b1e4e01 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
+@@ -21,6 +21,8 @@ public enum FirmwareGuestSystemPatchSet {
+ 
+     public static let installCoordinationPersona = "system-installcoordination_proxy-cfw-persona_lookup"
+     public static let installCoordinationPersonaMarker = "/usr/lib/vphone-installcoordination-persona-lookup"
++    public static let gyroscope = "system-backboardd-cfw-gyroscope"
++    public static let attitude = "system-apps-cfw-attitude"
+ 
+     private static let ios27 = VPhonePatchApplicability(iOSBase: .major(27))
+ 
+@@ -219,6 +221,24 @@ public enum FirmwareGuestSystemPatchSet {
+                 bootEssential: true,
+             ),
+ 
++            // MARK: Motion
++
++            VPhonePatchDeclaration(
++                identifier: gyroscope,
++                title: "Virtual 3D gyroscope",
++                summary: "Installs libvphonegyro.dylib, loaded by SystemHook into backboardd. Publishes a virtual HID gyro service using the three-axis rotation rate configured through vphoned. Removing the library disables the provider after a reboot.",
++                target: .guestFile(path: "/usr/lib/libvphonegyro.dylib"),
++                applicability: VPhonePatchApplicability(iOSBase: .atLeast(major: 18, minor: 0)),
++            ),
++
++            VPhonePatchDeclaration(
++                identifier: attitude,
++                title: "Device attitude simulation",
++                summary: "Installs libvphoneattitude.dylib, loaded by SystemHook into apps. Supplies a stationary Core Motion pose configured through vphoned, with polling and callback updates in the arbitrary vertical reference frame. Disabling simulation restores native motion; removing the library reverts the hook on app relaunch.",
++                target: .guestFile(path: "/usr/lib/libvphoneattitude.dylib"),
++                applicability: VPhonePatchApplicability(iOSBase: .atLeast(major: 18, minor: 0)),
++            ),
++
+             // MARK: Audio
+ 
+             VPhonePatchDeclaration(
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift
+index c19ebeb3ca3c038acc6cebcb7a6589b3e3f57027..d55829dc7012542e07bb3881255ac862c67fa39f 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift
+@@ -17,6 +17,34 @@ import VPhonePatchKit
+ 
+ @Suite("Bundled patch set catalogue")
+ struct FirmwarePatchSetCatalogTests {
++    @Test(arguments: [FirmwareGuestSystemPatchSet.gyroscope, FirmwareGuestSystemPatchSet.attitude])
++    func `Motion sensors follow selection and their deployment target`(identifier: String) throws {
++        for base in ["18.6.2", "26.4", "27.0.1"] {
++            let plan = try VPhonePatchPlan.resolve(
++                preset: FirmwarePatchSetCatalog.standardPreset,
++                patchSets: FirmwarePatchSetCatalog.bundled,
++                iOSBase: VPhoneVersion(base), cloudOS: VPhoneVersion("26.4"),
++            )
++            #expect(plan.isEnabled(identifier))
++            var blocked = FirmwarePatchSetCatalog.standardPreset
++            blocked.selection = blocked.selection.blocking([identifier])
++            let disabled = try VPhonePatchPlan.resolve(
++                preset: blocked, patchSets: FirmwarePatchSetCatalog.bundled,
++                iOSBase: VPhoneVersion(base), cloudOS: VPhoneVersion("26.4"),
++            )
++            #expect(!disabled.isEnabled(identifier))
++        }
++        let unsupportedBases: [VPhoneVersion?] = [nil, VPhoneVersion("17.0")]
++        for base in unsupportedBases {
++            let plan = try VPhonePatchPlan.resolve(
++                preset: FirmwarePatchSetCatalog.standardPreset,
++                patchSets: FirmwarePatchSetCatalog.bundled,
++                iOSBase: base, cloudOS: VPhoneVersion("26.4"),
++            )
++            #expect(!plan.isEnabled(identifier))
++        }
++    }
++
+     @Test func `CoreDevice persona lookup is selected only for iOS 27`() throws {
+         for base in ["26.4", "27.0.1", "28.0"] {
+             let plan = try VPhonePatchPlan.resolve(
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+index 43285d91d8dccb066c16490ccb823c9e8643db06..b9b3d6c8f1876596a67b4a77ee3c693106e16d9f 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+@@ -1004,9 +1004,13 @@ struct VPhoneCustomFirmwareInstaller {
+         /// Whether the VM's plan (its guest half re-resolved from the current
+         /// selection) turned this guest patch on. A VM with no plan gets every
+         /// legacy patch, which is what it was restored with. New Settings-row
+-        /// preferences still require an explicit plan.
++        /// preferences and motion sensors still require an explicit plan.
+         func on(_ identifier: String) -> Bool {
+-            guard let plan else { return !FirmwareGuestSystemPatchSet.settingsRowPatches.contains(identifier) }
++            guard let plan else {
++                return !FirmwareGuestSystemPatchSet.settingsRowPatches.contains(identifier)
++                    && identifier != FirmwareGuestSystemPatchSet.gyroscope
++                    && identifier != FirmwareGuestSystemPatchSet.attitude
++            }
+             guard plan.isEnabled(identifier) else {
+                 print("  [·] \(identifier): off in preset \(plan.presetIdentifier)")
+                 return false
+@@ -1114,6 +1118,22 @@ struct VPhoneCustomFirmwareInstaller {
+                 live.insert("system-launchdaemons-boot-environment")
+             }
+         }
++        for (identifier, library) in [
++            (FirmwareGuestSystemPatchSet.gyroscope, "libvphonegyro.dylib"),
++            (FirmwareGuestSystemPatchSet.attitude, "libvphoneattitude.dylib"),
++        ] {
++            isolate([identifier]) {
++                let path = "usr/lib/" + library
++                if on(identifier) {
++                    try system.replaceFile(path, fromFileAt: VPhoneGuestBinaries.resolve(library),
++                                           mode: 0o755, owner: Self.guestOwner)
++                    live.insert(identifier)
++                } else {
++                    // Removing vphone's added library reverts its injection.
++                    try system.removeItem(path)
++                }
++            }
++        }
+ 
+         // 2. The dyld shared cache. The version branches and the declarations'
+         //    applicability say the same thing; this is what a VM with no plan
+@@ -1756,6 +1776,7 @@ struct VPhoneCustomFirmwareInstaller {
+     /// infrastructure. A full install writes every library and creates `/vh`.
+     private func installEnvironment(system: VPhoneConfinedDirectory, environmentOnly: Bool = false) throws {
+         for name in VPhoneGuestEnvironment.libraries {
++            if VPhoneGuestEnvironment.selectedLibraries.contains(name) { continue }
+             let path = "usr/lib/\(name)"
+             if environmentOnly, try !system.exists(path) {
+                 print("  [·] \(path): not on this VM, left out")
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh b/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
+index f9ce21c791d8f61ea7330187e0b31911e3ade58f..bca72547c4889e666e35412ccef8a22d1aea30c3 100755
+--- a/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
++++ b/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
+@@ -79,6 +79,8 @@ fi
+ /bin/cp "$guest_products/devicename/libdevicename.dylib" "$guest/libdevicename.dylib"
+ /bin/cp "$guest_products/prefsfix/libprefsfix.dylib" "$guest/libprefsfix.dylib"
+ /bin/cp "$guest_products/signinfix/libsigninfix.dylib" "$guest/libsigninfix.dylib"
++/bin/cp "$guest_products/gyroscope/libvphonegyro.dylib" "$guest/libvphonegyro.dylib"
++/bin/cp "$guest_products/attitude/libvphoneattitude.dylib" "$guest/libvphoneattitude.dylib"
+ /bin/cp "$guest_products/gpu/libAppleParavirtCompilerPluginIOGPUFamily.dylib" \
+     "$guest/libAppleParavirtCompilerPluginIOGPUFamily.dylib"
+ # The HAL plugin is a bundle, signed whole by the Makefile; copied as a tree so
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh b/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh
+index 4bc548f571a4c8593376752ed8dcd93da2786f9d..04242e020e6721062c1af1a8404baf209ebfbd8e 100755
+--- a/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh
++++ b/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh
+@@ -95,7 +95,7 @@ done
+ 
+ for name in vphoned launchdhook-vphone.dylib SystemHook-vphone.dylib libcamfix.dylib \
+     libvcamcaptured.dylib libmisfix.dylib libhapticsfix.dylib libbatteryhealthfix.dylib libdevicehubfix.dylib libdevicename.dylib \
+-    libprefsfix.dylib libsigninfix.dylib libAppleParavirtCompilerPluginIOGPUFamily.dylib; do
++    libprefsfix.dylib libsigninfix.dylib libvphonegyro.dylib libvphoneattitude.dylib libAppleParavirtCompilerPluginIOGPUFamily.dylib; do
+     require_signed_macho "$guest/$name"
+ done
+ for name in vphoned.plist libcamfix.plist libvcamcaptured.plist libmisfix.plist; do
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings b/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings
+index 1133a84a5c1ff79206d420c6eba5947cbdf75fd7..2a20ebf5a6d74b9f9cfefd9c2cd368ff701a9f0d 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings
+@@ -1,6 +1,380 @@
+ {
+   "sourceLanguage" : "en",
+   "strings" : {
++    "Angles describe a stationary pose. Zero is face up. Enable simulation before launching the guest app." : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Angles describe a stationary pose. Zero is face up. Enable simulation before launching the guest app."
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "角度表示静止姿态。归零时屏幕朝上。请在启动来宾 App 前启用模拟。"
++          }
++        }
++      }
++    },
++    "Device Attitude" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Device Attitude"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "设备姿态"
++          }
++        }
++      }
++    },
++    "Enable the device attitude patch and relaunch the guest app." : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Enable the device attitude patch and relaunch the guest app."
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "请启用设备姿态补丁并重新启动来宾 App。"
++          }
++        }
++      }
++    },
++    "Guest did not apply the attitude configuration" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Guest did not apply the attitude configuration"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "来宾未应用设备姿态设定"
++          }
++        }
++      }
++    },
++    "Pitch" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Pitch"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "俯仰"
++          }
++        }
++      }
++    },
++    "Roll" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Roll"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "横滚"
++          }
++        }
++      }
++    },
++    "Roll and yaw: -180 to 180°. Pitch: -90 to 90°." : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Roll and yaw: -180 to 180°. Pitch: -90 to 90°."
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "横滚和偏航：-180 到 180°。俯仰：-90 到 90°。"
++          }
++        }
++      }
++    },
++    "Yaw" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Yaw"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "偏航"
++          }
++        }
++      }
++    },
++    "%@ axis" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "%@ axis"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "%@ 轴"
++          }
++        }
++      }
++    },
++    "3D Gyroscope" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "3D Gyroscope"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "3D 陀螺仪"
++          }
++        }
++      }
++    },
++    "Angular Velocity" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Angular Velocity"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "角速度"
++          }
++        }
++      }
++    },
++    "Changes sync to the guest immediately. Disabling keeps your axis values." : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Changes sync to the guest immediately. Disabling keeps your axis values."
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "修改会实时同步给来宾。禁用时保留三轴设定。"
++          }
++        }
++      }
++    },
++    "Enable Simulation" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Enable Simulation"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "启用模拟"
++          }
++        }
++      }
++    },
++    "Enter a number from -1000 to 1000 for each axis." : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Enter a number from -1000 to 1000 for each axis."
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "每个轴请输入 -1000 到 1000 之间的数字。"
++          }
++        }
++      }
++    },
++    "Guest did not apply the gyroscope configuration" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Guest did not apply the gyroscope configuration"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "来宾未应用陀螺仪设定"
++          }
++        }
++      }
++    },
++    "Motion Sensors" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Motion Sensors"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "运动传感器"
++          }
++        }
++      }
++    },
++    "Reset" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Reset"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "复位"
++          }
++        }
++      }
++    },
++    "Retry" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Retry"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "重试"
++          }
++        }
++      }
++    },
++    "Set all three axes to zero" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Set all three axes to zero"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "将三个轴归零"
++          }
++        }
++      }
++    },
++    "Synced" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Synced"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "已同步"
++          }
++        }
++      }
++    },
++    "Syncing…" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Syncing…"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "正在同步…"
++          }
++        }
++      }
++    },
++    "Waiting for sensor service…" : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Waiting for sensor service…"
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "等待运动传感器服务…"
++          }
++        }
++      }
++    },
+     "Use Hardware Keyboard" : {
+       "extractionState" : "manual",
+       "localizations" : {
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Tests/GyroscopeModelTests.swift b/VPhoneExecutable/VPhoneVirtualization/Tests/GyroscopeModelTests.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..455cd12c878b0782a6956e4fac965fa92e47b743
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/Tests/GyroscopeModelTests.swift
+@@ -0,0 +1,193 @@
++import Foundation
++
++@MainActor
++final class VPhoneGyroscopeTestGuest {
++    var reply = VPhoneMotionReply(configuration: VPhoneMotionConfiguration(), providerRunning: true)
++    var writes: [VPhoneMotionConfiguration] = []
++    var completions: [CheckedContinuation<VPhoneMotionReply, any Error>] = []
++    private var completed = 0
++
++    func write(_ value: VPhoneMotionConfiguration) async throws -> VPhoneMotionReply {
++        writes.append(value)
++        return try await withCheckedThrowingContinuation { completions.append($0) }
++    }
++
++    func finish(failing: Bool = false) {
++        let completion = completions.removeFirst()
++        let value = writes[completed]
++        completed += 1
++        if failing {
++            completion.resume(throwing: Failure.offline)
++        } else {
++            reply.configuration = value
++            completion.resume(returning: reply)
++        }
++    }
++
++    enum Failure: Error { case offline }
++}
++
++@main
++struct VPhoneMotionModelTests {
++    @MainActor static func waitFor(_ predicate: () -> Bool) async {
++        for _ in 0 ..< 10000 {
++            if predicate() { return }
++            await Task.yield()
++        }
++        fatalError("Timed out waiting for the gyroscope request queue")
++    }
++
++    @MainActor static func main() async {
++        let guest = VPhoneGyroscopeTestGuest()
++        let model = VPhoneMotionModel(locale: Locale(identifier: "en_US"), read: { guest.reply }, write: {
++            try await guest.write($0)
++        })
++        await model.connectionChanged(true)
++        assert(model.canEdit && !model.enabled && guest.writes.isEmpty)
++
++        // Rapid edits coalesce behind the single in-flight RPC. An old ack
++        // must neither overwrite newer field text nor skip the final value.
++        model.xText = "1"
++        await waitFor { guest.writes.count == 1 }
++        model.yText = "2"
++        model.zText = "-3"
++        model.enabled = true
++        assert(guest.writes.count == 1)
++        guest.finish()
++        await waitFor { guest.writes.count == 2 }
++        assert(guest.writes[1] == VPhoneMotionConfiguration(enabled: true, x: 1, y: 2, z: -3))
++        assert(model.xText == "1" && model.yText == "2" && model.zText == "-3")
++        model.reset()
++        assert(model.enabled && model.xText == "0" && model.yText == "0" && model.zText == "0")
++        guest.finish()
++        await waitFor { guest.writes.count == 3 }
++        assert(guest.writes[2] == VPhoneMotionConfiguration(enabled: true))
++        guest.finish()
++        await waitFor { !model.isSending }
++        assert(!model.hasLocalChanges && model.error == nil)
++
++        // Disable preserves configured axes; enable reuses them. A partial
++        // numeric edit must not prevent the safety-critical disable operation.
++        model.xText = "5"
++        await waitFor { guest.writes.count == 4 }
++        guest.finish()
++        await waitFor { !model.isSending }
++        model.enabled = false
++        await waitFor { guest.writes.count == 5 }
++        assert(!guest.writes[4].enabled && guest.writes[4].x == 5)
++        guest.finish()
++        await waitFor { !model.isSending }
++        model.enabled = true
++        await waitFor { guest.writes.count == 6 }
++        assert(guest.writes[5].enabled && guest.writes[5].x == 5)
++        guest.finish()
++        await waitFor { !model.isSending }
++        model.xText = "-"
++        model.yText = "nan"
++        model.zText = "1001"
++        assert(model.hasInvalidAxes && guest.writes.count == 6)
++        model.enabled = false
++        await waitFor { guest.writes.count == 7 }
++        assert(!guest.writes[6].enabled && guest.writes[6].x == 5)
++        guest.finish()
++        await waitFor { !model.isSending }
++        model.reset()
++        await waitFor { guest.writes.count == 8 }
++        assert(guest.writes[7] == VPhoneMotionConfiguration())
++        assert(!model.hasInvalidAxes)
++        guest.finish()
++        await waitFor { !model.isSending }
++
++        // Keep the desired values on a failed write and retry the same full
++        // configuration, rather than presenting unacknowledged values as sent.
++        model.xText = "7"
++        await waitFor { guest.writes.count == 9 }
++        guest.finish(failing: true)
++        await waitFor { !model.isSending }
++        assert(model.canRetry && model.xText == "7" && model.hasLocalChanges)
++        model.retry()
++        await waitFor { guest.writes.count == 10 }
++        assert(guest.writes[9].x == 7)
++        guest.finish()
++        await waitFor { !model.isSending }
++        assert(!model.hasLocalChanges && model.error == nil)
++
++        // Disconnect during a write, then reconnect. The old request must
++        // finish before the pending state is resent, and cannot clear it.
++        model.zText = "9"
++        await waitFor { guest.writes.count == 11 }
++        await model.connectionChanged(false)
++        assert(!model.canEdit && !model.providerRunning)
++        guest.reply.configuration = VPhoneMotionConfiguration()
++        await model.connectionChanged(true)
++        assert(model.zText == "9" && guest.writes.count == 11)
++        guest.finish()
++        await waitFor { guest.writes.count == 12 }
++        assert(guest.writes[11].x == 7 && guest.writes[11].z == 9)
++        guest.finish()
++        await waitFor { !model.isSending }
++        assert(!model.hasLocalChanges)
++
++        model.yText = "1"
++        await waitFor { guest.writes.count == 13 }
++        model.yText = "4"
++        guest.finish(failing: true)
++        await waitFor { guest.writes.count == 14 }
++        assert(guest.writes[13].y == 4)
++        guest.finish()
++        await waitFor { !model.isSending }
++        assert(model.error == nil && !model.hasLocalChanges)
++
++        // A cancelled/stale initial read cannot replace the new connection's
++        // values, nor can reading the guest itself trigger a write.
++        var reads: [CheckedContinuation<VPhoneMotionReply, any Error>] = []
++        let reconnect = VPhoneMotionModel(read: {
++            try await withCheckedThrowingContinuation { reads.append($0) }
++        }, write: { _ in fatalError("A read unexpectedly triggered a write") })
++        let first = Task { await reconnect.connectionChanged(true) }
++        await waitFor { reads.count == 1 }
++        await reconnect.connectionChanged(false)
++        let second = Task { await reconnect.connectionChanged(true) }
++        await waitFor { reads.count == 2 }
++        reads[1].resume(returning: VPhoneMotionReply(
++            configuration: VPhoneMotionConfiguration(enabled: true, x: 3), providerRunning: true,
++        ))
++        await second.value
++        reads[0].resume(returning: VPhoneMotionReply(
++            configuration: VPhoneMotionConfiguration(x: 99), providerRunning: false,
++        ))
++        await first.value
++        assert(reconnect.enabled && reconnect.xValue == 3 && reconnect.providerRunning)
++
++        let decimal = VPhoneMotionModel(locale: Locale(identifier: "de_DE"), read: { guest.reply }, write: {
++            VPhoneMotionReply(configuration: $0, providerRunning: true)
++        })
++        await decimal.connectionChanged(true)
++        decimal.xText = "1,25"
++        await waitFor { !decimal.hasLocalChanges }
++        assert(decimal.configuration.x == 1.25)
++
++        let attitude = VPhoneMotionModel(
++            ranges: [-180 ... 180, -90 ... 90, -180 ... 180],
++            read: { VPhoneMotionReply(configuration: VPhoneMotionConfiguration(), providerRunning: true) },
++            write: { VPhoneMotionReply(configuration: $0, providerRunning: true) },
++        )
++        await attitude.connectionChanged(true)
++        attitude.yText = "91"
++        assert(attitude.hasInvalidAxes && attitude.configuration.y == 0)
++        attitude.enabled = true // Still works with invalid pitch text.
++        await waitFor { !attitude.hasLocalChanges }
++        assert(attitude.configuration.enabled && attitude.configuration.y == 0)
++        attitude.reset()
++        await waitFor { !attitude.hasLocalChanges }
++        assert(attitude.enabled && !attitude.hasInvalidAxes && attitude.yText == "0")
++        attitude.xText = "180"
++        attitude.yText = "-90"
++        attitude.zText = "-180"
++        await waitFor { !attitude.hasLocalChanges }
++        assert(attitude.configuration == VPhoneMotionConfiguration(enabled: true, x: 180, y: -90, z: -180))
++        attitude.xText = "181"
++        assert(attitude.hasInvalidAxes && attitude.configuration.x == 180)
++        print("Motion model tests passed: ordered/coalesced writes, toggle, reset, invalid input, retry, reconnect, stale reads, locale and attitude bounds")
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Tests/run-gyroscope-tests.sh b/VPhoneExecutable/VPhoneVirtualization/Tests/run-gyroscope-tests.sh
+new file mode 100644
+index 0000000000000000000000000000000000000000..8cecd61465e70e513f123d8bbe9127fe9b4ffc9b
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/Tests/run-gyroscope-tests.sh
+@@ -0,0 +1,12 @@
++#!/bin/zsh
++# vphone-tier: build
++set -euo pipefail
++
++root="$(cd "${0:a:h}/../../.." && pwd)"
++out="$root/.build/gyroscope-tests"
++mkdir -p "$out"
++xcrun --sdk macosx swiftc -swift-version 6 -parse-as-library \
++    -target arm64-apple-macos15.0 -module-cache-path "$out/module-cache" \
++    "$root/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionModel.swift" \
++    "${0:a:h}/GyroscopeModelTests.swift" -o "$out/GyroscopeModelTests"
++"$out/GyroscopeModelTests"
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlAttitude.swift b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlAttitude.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..0bc7876cb7b21ff95cc57d3104289a4509a687dc
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlAttitude.swift
+@@ -0,0 +1,35 @@
++import CoreFoundation
++import Foundation
++
++// MARK: - Attitude RPC
++
++extension VPhoneGuestControl {
++    func readAttitude() async throws -> VPhoneMotionReply {
++        guard guestCapabilities.contains("motion_attitude") else {
++            throw ControlError.unsupportedCapability("motion_attitude")
++        }
++        return try attitudeReply(await call("motion.attitude.get"))
++    }
++
++    func setAttitude(_ value: VPhoneMotionConfiguration) async throws -> VPhoneMotionReply {
++        guard guestCapabilities.contains("motion_attitude") else {
++            throw ControlError.unsupportedCapability("motion_attitude")
++        }
++        return try attitudeReply(await call("motion.attitude.set", params: [
++            "enabled": value.enabled, "roll": value.x, "pitch": value.y, "yaw": value.z,
++        ]))
++    }
++
++    private func attitudeReply(_ result: [String: Any]) throws -> VPhoneMotionReply {
++        guard let enabled = result["enabled"] as? NSNumber, CFGetTypeID(enabled) == CFBooleanGetTypeID(),
++              let roll = result["roll"] as? NSNumber, let pitch = result["pitch"] as? NSNumber,
++              let yaw = result["yaw"] as? NSNumber,
++              [roll, pitch, yaw].allSatisfy({ CFGetTypeID($0) != CFBooleanGetTypeID() && $0.doubleValue.isFinite }),
++              abs(roll.doubleValue) <= 180, abs(pitch.doubleValue) <= 90, abs(yaw.doubleValue) <= 180
++        else { throw ControlError.protocolError("invalid attitude configuration") }
++        return VPhoneMotionReply(
++            configuration: VPhoneMotionConfiguration(enabled: enabled.boolValue, x: roll.doubleValue, y: pitch.doubleValue, z: yaw.doubleValue),
++            providerRunning: result.bool("provider_installed") ?? false,
++        )
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift
+index 2e53b4defe095b3e973a640ee4906e5de4da7073..863ee911e85f18cd9ee4bc91e126117f725c2a17 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift
+@@ -33,6 +33,9 @@ extension VPhoneGuestControl {
+         )
+         typealias Library = (name: String, data: Data, hash: String)
+         let changed = try VPhoneGuestEnvironment.libraries.compactMap { name -> Library? in
++            if VPhoneGuestEnvironment.selectedLibraries.contains(name), guestHashes[name] == nil {
++                return nil
++            }
+             let data = try Data(contentsOf: VPhoneGuestBinaries.resolve(name), options: .mappedIfSafe)
+             let hash = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+             return guestHashes[name] == hash ? nil : (name, data, hash)
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlGyroscope.swift b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlGyroscope.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..c51879125b18a1e55511d90c515cee5497643adb
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlGyroscope.swift
+@@ -0,0 +1,38 @@
++import CoreFoundation
++import Foundation
++
++// MARK: - Gyroscope RPC
++
++extension VPhoneGuestControl {
++    func readGyroscope() async throws -> VPhoneMotionReply {
++        guard guestCapabilities.contains("motion_gyroscope_toggle") else {
++            throw ControlError.unsupportedCapability("motion_gyroscope_toggle")
++        }
++        let result = try await call("motion.gyroscope.get")
++        return try gyroscopeReply(result)
++    }
++
++    func setGyroscope(_ value: VPhoneMotionConfiguration) async throws -> VPhoneMotionReply {
++        guard guestCapabilities.contains("motion_gyroscope_toggle") else {
++            throw ControlError.unsupportedCapability("motion_gyroscope_toggle")
++        }
++        let result = try await call("motion.gyroscope.set", params: [
++            "enabled": value.enabled, "x": value.x, "y": value.y, "z": value.z,
++        ])
++        return try gyroscopeReply(result)
++    }
++
++    private func gyroscopeReply(_ result: [String: Any]) throws -> VPhoneMotionReply {
++        guard let enabled = result["enabled"] as? NSNumber,
++              CFGetTypeID(enabled) == CFBooleanGetTypeID(),
++              let x = result["x"] as? NSNumber, let y = result["y"] as? NSNumber, let z = result["z"] as? NSNumber,
++              [x, y, z].allSatisfy({
++                  CFGetTypeID($0) != CFBooleanGetTypeID() && $0.doubleValue.isFinite && abs($0.doubleValue) <= 1000
++              })
++        else { throw ControlError.protocolError("invalid gyroscope configuration") }
++        return VPhoneMotionReply(
++            configuration: VPhoneMotionConfiguration(enabled: enabled.boolValue, x: x.doubleValue, y: y.doubleValue, z: z.doubleValue),
++            providerRunning: result.bool("provider_running") ?? false,
++        )
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuFeatures.swift b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuFeatures.swift
+index 50a3b1e396355299869ef989b96e50669fe05c79..2abe56769debaa1682243ebb6401ea872992908c 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuFeatures.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuFeatures.swift
+@@ -2,9 +2,7 @@ import AppKit
+ 
+ // MARK: - Features Menu
+ 
+-/// Sensors the host simulates for the guest: location, battery and camera.
+-/// Each is a titled section of this menu rather than a submenu, so every
+-/// control is one level down from the menu bar.
++/// Host sensor controls, with the motion panels grouped in their own submenu.
+ extension VPhoneMenuController {
+     func buildFeaturesMenu() -> NSMenuItem {
+         let item = NSMenuItem(title: "Features", action: nil, keyEquivalent: "")
+@@ -22,6 +20,8 @@ extension VPhoneMenuController {
+                 menu.addItem(child)
+             }
+         }
++        menu.addItem(NSMenuItem.separator())
++        menu.addItem(buildMotionSensorsMenu())
+         item.submenu = menu
+         return item
+     }
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuMotion.swift b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuMotion.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..6fc79aef87599465618e4ee8554c237d51eeca7d
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuMotion.swift
+@@ -0,0 +1,15 @@
++import AppKit
++
++// MARK: - Motion Sensors
++
++extension VPhoneMenuController {
++    func buildMotionSensorsMenu() -> NSMenuItem {
++        let item = NSMenuItem(title: "Motion Sensors", action: nil, keyEquivalent: "")
++        let menu = NSMenu(title: "Motion Sensors")
++        menu.autoenablesItems = false
++        menu.addItem(makePanelItem(.gyroscope, "3D Gyroscope", keyEquivalent: "", symbol: "gyroscope"))
++        menu.addItem(makePanelItem(.attitude, "Device Attitude", keyEquivalent: "", symbol: "rotate.3d"))
++        item.submenu = menu
++        return item
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionModel.swift b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionModel.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..1f02652294894fd53b2bd4e2d8694bef69f87c05
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionModel.swift
+@@ -0,0 +1,201 @@
++import Foundation
++import Observation
++
++struct VPhoneMotionConfiguration: Equatable, Sendable {
++    var enabled = false
++    var x = 0.0
++    var y = 0.0
++    var z = 0.0
++}
++
++struct VPhoneMotionReply: Sendable {
++    var configuration: VPhoneMotionConfiguration
++    var providerRunning: Bool
++}
++
++// MARK: - Live Motion Controls
++
++@MainActor
++@Observable
++final class VPhoneMotionModel {
++    var enabled = false {
++        didSet {
++            guard !applyingGuest, enabled != oldValue else { return }
++            // Disabling must work even while an axis contains a partial edit.
++            var value = parsedConfiguration ?? configuration
++            value.enabled = enabled
++            enqueue(value)
++        }
++    }
++    var xText = "0" { didSet { axesChanged() } }
++    var yText = "0" { didSet { axesChanged() } }
++    var zText = "0" { didSet { axesChanged() } }
++
++    private(set) var isConnected = false
++    private(set) var isReading = false
++    private(set) var isSending = false
++    private(set) var hasLoaded = false
++    private(set) var providerRunning = false
++    private(set) var error: String?
++    private(set) var hasLocalChanges = false
++    private(set) var configuration = VPhoneMotionConfiguration()
++
++    @ObservationIgnored private let read: @MainActor () async throws -> VPhoneMotionReply
++    @ObservationIgnored private let write: @MainActor (VPhoneMotionConfiguration) async throws -> VPhoneMotionReply
++    @ObservationIgnored private let locale: Locale
++    @ObservationIgnored private let ranges: [ClosedRange<Double>]
++    @ObservationIgnored private let rejectionMessage: String
++    @ObservationIgnored private var applyingGuest = false
++    @ObservationIgnored private var generation = 0
++    @ObservationIgnored private var pending: VPhoneMotionConfiguration?
++    @ObservationIgnored private var writer: Task<Void, Never>?
++
++    init(
++        locale: Locale = .current,
++        ranges: [ClosedRange<Double>] = [-1000 ... 1000, -1000 ... 1000, -1000 ... 1000],
++        rejectionMessage: String = "Guest did not apply the gyroscope configuration",
++        read: @escaping @MainActor () async throws -> VPhoneMotionReply,
++        write: @escaping @MainActor (VPhoneMotionConfiguration) async throws -> VPhoneMotionReply,
++    ) {
++        self.locale = locale
++        precondition(ranges.count == 3)
++        self.ranges = ranges
++        self.rejectionMessage = rejectionMessage
++        self.read = read
++        self.write = write
++    }
++
++    var canEdit: Bool { isConnected && hasLoaded && !isReading }
++    var hasInvalidAxes: Bool { parsedConfiguration == nil }
++    var canRetry: Bool { canEdit && !isSending && hasLocalChanges && error != nil }
++
++    // Computed key-path bindings let the steppers repair a partially typed axis.
++    var xValue: Double {
++        get { number(xText, range: ranges[0]) ?? configuration.x }
++        set { xText = formatted(newValue) }
++    }
++    var yValue: Double {
++        get { number(yText, range: ranges[1]) ?? configuration.y }
++        set { yText = formatted(newValue) }
++    }
++    var zValue: Double {
++        get { number(zText, range: ranges[2]) ?? configuration.z }
++        set { zText = formatted(newValue) }
++    }
++
++    private func number(_ text: String, range: ClosedRange<Double>) -> Double? {
++        let normalized = text.trimmingCharacters(in: .whitespacesAndNewlines)
++            .replacingOccurrences(of: locale.decimalSeparator ?? ".", with: ".")
++        guard let value = Double(normalized), value.isFinite, range.contains(value) else { return nil }
++        return value
++    }
++
++    private func formatted(_ value: Double) -> String {
++        value.formatted(.number.grouping(.never).precision(.fractionLength(0 ... 6)).locale(locale))
++    }
++
++    private var parsedConfiguration: VPhoneMotionConfiguration? {
++        guard let x = number(xText, range: ranges[0]), let y = number(yText, range: ranges[1]),
++              let z = number(zText, range: ranges[2]) else { return nil }
++        return VPhoneMotionConfiguration(enabled: enabled, x: x, y: y, z: z)
++    }
++
++    private func axesChanged() {
++        guard !applyingGuest, let value = parsedConfiguration, value != configuration else { return }
++        enqueue(value)
++    }
++
++    private func applyFields(_ value: VPhoneMotionConfiguration) {
++        applyingGuest = true
++        defer { applyingGuest = false }
++        enabled = value.enabled
++        xText = formatted(value.x)
++        yText = formatted(value.y)
++        zText = formatted(value.z)
++        configuration = value
++    }
++
++    func reset() {
++        guard canEdit else { return }
++        let zero = VPhoneMotionConfiguration(enabled: enabled)
++        applyFields(zero)
++        enqueue(zero)
++    }
++
++    func retry() { startWriter() }
++
++    /// A read belongs to the view's connection task; an accepted edit's write
++    /// survives closing the panel. Never apply a read/ack from an old connection.
++    func connectionChanged(_ connected: Bool) async {
++        generation &+= 1
++        let current = generation
++        isConnected = connected
++        hasLoaded = false
++        if hasLocalChanges { pending = configuration }
++        guard connected else {
++            isReading = false
++            providerRunning = false
++            return
++        }
++        isReading = true
++        defer { if generation == current { isReading = false } }
++        do {
++            let reply = try await read()
++            guard generation == current, isConnected, !Task.isCancelled else { return }
++            providerRunning = reply.providerRunning
++            if !hasLocalChanges { applyFields(reply.configuration) }
++            hasLoaded = true
++            error = nil
++            startWriter()
++        } catch {
++            guard generation == current, !Task.isCancelled else { return }
++            self.error = String(describing: error)
++        }
++    }
++
++    private func enqueue(_ value: VPhoneMotionConfiguration) {
++        guard canEdit else { return }
++        configuration = value
++        pending = value
++        hasLocalChanges = true
++        error = nil
++        startWriter()
++    }
++
++    private func startWriter() {
++        guard writer == nil, isConnected, hasLoaded, pending != nil else { return }
++        writer = Task { await drain() }
++    }
++
++    private func drain() async {
++        isSending = true
++        defer {
++            isSending = false
++            writer = nil
++        }
++        while isConnected, hasLoaded, let value = pending {
++            pending = nil
++            let current = generation
++            do {
++                let reply = try await write(value)
++                guard generation == current, isConnected else { continue }
++                providerRunning = reply.providerRunning
++                // The guest returns the persisted configuration, not merely
++                // transport success. Keep newer edits in the fields untouched.
++                guard reply.configuration == value else {
++                    error = rejectionMessage
++                    pending = configuration
++                    break
++                }
++                hasLocalChanges = pending != nil
++                error = nil
++            } catch {
++                guard generation == current, isConnected else { continue }
++                if pending != nil { continue } // A newer edit supersedes this failed write.
++                self.error = String(describing: error)
++                pending = configuration
++                break
++            }
++        }
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionView.swift b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionView.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..4b22a414db36c87a0308f5820c5a87145fab3c2f
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionView.swift
+@@ -0,0 +1,147 @@
++import SwiftUI
++
++enum VPhoneMotionSensor {
++    case gyroscope, attitude
++
++    var identifier: String { self == .gyroscope ? "gyroscope" : "attitude" }
++    var axes: [String] { self == .gyroscope ? ["X", "Y", "Z"] : ["Roll", "Pitch", "Yaw"] }
++    var ranges: [ClosedRange<Double>] {
++        self == .gyroscope ? [-1000 ... 1000, -1000 ... 1000, -1000 ... 1000] : [-180 ... 180, -90 ... 90, -180 ... 180]
++    }
++    var units: String { self == .gyroscope ? "rad/s" : "°" }
++    var step: Double { self == .gyroscope ? 0.1 : 1 }
++}
++
++struct VPhoneMotionView: View {
++    let model: VPhoneMotionModel
++    let sensor: VPhoneMotionSensor
++    let connected: @MainActor () -> Bool
++
++    var body: some View {
++        VPhoneMotionEditor(model: model, sensor: sensor)
++            .task(id: connected()) { await model.connectionChanged(connected()) }
++    }
++}
++
++struct VPhoneMotionEditor: View {
++    @Bindable var model: VPhoneMotionModel
++    let sensor: VPhoneMotionSensor
++
++    var body: some View {
++        VStack(spacing: 0) {
++            Form {
++                Section {
++                    Toggle(isOn: $model.enabled) {
++                        Text("Enable Simulation", bundle: VPhoneLocalization.bundle)
++                    }
++                    .toggleStyle(.checkbox)
++                    .accessibilityIdentifier(sensor.identifier + "-enabled")
++                    Text("Changes sync to the guest immediately. Disabling keeps your axis values.", bundle: VPhoneLocalization.bundle)
++                        .font(.caption)
++                        .foregroundStyle(.secondary)
++                    if sensor == .attitude {
++                        Text("Angles describe a stationary pose. Zero is face up. Enable simulation before launching the guest app.", bundle: VPhoneLocalization.bundle)
++                            .font(.caption)
++                            .foregroundStyle(.secondary)
++                    }
++                }
++                Section {
++                    VPhoneMotionAxisRow(sensor: sensor, index: 0, text: $model.xText, value: $model.xValue)
++                    VPhoneMotionAxisRow(sensor: sensor, index: 1, text: $model.yText, value: $model.yValue)
++                    VPhoneMotionAxisRow(sensor: sensor, index: 2, text: $model.zText, value: $model.zValue)
++                    if model.hasInvalidAxes {
++                        Text(sensor == .gyroscope ? "Enter a number from -1000 to 1000 for each axis." : "Roll and yaw: -180 to 180°. Pitch: -90 to 90°.", bundle: VPhoneLocalization.bundle)
++                            .font(.caption)
++                            .foregroundStyle(.orange)
++                    }
++                    Button { model.reset() } label: {
++                        Label {
++                            Text("Reset", bundle: VPhoneLocalization.bundle)
++                        } icon: { Image(systemName: "arrow.counterclockwise") }
++                    }
++                    .accessibilityIdentifier(sensor.identifier + "-reset")
++                    .help(Text("Set all three axes to zero", bundle: VPhoneLocalization.bundle))
++                } header: {
++                    Text(sensor == .gyroscope ? "Angular Velocity" : "Device Attitude", bundle: VPhoneLocalization.bundle)
++                }
++            }
++            .formStyle(.grouped)
++            .disabled(!model.canEdit)
++            Divider()
++            VPhoneMotionSyncStatus(model: model, sensor: sensor)
++        }
++    }
++}
++
++struct VPhoneMotionAxisRow: View {
++    let sensor: VPhoneMotionSensor
++    let index: Int
++    @Binding var text: String
++    @Binding var value: Double
++
++    var body: some View {
++        HStack(spacing: 8) {
++            Text(VPhoneLocalization.text(sensor.axes[index]))
++                .font(.system(.body, design: .monospaced))
++            TextField(VPhoneLocalization.text(sensor.axes[index]), text: $text)
++                .textFieldStyle(.roundedBorder)
++                .font(.system(.body, design: .monospaced))
++                .accessibilityLabel(VPhoneLocalization.text(sensor.axes[index]))
++                .accessibilityIdentifier(sensor.identifier + "-axis-" + sensor.axes[index].lowercased())
++            Text(verbatim: sensor.units).foregroundStyle(.secondary)
++            Stepper(VPhoneLocalization.text(sensor.axes[index]), value: $value, in: sensor.ranges[index], step: sensor.step)
++                .labelsHidden()
++                .accessibilityLabel(VPhoneLocalization.text(sensor.axes[index]))
++        }
++    }
++}
++
++struct VPhoneMotionSyncStatus: View {
++    let model: VPhoneMotionModel
++    let sensor: VPhoneMotionSensor
++
++    var body: some View {
++        HStack(spacing: 8) {
++            if !model.isConnected {
++                Text("Guest not connected", bundle: VPhoneLocalization.bundle)
++            } else if model.isReading || model.isSending {
++                ProgressView().controlSize(.small)
++                Text("Syncing…", bundle: VPhoneLocalization.bundle)
++            } else if let error = model.error {
++                Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
++                Text(VPhoneLocalization.text(error)).textSelection(.enabled)
++            } else if model.hasLoaded {
++                if model.providerRunning {
++                    Text("Synced", bundle: VPhoneLocalization.bundle)
++                } else if sensor == .attitude {
++                    Text("Enable the device attitude patch and relaunch the guest app.", bundle: VPhoneLocalization.bundle)
++                } else {
++                    Text("Waiting for sensor service…", bundle: VPhoneLocalization.bundle)
++                }
++            }
++            Spacer(minLength: 0)
++            if model.canRetry {
++                Button { model.retry() } label: { Text("Retry", bundle: VPhoneLocalization.bundle) }
++            } else if model.isConnected && !model.hasLoaded && !model.isReading {
++                Button { Task { await model.connectionChanged(true) } } label: {
++                    Text("Retry", bundle: VPhoneLocalization.bundle)
++                }
++            }
++        }
++        .font(.system(.caption, design: .monospaced))
++        .padding(8)
++        .background(.bar)
++    }
++}
++
++#Preview {
++    let sample = VPhoneMotionReply(
++        configuration: VPhoneMotionConfiguration(enabled: true, x: 1.25, y: 0, z: -0.75),
++        providerRunning: true,
++    )
++    let model = VPhoneMotionModel(read: { sample }, write: {
++        VPhoneMotionReply(configuration: $0, providerRunning: true)
++    })
++    return VPhoneMotionView(model: model, sensor: .gyroscope, connected: { true })
++        .frame(width: 440, height: 380)
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/VPhoneGuestPanelsWindowController.swift b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/VPhoneGuestPanelsWindowController.swift
+index ca96c4c6fcf772f3ce51d69c5679f3988d562513..1f27cdf26158939b14506a288e493ae633022ee3 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/VPhoneGuestPanelsWindowController.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/VPhoneGuestPanelsWindowController.swift
+@@ -12,6 +12,8 @@ enum VPhoneGuestPanel: CaseIterable {
+     case crashLogs
+     case services
+     case controls
++    case gyroscope
++    case attitude
+ 
+     /// The `/v1/health` capability an agent must report before the panel can
+     /// talk to it. Older agents answer "Unknown method" for everything else.
+@@ -22,6 +24,8 @@ enum VPhoneGuestPanel: CaseIterable {
+         case .console, .crashLogs: "logs"
+         case .services: "services"
+         case .controls: "display"
++        case .gyroscope: "motion_gyroscope_toggle"
++        case .attitude: "motion_attitude"
+         }
+     }
+ }
+@@ -96,6 +100,30 @@ final class VPhoneGuestPanelsWindowController {
+                 size: NSSize(width: 480, height: 640),
+                 minSize: NSSize(width: 460, height: 400),
+             ) { VPhoneControlsView(model: model) }
++        case .gyroscope:
++            let model = VPhoneMotionModel(
++                read: { try await control.readGyroscope() },
++                write: { try await control.setGyroscope($0) },
++            )
++            return VPhoneGuestToolWindow(
++                title: String(localized: "3D Gyroscope", bundle: VPhoneLocalization.bundle),
++                autosaveName: "vphone-panel-gyroscope",
++                size: NSSize(width: 440, height: 380),
++                minSize: NSSize(width: 400, height: 340),
++            ) { VPhoneMotionView(model: model, sensor: .gyroscope, connected: { control.isConnected }) }
++        case .attitude:
++            let model = VPhoneMotionModel(
++                ranges: VPhoneMotionSensor.attitude.ranges,
++                rejectionMessage: "Guest did not apply the attitude configuration",
++                read: { try await control.readAttitude() },
++                write: { try await control.setAttitude($0) },
++            )
++            return VPhoneGuestToolWindow(
++                title: String(localized: "Device Attitude", bundle: VPhoneLocalization.bundle),
++                autosaveName: "vphone-panel-attitude",
++                size: NSSize(width: 480, height: 440),
++                minSize: NSSize(width: 440, height: 400),
++            ) { VPhoneMotionView(model: model, sensor: .attitude, connected: { control.isConnected }) }
+         }
+     }
+ }
+diff --git a/VPhoneGuestComponents/Attitude/VPhoneAttitudeMotionManager.h b/VPhoneGuestComponents/Attitude/VPhoneAttitudeMotionManager.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..540efc39aa15af29300c6db0229374262c7ed72d
+--- /dev/null
++++ b/VPhoneGuestComponents/Attitude/VPhoneAttitudeMotionManager.h
+@@ -0,0 +1,18 @@
++#pragma once
++#import <CoreMotion/CoreMotion.h>
++
++// Public CMMotionManager selectors, sent through the runtime so the same
++// injection can be exercised on a host whose SDK hides this iOS class.
++@protocol VPhoneAttitudeMotionManager <NSObject>
++@property (nonatomic) NSTimeInterval deviceMotionUpdateInterval;
++@property (readonly, getter=isDeviceMotionAvailable) BOOL deviceMotionAvailable;
++@property (readonly, getter=isDeviceMotionActive) BOOL deviceMotionActive;
++@property (readonly) CMDeviceMotion *deviceMotion;
++@property (readonly) CMAttitudeReferenceFrame attitudeReferenceFrame;
+++ (CMAttitudeReferenceFrame)availableAttitudeReferenceFrames;
++- (void)startDeviceMotionUpdates;
++- (void)startDeviceMotionUpdatesUsingReferenceFrame:(CMAttitudeReferenceFrame)frame;
++- (void)startDeviceMotionUpdatesToQueue:(NSOperationQueue *)queue withHandler:(CMDeviceMotionHandler)handler;
++- (void)startDeviceMotionUpdatesUsingReferenceFrame:(CMAttitudeReferenceFrame)frame toQueue:(NSOperationQueue *)queue withHandler:(CMDeviceMotionHandler)handler;
++- (void)stopDeviceMotionUpdates;
++@end
+diff --git a/VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.h b/VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..b8c814a647d2611fad388e46e96b35c7d43a7045
+--- /dev/null
++++ b/VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.h
+@@ -0,0 +1,12 @@
++#pragma once
++#import <CoreMotion/CoreMotion.h>
++#import "VPhoneAttitudeState.h"
++
++// A stationary pose in XArbitraryZVertical. No magnetic/true-north claim.
++@interface VPhoneAttitude : CMAttitude
++- (instancetype)initWithState:(VPhoneAttitudeState)state;
++@end
++
++@interface VPhoneAttitudeSample : CMDeviceMotion
++- (instancetype)initWithState:(VPhoneAttitudeState)state timestamp:(NSTimeInterval)timestamp;
++@end
+diff --git a/VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.m b/VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..742ab3bce33dabfcd5e12dcea403d2f72bbd13f4
+--- /dev/null
++++ b/VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.m
+@@ -0,0 +1,115 @@
++#import "VPhoneAttitudeSample.h"
++
++// MARK: - Attitude snapshots
++
++@interface VPhoneAttitude ()
++@property (nonatomic) CMQuaternion value;
++@end
++
++@implementation VPhoneAttitude
++- (instancetype)initWithState:(VPhoneAttitudeState)state {
++    if ((self = [super init])) {
++        // Core Motion: pitch about X, roll about Y, yaw about Z.
++        // R = Rz(yaw) Rx(pitch) Ry(roll), in radians.
++        double r = state.roll * M_PI / 360, p = state.pitch * M_PI / 360, y = state.yaw * M_PI / 360;
++        double cr = cos(r), sr = sin(r), cp = cos(p), sp = sin(p), cy = cos(y), sy = sin(y);
++        _value = (CMQuaternion){cy * sp * cr - sy * cp * sr,
++                               cy * cp * sr + sy * sp * cr,
++                               cy * sp * sr + sy * cp * cr,
++                               cy * cp * cr - sy * sp * sr};
++    }
++    return self;
++}
++- (CMQuaternion)quaternion { return self.value; }
++- (CMRotationMatrix)rotationMatrix {
++    CMQuaternion q = self.value;
++    return (CMRotationMatrix){1-2*(q.y*q.y+q.z*q.z), 2*(q.x*q.y-q.z*q.w), 2*(q.x*q.z+q.y*q.w),
++                              2*(q.x*q.y+q.z*q.w), 1-2*(q.x*q.x+q.z*q.z), 2*(q.y*q.z-q.x*q.w),
++                              2*(q.x*q.z-q.y*q.w), 2*(q.y*q.z+q.x*q.w), 1-2*(q.x*q.x+q.y*q.y)};
++}
++- (double)roll { CMRotationMatrix m = self.rotationMatrix; return atan2(-m.m31, m.m33); }
++- (double)pitch { return asin(fmax(-1, fmin(1, self.rotationMatrix.m32))); }
++- (double)yaw { CMRotationMatrix m = self.rotationMatrix; return atan2(-m.m12, m.m22); }
++- (void)multiplyByInverseOfAttitude:(CMAttitude *)attitude {
++    CMQuaternion a = self.value, b = attitude.quaternion;
++    double norm = b.x*b.x + b.y*b.y + b.z*b.z + b.w*b.w;
++    if (!isfinite(norm) || norm <= 0) return;
++    b = (CMQuaternion){-b.x/norm, -b.y/norm, -b.z/norm, b.w/norm};
++    CMQuaternion q = {a.w*b.x+a.x*b.w+a.y*b.z-a.z*b.y,
++                      a.w*b.y-a.x*b.z+a.y*b.w+a.z*b.x,
++                      a.w*b.z+a.x*b.y-a.y*b.x+a.z*b.w,
++                      a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z};
++    double length = sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
++    if (isfinite(length) && length > 0)
++        self.value = (CMQuaternion){q.x/length, q.y/length, q.z/length, q.w/length};
++}
++- (id)copyWithZone:(NSZone *)zone {
++    VPhoneAttitude *copy = [[VPhoneAttitude allocWithZone:zone] initWithState:(VPhoneAttitudeState){0}];
++    copy.value = self.value;
++    return copy;
++}
+++ (BOOL)supportsSecureCoding { return YES; }
++- (void)encodeWithCoder:(NSCoder *)coder {
++    [coder encodeDouble:self.value.x forKey:@"x"]; [coder encodeDouble:self.value.y forKey:@"y"];
++    [coder encodeDouble:self.value.z forKey:@"z"]; [coder encodeDouble:self.value.w forKey:@"w"];
++}
++- (instancetype)initWithCoder:(NSCoder *)coder {
++    if ((self = [self initWithState:(VPhoneAttitudeState){0}])) {
++        CMQuaternion q = {[coder decodeDoubleForKey:@"x"], [coder decodeDoubleForKey:@"y"],
++                          [coder decodeDoubleForKey:@"z"], [coder decodeDoubleForKey:@"w"]};
++        double norm = sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
++        if (!isfinite(norm) || norm <= 0) return nil;
++        self.value = (CMQuaternion){q.x/norm, q.y/norm, q.z/norm, q.w/norm};
++    }
++    return self;
++}
++@end
++
++// MARK: - Stationary device motion
++
++@interface VPhoneAttitudeSample ()
++@property (nonatomic, strong) VPhoneAttitude *pose;
++@property (nonatomic) NSTimeInterval sampleTime;
++@end
++
++@implementation VPhoneAttitudeSample
++- (instancetype)initWithState:(VPhoneAttitudeState)state timestamp:(NSTimeInterval)timestamp {
++    if ((self = [super init])) {
++        _pose = [[VPhoneAttitude alloc] initWithState:state];
++        _sampleTime = timestamp;
++    }
++    return self;
++}
++- (CMAttitude *)attitude { return self.pose; }
++- (NSTimeInterval)timestamp { return self.sampleTime; }
++- (CMAcceleration)gravity {
++    CMRotationMatrix m = self.pose.rotationMatrix;
++    return (CMAcceleration){-m.m31, -m.m32, -m.m33};
++}
++- (CMAcceleration)userAcceleration { return (CMAcceleration){0}; }
++- (CMRotationRate)rotationRate { return (CMRotationRate){0}; }
++- (CMCalibratedMagneticField)magneticField {
++    return (CMCalibratedMagneticField){{0}, CMMagneticFieldCalibrationAccuracyUncalibrated};
++}
++- (double)heading { return -1; }
++- (double)headingAccuracy { return -1; }
++- (CMDeviceMotionSensorLocation)sensorLocation { return CMDeviceMotionSensorLocationDefault; }
++- (id)copyWithZone:(NSZone *)zone {
++    VPhoneAttitudeSample *copy = [[VPhoneAttitudeSample allocWithZone:zone]
++        initWithState:(VPhoneAttitudeState){0} timestamp:self.sampleTime];
++    copy.pose = [self.pose copy];
++    return copy;
++}
+++ (BOOL)supportsSecureCoding { return YES; }
++- (void)encodeWithCoder:(NSCoder *)coder {
++    [coder encodeObject:self.pose forKey:@"pose"];
++    [coder encodeDouble:self.sampleTime forKey:@"timestamp"];
++}
++- (instancetype)initWithCoder:(NSCoder *)coder {
++    if ((self = [self initWithState:(VPhoneAttitudeState){0} timestamp:[coder decodeDoubleForKey:@"timestamp"]])) {
++        self.pose = [coder decodeObjectOfClass:VPhoneAttitude.class forKey:@"pose"];
++        if (!self.pose || !isfinite(self.sampleTime)) return nil;
++    }
++    return self;
++}
++@end
+diff --git a/VPhoneGuestComponents/Attitude/VPhoneAttitudeState.h b/VPhoneGuestComponents/Attitude/VPhoneAttitudeState.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..c1593e20da2bda555b207443711fe1a40f0c9ba9
+--- /dev/null
++++ b/VPhoneGuestComponents/Attitude/VPhoneAttitudeState.h
+@@ -0,0 +1,55 @@
++#pragma once
++#import <Foundation/Foundation.h>
++#include <math.h>
++
++#define VP_ATTITUDE_DOMAIN "com.apple.backboardd"
++#define VP_ATTITUDE_CONFIGURATION "VPhoneAttitudeConfiguration"
++#ifndef VP_ATTITUDE_NOTIFICATION
++#define VP_ATTITUDE_NOTIFICATION "com.vphone.motion.attitude.changed"
++#endif
++
++typedef struct {
++    BOOL enabled;
++    double roll, pitch, yaw; // Degrees at the RPC boundary; Core Motion uses radians.
++} VPhoneAttitudeState;
++
++static inline BOOL VPhoneAttitudeDecode(id value, VPhoneAttitudeState *state) {
++    *state = (VPhoneAttitudeState){0};
++    if (![value isKindOfClass:NSDictionary.class]) return NO;
++    id enabled = value[@"enabled"];
++    if (![enabled isKindOfClass:NSNumber.class] ||
++        CFGetTypeID((__bridge CFTypeRef)enabled) != CFBooleanGetTypeID()) return NO;
++    double angles[3], limits[] = {180, 90, 180};
++    NSArray *keys = @[@"roll", @"pitch", @"yaw"];
++    for (NSUInteger i = 0; i < 3; i++) {
++        id angle = value[keys[i]];
++        if (![angle isKindOfClass:NSNumber.class] ||
++            CFGetTypeID((__bridge CFTypeRef)angle) == CFBooleanGetTypeID()) return NO;
++        angles[i] = [angle doubleValue];
++        if (!isfinite(angles[i]) || fabs(angles[i]) > limits[i]) return NO;
++    }
++    *state = (VPhoneAttitudeState){[enabled boolValue], angles[0], angles[1], angles[2]};
++    return YES;
++}
++
++static inline NSDictionary *VPhoneAttitudeEncode(VPhoneAttitudeState state) {
++    return @{@"enabled": @(state.enabled), @"roll": @(state.roll),
++             @"pitch": @(state.pitch), @"yaw": @(state.yaw)};
++}
++
++// One notify state holds the complete pose, including enabled. Millidegree
++// quantization avoids cross-domain preferences reads by sandboxed apps.
++static inline uint64_t VPhoneAttitudePack(VPhoneAttitudeState state) {
++    uint64_t roll = (uint64_t)llround((state.roll + 180) * 1000);
++    uint64_t pitch = (uint64_t)llround((state.pitch + 90) * 1000);
++    uint64_t yaw = (uint64_t)llround((state.yaw + 180) * 1000);
++    return (UINT64_C(1) << 63) | ((uint64_t)state.enabled << 56) | (yaw << 37) | (pitch << 19) | roll;
++}
++
++static inline VPhoneAttitudeState VPhoneAttitudeUnpack(uint64_t value) {
++    if (!(value & (UINT64_C(1) << 63))) return (VPhoneAttitudeState){0};
++    uint64_t r = value & 0x7ffff, p = (value >> 19) & 0x3ffff, y = (value >> 37) & 0x7ffff;
++    if (r > 360000 || p > 180000 || y > 360000) return (VPhoneAttitudeState){0};
++    return (VPhoneAttitudeState){(value >> 56) & 1, r / 1000.0 - 180,
++                                p / 1000.0 - 90, y / 1000.0 - 180};
++}
+diff --git a/VPhoneGuestComponents/Attitude/libvphoneattitude.m b/VPhoneGuestComponents/Attitude/libvphoneattitude.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f1d23fc94fcb1893d862be2474df5b04a2974eb
+--- /dev/null
++++ b/VPhoneGuestComponents/Attitude/libvphoneattitude.m
+@@ -0,0 +1,279 @@
++#import "VPhoneAttitudeSample.h"
++#import "VPhoneAttitudeMotionManager.h"
++#import <objc/runtime.h>
++#include <notify.h>
++
++// MARK: - Shared configuration
++
++static NSRecursiveLock *configurationLock;
++static NSHashTable *sessions;
++static VPhoneAttitudeState configuration;
++static int notificationToken;
++static char sessionKey;
++
++static VPhoneAttitudeState VPhoneCurrentAttitude(void) {
++    [configurationLock lock];
++    VPhoneAttitudeState value = configuration;
++    [configurationLock unlock];
++    return value;
++}
++
++// Preserve the actual implementations, including calls they make to each other.
++static void (*startPolling)(id, SEL);
++static void (*startFramePolling)(id, SEL, CMAttitudeReferenceFrame);
++static void (*startCallback)(id, SEL, NSOperationQueue *, CMDeviceMotionHandler);
++static void (*startFrameCallback)(id, SEL, CMAttitudeReferenceFrame, NSOperationQueue *, CMDeviceMotionHandler);
++static void (*stopUpdates)(id, SEL);
++static void (*setInterval)(id, SEL, NSTimeInterval);
++static BOOL (*isAvailable)(id, SEL);
++static BOOL (*isActive)(id, SEL);
++static CMDeviceMotion *(*getMotion)(id, SEL);
++static CMAttitudeReferenceFrame (*getFrame)(id, SEL);
++static CMAttitudeReferenceFrame (*availableFrames)(id, SEL);
++
++@interface VPhoneAttitudeSession : NSObject
++@property (nonatomic, weak) id<VPhoneAttitudeMotionManager> manager;
++@property (nonatomic, strong) NSOperationQueue *deliveryQueue;
++@property (nonatomic, copy) CMDeviceMotionHandler handler;
++@property (nonatomic, strong) dispatch_source_t timer;
++@property (nonatomic, strong) CMDeviceMotion *latest;
++@property (nonatomic) CMAttitudeReferenceFrame frame;
++@property (nonatomic) BOOL active;
++@property (nonatomic) BOOL nativeActive;
++@property (nonatomic) BOOL invokingNative;
++@property (nonatomic) NSUInteger generation;
++@property (nonatomic, strong) NSNumber *queuedGeneration;
++- (void)refresh;
++- (void)reschedule;
++- (void)stop;
++@end
++
++@implementation VPhoneAttitudeSession
++- (BOOL)simulating {
++    return self.active && self.frame == CMAttitudeReferenceFrameXArbitraryZVertical && VPhoneCurrentAttitude().enabled;
++}
++- (void)reschedule {
++    @synchronized (self) {
++        double interval = self.manager.deviceMotionUpdateInterval;
++        if (!isfinite(interval) || interval <= 0) interval = 1.0 / 60;
++        uint64_t period = (uint64_t)(fmax(0.005, fmin(1, interval)) * NSEC_PER_SEC);
++        if (self.timer) dispatch_source_set_timer(self.timer, DISPATCH_TIME_NOW, period, NSEC_PER_MSEC);
++    }
++}
++- (void)tick {
++    @synchronized (self) {
++        if (![self simulating]) return;
++        self.latest = [[VPhoneAttitudeSample alloc] initWithState:VPhoneCurrentAttitude()
++            timestamp:NSProcessInfo.processInfo.systemUptime];
++        if (!self.handler || self.queuedGeneration) return;
++        NSUInteger generation = self.generation;
++        self.queuedGeneration = @(generation);
++        __weak VPhoneAttitudeSession *weakSelf = self;
++        [self.deliveryQueue addOperationWithBlock:^{
++            VPhoneAttitudeSession *session = weakSelf;
++            // Recheck on the app's queue: stop/restart/disable invalidates
++            // callbacks waiting behind a suspended or slow operation queue.
++            CMDeviceMotionHandler handler;
++            CMDeviceMotion *sample;
++            @synchronized (session) {
++                if (session.queuedGeneration.unsignedIntegerValue == generation) session.queuedGeneration = nil;
++                if (session.generation != generation || ![session simulating]) return;
++                handler = session.handler;
++                sample = session.latest;
++            }
++            if (handler) handler(sample, nil);
++        }];
++    }
++}
++- (void)refresh {
++    @synchronized (self) {
++        id<VPhoneAttitudeMotionManager> manager = self.manager;
++        if (!self.active || !manager) return;
++        BOOL needsNative = ![self simulating];
++        if (needsNative == self.nativeActive) return;
++        self.generation++;
++        self.queuedGeneration = nil;
++        self.latest = nil;
++        self.invokingNative = YES;
++        if (needsNative) {
++            if (self.handler) {
++                NSUInteger generation = self.generation;
++                __weak VPhoneAttitudeSession *weakSelf = self;
++                startFrameCallback(manager, @selector(startDeviceMotionUpdatesUsingReferenceFrame:toQueue:withHandler:),
++                    self.frame, self.deliveryQueue, ^(CMDeviceMotion *sample, NSError *error) {
++                        VPhoneAttitudeSession *session = weakSelf;
++                        CMDeviceMotionHandler handler;
++                        @synchronized (session) {
++                            if (!session.active || session.generation != generation || [session simulating]) return;
++                            handler = session.handler;
++                        }
++                        if (handler) handler(sample, error);
++                    });
++            } else {
++                startFramePolling(manager, @selector(startDeviceMotionUpdatesUsingReferenceFrame:), self.frame);
++            }
++        } else {
++            stopUpdates(manager, @selector(stopDeviceMotionUpdates));
++        }
++        self.nativeActive = needsNative;
++        self.invokingNative = NO;
++    }
++}
++- (void)startWithFrame:(CMAttitudeReferenceFrame)frame queue:(NSOperationQueue *)queue handler:(CMDeviceMotionHandler)handler {
++    @synchronized (self) {
++        [self stop];
++        self.frame = frame;
++        self.deliveryQueue = queue;
++        self.handler = handler;
++        self.active = YES;
++        // A timer also caches polling samples at the requested interval.
++        self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
++            dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0));
++        __weak VPhoneAttitudeSession *weakSelf = self;
++        dispatch_source_set_event_handler(self.timer, ^{ @autoreleasepool { [weakSelf tick]; } });
++        [self reschedule];
++        dispatch_resume(self.timer);
++        [self refresh];
++        [self tick];
++    }
++}
++- (void)stop {
++    @synchronized (self) {
++        self.active = NO;
++        self.generation++;
++        self.queuedGeneration = nil;
++        if (self.timer) dispatch_source_cancel(self.timer);
++        self.timer = nil;
++        self.latest = nil;
++        self.handler = nil;
++        self.deliveryQueue = nil;
++        self.invokingNative = YES;
++        stopUpdates(self.manager, @selector(stopDeviceMotionUpdates));
++        self.invokingNative = NO;
++        self.nativeActive = NO;
++    }
++}
++- (void)dealloc { if (_timer) dispatch_source_cancel(_timer); }
++@end
++
++static VPhoneAttitudeSession *VPhoneSession(id<VPhoneAttitudeMotionManager> manager) {
++    @synchronized (manager) {
++        VPhoneAttitudeSession *session = objc_getAssociatedObject(manager, &sessionKey);
++        if (!session) {
++            session = [VPhoneAttitudeSession new];
++            session.manager = manager;
++            objc_setAssociatedObject(manager, &sessionKey, session, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++            [configurationLock lock];
++            [sessions addObject:session];
++            [configurationLock unlock];
++        }
++        return session;
++    }
++}
++
++// MARK: - CMMotionManager public entry points
++
++static void VPhoneStart(id manager, SEL selector) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) {
++        if (session.invokingNative) { startPolling(manager, selector); return; }
++        [session startWithFrame:CMAttitudeReferenceFrameXArbitraryZVertical queue:nil handler:nil];
++    }
++}
++static void VPhoneStartFrame(id manager, SEL selector, CMAttitudeReferenceFrame frame) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) {
++        if (session.invokingNative) { startFramePolling(manager, selector, frame); return; }
++        [session startWithFrame:frame queue:nil handler:nil];
++    }
++}
++static void VPhoneStartCallback(id manager, SEL selector, NSOperationQueue *queue, CMDeviceMotionHandler handler) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) {
++        if (session.invokingNative) { startCallback(manager, selector, queue, handler); return; }
++        [session startWithFrame:CMAttitudeReferenceFrameXArbitraryZVertical queue:queue handler:handler];
++    }
++}
++static void VPhoneStartFrameCallback(id manager, SEL selector, CMAttitudeReferenceFrame frame,
++                                     NSOperationQueue *queue, CMDeviceMotionHandler handler) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) {
++        if (session.invokingNative) { startFrameCallback(manager, selector, frame, queue, handler); return; }
++        [session startWithFrame:frame queue:queue handler:handler];
++    }
++}
++static void VPhoneStop(id manager, SEL selector) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) {
++        if (session.invokingNative) { stopUpdates(manager, selector); return; }
++        [session stop];
++    }
++}
++static void VPhoneInterval(id manager, SEL selector, NSTimeInterval value) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) { setInterval(manager, selector, value); [session reschedule]; }
++}
++static BOOL VPhoneAvailable(id manager, SEL selector) {
++    return VPhoneCurrentAttitude().enabled || isAvailable(manager, selector);
++}
++static BOOL VPhoneActive(id manager, SEL selector) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) { return [session simulating] || isActive(manager, selector); }
++}
++static CMDeviceMotion *VPhoneMotion(id manager, SEL selector) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) { return [session simulating] ? session.latest : getMotion(manager, selector); }
++}
++static CMAttitudeReferenceFrame VPhoneFrame(id manager, SEL selector) {
++    VPhoneAttitudeSession *session = VPhoneSession(manager);
++    @synchronized (session) { return [session simulating] ? session.frame : getFrame(manager, selector); }
++}
++static CMAttitudeReferenceFrame VPhoneFrames(id manager, SEL selector) {
++    CMAttitudeReferenceFrame frames = availableFrames(manager, selector);
++    return VPhoneCurrentAttitude().enabled ? frames | CMAttitudeReferenceFrameXArbitraryZVertical : frames;
++}
++
++static void VPhoneReadAttitude(void) {
++    uint64_t state = 0;
++    if (notify_get_state(notificationToken, &state) != NOTIFY_STATUS_OK) return;
++    [configurationLock lock];
++    configuration = VPhoneAttitudeUnpack(state);
++    NSArray *live = sessions.allObjects;
++    [configurationLock unlock];
++    for (VPhoneAttitudeSession *session in live) { [session refresh]; [session tick]; }
++}
++
++__attribute__((constructor)) static void VPhoneAttitudeInstall(void) {
++    @autoreleasepool {
++        configurationLock = [NSRecursiveLock new];
++        sessions = [NSHashTable weakObjectsHashTable];
++        dispatch_queue_t queue = dispatch_queue_create("com.vphone.motion.attitude", DISPATCH_QUEUE_SERIAL);
++        if (notify_register_dispatch(VP_ATTITUDE_NOTIFICATION, &notificationToken, queue,
++            ^(int token) { VPhoneReadAttitude(); }) != NOTIFY_STATUS_OK) return;
++        VPhoneReadAttitude();
++        Class cls = NSClassFromString(@"CMMotionManager");
++        // Validate the entire ABI before installing any part of the hook.
++        SEL selectors[] = {@selector(startDeviceMotionUpdates), @selector(startDeviceMotionUpdatesUsingReferenceFrame:),
++            @selector(startDeviceMotionUpdatesToQueue:withHandler:), @selector(startDeviceMotionUpdatesUsingReferenceFrame:toQueue:withHandler:),
++            @selector(stopDeviceMotionUpdates), @selector(setDeviceMotionUpdateInterval:), @selector(isDeviceMotionAvailable),
++            @selector(isDeviceMotionActive), @selector(deviceMotion), @selector(attitudeReferenceFrame)};
++        for (NSUInteger i = 0; i < sizeof(selectors)/sizeof(*selectors); i++)
++            if (!class_getInstanceMethod(cls, selectors[i])) return;
++        Method frames = class_getClassMethod(cls, @selector(availableAttitudeReferenceFrames));
++        if (!frames) return;
++#define VP_HOOK(methodName, replacement, original) \
++        original = (__typeof__(original))method_setImplementation(class_getInstanceMethod(cls, @selector(methodName)), (IMP)replacement)
++        VP_HOOK(startDeviceMotionUpdates, VPhoneStart, startPolling);
++        VP_HOOK(startDeviceMotionUpdatesUsingReferenceFrame:, VPhoneStartFrame, startFramePolling);
++        VP_HOOK(startDeviceMotionUpdatesToQueue:withHandler:, VPhoneStartCallback, startCallback);
++        VP_HOOK(startDeviceMotionUpdatesUsingReferenceFrame:toQueue:withHandler:, VPhoneStartFrameCallback, startFrameCallback);
++        VP_HOOK(stopDeviceMotionUpdates, VPhoneStop, stopUpdates);
++        VP_HOOK(setDeviceMotionUpdateInterval:, VPhoneInterval, setInterval);
++        VP_HOOK(isDeviceMotionAvailable, VPhoneAvailable, isAvailable);
++        VP_HOOK(isDeviceMotionActive, VPhoneActive, isActive);
++        VP_HOOK(deviceMotion, VPhoneMotion, getMotion);
++        VP_HOOK(attitudeReferenceFrame, VPhoneFrame, getFrame);
++#undef VP_HOOK
++        availableFrames = (__typeof__(availableFrames))method_setImplementation(frames, (IMP)VPhoneFrames);
++    }
++}
+diff --git a/VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeHID.h b/VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeHID.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..db5d54eb1b078d3cb01ac0b1616f2679e93a4747
+--- /dev/null
++++ b/VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeHID.h
+@@ -0,0 +1,25 @@
++#pragma once
++#import <Foundation/Foundation.h>
++
++// Small ABI surface from Apple's IOHIDFamily HIDVirtualEventService.h and
++// HIDEventAccessors.h. Classes are resolved at runtime, as with the camera
++// hook; no private framework stub or third-party loader is needed.
++@protocol VPhoneGyroscopeHIDEvent <NSObject>
+++ (id)gyroEvent:(uint64_t)timestamp x:(double)x y:(double)y z:(double)z options:(uint32_t)options;
++- (void)setGyroSequence:(uint32_t)sequence;
++@property (readonly) uint32_t gyroSequence;
++@property (readonly) double gyroX;
++@property (readonly) double gyroY;
++@property (readonly) double gyroZ;
++@property (readonly) uint64_t timestamp;
++@end
++
++@protocol VPhoneGyroscopeHIDService <NSObject>
++@property (weak) id delegate;
++@property (readonly) uint64_t serviceID;
++- (void)setDispatchQueue:(dispatch_queue_t)queue;
++- (void)setCancelHandler:(dispatch_block_t)handler;
++- (void)activate;
++- (void)cancel;
++- (BOOL)dispatchEvent:(id)event;
++@end
+diff --git a/VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeState.h b/VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeState.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..61a64a6d4b6ab29a3157d6b6e21434c760ed8342
+--- /dev/null
++++ b/VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeState.h
+@@ -0,0 +1,57 @@
++#pragma once
++#import <Foundation/Foundation.h>
++#include <math.h>
++
++// One dictionary per update: readers never combine axes from different RPCs.
++#define VP_GYRO_DOMAIN "com.apple.backboardd"
++#define VP_GYRO_CONFIGURATION "VPhoneGyroscopeConfiguration"
++#define VP_GYRO_STATUS "VPhoneGyroscopeStatus"
++#define VP_GYRO_NOTIFICATION "com.vphone.motion.gyroscope.changed"
++
++typedef struct {
++    BOOL enabled;
++    double x, y, z; // CoreMotion rotation rate, radians per second.
++} VPhoneGyroscopeState;
++
++// Reject malformed persisted state, booleans masquerading as axes, and rates
++// outside the HID event's signed 16.16 range. No partial-axis updates.
++static inline BOOL VPhoneGyroscopeNumber(id value) {
++    return [value isKindOfClass:NSNumber.class] &&
++           CFGetTypeID((__bridge CFTypeRef)value) != CFBooleanGetTypeID();
++}
++
++static inline BOOL VPhoneGyroscopeDecode(id value, VPhoneGyroscopeState *state) {
++    *state = (VPhoneGyroscopeState){0};
++    if (![value isKindOfClass:NSDictionary.class])
++        return NO;
++    id enabled = value[@"enabled"];
++    if (![enabled isKindOfClass:NSNumber.class] ||
++        CFGetTypeID((__bridge CFTypeRef)enabled) != CFBooleanGetTypeID())
++        return NO;
++    double axes[3];
++    NSArray *keys = @[@"x", @"y", @"z"];
++    for (NSUInteger index = 0; index < 3; index++) {
++        id axis = value[keys[index]];
++        if (!VPhoneGyroscopeNumber(axis))
++            return NO;
++        axes[index] = [axis doubleValue];
++        if (!isfinite(axes[index]) || fabs(axes[index]) > 1000)
++            return NO;
++    }
++    *state = (VPhoneGyroscopeState){[enabled boolValue], axes[0], axes[1], axes[2]};
++    return YES;
++}
++
++static inline NSDictionary *VPhoneGyroscopeEncode(VPhoneGyroscopeState state) {
++    return @{@"enabled": @(state.enabled), @"x": @(state.x), @"y": @(state.y), @"z": @(state.z)};
++}
++
++// HID report interval, microseconds. Zero means there are no subscribers.
++static inline uint64_t VPhoneGyroscopeInterval(id value) {
++    if (!VPhoneGyroscopeNumber(value))
++        return 0;
++    double interval = [value doubleValue];
++    if (!isfinite(interval) || interval <= 0)
++        return 0;
++    return (uint64_t)fmin(1000000, fmax(5000, interval));
++}
+diff --git a/VPhoneGuestComponents/Gyroscope/libvphonegyro.m b/VPhoneGuestComponents/Gyroscope/libvphonegyro.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..c96df1a93406da0a4b5837abb57d3b53c905d632
+--- /dev/null
++++ b/VPhoneGuestComponents/Gyroscope/libvphonegyro.m
+@@ -0,0 +1,211 @@
++#import "VPhoneGyroscopeHID.h"
++#import "VPhoneGyroscopeState.h"
++#include <dlfcn.h>
++#include <mach/mach_time.h>
++#include <notify.h>
++#include <unistd.h>
++
++// MARK: - HID provider in backboardd
++
++@interface VPhoneGyroscopeProvider : NSObject
++@property (nonatomic, strong) dispatch_queue_t queue;
++@property (nonatomic, strong) dispatch_source_t timer;
++@property (nonatomic, strong) id<VPhoneGyroscopeHIDService> service;
++@property (nonatomic) Class<VPhoneGyroscopeHIDEvent> eventClass;
++@property (nonatomic, strong) NSMutableDictionary *properties;
++@property (nonatomic) VPhoneGyroscopeState state;
++@property (nonatomic) BOOL enumerated;
++@property (nonatomic) BOOL cancelling;
++@property (nonatomic) uint32_t sequence;
++@property (nonatomic) uint64_t interval;
++@property (nonatomic) uint64_t dispatched;
++@property (nonatomic) uint64_t failures;
++@property (nonatomic) int notificationToken;
++@property (nonatomic, copy) NSString *lastError;
++- (void)start;
++@end
++
++@implementation VPhoneGyroscopeProvider
++
++- (void)publishStatus {
++    NSDictionary *status = @{
++        @"enumerated": @(self.enumerated), @"service_id": @(self.service.serviceID),
++        @"pid": @(getpid()), @"updated_at": @([NSDate date].timeIntervalSince1970),
++        @"report_interval_us": @(self.interval), @"dispatched": @(self.dispatched),
++        @"dispatch_failures": @(self.failures), @"error": self.lastError ?: @"",
++        @"configuration": VPhoneGyroscopeEncode(self.state),
++    };
++    CFPreferencesSetValue(CFSTR(VP_GYRO_STATUS), (__bridge CFDictionaryRef)status,
++                          CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost);
++    CFPreferencesSynchronize(CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost);
++}
++
++- (void)readConfiguration {
++    CFPreferencesSynchronize(CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost);
++    id value = CFBridgingRelease(CFPreferencesCopyValue(CFSTR(VP_GYRO_CONFIGURATION),
++                                  CFSTR(VP_GYRO_DOMAIN), CFSTR("mobile"), kCFPreferencesAnyHost));
++    VPhoneGyroscopeState state;
++    VPhoneGyroscopeDecode(value, &state);
++    self.state = state;
++    [self publishStatus];
++}
++
++- (void)updateTimer {
++    uint64_t period = self.enumerated && self.interval ? self.interval * NSEC_PER_USEC : DISPATCH_TIME_FOREVER;
++    dispatch_source_set_timer(self.timer, period == DISPATCH_TIME_FOREVER ? DISPATCH_TIME_FOREVER : DISPATCH_TIME_NOW,
++                              period, NSEC_PER_MSEC);
++}
++
++- (id)sample {
++    VPhoneGyroscopeState state = self.state;
++    // Clearing simulation gives the stationary sensor's zero rate. The HID
++    // service stays present, so an already running client's subscription is
++    // preserved and the next set does not require reopening CMMotionManager.
++    id event = [self.eventClass gyroEvent:mach_absolute_time()
++                                     x:state.enabled ? state.x : 0
++                                     y:state.enabled ? state.y : 0
++                                     z:state.enabled ? state.z : 0 options:0];
++    if (event)
++        [(id<VPhoneGyroscopeHIDEvent>)event setGyroSequence:self.sequence++];
++    return event;
++}
++
++- (void)createService {
++    self.enumerated = NO;
++    self.cancelling = NO;
++    self.interval = 0;
++    self.properties[@"ReportInterval"] = @0;
++    self.service = (id<VPhoneGyroscopeHIDService>)[NSClassFromString(@"HIDVirtualEventService") new];
++    if (!self.service) {
++        self.lastError = @"HIDVirtualEventService creation failed";
++        [self publishStatus];
++        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), self.queue, ^{ [self createService]; });
++        return;
++    }
++    self.service.delegate = self;
++    [self.service setDispatchQueue:self.queue];
++    __weak VPhoneGyroscopeProvider *weakSelf = self;
++    [self.service setCancelHandler:^{
++        VPhoneGyroscopeProvider *provider = weakSelf;
++        if (!provider)
++            return;
++        provider.service = nil;
++        // A reset invalidates the old service. Cancel completely before
++        // releasing it, then register a new one with the restarted HID server.
++        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), provider.queue,
++                       ^{ [provider createService]; });
++    }];
++    [self.service activate];
++}
++
++- (void)start {
++    void *hid = dlopen("/System/Library/PrivateFrameworks/HID.framework/HID", RTLD_NOW | RTLD_LOCAL);
++    self.eventClass = (Class<VPhoneGyroscopeHIDEvent>)NSClassFromString(@"HIDEvent");
++    Class serviceClass = NSClassFromString(@"HIDVirtualEventService");
++    if (!hid || !serviceClass ||
++        ![self.eventClass respondsToSelector:@selector(gyroEvent:x:y:z:options:)] ||
++        ![(Class)self.eventClass instancesRespondToSelector:@selector(setGyroSequence:)] ||
++        ![serviceClass instancesRespondToSelector:@selector(dispatchEvent:)]) {
++        self.lastError = @"Required HID virtual-service API unavailable";
++        NSLog(@"[vphone-gyro] %@", self.lastError);
++        [self publishStatus];
++        return;
++    }
++    self.properties = [@{
++        @"PrimaryUsagePage": @0xff00, @"PrimaryUsage": @9,
++        @"DeviceUsagePairs": @[@{@"DeviceUsagePage": @0xff00, @"DeviceUsage": @9}],
++        @"Product": @"VPhone 3D Gyroscope", @"Manufacturer": @"vphone",
++        @"Transport": @"Virtual", @"Built-In": @YES, @"IMULocationID": @0,
++        @"ReportInterval": @0, @"BatchInterval": @0,
++        // Aggregate subscriptions before forwarding the requested interval to
++        // this delegate, so one client's stop cannot stop other subscribers.
++        @"HIDDefaultSensorControlOptions": @7, @"SensorPropertySupported": @3,
++    } mutableCopy];
++    [self readConfiguration];
++    int status = notify_register_dispatch(VP_GYRO_NOTIFICATION, &_notificationToken, self.queue,
++                                          ^(int token) { [self readConfiguration]; });
++    if (status != NOTIFY_STATUS_OK) {
++        self.lastError = @"Gyroscope configuration notification registration failed";
++        [self publishStatus];
++        return;
++    }
++    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
++    dispatch_source_set_event_handler(self.timer, ^{
++        @autoreleasepool {
++            id event = [self sample];
++            if (event && [self.service dispatchEvent:event]) {
++                self.dispatched++;
++            } else {
++                self.failures++;
++                self.lastError = @"HID event dispatch failed";
++            }
++        }
++    });
++    [self updateTimer];
++    dispatch_resume(self.timer);
++    [self createService];
++    [self heartbeat];
++}
++
++- (void)heartbeat {
++    [self publishStatus];
++    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), self.queue, ^{ [self heartbeat]; });
++}
++
++// MARK: - HIDVirtualEventServiceDelegate selectors
++
++- (id)propertyForKey:(NSString *)key forService:(id)service {
++    return self.properties[key];
++}
++
++- (BOOL)setProperty:(id)value forKey:(NSString *)key forService:(id)service {
++    if ([key isEqualToString:@"ReportInterval"]) {
++        self.interval = VPhoneGyroscopeInterval(value);
++        self.properties[key] = @(self.interval);
++        [self updateTimer];
++        [self publishStatus];
++        return YES;
++    }
++    if ([key isEqualToString:@"BatchInterval"])
++        return YES; // No FIFO: samples are delivered as they are made.
++    return NO;
++}
++
++- (id)copyEventMatching:(NSDictionary *)matching forService:(id)service {
++    NSNumber *type = matching[@"EventType"];
++    return self.enumerated && (!type || type.unsignedIntValue == 0x14) ? [self sample] : nil;
++}
++
++- (BOOL)setOutputEvent:(id)event forService:(id)service {
++    return NO;
++}
++
++- (void)notification:(NSInteger)type withProperty:(NSDictionary *)property forService:(id)service {
++    if (service != self.service)
++        return;
++    if (type == 10) { // HIDVirtualServiceNotificationTypeEnumerated
++        self.enumerated = YES;
++        self.lastError = nil;
++        NSLog(@"[vphone-gyro] HID service enumerated: %llu", self.service.serviceID);
++    } else if (type == 11 && !self.cancelling) { // Terminated or reset
++        self.enumerated = NO;
++        self.cancelling = YES;
++        self.lastError = @"HID service terminated; waiting to register again";
++        [self.service cancel];
++    }
++    [self updateTimer];
++    [self publishStatus];
++}
++@end
++
++__attribute__((constructor)) static void VPhoneGyroscopeStart(void) {
++    // SystemHook loads this only into backboardd, the mobile user's HID host.
++    // Starting asynchronously avoids synchronously calling the HID server
++    // while its daemon is still running image constructors.
++    if (strcmp(getprogname(), "backboardd") != 0)
++        return;
++    static VPhoneGyroscopeProvider *provider;
++    provider = [VPhoneGyroscopeProvider new];
++    provider.queue = dispatch_queue_create("com.vphone.motion.gyroscope", DISPATCH_QUEUE_SERIAL);
++    dispatch_async(provider.queue, ^{ [provider start]; });
++}
+diff --git a/VPhoneGuestComponents/Makefile b/VPhoneGuestComponents/Makefile
+index 53188f7b83bc49708b0e2a6c942fb1cee9735720..699da39bd36d58032feed50b8e75e9af197820ac 100644
+--- a/VPhoneGuestComponents/Makefile
++++ b/VPhoneGuestComponents/Makefile
+@@ -83,6 +83,12 @@ PREFSFIX_INCLUDES := $(wildcard PrefsFix/*.h)
+ SIGNINFIX := $(STAGE)/signinfix/libsigninfix.dylib
+ SIGNINFIX_SOURCES := $(wildcard SignInFix/*.m SignInFix/*.c)
+ SIGNINFIX_INCLUDES := $(wildcard SignInFix/*.h)
++GYROSCOPE := $(STAGE)/gyroscope/libvphonegyro.dylib
++GYROSCOPE_SOURCES := $(call find_sources,Gyroscope)
++GYROSCOPE_INPUTS := $(call find_headers,Gyroscope) $(call find_folders,Gyroscope)
++ATTITUDE := $(STAGE)/attitude/libvphoneattitude.dylib
++ATTITUDE_SOURCES := $(call find_sources,Attitude)
++ATTITUDE_INPUTS := $(call find_headers,Attitude) $(call find_folders,Attitude)
+ GPU_PLUGIN := $(STAGE)/gpu/libAppleParavirtCompilerPluginIOGPUFamily.dylib
+ GPU_PLUGIN_SOURCES := $(wildcard GraphicLoader/*.mm)
+ GPU_PLUGIN_INCLUDES := $(wildcard GraphicLoader/*.h GraphicLoader/*.hpp GraphicLoader/*.inc)
+@@ -116,7 +122,7 @@ GPU_DYNAMIC_LOOKUP_SYMS := \
+ VIRTIOSOUND := $(STAGE)/virtiosound/VPhoneVirtIOSound.driver
+ VIRTIOSOUND_SOURCES := $(wildcard VirtIOSound/*.m VirtIOSound/*.c)
+ VIRTIOSOUND_INCLUDES := $(wildcard VirtIOSound/*.h) VirtIOSound/Info.plist VirtIOSound/AudioServerDriver.tbd
+-ARTIFACTS := $(CAMFIX) $(VCAMCAPTURED) $(LAUNCHHOOK) $(SYSTEMHOOK) $(MISFIX) $(HAPTICSFIX) $(BATTERYHEALTHFIX) $(DEVICEHUBFIX) $(DEVICENAME) $(PREFSFIX) $(SIGNINFIX) $(GPU_PLUGIN) $(VIRTIOSOUND)
++ARTIFACTS := $(CAMFIX) $(VCAMCAPTURED) $(LAUNCHHOOK) $(SYSTEMHOOK) $(MISFIX) $(HAPTICSFIX) $(BATTERYHEALTHFIX) $(DEVICEHUBFIX) $(DEVICENAME) $(PREFSFIX) $(SIGNINFIX) $(GYROSCOPE) $(ATTITUDE) $(GPU_PLUGIN) $(VIRTIOSOUND)
+ PLISTS := $(STAGE)/camfix/libcamfix.plist $(STAGE)/vcamcaptured/libvcamcaptured.plist \
+ 	$(STAGE)/misfix/libmisfix.plist
+ GPU_PROVENANCE := $(STAGE)/gpu/README.md
+@@ -131,7 +137,7 @@ gpu: $(GPU_PLUGIN)
+ 
+ package: all
+ 	@rm -f $(ARCHIVE)
+-	@/usr/bin/tar -cf $(ARCHIVE) -C $(STAGE) camfix vcamcaptured launchhook systemhook misfix hapticsfix batteryhealthfix devicehubfix devicename prefsfix signinfix gpu virtiosound
++	@/usr/bin/tar -cf $(ARCHIVE) -C $(STAGE) camfix vcamcaptured launchhook systemhook misfix hapticsfix batteryhealthfix devicehubfix devicename prefsfix signinfix gyroscope attitude gpu virtiosound
+ 	@echo "Packaged $(ARCHIVE)"
+ 
+ test-loader-links:
+@@ -191,7 +197,7 @@ test-vcam-dataplane:
+ 		-framework CoreGraphics
+ 	@$(OUT)/VCamDataPlaneTests
+ 
+-$(STAGE)/camfix $(STAGE)/vcamcaptured $(STAGE)/launchhook $(STAGE)/systemhook $(STAGE)/misfix $(STAGE)/hapticsfix $(STAGE)/batteryhealthfix $(STAGE)/devicehubfix $(STAGE)/devicename $(STAGE)/prefsfix $(STAGE)/signinfix $(STAGE)/gpu $(STAGE)/virtiosound:
++$(STAGE)/camfix $(STAGE)/vcamcaptured $(STAGE)/launchhook $(STAGE)/systemhook $(STAGE)/misfix $(STAGE)/hapticsfix $(STAGE)/batteryhealthfix $(STAGE)/devicehubfix $(STAGE)/devicename $(STAGE)/prefsfix $(STAGE)/signinfix $(STAGE)/gyroscope $(STAGE)/attitude $(STAGE)/gpu $(STAGE)/virtiosound:
+ 	@mkdir -p $@
+ 
+ $(CAMFIX): $(CAMFIX_SOURCES) $(CAMFIX_INPUTS) | $(STAGE)/camfix
+@@ -278,6 +284,40 @@ $(SIGNINFIX): $(SIGNINFIX_SOURCES) $(SIGNINFIX_INCLUDES) SignInFix | $(STAGE)/si
+ 		-Wl,-not_for_dyld_shared_cache
+ 	@codesign --force --sign - $@
+ 
++$(GYROSCOPE): $(GYROSCOPE_SOURCES) $(GYROSCOPE_INPUTS) | $(STAGE)/gyroscope
++	$(CLANG) -arch arm64e -miphoneos-version-min=18.0 -Os -fobjc-arc \
++		-Wall -Wextra -Werror -Wno-unused-parameter -dynamiclib \
++		-install_name /usr/lib/libvphonegyro.dylib -o $@ $(GYROSCOPE_SOURCES) \
++		-framework Foundation -Wl,-not_for_dyld_shared_cache
++	@codesign --force --sign - $@
++
++.PHONY: test-gyroscope
++$(ATTITUDE): $(ATTITUDE_SOURCES) $(ATTITUDE_INPUTS) | $(STAGE)/attitude
++	$(CLANG) -arch arm64e -miphoneos-version-min=18.0 -Os -fobjc-arc \
++		-Wall -Wextra -Werror -Wno-unused-parameter -dynamiclib \
++		-install_name /usr/lib/libvphoneattitude.dylib -o $@ $(ATTITUDE_SOURCES) \
++		-framework Foundation -framework CoreMotion -Wl,-not_for_dyld_shared_cache
++	@codesign --force --sign - $@
++
++.PHONY: test-attitude
++test-attitude:
++	@mkdir -p $(OUT)
++	xcrun --sdk macosx clang -fobjc-arc -Wall -Wextra -Werror -Wno-unused-parameter -IAttitude \
++		-o $(OUT)/AttitudeTests Tests/AttitudeTests.m Attitude/VPhoneAttitudeSample.m \
++		-framework Foundation -framework CoreMotion
++	@$(OUT)/AttitudeTests
++	xcrun --sdk macosx clang -fobjc-arc -Wall -Wextra -Werror -Wno-unused-parameter -IAttitude \
++		-DVP_ATTITUDE_NOTIFICATION='"com.vphone.motion.attitude.host-test"' \
++		-o $(OUT)/AttitudeHookTests Tests/AttitudeHookTests.m $(ATTITUDE_SOURCES) \
++		-framework Foundation -framework CoreMotion
++	@$(OUT)/AttitudeHookTests
++
++test-gyroscope:
++	@mkdir -p $(OUT)
++	xcrun --sdk macosx clang -fobjc-arc -Wall -Wextra -Werror -IGyroscope \
++		-o $(OUT)/GyroscopeTests Tests/GyroscopeTests.m -framework Foundation
++	@$(OUT)/GyroscopeTests
++
+ $(STAGE)/misfix/libmisfix.plist: MISFix/libmisfix.plist | $(STAGE)/misfix
+ 	@cp $< $@
+ 
+diff --git a/VPhoneGuestComponents/README.md b/VPhoneGuestComponents/README.md
+index 0c47428e4d3d20aad3d3862f8a01268d5ec8daa4..789a32a0d9b539c4bd1de872055afdd828e01578 100644
+--- a/VPhoneGuestComponents/README.md
++++ b/VPhoneGuestComponents/README.md
+@@ -12,6 +12,8 @@ tweak filter plists, and the GPU provenance note:
+ | Battery health fix | `batteryhealthfix/libbatteryhealthfix.dylib` |
+ | DeviceHub fix | `devicehubfix/libdevicehubfix.dylib` |
+ | Device name pin | `devicename/libdevicename.dylib` |
++| Virtual gyroscope | `gyroscope/libvphonegyro.dylib` |
++| Device attitude | `attitude/libvphoneattitude.dylib` |
+ | Launchd hook | `launchhook/launchdhook-vphone.dylib` |
+ | Process injection bridge | `systemhook/SystemHook-vphone.dylib` |
+ | iOS 27 app registrar | `vpregister/vpregister` |
+@@ -58,6 +60,20 @@ Apple GPU binary is stored in this directory, the archive, or the shipped app.
+ See `Research/Guest/virtual_camera_transport.md` for the camera transport
+ validation and the hook installation prerequisites.
+ 
++`system-backboardd-cfw-gyroscope` installs the optional gyro provider into
++`/usr/lib`. SystemHook loads it only in backboardd; it publishes a HID service
++using vphoned's `motion.gyroscope.set/get/clear` configuration. A live update
++replaces installed copies only and requests a reboot without restarting the
++UI daemon. `make test-gyroscope` checks its configuration transport. Guest
++CoreMotion acceptance is still pending; see `Research/Guest/virtual_gyroscope.md`.
++
++`system-apps-cfw-attitude` installs `libvphoneattitude.dylib`, loaded by
++SystemHook into apps. It supplies a stationary Core Motion pose through
++`motion.attitude.set/get/clear`, independently of gyro angular velocity.
++Removing the selected library and relaunching apps reverts the hook.
++`make test-attitude` checks samples and the actual host Core Motion subscription
++runtime. Guest validation is manual; see `Research/Guest/virtual_attitude.md`.
++
+ The virtio sound plugin is the CoreAudio half of the VM's virtio-snd device,
+ which iOS ships no driver for. audiomxd loads it when the kernel publishes
+ `AppleVirtIOSound`, and it publishes a speaker and a microphone device.
+diff --git a/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c b/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
+index f0f4811ed44ec08e05c5f28cad5ce3e297a0f812..b3971ca6491922719674b6b46a8d18b162da46c6 100644
+--- a/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
++++ b/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
+@@ -39,11 +39,15 @@ static int vpIsCameraDaemon(const char *path) {
+     return length >= sizeof(suffix) - 1 && strcmp(path + length - (sizeof(suffix) - 1), suffix) == 0;
+ }
+ 
++static int vpIsGyroscopeDaemon(const char *path) {
++    return vpPathHasSuffix(path, "/usr/libexec/backboardd");
++}
++
+ static int vpIsInjectionTarget(const char *path) {
+     if (!path)
+         return 0;
+     const char *root = getenv("VPHONE_JB_ROOT");
+-    return vpIsBootstrapPath(path, root) || vpIsAppPath(path) || vpIsCameraDaemon(path) ||
++    return vpIsBootstrapPath(path, root) || vpIsAppPath(path) || vpIsCameraDaemon(path) || vpIsGyroscopeDaemon(path) ||
+            (vpInBootstrap && path[0] != '/');
+ }
+ 
+@@ -149,6 +153,8 @@ static int vpExecve(const char *path, char *const argv[], char *const envp[]) {
+ // They need no tweak loader: each installs its own Objective-C hooks.
+ #define VP_CAMERA_DAEMON_HOOK "/usr/lib/libvcamcaptured.dylib"
+ #define VP_CAMERA_APP_HOOK "/usr/lib/libcamfix.dylib"
++#define VP_GYROSCOPE_HOOK "/usr/lib/libvphonegyro.dylib"
++#define VP_ATTITUDE_HOOK "/usr/lib/libvphoneattitude.dylib"
+ #define VP_AVFOUNDATION "/System/Library/Frameworks/AVFoundation.framework/AVFoundation"
+ // The haptics fix rides the same route and needs no loader of its own. See
+ // HapticsFix/libhapticsfix.c for what it answers and why SpringBoard is the
+@@ -210,7 +216,7 @@ __attribute__((constructor)) static void vpLogProcess(void) {
+     vpInBootstrap = vpIsBootstrapPath(path, getenv("VPHONE_JB_ROOT"));
+ 
+     // Every process loads this hook; only the ones it acts on are logged.
+-    int fd = vpInXPCProxy || vpInBootstrap || vpIsAppPath(path) || vpIsCameraDaemon(path)
++    int fd = vpInXPCProxy || vpInBootstrap || vpIsAppPath(path) || vpIsCameraDaemon(path) || vpIsGyroscopeDaemon(path)
+                  ? vpOpenLog("vphone-systemhook.log")
+                  : -1;
+     if (fd >= 0) {
+@@ -232,6 +238,10 @@ __attribute__((constructor)) static void vpLogProcess(void) {
+         vpLoadLibrary("camera-hook", VP_CAMERA_DAEMON_HOOK);
+         return;
+     }
++    if (vpIsGyroscopeDaemon(path)) {
++        vpLoadLibrary("gyroscope-hook", VP_GYROSCOPE_HOOK);
++        return;
++    }
+     // Loaded before the app gate: SpringBoard is neither an app path nor a
+     // bootstrap executable, and the swizzle has to be in place before UIKit
+     // first asks CoreHaptics for an engine.
+@@ -248,6 +258,8 @@ __attribute__((constructor)) static void vpLogProcess(void) {
+     // above, so background AuthKit auth is untouched).
+     if (vpIsAppPath(path))
+         vpLoadLibrary("signin-fix", VP_SIGNIN_FIX);
++    if (vpIsAppPath(path))
++        vpLoadLibrary("attitude-hook", VP_ATTITUDE_HOOK);
+     if (vpIsAppPath(path) && dlopen(VP_AVFOUNDATION, RTLD_LAZY | RTLD_NOLOAD))
+         vpLoadLibrary("camera-hook", VP_CAMERA_APP_HOOK);
+     const char *root = getenv("VPHONE_JB_ROOT");
+diff --git a/VPhoneGuestComponents/Tests/AttitudeHookTests.m b/VPhoneGuestComponents/Tests/AttitudeHookTests.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..c1148c3b73317733563084eebc65c29b9678fa17
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/AttitudeHookTests.m
+@@ -0,0 +1,83 @@
++#import "VPhoneAttitudeSample.h"
++#import "VPhoneAttitudeMotionManager.h"
++#include <assert.h>
++#include <notify.h>
++#include <unistd.h>
++
++static int token;
++static void publish(VPhoneAttitudeState state) {
++    assert(notify_set_state(token, VPhoneAttitudePack(state)) == NOTIFY_STATUS_OK);
++    assert(notify_post(VP_ATTITUDE_NOTIFICATION) == NOTIFY_STATUS_OK);
++}
++static void waitFor(BOOL (^condition)(void)) {
++    for (int i = 0; i < 200; i++) {
++        if (condition()) return;
++        usleep(5000);
++    }
++    assert(!"Timed out waiting for the attitude hook");
++}
++static void closeTo(double actual, double expected) { assert(fabs(actual - expected) < 1e-8); }
++
++int main(void) {
++    @autoreleasepool {
++        assert(notify_register_check(VP_ATTITUDE_NOTIFICATION, &token) == NOTIFY_STATUS_OK);
++        Class<VPhoneAttitudeMotionManager> managerClass = (Class<VPhoneAttitudeMotionManager>)NSClassFromString(@"CMMotionManager");
++        assert(managerClass);
++        id<VPhoneAttitudeMotionManager> polling = [(Class)managerClass new];
++        BOOL nativeAvailable = polling.deviceMotionAvailable;
++        publish((VPhoneAttitudeState){YES, 30, -20, 45});
++        waitFor(^BOOL { return polling.deviceMotionAvailable; });
++        assert([managerClass availableAttitudeReferenceFrames] & CMAttitudeReferenceFrameXArbitraryZVertical);
++        [polling startDeviceMotionUpdates];
++        assert(polling.deviceMotionActive);
++        assert(polling.attitudeReferenceFrame == CMAttitudeReferenceFrameXArbitraryZVertical);
++        waitFor(^BOOL { return polling.deviceMotion != nil; });
++        CMDeviceMotion *old = polling.deviceMotion;
++        closeTo(old.attitude.roll, M_PI/6);
++        closeTo(old.attitude.pitch, -M_PI/9);
++
++        id<VPhoneAttitudeMotionManager> callbacks = [(Class)managerClass new];
++        callbacks.deviceMotionUpdateInterval = 0.01;
++        NSOperationQueue *queue = [NSOperationQueue new];
++        queue.maxConcurrentOperationCount = 1;
++        dispatch_semaphore_t received = dispatch_semaphore_create(0);
++        __block NSTimeInterval timestamp = 0;
++        [callbacks startDeviceMotionUpdatesToQueue:queue withHandler:^(CMDeviceMotion *sample, NSError *error) {
++            assert(!error && sample.timestamp >= timestamp);
++            timestamp = sample.timestamp;
++            dispatch_semaphore_signal(received);
++        }];
++        assert(dispatch_semaphore_wait(received, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC)) == 0);
++        publish((VPhoneAttitudeState){YES, -60, 10, -90});
++        waitFor(^BOOL { return fabs(polling.deviceMotion.attitude.roll + M_PI/3) < 1e-8; });
++        closeTo(old.attitude.roll, M_PI/6); // Delivered samples are snapshots.
++        [callbacks stopDeviceMotionUpdates];
++        [queue waitUntilAllOperationsAreFinished];
++        assert(!callbacks.deviceMotionActive && callbacks.deviceMotion == nil);
++
++        // Bound delivery backlog and discard queued callbacks after a stop.
++        queue.suspended = YES;
++        __block int calls = 0;
++        [callbacks startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXArbitraryZVertical
++            toQueue:queue withHandler:^(CMDeviceMotion *sample, NSError *error) { calls++; }];
++        usleep(80000);
++        assert(queue.operationCount == 1);
++        [callbacks stopDeviceMotionUpdates];
++        queue.suspended = NO;
++        [queue waitUntilAllOperationsAreFinished];
++        assert(calls == 0);
++
++        // Exercise explicit polling and toggling an existing subscription.
++        [polling startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXArbitraryZVertical];
++        publish((VPhoneAttitudeState){NO, -60, 10, -90});
++        waitFor(^BOOL { return polling.deviceMotionAvailable == nativeAvailable && ![polling.deviceMotion isKindOfClass:VPhoneAttitudeSample.class]; });
++        publish((VPhoneAttitudeState){YES, 0, 0, 0});
++        waitFor(^BOOL { return [polling.deviceMotion isKindOfClass:VPhoneAttitudeSample.class]; });
++        closeTo(polling.deviceMotion.gravity.z, -1);
++        [polling stopDeviceMotionUpdates];
++        publish((VPhoneAttitudeState){0});
++        notify_cancel(token);
++        puts("Core Motion polling, callback, live toggle, snapshot and bounded backlog tests passed");
++    }
++    return 0;
++}
+diff --git a/VPhoneGuestComponents/Tests/AttitudeTests.m b/VPhoneGuestComponents/Tests/AttitudeTests.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..5f9ed03bca0b0de9567524b3ab3e6ff1c9c927a8
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/AttitudeTests.m
+@@ -0,0 +1,55 @@
++#import "VPhoneAttitudeSample.h"
++#include <assert.h>
++
++static void closeTo(double actual, double expected) { assert(fabs(actual - expected) < 1e-9); }
++
++int main(void) {
++    @autoreleasepool {
++        VPhoneAttitudeState state = {YES, 32.5, -24.25, 117.75}, decoded;
++        assert(VPhoneAttitudeDecode(VPhoneAttitudeEncode(state), &decoded));
++        closeTo(decoded.roll, state.roll);
++        for (NSDictionary *invalid in @[
++            @{@"enabled": @YES, @"roll": @YES, @"pitch": @0, @"yaw": @0},
++            @{@"enabled": @1, @"roll": @0, @"pitch": @0, @"yaw": @0},
++            @{@"enabled": @YES, @"roll": @181, @"pitch": @0, @"yaw": @0},
++            @{@"enabled": @YES, @"roll": @0, @"pitch": @91, @"yaw": @0},
++            @{@"enabled": @YES, @"roll": @0, @"pitch": @0, @"yaw": @(NAN)},
++        ]) assert(!VPhoneAttitudeDecode(invalid, &decoded));
++        VPhoneAttitudeState poses[] = {state, {NO, -180, -90, -180}, {YES, 180, 90, 180}, {YES, 0, 0, 0}};
++        for (NSUInteger i = 0; i < sizeof(poses)/sizeof(*poses); i++) {
++            decoded = VPhoneAttitudeUnpack(VPhoneAttitudePack(poses[i]));
++            assert(decoded.enabled == poses[i].enabled);
++            closeTo(decoded.roll, poses[i].roll); closeTo(decoded.pitch, poses[i].pitch); closeTo(decoded.yaw, poses[i].yaw);
++        }
++        assert(!VPhoneAttitudeUnpack(0).enabled);
++        assert(!VPhoneAttitudeUnpack(UINT64_MAX).enabled);
++        VPhoneAttitudeSample *sample = [[VPhoneAttitudeSample alloc] initWithState:state timestamp:123];
++        CMAttitude *pose = sample.attitude;
++        closeTo(pose.roll, state.roll*M_PI/180); closeTo(pose.pitch, state.pitch*M_PI/180); closeTo(pose.yaw, state.yaw*M_PI/180);
++        CMQuaternion q = pose.quaternion;
++        closeTo(q.x*q.x+q.y*q.y+q.z*q.z+q.w*q.w, 1);
++        CMRotationMatrix m = pose.rotationMatrix;
++        closeTo(m.m11*m.m11+m.m12*m.m12+m.m13*m.m13, 1);
++        closeTo(m.m11*m.m21+m.m12*m.m22+m.m13*m.m23, 0);
++        CMAcceleration g = sample.gravity;
++        closeTo(g.x*g.x+g.y*g.y+g.z*g.z, 1);
++        closeTo(sample.rotationRate.x, 0); closeTo(sample.userAcceleration.y, 0); closeTo(sample.timestamp, 123);
++        assert(sample.heading < 0 && sample.magneticField.accuracy == CMMagneticFieldCalibrationAccuracyUncalibrated);
++        CMAttitude *copy = [pose copy];
++        [copy multiplyByInverseOfAttitude:pose];
++        closeTo(copy.quaternion.w, 1); closeTo(copy.roll, 0); closeTo(copy.pitch, 0); closeTo(copy.yaw, 0);
++        closeTo(pose.roll, state.roll*M_PI/180);
++        NSError *error;
++        NSData *archive = [NSKeyedArchiver archivedDataWithRootObject:sample requiringSecureCoding:YES error:&error];
++        assert(archive && !error);
++        VPhoneAttitudeSample *restored = [NSKeyedUnarchiver unarchivedObjectOfClass:VPhoneAttitudeSample.class fromData:archive error:&error];
++        assert(restored && !error);
++        closeTo(restored.attitude.yaw, pose.yaw); closeTo(restored.timestamp, 123);
++        VPhoneAttitudeSample *pitch = [[VPhoneAttitudeSample alloc] initWithState:(VPhoneAttitudeState){YES, 0, 90, 0} timestamp:0];
++        closeTo(pitch.gravity.y, -1);
++        VPhoneAttitudeSample *roll = [[VPhoneAttitudeSample alloc] initWithState:(VPhoneAttitudeState){YES, 90, 0, 0} timestamp:0];
++        closeTo(roll.gravity.x, 1);
++        puts("Attitude configuration, quaternion, gravity, copy and coding tests passed");
++    }
++    return 0;
++}
+diff --git a/VPhoneGuestComponents/Tests/GyroscopeTests.m b/VPhoneGuestComponents/Tests/GyroscopeTests.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..d822321d7f136ec81c9fc8c72c02528f336f83ee
+--- /dev/null
++++ b/VPhoneGuestComponents/Tests/GyroscopeTests.m
+@@ -0,0 +1,74 @@
++#import "VPhoneGyroscopeState.h"
++#import "VPhoneGyroscopeHID.h"
++#include <assert.h>
++#include <dlfcn.h>
++#include <float.h>
++#include <stdio.h>
++
++int main(void) {
++    @autoreleasepool {
++        VPhoneGyroscopeState state;
++        NSDictionary *sample = @{@"enabled": @YES, @"x": @1.25, @"y": @-2.5, @"z": @0.125};
++        // The transport is a property list, including a real Boolean. Test
++        // after serialization, as cfprefsd crosses a process boundary.
++        NSData *wire = [NSPropertyListSerialization dataWithPropertyList:sample
++                                     format:NSPropertyListBinaryFormat_v1_0 options:0 error:nil];
++        id decoded = [NSPropertyListSerialization propertyListWithData:wire options:0 format:nil error:nil];
++        assert(VPhoneGyroscopeDecode(decoded, &state));
++        assert(state.enabled && state.x == 1.25 && state.y == -2.5 && state.z == 0.125);
++        assert([VPhoneGyroscopeEncode(state) isEqual:sample]);
++
++        NSMutableDictionary *disabled = [sample mutableCopy];
++        disabled[@"enabled"] = @NO;
++        NSData *disabledWire = [NSPropertyListSerialization dataWithPropertyList:disabled
++                                     format:NSPropertyListBinaryFormat_v1_0 options:0 error:nil];
++        id disabledRead = [NSPropertyListSerialization propertyListWithData:disabledWire options:0 format:nil error:nil];
++        assert(VPhoneGyroscopeDecode(disabledRead, &state));
++        assert(!state.enabled && state.x == 1.25 && state.y == -2.5 && state.z == 0.125);
++
++        for (id invalid in @[@YES, @"1", NSNull.null, @(NAN), @(INFINITY), @1001, @-1001]) {
++            NSMutableDictionary *bad = [sample mutableCopy];
++            bad[@"y"] = invalid;
++            assert(!VPhoneGyroscopeDecode(bad, &state));
++            assert(!state.enabled && state.x == 0 && state.y == 0 && state.z == 0);
++        }
++        for (NSString *key in @[@"enabled", @"x", @"y", @"z"]) {
++            NSMutableDictionary *bad = [sample mutableCopy];
++            [bad removeObjectForKey:key];
++            assert(!VPhoneGyroscopeDecode(bad, &state));
++        }
++        NSMutableDictionary *badFlag = [sample mutableCopy];
++        badFlag[@"enabled"] = @1;
++        assert(!VPhoneGyroscopeDecode(badFlag, &state));
++        assert(!VPhoneGyroscopeDecode(nil, &state));
++        assert(!VPhoneGyroscopeDecode(@[], &state));
++        assert(VPhoneGyroscopeDecode(@{@"enabled": @NO, @"x": @0, @"y": @0, @"z": @0}, &state));
++        assert(!state.enabled);
++        // A hostile or broken client interval must not produce an unbounded
++        // timer, overflow nanoseconds, or keep streaming after unsubscribe.
++        assert(VPhoneGyroscopeInterval(@500) == 5000);
++        assert(VPhoneGyroscopeInterval(@20000) == 20000);
++        assert(VPhoneGyroscopeInterval(@(DBL_MAX)) == 1000000);
++        for (id interval in @[@0, @-1, @YES, @"5000", @(NAN), @(INFINITY), NSNull.null])
++            assert(VPhoneGyroscopeInterval(interval) == 0);
++        puts("Gyroscope transport tests passed");
++
++        // Exercise the real HID factory without creating/publishing a host
++        // service. This verifies our ObjC ABI and signed axis representation.
++        void *hid = dlopen("/System/Library/PrivateFrameworks/HID.framework/HID", RTLD_NOW | RTLD_LOCAL);
++        assert(hid);
++        Class<VPhoneGyroscopeHIDEvent> eventClass = (Class<VPhoneGyroscopeHIDEvent>)NSClassFromString(@"HIDEvent");
++        assert([eventClass respondsToSelector:@selector(gyroEvent:x:y:z:options:)]);
++        id<VPhoneGyroscopeHIDEvent> event = [eventClass gyroEvent:123456789 x:1.25 y:-2.5 z:0.125 options:0];
++        assert(event && event.timestamp == 123456789);
++        assert(event.gyroX == 1.25 && event.gyroY == -2.5 && event.gyroZ == 0.125);
++        [event setGyroSequence:42];
++        assert(event.gyroSequence == 42);
++        event = [eventClass gyroEvent:123456790 x:0.1234567 y:-0.1234567 z:1000 options:0];
++        assert(fabs(event.gyroX - 0.1234567) < 1.0 / 65536);
++        assert(fabs(event.gyroY + 0.1234567) < 1.0 / 65536);
++        assert(event.gyroZ == 1000 && event.timestamp == 123456790);
++        puts("Gyroscope HID event factory tests passed");
++    }
++    return 0;
++}
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift
+index 914375575e198605035f4eb647f13f8f342f2584..b6ef1b816812cc86acdbcaf95de2c7c3446c4a52 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift
+@@ -18,5 +18,11 @@ public enum VPhoneGuestEnvironment {
+         "libdevicename.dylib",
+         "libprefsfix.dylib",
+         "libsigninfix.dylib",
++        "libvphonegyro.dylib",
++        "libvphoneattitude.dylib",
+     ]
++
++    /// Selection installs/removes these. A live hash sync may replace an
++    /// installed copy, but must never reinstall a patch the user turned off.
++    public static let selectedLibraries: Set<String> = ["libvphonegyro.dylib", "libvphoneattitude.dylib"]
+ }
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings b/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings
+index a3e2098ac29b6b88acae1f3ce1e1ff0cd8443e1f..8950f1a75c484b4661bf4e6181870647269167ca 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings
+@@ -3,7 +3,6 @@
+   "strings" : {
+     "CFBundleDisplayName" : {
+       "comment" : "Bundle display name",
+-      "extractionState" : "extracted_with_value",
+       "localizations" : {
+         "en" : {
+           "stringUnit" : {
+@@ -39,7 +38,6 @@
+     },
+     "CFBundleName" : {
+       "comment" : "Bundle name",
+-      "extractionState" : "extracted_with_value",
+       "localizations" : {
+         "en" : {
+           "stringUnit" : {
+@@ -213,7 +211,6 @@
+         }
+       }
+     }
+-
+   },
+   "version" : "1.3"
+ }
+\ No newline at end of file
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings b/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings
+index 41e6cbd27f9d77f212c6f7aadd1410e2566218eb..a44549cb207abb8ac664bebce3b4c655070bd83e 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings
+@@ -1,6 +1,12 @@
+ {
+   "sourceLanguage" : "en",
+   "strings" : {
++    "Edit…" : {
++
++    },
++    "iPadOS" : {
++
++    },
+     "Device" : {
+       "localizations" : {
+         "en" : {

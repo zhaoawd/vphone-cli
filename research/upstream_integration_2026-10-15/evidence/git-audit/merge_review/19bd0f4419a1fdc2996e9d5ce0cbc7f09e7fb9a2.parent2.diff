@@ -1,0 +1,816 @@
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index f7290a1c247fcbede29ccae74a5f75410abea4fd..b262dbe165a71bf1e6d56d2420297d24edc881a6 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+ MARKETING_VERSION = 2.7.0
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+-CURRENT_PROJECT_VERSION = 14
++CURRENT_PROJECT_VERSION = 15
+diff --git a/VPhoneLaunchpad/Tests/FirmwareAdmissionTests.sh b/VPhoneLaunchpad/Tests/FirmwareAdmissionTests.sh
+new file mode 100755
+index 0000000000000000000000000000000000000000..ac48ebf17dea30e652ea109f59ee2945238191eb
+--- /dev/null
++++ b/VPhoneLaunchpad/Tests/FirmwareAdmissionTests.sh
+@@ -0,0 +1,13 @@
++#!/bin/zsh
++set -euo pipefail
++
++launchpad="${0:a:h:h}"
++temporary="$(/usr/bin/mktemp -d)"
++trap '/bin/rm -rf "$temporary"' EXIT
++
++/usr/bin/xcrun swiftc -swift-version 6 -strict-concurrency=complete \
++    -parse-as-library \
++    "$launchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareAdmission.swift" \
++    "$launchpad/Tests/FirmwareAdmissionTests.swift" \
++    -o "$temporary/firmware-admission-tests"
++"$temporary/firmware-admission-tests" "$@"
+diff --git a/VPhoneLaunchpad/Tests/FirmwareAdmissionTests.swift b/VPhoneLaunchpad/Tests/FirmwareAdmissionTests.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..f60fc28ed4aa32ed2783fab258cb78196e48da12
+--- /dev/null
++++ b/VPhoneLaunchpad/Tests/FirmwareAdmissionTests.swift
+@@ -0,0 +1,86 @@
++import Darwin
++
++@main
++struct FirmwareAdmissionTests {
++    typealias Admission = VPhoneLaunchpadHelperFirmwareAdmission
++
++    static let gib: Int64 = 1024 * 1024 * 1024
++
++    static func machine(_ inode: ino_t, on device: dev_t = 1) -> Admission.MachineKey {
++        Admission.MachineKey(device: device, inode: inode)
++    }
++
++    static func refusal(
++        _ candidate: Admission.MachineKey,
++        volumes: [dev_t: String],
++        running: [Admission.MachineKey: Set<dev_t>],
++        capacity: [String: Int64] = [:],
++    ) -> String? {
++        Admission.refusal(machine: candidate, volumes: volumes, running: running) { path in
++            guard let free = capacity[path] else {
++                fatalError("Unexpected capacity query for \(path)")
++            }
++            return free
++        }
++    }
++
++    static func main() {
++        let a = machine(10)
++        let b = machine(11)
++        let c = machine(12)
++
++        // Nothing running: admitted without a capacity query, since
++        // vphone-cli's own check reports a short volume precisely.
++        precondition(refusal(a, volumes: [1: "/lib", 2: "/tmp"], running: [:]) == nil)
++
++        // The same machine is refused whatever space there is.
++        precondition(
++            refusal(a, volumes: [1: "/lib"], running: [a: [1]], capacity: ["/lib": 1000 * gib])
++                == Admission.machineBusy,
++        )
++
++        // A folder is the machine, not its name: an equal inode on another
++        // device is another machine.
++        precondition(refusal(machine(10, on: 9), volumes: [9: "/other"], running: [a: [1]]) == nil)
++
++        // A volume no running operation writes to is not queried.
++        precondition(refusal(b, volumes: [3: "/elsewhere"], running: [a: [1, 2]]) == nil)
++
++        // A shared volume needs a share for each run, this one included.
++        precondition(
++            refusal(b, volumes: [1: "/lib"], running: [a: [1]], capacity: ["/lib": 100 * gib]) == nil,
++        )
++        precondition(
++            refusal(b, volumes: [1: "/lib"], running: [a: [1]], capacity: ["/lib": 100 * gib - 1])
++                == Admission.notEnoughSpace,
++        )
++        precondition(
++            refusal(c, volumes: [1: "/lib"], running: [a: [1], b: [1]], capacity: ["/lib": 150 * gib]) == nil,
++        )
++        precondition(
++            refusal(c, volumes: [1: "/lib"], running: [a: [1], b: [1]], capacity: ["/lib": 149 * gib])
++                == Admission.notEnoughSpace,
++        )
++
++        // Each volume is counted on its own: the work folder's volume is
++        // shared by both runs, the library's only by the new one.
++        precondition(
++            refusal(
++                b,
++                volumes: [1: "/lib", 2: "/tmp"],
++                running: [machine(20, on: 5): [5, 2]],
++                capacity: ["/tmp": 100 * gib],
++            ) == nil,
++        )
++        precondition(
++            refusal(
++                b,
++                volumes: [1: "/lib", 2: "/tmp"],
++                running: [machine(20, on: 5): [5, 2]],
++                capacity: ["/tmp": 60 * gib],
++            ) == Admission.notEnoughSpace,
++        )
++
++        print("FirmwareAdmissionTests passed")
++    }
++}
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift b/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift
+index 9d65c83447cd24a36748a3f4877b0bf2179fb07b..cc7badf8d5abbd20915ebc501bda046e467a7f34 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift
+@@ -20,7 +20,8 @@ final class VPhoneLaunchpadHelperClient {
+ 
+     private(set) var state: State = .unknown
+     private var connection: NSXPCConnection?
+-    private let receiver = VPhoneLaunchpadHelperReceiver()
++    /// Machines with a CFW install or update running, by `firmwareKey`.
++    private var firmwareMachines: Set<String> = []
+     private let authorizationSession = VPhoneLaunchpadHelperAuthorizationSession()
+ 
+     private nonisolated static let label = VPhoneLaunchpadHelperIdentity.label
+@@ -253,29 +254,15 @@ final class VPhoneLaunchpadHelperClient {
+         keepArtifacts: Bool,
+         onLine: @escaping @Sendable (String) -> Void,
+     ) async throws -> Int32 {
+-        let authorization = try await authorizationSession.externalForm()
+-        guard receiver.claim(onLine) else {
+-            throw Self.firmwareBusy
+-        }
+-        defer { receiver.release() }
+-        return try await withTaskCancellationHandler {
+-            try await request { proxy, done in
+-                proxy.installCustomFirmware(
+-                    authorization: authorization,
+-                    bundleVersion: bundleVersion,
+-                    machineName: machineName,
+-                    libraryRoot: libraryRoot,
+-                    keepArtifacts: keepArtifacts,
+-                ) { status, message in
+-                    if let message {
+-                        done(.failure(VPhoneLaunchpadError(message)))
+-                    } else {
+-                        done(.success(status))
+-                    }
+-                }
+-            }
+-        } onCancel: {
+-            Task { @MainActor in self.cancelCustomFirmware() }
++        try await runFirmware(machineName: machineName, libraryRoot: libraryRoot, onLine: onLine) { proxy, authorization, reply in
++            proxy.installCustomFirmware(
++                authorization: authorization,
++                bundleVersion: bundleVersion,
++                machineName: machineName,
++                libraryRoot: libraryRoot,
++                keepArtifacts: keepArtifacts,
++                reply: reply,
++            )
+         }
+     }
+ 
+@@ -287,28 +274,14 @@ final class VPhoneLaunchpadHelperClient {
+         libraryRoot: String,
+         onLine: @escaping @Sendable (String) -> Void,
+     ) async throws -> Int32 {
+-        let authorization = try await authorizationSession.externalForm()
+-        guard receiver.claim(onLine) else {
+-            throw Self.firmwareBusy
+-        }
+-        defer { receiver.release() }
+-        return try await withTaskCancellationHandler {
+-            try await request { proxy, done in
+-                proxy.updateGuestEnvironment(
+-                    authorization: authorization,
+-                    bundleVersion: bundleVersion,
+-                    machineName: machineName,
+-                    libraryRoot: libraryRoot,
+-                ) { status, message in
+-                    if let message {
+-                        done(.failure(VPhoneLaunchpadError(message)))
+-                    } else {
+-                        done(.success(status))
+-                    }
+-                }
+-            }
+-        } onCancel: {
+-            Task { @MainActor in self.cancelCustomFirmware() }
++        try await runFirmware(machineName: machineName, libraryRoot: libraryRoot, onLine: onLine) { proxy, authorization, reply in
++            proxy.updateGuestEnvironment(
++                authorization: authorization,
++                bundleVersion: bundleVersion,
++                machineName: machineName,
++                libraryRoot: libraryRoot,
++                reply: reply,
++            )
+         }
+     }
+ 
+@@ -320,28 +293,14 @@ final class VPhoneLaunchpadHelperClient {
+         libraryRoot: String,
+         onLine: @escaping @Sendable (String) -> Void,
+     ) async throws -> Int32 {
+-        let authorization = try await authorizationSession.externalForm()
+-        guard receiver.claim(onLine) else {
+-            throw Self.firmwareBusy
+-        }
+-        defer { receiver.release() }
+-        return try await withTaskCancellationHandler {
+-            try await request { proxy, done in
+-                proxy.updateKernel(
+-                    authorization: authorization,
+-                    bundleVersion: bundleVersion,
+-                    machineName: machineName,
+-                    libraryRoot: libraryRoot,
+-                ) { status, message in
+-                    if let message {
+-                        done(.failure(VPhoneLaunchpadError(message)))
+-                    } else {
+-                        done(.success(status))
+-                    }
+-                }
+-            }
+-        } onCancel: {
+-            Task { @MainActor in self.cancelCustomFirmware() }
++        try await runFirmware(machineName: machineName, libraryRoot: libraryRoot, onLine: onLine) { proxy, authorization, reply in
++            proxy.updateKernel(
++                authorization: authorization,
++                bundleVersion: bundleVersion,
++                machineName: machineName,
++                libraryRoot: libraryRoot,
++                reply: reply,
++            )
+         }
+     }
+ 
+@@ -371,15 +330,46 @@ final class VPhoneLaunchpadHelperClient {
+         }
+     }
+ 
+-    /// Never prompts. The helper stops only an install this user started.
+-    func cancelCustomFirmware() {
++    /// Never prompts. The helper stops only an operation this user started on
++    /// that machine.
++    func cancelCustomFirmware(machineName: String, libraryRoot: String) {
+         let proxy = currentConnection().remoteObjectProxy as? VPhoneLaunchpadHelperProtocol
+-        proxy?.cancelCustomFirmware {}
++        proxy?.cancelCustomFirmware(machineName: machineName, libraryRoot: libraryRoot) {}
+     }
+ 
+-    /// A CFW install or environment update from this app is still streaming.
+-    private static var firmwareBusy: VPhoneLaunchpadError {
+-        VPhoneLaunchpadError(String(localized: "Another CFW install or environment update is in progress. Wait for it to finish, then try again."))
++    /// Runs one CFW install or update on its own connection. The helper sends
++    /// output lines only over the connection that made the request, so each
++    /// operation's lines reach its own receiver, and operations on different
++    /// machines run side by side. One machine runs one operation at a time.
++    private func runFirmware(
++        machineName: String,
++        libraryRoot: String,
++        onLine: @escaping @Sendable (String) -> Void,
++        _ body: @escaping (VPhoneLaunchpadHelperProtocol, Data, @escaping @Sendable (Int32, String?) -> Void) -> Void,
++    ) async throws -> Int32 {
++        let key = URL(fileURLWithPath: libraryRoot, isDirectory: true)
++            .appendingPathComponent(machineName)
++            .standardizedFileURL.resolvingSymlinksInPath().path
++        guard firmwareMachines.insert(key).inserted else {
++            throw VPhoneLaunchpadError(String(localized: "A CFW install or environment update is already running on this machine. Wait for it to finish, then try again."))
++        }
++        defer { firmwareMachines.remove(key) }
++        let authorization = try await authorizationSession.externalForm()
++        let connection = makeConnection(receiver: VPhoneLaunchpadHelperReceiver(onLine))
++        defer { connection.invalidate() }
++        return try await withTaskCancellationHandler {
++            try await request(on: connection) { proxy, done in
++                body(proxy, authorization) { status, message in
++                    if let message {
++                        done(.failure(VPhoneLaunchpadError(message)))
++                    } else {
++                        done(.success(status))
++                    }
++                }
++            }
++        } onCancel: {
++            Task { @MainActor in self.cancelCustomFirmware(machineName: machineName, libraryRoot: libraryRoot) }
++        }
+     }
+ 
+     // MARK: - XPC plumbing
+@@ -388,29 +378,43 @@ final class VPhoneLaunchpadHelperClient {
+         if let connection {
+             return connection
+         }
+-        let connection = NSXPCConnection(machServiceName: Self.label, options: .privileged)
+-        connection.remoteObjectInterface = NSXPCInterface(with: VPhoneLaunchpadHelperProtocol.self)
+-        connection.exportedInterface = NSXPCInterface(with: VPhoneLaunchpadHelperClientProtocol.self)
+-        connection.exportedObject = receiver
+-        if let helperRequirement {
+-            connection.setCodeSigningRequirement(helperRequirement)
+-        }
+         // XPC calls this and the error handlers below on its own queue. Without
+         // @Sendable they would inherit the main actor, and Swift 6 traps when
+         // they run there.
+-        connection.invalidationHandler = { @Sendable [weak self] in
++        let connection = makeConnection { @Sendable [weak self] in
+             Task { @MainActor in self?.connection = nil }
+         }
+-        connection.resume()
+         self.connection = connection
+         return connection
+     }
+ 
+-    /// One request whose reply carries a value.
++    /// A resumed connection to the helper. Only a firmware operation's own
++    /// connection takes a receiver, as only those requests stream output.
++    private func makeConnection(
++        receiver: VPhoneLaunchpadHelperReceiver? = nil,
++        invalidationHandler: (@Sendable () -> Void)? = nil,
++    ) -> NSXPCConnection {
++        let connection = NSXPCConnection(machServiceName: Self.label, options: .privileged)
++        connection.remoteObjectInterface = NSXPCInterface(with: VPhoneLaunchpadHelperProtocol.self)
++        if let receiver {
++            connection.exportedInterface = NSXPCInterface(with: VPhoneLaunchpadHelperClientProtocol.self)
++            connection.exportedObject = receiver
++        }
++        if let helperRequirement {
++            connection.setCodeSigningRequirement(helperRequirement)
++        }
++        connection.invalidationHandler = invalidationHandler
++        connection.resume()
++        return connection
++    }
++
++    /// One request whose reply carries a value, on `connection` or else the
++    /// shared one.
+     private func request<T: Sendable>(
++        on connection: NSXPCConnection? = nil,
+         _ body: (VPhoneLaunchpadHelperProtocol, @escaping @Sendable (Result<T, Error>) -> Void) -> Void,
+     ) async throws -> T {
+-        let connection = currentConnection()
++        let connection = connection ?? currentConnection()
+         return try await withCheckedThrowingContinuation { continuation in
+             let once = VPhoneLaunchpadResumeOnce(continuation)
+             let proxy = connection.remoteObjectProxyWithErrorHandler { @Sendable error in
+@@ -545,34 +549,17 @@ final nonisolated class VPhoneLaunchpadHelperAuthorizationSession: @unchecked Se
+     }
+ }
+ 
+-/// Receives output lines the helper streams back during a CFW install.
+-///
+-/// One operation owns it at a time, as the helper runs one at a time. A second
+-/// request made while one is streaming is turned away here: if it set its own
+-/// handler, the running install's lines would go to the wrong log, and when it
+-/// finished it would clear the handler the running install still needs.
+-final nonisolated class VPhoneLaunchpadHelperReceiver: NSObject, VPhoneLaunchpadHelperClientProtocol, @unchecked Sendable {
+-    private let lock = NSLock()
+-    private var handler: (@Sendable (String) -> Void)?
+-
+-    /// Takes the receiver for one operation; false while another holds it.
+-    func claim(_ handler: @escaping @Sendable (String) -> Void) -> Bool {
+-        lock.withLock {
+-            guard self.handler == nil else {
+-                return false
+-            }
+-            self.handler = handler
+-            return true
+-        }
+-    }
++/// Receives the output lines the helper streams back during one CFW install
++/// or update, on that operation's own connection.
++final nonisolated class VPhoneLaunchpadHelperReceiver: NSObject, VPhoneLaunchpadHelperClientProtocol, Sendable {
++    private let handler: @Sendable (String) -> Void
+ 
+-    func release() {
+-        lock.withLock { handler = nil }
++    init(_ handler: @escaping @Sendable (String) -> Void) {
++        self.handler = handler
+     }
+ 
+     func helperDidEmit(line: String) {
+-        let handler = lock.withLock { self.handler }
+-        handler?(line)
++        handler(line)
+     }
+ 
+     /// XPC hands this over after every line sent before it, so replying is
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings b/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings
+index 533e7385c729933ece17c53a574cfe40792c98e5..1b786a55fb777828538297bce129601c17ebc4a1 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings
+@@ -5679,13 +5679,13 @@
+         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在更新客户机环境…" } }
+       }
+     },
+-    "Another CFW install or environment update is in progress. Wait for it to finish, then try again." : {
++    "A CFW install or environment update is already running on this machine. Wait for it to finish, then try again." : {
+       "localizations" : {
+-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Another CFW install or environment update is in progress. Wait for it to finish, then try again." } },
+-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "別の CFW インストールまたはゲスト環境の更新が実行中です。完了するまで待ってから、もう一度お試しください。" } },
+-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "다른 CFW 설치 또는 게스트 환경 업데이트가 진행 중입니다. 완료될 때까지 기다린 후 다시 시도하십시오." } },
+-        "vi" : { "stringUnit" : { "state" : "translated", "value" : "Một lần cài CFW hoặc cập nhật môi trường máy khách khác đang chạy. Hãy đợi nó xong rồi thử lại." } },
+-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "另一个 CFW 安装或客户机环境更新正在进行。请等它完成后再试。" } }
++        "en" : { "stringUnit" : { "state" : "translated", "value" : "A CFW install or environment update is already running on this machine. Wait for it to finish, then try again." } },
++        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このマシンでは CFW インストールまたはゲスト環境の更新がすでに実行中です。完了するまで待ってから、もう一度お試しください。" } },
++        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이 머신에서 CFW 설치 또는 게스트 환경 업데이트가 이미 진행 중입니다. 완료될 때까지 기다린 후 다시 시도하십시오." } },
++        "vi" : { "stringUnit" : { "state" : "translated", "value" : "Máy này đang chạy một lần cài CFW hoặc cập nhật môi trường máy khách. Hãy đợi nó xong rồi thử lại." } },
++        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "这台机器上已有 CFW 安装或客户机环境更新正在进行。请等它完成后再试。" } }
+       }
+     },
+     "Unable to update the guest environment." : {
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLibrary.swift b/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLibrary.swift
+index a5b3e61d4d77f9e97a85d3374544f799fcbfa0b1..757c8e01c8b32c2f15643c3bb1bbd072b5b81e51 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLibrary.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLibrary.swift
+@@ -683,8 +683,16 @@ final class VPhoneLaunchpadMachineLibrary {
+         }
+     }
+ 
++    /// Removing the folder needs nothing version-specific, so a machine whose
++    /// own bundle is gone or from an unsupported series is deleted with the
++    /// default one instead of having to be rebound first.
+     func delete(_ machine: Path) async {
+-        await perform(String(localized: "Deleting…"), on: machine, ["vm", "delete", machine.name, "--force"] + machine.libraryArguments)
++        await perform(
++            String(localized: "Deleting…"),
++            on: machine,
++            ["vm", "delete", machine.name, "--force"] + machine.libraryArguments,
++            anyBundle: true,
++        )
+     }
+ 
+     // MARK: - Export
+@@ -767,10 +775,11 @@ final class VPhoneLaunchpadMachineLibrary {
+         _ activity: String,
+         on machine: Path?,
+         _ arguments: [String],
++        anyBundle: Bool = false,
+         onProgress: (@Sendable (Double) -> Void)? = nil,
+     ) async -> Bool {
+         do {
+-            try await performChecked(activity, on: machine, arguments, onProgress: onProgress)
++            try await performChecked(activity, on: machine, arguments, anyBundle: anyBundle, onProgress: onProgress)
+             return true
+         } catch {
+             if !(error is CancellationError) {
+@@ -786,9 +795,17 @@ final class VPhoneLaunchpadMachineLibrary {
+         _ activity: String,
+         on machine: Path?,
+         _ arguments: [String],
++        anyBundle: Bool = false,
+         onProgress: (@Sendable (Double) -> Void)? = nil,
+     ) async throws {
+-        guard let commandLine = machine.map(commandLine(for:)) ?? bundles.commandLine() else {
++        // A machine's commands run with its own bundle; `anyBundle` lets one
++        // that needs no particular version fall back to the default.
++        let commandLine: VPhoneLaunchpadCommandLine? = if let machine {
++            self.commandLine(for: machine) ?? (anyBundle ? bundles.commandLine() : nil)
++        } else {
++            bundles.commandLine()
++        }
++        guard let commandLine else {
+             if let machine {
+                 throw Self.missingBundle(machine)
+             }
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareAdmission.swift b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareAdmission.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..668ac262f84f8e9a84459cebc185456ce714ef51
+--- /dev/null
++++ b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareAdmission.swift
+@@ -0,0 +1,52 @@
++import Darwin
++
++/// Which CFW installs and updates may run side by side: one per machine, and
++/// on a volume that running operations already write to, only while it has
++/// free space for all of them.
++///
++/// Each run host-mounts its machine's disk, so two on one machine would
++/// collide. Runs on different machines keep their own work folders, clones
++/// and mount points; what they share is free space on the volumes they write
++/// to.
++enum VPhoneLaunchpadHelperFirmwareAdmission {
++    /// A machine, named by its folder rather than its name: two libraries can
++    /// each hold a machine with the same name.
++    struct MachineKey: Hashable {
++        let device: dev_t
++        let inode: ino_t
++    }
++
++    /// The free space one run needs on each volume it writes to, matching
++    /// `VPhoneCustomFirmwareInstaller.requireFreeSpace` in vphone-cli.
++    static let freeSpacePerRun: Int64 = 50 * 1024 * 1024 * 1024
++
++    static let machineBusy = "A CFW install or environment update is already running on this machine. Wait for it to finish, then try again."
++    static let notEnoughSpace = "Not enough free disk space to run this alongside the CFW installs or environment updates already running. Wait for them to finish or free up space, then try again."
++
++    /// Why a run on `machine`, writing to `volumes` (each device with a path
++    /// on it), may not start beside `running` (each running machine with the
++    /// devices it writes to), or nil.
++    ///
++    /// A volume no other run writes to is left to vphone-cli, whose own check
++    /// says exactly how much space is missing. A volume shared with running
++    /// operations must hold their share each plus this one's, or they could
++    /// all pass their own checks and then fill the disk together.
++    static func refusal(
++        machine: MachineKey,
++        volumes: [dev_t: String],
++        running: [MachineKey: Set<dev_t>],
++        availableCapacity: (String) -> Int64,
++    ) -> String? {
++        guard running[machine] == nil else {
++            return machineBusy
++        }
++        for (device, path) in volumes {
++            let sharing = running.values.count(where: { $0.contains(device) })
++            guard sharing > 0 else { continue }
++            guard availableCapacity(path) >= freeSpacePerRun * Int64(sharing + 1) else {
++                return notEnoughSpace
++            }
++        }
++        return nil
++    }
++}
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift
+index 3db81b2167853bb86522511db5d25a39f5e26fe1..69f28306cc6e959e363834c5a6b30abe3df634b5 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift
+@@ -15,10 +15,20 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+         case updateKernel
+     }
+ 
++    typealias MachineKey = VPhoneLaunchpadHelperFirmwareAdmission.MachineKey
++
++    /// The installer's work parent, `VPhoneCustomFirmwareInstaller.workParent`:
++    /// every run makes its private work folder there.
++    static let workParent = "/private/var/tmp"
++
+     let executable: URL
+     let arguments: [String]
+     let environment: [String: String]
+     let workingDirectory: URL
++    let machineKey: MachineKey
++    /// The volumes the run writes to, by device, each with a path on it: the
++    /// machine folder's and the work parent's. One entry when they share one.
++    let volumes: [dev_t: String]
+ 
+     init(
+         operation: Operation,
+@@ -45,9 +55,13 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+         // to the caller. The caller can still rename these afterwards, so this
+         // only refuses a bad request up front; the root vphone-cli child pins
+         // the machine directory again itself before it touches anything.
+-        try Self.requireMachine(libraryRoot: libraryRoot, machineName: machineName, ownedBy: callerUID)
++        let folder = try Self.requireMachine(libraryRoot: libraryRoot, machineName: machineName, ownedBy: callerUID)
+         let machine = URL(fileURLWithPath: libraryRoot, isDirectory: true)
+             .appendingPathComponent(machineName, isDirectory: true)
++        var work = stat()
++        guard stat(Self.workParent, &work) == 0 else {
++            throw VPhoneLaunchpadHelperError("Unable to read \(Self.workParent): \(String(cString: strerror(errno)))")
++        }
+ 
+         var arguments: [String]
+         switch operation {
+@@ -65,24 +79,44 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+         self.executable = executable
+         self.arguments = arguments
+         workingDirectory = machine
++        machineKey = MachineKey(device: folder.st_dev, inode: folder.st_ino)
++        // Not one literal: equal keys in a dictionary literal trap.
++        var volumes = [work.st_dev: Self.workParent]
++        volumes[folder.st_dev] = machine.path
++        self.volumes = volumes
+         // The same environment `sudo vphone-cli cfw install` sees: SUDO_UID
+         // and SUDO_GID are how the installer hands root-created files back
+         // to the user afterwards.
+         environment = try VPhoneLaunchpadHelperLibraryPath.environment(callerUID: callerUID, callerGID: callerGID)
+     }
+ 
++    /// The machine a cancel names. It checks no ownership: the operation
++    /// found under the key is stopped only for the user who started it.
++    static func machineKey(libraryRoot: String, machineName: String) throws -> MachineKey {
++        guard VPhoneLaunchpadNames.isValidMachineName(machineName) else {
++            throw VPhoneLaunchpadHelperError("\"\(machineName)\" is not a valid machine name.")
++        }
++        let root = try VPhoneLaunchpadHelperLibraryPath.openDirectory(libraryRoot)
++        defer { close(root) }
++        let machine = try openMachine(root, libraryRoot: libraryRoot, machineName: machineName)
++        defer { close(machine) }
++        var folder = stat()
++        guard fstat(machine, &folder) == 0 else {
++            throw VPhoneLaunchpadHelperError("\(libraryRoot)/\(machineName) is not a folder.")
++        }
++        return MachineKey(device: folder.st_dev, inode: folder.st_ino)
++    }
++
+     // MARK: - Machine directory
+ 
+-    private static func requireMachine(libraryRoot: String, machineName: String, ownedBy uid: uid_t) throws {
++    /// Returns the machine folder's metadata.
++    private static func requireMachine(libraryRoot: String, machineName: String, ownedBy uid: uid_t) throws -> stat {
+         let root = try VPhoneLaunchpadHelperLibraryPath.openDirectory(libraryRoot)
+         defer { close(root) }
+         try VPhoneLaunchpadHelperLibraryPath.requireOwner(root, libraryRoot, uid)
+ 
+         let machinePath = libraryRoot + "/" + machineName
+-        let machine = openat(root, machineName, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+-        guard machine >= 0 else {
+-            throw VPhoneLaunchpadHelperError("\(machinePath) is not a folder, or is a symbolic link.")
+-        }
++        let machine = try openMachine(root, libraryRoot: libraryRoot, machineName: machineName)
+         defer { close(machine) }
+         try VPhoneLaunchpadHelperLibraryPath.requireOwner(machine, machinePath, uid)
+ 
+@@ -96,5 +130,18 @@ struct VPhoneLaunchpadHelperFirmwareRequest {
+         guard disk.st_uid == uid else {
+             throw VPhoneLaunchpadHelperError("\(machinePath)/Disk.img is not owned by your user account.")
+         }
++        var folder = stat()
++        guard fstat(machine, &folder) == 0 else {
++            throw VPhoneLaunchpadHelperError("\(machinePath) is not a folder.")
++        }
++        return folder
++    }
++
++    private static func openMachine(_ root: Int32, libraryRoot: String, machineName: String) throws -> Int32 {
++        let machine = openat(root, machineName, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
++        guard machine >= 0 else {
++            throw VPhoneLaunchpadHelperError("\(libraryRoot)/\(machineName) is not a folder, or is a symbolic link.")
++        }
++        return machine
+     }
+ }
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift
+index 3415d392352869c8c709197a7f5d2ca6f6e07591..5632e0d9469e283e823930d0eb6588e7fefee3a3 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift
+@@ -8,12 +8,19 @@ final class VPhoneLaunchpadHelperService: NSObject, VPhoneLaunchpadHelperProtoco
+     private let callerGID: gid_t
+     private let work = DispatchQueue(label: "com.vphone.launchpad.helper.work")
+ 
+-    /// One CFW install at a time across every connection: two installs
+-    /// host-mounting disks at once is never what anyone wants. The owner is
+-    /// the user that started it, the only one allowed to cancel it.
++    /// The CFW installs, environment updates and kernel updates running, one
++    /// per machine at most, across every connection and user. Which may start
++    /// is `VPhoneLaunchpadHelperFirmwareAdmission`. The owner is the user that
++    /// started a run, the only one allowed to cancel it.
+     private static let firmwareLock = NSLock()
+-    private nonisolated(unsafe) static var firmwareProcess: Process?
+-    private nonisolated(unsafe) static var firmwareOwner: uid_t?
++    private nonisolated(unsafe) static var firmwareRuns: [VPhoneLaunchpadHelperFirmwareRequest.MachineKey: FirmwareRun] = [:]
++
++    private struct FirmwareRun {
++        let process: Process
++        let owner: uid_t
++        /// Devices of the volumes the run writes to.
++        let volumes: Set<dev_t>
++    }
+ 
+     init(connection: NSXPCConnection) {
+         self.connection = connection
+@@ -125,9 +132,9 @@ final class VPhoneLaunchpadHelperService: NSObject, VPhoneLaunchpadHelperProtoco
+         )
+     }
+ 
+-    /// Both operations share one slot, so an install and an environment
+-    /// update never write the same machine at once, and one cancel stops
+-    /// either.
++    /// All three operations share one slot per machine, so an install and
++    /// an update never write the same machine at once, and one cancel for
++    /// that machine stops whichever is running.
+     private func runFirmware(
+         _ operation: VPhoneLaunchpadHelperFirmwareRequest.Operation,
+         authorization: Data,
+@@ -165,19 +172,23 @@ final class VPhoneLaunchpadHelperService: NSObject, VPhoneLaunchpadHelperProtoco
+             process.standardOutput = pipe
+             process.standardError = pipe
+ 
++            // Checked and registered in one critical section, so two requests
++            // cannot both pass before either is counted.
+             Self.firmwareLock.lock()
+-            guard Self.firmwareProcess == nil else {
++            if let refusal = Self.firmwareRefusal(for: request) {
+                 Self.firmwareLock.unlock()
+-                reply(-1, "Another CFW install or environment update is in progress. Wait for it to finish, then try again.")
++                reply(-1, refusal)
+                 return
+             }
+-            Self.firmwareProcess = process
+-            Self.firmwareOwner = callerUID
++            Self.firmwareRuns[request.machineKey] = FirmwareRun(
++                process: process,
++                owner: callerUID,
++                volumes: Set(request.volumes.keys),
++            )
+             Self.firmwareLock.unlock()
+             defer {
+                 Self.firmwareLock.lock()
+-                Self.firmwareProcess = nil
+-                Self.firmwareOwner = nil
++                Self.firmwareRuns[request.machineKey] = nil
+                 Self.firmwareLock.unlock()
+             }
+ 
+@@ -195,6 +206,20 @@ final class VPhoneLaunchpadHelperService: NSObject, VPhoneLaunchpadHelperProtoco
+         }
+     }
+ 
++    /// Why a run may not start now, or nil. Called with `firmwareLock` held;
++    /// the capacity queries it makes are quick.
++    private static func firmwareRefusal(for request: VPhoneLaunchpadHelperFirmwareRequest) -> String? {
++        VPhoneLaunchpadHelperFirmwareAdmission.refusal(
++            machine: request.machineKey,
++            volumes: request.volumes,
++            running: firmwareRuns.mapValues(\.volumes),
++        ) { path in
++            (try? URL(fileURLWithPath: path)
++                .resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
++                .volumeAvailableCapacityForImportantUsage) ?? 0
++        }
++    }
++
+     // MARK: - DHCP leases
+ 
+     func releaseOrphanedLeases(
+@@ -260,7 +285,11 @@ final class VPhoneLaunchpadHelperService: NSObject, VPhoneLaunchpadHelperProtoco
+         }
+     }
+ 
+-    func cancelCustomFirmware(reply: @escaping @Sendable () -> Void) {
++    func cancelCustomFirmware(
++        machineName: String,
++        libraryRoot: String,
++        reply: @escaping @Sendable () -> Void,
++    ) {
+         let callerUID = callerUID
+         // Not on `work`: a bundle install queued there must not delay a cancel.
+         // No authorization check: the install's right may have expired by
+@@ -268,9 +297,16 @@ final class VPhoneLaunchpadHelperService: NSObject, VPhoneLaunchpadHelperProtoco
+         // user who started the install can stop it.
+         DispatchQueue.global(qos: .userInitiated).async {
+             defer { reply() }
++            // A machine that cannot be found has nothing running to stop.
++            guard let machine = try? VPhoneLaunchpadHelperFirmwareRequest.machineKey(
++                libraryRoot: libraryRoot,
++                machineName: machineName,
++            ) else { return }
+             Self.firmwareLock.lock()
+-            if Self.firmwareOwner == callerUID {
+-                Self.firmwareProcess?.interrupt()
++            // A run is registered just before its process starts, and
++            // interrupting a process that has not started raises.
++            if let run = Self.firmwareRuns[machine], run.owner == callerUID, run.process.isRunning {
++                run.process.interrupt()
+             }
+             Self.firmwareLock.unlock()
+         }
+@@ -319,7 +355,7 @@ final class VPhoneLaunchpadHelperService: NSObject, VPhoneLaunchpadHelperProtoco
+     /// connection fails, or 30 seconds pass. Without it the request's reply
+     /// could overtake the last lines, which then reach an app that has stopped
+     /// listening: the output a command flushes when it exits never made the
+-    /// console log. Bounded, so a stuck app cannot hold the install lock.
++    /// console log. Bounded, so a stuck app cannot hold its machine's slot.
+     private func finishOutput() {
+         let handled = DispatchSemaphore(value: 0)
+         let proxy = connection?.remoteObjectProxyWithErrorHandler { _ in handled.signal() }
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadHelperProtocol.swift b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadHelperProtocol.swift
+index 63804f8e28fa12aa51a44df0ac6af1f78f3aa6b8..84dd9f50688fd322fee9855d3242cfae1dbbebe3 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadHelperProtocol.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadHelperProtocol.swift
+@@ -47,8 +47,14 @@ nonisolated protocol VPhoneLaunchpadHelperProtocol {
+ 
+     /// Runs `vphone-cli cfw install` from a store bundle as root, on behalf of
+     /// the calling user. Output lines arrive through
+-    /// `VPhoneLaunchpadHelperClientProtocol`. Replies with the exit status and
+-    /// an error message when the request was refused before running.
++    /// `VPhoneLaunchpadHelperClientProtocol` on the connection that made the
++    /// request, so the app opens one connection per operation. Replies with
++    /// the exit status and an error message when the request was refused
++    /// before running.
++    ///
++    /// One operation per machine at a time; different machines run side by
++    /// side, provided each volume they write to keeps enough free space for
++    /// every operation already running on it.
+     func installCustomFirmware(
+         authorization: Data,
+         bundleVersion: String,
+@@ -94,9 +100,14 @@ nonisolated protocol VPhoneLaunchpadHelperProtocol {
+         reply: @escaping @Sendable (String?, String?) -> Void,
+     )
+ 
+-    /// Sends SIGINT to a running CFW install started by the same user. It
+-    /// needs no authorization: it can only stop the caller's own install.
+-    func cancelCustomFirmware(reply: @escaping @Sendable () -> Void)
++    /// Sends SIGINT to the CFW install, environment update or kernel update
++    /// running on one machine, when the same user started it. It needs no
++    /// authorization: it can only stop the caller's own operation.
++    func cancelCustomFirmware(
++        machineName: String,
++        libraryRoot: String,
++        reply: @escaping @Sendable () -> Void,
++    )
+ 
+     /// Removes the helper's launchd job and binary, then exits.
+     func uninstallHelper(authorization: Data, reply: @escaping @Sendable (String?) -> Void)

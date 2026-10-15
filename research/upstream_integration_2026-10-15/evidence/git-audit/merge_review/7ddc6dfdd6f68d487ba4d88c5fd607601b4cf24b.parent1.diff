@@ -1,0 +1,238 @@
+diff --git a/Research/roothide_loader_links.md b/Research/roothide_loader_links.md
+index c1175c14cc7c7663b63d346819ecad5ba94566ff..084496e7fef0926682bb04e5b7b5313131debce0 100644
+--- a/Research/roothide_loader_links.md
++++ b/Research/roothide_loader_links.md
+@@ -37,7 +37,7 @@ framework or extension directory.
+   and creates `../`×depth + `.jbroot` there. A directory with any `.jbroot`
+   entry is skipped, and a failed link is not fatal. It runs at install, on
+   `vphoned` startup, and one second after the root's `Library/dpkg` changes:
+-  `watchRootHidePackages` keeps a vnode watch on that directory, which
++  `watchBootstrapPackages` keeps a vnode watch on that directory, which
+   Irisin, apt and dpkg all rewrite when a package operation finishes.
+ - The spawn hooks cannot replace that watch. `sudo` is usually run from a
+   mobile shell (an ssh session, or `ighostvtd-io`'s zsh), and mobile cannot
+diff --git a/Research/vphoned_http_api.md b/Research/vphoned_http_api.md
+index 6388e2f0beb5a2e76014efb0d94fe429e82e07dd..c00f00483ca4a0bdbccdb1b8dafcca877d60fd77 100644
+--- a/Research/vphoned_http_api.md
++++ b/Research/vphoned_http_api.md
+@@ -143,6 +143,11 @@ The launchd and SystemHook spawn bridges also create a missing `.jbroot`
+ beside a bootstrap executable and its in-root dependencies just before it
+ starts, when the spawning process may write there. See
+ `Research/roothide_loader_links.md`.
++In either layout, the same `Library/dpkg` change, and vphoned's start, also
++refresh the bootstrap's `/Applications` as `apps.refresh` does. A package's
++postinst and uikittools' trigger run `uicache`, which cannot register an app on
++iOS 27, so an app installed by Irisin, apt or dpkg otherwise stays unregistered
++until `apps.refresh` is called.
+ `POST /v1/bootstrap/firmware` (RPC `bootstrap.firmware`)
+ repairs the record for a bootstrap already identified by the completion marker
+ without running another install. The reply includes the tag,
+diff --git a/VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Packages.swift b/VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Packages.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b57f34dce1d48160392dba347214c8bf9e8b666
+--- /dev/null
++++ b/VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Packages.swift
+@@ -0,0 +1,76 @@
++import Darwin
++import Foundation
++import IcliKit
++
++// MARK: - Package changes
++
++extension GuestIrisinInstaller {
++    private static let packageQueue = DispatchQueue(label: "vphoned.bootstrap.packages")
++    private nonisolated(unsafe) static var packageWatch: DispatchSourceFileSystemObject?
++    private nonisolated(unsafe) static var packageRefreshPending = false
++
++    /// Irisin, apt and dpkg all rewrite Library/dpkg/status when they finish,
++    /// so a changed directory means a package operation is done. RootHide
++    /// relinks the new package's Mach-O directories then (see
++    /// `repairRootHidePackages`), and both layouts register the bootstrap's
++    /// apps as `uicache -a` would: a package's postinst runs uikittools'
++    /// uicache, which cannot register apps on iOS 27. The apps are refreshed
++    /// once when the watch starts too, for packages changed while vphoned was
++    /// not running.
++    static func watchBootstrapPackages(layout: String, root: String) {
++        packageQueue.async {
++            guard packageWatch == nil else { return }
++            let directory = root + "/Library/dpkg"
++            let descriptor = open(directory, O_EVTONLY | O_CLOEXEC)
++            guard descriptor >= 0 else {
++                NSLog("vphoned: cannot watch %@: %s", directory, strerror(errno))
++                return
++            }
++            let source = DispatchSource.makeFileSystemObjectSource(
++                fileDescriptor: descriptor, eventMask: [.write, .delete, .rename], queue: packageQueue,
++            )
++            source.setEventHandler {
++                guard let watch = packageWatch else { return }
++                if !watch.data.isDisjoint(with: [.delete, .rename]) {
++                    // The bootstrap was removed; a new install starts a new watch.
++                    watch.cancel()
++                    packageWatch = nil
++                    return
++                }
++                guard !packageRefreshPending else { return }
++                packageRefreshPending = true
++                // Let the package manager finish writing before walking.
++                packageQueue.asyncAfter(deadline: .now() + 1) {
++                    packageRefreshPending = false
++                    if layout == "roothide" {
++                        repairRootHidePackages(root: root)
++                    }
++                    refreshBootstrapApps(root: root)
++                }
++            }
++            source.setCancelHandler { close(descriptor) }
++            packageWatch = source
++            source.resume()
++            refreshBootstrapApps(root: root)
++        }
++    }
++
++    static func stopWatchingBootstrapPackages() {
++        packageQueue.sync {
++            packageWatch?.cancel()
++            packageWatch = nil
++        }
++    }
++
++    private static func refreshBootstrapApps(root: String) {
++        do {
++            let result = try refreshApps(directory: root + "/Applications")
++            let changed = ["registered", "unregistered"].flatMap { result[$0] as? [String] ?? [] }
++            if !changed.isEmpty {
++                NSLog("vphoned: bootstrap app registrations: %@", changed.joined(separator: ", "))
++            }
++        } catch {
++            NSLog("vphoned: could not refresh bootstrap app registrations: %@", String(describing: error))
++        }
++    }
++}
+diff --git a/VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller.swift b/VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller.swift
+index 3bb4b35f4467a09afee79fa4123e2d01458419e1..f0b046896e0a4d1eca60f76bbe7141c0411e50e6 100644
+--- a/VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller.swift
++++ b/VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller.swift
+@@ -72,7 +72,7 @@ enum GuestIrisinInstaller {
+             throw GuestAPIError.invalidRequest("Bootstrap paths changed; inspect them again before uninstalling")
+         }
+ 
+-        stopWatchingRootHidePackages()
++        stopWatchingBootstrapPackages()
+         for installation in roots {
+             try removeBootstrap(root: installation.root, layout: installation.layout)
+         }
+@@ -100,12 +100,12 @@ enum GuestIrisinInstaller {
+                 if base["created"] as? [String] != [] || base["deferred"] as? [String] != [] {
+                     NSLog("vphoned: RootHide bootstrap base: %@", String(describing: base))
+                 }
+-                watchRootHidePackages(root: installation.root)
+             }
+         } catch {
+             NSLog("vphoned: could not repair RootHide bootstrap: %@", String(describing: error))
+         }
+         if let installation {
++            watchBootstrapPackages(layout: installation.layout, root: installation.root)
+             // Off the startup path: the server should not wait for launchd.
+             DispatchQueue.global().async {
+                 loadBootstrapDaemons(layout: installation.layout, root: installation.root)
+@@ -358,9 +358,7 @@ enum GuestIrisinInstaller {
+             let firmware = try ensureFirmwareRecord(root: root)
+             let marker = ["tag": tag, "layout": layout, "jbroot": root]
+             try writeMarker(marker)
+-            if layout == "roothide" {
+-                watchRootHidePackages(root: root)
+-            }
++            watchBootstrapPackages(layout: layout, root: root)
+             for entry in replaced {
+                 if let backup = entry.backup {
+                     try? FileManager.default.removeItem(at: backup)
+diff --git a/VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift b/VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift
+index 25c59abd3e36cf50d3e55a0b83cda82352a37d93..356cae7f011c0a12deab4403537af3ea5f1108cf 100644
+--- a/VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift
++++ b/VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift
+@@ -142,67 +142,24 @@ extension GuestIrisinInstaller {
+         return created
+     }
+ 
+-    // MARK: - Package changes
+-
+-    private static let packageQueue = DispatchQueue(label: "vphoned.roothide.packages")
+-    private nonisolated(unsafe) static var packageWatch: DispatchSourceFileSystemObject?
+-    private nonisolated(unsafe) static var packageRelinkPending = false
+-
+-    /// Irisin, apt and dpkg all rewrite Library/dpkg/status when they finish,
+-    /// so a changed directory relinks the new package's Mach-O directories
+-    /// right away. The spawn hooks cannot do it for a mobile shell: running
+-    /// sudo there cannot create a link in the root-owned usr/libexec/sudo.
+-    /// The base steps that waited for pwd_mkdb or ssh-keygen run then too,
+-    /// so sshd has host keys as soon as openssh is installed.
+-    static func watchRootHidePackages(root: String) {
+-        packageQueue.async {
+-            guard packageWatch == nil else { return }
+-            let directory = root + "/Library/dpkg"
+-            let descriptor = open(directory, O_EVTONLY | O_CLOEXEC)
+-            guard descriptor >= 0 else {
+-                NSLog("vphoned: cannot watch %@: %s", directory, strerror(errno))
+-                return
+-            }
+-            let source = DispatchSource.makeFileSystemObjectSource(
+-                fileDescriptor: descriptor, eventMask: [.write, .delete, .rename], queue: packageQueue,
+-            )
+-            source.setEventHandler {
+-                guard let watch = packageWatch else { return }
+-                if !watch.data.isDisjoint(with: [.delete, .rename]) {
+-                    // The bootstrap was removed; a new install starts a new watch.
+-                    watch.cancel()
+-                    packageWatch = nil
+-                    return
+-                }
+-                guard !packageRelinkPending else { return }
+-                packageRelinkPending = true
+-                // Let the package manager finish writing before walking.
+-                packageQueue.asyncAfter(deadline: .now() + 1) {
+-                    packageRelinkPending = false
+-                    let seeded = ensureRootHideMachOLinks(root: root)
+-                    if !seeded.isEmpty {
+-                        NSLog("vphoned: RootHide loader links: %@", seeded.joined(separator: ", "))
+-                    }
+-                    do {
+-                        let base = try ensureRootHideBase(root: root)
+-                        if base["created"] as? [String] != [] {
+-                            NSLog("vphoned: RootHide bootstrap base: %@", String(describing: base))
+-                        }
+-                    } catch {
+-                        NSLog("vphoned: could not repair RootHide bootstrap: %@", String(describing: error))
+-                    }
+-                }
+-            }
+-            source.setCancelHandler { close(descriptor) }
+-            packageWatch = source
+-            source.resume()
++    /// After a package operation: relinks the new package's Mach-O
++    /// directories right away. The spawn hooks cannot do it for a mobile
++    /// shell: running sudo there cannot create a link in the root-owned
++    /// usr/libexec/sudo. The base steps that waited for pwd_mkdb or
++    /// ssh-keygen run then too, so sshd has host keys as soon as openssh is
++    /// installed.
++    static func repairRootHidePackages(root: String) {
++        let seeded = ensureRootHideMachOLinks(root: root)
++        if !seeded.isEmpty {
++            NSLog("vphoned: RootHide loader links: %@", seeded.joined(separator: ", "))
+         }
+-    }
+-
+-    static func stopWatchingRootHidePackages() {
+-        packageQueue.sync {
+-            packageWatch?.cancel()
+-            packageWatch = nil
++        do {
++            let base = try ensureRootHideBase(root: root)
++            if base["created"] as? [String] != [] {
++                NSLog("vphoned: RootHide bootstrap base: %@", String(describing: base))
++            }
++        } catch {
++            NSLog("vphoned: could not repair RootHide bootstrap: %@", String(describing: error))
+         }
+     }
+ 

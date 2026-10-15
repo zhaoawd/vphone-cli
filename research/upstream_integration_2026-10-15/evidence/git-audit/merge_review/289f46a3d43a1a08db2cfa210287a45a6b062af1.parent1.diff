@@ -1,0 +1,141 @@
+diff --git a/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c b/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c
+index c447f6cdbb3e4b2fbb24ab18620d0f8bb4d8cf77..b297db3675c80738de5df451f9c012e81c266a53 100644
+--- a/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c
++++ b/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c
+@@ -1,4 +1,5 @@
+ #include "../Shared/InjectionEnvironment.h"
++#include "../Shared/JetsamLimits.h"
+ #include "../Shared/RootHideLoaderLinks.h"
+ #include <fcntl.h>
+ #include <limits.h>
+@@ -97,7 +98,9 @@ static int vpSpawnWith(VPSpawnFunction spawn, pid_t *restrict pid, const char *r
+     // have to be decided here as well as in SystemHook.
+     const VPInsertedLibraries libraries = vpInsertedLibrariesFor(path);
+     VPInjectionEnvironment injected = vpInsertHooksFor(envp, vpBootRoot, &libraries);
++    VPJetsamLimits limits = vpRaiseJetsamLimits(vpBootRoot, path, attributes, envp);
+     int status = spawn(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
++    vpRestoreJetsamLimits(&limits);
+     if (bootstrapProgram || appProgram || libraries.count || strcmp(path, "/usr/libexec/xpcproxy") == 0) {
+         char event[128];
+         if (!injected.values) {
+diff --git a/VPhoneGuestComponents/README.md b/VPhoneGuestComponents/README.md
+index a0692ca755675279a5564b3e9fe7a0886187b00b..35bda090894e8bf417ac52f925e822d7c314f5b9 100644
+--- a/VPhoneGuestComponents/README.md
++++ b/VPhoneGuestComponents/README.md
+@@ -47,6 +47,9 @@ ElleKit owns tweak selection and loading. It logs PID and executable path to
+ `/var/mobile/Library/Caches/vphone-systemhook.log`, falling back to the app's
+ own `Library/Caches` when sandboxed.
+ `DISABLE_TWEAKS=1` and the safe-mode flags skip injection.
++While a bootstrap is installed, both spawn hooks also triple the jetsam memory
++limits a spawn carries, with Dopamine's exclusions, and restore the caller's
++attributes afterwards (`Shared/JetsamLimits.h`).
+ Irisin installs ElleKit's own `TweakLoader.dylib` in the selected bootstrap.
+ The required GPU bundle is extracted from the selected PCC firmware by
+ `vphone-cli fw prepare` and copied into the VM during JB installation. No
+diff --git a/VPhoneGuestComponents/Shared/JetsamLimits.h b/VPhoneGuestComponents/Shared/JetsamLimits.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..0fda3edeca4474cf00bdeaa2dae7ea0283c84a7b
+--- /dev/null
++++ b/VPhoneGuestComponents/Shared/JetsamLimits.h
+@@ -0,0 +1,71 @@
++#ifndef VPHONE_JETSAM_LIMITS_H
++#define VPHONE_JETSAM_LIMITS_H
++
++#include "InjectionEnvironment.h"
++#include <spawn.h>
++#include <string.h>
++#include <unistd.h>
++
++// Dopamine's spawn hooks, in launchd and in every injected process, multiply
++// the jetsam memory limits a spawn carries by its jetsamMultiplier setting,
++// 3 unless the user changed it (BaseBin/systemhook/src/common/common.c,
++// spawn_exec_hook_common). They leave a limit of -1 (none) alone and skip
++// what Dopamine does not inject: its process blacklist, a spawn with
++// _SafeMode=1 or _MSSafeMode=1, a DriverKit driver, and every spawn while the
++// hook dylib is missing. vphone does the same while a bootstrap is installed.
++#define VP_JETSAM_MULTIPLIER 3
++
++// psa_memlimit_active, followed by psa_memlimit_inactive, in xnu's
++// struct _posix_spawnattr (bsd/sys/spawn_internal.h, xnu-12377). Neither has
++// a getter in libsystem_kernel; Dopamine writes the same offsets.
++#define VP_SPAWNATTR_MEMLIMITS 0x48
++#define VP_SPAWN_PROC_TYPE_DRIVER 0x700
++
++int posix_spawnattr_getprocesstype_np(const posix_spawnattr_t *__restrict, int *__restrict);
++
++typedef struct {
++    int *limits;
++    int original[2];
++} VPJetsamLimits;
++
++// Multiplies the limits in `attributes` in place for the spawn of `path`, and
++// returns what vpRestoreJetsamLimits needs to put the caller's values back.
++static VPJetsamLimits vpRaiseJetsamLimits(const char *root, const char *path,
++                                          const posix_spawnattr_t *attributes, char *const envp[]) {
++    static const char *const blacklist[] = {
++        "/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",
++        "/System/Library/PrivateFrameworks/DataAccess.framework/Support/dataaccessd",
++        "/System/Library/PrivateFrameworks/IDSBlastDoorSupport.framework/XPCServices/IDSBlastDoorService.xpc/"
++        "IDSBlastDoorService",
++        "/System/Library/PrivateFrameworks/MessagesBlastDoorSupport.framework/XPCServices/"
++        "MessagesBlastDoorService.xpc/MessagesBlastDoorService",
++    };
++    VPJetsamLimits raised = {0};
++    if (!root || !*root || !path || !attributes || !*attributes)
++        return raised;
++    for (size_t i = 0; i < sizeof(blacklist) / sizeof(blacklist[0]); i++) {
++        if (strcmp(path, blacklist[i]) == 0)
++            return raised;
++    }
++    if (vpEnvIsOne(envp, "_SafeMode") || vpEnvIsOne(envp, "_MSSafeMode"))
++        return raised;
++    int type = 0;
++    if (posix_spawnattr_getprocesstype_np(attributes, &type) == 0 && type == VP_SPAWN_PROC_TYPE_DRIVER)
++        return raised;
++    if (access(VP_SYSTEM_HOOK, F_OK) != 0)
++        return raised;
++    raised.limits = (int *)((char *)*attributes + VP_SPAWNATTR_MEMLIMITS);
++    for (size_t i = 0; i < 2; i++) {
++        raised.original[i] = raised.limits[i];
++        if (raised.limits[i] != -1)
++            raised.limits[i] *= VP_JETSAM_MULTIPLIER;
++    }
++    return raised;
++}
++
++static void vpRestoreJetsamLimits(const VPJetsamLimits *raised) {
++    if (raised->limits)
++        memcpy(raised->limits, raised->original, sizeof(raised->original));
++}
++
++#endif
+diff --git a/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c b/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
+index 8071130e9cf14a548a770b97329c44ca26199e5f..f0f4811ed44ec08e05c5f28cad5ce3e297a0f812 100644
+--- a/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
++++ b/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c
+@@ -1,4 +1,5 @@
+ #include "../Shared/InjectionEnvironment.h"
++#include "../Shared/JetsamLimits.h"
+ #include "../Shared/RootHideLoaderLinks.h"
+ #include <crt_externs.h>
+ #include <dlfcn.h>
+@@ -117,7 +118,9 @@ static int vpSpawnP(pid_t *restrict pid, const char *restrict path, const posix_
+                     const posix_spawnattr_t *restrict attributes, char *const argv[restrict],
+                     char *const envp[restrict]) {
+     VPInjectionEnvironment injected = vpPrepareChild(path, envp, "");
++    VPJetsamLimits limits = vpRaiseJetsamLimits(getenv("VPHONE_JB_ROOT"), path, attributes, envp);
+     int status = posix_spawnp(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
++    vpRestoreJetsamLimits(&limits);
+     vpFreeEnvironment(&injected);
+     return status;
+ }
+@@ -126,7 +129,9 @@ static int vpSpawn(pid_t *restrict pid, const char *restrict path, const posix_s
+                    const posix_spawnattr_t *restrict attributes, char *const argv[restrict],
+                    char *const envp[restrict]) {
+     VPInjectionEnvironment injected = vpPrepareChild(path, envp, "");
++    VPJetsamLimits limits = vpRaiseJetsamLimits(getenv("VPHONE_JB_ROOT"), path, attributes, envp);
+     int status = posix_spawn(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
++    vpRestoreJetsamLimits(&limits);
+     vpFreeEnvironment(&injected);
+     return status;
+ }

@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-15",
+  "checks": {
+    "input_manifest_sha256": "passed",
+    "zip_sha256sums": "passed",
+    "task_ids_unique_and_contiguous_61": "passed",
+    "dependency_references_and_acyclic_graph": "passed",
+    "all_original_fields_of_47_local_tasks_preserved": "passed",
+    "increment_commit_records_194": "passed",
+    "new_plan_relative_links": "passed",
+    "new_content_whitespace": "passed",
+    "tracked_entrypoint_diff_check": "passed"
+  },
+  "not_run": [
+    "upstream_full_git_audit_missing_target_object",
+    "build",
+    "firmware_tests",
+    "vm_acceptance"
+  ],
+  "scope": "plan_documentation_only",
+  "execution_followup": {
+    "git_exact_set_match": true,
+    "target_reachable_objects_complete": true,
+    "task_ids_and_historical_fields": true,
+    "local_inventory_61": true,
+    "full_sha_commit_records_194": true,
+    "merge_records_51": true,
+    "new_document_links_and_whitespace": true,
+    "audit_tool_ast": true,
+    "root_TODO_content_excluded": true,
+    "production_wip_unchanged": true,
+    "evidence_manifest": "evidence/git-audit-manifest.json",
+    "build_and_vm_tests": "not_run_read_only_audit"
+  },
+  "adaptation_followup": {
+    "catalog_generation": "passed_148_target_159_total",
+    "migration_generation": "passed_119_aliases",
+    "iOS_release_candidate_build_and_checks": "passed_not_deployed",
+    "public_swift_call_name_candidates": 120,
+    "called_signatures_removed_or_changed": [],
+    "related_swift": "131_tests_11_suites_passed",
+    "python_standard_final": "779_tests_passed_1_skipped_404.548_seconds",
+    "swift_standard_initial": "1502_tests_234_suites_20_issues",
+    "swift_failed_suite_recheck": "126_tests_14_suites_2_issues",
+    "before_source_control": "both_remaining_failures_reproduced_individually",
+    "proMotion_default": "off_all_five_modes",
+    "source_preservation": "passed_no_unexpected_changes",
+    "actual_firmware_or_VM_acceptance": "not_run",
+    "evidence": "T08_T09_adaptation.md"
+  }
+}

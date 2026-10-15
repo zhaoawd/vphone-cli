@@ -42,7 +42,7 @@ struct FirmwarePlanBinding: Codable, Equatable {
         }
         let payload = Payload(vmDirectoryId: "", stableIdentity: try VPhoneFirmwareIdentity.read(in: directory), generationID: options["generationID"],
             configSHA256: nil,
-            upstreamTarget: "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+            upstreamTarget: PatchDeclarationCatalog.upstreamTag,
             catalogRevision: PatchDeclarationCatalog.upstreamTag,
             catalogSHA256: try catalogDigest(), plan: plan, versionInputs: versions,
             sources: sources(entries), options: options)
@@ -86,7 +86,8 @@ struct FirmwarePlanBinding: Codable, Equatable {
         }
         if currentCatalog {
             try Self.validateCurrentPlan(payload.plan)
-            guard payload.catalogRevision == PatchDeclarationCatalog.upstreamTag,
+            guard payload.upstreamTarget == PatchDeclarationCatalog.upstreamTag,
+                  payload.catalogRevision == PatchDeclarationCatalog.upstreamTag,
                   try Self.catalogDigest() == payload.catalogSHA256 else {
                 throw FirmwareTransaction.RecordFailure.bindingMismatch("catalog")
             }

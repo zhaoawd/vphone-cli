@@ -1,0 +1,3368 @@
+{
+  "method": "Compare changed upstream endpoints against current sources/scripts/tests using filename candidates and explicit renames; this does not establish semantic equivalence. Local working tree bytes include WIP.",
+  "counts": {
+    "no_filename_candidate_not_proof_of_absence": 288,
+    "different_candidate_requires_semantic_review": 87,
+    "upstream_deleted_path": 1
+  },
+  "paths": [
+    {
+      "status": "A",
+      "path": ".github/pull_request_template.md",
+      "local_candidates": [],
+      "upstream_sha256": "021113197a8624c552174a584a5601c1d8b8e74894f4a37363b13968a2961469",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": ".github/workflows/build.yml",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/trustcache/.github/workflows/build.yml",
+          "sha256": "2605e6398fe50c650b1de38bc2423879e22b8ca82367c11fbace70dbfa39f705",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "6861ebd2d7424f289f6ca859aa9d0d81e8a85dd5bc814cc7b5a3ca0a43808a68",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "Documents/Downloads/README.md",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/README.md",
+          "sha256": "b4c698eb1e1b88edcb3dce21578b8c633e833fe5f3b1121b30bcfc43905af7ac",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/tweakloader/README.md",
+          "sha256": "5d36df2ac4c6ea2f93c9b5ad8ad68f9c15f2d7011725ae8e7fb60001b8dbb187",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+          "sha256": "9baa3d1f3f4b89835c4d6081ac2b740de555ad2541d83edb4dd022037c37ac6e",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/README.md",
+          "sha256": "555c0547bbea56668db006893b986f964ffffaf8f071bc14767b8a56c5a2eb67",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "578aa1efc1502440739817e12c017653bdff992fbaf1bea9798212ff7e169098",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "Documents/Guides/create-and-run.md",
+      "local_candidates": [],
+      "upstream_sha256": "31f05973dfd304d04bf6096c5bdd645577bf3724c3c7e34bc0d85e8915215897",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Documents/Guides/launchpad-cli.md",
+      "local_candidates": [],
+      "upstream_sha256": "5171a9cc3f3b4dc54e2de2bfe8b5a002ce1f80dae6f40d9252a857077515415d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Documents/Guides/networking.md",
+      "local_candidates": [],
+      "upstream_sha256": "5454aeff4e2ce752fb73d334e8b91c496e949cd7eadf863fd133a40b4d23778c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Documents/Guides/package-environment.md",
+      "local_candidates": [],
+      "upstream_sha256": "4a26bd894fba79ba825b9e01466c75172133dc2141a5ff6133c15c6fd27cec1d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Documents/Guides/snapshots.md",
+      "local_candidates": [],
+      "upstream_sha256": "63b1802adf9fbc0bc29a3e628526b1d903897828dd90c249d6a603a1933513d9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Documents/README.md",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/README.md",
+          "sha256": "b4c698eb1e1b88edcb3dce21578b8c633e833fe5f3b1121b30bcfc43905af7ac",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/tweakloader/README.md",
+          "sha256": "5d36df2ac4c6ea2f93c9b5ad8ad68f9c15f2d7011725ae8e7fb60001b8dbb187",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+          "sha256": "9baa3d1f3f4b89835c4d6081ac2b740de555ad2541d83edb4dd022037c37ac6e",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/README.md",
+          "sha256": "555c0547bbea56668db006893b986f964ffffaf8f071bc14767b8a56c5a2eb67",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "c90e07836591576295076a93434cb7b097d3a47f7109229d8471da0d6335c88d",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "README.md",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/README.md",
+          "sha256": "b4c698eb1e1b88edcb3dce21578b8c633e833fe5f3b1121b30bcfc43905af7ac",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/tweakloader/README.md",
+          "sha256": "5d36df2ac4c6ea2f93c9b5ad8ad68f9c15f2d7011725ae8e7fb60001b8dbb187",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+          "sha256": "9baa3d1f3f4b89835c4d6081ac2b740de555ad2541d83edb4dd022037c37ac6e",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/README.md",
+          "sha256": "555c0547bbea56668db006893b986f964ffffaf8f071bc14767b8a56c5a2eb67",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "d49cd50f836ac785cc3caf8e961018889ef414546c51526b245e286356006709",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "Research/0_binary_patch_comparison.md",
+      "local_candidates": [],
+      "upstream_sha256": "ab0d961b7180c265d4e9e66450c058096032127d82ce941fedf013a83a7291ec",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/Firmware/iboot_patches.md",
+      "local_candidates": [],
+      "upstream_sha256": "41d9b7103f2f069f31864a3e6edb0c1fb17a2fe5fd217575876dc14e25b9f5ba",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/2026-10-07_reverse-settings-rows-report.md",
+      "local_candidates": [],
+      "upstream_sha256": "c3f42f0f95fe60a0cb38c3865990a5edd353cee9e9dea55a8a78d81377903631",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/CachePatch/main.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCommandEntry/main.swift",
+          "sha256": "bdb4d2b7ab6c89e79b0132382f3049891235c186b57ea51859882e668bb14b59",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneDaemon/Daemon/main.swift",
+          "sha256": "00397e1cc0cd2fce0257bf9890f4cddf9016615b5870f6c0d69ed763b788fc2d",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneHelperEntry/main.swift",
+          "sha256": "fb88eda5ef72e21844d354a28f6490e4b8e79d0bfcad97d9688763918c0bf301",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneLaunchpadLauncherEntry/main.swift",
+          "sha256": "198eadef44b138dcf8e6413fa82c174fbeec93d4944af951b88998907d8d6f14",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneVMEntry/main.swift",
+          "sha256": "266aca5eee52c3c4091c41cf9964a929342fedfe007b6c8d5fd433125a43be0e",
+          "bytes_equal": false
+        },
+        {
+          "path": "tests/fixtures/daemon_pipe_ownership/main.swift",
+          "sha256": "fbc10a7100252c0e25996bd87784f46d24feb8404d20be07834419457bb36d0c",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "c4cec1017868edb969775b307547d39e1242b0d5f0df0bd7e78236b79e9b3e68",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/Evidence-20261007/final-general-ui.json",
+      "local_candidates": [],
+      "upstream_sha256": "e444f94ef8699d761b1773dc7d368414ca9bac1ab7c0bcce2b004227116e59f0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/Evidence-20261007/final-root-lower-ui.json",
+      "local_candidates": [],
+      "upstream_sha256": "50299f93ac7c0977050361163930b169aa5afd790903c8a4dd4b9546ab25eaa9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/Evidence-20261007/final-root-top-ui.json",
+      "local_candidates": [],
+      "upstream_sha256": "18a30685d30891ad4aa3f0fe8889fbb6fb4e0390e894cd856b6fddc251dbe2ab",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/Evidence-20261007/rollback-root-bottom.json",
+      "local_candidates": [],
+      "upstream_sha256": "249bef39728266bd2ace6f8b1257af570abe789763e13ee590a55e330d59f40a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/Evidence-20261007/rollback-root-top.json",
+      "local_candidates": [],
+      "upstream_sha256": "e14050a7af5a6e2b0c65aeee8cb5c96cb629138d11bc6798e5687e040898bd1d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/Evidence-20261007/software-update-rollback-ui.json",
+      "local_candidates": [],
+      "upstream_sha256": "6fb2d75889557b619d6922979b27220cefff191da1ebe7bcb1b5b9994952928c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/Evidence-20261007/software-update-undo-stamped.json",
+      "local_candidates": [],
+      "upstream_sha256": "e369c05f312cb9945213f945ae2f96ded615995a79e8e78cf65548feaab1d186",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/GameCenterStandalonePatch.swift",
+      "local_candidates": [],
+      "upstream_sha256": "a606476f3ef4291cea2f1bb236f05e9bc7a1cd6378bc4088ae85f49fd4bbab06",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/README.md",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/README.md",
+          "sha256": "b4c698eb1e1b88edcb3dce21578b8c633e833fe5f3b1121b30bcfc43905af7ac",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/tweakloader/README.md",
+          "sha256": "5d36df2ac4c6ea2f93c9b5ad8ad68f9c15f2d7011725ae8e7fb60001b8dbb187",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+          "sha256": "9baa3d1f3f4b89835c4d6081ac2b740de555ad2541d83edb4dd022037c37ac6e",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/README.md",
+          "sha256": "555c0547bbea56668db006893b986f964ffffaf8f071bc14767b8a56c5a2eb67",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "414c38819325c6e2a443994f3ceb2f1c0cb64326bbd14543d9158eb000cefb1e",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/SettingsRows/ReviewedProviderPatch.swift",
+      "local_candidates": [],
+      "upstream_sha256": "9877a9e8b4a2bddbe7583ca0bf2abc0ab7268aeebb54ee8d40e592f63954314f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/device_name_pinning.md",
+      "local_candidates": [],
+      "upstream_sha256": "d66993375e252620d0472ed5ff0e7727cb7670e8b2d4ba106dd01c09b941d59c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/devicehub_screen_viewing.md",
+      "local_candidates": [],
+      "upstream_sha256": "aceedfea4d4c65f1c815f023aad22702bbf44f1c3b0aa608120461358e653e49",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/Guest/display_refresh_rate.md",
+      "local_candidates": [],
+      "upstream_sha256": "7bcfe9ff5a2e960aadf97203c427886e697090762784fedd4d640d596abc29a0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/flutter_aot_remap_compatibility.md",
+      "local_candidates": [],
+      "upstream_sha256": "961d12925c682829f83da0b3d95d9218d39fe2e15bedb11cde78c1de41e19241",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/host_clock_sync.md",
+      "local_candidates": [],
+      "upstream_sha256": "d3f89b4437f71c041fec062ee5eae6b9a61e5611a3aa5255ddd6b00222333a9a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/ios27_xcode_persona_lookup.md",
+      "local_candidates": [],
+      "upstream_sha256": "465cf27fbe61ced99eae8e1d742b6551ffb82a2cc630a5443ee2d574353097e0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/Guest/location_simulation_26_4_failure.md",
+      "local_candidates": [],
+      "upstream_sha256": "a1be45501f2070b10c144e719d3831b14f79d4bf09358091738503586db74ced",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/locationd_27_0_1_startup_race.md",
+      "local_candidates": [],
+      "upstream_sha256": "ce7625c1d21997bf21f98a449de84953644370262ee719af2b78baf8d5a0ed5b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/locationd_startup_deadlock.md",
+      "local_candidates": [],
+      "upstream_sha256": "45a8e5fb178734edf827108bdb81e058a8ece2c5949720e0d84f3d99667a8d35",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/ota_software_update_block.md",
+      "local_candidates": [],
+      "upstream_sha256": "d352027a40c0f4a063c21b6ac25c13710c8dea98671d613aa49498e65a5b1726",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/post_setup_signin_and_appstore.md",
+      "local_candidates": [],
+      "upstream_sha256": "b5c6c4d2772b0ea8f386cd58152cca5c04c4255e48e6c13802d29724d5429fde",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/service_trimming.md",
+      "local_candidates": [],
+      "upstream_sha256": "bb4fab1814e48b87de55595de4992a10c996d6a1cd0cc7232d6550e4f76e5f23",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/settings_app_row_hiding.md",
+      "local_candidates": [],
+      "upstream_sha256": "54acc84a068e2794b7dddeb627e95c30882372343679cd794200df88fd7dd00f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/Guest/setup_assistant_skip.md",
+      "local_candidates": [],
+      "upstream_sha256": "d02e8b5ab25c80bea50c4dcca959c64353568d2350e794cc75ee056ac952acfd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/signin_and_vm_feature_hiding.md",
+      "local_candidates": [],
+      "upstream_sha256": "299ca0c1b2a5c6ac2007e286eb764822ab98aedabc91b4153c0f1d4ffb4fedd8",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/template_snapshot_deletion.md",
+      "local_candidates": [],
+      "upstream_sha256": "8154bae45b8c724f4dde35bd620a4360efe623c9073f243ce104e932e3fa1135",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/Guest/virtio_sound.md",
+      "local_candidates": [],
+      "upstream_sha256": "5a6ad7bcd5a4071315a1341a43e71a81475b01925a754b40c50e286a8a9d1688",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/virtual_attitude.md",
+      "local_candidates": [],
+      "upstream_sha256": "f97f3641460ce78d3cbff151b12caa490c8107a7caba7d69d1d2ca08a321e43a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/Guest/virtual_camera_transport.md",
+      "local_candidates": [],
+      "upstream_sha256": "0f827e48197dd6bb95f3e742e078bd9197893e98b91d995c08d8872bc94795dc",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Guest/virtual_gyroscope.md",
+      "local_candidates": [],
+      "upstream_sha256": "0246348df525efc6dfdfe040731cc85e04bebc49320e69601235734edfe7f37a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Host/content_addressed_block_store.md",
+      "local_candidates": [],
+      "upstream_sha256": "3a96f846499b3f8ccb08244c1c9a680ea773ea32b4d402ed31e117500f7a0c4f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Host/deterministic_disk_layout.md",
+      "local_candidates": [],
+      "upstream_sha256": "c6efd5aed138fe2885792843972917a496ae465ed26d9b69c192a67835d8b24f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Host/disk_rebase.md",
+      "local_candidates": [],
+      "upstream_sha256": "82a02fdc000fcd1acd3b843d5f0f27c5b823719710dff828b3ad370e33273983",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Host/disk_space.md",
+      "local_candidates": [],
+      "upstream_sha256": "72f0efb528d3418791226288c478ed17278cb8203d1b96fd4d1e569016b58cf2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Host/guest_discard.md",
+      "local_candidates": [],
+      "upstream_sha256": "c75ddb30a22d9ec47c166cf2e6c9fd89ef1e8c154f92b312b151d985a1215ee0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Host/machine_identity_and_clone.md",
+      "local_candidates": [],
+      "upstream_sha256": "ae151588565d43036c36d29fde2fb47d3367897f256cd021212137bf38312977",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "Research/Host/machine_templates.md",
+      "local_candidates": [],
+      "upstream_sha256": "e150ad23455b15ea1028e2456472a5639555061087ed5d04e7ae6c859e19040f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/Host/network_fixed_address.md",
+      "local_candidates": [],
+      "upstream_sha256": "c774848dae82c7bbddf258f3ff57290c182edca57fc4bdd73e383989e28ef3ca",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/README.md",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/README.md",
+          "sha256": "b4c698eb1e1b88edcb3dce21578b8c633e833fe5f3b1121b30bcfc43905af7ac",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/tweakloader/README.md",
+          "sha256": "5d36df2ac4c6ea2f93c9b5ad8ad68f9c15f2d7011725ae8e7fb60001b8dbb187",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+          "sha256": "9baa3d1f3f4b89835c4d6081ac2b740de555ad2541d83edb4dd022037c37ac6e",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/README.md",
+          "sha256": "555c0547bbea56668db006893b986f964ffffaf8f071bc14767b8a56c5a2eb67",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "4321a336c3512c7d1405ae63c65a845888efc2a4136caffcdfbd295df52910ca",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "Research/VPhoneVirtualMachineRefactored.swift",
+      "local_candidates": [],
+      "upstream_sha256": "6c76a602257617616b52856729e4a72aa3a956fc3cc39d8992c8d77996cc2b90",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/roothide_loader_links.md",
+      "local_candidates": [],
+      "upstream_sha256": "dec317896dc5a47e70f05b640527c076dd35fd2a902f897f035d459854b1ed66",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Research/vphoned_http_api.md",
+      "local_candidates": [],
+      "upstream_sha256": "2dc6ce08763f1efb0bc15e1aadbe62e0d2e9cd8c9f5e56403e6f20097d6670d9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Skills/vphone-guest-control/evals/evals.json",
+      "local_candidates": [],
+      "upstream_sha256": "4ee54fe23f5044e6821ebcf81dd05f77a3fd406c51abfded07d873e48e47d19e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Skills/vphone-guest-control/references/finding-docs.md",
+      "local_candidates": [],
+      "upstream_sha256": "7df08e9901a2ccacde0b30746e289fda18ad5ceeabd28d592647325e00f62d7a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Skills/vphone-guest-control/references/guest-layout.md",
+      "local_candidates": [],
+      "upstream_sha256": "624225f70c383501966d578e594a7adde1382e396c11f8f1821eb77e863c4843",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Skills/vphone-guest-control/references/guest-socket.md",
+      "local_candidates": [],
+      "upstream_sha256": "5648dbe16e04535658ea9d66801e9b180164394444ddffa6c606d9e0424db924",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "Skills/vphone-guest-control/references/rpc-methods.md",
+      "local_candidates": [],
+      "upstream_sha256": "5a1a71cf7369780bbc21cb4915016125d51a6a95911a2da01e87103af575a2bf",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+          "sha256": "76f36d0cfc590ecc4a16d458aaf3bdfcdc00500b541c2c1b7709bc439d7999de",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "d00b39f24b03de5e01cc63adbc9f0d7148f5d723966a598970f13fa3290c0c26",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Configuration/VPhoneDaemon.entitlements",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements",
+          "sha256": "40f3ead43dd842eadf7edadd96baed2a4f6013b7fe45072e134cfb6f66169abb",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "2f9002bc99ea8928205c6bc50b4e21f07e79df8f5c229c8d9afc9fbda1eb46fb",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/APIWire.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/APIWire.swift",
+          "sha256": "47d12b90ca67a103a272a667f4dc6ffcc3bb12cd8e9a1344136af0f559cee397",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "195e730eb5ecd62f21fc457e4135f2f7fa572b23d82c61fbf89974b504f266ac",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Packages.swift",
+      "local_candidates": [],
+      "upstream_sha256": "108a0cdfe57c31e99c81b67bacde87306a7da886138f29e11d755bb86437f51c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Payload.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d2f9bb550e25cf71b86ebfadfa9f5b0fddfed73ce762e5229b22a5c6dd0e228a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+          "sha256": "a1e7bdd5974bb5879d099d6edfc7f5cd053902ab536f0a11bb9e228c64302dc0",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "d8633bbc7ee2a0e91f71b8a9d465fffb38c1bcc5c5883a91e19e9a78e59a8bfa",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
+      "local_candidates": [],
+      "upstream_sha256": "252a889c90b89270c88076c49e79a2b1ca660cd2d47648e62e1c104dde8cf6c3",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+          "sha256": "3f0dc7e6930679a5f4f5505363ff09ac17bda7d3f378114a9d3000292be5c9e7",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "196df82227f8ffba8bc5006d6bbb181c2f06ec3cc6511f4f347d01028fbad4d8",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Attitude.swift",
+      "local_candidates": [],
+      "upstream_sha256": "801d49b8aff9f3dcf4358a26b8ab959608b928ebaa410cf3e9084d4e6b9e400f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Clock.swift",
+      "local_candidates": [],
+      "upstream_sha256": "fb41b86ce018344add1d88d75502f0a4965ad4e0911ad2f4ab46f2bf653f3d41",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+          "sha256": "8297dafaa0d82922d5692cdeeca1373e2339f725827ed24dcce806c19a546a00",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "db42f33f47b16b1165250571bd44476e4cbf571abe4ecc81a60bf0e4f329945b",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+          "sha256": "92c319b6ebc5c226f0168608ac0b99dd0b40cd1fa0a389664d066439ce45a188",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "23a659bebe84694ff0615e4390b84ecd82aa80e32eb1d293a5879723f13c8a98",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+          "sha256": "c62d73617810065a1a39307fa575093844f1dc970f0db6590df3a3c6ee624c2f",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "010a4a430bfefa1574125fa4e14352454d494d0b13488f03a973d895e62d2e8e",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+FirstBoot.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b25313b78c6cf50438ce4b8182666c20c35ab0facc0ea01b889d2fa644a8f33d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Gyroscope.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4b8c2e77fbd4445014cbab63234401840f445a0f27091d2ceb8bd1d44708c0b1",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+          "sha256": "c0d51640db3d699c8684a49ad39d0df01e21639c8fb4aa4c971334aff5884688",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "fc7fc8f3274c656f5be817908b47e2387f06652ed3f52a6fbbfdeea9ab3d9445",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+ServiceProfile.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d484b732eda5d2b56eec0e7d17d02b6b16fbcca6302b0d0f5e46d3de6871ad81",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+          "sha256": "9eab426ddecf366b72b67891da922677bfd2abe019c2275facb8856e33bedd4d",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "ad21cb5e07600475803a773ec887cca6bc14a48b5ed6330ce5f7226fea83b926",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Storage.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b2d7999463fffecac3d53f3cb8b1b10481886093790c6e303429ecfbb1fd305d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+SystemApps.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2b219f6477990ba4444339caf5cec6ed52e832a8e5406e40cdd2970f11dc33d8",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestAPI.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+          "sha256": "555d864a27e15164f9317bfbdeb4befd89c9fe43f6d56c7404be89bbc982bd26",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "be83fcc70df847e2f8087cd17d121bd05540cf3e9b3193726de2ec4d9a52a8df",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestDeviceNameRule.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2a6baaf611742c208d174ca79c324be2a20584f19268aa92e5d4e44f57ec63b5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+          "sha256": "91252c985d51c0a6b6cabb61c6b683955a9fae2c9988388fa0e955fb9300cfe4",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "94e691ed14c1d8943d858148ce0405b6fc7cc47795bf1115f333caf2308a2fd8",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestFirstBootSettle.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b6ada51137c07e93f37f552ffb85817252160f5e9c1fce3902ea8a5aaaed7b7e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+          "sha256": "72c241bfdd29175f6e73d7d0212356e0321b59049a68f3619c20c3cc6ab79b03",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "5cdd22920b79e8c7bd42a32c2abc3d633688cd7d603c761753a44f205773e549",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestLocationdWatchdog.swift",
+      "local_candidates": [],
+      "upstream_sha256": "55cf027ac15cf22b530ede9a46e6bce0a28857661e502f9195670465d113e28f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestServiceProfile.swift",
+      "local_candidates": [],
+      "upstream_sha256": "cd58f273ac2eefd3e2257503446a490bb07ba63f4038a960df4a5c59d2102625",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestSnapshotPolicy.swift",
+      "local_candidates": [],
+      "upstream_sha256": "0c4d38aa27dafd17aac11b74996591afbcc7ca38a47471baf26d36127bf3ca11",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Daemon/GuestSystemAppPolicy.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b4683be009c7509f9186072ea8ae12c1bdc994ed59b2d977a018d57dcb63b7ba",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Daemon/main.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCommandEntry/main.swift",
+          "sha256": "bdb4d2b7ab6c89e79b0132382f3049891235c186b57ea51859882e668bb14b59",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneDaemon/Daemon/main.swift",
+          "sha256": "00397e1cc0cd2fce0257bf9890f4cddf9016615b5870f6c0d69ed763b788fc2d",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneHelperEntry/main.swift",
+          "sha256": "fb88eda5ef72e21844d354a28f6490e4b8e79d0bfcad97d9688763918c0bf301",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneLaunchpadLauncherEntry/main.swift",
+          "sha256": "198eadef44b138dcf8e6413fa82c174fbeec93d4944af951b88998907d8d6f14",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneVMEntry/main.swift",
+          "sha256": "266aca5eee52c3c4091c41cf9964a929342fedfe007b6c8d5fd433125a43be0e",
+          "bytes_equal": false
+        },
+        {
+          "path": "tests/fixtures/daemon_pipe_ownership/main.swift",
+          "sha256": "fbc10a7100252c0e25996bd87784f46d24feb8404d20be07834419457bb36d0c",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "73dabdbd775b79a90b6bf67bfd43347e2785d49514e62142336b166fc15d69c5",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Native/Include/VphonedNative.h",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/Native/Include/VphonedNative.h",
+          "sha256": "04ae9bce9c093b785f0af20b77c036579857d166a17db0ff8adfd1a6a0336314",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "e4dbacd634aedc824c16429c7e012b320e1d7ce7887364fe07da8189fd18fe93",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Native/vphoned_apfs.m",
+      "local_candidates": [],
+      "upstream_sha256": "63f4a9e6528981f3cef75703a006346abac902fd9857153a64321085e2cee2bd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Native/vphoned_apps.m",
+      "local_candidates": [
+        {
+          "path": "scripts/vphoned/vphoned_apps.m",
+          "sha256": "16167f6a299cd54dac35d5fec58b012c70b37d2c468c0d8fb99ecba5990fd3a3",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "77e49531bc502bae9be6a13c72be317f50b0089b69c90acb1a123aab5234cc84",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Native/vphoned_attitude.m",
+      "local_candidates": [],
+      "upstream_sha256": "a9b9f456c628331e3f78b10a4788501989ffc5b20586b88d24fd6edef93bedd5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Native/vphoned_clock.m",
+      "local_candidates": [],
+      "upstream_sha256": "6ffa404e16e7d3668d73982ddc21a5cc90b1cbc99b0e673577683f02e5a80ec5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Native/vphoned_gyro.m",
+      "local_candidates": [],
+      "upstream_sha256": "453b51bc14b11b277775e515fd7c65eef8d52d37aa530767207e6294a563b08a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/Native/vphoned_network.m",
+      "local_candidates": [],
+      "upstream_sha256": "646e829455ec0c18090c2a5c6a28462fbb76628d19d6573ed12eba66038d1ada",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Tests/APFSSnapshotParseTests.m",
+      "local_candidates": [],
+      "upstream_sha256": "fd758cf810d71c497e4ea8eb1afff1b5ea205a0f40869fe20bfc8974a1d48054",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Tests/LogicTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "38ac15de727ed015c31f8d5eb04dd399b9dbfb91516a0c71b09f937351ca2778",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Tests/SystemMaintenanceTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2194ff43365da1a78ffac0405143fe3986ca08c8c1049da1bc0976d72543800b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Tests/run-logic-tests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "5dad2e5ecbea9df3ec0a36f1f55fd039fd293e6abe65e82c2f09606c03af73f3",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneDaemon/Tests/run-system-maintenance-tests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "e14a952bee3d02a7d6252ada65fd648fa7a405846ffcf03779ef1ebc3c06398f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/insert_dylib.xcodeproj/project.pbxproj",
+          "sha256": "6457f471b8e5a2d6abb3796fbf8ce57fded6de7b8ea6c9408246dfb360a983bd",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+          "sha256": "7cc79f4bc11e0e408db19434cd535e4dc17323d624780114ee26fc75cac92ec9",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "0f74798bad50566cc21ef4a8d2963a2ed59dbc21bb68d54017efb16da753c8ff",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+          "sha256": "76f36d0cfc590ecc4a16d458aaf3bdfcdc00500b541c2c1b7709bc439d7999de",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "bff82889840f9089e7df33f891f26b55030403fae066c6cc20fa4fdf0ad61a67",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherDiskImage.swift",
+      "local_candidates": [],
+      "upstream_sha256": "eba4634eb96309a42af6b587718a02aa5359fa45a9caabad360492202cf472b6",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CryptexFilesystem/CryptexFilesystemPatcherProcess.swift",
+      "local_candidates": [],
+      "upstream_sha256": "eb30aa25f0823a555b76248c6877ae4c840818c61d584558ba5637e2905c0665",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareJetsamDisableAllowed.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b5123b6da5a268a96f029623023e26a5031103772e020f2c995d8b0ad2af65c6",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareLocationdCohorting.swift",
+      "local_candidates": [],
+      "upstream_sha256": "ea7ae46a435e0820ccd0ed9c247300f97d156475f5cb372494efa8675432371a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/ExecutablePatches/SettingsRows/CustomFirmwareSettingsRows.swift",
+      "local_candidates": [],
+      "upstream_sha256": "3d26d6a851fc461a806029f6f3f217f31d1eb19e251661748bfe2a4e9c71001b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift",
+      "local_candidates": [],
+      "upstream_sha256": "baab5962a02cb4d6dbe14ce354cb58a28b254d1cb4b6467031045994951c5217",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheCameraPatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "075c3a593c75c3cae334dd8b53eb8213173dedca36bc7549b4924121eb25a94b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheHypervisorVirtualMachinePatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "ec82ca2a06c7997a59829169881fdab538252f9e8708e0593538d82c0944fd1c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheIOMFBForceKernPatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "23ecb4c8246c7cc3757cf861e2d0b6e51fc914fc42dca951579e4fc8534e970a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheIOMFBSwapEndPatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "914743e40bfbe4e1b319271091b9a3aa64c451d959e9a5f36dd0bc3dd1dfce7c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheLSDEmbeddedRegPatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "62b7023b023291fa0af243a9fe5cb7736b5319ae26e26aa82787fd26f5668dab",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheLockdownModePatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "5840b2a549b5118535b0709471c59b001e263a4e38ddf99a7686fc1ed34edb1f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheMISTrustAuthPatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "dcd3b311f7d0269f30f968f5e38041fee2b0d5fe1cab07bcfe04b6362f836fa4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheMaxSlidePatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f8cd1538ab3d25752c37ee6cf5a2bdeae4a0ed8a9ba85b07c74fe6ea0906f6e1",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheSettingsRowsPatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "3767e0fd74ab20540468399eba660f9eb790c82fb34b34ca50236e7398c42c08",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheXPCLWCRPatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "027d688640a2083237c82e3918a655528fc500fb268a9652ffa8dd097d5f3463",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Drivers/KernelCustomFirmwarePatchDisplayRefresh.swift",
+      "local_candidates": [],
+      "upstream_sha256": "fdf47c4cc214d2b8c46f6809d702e3c9feb7d7e876b77d02da9098c4d1fcdb92",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Memory/KernelCustomFirmwarePatchSharedRegionSize.swift",
+      "local_candidates": [],
+      "upstream_sha256": "0bc02bb68e91941279871d44c0ed6a37eb1d46286d1a2c7d682affbc816aef83",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/KernelCustomFirmwarePatcher.swift",
+      "local_candidates": [],
+      "upstream_sha256": "8b90dbae200a07a01a93db8389b8192d78820c9a84118257d99a5d45595b34e7",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f37aac1a138347bd111b1c9499ca9e4c7763a67a9c18bc423ec5cfa616b5599d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "local_candidates": [],
+      "upstream_sha256": "fdfb6cd144399e4dd4a31bb73157a29534062bd17473bb089799af22a08a20a7",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift",
+      "local_candidates": [],
+      "upstream_sha256": "30eb39e6d0d99edd2b978b5870a85dee27f11fbd104f87bb783c2b680268f4a1",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+      "local_candidates": [
+        {
+          "path": "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+          "sha256": "c6768cb43ef46294ff09ca5b6546e73ca5ec3b9cf2ca8841046e8efdf03db22c",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "f61cf4b6d388ff42302c8f212d5a52bb739e0fba5f7aa4782d982ef12ca65e67",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift",
+      "local_candidates": [],
+      "upstream_sha256": "7c0872d51191319b05a7688eef49dbb33b4e60973a407e0df1ad50dd84b424e6",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/TXM/TXMDevPatcher.swift",
+      "local_candidates": [
+        {
+          "path": "sources/FirmwarePatcher/TXM/TXMDevPatcher.swift",
+          "sha256": "6dbd735ead10a71b1f668f3c360df51b693399406f55466422867d36fe71a582",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "03bf886f720c73efae29a7e7849902a749b44e2fe7920a0cea6498bcda1d4307",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/Core/ARM64EncoderTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b25ee019816e71c0614d03049e028b840d43178e08578733bf3a56fab8ec8393",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/Core/FirmwarePatcherTests.swift",
+      "local_candidates": [
+        {
+          "path": "tests/FirmwarePatcherTests/FirmwarePatcherTests.swift",
+          "sha256": "bec1e2a842c3b3df4542032887de3be39e57b227dbcfa68516d8a0382fec75c5",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "1dbac02af85ed1692cf3ab88f146a37ca325d8a737c7eb0509b75df89062617e",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareJetsamDisableAllowedTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d371c2f0180eb375c3a426d7ac567ea465f94598386b26bc34d806744909c695",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareKernelcacheSwapTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "0c5afa3c9bc0bf4da8e0f6409c8964490a189c596d5ec9fae84c3f607a5cad1d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareLocationdCohortingTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "404f249c73648c40c595f80f733113232cf5e90bfea96805abe404c2a9e4017a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareSettingsRowsTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "753afe8e04532848b3d8d9e033817a80bcd5c26feeecc0785d72309b4dbbbbff",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/SettingsRowsStoreEncodingTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "20f9ecd5396ffbb2897fefc05bddfac8f5fed06be553bd4c5457db7cf56887a5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheIOMFBForceKernTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "9073f80fcb160179631131a0f5cc45ed3af4973a5740a08061ef3147bcff9394",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheMaxSlidePatcherTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "01692c9b1f4517fc93118133f9c0a4cca02ef45d3e4e439f7836896c257c0bd0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheSettingsRowsTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "30863b020e218b8fff60626a73eccdef3230e0796d676ef2c92a2b352ff5cd51",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheUndoLogTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "be2c740c8b4b9d52a10f9197f7dddcde9168dfb06d59db4af23fa0cc5885a59d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/Kernel/KernelCustomFirmwarePatchSharedRegionSizeTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "34d036bb29b591e8379e44b56f2890e6465e73a434856bb12ce7cbaeafd57743",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwareGuestPatchResolutionTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "9d560f64f91213fb77e5f8aaae835b3ad08165dca3b64ca6b82a3c44a4e9d803",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchDriftTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f694c699101f98b627a5dae7076b57d1858ae7b3f45928848be3c225c63ed4d2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f1235d7d7cc356510912e0f19dd2dc20fd925b12da624c894cac53856dc9cbf6",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareDyldSharedCacheVerbsCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "ce1916d511f0f1e319883fdab8b1067f8f77ac7a2eb176017380d64fdf921a22",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+      "local_candidates": [
+        {
+          "path": "scripts/cfw_install_host.sh",
+          "sha256": "5a06cc0dc6514667463ef638abb38817aae311defa8dbae35d076b4dd81ed5fa",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+          "sha256": "a4dd272db9519c67eaae22e08b96971a37c01b984ae00ac2cb21e5643a437937",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "de533b7773ed70e942e949d8dac391faa7b619b65f687daa64e2fb0b4959da70",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareMachOVerbsCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "6c2a08d5b8dad7906336880be678844bd11f77d6ee795baca45e5e2649f0d85c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "752aa957edecd028b2b259ba5a12e78609461a8350bf3cad0c4f7e58ca08b58a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsRootRowsCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "17be85ff00df4b4b10a0da3a15108a0f3a46ca885cbd8e38d0383cbdde486d61",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsSoftwareUpdateCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "53e93468fd3a2f41c4ce9946c75504cb91c844ff0a3685e1934dfc9f2fdad75f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4bc99480fb2dc9cef1cbb847baeea71989adda83c6daafd58da52994fd4f2e05",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwareDownloadCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "189f516240cd0a72a4a5dc1d008b5e39d080344a06f32f925d8ae0f476c042fa",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift",
+      "local_candidates": [],
+      "upstream_sha256": "5622e868d800f76ef58fa420d641c12d274f289760201002254bd3f6a7ad71c5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d3e2b9028e90b0f4a0d3c5801956728c26ce29cdf427225f37d5ecf7e950d1e8",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhoneHostAutomationProbe.swift",
+      "local_candidates": [],
+      "upstream_sha256": "c91985c8e9e1959a3169630393008891ff61722f9e880a299890a2ac7e4a5eef",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Host/VPhonePCCGPURecovery.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4803ab1955435dc8a2b14862018497d7548b8b913d2a72f00120821286125f70",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Restore/VPhoneRestoreCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "7deaeeb52a1ff6c18d5ef512f09643e9361ef1381918a520f70449e459adbb4d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Support/VPhoneProgressBar.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneProgressBar.swift",
+          "sha256": "44321b445e31ad2ef1462ff69c7b8ea4a47e1bab56d91be512bca705426ef161",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "9108644ad87adecb8087bad4e1be653e335a275beca317cffe424090582d8dbc",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneMachineTemplateKeys.swift",
+      "local_candidates": [],
+      "upstream_sha256": "602bcafda2e0d2235feeb1b4e5e23805e41170167ce5124dffb8c35d9b138825",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneMachineTemplateTrimmer.swift",
+      "local_candidates": [],
+      "upstream_sha256": "6533345c9e511f77c6fa7008193fcb564e0e8158326edb8aeef2e521e8f08568",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneTemplateSetup.swift",
+      "local_candidates": [],
+      "upstream_sha256": "0b524822a2bbc7aca433611383b31790a29bac5770dee2cca3c9611dc7937836",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCommand.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneVMCLI.swift",
+          "sha256": "49e478d819512d57ffb6b093c0752730b132498a1b8e3636b78153bc00027e04",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "097dd867981a62726326344a30f99545c414b351ee2cd4eec489f3bd7e7230a8",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCreateCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d090a98e3f7b877a2163a4f457f5352cb8afb05c56ee468fc17db68ccb6b55c2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCreateOptions.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f64fdf24eae9e3b9ecbd8c4e829a8af1eb48861fce33e3902142cab491e285a2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineCreator.swift",
+      "local_candidates": [],
+      "upstream_sha256": "00198eedfaf74c95884aa0b410a26ae2abce6d3f3f5146a93b1f54952490376c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineLaunchCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "68f089d6dcea1f014a2c3705db843fb462c8a4010c6245dc88082c15d29d468f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineRebaseCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "6d9ce12680a35f8ebddf5ada11b216a676aaa0738f541bf613d6940ab4cb8479",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineSnapshotCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "9d880f1c6e20474eb7973dbe6a5849251033efda81e7e3b8419fd2f21583742e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineTemplateCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "1a1ad822d67d21a0e7cecdbdf088c5c869cbee702765c703c941023e188a1826",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/VirtualMachine/VPhoneVirtualMachineTransferCommand.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneVMTransferCLI.swift",
+          "sha256": "f9f9b360e4c64fed653f056c58c4f49f9c80b190356f94edceb68448c0977696",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "884fbb4fe8c50eaa93c137aa777febfb58ecd7bb98ce994f4689dd691b45032f",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneCommand/VPhonePatchKit/ARM64/ARM64Encoder.swift",
+      "local_candidates": [
+        {
+          "path": "sources/FirmwarePatcher/ARM64/ARM64Encoder.swift",
+          "sha256": "0fa7c9770253a9f1d88359b5deed486dbf94f833e0e8814405640ed4762c2737",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "2b63c9e30ec7436d3c1abf9868281c807b637dafe97707b94097ac757f1f1167",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh",
+      "local_candidates": [],
+      "upstream_sha256": "0e3808d1d3d96ec209f5717f6417c1416a747d42229f57b53e9b02f98903f34e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh",
+      "local_candidates": [],
+      "upstream_sha256": "4d8b8a1debd1059b00c25c6bb02b206fb346f2707522cfa7a76736d3278eaaa4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/insert_dylib_tests/Info.plist",
+          "sha256": "48c37fcaebc94d85bca35a36f84a19df64d26d62b8471615a27a46c5b3f77c9b",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/Info.plist",
+          "sha256": "8574bcd6abc97b98446aa26eabf3cfda71e8adb6f855eb3673d6ab5e06a831e5",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "d9f156efb779c99599eb4c5874e3da988acde4f5e6c44d34b815564689f3ebf4",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/Localizable.xcstrings",
+          "sha256": "88734a78b7c0dc45bf3ded792a3d2c67b17007f09031a06e9df6895614861660",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "211a65f1da3c606a47054add9904316cba66680745c3f872bf792152773783de",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist",
+      "local_candidates": [],
+      "upstream_sha256": "30fbb13c4195e6cace82b1c5775fc725e51cf0f30140e05ec0b41e4423736091",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Tests/AttitudeDialTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f24948d7b335ea6052cdee61a9ebe90bb350f5f46d16c52059937ba70fedfcc4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Tests/GyroscopeModelTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "9de4dceef1d7b821c64df0c981cad00236fd8aa5dd2d2efea1ae5927b2fe4309",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Tests/run-attitude-dial-tests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "53c69bdddd8111500cff6a31ae135c593fbef88b956b84287ca0e6bafd742bb4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/Tests/run-gyroscope-tests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "763f8541e7dc1e05adc0d7482c155f6c87df90c27efdb3421c28b48b0c755de2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2d187fc7500541d63f96a1aa8bf4b1ecd29f46dee90a2000e181e46044f133eb",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlAttitude.swift",
+      "local_candidates": [],
+      "upstream_sha256": "50c761a9e0beb90ae86bd96a8cd87fc6d1e4c0475698bc43f45a89bd36e20de0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift",
+      "local_candidates": [],
+      "upstream_sha256": "be017912fc1879c3e2237b4b7d1842b54d9096e45f384de9ccea0909bd3e5a76",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlGyroscope.swift",
+      "local_candidates": [],
+      "upstream_sha256": "fafa9b9311235b6a04742a1ab9f55b5b4df4721abb33c8b7d841d0c2fb6cc9e3",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlSystem.swift",
+      "local_candidates": [],
+      "upstream_sha256": "866e48d7d0f15e989232a92078ce459b91d900d445662113907af84662c19278",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneClockSync.swift",
+      "local_candidates": [],
+      "upstream_sha256": "da697efce9c0262a3fb261cd745fd507862543595a7605ee06b08b31d02ed2f1",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneLocationProvider.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneLocationProvider.swift",
+          "sha256": "51f1d42256ae7ce6d5aef2a515fb24295764fcac4e35e47ee992454bc1fc7ade",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "e98a36287c6e015ea33ec12b495faf274638fdefb666efed52b2686383024029",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuController.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneMenuController.swift",
+          "sha256": "f730d6f6c9a8bf4423f62c03a193a72481670785c92842eb79db40a36a6bd361",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "b9f3d45fede75a61269bdf0b9eb37a2c0eed2bb574646b95ad88d55c644ce3ff",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuDiagnostics.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4da691e8cdf4859812e68c442fa22f8244147c483d32174d11159547f589c507",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuFeatures.swift",
+      "local_candidates": [],
+      "upstream_sha256": "e0c8b10b651df42c25bc1babf685628d923905c4182350f109b8550012fd1cf4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuLocation.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneMenuLocation.swift",
+          "sha256": "5a5292d9eb5713c363f3857771bbacda27e1083e34ef15489c1b4d991c13ba3a",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "3b65240f9ee27f5e163d9539ce554e7a1004dc27dfa4cd9bf3e806efc0c017a0",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuMotion.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b2513766813191fd7add036cc4ddb95887020ccfad1357b6214fc881e762ecc9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneAttitudeDial.swift",
+      "local_candidates": [],
+      "upstream_sha256": "e2fa5464a24e0eb620507e91c97a10442a0e66a6a56569d7a590a9a665eb9f17",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneAttitudeDialsWindowController.swift",
+      "local_candidates": [],
+      "upstream_sha256": "57bcc93254d4e006a434eae3fdc2618b35331682b4adc680b82b10292c0347fa",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionModel.swift",
+      "local_candidates": [],
+      "upstream_sha256": "341346161db1e18316fa4724270dc38cdda4308710af3ea3984fa045dd233c7b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Motion/VPhoneMotionView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "7d7d928561e000f83a33dbbcfa836c258ea6496a37d40f4dc4f53f022fadd2f3",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/VPhoneGuestPanelsWindowController.swift",
+      "local_candidates": [],
+      "upstream_sha256": "a6637ecea173270061260f49842098a0d83f093a9cd56a89290471084e454373",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneVirtualMachineWindowController.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4fcbbda144e8d6459f7d5bf719cf38df02c8c032522351aa089e4e6faa28656c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2889128492dd6837e3af01c223bf3fa89f99a1160c4d3e0520c9e7fc191c4a8d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneAppDelegate.swift",
+          "sha256": "50dcde2c50924ba327f9174c3f62bb3a08adf8bc3f4fce2efdb55486137bf388",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "279732c0ac964bd3deeaca435a089978024c849e6d4dcf09bab3dfae2da31a8a",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/VirtualMachine/VPhoneVirtualMachine.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneVirtualMachine.swift",
+          "sha256": "b5ba089096c294ccf4d32c4c8cab4c89412d335161d31a5e4c66243117e10503",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "40dd6ceb2a805136fa6eb7ab25e88682c1277cf182063fe88b86cfe74676548a",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/VirtualMachine/VPhoneVirtualMachineView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneVirtualMachineView.swift",
+          "sha256": "85cc1a6ba100a93950185baba5341bfc4d5d77b07b8be1f182f559af5c045fc8",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "fafa0ce80e8556145b794882d36f2000ee7fac64e7827ae3fe1454e951accb32",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Attitude/VPhoneAttitudeMotionManager.h",
+      "local_candidates": [],
+      "upstream_sha256": "410bb7239258fc45221960417b1085f1a8dd7f4c64c52e97fb1515a24bcc63c5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.h",
+      "local_candidates": [],
+      "upstream_sha256": "61e4e68c982d8426963bfa4f15835be39371b63c470597806533bafe0bba7b41",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Attitude/VPhoneAttitudeSample.m",
+      "local_candidates": [],
+      "upstream_sha256": "c1cc0095848329aa10be04aec1f83fe87876b72d038115d3e36ef65b8d6cc82f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Attitude/VPhoneAttitudeState.h",
+      "local_candidates": [],
+      "upstream_sha256": "3350cc5d25d04fb202b3428968924236300a404908ea800898561a59a84de584",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Attitude/libvphoneattitude.m",
+      "local_candidates": [],
+      "upstream_sha256": "0027476ae3bae7ddcae074116148eba99bc0d41fcc0b735b360205f1fef0531b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/CamFix/CamFixPrivate.h",
+      "local_candidates": [],
+      "upstream_sha256": "4e293a33c12e8e215a0756112d7ce4d621fffd3b9ea0178e13ed798f57f5fa92",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/CamFix/CamFixSupport.m",
+      "local_candidates": [],
+      "upstream_sha256": "1455188142ec2d828890b0571f5ff6edad2016d875d7692d0beafb51da2b1d21",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/CamFix/Device/CamFixExposure.m",
+      "local_candidates": [],
+      "upstream_sha256": "f27554643d078ccde3ccb10dbc4b4da2b637e5bf9d6150b037084a95494350d6",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/CamFix/Device/CamFixFrontCamera.m",
+      "local_candidates": [],
+      "upstream_sha256": "b4537d8300f395882b9a494250c3c37e391e858fb092904e86b7f7d9b708c6f9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.c",
+      "local_candidates": [],
+      "upstream_sha256": "dee08d6f30f40749f39847fa3b5cc2272f90e7803690cbdb00e1ca930a5ba9b6",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/CamFix/Frame/CamFixFrameGeometry.h",
+      "local_candidates": [],
+      "upstream_sha256": "9d37e41bfaac3b1a2c057148d8b5af8f3e930a1ab2be4183af568a2d246b4863",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m",
+      "local_candidates": [],
+      "upstream_sha256": "26a1b928585a9a3fd7ed26a73543bd377385be76ad395d81a3e5dcd0c8eb4eac",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/CamFix/Preview/CamFixPreviewLayers.m",
+      "local_candidates": [],
+      "upstream_sha256": "42309067a9f9b26db59e43ec3b9ec39c3c431d3dd0b8f6f1134140f5dab6463c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/CamFix/Session/CamFixAssetWriterSettings.m",
+      "local_candidates": [],
+      "upstream_sha256": "ecb15529fce016a392a6ec0b5d726afcf4245b247abc6a1f5bc4063b8b8918a5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/CamFix/Session/CamFixSessionGuards.m",
+      "local_candidates": [],
+      "upstream_sha256": "f4dbd3dc374f40d3d5e5e3c348b8791d07ff55a10b529b5e1d997bf8815e8eab",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m",
+      "local_candidates": [],
+      "upstream_sha256": "d4c7b4eb22de34bbe7472a64e79d1766cd48cbdf396297df9522b48032e1a13a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/CamFix/libcamfix.m",
+      "local_candidates": [
+        {
+          "path": "scripts/camfix/libcamfix.m",
+          "sha256": "dee197bf1c52be17fb744a928be0cb217a01a1084491e6e1196ff5adadf7db0e",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/CamFix/libcamfix.m",
+          "sha256": "013eec571944db1f8ad1fa9bbea755e0ea7bf8ef83c6379063e145c0faae3398",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "879083660b9068660e3a36844ab5ec6eb563b693b21b49f7c1279b481a3ccf5f",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/DeviceHubFix/libdevicehubfix.c",
+      "local_candidates": [],
+      "upstream_sha256": "1cccdd9326bc183bbcc6f79b6744af0d14f80cd83f21ccfa1fc838417fd47a47",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/DeviceName/DeviceNamePolicy.c",
+      "local_candidates": [],
+      "upstream_sha256": "d51c130b47fff9ac68e703f1c33987004f4763b2707021478b5c4fd244a7c56b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/DeviceName/DeviceNamePolicy.h",
+      "local_candidates": [],
+      "upstream_sha256": "44f314096f459c12d8fd6a468385a8aefde1219ed13a9c1506612ba079f5f82b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/DeviceName/libdevicename.c",
+      "local_candidates": [],
+      "upstream_sha256": "7c9fe9058d8446ccea3606df49bb2b8cb9dcf3550b38025bb2ec7854ef9e9531",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h",
+      "local_candidates": [],
+      "upstream_sha256": "aeccae528f4a8e61319d63830077990bcfaaf550488353c7d8ba1614c27a1915",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c",
+      "local_candidates": [],
+      "upstream_sha256": "ad7530f45607cfaa9bbb4c80bab55e376e072e1cad4ad096ca1ed8ba832c7dbd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeHID.h",
+      "local_candidates": [],
+      "upstream_sha256": "679bc7fc3229a9615c4502848c113c2f832c2608a40919661dce85b834390991",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Gyroscope/VPhoneGyroscopeState.h",
+      "local_candidates": [],
+      "upstream_sha256": "0379dd005533585227bbc0efec24e1c2dafad73ea4cc82adbc5b595106cf333a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Gyroscope/libvphonegyro.m",
+      "local_candidates": [],
+      "upstream_sha256": "b78bc8ff265917a3f99b95c45b04cf24be3bf86f3f2b1d02a93a400614b394ea",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/LaunchHook/InstallCoordinationPersona.h",
+      "local_candidates": [],
+      "upstream_sha256": "68cfee0f94221cf6014bcbc54c52043f889f68846b79e1d71e469b1bd3505a62",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
+          "sha256": "c98900cda655bf784b1dba66b60b1908edc6e7424bc787d7dd1f6a6ef478af03",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "d6ec5a41a9803f24093ab8fed3d88db34f140ca60afb9c832e22d31c68d43a31",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/Makefile",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/trustcache/Makefile",
+          "sha256": "f073a6c531c92892b29b4a822fd773c96aba373588aa71ed81f18cf63cd9350b",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/vcamcaptured/Makefile",
+          "sha256": "0a342b093f4ee7e102e417b41d4423da76e99c848b2a3ae469a3227bacdd4568",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/vphoned/Makefile",
+          "sha256": "26f2d48d722032158a16a62d411d664c762bbaa5fb66a114acc237b3afa7367a",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/Makefile",
+          "sha256": "36b897536ba377d7d3fd08cc82a71b74be89e510c58b67bd3b6d189a355e5287",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "b6a6ca8ea3022a6b7568153b6c49ec2952a4a008c70c33f6d0b706737a1ae99d",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/PrefsFix/libprefsfix.m",
+      "local_candidates": [],
+      "upstream_sha256": "b39604ba4baf190ef12ac31ea0906b0d233a50dbe5ba24f021f902d4c1286c4d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/README.md",
+      "local_candidates": [
+        {
+          "path": "scripts/repos/insert_dylib/README.md",
+          "sha256": "b4c698eb1e1b88edcb3dce21578b8c633e833fe5f3b1121b30bcfc43905af7ac",
+          "bytes_equal": false
+        },
+        {
+          "path": "scripts/tweakloader/README.md",
+          "sha256": "5d36df2ac4c6ea2f93c9b5ad8ad68f9c15f2d7011725ae8e7fb60001b8dbb187",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+          "sha256": "9baa3d1f3f4b89835c4d6081ac2b740de555ad2541d83edb4dd022037c37ac6e",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneGuestComponents/README.md",
+          "sha256": "555c0547bbea56668db006893b986f964ffffaf8f071bc14767b8a56c5a2eb67",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "0a60a27d7bc89b863b7e7c039b95cf60901000d41e224195e9d2a38431812552",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Shared/AttitudeProcess.h",
+      "local_candidates": [],
+      "upstream_sha256": "4d24ce91a5686081f5a500807b39684fc286954d5838bbf3448bf46030a35b0f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+          "sha256": "97175d707f52424e9fe8e076a3e41dbdae4e29391f4ed510eec190ca955fefd8",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "4af1d3218984a68912588facc85bd991ad767df6bd57dfd6cf6ebd32fb63b1a2",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Shared/JetsamLimits.h",
+      "local_candidates": [],
+      "upstream_sha256": "49e23cb428a7cca795962480a29b910983457cb73f1a8c47c80a85de323a46b8",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/SignInFix/libsigninfix.m",
+      "local_candidates": [],
+      "upstream_sha256": "438344766a3af3629e346df7075a459c495cd07476ddaa0f465f2f1c8d91c588",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/SystemHook/SystemHook-vphone.c",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c",
+          "sha256": "71d9d5186c4f5160978c04b04a8ecddf3753f3835ab63578ea555d9a01ab0074",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "ce36b54b8c81fdf5e7aaa7b96f2f6596f3b5aa67950d2ff7025a659d9e982c8a",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/AttitudeHookTests.m",
+      "local_candidates": [],
+      "upstream_sha256": "f47ccf13fb1283cb15b897fddf2d11e4948097216d2462a1c91e9a5600f5039f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/AttitudeLifecycleTests.m",
+      "local_candidates": [],
+      "upstream_sha256": "22dc8563f55e5a990bf7f36286ae18463293be3094007957962ff596ebdbec33",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/AttitudeLockOrderTests.m",
+      "local_candidates": [],
+      "upstream_sha256": "9d7aa1b766d0d130a4732ea408aeec3cac18361296c63312ca6612e20159687b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/AttitudeTests.m",
+      "local_candidates": [],
+      "upstream_sha256": "2d1d6c3ddb5d4d0bdba2d3c8126cd6832e1b99ecde0e8333dbeb36d249ac93c2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/CamFixFrameGeometryTests.c",
+      "local_candidates": [],
+      "upstream_sha256": "8508301d498048a4df2dd3e1d56926d04cd8a4be318bd3a290975f0497279e2e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/DeviceNameTests.c",
+      "local_candidates": [],
+      "upstream_sha256": "07b08a5ab11d9574468fc4111ef06f60e1059f9a89e32e13dc5ce00fcc58e219",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/ExecutableRemapProbe.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d0c04f9e01b74eeb73c511fd09f0c9d3dcdef8d3616a80229c43be0aeb7f9920",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c",
+      "local_candidates": [],
+      "upstream_sha256": "947adbb13182d71c64ec2012c65f186a9bfc45061af2669e6663bce7a6827413",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c",
+      "local_candidates": [],
+      "upstream_sha256": "0d6d869f0baff80e6f0c8a8743894033587c1bcdf3070865af2fed480f5fe5bd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/GyroscopeTests.m",
+      "local_candidates": [],
+      "upstream_sha256": "9940c6cc697c69c8928cf5e8428b38ee4dd04577131fafc592611b31fe9bea1a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/Tests/InjectionEnvironmentTests.c",
+      "local_candidates": [],
+      "upstream_sha256": "80f2072aeee16be28a977313f115058e8f70adc7887fbf8efa5ef36a29e98cd1",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/InstallCoordinationPersonaTests.c",
+      "local_candidates": [],
+      "upstream_sha256": "dccb5b8a64367cec1fb50667155ac3eec257121f6d931e3cebada13c4b34b52e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/Tests/VCamDriveGateTests.c",
+      "local_candidates": [],
+      "upstream_sha256": "599e27a2fc4527ee14676b2dd5a3b5ec8015255faef83f106a3cac7943bc0250",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/VCamCaptured/Frames/VCamDriveGate.c",
+      "local_candidates": [],
+      "upstream_sha256": "e9eb3fec46f8a2e92d3feb193cffa00b4e1dfc9ee323a2fcba96e7110672a796",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneGuestComponents/VCamCaptured/Frames/VCamDriveGate.h",
+      "local_candidates": [],
+      "upstream_sha256": "5ae6a9c0105546c057385e814d6ab941c8ed5fd47ec10ae825692465c804dea9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrames.h",
+      "local_candidates": [],
+      "upstream_sha256": "918b346790f1121a990becb4c9b099f467322e9f2549d5ad07c3f5d2e18e0a02",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/VCamCaptured/Frames/VCamViewfinderHooks.m",
+      "local_candidates": [],
+      "upstream_sha256": "b3c9b25bc412435cedb04d37a4bf4281d8c74375f29b9fc7b3ffe790a13eac4b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSinkObservation.m",
+      "local_candidates": [],
+      "upstream_sha256": "c50fabe16358726384e0c58a1846da1d32f2f36c8dc926528e44c5b02c7714d0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundPlugin.m",
+      "local_candidates": [],
+      "upstream_sha256": "cab12d856415ad61109be3250428341da002e39551fbe5c8620d6e5833424c25",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveWriter.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveWriter.swift",
+          "sha256": "81ea3b0d3af1c7600cd1db4c0e97d43de356742d78e895f1e5a6617b159be690",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "823d3add67518ff5e1e2711d28e8e6001f451c2da9fe901987dd05cfbb11841b",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBundleTransfer.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneBundleOps.swift",
+          "sha256": "3b6dbfc9fdc0f160623371545ccf9f61514995356ee37d3a063ba135b2c0931a",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneCore/VPhoneNativeTransfer.swift",
+          "sha256": "c55487d597e5f35a996aaaf88a9dc90f21914c61caf89d4cae8028489e686b6c",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "295750c61779193b5a165514a8750d6c805d5b593fb5de6fe90d170fe48ecaa8",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneIPSWCache.swift",
+          "sha256": "91c516a35470947b59f2870a96cb353e5308db3d36b6eb44b2aebc66704a12b4",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "42e8193157ed362d526f6e8cca804d4f6a33b284b5cb84360e0d739fa36517de",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneArchiveKitTests/BundleTransferTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "8ee5714a212a25083be5266c92950e70bc7b1ab45e471b908bfb94427fbd0e23",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneArchiveKitTests/IPSWCacheTests.swift",
+      "local_candidates": [
+        {
+          "path": "tests/VPhoneCoreTests/IPSWCacheTests.swift",
+          "sha256": "ba85eb58aaf7dfefed5ceb7bc9d893eb391a6bb436c796d2ad4cc794b6cc05f3",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "0350d1b879e7b34464a0a0d0f6157263843b19a7d1f2cb8df694a4c4f88bb720",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneArchiveKitTests/RoundTripTests.swift",
+      "local_candidates": [
+        {
+          "path": "tests/VPhoneArchiveKitTests/RoundTripTests.swift",
+          "sha256": "ee5dbbfd1375d01ec72751d552f6ab4ead949cba3a719bff6bc69a359410c5fe",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "b9953d021661979de55b0ade8e5e77e77609008cecee9b61c106b1e21a0b4035",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleActivity.swift",
+      "local_candidates": [],
+      "upstream_sha256": "a450f18768d39e4bef3abaef4c35f6152cef6ac69ceb3152957969da6ab05dd8",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneBundleOps.swift",
+          "sha256": "3b6dbfc9fdc0f160623371545ccf9f61514995356ee37d3a063ba135b2c0931a",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "a29963e4ca964f0bee80aba7ceba12e447422d8f11f7be70a1c24a2968d013ec",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleReport.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneBundleReport.swift",
+          "sha256": "99fe836afac39a4f7caf4ac4d7edeabc4f5e962a0cc3d67e151343e5f4cb0c36",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "bcb5feb24bf474f0e2bd0f4ad5e2e44c5cdcd285999fe87a1941d7db9a52558d",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneDiskRebase.swift",
+      "local_candidates": [],
+      "upstream_sha256": "039c7e312fe78c31d9f5cead96cc552a9633aabc11cbfd5da18045c46340041e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneMachineSnapshots.swift",
+      "local_candidates": [],
+      "upstream_sha256": "7b3c032b00e67b58a9f9bcd2e2fc6443880fe11f9551fa395ff0c30e0f3eefda",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneMachineTemplateKey.swift",
+      "local_candidates": [],
+      "upstream_sha256": "0a46d53f92ad029c6a6b1407e717445aaa99c96c948626b0b89c5bbcb76db5c4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneMachineTemplates.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2a9b5a0d10e8c448952e7030dae5fe1aaecce74e600edb6a43bb499e6b1de1e8",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneSystemTrim.swift",
+      "local_candidates": [],
+      "upstream_sha256": "759b2c90c1c419beaf19d0871d4697d6e61686b2119b5d21a2568c6af26f51bd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneTemplateSetupBoot.swift",
+      "local_candidates": [],
+      "upstream_sha256": "3b15d156ed983753206ebf2d69cac65f8112ec8cc321074856caa9c0d4f95de3",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneTemplateSlimmingRequest.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4a7b3818394771189bc388f4a6dc07c81309517a6f18b73582b896176005e29a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/Process/VPhoneConfinedDirectory.swift",
+      "local_candidates": [],
+      "upstream_sha256": "222ca69913f0731a3047f21fa2fe52d02bbf5b6f58f76632a6ce8a7b53b26b3d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/Process/VPhoneManagedProcess.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneManagedProcess.swift",
+          "sha256": "6b1512a8d53911dd5b031e4a2e0b8a397490d68b24059645b8dff13b4f9056f4",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "ff7d3e935972d5a707825c536141dd9c4e2668046323fa5d2953713bc3c00e0d",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Process/VPhoneUnixSocket.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f0d750f25846868670188a9b30754b6abc63bdc37a82d2a9457f7573295758bd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/Support/VPhoneFileDigestCache.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4907ddb61db3526385cb1a946b5c1a27b8a65ad0d867fcc904e87711effc5e09",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneBootCommand.swift",
+      "local_candidates": [],
+      "upstream_sha256": "ca52d4973d6b8ffad5ab1217c4a153ffda22c058a65163643ccc5bd27557d8eb",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestDeviceName.swift",
+      "local_candidates": [],
+      "upstream_sha256": "525a4a690a75a247e8a930e2b1a35a5041ad34d1dd52ea3ade4e13222988a29d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift",
+      "local_candidates": [
+        {
+          "path": "sources/vphone-cli/VPhoneGuestEnvironment.swift",
+          "sha256": "96d054c5497d78e4ab620cd9e4fdf7cd793807ac315caae877db4501c56e74f4",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "4f8cbec38d944799164f6595e1f92c60ff542dcf75879fa47706548f9e7484c0",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneLaunchLayout.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneLaunchLayout.swift",
+          "sha256": "2cfe0cdd84738f1e361e363197be4479c405805499f2208eedd3aed1a695a474",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "ad54bc930ddd0c90441db630c9cda8bed8dba804d6ccf7724593f455a93479ad",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneLibrary.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneLibrary.swift",
+          "sha256": "c0ca77b77b4376847d7eec68e8b888325ab057ff2c8a21a7f879d93c02ce0d8c",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "e5263b414f8f2f5b8091c76df59425ace0c7025f34dae59065761d4dca56f576",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
+          "sha256": "2901ffec875d732e337711aba5f59b9422b946f1378e9c488186c4d1b234a1de",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "a59bfebdedef6adbbf8bde7e6c036094c38e75a0719986a354f5e2aa777efc27",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/BundleActivityTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "6f8afa8df3cda0367be69aa6fd24a20e499988d8d33d420ecba5feb024e02f90",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/BundleOperationsTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "1b91597b20b8de0df85fb0b1fe13376d3eb7cdce350a3853bba6d4808629a6c5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/BundleReportTests.swift",
+      "local_candidates": [
+        {
+          "path": "tests/VPhoneCoreTests/BundleReportTests.swift",
+          "sha256": "65a1b14f2bd073c0582d48091cfdafb6ef0e0815d0b4df9e10210d3e82e41b27",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "0afa3dd8dedc9e8b8e4a056ec23d9a415dd7824794878ff8f65b744a64259869",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/BundleSnapshotsTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "88634001bf61ac419304116e9e836d87c35698732b514dcc461b135e312d9eea",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/DiskRebaseTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "25f148b4b410a1e1758d7df30cdc398d479747f8745cfe3930c897a454ce59bc",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/MachineTemplateKeyTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "6c1007995a93509b21bd8977dc07f2f2d1c23a232a6a0877c1be9d2bde4d82dd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/MachineTemplatesTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "28133fd7acda86df402c91796071b278b2c028d88c5591f2a42d0ea39de87d13",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/SystemTrimTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "de19bcf84f6adaaacef44848a4e81f54326691836955f1a9d664093989e2f096",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/TemplateSetupBootTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "e572b37888258fc2bc92a02b44187ae4199793bbbe1c5eee3be381bbf6b8c6a4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Bundle/TemplateSlimmingRequestTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "70b12a749db3ae19058111fc57e466c3a0772642148c80686f2549127dd9bcf2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Process/UnixSocketTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "c6070340f5880a2716c0547585a1e0be2367c9be11b9eb3390a1c44ec5a6871d",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/Support/FileDigestCacheTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d863468201518f5eab84f0880d9e51ef6570574614683f0440856547506899d3",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/VirtualMachine/GuestDeviceNameTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "9bd7147442d7b114c37184d0975ea69a100952af3790280255fa7732a6d80318",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKitTests/VirtualMachine/LaunchLayoutTests.swift",
+      "local_candidates": [
+        {
+          "path": "tests/VPhoneCoreTests/LaunchLayoutTests.swift",
+          "sha256": "ed59033cb90c563ad13b873b380f89d5ea3b0641e61d3f1307d9ed7866fc6de1",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "1516529439b020a6930e84f4b96e7a761a4e77ee2c9aa75e4871d9eb1c2e778d",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneKit/VPhoneCoreKitTests/VirtualMachine/ManifestTests.swift",
+      "local_candidates": [
+        {
+          "path": "tests/VPhoneCoreTests/ManifestTests.swift",
+          "sha256": "a5b48d0d0e93c28c8aac6ebea3af35e28d914cf4d5733136c8b8276bf4b0a0a3",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "5c3c2a1297749adf0559386832d117ec6aa5f58c92ad61f231bc0c1493d1f0f4",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneKit/VPhoneCoreKitTests/VirtualMachine/ProcessHolderKinds.json",
+      "local_candidates": [],
+      "upstream_sha256": "fcdbc8ee04f24e4527144f23ef6fb595484c401806bb77e782bf1054f2db3f72",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/Configuration/Version.xcconfig",
+      "local_candidates": [],
+      "upstream_sha256": "ceb5c481b77951d723cb3532a9fec8bffdb9665b1871ed8c7467abb541e4dc69",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/Resources/VPhoneLaunchpad.Info.plist",
+      "local_candidates": [],
+      "upstream_sha256": "e3bfaf9b55f03ebcaebca43f3956c57696b9c86d5df3909a3290eb5798427945",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/Tests/BundleNamesTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f50d00ed02150ab47ba8591f6bda755cf3d1f97d9fbf5f66c16d70b0a3e0f6ed",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/Tests/ConsoleOutputTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "89f0c2ae08154bed8e761483d8cd4c7355a54178b2ae5c613f1272667bf1fdce",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/ControlTests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "cc72282bea92e98229a5a46358464ba939b858f718537242700589437fbe4223",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/ControlTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2239d149335b01fe1ebcfa7b7be413ab4bf07253bdafe396cd6485be5bdb48b6",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/FirmwareAdmissionTests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "2095a55da1841f415dde60f5e133a82c348aeac2a1a21149d6307e99170d980c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/FirmwareAdmissionTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "fe1ac6767eb50161ca8ae2251070cf7f46ac56c52f41b9823ece734e6b4114d0",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/IPSWCacheTests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "0299d283cb05edf592489c11a9eff39d0ccb3d5545bbe75e7f911d4c14d404e9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/IPSWCacheTests.swift",
+      "local_candidates": [
+        {
+          "path": "tests/VPhoneCoreTests/IPSWCacheTests.swift",
+          "sha256": "ba85eb58aaf7dfefed5ceb7bc9d893eb391a6bb436c796d2ad4cc794b6cc05f3",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "f6e3d820de52a72f7b00ace12a0f0bc1f584ce575786aa977e2640c97e7f3ac2",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/MachineProductTypeTests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "13f46d2067ae7d2c2054e005170b6c5d3e76c30b6b809fbc20a209ed0ba7d874",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/MachineProductTypeTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d992326fffc106267085a3756100dcc041d164f8ff7e888245f7ea05fd04cc5a",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/MachineSnapshotsTests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "caead75e231a7833fda1f5d51b16a989e1430695726615cbf0dfb850b0ee2ffd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/MachineSnapshotsTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "3924a724d8268b3bbf1a98b73c39fe4823e4309a4e43447278facb1ec3afb4dd",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/TemplatesTests.sh",
+      "local_candidates": [],
+      "upstream_sha256": "457574a32fc4f018e30da682fc88a5bc5e54f7cd4ce984dfeffe703b5a5ff869",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/Tests/TemplatesTests.swift",
+      "local_candidates": [],
+      "upstream_sha256": "5250450314b2aa8df40d45ab734d63740425f7a1b5b1c995acd1635f323d1fa4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadApp.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift",
+          "sha256": "48d8418365cf60802446ebf24042850bc009b724bb2424e51790205895879a47",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "d8aed281c5c79eaa69867c065818b0e10a1eeecf80b2e617ddf0b891445d1503",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadMenuBar.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMenuBar.swift",
+          "sha256": "8e79ec8400f8d315fe0b1b0e53595772fe037c9f11f08a254ada324429f62d0f",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "f99c35233244a5f4c28cc4a9a94679268c3ba74e317f5042c30332c0fadf00ba",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadModel.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift",
+          "sha256": "3ab179548a19259e0a71033a17c554ec731e60c34fa5f4adfbc25b96c34340ad",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "04c6a91079b723c74115d153b261e0a0408cc72ea0c09810efd1d6ffe0eec595",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadPreview.swift",
+      "local_candidates": [],
+      "upstream_sha256": "70a525b4376e09e10b1085e8f3023faf958b5c3b2423766c476b8e708ef0c1db",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadRootView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadRootView.swift",
+          "sha256": "b4f4b0d888c59e3c525fbc5104b37ead147e151798013dd11b27fb01515d78fa",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "fc0b4f127811e8850ba8d571919f9ea20e848907a53e657fdff2e79998862d4c",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadSheet.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadSheet.swift",
+          "sha256": "8899f3a5e726c5b4cf3589acd2ce23d17c84e0af36e74d660b061576f1d4dcb3",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "da11f559e1841aabd0b6fe64ff8db9f9c920442a4f2f768e28f03b4d7a25a007",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Command/VPhoneLaunchpadCommandHistoryView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadCommandHistoryView.swift",
+          "sha256": "eae0a7695036b62b53654ddaa6694af30dec1c3a5cfe0314f9c070aadd6d0f1a",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "64cf0149abbd519599b7558cb2aeca11350da9052c81e5ab6dc6974f3baedf5a",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Command/VPhoneLaunchpadCommandInfoButton.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadCommandInfoButton.swift",
+          "sha256": "6a9189e9de1a995fe78b5351cf3e327a757bf53f986d9dc0b7cbf64aaec2f78f",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "e0d15dbd9e352d15da96a5b2a7a22eab7a3e61c303b79146709ed579b6d3ad81",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Command/VPhoneLaunchpadCommandLine.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+          "sha256": "284009743f1abdef30ee1ecee21de1749c5fe8caab44348eababedb68ca8d210",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "ff12ce8ad9f0e52dcc9600edc6645490ccbe8dd3b97f0f0c52bff3bc57f33d14",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Control/VPhoneLaunchpadControlCommands.swift",
+      "local_candidates": [],
+      "upstream_sha256": "942b372066999b3c614b9af23f104334e062293326052879a936d3b693346f41",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "D",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadArtifact.swift",
+      "local_candidates": [],
+      "review_state": "upstream_deleted_path"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadCoreBundle.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+          "sha256": "dd1158066329b6cabbd7d5ad9711ba726792b56a0a5ce8da9c89bf70ece06e0e",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "90942c24bf44ea0f6079b0550a8ec28b10a7e9e518d344c2f45b4f878f40d0fe",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadCoreBundleView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadCoreBundleView.swift",
+          "sha256": "5f6b7cf58d56fd78c4a25d66924c0afade7c67a27a5d08681b08749902431f5a",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "56f9260b949b3f018e8638bd26775febd93a2c70d6e1628f19525b7fa017695f",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadDownload.swift",
+      "local_candidates": [],
+      "upstream_sha256": "80a8cd688eb8e2f9dd4104151388a79dcca99c2337954dbaf5c4e81f33ddff1b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadInstallView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "6d854e9d1dbd61dce0242170e368ad440eb627ca0d2b9f54298d23cc9480cc64",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadLocalBundle.swift",
+      "local_candidates": [],
+      "upstream_sha256": "8fecb2ef1078b31580c90856e0899dcd2fcffa71d68a5c34d75de887be69ced9",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
+      "local_candidates": [],
+      "upstream_sha256": "fca3b28e2742748211cf62e3ab279d75508eef9394c3aac98bbfbcddad40e930",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHostSetup.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadHostSetup.swift",
+          "sha256": "cfe61847dad8d36add869fddfcb139f627d60607d6be8ee33809b04dd2fafd59",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "8a41c4cc4c059643ed5d8759fbcb8619401bc3cf9e7113f787e3769b6059eb49",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHostSetupView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadHostSetupView.swift",
+          "sha256": "39003e441e613e614eccefd2b453bae6b7116627ab3148c56c7e0dcd6d274fe6",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "08d7dd6cf78b1fb209afc534662a2d28b05c831ca91889abdcb4573e3c4baffd",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadSkillInstallView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "ce1f184ac5b692ae9c58131f325f039ec5f387a944f064dff29e37cbd91484bb",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/IPSWCache/VPhoneLaunchpadIPSW.swift",
+      "local_candidates": [],
+      "upstream_sha256": "41a5c1343f27507f5a90786ae8e153007f9c311938714fc23f32cb1c65a8f3c2",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/IPSWCache/VPhoneLaunchpadIPSWCache.swift",
+      "local_candidates": [],
+      "upstream_sha256": "66ff71643eca7b9aa911cbfb7475df168156a1f2fa325889db3b566f2a1ced8c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/IPSWCache/VPhoneLaunchpadIPSWCacheView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "5a89c0fd0cc2b2fc308e094b63d6d67b4d340407758e22e5f29f045dce73e665",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/IPSWCache/VPhoneLaunchpadIPSWImport.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d455c85ffff9fe464ed1ff604b690e576cb9216ee8460184b555543d8b8c5b56",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/IPSWCache/VPhoneLaunchpadIPSWRows.swift",
+      "local_candidates": [],
+      "upstream_sha256": "f3672894080d759750b533e9c195aca9d199d3ab9de126bab25f3c09abed2da8",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/InfoPlist.xcstrings",
+          "sha256": "8557e9ff155e1fc1d3937f7dab0a08c681d84e9c4aeab91de7b88937b7645d10",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "57fcefa140b3f173f3ac35d34b4a68ab1f18f305b08e351de0cca2ca1c3d44c9",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/Localizable.xcstrings",
+          "sha256": "88734a78b7c0dc45bf3ded792a3d2c67b17007f09031a06e9df6895614861660",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "8ddb9ecda3f56c40bb1cf4aeb0120525b5a293888521ad3f5a47e923f8454c2b",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadBundleChange.swift",
+      "local_candidates": [],
+      "upstream_sha256": "db1c65b8f4b6581d69a5d0ec108fb9a8154aecfd05212333e523e47ff88db73e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadChangeBundleView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "e25da39352690b51e87ccdae6ddd29fdc019d87401ffeb5fb81faeea81bf3cec",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadConsoleView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadConsoleView.swift",
+          "sha256": "45da0699be0703eca40040a103d986c09995ad1c973811a71a752fc18abf09b4",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "a722d2eefdedface1504cf5274c44a2e3f53bef8afcbd8fd24344a5214555f23",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
+      "local_candidates": [],
+      "upstream_sha256": "d994b56572354e61660590d58f98feb6172b04658b8dcc8138aaa29b53a2e386",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPlan.swift",
+      "local_candidates": [],
+      "upstream_sha256": "172ef09caf6d0ce7bdfda4fc7370fbf346d538fbe9e21b732980878d99237441",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadDiskExtents.swift",
+      "local_candidates": [],
+      "upstream_sha256": "c2248f35a4ed167f6b71dfd4614ff37d6a8671a09487f36ee37f2d5cca2b81bf",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadDiskHolder.swift",
+      "local_candidates": [],
+      "upstream_sha256": "5a7f6ca427246c38196772f0b3792c5cec662d6d1431822dc487fb2b6f9c1107",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadDiskUsage.swift",
+      "local_candidates": [],
+      "upstream_sha256": "91955a5a079571207f00ea5bd485bf7bd825d979bddeb510cc14ba304a1b6523",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadGuestSystemView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "c663056417f1895dc1bb2aea969754ea51864ebc405f7d718677688d12bb5107",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachine.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachine.swift",
+          "sha256": "7d5c9955449b244c0cb456cc4c531a31dd8451a806454f400fc6c037dec7f535",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "70b4883a4f6e765a7004bb94f9f64e18eb8997293f86b21d4f7e5f516fe64fac",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineActions.swift",
+      "local_candidates": [],
+      "upstream_sha256": "8736538abcaebb14c886d2aecf26d20eff0ab9bee9df6295fa50f306d0bbfa09",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineBinding.swift",
+          "sha256": "c37d621247bcfc9871e51c89aab7db389f2b34a037cff7c0e4268c8f81facdc0",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "36f0f34be8f6b7b884eb3006eba99d0c2dc6253a7b939fb2dfc8c760fd023bea",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineInspector.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+          "sha256": "3747fce4f2678c91344d58e5c2cdfdca138b4a91bb2ed43fb3f768f93902d83b",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "dd23b868719127bd2bda1ad1d605c36d165019eea6a2f676176b9e469a333583",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLibrary.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+          "sha256": "6364dae0c206588a3d766536ebce9d09723ccac577800063f459b6a7f5e976e7",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "99a015040418084ff83221e4a0406cee2101683df619ff169c10d2623ae190a4",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLocations.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift",
+          "sha256": "25a6011f6ac41183641803a67a6dd1c5a683ec90a7c0615156e93adfc05d7aa2",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "babe445d0d1f77078a3c0389e9bbe1b723056bf090dca707980a6a0ee5c4f999",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineSheets.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift",
+          "sha256": "258972b4dd225ecc9b17f17270b3719760197a15b2bfc7959979c1a7d435d509",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "3c88b8efe9650009bd9585b73fe7d5f23f43e7335067750499cc1fcc97d2a02d",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineSnapshot.swift",
+      "local_candidates": [],
+      "upstream_sha256": "bb6a35ff577ebaa7da5c19c80941f39fe3a669eafd840a2a5bc01d0db5b2585e",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachinesView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+          "sha256": "4a7b0770430e5ae6a11d27b9f54af547a6fe7aa3c645de99b72bf37a60a6f3d9",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "0204b8de1ca4231bb72d7fa32bb393098b0cea47b47a6916ab541b392124a9f0",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadNewMachineAdvancedView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "a2d1f0af2f27c0972b8f9b6b4468ae26a08daf63a61a341b576d913de47a0cd5",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadNewMachineView.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
+          "sha256": "f4bbe3342a1ac20bbd8d5f8fe34d4c2c99ac91cec23fe3400effc380d9a3057a",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "1dda3b57a348856b60b01bb9fbf839e081ea88021b25e263a6054135b18125cb",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchCatalog.swift",
+      "local_candidates": [],
+      "upstream_sha256": "60f3bab37355fc2a07985130148cf69e7ceeda04ef34317b031cf87d69c11975",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchSettingsView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "3dd8fcd4b7f82c5e8f859f7a3fc03a0ab6abbbed564e1e99ba97a53f5f1d9168",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadSlimmingView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "3f9d07bcd240cf634729c48621ae29f429b5ed4c2fb6a13cb01768da13edac1b",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadSnapshotsView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "82b0792ca37452603e67a78077d5e5c6241545f48bec5482f7a24bd8ca806dd4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadTemplates.swift",
+      "local_candidates": [],
+      "upstream_sha256": "2870be2eee7475ecbf7354cea16e2cca71bab2bbaddb1e74ba56aa5bfb770b5c",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadTemplatesView.swift",
+      "local_candidates": [],
+      "upstream_sha256": "bcd8e30d5d9c366997e1fe2d0b09ff2c30f6249cf659304e05701d93a8c2b980",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadCLI/main.swift",
+      "local_candidates": [
+        {
+          "path": "sources/VPhoneCommandEntry/main.swift",
+          "sha256": "bdb4d2b7ab6c89e79b0132382f3049891235c186b57ea51859882e668bb14b59",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneDaemon/Daemon/main.swift",
+          "sha256": "00397e1cc0cd2fce0257bf9890f4cddf9016615b5870f6c0d69ed763b788fc2d",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneHelperEntry/main.swift",
+          "sha256": "fb88eda5ef72e21844d354a28f6490e4b8e79d0bfcad97d9688763918c0bf301",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneLaunchpadLauncherEntry/main.swift",
+          "sha256": "198eadef44b138dcf8e6413fa82c174fbeec93d4944af951b88998907d8d6f14",
+          "bytes_equal": false
+        },
+        {
+          "path": "sources/VPhoneVMEntry/main.swift",
+          "sha256": "266aca5eee52c3c4091c41cf9964a929342fedfe007b6c8d5fd433125a43be0e",
+          "bytes_equal": false
+        },
+        {
+          "path": "tests/fixtures/daemon_pipe_ownership/main.swift",
+          "sha256": "fbc10a7100252c0e25996bd87784f46d24feb8404d20be07834419457bb36d0c",
+          "bytes_equal": false
+        }
+      ],
+      "upstream_sha256": "c1dd080d0d464281fad293734587a74e13bc0cef6752343e163119249d4a4f4a",
+      "review_state": "different_candidate_requires_semantic_review"
+    },
+    {
+      "status": "A",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareAdmission.swift",
+      "local_candidates": [],
+      "upstream_sha256": "3e97a88f5e1607e3842fb069fe48b42c59f630863512c5e8f915113ae0554d9f",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperFirmwareRequest.swift",
+      "local_candidates": [],
+      "upstream_sha256": "b8c0ce4294d7217226c59089b52d3ebdacb44f7647135e6e9b0b1fc1b74aa6ef",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift",
+      "local_candidates": [],
+      "upstream_sha256": "950e425256619dda1cb7ea0edd9e2e80812f2cd97b0b48f68b71df682af67fd4",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
+      "local_candidates": [],
+      "upstream_sha256": "282f36e416874ee0b7a4f6e6cedab50d997ab4adaa5818028867bfad7b196278",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadControl.swift",
+      "local_candidates": [],
+      "upstream_sha256": "7a39e317fb6c44bbdd82f67fcadff84022a9e841ef24880a945508259e5906c7",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    },
+    {
+      "status": "M",
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadHelperProtocol.swift",
+      "local_candidates": [],
+      "upstream_sha256": "4fba83bb36a6a21efb48fbd7bed19f692eecfe4d3dbc6ab853474bc6a3d8be75",
+      "review_state": "no_filename_candidate_not_proof_of_absence"
+    }
+  ]
+}

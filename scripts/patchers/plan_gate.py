@@ -14,7 +14,7 @@ import stat
 import subprocess
 import sys
 
-TARGET = '2d21d21fbdd4f51f013616273ceda9b35a3e0789'
+TARGET = '8a75092013eda87a4e30ed029b72028cb9279ac4'
 DIGEST = re.compile(r'[0-9a-f]{64}\Z')
 GROUPS = ('selected', 'excludedByVersion', 'excludedByOptIn', 'excludedByVariant', 'guestUncovered', 'notImplemented')
 

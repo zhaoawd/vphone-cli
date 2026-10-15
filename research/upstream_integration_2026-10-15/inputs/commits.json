@@ -1,0 +1,4331 @@
+{
+  "metadata": {
+    "date": "2026-10-14",
+    "upstream": "Lakr233/vphone-cli",
+    "base_exclusive": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+    "target_inclusive": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+    "evidence": "GitHub paginated history; release count cross-check; selected primary code and documentation",
+    "git_object_audit_performed": false,
+    "local_fork_read": false,
+    "local_merge_performed": false,
+    "total_observed": 194,
+    "merge_records_observed": 51,
+    "other_records_observed": 143,
+    "endpoint_changed_paths": null,
+    "endpoint_additions": null,
+    "endpoint_deletions": null,
+    "order": "GitHub history listing, newest first; NOT a cherry-pick execution order"
+  },
+  "commits": [
+    {
+      "ordinal_newest_first": 1,
+      "short_sha": "8a75092",
+      "kind_from_listing": "M",
+      "module": "依赖构建",
+      "summary_zh": "合并 #667：IcliKit 0.8.5 与 2.9.4",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/8a75092",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 2,
+      "short_sha": "ccf8ef7",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "消除 daemon 与 CLI 的四项编译警告",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ccf8ef7",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 3,
+      "short_sha": "9a8f659",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "锁定 IcliKit 0.8.5，更新 2.9.4 版本",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9a8f659",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 4,
+      "short_sha": "3f3bc2f",
+      "kind_from_listing": "M",
+      "module": "应用与Bootstrap",
+      "summary_zh": "合并 #665：识别本机安装的 bootstrap",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/3f3bc2f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 5,
+      "short_sha": "9a7388c",
+      "kind_from_listing": "M",
+      "module": "依赖构建",
+      "summary_zh": "合并 #666：IcliKit 0.8.4",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9a7388c",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 6,
+      "short_sha": "2cd1db4",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "IcliKit 0.8.4 对齐环境及包数据库根路径",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "中间依赖 pin；行为按最终 0.8.5 整合和验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2cd1db4",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 7,
+      "short_sha": "4c2d768",
+      "kind_from_listing": "C",
+      "module": "应用与Bootstrap",
+      "summary_zh": "设备信息报告 vphoned 安装的 RootHide 布局",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4c2d768",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 8,
+      "short_sha": "33737fe",
+      "kind_from_listing": "M",
+      "module": "系统精简",
+      "summary_zh": "合并 #664：修正 jetsam 强制启用服务",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/33737fe",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 9,
+      "short_sha": "fde9caf",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "让 iOS 27 中被禁用的服务保持关闭",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "精简闭环：写入 disabled overrides 后还需重启验证实际服务状态。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/fde9caf",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 10,
+      "short_sha": "35d8e8f",
+      "kind_from_listing": "M",
+      "module": "Xcode与Flutter",
+      "summary_zh": "合并 #662：DSC 头页重新签名",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/35d8e8f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 11,
+      "short_sha": "ea5382b",
+      "kind_from_listing": "M",
+      "module": "输入与剪贴板",
+      "summary_zh": "合并 #663：控制回复附带彩色图像",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T38",
+        "T39"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ea5382b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 12,
+      "short_sha": "87ba47e",
+      "kind_from_listing": "C",
+      "module": "输入与剪贴板",
+      "summary_zh": "控制 socket 的附带截图改为彩色",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T38",
+        "T39"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/87ba47e",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 13,
+      "short_sha": "a68a533",
+      "kind_from_listing": "C",
+      "module": "Xcode与Flutter",
+      "summary_zh": "maxSlide 修改后重新证明 DSC 头页",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a68a533",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 14,
+      "short_sha": "8cf780d",
+      "kind_from_listing": "M",
+      "module": "固件与磁盘安全",
+      "summary_zh": "合并 #661：临时 PCC 恢复机不接网络",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/8cf780d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 15,
+      "short_sha": "e91b907",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "GPU 提取用临时 PCC 机移除网络设备",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "仅准备阶段临时 PCC；不要删除用户 VM 网络配置。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e91b907",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 16,
+      "short_sha": "6af3fe9",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "引入 IcliKit 0.8.0，发布 2.9.3",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/6af3fe9",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 17,
+      "short_sha": "c4a0081",
+      "kind_from_listing": "C",
+      "module": "应用与Bootstrap",
+      "summary_zh": "Irisin 数据目录放到实际 jbroot 用户目录",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/c4a0081",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 18,
+      "short_sha": "f4e4fb2",
+      "kind_from_listing": "M",
+      "module": "时间同步",
+      "summary_zh": "合并 #659：宿主时间同步",
+      "old_tasks": [
+        "T06",
+        "T36"
+      ],
+      "proposed_tasks": [
+        "T56"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f4e4fb2",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 19,
+      "short_sha": "3715b5b",
+      "kind_from_listing": "C",
+      "module": "时间同步",
+      "summary_zh": "guest 时钟跟随 Mac",
+      "old_tasks": [
+        "T06",
+        "T36"
+      ],
+      "proposed_tasks": [
+        "T56"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/3715b5b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 20,
+      "short_sha": "0e7a7e7",
+      "kind_from_listing": "M",
+      "module": "设备与相机",
+      "summary_zh": "合并 #657：board-presenting iPhone 修复",
+      "old_tasks": [
+        "T22",
+        "T23",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/0e7a7e7",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 21,
+      "short_sha": "e52dc61",
+      "kind_from_listing": "C",
+      "module": "设备与相机",
+      "summary_zh": "对展示本机 board 的 iPhone 执行产品修复",
+      "old_tasks": [
+        "T22",
+        "T23",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e52dc61",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 22,
+      "short_sha": "0da1bea",
+      "kind_from_listing": "M",
+      "module": "运动传感器",
+      "summary_zh": "合并 #656：传感器面板",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/0da1bea",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 23,
+      "short_sha": "5075153",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "去掉运动面板重复的坐标轴文字",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5075153",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 24,
+      "short_sha": "5632674",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "显示窗口附带姿态角度仪表",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5632674",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 25,
+      "short_sha": "2032dff",
+      "kind_from_listing": "M",
+      "module": "设备与相机",
+      "summary_zh": "合并 #654：前置虚拟相机",
+      "old_tasks": [
+        "T22",
+        "T23",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2032dff",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 26,
+      "short_sha": "5f3ac24",
+      "kind_from_listing": "C",
+      "module": "设备与相机",
+      "summary_zh": "支持前摄及相机规格的视频帧",
+      "old_tasks": [
+        "T22",
+        "T23",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5f3ac24",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 27,
+      "short_sha": "7fc2e2c",
+      "kind_from_listing": "D",
+      "module": "文档与格式",
+      "summary_zh": "说明 2.9 系列进入维护阶段",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/7fc2e2c",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 28,
+      "short_sha": "64a4c09",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "避免网络初始化变量同名遮蔽",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/64a4c09",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 29,
+      "short_sha": "da6906f",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "导入进度行与退出清理，发布 2.9.2",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/da6906f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 30,
+      "short_sha": "6f90a2f",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "进度读取端消失不再中止导入",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "进度 EPIPE 不是取消；真正中止必须走显式信号/清理。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/6f90a2f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 31,
+      "short_sha": "a2e964f",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "归档跳过遗留 socket，2.9.1 发布锚点",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "2.9.1 tag 位于此提交，不要把更早版本号调整提交当发布终点。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a2e964f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 32,
+      "short_sha": "4f3cee3",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "调整页面切换器及进度活动名称",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4f3cee3",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 33,
+      "short_sha": "9341c9b",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "机器菜单、快捷键、只读补丁及直接导出",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9341c9b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 34,
+      "short_sha": "83b791d",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "重组机器操作，扩展日志与模板界面",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/83b791d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 35,
+      "short_sha": "2c3b818",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "重做新建、表格及弹窗，设置 2.9.1 版本",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2c3b818",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits"
+    },
+    {
+      "ordinal_newest_first": 36,
+      "short_sha": "c39628a",
+      "kind_from_listing": "M",
+      "module": "导入导出与UI",
+      "summary_zh": "合并 #649：简化新建机器",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/c39628a",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 37,
+      "short_sha": "12945bd",
+      "kind_from_listing": "M",
+      "module": "文档与格式",
+      "summary_zh": "合并 #648：磁盘研究说明",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/12945bd",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 38,
+      "short_sha": "f5de67e",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "新建缩为一页，高级选项折叠",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f5de67e",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 39,
+      "short_sha": "1cb62d1",
+      "kind_from_listing": "D",
+      "module": "文档与格式",
+      "summary_zh": "补齐模板、克隆与服务文档",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1cb62d1",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 40,
+      "short_sha": "d2f85f4",
+      "kind_from_listing": "D",
+      "module": "文档与格式",
+      "summary_zh": "记录 VM 磁盘空间研究",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/d2f85f4",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 41,
+      "short_sha": "9346777",
+      "kind_from_listing": "M",
+      "module": "运动传感器",
+      "summary_zh": "合并 #647：Core Motion 姿态修复",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9346777",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 42,
+      "short_sha": "2be089b",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "防止姿态模拟导致 SpringBoard 重启",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2be089b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 43,
+      "short_sha": "ca60543",
+      "kind_from_listing": "M",
+      "module": "导入导出与UI",
+      "summary_zh": "合并 #644：补丁筛选空结果布局",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ca60543",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 44,
+      "short_sha": "84e9cec",
+      "kind_from_listing": "M",
+      "module": "默认策略",
+      "summary_zh": "合并 #645：标准预设启用 ProMotion",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T45"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "explicit_policy_decision",
+      "review_note": "包含 ProMotion 默认政策改变；merge 内容需审查，本地 T45 决策保留。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/84e9cec",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 45,
+      "short_sha": "4051399",
+      "kind_from_listing": "M",
+      "module": "模板与首启",
+      "summary_zh": "合并 #643：首启与空闲优化",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4051399",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 46,
+      "short_sha": "f167100",
+      "kind_from_listing": "D",
+      "module": "系统精简",
+      "summary_zh": "记录 iOS 26 服务裁剪清单",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f167100",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 47,
+      "short_sha": "50545d3",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "增加 iOS 26 专属服务精简配置",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/50545d3",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 48,
+      "short_sha": "492a4f6",
+      "kind_from_listing": "C",
+      "module": "默认策略",
+      "summary_zh": "standard 预设默认开启 ProMotion",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T45"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "explicit_policy_decision",
+      "review_note": "政策变化：原 T45 可选延后；不随上游 standard 静默开启。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/492a4f6",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 49,
+      "short_sha": "cf129b8",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "补丁筛选无匹配时维持面板布局",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/cf129b8",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 50,
+      "short_sha": "a6a2aae",
+      "kind_from_listing": "D",
+      "module": "文档与格式",
+      "summary_zh": "记录姿态锁顺序与 iOS 26 精简限制",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a6a2aae",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 51,
+      "short_sha": "5289466",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "中间修正：iOS 26 暂不套用 iOS 27 精简表",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "superseded_intermediate_behavior",
+      "review_note": "后续 50545d3 增加 iOS 26 专用 profile；不能永久停用精简。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5289466",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 52,
+      "short_sha": "12c72fa",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "修复姿态 Hook 与 Core Motion 的死锁",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/12c72fa",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 53,
+      "short_sha": "e4a6ef4",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "消除 daemon 退出拖住首启重启的问题",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e4a6ef4",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 54,
+      "short_sha": "9e2d690",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "模板冻结前清理其自身启动崩溃记录",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9e2d690",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 55,
+      "short_sha": "b7e545c",
+      "kind_from_listing": "M",
+      "module": "输入与剪贴板",
+      "summary_zh": "合并 #641：右键语义修复",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T38",
+        "T39"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/b7e545c",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 56,
+      "short_sha": "35f92d1",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "克隆等待短时读取者释放磁盘",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/35f92d1",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 57,
+      "short_sha": "9700aa5",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "模板匹配由 CLI 提供，持有者规则加一致性测试",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9700aa5",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 58,
+      "short_sha": "43d8470",
+      "kind_from_listing": "D",
+      "module": "空闲性能",
+      "summary_zh": "记录 guest 自有组件的空闲成本",
+      "old_tasks": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_tasks": [
+        "T59"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/43d8470",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 59,
+      "short_sha": "c35e99b",
+      "kind_from_listing": "C",
+      "module": "空闲性能",
+      "summary_zh": "daemon 二进制摘要按文件缓存",
+      "old_tasks": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_tasks": [
+        "T59"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/c35e99b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 60,
+      "short_sha": "afc62ef",
+      "kind_from_listing": "C",
+      "module": "空闲性能",
+      "summary_zh": "只在事件 socket 有订阅时轮询设备",
+      "old_tasks": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_tasks": [
+        "T59"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/afc62ef",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 61,
+      "short_sha": "7cdf6a5",
+      "kind_from_listing": "C",
+      "module": "空闲性能",
+      "summary_zh": "只在样本流动时刷新陀螺仪状态",
+      "old_tasks": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_tasks": [
+        "T59"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/7cdf6a5",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 62,
+      "short_sha": "a7a5d13",
+      "kind_from_listing": "C",
+      "module": "空闲性能",
+      "summary_zh": "扬声器停止时取消刷新定时器",
+      "old_tasks": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_tasks": [
+        "T59"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a7a5d13",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 63,
+      "short_sha": "069d530",
+      "kind_from_listing": "C",
+      "module": "空闲性能",
+      "summary_zh": "相机预览层扫描随会话启动",
+      "old_tasks": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_tasks": [
+        "T59"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/069d530",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 64,
+      "short_sha": "22bd752",
+      "kind_from_listing": "C",
+      "module": "空闲性能",
+      "summary_zh": "相机帧驱动按客户端需求开启",
+      "old_tasks": [
+        "T06",
+        "T22",
+        "T23",
+        "T36",
+        "T42"
+      ],
+      "proposed_tasks": [
+        "T59"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/22bd752",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 65,
+      "short_sha": "40f4f3e",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "首启等待数据迁移并显示进度",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/40f4f3e",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 66,
+      "short_sha": "eebe680",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "跳过设置向导时不打断迁移中的 SpringBoard",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/eebe680",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 67,
+      "short_sha": "e73cdda",
+      "kind_from_listing": "C",
+      "module": "输入与剪贴板",
+      "summary_zh": "右键执行次要点击而非 Home",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T38",
+        "T39"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e73cdda",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 68,
+      "short_sha": "625f6c6",
+      "kind_from_listing": "M",
+      "module": "输入与剪贴板",
+      "summary_zh": "合并 #640：guest 应用剪贴板",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T38",
+        "T39"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/625f6c6",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 69,
+      "short_sha": "328ff74",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "发布 2.9.0",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/328ff74",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 70,
+      "short_sha": "b4f00fc",
+      "kind_from_listing": "D",
+      "module": "文档与格式",
+      "summary_zh": "按 Swift 6.2 执行格式化",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "格式化建议单独处置，避免压过本地语义冲突。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/b4f00fc",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+34"
+    },
+    {
+      "ordinal_newest_first": 71,
+      "short_sha": "2276a0d",
+      "kind_from_listing": "C",
+      "module": "输入与剪贴板",
+      "summary_zh": "daemon 可观察真实 guest 应用的复制行为",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T38",
+        "T39"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2276a0d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 72,
+      "short_sha": "9957d0a",
+      "kind_from_listing": "M",
+      "module": "模板与首启",
+      "summary_zh": "合并 #633：模板化机器创建",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9957d0a",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 73,
+      "short_sha": "ab441ae",
+      "kind_from_listing": "C",
+      "module": "磁盘重整",
+      "summary_zh": "修正 rebase 两处提示",
+      "old_tasks": [
+        "T03",
+        "T15",
+        "T26",
+        "T31"
+      ],
+      "proposed_tasks": [
+        "T51",
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ab441ae",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 74,
+      "short_sha": "eec7350",
+      "kind_from_listing": "C",
+      "module": "磁盘重整",
+      "summary_zh": "rebase 只把新增共享块算作节省",
+      "old_tasks": [
+        "T03",
+        "T15",
+        "T26",
+        "T31"
+      ],
+      "proposed_tasks": [
+        "T51",
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "保留新共享/已共享的最终口径，不沿用早期 rebase 节省统计。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/eec7350",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 75,
+      "short_sha": "f9c6980",
+      "kind_from_listing": "C",
+      "module": "Bundle绑定",
+      "summary_zh": "环境更新真正启动后才输出开始提示",
+      "old_tasks": [
+        "T16",
+        "T24",
+        "T25",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f9c6980",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 76,
+      "short_sha": "c36e7d6",
+      "kind_from_listing": "C",
+      "module": "Bundle绑定",
+      "summary_zh": "绑定并更新前先检查磁盘占用",
+      "old_tasks": [
+        "T16",
+        "T24",
+        "T25",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/c36e7d6",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 77,
+      "short_sha": "eb77997",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "Inspector 按模板 build 匹配来源",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/eb77997",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 78,
+      "short_sha": "5952484",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "区分运行 VM 与普通磁盘读取进程",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5952484",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 79,
+      "short_sha": "77efe89",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "Launchpad CLI 创建支持逐补丁覆盖",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/77efe89",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 80,
+      "short_sha": "e31942a",
+      "kind_from_listing": "C",
+      "module": "磁盘重整",
+      "summary_zh": "不打开运行中机器的磁盘做占用计量",
+      "old_tasks": [
+        "T03",
+        "T15",
+        "T26",
+        "T31"
+      ],
+      "proposed_tasks": [
+        "T51",
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e31942a",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 81,
+      "short_sha": "9a35217",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "按构建批次统计模板使用者和删除影响",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9a35217",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 82,
+      "short_sha": "5a9db70",
+      "kind_from_listing": "C",
+      "module": "生命周期",
+      "summary_zh": "stop 只向目标机器所属进程发信号",
+      "old_tasks": [
+        "T24",
+        "T36",
+        "T37"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "安全关键：区分 VM 与旁观读者，并防止 PID 复用误杀。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5a9db70",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 83,
+      "short_sha": "6e0488c",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "重启提示保留到 guest 确实重启",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/6e0488c",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 84,
+      "short_sha": "1029b23",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "固定模板构建键，guest 覆盖留给克隆",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1029b23",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 85,
+      "short_sha": "9e063a7",
+      "kind_from_listing": "C",
+      "module": "磁盘重整",
+      "summary_zh": "按物理区间而非 APFS private size 计量",
+      "old_tasks": [
+        "T03",
+        "T15",
+        "T26",
+        "T31"
+      ],
+      "proposed_tasks": [
+        "T51",
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9e063a7",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 86,
+      "short_sha": "bfeb362",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "固定请求键并在无下载情况下查找模板",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/bfeb362",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 87,
+      "short_sha": "4d9d188",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "统一模板列表中的精简服务名称",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4d9d188",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 88,
+      "short_sha": "0de9048",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "Launchpad 接入精简模板创建",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/0de9048",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 89,
+      "short_sha": "84eefee",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "无原始 IPSW 时查找模板并记录来源",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/84eefee",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 90,
+      "short_sha": "b4f5963",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "修复长 socket 路径 mkdtemp 缓冲区生命周期",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/b4f5963",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 91,
+      "short_sha": "7b6f2f6",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "模板裁剪挂盘改用 diskutil",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/7b6f2f6",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 92,
+      "short_sha": "f0a67c0",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "离线裁剪模板 System 卷并清理残留",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f0a67c0",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 93,
+      "short_sha": "a9eb109",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "模板增加准备启动与精简选项",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a9eb109",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 94,
+      "short_sha": "8dbf387",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "新增模板及模板化 vm create",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/8dbf387",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 95,
+      "short_sha": "3e6437c",
+      "kind_from_listing": "C",
+      "module": "模板与首启",
+      "summary_zh": "模板步骤记录 guest APFS 快照删除",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/3e6437c",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 96,
+      "short_sha": "80f4951",
+      "kind_from_listing": "C",
+      "module": "协议与错误",
+      "summary_zh": "控制 socket 透传 guest 完整错误对象",
+      "old_tasks": [
+        "T06",
+        "T07",
+        "T36"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "保留结构化 guest_error；读取失败后不得盲重试未知副作用 RPC。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/80f4951",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 97,
+      "short_sha": "2a41d10",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "修正快照 entitlement 与跨卷系统应用备份",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2a41d10",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 98,
+      "short_sha": "5ebfa46",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "新增系统应用移除与 orig-fs 快照删除",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5ebfa46",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 99,
+      "short_sha": "975553e",
+      "kind_from_listing": "C",
+      "module": "系统精简",
+      "summary_zh": "新增服务配置与首启稳定等待",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/975553e",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 100,
+      "short_sha": "7064a82",
+      "kind_from_listing": "M",
+      "module": "模板与首启",
+      "summary_zh": "分支同步 origin/main",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T25",
+        "T26",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T49",
+        "T50"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/7064a82",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 101,
+      "short_sha": "9c9446a",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "IcliKit 0.7.18 放宽 IPA 解包容量",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "中间依赖 pin；大 IPA 能力保留，最终锁定 0.8.5。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9c9446a",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 102,
+      "short_sha": "4254854",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "环境及内核更新支持 --work-parent",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4254854",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 103,
+      "short_sha": "7d22444",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "按位解释设备号以避免有符号转换陷阱",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/7d22444",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 104,
+      "short_sha": "65ddcc9",
+      "kind_from_listing": "M",
+      "module": "固件与磁盘安全",
+      "summary_zh": "合并 #632：外置卷临时工作区",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/65ddcc9",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 105,
+      "short_sha": "caa9dbd",
+      "kind_from_listing": "M",
+      "module": "定位",
+      "summary_zh": "合并 #636：iOS 27 locationd 启动竞争",
+      "old_tasks": [
+        "T20",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/caa9dbd",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+69"
+    },
+    {
+      "ordinal_newest_first": 106,
+      "short_sha": "d3df4e5",
+      "kind_from_listing": "M",
+      "module": "运动传感器",
+      "summary_zh": "合并 #635：陀螺仪及姿态模拟",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/d3df4e5",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 107,
+      "short_sha": "8b1b07b",
+      "kind_from_listing": "M",
+      "module": "磁盘重整",
+      "summary_zh": "合并 #617：vm rebase",
+      "old_tasks": [
+        "T03",
+        "T15",
+        "T26",
+        "T31"
+      ],
+      "proposed_tasks": [
+        "T51",
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/8b1b07b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 108,
+      "short_sha": "2a1e03a",
+      "kind_from_listing": "C",
+      "module": "磁盘重整",
+      "summary_zh": "rebase 让现有磁盘共享相同块",
+      "old_tasks": [
+        "T03",
+        "T15",
+        "T26",
+        "T31"
+      ],
+      "proposed_tasks": [
+        "T51",
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2a1e03a",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 109,
+      "short_sha": "1e9dc6b",
+      "kind_from_listing": "C",
+      "module": "定位",
+      "summary_zh": "修复 iOS 27 locationd cohort 竞争",
+      "old_tasks": [
+        "T20",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1e9dc6b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 110,
+      "short_sha": "b2a1861",
+      "kind_from_listing": "D",
+      "module": "文档与格式",
+      "summary_zh": "刷新 Launchpad 提取的本地化条目",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/b2a1861",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 111,
+      "short_sha": "193f575",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "显示应用增加实时姿态控制",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/193f575",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 112,
+      "short_sha": "e36f537",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "guest 增加设备姿态模拟",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e36f537",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 113,
+      "short_sha": "67a05e5",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "显示应用增加实时陀螺仪控制",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/67a05e5",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 114,
+      "short_sha": "6b55fed",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "CFW scratch 使用 VM 所在外置卷",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/6b55fed",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 115,
+      "short_sha": "0be9528",
+      "kind_from_listing": "C",
+      "module": "运动传感器",
+      "summary_zh": "新增虚拟 HID 陀螺仪与 motion RPC",
+      "old_tasks": [
+        "T06",
+        "T23",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T54"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/0be9528",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 116,
+      "short_sha": "ddf168b",
+      "kind_from_listing": "M",
+      "module": "固件与磁盘安全",
+      "summary_zh": "合并 #631：CFW 临时目录修复",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ddf168b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 117,
+      "short_sha": "4bd1d3b",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "修复 CFW mkdtemp 缓冲区生命周期",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4bd1d3b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 118,
+      "short_sha": "738983e",
+      "kind_from_listing": "M",
+      "module": "固件与磁盘安全",
+      "summary_zh": "合并 #630：diskutil 迁移",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/738983e",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 119,
+      "short_sha": "a7fd759",
+      "kind_from_listing": "M",
+      "module": "固件与磁盘安全",
+      "summary_zh": "diskutil 分支同步 main",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a7fd759",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 120,
+      "short_sha": "1cc651a",
+      "kind_from_listing": "M",
+      "module": "Xcode与Flutter",
+      "summary_zh": "合并 #627：Flutter AOT 映射修复",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1cc651a",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 121,
+      "short_sha": "0768640",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "替换弃用的 hdiutil 调用",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/0768640",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 122,
+      "short_sha": "4391c10",
+      "kind_from_listing": "C",
+      "module": "Xcode与Flutter",
+      "summary_zh": "修复 Flutter AOT 重映射丢失 RX 权限",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4391c10",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 123,
+      "short_sha": "dfcfae9",
+      "kind_from_listing": "M",
+      "module": "固件下载",
+      "summary_zh": "合并 #626：多连接 IPSW 下载",
+      "old_tasks": [
+        "T13",
+        "T14",
+        "T26"
+      ],
+      "proposed_tasks": [
+        "T57"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/dfcfae9",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 124,
+      "short_sha": "fc6456f",
+      "kind_from_listing": "C",
+      "module": "固件下载",
+      "summary_zh": "IPSW 多连接下载",
+      "old_tasks": [
+        "T13",
+        "T14",
+        "T26"
+      ],
+      "proposed_tasks": [
+        "T57"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/fc6456f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 125,
+      "short_sha": "65a0e9b",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "发布 2.8.0",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/65a0e9b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 126,
+      "short_sha": "3823a55",
+      "kind_from_listing": "M",
+      "module": "Xcode与Flutter",
+      "summary_zh": "合并 #624：分带屏幕流 GPU 死锁",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/3823a55",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 127,
+      "short_sha": "a11e857",
+      "kind_from_listing": "M",
+      "module": "固件下载",
+      "summary_zh": "合并 #623：已下载 IPSW 管理",
+      "old_tasks": [
+        "T13",
+        "T14",
+        "T26"
+      ],
+      "proposed_tasks": [
+        "T57"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a11e857",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 128,
+      "short_sha": "038be1d",
+      "kind_from_listing": "M",
+      "module": "导入导出与UI",
+      "summary_zh": "合并 #622：iPadOS 标签",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/038be1d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 129,
+      "short_sha": "66956a8",
+      "kind_from_listing": "C",
+      "module": "Xcode与Flutter",
+      "summary_zh": "避免 banded stream 卡死宿主 GPU",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/66956a8",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 130,
+      "short_sha": "1c2c23e",
+      "kind_from_listing": "C",
+      "module": "固件下载",
+      "summary_zh": "Launchpad 列出与删除缓存 IPSW",
+      "old_tasks": [
+        "T13",
+        "T14",
+        "T26"
+      ],
+      "proposed_tasks": [
+        "T57"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1c2c23e",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 131,
+      "short_sha": "a85ecbb",
+      "kind_from_listing": "D",
+      "module": "文档与格式",
+      "summary_zh": "统一中文快照操作文案",
+      "old_tasks": [
+        "T28",
+        "T29"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a85ecbb",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 132,
+      "short_sha": "4d34bbe",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "iPad guest 显示 iPadOS 标签",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4d34bbe",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 133,
+      "short_sha": "a9608f3",
+      "kind_from_listing": "M",
+      "module": "定位",
+      "summary_zh": "合并 #616：guest 定位服务",
+      "old_tasks": [
+        "T20",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a9608f3",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 134,
+      "short_sha": "d00f29c",
+      "kind_from_listing": "M",
+      "module": "Xcode与Flutter",
+      "summary_zh": "合并 #614：Xcode persona lookup",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/d00f29c",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 135,
+      "short_sha": "7f4760d",
+      "kind_from_listing": "M",
+      "module": "Xcode与Flutter",
+      "summary_zh": "persona 分支同步 origin/main",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/7f4760d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 136,
+      "short_sha": "289f46a",
+      "kind_from_listing": "M",
+      "module": "应用与Bootstrap",
+      "summary_zh": "合并 #618：spawn 内存额度",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/289f46a",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 137,
+      "short_sha": "fa3c252",
+      "kind_from_listing": "M",
+      "module": "应用与Bootstrap",
+      "summary_zh": "分支同步 origin/main",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/fa3c252",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 138,
+      "short_sha": "7ddc6df",
+      "kind_from_listing": "M",
+      "module": "应用与Bootstrap",
+      "summary_zh": "合并 #619：包管理应用注册",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/7ddc6df",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 139,
+      "short_sha": "f6b57bc",
+      "kind_from_listing": "M",
+      "module": "依赖构建",
+      "summary_zh": "合并 #621：IcliKit 0.7.17",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f6b57bc",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 140,
+      "short_sha": "1c77108",
+      "kind_from_listing": "C",
+      "module": "定位",
+      "summary_zh": "重启启动阶段已死锁的 locationd",
+      "old_tasks": [
+        "T20",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1c77108",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+104"
+    },
+    {
+      "ordinal_newest_first": 141,
+      "short_sha": "3e71620",
+      "kind_from_listing": "M",
+      "module": "登录与设置策略",
+      "summary_zh": "合并 #620：登录提示抑制",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T21",
+        "T32",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T58"
+      ],
+      "proposed_disposition": "explicit_policy_decision",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/3e71620",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 142,
+      "short_sha": "5be1f18",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "IcliKit 0.7.17 对齐 uicache 注册记录",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "中间依赖 pin；注册记录要求保留，最终锁定 0.8.5。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5be1f18",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 143,
+      "short_sha": "e0415d1",
+      "kind_from_listing": "M",
+      "module": "定位",
+      "summary_zh": "定位分支同步 upstream/main",
+      "old_tasks": [
+        "T20",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e0415d1",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 144,
+      "short_sha": "fe991fc",
+      "kind_from_listing": "C",
+      "module": "登录与设置策略",
+      "summary_zh": "增加登录抑制和设置建议隐藏库",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T21",
+        "T32",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T58"
+      ],
+      "proposed_disposition": "explicit_policy_decision",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/fe991fc",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 145,
+      "short_sha": "f1accd8",
+      "kind_from_listing": "M",
+      "module": "固件与磁盘安全",
+      "summary_zh": "合并 #613：删除无效 boot-args 写入",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f1accd8",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 146,
+      "short_sha": "19bd0f4",
+      "kind_from_listing": "M",
+      "module": "设备名称",
+      "summary_zh": "合并 #609：guest 设备名称",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/19bd0f4",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 147,
+      "short_sha": "5050c4d",
+      "kind_from_listing": "C",
+      "module": "定位",
+      "summary_zh": "宿主定位开关保持在当时 2.7 series",
+      "old_tasks": [
+        "T20",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5050c4d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 148,
+      "short_sha": "872a8b4",
+      "kind_from_listing": "C",
+      "module": "应用与Bootstrap",
+      "summary_zh": "包操作后注册 bootstrap 内的应用",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/872a8b4",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 149,
+      "short_sha": "269517f",
+      "kind_from_listing": "C",
+      "module": "应用与Bootstrap",
+      "summary_zh": "bootstrap 活跃时提高 spawn 的 jetsam 额度",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/269517f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 150,
+      "short_sha": "c96decf",
+      "kind_from_listing": "C",
+      "module": "定位",
+      "summary_zh": "宿主定位同步变为可持久化的每机开关",
+      "old_tasks": [
+        "T20",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/c96decf",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 151,
+      "short_sha": "15a5af7",
+      "kind_from_listing": "C",
+      "module": "Xcode与Flutter",
+      "summary_zh": "修复 iOS 27 CoreDevice 安装 persona 查询",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/15a5af7",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 152,
+      "short_sha": "4702333",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "停止写入 guest 不读取的 NVRAM 启动参数",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4702333",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 153,
+      "short_sha": "3d4a9d0",
+      "kind_from_listing": "D",
+      "module": "设备名称",
+      "summary_zh": "记录设备名传递路径与测量",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/3d4a9d0",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 154,
+      "short_sha": "2fc8850",
+      "kind_from_listing": "C",
+      "module": "设备名称",
+      "summary_zh": "设备名由 vphoned 传递，不再依赖 NVRAM",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2fc8850",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 155,
+      "short_sha": "4391ded",
+      "kind_from_listing": "C",
+      "module": "设备名称",
+      "summary_zh": "daemon 接受宿主固定设备名",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4391ded",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 156,
+      "short_sha": "c7fdced",
+      "kind_from_listing": "C",
+      "module": "设备名称",
+      "summary_zh": "名称 Hook 从 daemon 保存文件读取",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/c7fdced",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 157,
+      "short_sha": "ba9d023",
+      "kind_from_listing": "M",
+      "module": "固件与磁盘安全",
+      "summary_zh": "合并 #611：每机 CFW 锁",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ba9d023",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 158,
+      "short_sha": "73d0253",
+      "kind_from_listing": "M",
+      "module": "Bundle绑定",
+      "summary_zh": "合并 #610：删除不依赖原 Bundle",
+      "old_tasks": [
+        "T16",
+        "T24",
+        "T25",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/73d0253",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 159,
+      "short_sha": "b36dbaa",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "不同机器的 CFW 操作允许并行",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/b36dbaa",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 160,
+      "short_sha": "2745535",
+      "kind_from_listing": "C",
+      "module": "Bundle绑定",
+      "summary_zh": "原 Core Bundle 缺失时仍可删除机器",
+      "old_tasks": [
+        "T16",
+        "T24",
+        "T25",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2745535",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 161,
+      "short_sha": "0e59e69",
+      "kind_from_listing": "D",
+      "module": "设备名称",
+      "summary_zh": "说明 guest 固定名取自 VM 名称",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/0e59e69",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 162,
+      "short_sha": "a312b8f",
+      "kind_from_listing": "C",
+      "module": "设备名称",
+      "summary_zh": "中间实现：启动前经 NVRAM 传递名称",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "superseded_intermediate_behavior",
+      "review_note": "中间 NVRAM 实现，保留追溯，终态使用 daemon 文件/RPC。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/a312b8f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 163,
+      "short_sha": "8825d63",
+      "kind_from_listing": "D",
+      "module": "设备名称",
+      "summary_zh": "补充名称固定机制文档",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/8825d63",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 164,
+      "short_sha": "8b31d00",
+      "kind_from_listing": "C",
+      "module": "设备名称",
+      "summary_zh": "guest 环境加入 libdevicename",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/8b31d00",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 165,
+      "short_sha": "e5bcf80",
+      "kind_from_listing": "C",
+      "module": "设备名称",
+      "summary_zh": "中间实现：从 NVRAM 固定设备名",
+      "old_tasks": [
+        "T06",
+        "T19",
+        "T36",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T55"
+      ],
+      "proposed_disposition": "superseded_intermediate_behavior",
+      "review_note": "中间 NVRAM 实现，按 2fc8850 的 daemon 路线整合，不独立回放。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/e5bcf80",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 166,
+      "short_sha": "fc80ed6",
+      "kind_from_listing": "C",
+      "module": "应用与Bootstrap",
+      "summary_zh": "spawn Hook 支持一次注入多库",
+      "old_tasks": [
+        "T18",
+        "T21",
+        "T43"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/fc80ed6",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 167,
+      "short_sha": "f755645",
+      "kind_from_listing": "C",
+      "module": "依赖构建",
+      "summary_zh": "发布 2.7.0",
+      "old_tasks": [
+        "T08",
+        "T24",
+        "T29",
+        "T40"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f755645",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 168,
+      "short_sha": "45fab51",
+      "kind_from_listing": "M",
+      "module": "Xcode与Flutter",
+      "summary_zh": "合并 #604：DeviceHub 屏幕",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/45fab51",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 169,
+      "short_sha": "2e39906",
+      "kind_from_listing": "D",
+      "module": "Xcode与Flutter",
+      "summary_zh": "整理 DeviceHub 研究说明",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/2e39906",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 170,
+      "short_sha": "fc22a9d",
+      "kind_from_listing": "D",
+      "module": "Xcode与Flutter",
+      "summary_zh": "记录高负载多屏流的停顿和延迟",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/fc22a9d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 171,
+      "short_sha": "1e5c465",
+      "kind_from_listing": "D",
+      "module": "Xcode与Flutter",
+      "summary_zh": "记录安静宿主单路 DeviceHub 测试",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1e5c465",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 172,
+      "short_sha": "25d19e5",
+      "kind_from_listing": "D",
+      "module": "Xcode与Flutter",
+      "summary_zh": "记录 DeviceHub 矩阵与编码停顿",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/25d19e5",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 173,
+      "short_sha": "aa20eb8",
+      "kind_from_listing": "M",
+      "module": "身份克隆",
+      "summary_zh": "合并 #605：新身份克隆与磁盘快照",
+      "old_tasks": [
+        "T03",
+        "T19",
+        "T21",
+        "T41"
+      ],
+      "proposed_tasks": [
+        "T47"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/aa20eb8",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 174,
+      "short_sha": "773b6c1",
+      "kind_from_listing": "M",
+      "module": "登录与设置策略",
+      "summary_zh": "合并 #606：可选 Settings 行隐藏",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T21",
+        "T32",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T58"
+      ],
+      "proposed_disposition": "explicit_policy_decision",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/773b6c1",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 175,
+      "short_sha": "1cdcad7",
+      "kind_from_listing": "M",
+      "module": "生命周期",
+      "summary_zh": "合并 #608：退出前关闭 guest",
+      "old_tasks": [
+        "T24",
+        "T36",
+        "T37"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/1cdcad7",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+139"
+    },
+    {
+      "ordinal_newest_first": 176,
+      "short_sha": "5cc2b28",
+      "kind_from_listing": "M",
+      "module": "导入导出与UI",
+      "summary_zh": "合并 #607：空闲磁盘空间刷新",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "review_merge_and_account",
+      "review_note": "保留 merge 追溯；须用 Git 父提交差异检查独立解决内容，不能只算 PR 功能。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/5cc2b28",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 177,
+      "short_sha": "9cefcbd",
+      "kind_from_listing": "C",
+      "module": "生命周期",
+      "summary_zh": "窗口及命令退出统一先关闭 guest",
+      "old_tasks": [
+        "T24",
+        "T36",
+        "T37"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/9cefcbd",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 178,
+      "short_sha": "f496cfe",
+      "kind_from_listing": "C",
+      "module": "Xcode与Flutter",
+      "summary_zh": "已装 iOS 27 独立迁移 force-kern 补丁",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "必须与新 IOMFB 分发和 Undo 迁移成组；同 ID 旧实现不能只查 Receipt。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/f496cfe",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 179,
+      "short_sha": "de8774c",
+      "kind_from_listing": "C",
+      "module": "导入导出与UI",
+      "summary_zh": "Launchpad 打开期间刷新可用磁盘空间",
+      "old_tasks": [
+        "T05",
+        "T25",
+        "T26",
+        "T27",
+        "T37",
+        "T40",
+        "T46"
+      ],
+      "proposed_tasks": [
+        "T60"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/de8774c",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 180,
+      "short_sha": "80d4735",
+      "kind_from_listing": "C",
+      "module": "协议与错误",
+      "summary_zh": "集中封装 vphone.sock 连接",
+      "old_tasks": [
+        "T06",
+        "T07",
+        "T36"
+      ],
+      "proposed_tasks": [],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/80d4735",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 181,
+      "short_sha": "272b75f",
+      "kind_from_listing": "D",
+      "module": "系统精简",
+      "summary_zh": "记录可恢复移除 Wallet 的研究",
+      "old_tasks": [
+        "T10",
+        "T15",
+        "T18",
+        "T21",
+        "T32",
+        "T33",
+        "T37",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T50"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/272b75f",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 182,
+      "short_sha": "680b3a0",
+      "kind_from_listing": "C",
+      "module": "磁盘快照",
+      "summary_zh": "无来源快照恢复后将环境标为未知",
+      "old_tasks": [
+        "T03",
+        "T11",
+        "T15",
+        "T31",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T48"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/680b3a0",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 183,
+      "short_sha": "6ed4954",
+      "kind_from_listing": "C",
+      "module": "身份克隆",
+      "summary_zh": "复制完成再次确认源机器停机",
+      "old_tasks": [
+        "T03",
+        "T19",
+        "T21",
+        "T41"
+      ],
+      "proposed_tasks": [
+        "T47"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/6ed4954",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 184,
+      "short_sha": "84b9f7d",
+      "kind_from_listing": "C",
+      "module": "磁盘快照",
+      "summary_zh": "加强快照整组恢复与元数据校验",
+      "old_tasks": [
+        "T03",
+        "T11",
+        "T15",
+        "T31",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T48"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/84b9f7d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 185,
+      "short_sha": "623abab",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "socket 拒绝当前用户时按运行中处理",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/623abab",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 186,
+      "short_sha": "b07d6df",
+      "kind_from_listing": "C",
+      "module": "登录与设置策略",
+      "summary_zh": "新增可选 Settings 行隐藏及研究说明",
+      "old_tasks": [
+        "T09",
+        "T10",
+        "T21",
+        "T32",
+        "T43"
+      ],
+      "proposed_tasks": [
+        "T58"
+      ],
+      "proposed_disposition": "explicit_policy_decision",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/b07d6df",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 187,
+      "short_sha": "8f20100",
+      "kind_from_listing": "C",
+      "module": "身份克隆",
+      "summary_zh": "克隆与快照复用状态文件及身份规则",
+      "old_tasks": [
+        "T03",
+        "T19",
+        "T21",
+        "T41"
+      ],
+      "proposed_tasks": [
+        "T47"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/8f20100",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 188,
+      "short_sha": "ac8268b",
+      "kind_from_listing": "D",
+      "module": "Xcode与Flutter",
+      "summary_zh": "将 DeviceHub 研究重写为参考文档",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "documentation_or_format_review",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ac8268b",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 189,
+      "short_sha": "4f6cf11",
+      "kind_from_listing": "C",
+      "module": "Xcode与Flutter",
+      "summary_zh": "修复 iOS 27 DeviceHub 捕获显示",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/4f6cf11",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 190,
+      "short_sha": "62b388d",
+      "kind_from_listing": "C",
+      "module": "Xcode与Flutter",
+      "summary_zh": "使 Xcode DeviceHub 可展示 guest 屏幕",
+      "old_tasks": [
+        "T18",
+        "T24",
+        "T32",
+        "T33",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "proposed_tasks": [
+        "T53"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/62b388d",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 191,
+      "short_sha": "d898718",
+      "kind_from_listing": "C",
+      "module": "磁盘快照",
+      "summary_zh": "Launchpad 接入新身份克隆与快照",
+      "old_tasks": [
+        "T03",
+        "T11",
+        "T15",
+        "T31",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T48"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/d898718",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 192,
+      "short_sha": "ba2ea41",
+      "kind_from_listing": "C",
+      "module": "身份克隆",
+      "summary_zh": "克隆可重新生成设备身份",
+      "old_tasks": [
+        "T03",
+        "T19",
+        "T21",
+        "T41"
+      ],
+      "proposed_tasks": [
+        "T47"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ba2ea41",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 193,
+      "short_sha": "ead66d1",
+      "kind_from_listing": "C",
+      "module": "磁盘快照",
+      "summary_zh": "新增停机磁盘状态快照命令",
+      "old_tasks": [
+        "T03",
+        "T11",
+        "T15",
+        "T31",
+        "T32",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T48"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/ead66d1",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    },
+    {
+      "ordinal_newest_first": 194,
+      "short_sha": "673e9e9",
+      "kind_from_listing": "C",
+      "module": "固件与磁盘安全",
+      "summary_zh": "写状态前判断机器是否正在运行",
+      "old_tasks": [
+        "T03",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T24",
+        "T37",
+        "T40"
+      ],
+      "proposed_tasks": [
+        "T52"
+      ],
+      "proposed_disposition": "semantic_port_final_behavior",
+      "review_note": "按该模块最终行为对账；未在用户 fork 执行合并或验收。",
+      "local_status": "pending_local_audit",
+      "source_url": "https://github.com/Lakr233/vphone-cli/commit/673e9e9",
+      "listing_source_url": "https://github.com/Lakr233/vphone-cli/commits?after=8a75092013eda87a4e30ed029b72028cb9279ac4+174"
+    }
+  ]
+}

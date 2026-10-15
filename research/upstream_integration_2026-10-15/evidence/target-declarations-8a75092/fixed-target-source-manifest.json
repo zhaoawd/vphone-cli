@@ -1,0 +1,959 @@
+{
+  "target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+  "scope": "Fixed declaration intent and blob hashes; local execution remains controlled by reviewed decisions.",
+  "files": [
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "git_blob": "109ab6b01760305190009cca4431578ff0c2f1e5",
+      "sha256": "6f5462ddf8f02a50757b5d20ba892b194d5fbf9e6b28d6b6dcc3b61f5eb3d359",
+      "bytes": 7785,
+      "evidence": "target-declarations/FirmwareBootChainPatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "git_blob": "62cc226e6a5a8b3ae5fc12b66881089e32b9a5f3",
+      "sha256": "e885c486f83403afcbcfb8dbedb1358cd2023629301d528208b6101124a5b6ca",
+      "bytes": 8463,
+      "evidence": "target-declarations/FirmwareDeviceTreePatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestDisplayPatchSet.swift",
+      "git_blob": "ae7b10c7288b04176aaf1b5a7ee2c92bfd3db177",
+      "sha256": "c27a8ed8fce2a99fa09399a31fe9e1bc5ef78d9e95e364c5f6d0c6db914c5dd9",
+      "bytes": 1939,
+      "evidence": "target-declarations/FirmwareGuestDisplayPatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestIdentityPatchSet.swift",
+      "git_blob": "d10346286abbfde283e4e76338a9e5fe6a22877b",
+      "sha256": "dc2437613322d3a22ec12b04216e101243aacb5c1e5f1fb71182d5d8c3491334",
+      "bytes": 3667,
+      "evidence": "target-declarations/FirmwareGuestIdentityPatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "git_blob": "14befecdb74dd07b7cbddf95e3349a4a405dbeac",
+      "sha256": "f37aac1a138347bd111b1c9499ca9e4c7763a67a9c18bc423ec5cfa616b5599d",
+      "bytes": 28073,
+      "evidence": "target-declarations/FirmwareGuestSystemPatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "git_blob": "44fde1b6bc642234bbd985f72a3ce56570d359f9",
+      "sha256": "95e7bf9e126843dae087fb75584cc9c2f68d641cb9f6571e7d5191d26f26d263",
+      "bytes": 7203,
+      "evidence": "target-declarations/FirmwareKernelBasePatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "git_blob": "18ca8a7d01c1a0d1bcd36f37be1f4c5b664d4892",
+      "sha256": "fdfb6cd144399e4dd4a31bb73157a29534062bd17473bb089799af22a08a20a7",
+      "bytes": 13793,
+      "evidence": "target-declarations/FirmwareKernelCustomFirmwarePatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelFridaPatchSet.swift",
+      "git_blob": "9d513e09748b0f7924a67bf29da6f8cb718039a7",
+      "sha256": "525ffdf459bece0f6dc8ecb498389a3da5f13cfb2ccb8467e1a341e1a374d098",
+      "bytes": 1915,
+      "evidence": "target-declarations/FirmwareKernelFridaPatchSet.swift.gz"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelHypervisorPatchSet.swift",
+      "git_blob": "84681caa1d0dfbaaaa8b5e5baecd6d21750a7af4",
+      "sha256": "becf228fd0b90de9a06bf5aa3cd6e8eb511456e840a12a7616ec2ae092d1d2d8",
+      "bytes": 2497,
+      "evidence": "target-declarations/FirmwareKernelHypervisorPatchSet.swift.gz"
+    }
+  ],
+  "declarations": [
+    {
+      "id": "avpbooter-boot-dgst_bypass",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 24,
+      "expression": "\"avpbooter-boot-dgst_bypass\""
+    },
+    {
+      "id": "devicetree-cfw-arm_io_isp_camera_flags",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 159,
+      "expression": "\"devicetree-cfw-arm_io_isp_camera_flags\""
+    },
+    {
+      "id": "devicetree-cfw-arm_io_isp_rtb_camera_flags",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 164,
+      "expression": "\"devicetree-cfw-arm_io_isp_rtb_camera_flags\""
+    },
+    {
+      "id": "devicetree-cfw-arm_io_smc_ext_charger_camera_driver",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 154,
+      "expression": "\"devicetree-cfw-arm_io_smc_ext_charger_camera_driver\""
+    },
+    {
+      "id": "devicetree-cfw-arm_io_smc_iop_smc_nub_stub",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 149,
+      "expression": "\"devicetree-cfw-arm_io_smc_iop_smc_nub_stub\""
+    },
+    {
+      "id": "devicetree-cfw-arm_io_smc_stub",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 144,
+      "expression": "\"devicetree-cfw-arm_io_smc_stub\""
+    },
+    {
+      "id": "devicetree-cfw-artwork_device_subtype",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 55,
+      "expression": "\"devicetree-cfw-artwork_device_subtype\""
+    },
+    {
+      "id": "devicetree-cfw-home_button_type",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 50,
+      "expression": "\"devicetree-cfw-home_button_type\""
+    },
+    {
+      "id": "devicetree-cfw-ipad_artwork",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 192,
+      "expression": "\"devicetree-cfw-ipad_artwork\""
+    },
+    {
+      "id": "devicetree-cfw-ipad_audio",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 212,
+      "expression": "\"devicetree-cfw-ipad_audio\""
+    },
+    {
+      "id": "devicetree-cfw-ipad_buttons",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 202,
+      "expression": "\"devicetree-cfw-ipad_buttons\""
+    },
+    {
+      "id": "devicetree-cfw-ipad_identity",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 207,
+      "expression": "\"devicetree-cfw-ipad_identity\""
+    },
+    {
+      "id": "devicetree-cfw-ipad_product",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 197,
+      "expression": "\"devicetree-cfw-ipad_product\""
+    },
+    {
+      "id": "devicetree-cfw-island_notch_location",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 60,
+      "expression": "\"devicetree-cfw-island_notch_location\""
+    },
+    {
+      "id": "devicetree-cfw-product_audio_microphone_array",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 180,
+      "expression": "\"devicetree-cfw-product_audio_microphone_array\""
+    },
+    {
+      "id": "devicetree-cfw-product_audio_node",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 134,
+      "expression": "\"devicetree-cfw-product_audio_node\""
+    },
+    {
+      "id": "devicetree-cfw-product_camera_node",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 124,
+      "expression": "\"devicetree-cfw-product_camera_node\""
+    },
+    {
+      "id": "devicetree-cfw-product_facetime_node",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 129,
+      "expression": "\"devicetree-cfw-product_facetime_node\""
+    },
+    {
+      "id": "devicetree-cfw-product_front_cam_offset",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 111,
+      "expression": "\"devicetree-cfw-product_front_cam_offset\""
+    },
+    {
+      "id": "devicetree-cfw-product_haptics_node",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 175,
+      "expression": "\"devicetree-cfw-product_haptics_node\""
+    },
+    {
+      "id": "devicetree-cfw-product_iopm_node",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 139,
+      "expression": "\"devicetree-cfw-product_iopm_node\""
+    },
+    {
+      "id": "devicetree-cfw-product_rear_cam_offset",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 116,
+      "expression": "\"devicetree-cfw-product_rear_cam_offset\""
+    },
+    {
+      "id": "devicetree-cfw-serial_number",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 45,
+      "expression": "\"devicetree-cfw-serial_number\""
+    },
+    {
+      "id": "devicetree-exp-arm_io_device_type",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 98,
+      "expression": "\"devicetree-exp-arm_io_device_type\""
+    },
+    {
+      "id": "devicetree-exp-arm_io_soc_generation",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 103,
+      "expression": "\"devicetree-exp-arm_io_soc_generation\""
+    },
+    {
+      "id": "devicetree-exp-compatible_secondary",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 73,
+      "expression": "\"devicetree-exp-compatible_secondary\""
+    },
+    {
+      "id": "devicetree-exp-product_fdr_product_type",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 78,
+      "expression": "\"devicetree-exp-product_fdr_product_type\""
+    },
+    {
+      "id": "devicetree-exp-product_gestalt_variants_rename",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 93,
+      "expression": "\"devicetree-exp-product_gestalt_variants_rename\""
+    },
+    {
+      "id": "devicetree-exp-product_sub_product_type",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 83,
+      "expression": "\"devicetree-exp-product_sub_product_type\""
+    },
+    {
+      "id": "devicetree-exp-product_unique_model",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 88,
+      "expression": "\"devicetree-exp-product_unique_model\""
+    },
+    {
+      "id": "devicetree-exp-target_sub_type",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareDeviceTreePatchSet.swift",
+      "line": 68,
+      "expression": "\"devicetree-exp-target_sub_type\""
+    },
+    {
+      "id": "dyld-boot-iomfb_force_kern",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestDisplayPatchSet.swift",
+      "line": 19,
+      "expression": "\"dyld-boot-iomfb_force_kern\""
+    },
+    {
+      "id": "dyld-boot-iomfb_swapend",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestDisplayPatchSet.swift",
+      "line": 27,
+      "expression": "\"dyld-boot-iomfb_swapend\""
+    },
+    {
+      "id": "dyld-boot-lockdown_mode",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 101,
+      "expression": "\"dyld-boot-lockdown_mode\""
+    },
+    {
+      "id": "dyld-boot-lsd_embedded_reg",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 85,
+      "expression": "\"dyld-boot-lsd_embedded_reg\""
+    },
+    {
+      "id": "dyld-boot-maxslide",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 74,
+      "expression": "\"dyld-boot-maxslide\""
+    },
+    {
+      "id": "dyld-boot-xpc_lwcr",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 93,
+      "expression": "\"dyld-boot-xpc_lwcr\""
+    },
+    {
+      "id": "dyld-cfw-camera",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestIdentityPatchSet.swift",
+      "line": 61,
+      "expression": "\"dyld-cfw-camera\""
+    },
+    {
+      "id": "dyld-exp-hv_vmm",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestIdentityPatchSet.swift",
+      "line": 32,
+      "expression": "\"dyld-exp-hv_vmm\""
+    },
+    {
+      "id": "dyld-exp-mis_trust_auth",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 109,
+      "expression": "\"dyld-exp-mis_trust_auth\""
+    },
+    {
+      "id": "dyld-exp-settings_software_update_row",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 130,
+      "expression": "settingsSoftwareUpdate"
+    },
+    {
+      "id": "ibec-boot-boot_args",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 70,
+      "expression": "\"ibec-boot-boot_args\""
+    },
+    {
+      "id": "ibec-boot-bootx_precondition",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 77,
+      "expression": "\"ibec-boot-bootx_precondition\""
+    },
+    {
+      "id": "ibec-boot-image4_callback",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 63,
+      "expression": "\"ibec-boot-image4_callback\""
+    },
+    {
+      "id": "ibec-cfw-serial_label",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 57,
+      "expression": "\"ibec-cfw-serial_label\""
+    },
+    {
+      "id": "ibss-boot-image4_callback",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 40,
+      "expression": "\"ibss-boot-image4_callback\""
+    },
+    {
+      "id": "ibss-boot-skip_generate_nonce",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 47,
+      "expression": "\"ibss-boot-skip_generate_nonce\""
+    },
+    {
+      "id": "ibss-cfw-serial_label",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 34,
+      "expression": "\"ibss-cfw-serial_label\""
+    },
+    {
+      "id": "kernel-boot-amfi_execve",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 56,
+      "expression": "\"kernel-boot-amfi_execve\""
+    },
+    {
+      "id": "kernel-boot-amfi_trustcache",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 28,
+      "expression": "\"kernel-boot-amfi_trustcache\""
+    },
+    {
+      "id": "kernel-boot-apfs_graft",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 39,
+      "expression": "\"kernel-boot-apfs_graft\""
+    },
+    {
+      "id": "kernel-boot-apfs_mount_upgrade_checks",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 53,
+      "expression": "\"kernel-boot-apfs_mount_upgrade_checks\""
+    },
+    {
+      "id": "kernel-boot-apfs_root_snapshot",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 25,
+      "expression": "\"kernel-boot-apfs_root_snapshot\""
+    },
+    {
+      "id": "kernel-boot-apfs_seal_broken",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 32,
+      "expression": "\"kernel-boot-apfs_seal_broken\""
+    },
+    {
+      "id": "kernel-boot-apfs_vfsop_mount",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 46,
+      "expression": "\"kernel-boot-apfs_vfsop_mount\""
+    },
+    {
+      "id": "kernel-boot-bsd_init_auth",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 155,
+      "expression": "\"kernel-boot-bsd_init_auth\""
+    },
+    {
+      "id": "kernel-boot-bsd_init_rootvp",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 77,
+      "expression": "\"kernel-boot-bsd_init_rootvp\""
+    },
+    {
+      "id": "kernel-boot-container_manager_upcall_force_success",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 250,
+      "expression": "\"kernel-boot-container_manager_upcall_force_success\""
+    },
+    {
+      "id": "kernel-boot-cred_label_update_execve",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 42,
+      "expression": "\"kernel-boot-cred_label_update_execve\""
+    },
+    {
+      "id": "kernel-boot-di2",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 234,
+      "expression": "\"kernel-boot-di2\""
+    },
+    {
+      "id": "kernel-boot-dounmount",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 176,
+      "expression": "\"kernel-boot-dounmount\""
+    },
+    {
+      "id": "kernel-boot-dyld_policy",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 101,
+      "expression": "\"kernel-boot-dyld_policy\""
+    },
+    {
+      "id": "kernel-boot-exec_security_policy_kill",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 242,
+      "expression": "\"kernel-boot-exec_security_policy_kill\""
+    },
+    {
+      "id": "kernel-boot-fpfs_scoped_open",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 266,
+      "expression": "\"kernel-boot-fpfs_scoped_open\""
+    },
+    {
+      "id": "kernel-boot-handle_fsioc_graft",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 60,
+      "expression": "\"kernel-boot-handle_fsioc_graft\""
+    },
+    {
+      "id": "kernel-boot-handle_get_dev_by_role",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 67,
+      "expression": "\"kernel-boot-handle_get_dev_by_role\""
+    },
+    {
+      "id": "kernel-boot-hook_cred_label",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 49,
+      "expression": "\"kernel-boot-hook_cred_label\""
+    },
+    {
+      "id": "kernel-boot-io_secure_bsd_root",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 162,
+      "expression": "\"kernel-boot-io_secure_bsd_root\""
+    },
+    {
+      "id": "kernel-boot-iomfb_swapend",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 258,
+      "expression": "\"kernel-boot-iomfb_swapend\""
+    },
+    {
+      "id": "kernel-boot-iouc_macf_gate",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 199,
+      "expression": "\"kernel-boot-iouc_macf_gate\""
+    },
+    {
+      "id": "kernel-boot-iouc_sandbox_gate",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 206,
+      "expression": "\"kernel-boot-iouc_sandbox_gate\""
+    },
+    {
+      "id": "kernel-boot-kcall10",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 217,
+      "expression": "\"kernel-boot-kcall10\""
+    },
+    {
+      "id": "kernel-boot-launch_constraints",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 94,
+      "expression": "\"kernel-boot-launch_constraints\""
+    },
+    {
+      "id": "kernel-boot-load_dylinker",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 63,
+      "expression": "\"kernel-boot-load_dylinker\""
+    },
+    {
+      "id": "kernel-boot-mac_mount",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 169,
+      "expression": "\"kernel-boot-mac_mount\""
+    },
+    {
+      "id": "kernel-boot-port_to_map",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 86,
+      "expression": "\"kernel-boot-port_to_map\""
+    },
+    {
+      "id": "kernel-boot-post_validation",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 87,
+      "expression": "\"kernel-boot-post_validation\""
+    },
+    {
+      "id": "kernel-boot-post_validation_unsigned",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 35,
+      "expression": "\"kernel-boot-post_validation_unsigned\""
+    },
+    {
+      "id": "kernel-boot-proc_security_policy",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 99,
+      "expression": "\"kernel-boot-proc_security_policy\""
+    },
+    {
+      "id": "kernel-boot-sandbox_ext",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 192,
+      "expression": "\"kernel-boot-sandbox_ext\""
+    },
+    {
+      "id": "kernel-boot-sandbox_mount_check_mount",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 123,
+      "expression": "\"kernel-boot-sandbox_mount_check_mount\""
+    },
+    {
+      "id": "kernel-boot-sandbox_mount_check_remount",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 130,
+      "expression": "\"kernel-boot-sandbox_mount_check_remount\""
+    },
+    {
+      "id": "kernel-boot-shared_region_map",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 137,
+      "expression": "\"kernel-boot-shared_region_map\""
+    },
+    {
+      "id": "kernel-boot-shared_region_size",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 144,
+      "expression": "\"kernel-boot-shared_region_size\""
+    },
+    {
+      "id": "kernel-boot-spawn_validate_persona",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 106,
+      "expression": "\"kernel-boot-spawn_validate_persona\""
+    },
+    {
+      "id": "kernel-boot-syscallmask",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 224,
+      "expression": "\"kernel-boot-syscallmask\""
+    },
+    {
+      "id": "kernel-boot-task_conversion_eval",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 73,
+      "expression": "\"kernel-boot-task_conversion_eval\""
+    },
+    {
+      "id": "kernel-boot-thid_should_crash",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 113,
+      "expression": "\"kernel-boot-thid_should_crash\""
+    },
+    {
+      "id": "kernel-boot-thread_guard_violation",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 152,
+      "expression": "\"kernel-boot-thread_guard_violation\""
+    },
+    {
+      "id": "kernel-boot-vm_fault_enter_prepare",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 130,
+      "expression": "\"kernel-boot-vm_fault_enter_prepare\""
+    },
+    {
+      "id": "kernel-boot-vm_map_protect",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 123,
+      "expression": "\"kernel-boot-vm_map_protect\""
+    },
+    {
+      "id": "kernel-cfw-debugger",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 108,
+      "expression": "\"kernel-cfw-debugger\""
+    },
+    {
+      "id": "kernel-cfw-display_promotion",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 291,
+      "expression": "FirmwarePatchSetCatalog.proMotionPatch"
+    },
+    {
+      "id": "kernel-cfw-nvram_verify_permission",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 183,
+      "expression": "\"kernel-cfw-nvram_verify_permission\""
+    },
+    {
+      "id": "kernel-cfw-paravirt_user_clients",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 275,
+      "expression": "FirmwarePatchSetCatalog.paravirtUserClientsPatch"
+    },
+    {
+      "id": "kernel-cfw-proc_pidinfo",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 93,
+      "expression": "\"kernel-cfw-proc_pidinfo\""
+    },
+    {
+      "id": "kernel-cfw-sandbox_file_check_mmap",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 117,
+      "expression": "\"kernel-cfw-sandbox_file_check_mmap\""
+    },
+    {
+      "id": "kernel-cfw-sandbox_mount_check_umount",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 137,
+      "expression": "\"kernel-cfw-sandbox_mount_check_umount\""
+    },
+    {
+      "id": "kernel-cfw-sandbox_vnode_check_rename",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelBasePatchSet.swift",
+      "line": 143,
+      "expression": "\"kernel-cfw-sandbox_vnode_check_rename\""
+    },
+    {
+      "id": "kernel-cfw-task_for_pid",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelCustomFirmwarePatchSet.swift",
+      "line": 80,
+      "expression": "\"kernel-cfw-task_for_pid\""
+    },
+    {
+      "id": "kernel-exp-frida_thread_set_state_entitlement_flag",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelFridaPatchSet.swift",
+      "line": 24,
+      "expression": "\"kernel-exp-frida_thread_set_state_entitlement_flag\""
+    },
+    {
+      "id": "kernel-exp-frida_vm_map_delete_immutable_code",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelFridaPatchSet.swift",
+      "line": 31,
+      "expression": "\"kernel-exp-frida_vm_map_delete_immutable_code\""
+    },
+    {
+      "id": "kernel-exp-hv_vmm",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareKernelHypervisorPatchSet.swift",
+      "line": 34,
+      "expression": "\"kernel-exp-hv_vmm\""
+    },
+    {
+      "id": "llb-boot-boot_args",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 100,
+      "expression": "\"llb-boot-boot_args\""
+    },
+    {
+      "id": "llb-boot-image4_callback",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 93,
+      "expression": "\"llb-boot-image4_callback\""
+    },
+    {
+      "id": "llb-boot-panic_bypass",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 114,
+      "expression": "\"llb-boot-panic_bypass\""
+    },
+    {
+      "id": "llb-boot-rootfs",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 107,
+      "expression": "\"llb-boot-rootfs\""
+    },
+    {
+      "id": "llb-cfw-display_scale",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 121,
+      "expression": "\"llb-cfw-display_scale\""
+    },
+    {
+      "id": "llb-cfw-serial_label",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 87,
+      "expression": "\"llb-cfw-serial_label\""
+    },
+    {
+      "id": "preboot-cfw-devicetree_board_audio",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 361,
+      "expression": "prebootBoardAudio"
+    },
+    {
+      "id": "preboot-cfw-devicetree_haptics",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 387,
+      "expression": "prebootHaptics"
+    },
+    {
+      "id": "preboot-cfw-devicetree_iphone_product",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 373,
+      "expression": "prebootIPhoneProduct"
+    },
+    {
+      "id": "preboot-cfw-devicetree_microphone_array",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 398,
+      "expression": "prebootMicrophoneArray"
+    },
+    {
+      "id": "preboot-exp-devicetree_identity",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestIdentityPatchSet.swift",
+      "line": 52,
+      "expression": "prebootDeviceTreeIdentity"
+    },
+    {
+      "id": "system-apps-cfw-attitude",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 256,
+      "expression": "attitude"
+    },
+    {
+      "id": "system-backboardd-cfw-gyroscope",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 248,
+      "expression": "gyroscope"
+    },
+    {
+      "id": "system-campo-cfw-entitlements",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 181,
+      "expression": "\"system-campo-cfw-entitlements\""
+    },
+    {
+      "id": "system-debugserver-cfw-install",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 175,
+      "expression": "\"system-debugserver-cfw-install\""
+    },
+    {
+      "id": "system-diskimagesiod-cfw-is_mount_complete",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 147,
+      "expression": "\"system-diskimagesiod-cfw-is_mount_complete\""
+    },
+    {
+      "id": "system-extensions-boot-gpu_bundle",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 206,
+      "expression": "\"system-extensions-boot-gpu_bundle\""
+    },
+    {
+      "id": "system-gigalocker-boot-rename",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 199,
+      "expression": "\"system-gigalocker-boot-rename\""
+    },
+    {
+      "id": "system-installcoordination_proxy-cfw-persona_lookup",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 189,
+      "expression": "installCoordinationPersona"
+    },
+    {
+      "id": "system-jetsamproperties-cfw-disable_allowed",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 60,
+      "expression": "jetsamDisableAllowed"
+    },
+    {
+      "id": "system-launchd-boot-jetsam_panic_guard_bypass",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 168,
+      "expression": "\"system-launchd-boot-jetsam_panic_guard_bypass\""
+    },
+    {
+      "id": "system-launchd_cache_loader-boot-unsecure_cache_gate",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 154,
+      "expression": "\"system-launchd_cache_loader-boot-unsecure_cache_gate\""
+    },
+    {
+      "id": "system-launchdaemons-boot-environment",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 220,
+      "expression": "\"system-launchdaemons-boot-environment\""
+    },
+    {
+      "id": "system-locationd-cfw-disable_auto_cohort",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 53,
+      "expression": "locationdCohorting"
+    },
+    {
+      "id": "system-mobileactivationd-boot-should_hactivate",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 161,
+      "expression": "\"system-mobileactivationd-boot-should_hactivate\""
+    },
+    {
+      "id": "system-preferences-exp-root_rows",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 122,
+      "expression": "settingsRootRows"
+    },
+    {
+      "id": "system-seputil-boot-gigalocker_uuid",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 140,
+      "expression": "\"system-seputil-boot-gigalocker_uuid\""
+    },
+    {
+      "id": "system-systemversion-cfw-build_version",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 410,
+      "expression": "\"system-systemversion-cfw-build_version\""
+    },
+    {
+      "id": "system-virtiosound-cfw-hal_plugin",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 266,
+      "expression": "virtioSoundDriver"
+    },
+    {
+      "id": "system-virtualaudio-cfw-microphone_graph_chains",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 350,
+      "expression": "virtualAudioMicrophoneChains"
+    },
+    {
+      "id": "system-virtualaudio-cfw-mute_set_throw",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 288,
+      "expression": "virtualAudioMuteSetThrow"
+    },
+    {
+      "id": "system-virtualaudio-cfw-speaker_graph_chains",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 327,
+      "expression": "virtualAudioGraphConfigurations"
+    },
+    {
+      "id": "system-virtualaudio-cfw-speaker_protection_gate",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 300,
+      "expression": "virtualAudioSpeakerProtectionGate"
+    },
+    {
+      "id": "system-virtualaudio-cfw-speaker_raw_chains",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 339,
+      "expression": "virtualAudioSpeakerRawChains"
+    },
+    {
+      "id": "system-virtualaudio-cfw-speaker_route_throws",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 276,
+      "expression": "virtualAudioSpeakerRouteThrows"
+    },
+    {
+      "id": "system-virtualaudio-cfw-volume_mode_precondition",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 313,
+      "expression": "virtualAudioVolumeModePrecondition"
+    },
+    {
+      "id": "system-vphoned-boot-install",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift",
+      "line": 213,
+      "expression": "\"system-vphoned-boot-install\""
+    },
+    {
+      "id": "system-watchdogd-exp-hv_vmm_cache",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestIdentityPatchSet.swift",
+      "line": 42,
+      "expression": "\"system-watchdogd-exp-hv_vmm_cache\""
+    },
+    {
+      "id": "txm-boot-developer_mode_bypass",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 149,
+      "expression": "\"txm-boot-developer_mode_bypass\""
+    },
+    {
+      "id": "txm-boot-precheck_admission",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 163,
+      "expression": "\"txm-boot-precheck_admission\""
+    },
+    {
+      "id": "txm-boot-sel42_29",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 171,
+      "expression": "\"txm-boot-sel42_29\""
+    },
+    {
+      "id": "txm-boot-selector24_bypass",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 156,
+      "expression": "\"txm-boot-selector24_bypass\""
+    },
+    {
+      "id": "txm-boot-trustcache_bypass",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 130,
+      "expression": "\"txm-boot-trustcache_bypass\""
+    },
+    {
+      "id": "txm-cfw-debugger_entitlement",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 143,
+      "expression": "\"txm-cfw-debugger_entitlement\""
+    },
+    {
+      "id": "txm-cfw-get_task_allow",
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareBootChainPatchSet.swift",
+      "line": 137,
+      "expression": "\"txm-cfw-get_task_allow\""
+    }
+  ]
+}

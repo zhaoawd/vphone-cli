@@ -183,6 +183,25 @@ public enum PatchDeclarationGate {
         try reject(violations(in: report, plan: plan))
     }
 
+    /// Kernel-only operations retain the full frozen plan. Only the required
+    /// evidence obligation is narrowed; all emitted records remain checked.
+    static func enforceKernel(report: PatchRunReport, plan: VariantPlanResolver.VariantPlan) throws {
+        guard !report.components.isEmpty,
+              report.components.allSatisfy({ $0.component.lowercased() == "kernelcache" }),
+              report.allRecords.allSatisfy({ $0.component.lowercased() == "kernelcache" }) else {
+            throw PatcherError.patchVerificationFailed("Kernel update contains a non-kernel component")
+        }
+        let kernelIDs = Set(plan.selected.filter {
+            $0.swiftSteps.contains { $0.hasPrefix("kernelcache.") }
+        }.map(\.id))
+        guard !kernelIDs.isEmpty else {
+            throw PatcherError.patchVerificationFailed("Kernel update has no selected kernel declarations")
+        }
+        try reject(violations(in: report, plan: plan).filter {
+            $0.kind != .requiredDeclarationMissing || kernelIDs.contains($0.step)
+        })
+    }
+
     /// Throw when record ownership is invalid or an owning step is not enabled. Called before commit,
     /// so a violation leaves the original firmware unchanged.
     public static func enforce(

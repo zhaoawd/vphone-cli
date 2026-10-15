@@ -1,0 +1,3938 @@
+diff --git a/Documents/Guides/create-and-run.md b/Documents/Guides/create-and-run.md
+index e41d6536b6231a39bf861124b6469e805f0f6f9a..32bff0ad885657662ccc30ae7846161573df68d6 100644
+--- a/Documents/Guides/create-and-run.md
++++ b/Documents/Guides/create-and-run.md
+@@ -28,6 +28,8 @@ vphone-cli vm launch myphone  # start the VM window and keep it running
+ vphone-cli vm stop myphone    # run from another terminal to stop it
+ ```
+ 
++Closing the VM window, ⌘Q, `vm stop` and Control-C in the `vm launch` terminal all shut the guest down first (vphoned `system.shutdown`) and end the virtual machine once the guest has stopped, or after 15 seconds if it has not. A guest vphoned cannot answer for, such as one in DFU or still starting up, is turned off at once, as pulling the power would. A second Control-C turns it off without waiting.
++
+ `vm launch` starts the guest without waiting for vphoned; the daemon connects during boot. The VM window and menu provide Home/power keys, app installation and file browsing. The host control socket is `<VM bundle>/vphone.sock`: one JSON line in, one out. Connections are served concurrently, and the socket also exists with `--no-graphics`, where `tap` and `swipe` go through vphoned's touch injection and screen images come from the guest. Besides `tap`, `swipe`, `key` and `screenshot`, `{"t":"rpc","method":"<vphoned method>","params":{…}}` calls any method in `Research/vphoned_http_api.md`. For example, `input.key` with `{"name":"cmd+v"}` pastes and `input.type` types text. No SSH or VNC endpoint is installed by this workflow.
+ 
+ ## Manual stages
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+index 7413d59d42f165c32b0c77319b65da2a84e6520b..84e6d4aef61d34c49deb00e38789633fff2306cf 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -2783,3 +2783,7 @@ re-patched kernelcache and the marker survived. Flow: `fw set-patches` →
+ route a kernel patch through `cfw update-kernel` and the rest of the boot chain
+ (TXM, DeviceTree, LLB, iBSS, iBEC) through the erasing restore. TXM and
+ DeviceTree are also in Preboot and could follow the same path later.
++
++## Optional Settings row hiding (WIP, 2026-10-07)
++
++Two standard-blocked declarations hide Apple Account, Game Center, iCloud and Wallet in Preferences (`system-preferences-exp-root_rows`) and Software Update in GeneralSettingsUI (`dyld-exp-settings_software_update_row`). Native discovery is restricted to reviewed 24A435 inputs. The installer uses pristine executable backups and cache undo records with page re-attestation. All five rows passed guest rollback, reapplication and reboot checks. See [research report](Guest/2026-10-07_reverse-settings-rows-report.md). Broader firmware coverage and bundled deployment remain WIP; no kernel/SEP or runtime hook changes are included.
+diff --git a/Research/Guest/2026-10-07_reverse-settings-rows-report.md b/Research/Guest/2026-10-07_reverse-settings-rows-report.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..8b7629bc071f4aa3f246a3ff45e30467b37de16f
+--- /dev/null
++++ b/Research/Guest/2026-10-07_reverse-settings-rows-report.md
+@@ -0,0 +1,56 @@
++# Settings row hiding: deployment and rollback verification
++
++## Outcome and scope
++
++On 2026-10-07, panetest-iphone (iOS 27.0, build 24A435) hid Apple Account, Game Center, iCloud, Wallet & Apple Pay, and Software Update. The four root rows and the General > Software Update row passed restoration, reappearance, reapplication, and full-reboot checks. Indexing/Search & Siri was explicitly excluded and its provider was unchanged. The guest retained its original admitted Core Bundle, 2.6.0-local.92448989. Unrelated kernel and SEP experiments were not deployed by this work.
++
++The user authorized implementation, deployment and verification, including a temporary writable mount after the approval review requested explicit authorization. Each temporary mount job was unloaded and removed. Final checks found the root filesystem read-only and no residual mount job, plist or log.
++
++Both patch implementations are integrated into the source installer. The final CLI produces exactly the bytes tested in the guest. The live deployment used recoverable file replacements under the original Bundle; a newly packaged Bundle has not been deployed. This distinction, narrow firmware coverage, and remaining installer-level validation make this a WIP PR rather than a release claim.
++
++## Evidence, findings and reproduction paths
++
++| Evidence | Finding | Verification path |
++|---|---|---|
++| `SettingsRows/Evidence-20261007/rollback-root-top.json`, `rollback-root-bottom.json` | Restoring original Preferences restores all four root rows | Original executable → candidate → original → candidate, relaunching Settings each time |
++| `SettingsRows/Evidence-20261007/software-update-rollback-ui.json` | Restoring the original cache restores Software Update | Restore the cache chunk and fully reboot |
++| `SettingsRows/Evidence-20261007/final-root-top-ui.json`, `final-root-lower-ui.json`, `final-general-ui.json` | All five targets are absent and neighboring rows remain | Assert each relevant UI region after the final full reboot |
++| Local `final-environment.json`, `final-services.json`, `final-root-files.json` | Root is read-only; the temporary mount service and files are absent | Read back environment.status, services.list and files.list |
++| Local `five-row-integration-tests.log`, `patch-model-tests.log` | 52 tests passed, including real executable and cache fixtures | Isolated Xcode build and test runs |
++
++Local artifacts in this report are under `/private/tmp/prefs-audit` on the research host and are not portable fixtures. The UI evidence listed with repository-relative paths is included with the research notes. Apple binaries and cache chunks are not included.
++
++The final verified boot session was `0980B399-163F-4EBA-B8D0-51A115AD4D80`. Settings launched with PID 377 and `frontmost_verified=true`. The first Software Update deployment used boot session `2BB7E8F3-F3BF-453B-9DEE-13E3B7B0731B`.
++
++## Implementation and integrity
++
++For three Preferences rows, resilient Swift witness metadata locates each provider's Optional branch. The replacement takes its existing cleanup path and returns an empty value. For Game Center, native Mach-O indirect-symbol lookup locates the construction block associated with `MCFeatureGameCenterAllowed`; only its sharedPad rule is replaced with boolean(false,false). The five instructions are discovered structurally. A hash gate restricts Preferences to the reviewed pristine input. Signing preserved all 767 original entitlement keys and values.
++
++The actual Software Update row identifier is `com.apple.settings.general.softwareUpdate` in GeneralSettingsUI. In this fixture, the discovered instruction maps to cache chunk `.36`, file offset 23494832. This offset is evidence for this sample, not a cross-version discovery rule. `DyldSharedCacheChunkSet` captures original bytes, and re-attestation updates page 1434's signature slot at file offset 131347490. Only the instruction and one page hash differ, totaling 35 changed bytes. Upload/download comparison matched, and undo plus re-attestation restored the entire original chunk.
++
++| Artifact | SHA-256 |
++|---|---|
++| Original Preferences | `e59851f14f29409590a6de76ca2fe9b9912341aee526a278692ef0d7a86ee2f3` |
++| Deployed signed Preferences | `dc92f2f36d1f5fbb3e8f84f52487e000fe353accf99181561b4df590031a75b5` |
++| Original cache chunk | `62a41422d07cf098ee848f20a793747196c0ba59b05b42348620fe6c672419bb` |
++| Deployed cache chunk | `dd79a85eb90dbe9dab116220ad2a5cde32109054e6f8bef5bee9e131690240c4` |
++
++## Recovery and installer integration
++
++Guest executable backups are `/Applications/Preferences.app/Preferences.rows-original-20261007` and `Preferences.rows-previous-20261007`. The original cache is saved as `/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld/.settings-rows-cache36-original-20261007`; additional copies exist in guest staging and host research storage. Cache restoration requires a writable mount, file replacement and a full reboot. An extracted dylib must never be installed as a cache chunk.
++
++`cfw patch-settings-root-rows` implements `system-preferences-exp-root_rows`. It accepts a pristine Preferences copy; its caller signs the result. The installer uses its existing `.bak`, entitlement-preservation, signing and restoration paths.
++
++`DyldSharedCacheSettingsRowsPatcher`, exposed by `cfw patch-settings-software-update`, implements `dyld-exp-settings_software_update_row`. The installer supplies `--undo-log` and `--undo-id`; deselection uses `patch-dsc-revert` to restore bytes and re-attest the page. Both declarations are blocked by the standard preset and remain off for legacy machines without a patch plan. Cache discovery reads the reviewed image UUID, provider type name, resilient witnesses and LC_FUNCTION_STARTS; it needs no extraction tool, fixed instruction address or external symbol listing. Older standalone scripts remain research artifacts only.
++
++## Validation and WIP boundaries
++
++The complete Release VPhoneCommand build passed. Three fixture/catalogue suites passed 20 tests, including the real Preferences and full-cache fixtures. Five patch-model suites passed another 32 tests. Cache coverage includes dry-run, equality with deployed bytes, idempotent repetition with no new undo record, and exact restoration. The same sequence was exercised through the new CLI and the standard revert command. `git diff --check` passed.
++
++These results were obtained in the original mixed research checkout. The isolated PR branch is validated separately in the PR description. Support is intentionally restricted to the reviewed 24A435 input/UUID. Live tests prove the candidate bytes, not a newly packaged Bundle's end-to-end installation. Broader fixture coverage, a packaged installer run, and adoption of the manually deployed guest into managed patch receipts remain follow-up work.
++
++Related app-entry removal and OTA-blocking experiments are documented in `post_setup_signin_and_appstore.md` and `ota_software_update_block.md`. They are manual research procedures, not additional automatic behavior of these two Settings patches.
++
++### Isolated WIP branch verification
++
++The PR branch was rebuilt independently from upstream main at `2d21d21f`, without the parallel kernel/SEP, IOMFB or libprefsfix changes. All 54 tests in 9 selected suites passed, including both real fixtures and the standalone store-encoding tests. The complete Release VPhoneCommand CLI build also passed. This verifies the scoped source branch; the packaged Bundle deployment boundary above still applies.
+diff --git a/Research/Guest/SettingsRows/CachePatch/main.swift b/Research/Guest/SettingsRows/CachePatch/main.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..47ceb53e9084da3bbff103f9f980ec927387b56a
+--- /dev/null
++++ b/Research/Guest/SettingsRows/CachePatch/main.swift
+@@ -0,0 +1,40 @@
++import Foundation
++import CryptoKit
++import VPhonePatchKit
++struct Failure: Error {let message:String}
++func require(_ ok:Bool,_ message:String)throws{if !ok{throw Failure(message:message)}}
++func hash(_ d:Data)->String{SHA256.hash(data:d).map{String(format:"%02x",$0)}.joined()}
++func hex(_ s:String)->Data {Data(stride(from:0,to:s.count,by:2).map{let i=s.index(s.startIndex,offsetBy:$0);return UInt8(s[i..<s.index(i,offsetBy:2)],radix:16)!})}
++do {
++ let args=CommandLine.arguments
++ try require(args.count==5,"usage: tool original-chunk extracted-image discovery-manifest output-directory")
++ let source=URL(fileURLWithPath:args[1]), fixture=try Data(contentsOf:URL(fileURLWithPath:args[2]))
++ let manifest=try JSONSerialization.jsonObject(with:Data(contentsOf:URL(fileURLWithPath:args[3]))) as! [String:Any]
++ try require(hash(fixture)==manifest["inputSHA256"] as? String,"extracted fixture hash mismatch")
++ let changes=manifest["changes"] as! [[String:Any]]
++ try require(changes.count==1 && changes[0]["provider"] as? String == "SoftwareUpdateListItemProvider","unexpected discovery manifest")
++ let c=changes[0],va=UInt64((c["va"] as! String).dropFirst(2),radix:16)!,fo=c["fileOffset"] as! Int
++ let before=hex(c["before"] as! String),after=hex(c["after"] as! String)
++ try require(before.count==4 && ARM64Encoder.encodeB(from:Int(va),to:Int(va+4))==after,"invalid replacement")
++ let original=try Data(contentsOf:source)
++ let dir=URL(fileURLWithPath:args[4]),out=dir.appendingPathComponent("dyld_shared_cache_arm64e.36")
++ try require(!FileManager.default.fileExists(atPath:out.path),"output exists")
++ try FileManager.default.copyItem(at:source,to:out)
++ let chunks=try DyldSharedCacheChunkSet(directory:dir,captureUndo:true)
++ try require(try chunks.readAtVMA(va,length:4)==before,"cache site mismatch")
++ try require(fo>=128 && fo+132<=fixture.count,"fixture bounds")
++ try require(try chunks.readAtVMA(va-128,length:260)==fixture.subdata(in:(fo-128)..<(fo+132)),"surrounding code differs from reviewed image")
++ try chunks.write(at:va,after)
++ let report=try DyldSharedCacheCodeSignature.reattestRecordedWrites(in:chunks)
++ try require(report.skipped.isEmpty,"signature pages skipped")
++ if let undo=chunks.takeUndoLog(){try JSONEncoder().encode(undo).write(to:dir.appendingPathComponent("software-update-undo.json"),options:.withoutOverwriting)}
++ let patched=try Data(contentsOf:out)
++ let (url,range)=try chunks.fileRange(of:DyldSharedCacheWriteSpan(vma:va,length:4))
++ guard let cd=try DyldSharedCacheCodeSignature.readCodeDirectory(ofChunk:url) else{throw Failure(message:"no code directory")}
++ let page=range.lowerBound/cd.pageSize,slot=cd.slotOffset(forPage:page)
++ try require(Data(SHA256.hash(data:patched.subdata(in:page*cd.pageSize..<(page+1)*cd.pageSize)))==patched.subdata(in:slot..<slot+32),"hash validation failed")
++ try require(original.count==patched.count,"size changed")
++ var count=0
++ for i in original.indices where original[i] != patched[i] {try require(range.contains(i)||(slot..<slot+32).contains(i),"unexpected changed byte"); count+=1}
++ print("sourceSHA256=\(hash(original)) outputSHA256=\(hash(patched)) changedBytes=\(count) site=\(range) page=\(page) hashSlot=\(slot)")
++} catch {fputs("ERROR: \(error)\n",stderr);exit(1)}
+diff --git a/Research/Guest/SettingsRows/Evidence-20261007/final-general-ui.json b/Research/Guest/SettingsRows/Evidence-20261007/final-general-ui.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..2280a409da579f6be05ce0e0d96720d8bac13ce7
+--- /dev/null
++++ b/Research/Guest/SettingsRows/Evidence-20261007/final-general-ui.json
+@@ -0,0 +1,209 @@
++{
++  "ok" : true,
++  "result" : {
++    "count" : 11,
++    "elements" : [
++      {
++        "clickable" : false,
++        "enabled" : true,
++        "frame" : {
++          "height" : 26.333333333333314,
++          "width" : 80,
++          "x" : 40,
++          "y" : 238
++        },
++        "identifier" : "",
++        "label" : "General",
++        "role" : "text",
++        "traits" : 8590000192,
++        "value" : "",
++        "visible" : 1,
++        "x" : 80,
++        "y" : 251.16666666666666
++      },
++      {
++        "clickable" : false,
++        "enabled" : true,
++        "frame" : {
++          "height" : 64.333333333333314,
++          "width" : 344.66666666666663,
++          "x" : 40,
++          "y" : 268.33333333333331
++        },
++        "identifier" : "",
++        "label" : "Manage your overall setup and preferences for iPhone, such as software updates, device language, CarPlay, AirDrop and more.",
++        "role" : "text",
++        "traits" : 8590000192,
++        "value" : "",
++        "visible" : 1,
++        "x" : 212.33333333333331,
++        "y" : 300.5
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 382.66666666666669
++        },
++        "identifier" : "com.apple.settings.general.about",
++        "label" : "About",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 408.66666666666669
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 434.66666666666669
++        },
++        "identifier" : "com.apple.settings.general.deviceStorage",
++        "label" : "iPhone Storage",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 460.66666666666669
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 521.66666666666674
++        },
++        "identifier" : "com.apple.settings.general.appleCareAndWarranty",
++        "label" : "AppleCare & Warranty",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 547.66666666666674
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 608.66666666666674
++        },
++        "identifier" : "com.apple.settings.general.airDrop",
++        "label" : "AirDrop",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 634.66666666666674
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 660.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.airPlayAndContinuity",
++        "label" : "AirPlay & Continuity",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 686.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 712.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.pictureInPicture",
++        "label" : "Picture in Picture",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 738.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 764.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.screenCapture",
++        "label" : "Screen Capture",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 790.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 816.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.carPlay",
++        "label" : "CarPlay",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 842.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 44,
++          "width" : 44,
++          "x" : 20,
++          "y" : 59
++        },
++        "identifier" : "BackButton",
++        "label" : "Settings",
++        "role" : "button",
++        "traits" : 8724152321,
++        "value" : "",
++        "visible" : 1,
++        "x" : 42,
++        "y" : 81
++      }
++    ],
++    "pid" : 377,
++    "source" : "ax",
++    "truncated" : false
++  }
++}
+diff --git a/Research/Guest/SettingsRows/Evidence-20261007/final-root-lower-ui.json b/Research/Guest/SettingsRows/Evidence-20261007/final-root-lower-ui.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..53292782e670bcda978117f7ce20eb1f81fd457e
+--- /dev/null
++++ b/Research/Guest/SettingsRows/Evidence-20261007/final-root-lower-ui.json
+@@ -0,0 +1,263 @@
++{
++  "ok" : true,
++  "result" : {
++    "count" : 14,
++    "elements" : [
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 20.666666666666671,
++          "width" : 66.666666666666657,
++          "x" : 181.66666666666666,
++          "y" : 70.666666666666657
++        },
++        "identifier" : "",
++        "label" : "Settings",
++        "role" : "element",
++        "traits" : 8590000128,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 81
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 114
++        },
++        "identifier" : "com.apple.settings.standBy",
++        "label" : "StandBy",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 140
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 166
++        },
++        "identifier" : "com.apple.settings.wallpaper",
++        "label" : "Wallpaper",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 192
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 253
++        },
++        "identifier" : "com.apple.settings.notifications",
++        "label" : "Notifications",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 279
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 305
++        },
++        "identifier" : "com.apple.settings.sounds",
++        "label" : "Sounds",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 331
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 357
++        },
++        "identifier" : "com.apple.settings.focus",
++        "label" : "Focus",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 383
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 409
++        },
++        "identifier" : "com.apple.settings.screenTime",
++        "label" : "Screen Time",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 435
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 496
++        },
++        "identifier" : "com.apple.settings.passcodeAndBiometrics",
++        "label" : "Passcode",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 522
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 548
++        },
++        "identifier" : "com.apple.settings.sos",
++        "label" : "Emergency SOS",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 574
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 600
++        },
++        "identifier" : "com.apple.settings.privacyAndSecurity",
++        "label" : "Privacy & Security",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 626
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 687
++        },
++        "identifier" : "com.apple.settings.apps",
++        "label" : "Apps",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 713
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 774
++        },
++        "identifier" : "com.apple.settings.developer",
++        "label" : "Developer",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 800
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 28,
++          "width" : 374,
++          "x" : 28,
++          "y" : 866
++        },
++        "identifier" : "",
++        "label" : "Search",
++        "role" : "element",
++        "traits" : 146029151232,
++        "value" : "Search",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 880
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 22,
++          "width" : 17.333333333333314,
++          "x" : 369.66666666666669,
++          "y" : 869
++        },
++        "identifier" : "Dictate",
++        "label" : "Dictate",
++        "role" : "button",
++        "traits" : 8589934593,
++        "value" : "",
++        "visible" : 1,
++        "x" : 378.33333333333337,
++        "y" : 879.83333333333337
++      }
++    ],
++    "pid" : 377,
++    "source" : "ax",
++    "truncated" : false
++  }
++}
+diff --git a/Research/Guest/SettingsRows/Evidence-20261007/final-root-top-ui.json b/Research/Guest/SettingsRows/Evidence-20261007/final-root-top-ui.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..eb07e5b5365c8c223fa0bcfc45f4762d2795e13b
+--- /dev/null
++++ b/Research/Guest/SettingsRows/Evidence-20261007/final-root-top-ui.json
+@@ -0,0 +1,299 @@
++{
++  "ok" : true,
++  "result" : {
++    "count" : 16,
++    "elements" : [
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 40.666666666666671,
++          "width" : 133,
++          "x" : 20,
++          "y" : 116.66666666666667
++        },
++        "identifier" : "",
++        "label" : "Settings",
++        "role" : "element",
++        "traits" : 8590000128,
++        "value" : "",
++        "visible" : 1,
++        "x" : 86.5,
++        "y" : 137
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 165
++        },
++        "identifier" : "com.apple.settings.airplaneMode",
++        "label" : "Airplane Mode",
++        "role" : "button",
++        "traits" : 9007207844675649,
++        "value" : "0",
++        "visible" : 1,
++        "x" : 360.5,
++        "y" : 191
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 217
++        },
++        "identifier" : "com.apple.settings.wifi",
++        "label" : "Wi-Fi, Off",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 243
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 269
++        },
++        "identifier" : "com.apple.settings.ethernet",
++        "label" : "Ethernet",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 295
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 321
++        },
++        "identifier" : "com.apple.settings.bluetooth",
++        "label" : "Bluetooth, On",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 347
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 373
++        },
++        "identifier" : "com.apple.settings.battery",
++        "label" : "Battery",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 399
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 460
++        },
++        "identifier" : "com.apple.settings.general",
++        "label" : "General",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 486
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 512
++        },
++        "identifier" : "com.apple.settings.accessibility",
++        "label" : "Accessibility",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 538
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 564
++        },
++        "identifier" : "com.apple.settings.actionButton",
++        "label" : "Action Button",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 590
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 616
++        },
++        "identifier" : "com.apple.settings.appearance",
++        "label" : "Appearance",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 642
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 668
++        },
++        "identifier" : "com.apple.settings.camera",
++        "label" : "Camera",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 694
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 720
++        },
++        "identifier" : "com.apple.settings.controlCenter",
++        "label" : "Control Centre",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 746
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 772
++        },
++        "identifier" : "com.apple.settings.displayAndBrightness",
++        "label" : "Display & Brightness",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 798
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 824
++        },
++        "identifier" : "com.apple.settings.homeScreen",
++        "label" : "Home Screen & App Library",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 850
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 28,
++          "width" : 374,
++          "x" : 28,
++          "y" : 866
++        },
++        "identifier" : "",
++        "label" : "Search",
++        "role" : "element",
++        "traits" : 146029151232,
++        "value" : "Search",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 880
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 22,
++          "width" : 17.333333333333314,
++          "x" : 369.66666666666669,
++          "y" : 869
++        },
++        "identifier" : "Dictate",
++        "label" : "Dictate",
++        "role" : "button",
++        "traits" : 8589934593,
++        "value" : "",
++        "visible" : 1,
++        "x" : 378.33333333333337,
++        "y" : 879.83333333333337
++      }
++    ],
++    "pid" : 377,
++    "source" : "ax",
++    "truncated" : false
++  }
++}
+diff --git a/Research/Guest/SettingsRows/Evidence-20261007/rollback-root-bottom.json b/Research/Guest/SettingsRows/Evidence-20261007/rollback-root-bottom.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..d6fd85e33837730b77ab1a172e8902ef59404b97
+--- /dev/null
++++ b/Research/Guest/SettingsRows/Evidence-20261007/rollback-root-bottom.json
+@@ -0,0 +1,263 @@
++{
++  "ok" : true,
++  "result" : {
++    "count" : 14,
++    "elements" : [
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 20.666666666666671,
++          "width" : 66.666666666666657,
++          "x" : 181.66666666666666,
++          "y" : 70.666666666666657
++        },
++        "identifier" : "",
++        "label" : "Settings",
++        "role" : "element",
++        "traits" : 8590000128,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 81
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 113.99999999999989
++        },
++        "identifier" : "com.apple.settings.sounds",
++        "label" : "Sounds",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 139.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 165.99999999999989
++        },
++        "identifier" : "com.apple.settings.focus",
++        "label" : "Focus",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 191.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 217.99999999999989
++        },
++        "identifier" : "com.apple.settings.screenTime",
++        "label" : "Screen Time",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 243.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 304.99999999999989
++        },
++        "identifier" : "com.apple.settings.passcodeAndBiometrics",
++        "label" : "Passcode",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 330.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 356.99999999999989
++        },
++        "identifier" : "com.apple.settings.sos",
++        "label" : "Emergency SOS",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 382.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 408.99999999999989
++        },
++        "identifier" : "com.apple.settings.privacyAndSecurity",
++        "label" : "Privacy & Security",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 434.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 495.99999999999989
++        },
++        "identifier" : "com.apple.settings.gameCenter",
++        "label" : "Game Center",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 521.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 547.99999999999989
++        },
++        "identifier" : "com.apple.settings.iCloud",
++        "label" : "iCloud",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 573.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 599.99999999999989
++        },
++        "identifier" : "com.apple.settings.walletAndApplePay",
++        "label" : "Wallet & Apple Pay",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 625.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 686.99999999999989
++        },
++        "identifier" : "com.apple.settings.apps",
++        "label" : "Apps",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 712.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 773.99999999999989
++        },
++        "identifier" : "com.apple.settings.developer",
++        "label" : "Developer",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 799.99999999999989
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 28,
++          "width" : 374,
++          "x" : 28,
++          "y" : 866
++        },
++        "identifier" : "",
++        "label" : "Search",
++        "role" : "element",
++        "traits" : 146029151232,
++        "value" : "Search",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 880
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 22,
++          "width" : 17.333333333333314,
++          "x" : 369.66666666666669,
++          "y" : 869
++        },
++        "identifier" : "Dictate",
++        "label" : "Dictate",
++        "role" : "button",
++        "traits" : 8589934593,
++        "value" : "",
++        "visible" : 1,
++        "x" : 378.33333333333337,
++        "y" : 879.83333333333337
++      }
++    ],
++    "pid" : 629,
++    "source" : "ax",
++    "truncated" : false
++  }
++}
+diff --git a/Research/Guest/SettingsRows/Evidence-20261007/rollback-root-top.json b/Research/Guest/SettingsRows/Evidence-20261007/rollback-root-top.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..005efe68dc34e462339eafa2358d975d0570e345
+--- /dev/null
++++ b/Research/Guest/SettingsRows/Evidence-20261007/rollback-root-top.json
+@@ -0,0 +1,263 @@
++{
++  "ok" : true,
++  "result" : {
++    "count" : 14,
++    "elements" : [
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 40.666666666666671,
++          "width" : 133,
++          "x" : 20,
++          "y" : 116.66666666666667
++        },
++        "identifier" : "",
++        "label" : "Settings",
++        "role" : "element",
++        "traits" : 8590000128,
++        "value" : "",
++        "visible" : 1,
++        "x" : 86.5,
++        "y" : 137
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 90.333333333333314,
++          "width" : 390,
++          "x" : 20,
++          "y" : 165
++        },
++        "identifier" : "com.apple.settings.primaryAppleAccount",
++        "label" : "Apple Account, Sign in to access your iCloud data, the App Store, Apple services and more.",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 210.16666666666666
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 290.33333333333331
++        },
++        "identifier" : "com.apple.settings.airplaneMode",
++        "label" : "Airplane Mode",
++        "role" : "button",
++        "traits" : 9007207844675649,
++        "value" : "0",
++        "visible" : 1,
++        "x" : 360.5,
++        "y" : 316.33333333333331
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 342.33333333333337
++        },
++        "identifier" : "com.apple.settings.wifi",
++        "label" : "Wi-Fi, Off",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 368.33333333333337
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 394.33333333333337
++        },
++        "identifier" : "com.apple.settings.ethernet",
++        "label" : "Ethernet",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 420.33333333333337
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 446.33333333333331
++        },
++        "identifier" : "com.apple.settings.bluetooth",
++        "label" : "Bluetooth, On",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 472.33333333333331
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 51.999999999999943,
++          "width" : 390,
++          "x" : 20,
++          "y" : 498.33333333333331
++        },
++        "identifier" : "com.apple.settings.battery",
++        "label" : "Battery",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 524.33333333333326
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 585.33333333333326
++        },
++        "identifier" : "com.apple.settings.general",
++        "label" : "General",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 611.33333333333326
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 637.33333333333326
++        },
++        "identifier" : "com.apple.settings.accessibility",
++        "label" : "Accessibility",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 663.33333333333326
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 689.33333333333337
++        },
++        "identifier" : "com.apple.settings.actionButton",
++        "label" : "Action Button",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 715.33333333333337
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 741.33333333333337
++        },
++        "identifier" : "com.apple.settings.appearance",
++        "label" : "Appearance",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 767.33333333333337
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 793.33333333333337
++        },
++        "identifier" : "com.apple.settings.camera",
++        "label" : "Camera",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 819.33333333333337
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 28,
++          "width" : 374,
++          "x" : 28,
++          "y" : 866
++        },
++        "identifier" : "",
++        "label" : "Search",
++        "role" : "element",
++        "traits" : 146029151232,
++        "value" : "Search",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 880
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 22,
++          "width" : 17.333333333333314,
++          "x" : 369.66666666666669,
++          "y" : 869
++        },
++        "identifier" : "Dictate",
++        "label" : "Dictate",
++        "role" : "button",
++        "traits" : 8589934593,
++        "value" : "",
++        "visible" : 1,
++        "x" : 378.33333333333337,
++        "y" : 879.83333333333337
++      }
++    ],
++    "pid" : 629,
++    "source" : "ax",
++    "truncated" : false
++  }
++}
+diff --git a/Research/Guest/SettingsRows/Evidence-20261007/software-update-rollback-ui.json b/Research/Guest/SettingsRows/Evidence-20261007/software-update-rollback-ui.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..5cc5db132fe68fd289e15c971ecc9405bc2a569a
+--- /dev/null
++++ b/Research/Guest/SettingsRows/Evidence-20261007/software-update-rollback-ui.json
+@@ -0,0 +1,227 @@
++{
++  "ok" : true,
++  "result" : {
++    "count" : 12,
++    "elements" : [
++      {
++        "clickable" : false,
++        "enabled" : true,
++        "frame" : {
++          "height" : 26.333333333333314,
++          "width" : 80,
++          "x" : 40,
++          "y" : 238
++        },
++        "identifier" : "",
++        "label" : "General",
++        "role" : "text",
++        "traits" : 8590000192,
++        "value" : "",
++        "visible" : 1,
++        "x" : 80,
++        "y" : 251.16666666666666
++      },
++      {
++        "clickable" : false,
++        "enabled" : true,
++        "frame" : {
++          "height" : 64.333333333333314,
++          "width" : 344.66666666666663,
++          "x" : 40,
++          "y" : 268.33333333333331
++        },
++        "identifier" : "",
++        "label" : "Manage your overall setup and preferences for iPhone, such as software updates, device language, CarPlay, AirDrop and more.",
++        "role" : "text",
++        "traits" : 8590000192,
++        "value" : "",
++        "visible" : 1,
++        "x" : 212.33333333333331,
++        "y" : 300.5
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 382.66666666666669
++        },
++        "identifier" : "com.apple.settings.general.about",
++        "label" : "About",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 408.66666666666669
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 434.66666666666669
++        },
++        "identifier" : "com.apple.settings.general.softwareUpdate",
++        "label" : "Software Update",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 460.66666666666669
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52.000000000000057,
++          "width" : 390,
++          "x" : 20,
++          "y" : 486.66666666666669
++        },
++        "identifier" : "com.apple.settings.general.deviceStorage",
++        "label" : "iPhone Storage",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 512.66666666666674
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 573.66666666666674
++        },
++        "identifier" : "com.apple.settings.general.appleCareAndWarranty",
++        "label" : "AppleCare & Warranty",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 599.66666666666674
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 660.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.airDrop",
++        "label" : "AirDrop",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 686.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 712.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.airPlayAndContinuity",
++        "label" : "AirPlay & Continuity",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 738.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 764.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.pictureInPicture",
++        "label" : "Picture in Picture",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 790.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 816.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.screenCapture",
++        "label" : "Screen Capture",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 842.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 52,
++          "width" : 390,
++          "x" : 20,
++          "y" : 868.66666666666663
++        },
++        "identifier" : "com.apple.settings.general.carPlay",
++        "label" : "CarPlay",
++        "role" : "button",
++        "traits" : 8589934657,
++        "value" : "",
++        "visible" : 1,
++        "x" : 215,
++        "y" : 894.66666666666663
++      },
++      {
++        "clickable" : true,
++        "enabled" : true,
++        "frame" : {
++          "height" : 44,
++          "width" : 44,
++          "x" : 20,
++          "y" : 59
++        },
++        "identifier" : "BackButton",
++        "label" : "Settings",
++        "role" : "button",
++        "traits" : 8724152321,
++        "value" : "",
++        "visible" : 1,
++        "x" : 42,
++        "y" : 81
++      }
++    ],
++    "pid" : 385,
++    "source" : "ax",
++    "truncated" : false
++  }
++}
+diff --git a/Research/Guest/SettingsRows/Evidence-20261007/software-update-undo-stamped.json b/Research/Guest/SettingsRows/Evidence-20261007/software-update-undo-stamped.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..dbbd2a66930ecf8cc0a68231e08f1c8d2c8c0634
+--- /dev/null
++++ b/Research/Guest/SettingsRows/Evidence-20261007/software-update-undo-stamped.json
+@@ -0,0 +1 @@
++{"Records":[{"FileOffset":23494832,"Original":"QQEAVA==","VMA":9154494640,"PatchID":"dyld-exp-settings-software-update-row","Chunk":"dyld_shared_cache_arm64e.36"}]}
+\ No newline at end of file
+diff --git a/Research/Guest/SettingsRows/GameCenterStandalonePatch.swift b/Research/Guest/SettingsRows/GameCenterStandalonePatch.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..1559a2f778be4071512e57c643dc815eef453a3b
+--- /dev/null
++++ b/Research/Guest/SettingsRows/GameCenterStandalonePatch.swift
+@@ -0,0 +1,123 @@
++import Foundation
++struct InvalidImage: Error, CustomStringConvertible { let description: String }
++struct Image {
++ let data: Data
++ struct Segment { let va: UInt64; let size: UInt64; let file: Int }
++ struct Section { let name: String; let va: UInt64; let size: Int; let file: Int }
++ var segments: [Segment] = []
++ var sections: [Section] = []
++ var starts: Set<UInt64> = []
++ func check(_ p:Int,_ n:Int) throws { guard p>=0,n>=0,p<=data.count,n<=data.count-p else {throw InvalidImage(description:"out of bounds \(p), \(n)")} }
++ func word(_ p:Int) throws -> UInt32 {try check(p,4);return data.withUnsafeBytes{UInt32(littleEndian:$0.loadUnaligned(fromByteOffset:p,as:UInt32.self))}}
++ func quad(_ p:Int) throws -> UInt64 {try check(p,8);return data.withUnsafeBytes{UInt64(littleEndian:$0.loadUnaligned(fromByteOffset:p,as:UInt64.self))}}
++ func name(_ p:Int,_ max:Int=512) throws -> String {try check(p,1);let end=min(data.count,p+max);guard let z=data[p..<end].firstIndex(of:0) else {throw InvalidImage(description:"unterminated string")};return String(decoding:data[p..<z],as:UTF8.self)}
++ func offset(_ va:UInt64) throws -> Int {guard let s=segments.first(where:{va >= $0.va && va-$0.va < $0.size}) else {throw InvalidImage(description:"unmapped VA")};let p=s.file+Int(va-s.va);try check(p,1);return p}
++ func relative(_ va:UInt64) throws -> UInt64 {let delta=Int64(Int32(bitPattern:try word(offset(va))));let value=Int64(va)+delta;guard value>=0 else{throw InvalidImage(description:"negative address")};return UInt64(value)}
++ init(_ data:Data) throws {
++  self.data=data
++  guard try word(0)==0xfeedfacf,try word(4)==0x0100000c else{throw InvalidImage(description:"expected ARM64 Mach-O")}
++  let end=32+Int(try word(20));try check(32,end-32)
++  var p=32; var fs:(Int,Int)?
++  for _ in 0..<(try word(16)) {
++   let cmd=try word(p), n=Int(try word(p+4));guard n>=8,p+n<=end else{throw InvalidImage(description:"bad load command")}
++   if cmd==0x19 {
++    guard n>=72 else{throw InvalidImage(description:"short segment")}
++    let count=Int(try word(p+64));guard count<=(n-72)/80 else{throw InvalidImage(description:"short sections")}
++    let file=Int(try quad(p+40)),size=try quad(p+48);try check(file,Int(size))
++    segments.append(Segment(va:try quad(p+24),size:size,file:file))
++    for i in 0..<count {let s=p+72+i*80;sections.append(Section(name:String(decoding:data[s..<s+16].prefix(while:{$0 != 0}),as:UTF8.self),va:try quad(s+32),size:Int(try quad(s+40)),file:Int(try word(s+48))))}
++   }
++   if cmd==0x26 {guard n>=16 else{throw InvalidImage(description:"short function starts")};fs=(Int(try word(p+8)),Int(try word(p+12)))}
++   p+=n
++  }
++  if let (at,size)=fs,let text=sections.first(where:{$0.name=="__text"}),let base=segments.first(where:{text.va >= $0.va && text.va-$0.va < $0.size})?.va {
++   try check(at,size); var cur=at;var va=base
++   while cur<at+size {var value:UInt64=0;var shift=0;var byte:UInt8
++    repeat {guard cur<at+size,shift<63 else{throw InvalidImage(description:"bad ULEB")};byte=data[cur];cur+=1;value|=UInt64(byte&127)<<shift;shift+=7} while byte&128 != 0
++    if value==0{break};va+=value;starts.insert(va)
++   }
++  }
++ }
++ func resolve() throws {
++  guard let proto=sections.first(where:{$0.name=="__swift5_proto"}) else{throw InvalidImage(description:"no conformances")}
++  for i in stride(from:0,to:proto.size,by:4) {
++   let c=try relative(proto.va+UInt64(i));let cp=try offset(c);let flags=try word(cp+12)
++   // Only non-generic direct nominal references without conditional trailing records.
++   guard (flags>>3)&7==0,flags&0xff00==0,flags&0x10000 != 0 else{continue}
++   let type=try relative(c+4),tp=try offset(type);guard try word(tp)&0x80==0 else{continue}
++   let typeName=try name(offset(relative(type+8)));guard typeName.contains("Provider") else{continue}
++   let count=Int(try word(cp+16));guard count<=64 else{throw InvalidImage(description:"invalid witness count")}
++   try check(cp+20,count*8)
++   var functions:[String]=[]
++   for slot in 0..<count {let impl=try relative(c+UInt64(24+slot*8));if starts.contains(impl){functions.append(String(format:"%d:0x%llx",slot,impl))}}
++   print(typeName,functions.joined(separator:" "))
++  }
++ }
++}
++
++import VPhonePatchKit
++import CryptoKit
++guard CommandLine.arguments.count == 3 else {fputs("usage: gamecenter-patch input output\n",stderr);exit(1)}
++let input=try Data(contentsOf:URL(fileURLWithPath:CommandLine.arguments[1]))
++let digest=SHA256.hash(data:input).map{String(format:"%02x",$0)}.joined()
++guard digest == "e59851f14f29409590a6de76ca2fe9b9912341aee526a278692ef0d7a86ee2f3" else {fputs("unreviewed input hash\n",stderr);exit(1)}
++let image=try Image(input)
++// Resolve the named import through LC_SYMTAB, LC_DYSYMTAB and pointer sections.
++// No exported r2 JSON or absolute GOT address is part of the patch input.
++var sym:(Int,Int,Int,Int)?
++var indirect:(Int,Int)?
++var pointerSections:[(UInt64,Int,Int)]=[]
++var command=32
++for _ in 0..<(try image.word(16)) {
++ let kind=try image.word(command),size=Int(try image.word(command+4))
++ if kind==2 {try image.check(command,24);sym=(Int(try image.word(command+8)),Int(try image.word(command+12)),Int(try image.word(command+16)),Int(try image.word(command+20)))}
++ if kind==0xb {try image.check(command,80);indirect=(Int(try image.word(command+56)),Int(try image.word(command+60)))}
++ if kind==0x19 {
++  let count=Int(try image.word(command+64))
++  for i in 0..<count {let section=command+72+i*80;let flags=try image.word(section+64)&0xff
++   if flags==6 || flags==7 {pointerSections.append((try image.quad(section+32),Int(try image.quad(section+40))/8,Int(try image.word(section+68))))}
++  }
++ }
++ command+=size
++}
++guard let (symbols,symbolCount,strings,stringSize)=sym,let (indirectOffset,indirectCount)=indirect else {fputs("missing symbol tables\n",stderr);exit(1)}
++try image.check(symbols,symbolCount*16);try image.check(strings,stringSize);try image.check(indirectOffset,indirectCount*4)
++var targets:[UInt64]=[]
++for (base,count,first) in pointerSections {
++ guard first<=indirectCount,count<=indirectCount-first else{throw InvalidImage(description:"indirect section out of bounds")}
++ for slot in 0..<count {
++  let symbol=try image.word(indirectOffset+(first+slot)*4)
++  if symbol&0xc0000000 != 0 {continue}
++  guard symbol<symbolCount else{throw InvalidImage(description:"bad symbol index")}
++  let nameOffset=Int(try image.word(symbols+Int(symbol)*16))
++  guard nameOffset<stringSize else{throw InvalidImage(description:"bad symbol name offset")}
++  if try image.name(strings+nameOffset,stringSize-nameOffset)=="_MCFeatureGameCenterAllowed" {targets.append(base+UInt64(slot*8))}
++ }
++}
++guard targets.count==1 else {fputs("ambiguous named import\n",stderr);exit(1)}
++let got=targets[0]
++print("resolved MCFeatureGameCenterAllowed GOT",String(format:"0x%llx",got))
++let text=image.sections.first{$0.name=="__text"}!
++let decoder=ARM64Disassembler()
++let code=decoder.disassemble(Data(image.data[text.file..<text.file+text.size]),at:text.va)
++var candidates:[(Int,Int,UInt32)]=[]
++for i in 8..<code.count {
++ let a=code[i-1],l=code[i]
++ guard a.mnemonic=="adrp",l.mnemonic=="ldr",let ao=a.detail?.operands,let lo=l.detail?.operands,ao.count==2,lo.count==2,ao[1].type == .immediate,lo[1].type == .memory,ao[0].reg==lo[1].mem.base,UInt64(ao[1].imm)+UInt64(lo[1].mem.disp)==got else{continue}
++ let tag=code[i-4],call=code[i-3],store=code[i-7],arg0=code[i-6]
++ guard tag.mnemonic=="mov",let t=tag.detail?.operands,t.count==2,t[0].reg == .w(2),t[1].imm==8,call.mnemonic=="bl",store.mnemonic=="strb",let so=store.detail?.operands,so.count==2,so[1].type == .memory,so[1].mem.disp==0,arg0.mnemonic=="mov",let args=arg0.detail?.operands,args.count==2,args[0].reg == .x(0),args[1].reg==so[1].mem.base else{continue}
++ guard let rn=(0..<31).first(where:{so[1].mem.base == .x($0)}) else{continue}
++ candidates.append((i-7,i-4,UInt32(rn)))
++}
++guard candidates.count==1 else{fatalError("expected one construction block, got \(candidates.count)")}
++let (s,t,rn)=candidates[0]
++let changes=[(code[s],ARM64Encoder.encodeStrXUnsignedOffset(rt:31,rn:rn,offset:0)!), (code[t],ARM64Encoder.encodeMovzW(rd:2,imm16:2)!)]
++var out=image.data
++for (before,bytes) in changes {
++ let after=decoder.disassembleOne(bytes,at:before.address)!
++ print("REVIEW",before.description,"->",after.description)
++ let off=try image.offset(before.address);out.replaceSubrange(off..<off+4,with:bytes)
++}
++// Experimental copy only; no signing, guest writes or installer integration.
++try out.write(to:URL(fileURLWithPath:CommandLine.arguments[2]),options:.withoutOverwriting)
++print("sha256",SHA256.hash(data:out).map{String(format:"%02x",$0)}.joined())
+diff --git a/Research/Guest/SettingsRows/README.md b/Research/Guest/SettingsRows/README.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..0bee074c3e33f8ae96a3169189bfcf90746b6e71
+--- /dev/null
++++ b/Research/Guest/SettingsRows/README.md
+@@ -0,0 +1,23 @@
++# Settings row patch research tools
++
++These standalone Swift research tools reproduce the tested 24A435 Preferences edits. The combined library is now wired into the installer and patch catalogue; these standalone research scripts are not shipping commands. Indexing is excluded. No tool writes to a guest or signs a file.
++
++Both compile against the repository's built VPhonePatchKit.framework. ReviewedProviderPatch takes an original Mach-O path, explicit `--providers` (comma separated), and a new `--output` path. It accepts only the reviewed Preferences/GeneralSettingsUI hashes, checks the hash before parsing, resolves Swift resilient witnesses and instruction structure, and refuses missing/ambiguous providers or existing output. GameCenterStandalonePatch takes original Preferences and a new output path; it resolves MCFeatureGameCenterAllowed from native symbol/indirect-pointer tables rather than an external disassembler export.
++
++Use the original image for each tool. Game Center and the three provider edits must be combined as non-overlapping diffs against that same original before signing. The deployed combined candidate has been verified independently; these tools do not yet provide a combined installer command. The GeneralSettingsUI output is an extracted analysis image and must never be installed as a dyld cache file.
++
++Validation on 2026-10-07:
++- Native-symbol Game Center output matches the previously deployed rule-edit candidate byte for byte.
++- ReviewedProviderPatch output for Apple Account, iCloud and Wallet matches Preferences.review-v3 byte for byte.
++- Missing arguments, truncated/unreviewed input, excluded Indexing provider, provider absent from the input, and output overwrite are refused.
++- Live four-row deployment, rollback, and full reboot evidence is recorded in ../settings_app_row_hiding.md.
++
++Five-row live deployment, rollback and reboot validation are complete. Software Update is now integrated as `dyld-exp-settings_software_update_row` using native cache discovery and the standard undo log. No new Bundle release was requested or published.
++
++## Combined library implementation
++
++`FirmwarePatcher/CustomFirmware/ExecutablePatches/SettingsRows/CustomFirmwareSettingsRows.swift` now exposes `patchPreferences(_:)`. It performs all four root-row transformations in memory and returns five instruction records with their original and replacement bytes. Discovery and overlap checks finish before output is returned. It accepts only the reviewed original Preferences image, so callers must use their pristine backup rather than a previously signed or patched image.
++
++The combined result was compiled in Swift 6 mode with warnings as errors, matched the tested unsigned combined candidate byte for byte, rejected empty/truncated/already-patched input, and restored the original byte for byte using its edit records. The library is called by `cfw patch-settings-root-rows` through the common Mach-O installer and declared as `system-preferences-exp-root_rows`; standard blocks it. Full source build and command dry-run/real-output equality pass. Xcode catalogue and regression tests are being verified separately.
++
++Final validation: 52 Xcode tests passed; complete Release CLI build passed. Software Update command dry-run, apply, repeat and standard revert reproduce the field-tested bytes. See ../2026-10-07_reverse-settings-rows-report.md.
+diff --git a/Research/Guest/SettingsRows/ReviewedProviderPatch.swift b/Research/Guest/SettingsRows/ReviewedProviderPatch.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..66407fae0e07c33a1999e32d56a8f41e468842d9
+--- /dev/null
++++ b/Research/Guest/SettingsRows/ReviewedProviderPatch.swift
+@@ -0,0 +1,138 @@
++import Foundation
++import CryptoKit
++struct InvalidImage: Error, CustomStringConvertible { let description: String }
++struct Image {
++ let data: Data
++ struct Segment { let va: UInt64; let size: UInt64; let file: Int }
++ struct Section { let name: String; let va: UInt64; let size: Int; let file: Int }
++ var segments: [Segment] = []
++ var sections: [Section] = []
++ var starts: Set<UInt64> = []
++ func check(_ p:Int,_ n:Int) throws { guard p>=0,n>=0,p<=data.count,n<=data.count-p else {throw InvalidImage(description:"out of bounds \(p), \(n)")} }
++ func word(_ p:Int) throws -> UInt32 {try check(p,4);return data.withUnsafeBytes{UInt32(littleEndian:$0.loadUnaligned(fromByteOffset:p,as:UInt32.self))}}
++ func quad(_ p:Int) throws -> UInt64 {try check(p,8);return data.withUnsafeBytes{UInt64(littleEndian:$0.loadUnaligned(fromByteOffset:p,as:UInt64.self))}}
++ func name(_ p:Int,_ max:Int=512) throws -> String {try check(p,1);let end=min(data.count,p+max);guard let z=data[p..<end].firstIndex(of:0) else {throw InvalidImage(description:"unterminated string")};return String(decoding:data[p..<z],as:UTF8.self)}
++ func offset(_ va:UInt64) throws -> Int {guard let s=segments.first(where:{va >= $0.va && va-$0.va < $0.size}) else {throw InvalidImage(description:"unmapped VA")};let p=s.file+Int(va-s.va);try check(p,1);return p}
++ func relative(_ va:UInt64) throws -> UInt64 {let delta=Int64(Int32(bitPattern:try word(offset(va))));let value=Int64(va)+delta;guard value>=0 else{throw InvalidImage(description:"negative address")};return UInt64(value)}
++ init(_ data:Data) throws {
++  self.data=data
++  guard try word(0)==0xfeedfacf,try word(4)==0x0100000c else{throw InvalidImage(description:"expected ARM64 Mach-O")}
++  let end=32+Int(try word(20));try check(32,end-32)
++  var p=32; var fs:(Int,Int)?
++  for _ in 0..<(try word(16)) {
++   let cmd=try word(p), n=Int(try word(p+4));guard n>=8,p+n<=end else{throw InvalidImage(description:"bad load command")}
++   if cmd==0x19 {
++    guard n>=72 else{throw InvalidImage(description:"short segment")}
++    let count=Int(try word(p+64));guard count<=(n-72)/80 else{throw InvalidImage(description:"short sections")}
++    let file=Int(try quad(p+40)),size=try quad(p+48);try check(file,Int(size))
++    segments.append(Segment(va:try quad(p+24),size:size,file:file))
++    for i in 0..<count {let s=p+72+i*80;sections.append(Section(name:String(decoding:data[s..<s+16].prefix(while:{$0 != 0}),as:UTF8.self),va:try quad(s+32),size:Int(try quad(s+40)),file:Int(try word(s+48))))}
++   }
++   if cmd==0x26 {guard n>=16 else{throw InvalidImage(description:"short function starts")};fs=(Int(try word(p+8)),Int(try word(p+12)))}
++   p+=n
++  }
++  if let (at,size)=fs,let text=sections.first(where:{$0.name=="__text"}),let base=segments.first(where:{text.va >= $0.va && text.va-$0.va < $0.size})?.va {
++   try check(at,size); var cur=at;var va=base
++   while cur<at+size {var value:UInt64=0;var shift=0;var byte:UInt8
++    repeat {guard cur<at+size,shift<63 else{throw InvalidImage(description:"bad ULEB")};byte=data[cur];cur+=1;value|=UInt64(byte&127)<<shift;shift+=7} while byte&128 != 0
++    if value==0{break};va+=value;starts.insert(va)
++   }
++  }
++ }
++ func resolve() throws {
++  guard let proto=sections.first(where:{$0.name=="__swift5_proto"}) else{throw InvalidImage(description:"no conformances")}
++  for i in stride(from:0,to:proto.size,by:4) {
++   let c=try relative(proto.va+UInt64(i));let cp=try offset(c);let flags=try word(cp+12)
++   // Only non-generic direct nominal references without conditional trailing records.
++   guard (flags>>3)&7==0,flags&0xff00==0,flags&0x10000 != 0 else{continue}
++   let type=try relative(c+4),tp=try offset(type);guard try word(tp)&0x80==0 else{continue}
++   let typeName=try name(offset(relative(type+8)));guard typeName.contains("Provider") else{continue}
++   let count=Int(try word(cp+16));guard count<=64 else{throw InvalidImage(description:"invalid witness count")}
++   try check(cp+20,count*8)
++   var functions:[String]=[]
++   for slot in 0..<count {let impl=try relative(c+UInt64(24+slot*8));if starts.contains(impl){functions.append(String(format:"%d:0x%llx",slot,impl))}}
++   print(typeName,functions.joined(separator:" "))
++  }
++ }
++}
++
++import VPhonePatchKit
++let decoder=ARM64Disassembler()
++func instructions(_ image:Image,_ va:UInt64) throws -> [ARM64Instruction] {
++ let end=image.starts.filter{$0>va}.min() ?? va
++ guard end>va,end-va<20000 else{return []}
++ let off=try image.offset(va);try image.check(off,Int(end-va))
++ return decoder.disassemble(Data(image.data[off..<off+Int(end-va)]),at:va)
++}
++do {
++ guard CommandLine.arguments.count>1 else{throw InvalidImage(description:"input path required")}
++ let path=CommandLine.arguments[1]
++ let input=try Data(contentsOf:URL(fileURLWithPath:path))
++ let inputHash=SHA256.hash(data:input).map{String(format:"%02x",$0)}.joined()
++ let reviewedInputs:Set<String>=["e59851f14f29409590a6de76ca2fe9b9912341aee526a278692ef0d7a86ee2f3","e43fa27956007aef6180570b242e3b08bb2030841121d13ac8671ec9f8480dd1"]
++ guard reviewedInputs.contains(inputHash) else{throw InvalidImage(description:"unreviewed input hash; parsing and output refused")}
++ let image=try Image(input)
++ guard let proto=image.sections.first(where:{$0.name=="__swift5_proto"}) else{throw InvalidImage(description:"missing conformance section")}
++ var sites:[String:[(UInt64,Data)]]=[:]
++ let wanted:Set<String>=["PrimaryAppleAccountListItemProvider","iCloudListItemProvider","WalletAndApplePayOrPaymentAndContactlessListItemProvider","SoftwareUpdateListItemProvider"]
++ for i in stride(from:0,to:proto.size,by:4) {
++  let c=try image.relative(proto.va+UInt64(i));let cp=try image.offset(c);let flags=try image.word(cp+12)
++  guard (flags>>3)&7==0,flags&0xff00==0,flags&0x10000 != 0 else{continue}
++  let t=try image.relative(c+4);let name=try image.name(image.offset(image.relative(t+8)));guard wanted.contains(name) else{continue}
++  let n=Int(try image.word(cp+16));guard n<=64 else{throw InvalidImage(description:"witness overflow")}
++  for slot in 0..<n {
++   let impl=try image.relative(c+UInt64(24+slot*8));guard image.starts.contains(impl) else{continue}
++   let wrapper=try instructions(image,impl)
++   for call in wrapper where call.mnemonic=="bl" {
++    guard let op=call.detail?.operands.first,op.type == .immediate,op.imm>0,image.starts.contains(UInt64(op.imm)) else{continue}
++    let body=try instructions(image,UInt64(op.imm))
++    for k in 1..<body.count {
++     let prev=body[k-1],branch=body[k]
++     guard prev.mnemonic=="cmp",let ops=prev.detail?.operands,ops.count==2,ops[0].type == .register,ops[0].reg == .w(0),ops[1].type == .immediate,ops[1].imm==1,branch.mnemonic=="b.ne" else{continue}
++     guard k>=2,body[k-2].mnemonic=="blraa",
++           let dest=branch.detail?.operands.first,dest.type == .immediate,
++           dest.imm>Int64(branch.address),let end=body.firstIndex(where:{$0.address==UInt64(dest.imm)}),
++           end>k,end-k<=40 else {continue}
++     let fallthroughBlock=Array(body[(k+1)..<end].prefix(while:{$0.mnemonic != "b" && !$0.isReturn}))
++     guard fallthroughBlock.contains(where:{$0.mnemonic=="bl"}),
++           k+1+fallthroughBlock.count < end,body[k+1+fallthroughBlock.count].mnemonic=="b" else {
++      print("REJECT",name,branch.description,"no cleanup call before merge")
++      continue
++     }
++     guard let replacement=ARM64Encoder.encodeB(from:Int(branch.address),to:Int(branch.address+4)),
++           let decoded=decoder.disassembleOne(replacement,at:branch.address),decoded.mnemonic=="b",
++           decoded.detail?.operands.first?.imm==Int64(branch.address+4) else {throw InvalidImage(description:"encoder round trip failed")}
++     sites[name,default:[]].append((branch.address,replacement))
++     print(name,"witness",String(format:"0x%llx",impl),"body",String(format:"0x%llx",UInt64(op.imm)),"CANDIDATE",branch.description)
++     for x in body[k..<min(k+9,body.count)] {print("  ",x.description)}
++    }
++   }
++  }
++ }
++ for (name,matches) in sites.sorted(by:{$0.key<$1.key}) {
++  guard matches.count==1 else {throw InvalidImage(description:"ambiguous sites for \(name)")}
++  print("UNIQUE STRUCTURAL CANDIDATE",name,String(format:"0x%llx",matches[0].0),"replacement",matches[0].1.map{String(format:"%02x",$0)}.joined())
++ }
++ if let outIndex=CommandLine.arguments.firstIndex(of:"--output") {
++  guard outIndex+1<CommandLine.arguments.count else {throw InvalidImage(description:"--output requires path")}
++  let out=CommandLine.arguments[outIndex+1]
++  guard !FileManager.default.fileExists(atPath:out),!FileManager.default.fileExists(atPath:out+".json") else{throw InvalidImage(description:"output already exists")}
++  guard let selectIndex=CommandLine.arguments.firstIndex(of:"--providers"),selectIndex+1<CommandLine.arguments.count else{throw InvalidImage(description:"explicit --providers required")}
++  let selected=Set(CommandLine.arguments[selectIndex+1].split(separator:",").map(String.init))
++  guard !selected.isEmpty,selected.isSubset(of:wanted) else{throw InvalidImage(description:"unknown provider")}
++  let hash=SHA256.hash(data:image.data).map{String(format:"%02x",$0)}.joined()
++  let known:Set<String>=["e59851f14f29409590a6de76ca2fe9b9912341aee526a278692ef0d7a86ee2f3","e43fa27956007aef6180570b242e3b08bb2030841121d13ac8671ec9f8480dd1"]
++  guard known.contains(hash) else{throw InvalidImage(description:"unreviewed input hash; no output written")}
++  var output=image.data;var changes:[[String:Any]]=[]
++  for name in selected.sorted() {
++   guard let matches=sites[name],matches.count==1 else{throw InvalidImage(description:"missing or ambiguous provider \(name)")}
++   let (va,replacement)=matches[0];let off=try image.offset(va)
++   changes.append(["provider":name,"va":String(format:"0x%llx",va),"fileOffset":off,"before":output[off..<off+4].map{String(format:"%02x",$0)}.joined(),"after":replacement.map{String(format:"%02x",$0)}.joined()])
++   output.replaceSubrange(off..<off+4,with:replacement)
++  }
++  let manifest:[String:Any]=["status":"EXPERIMENTAL_NOT_DEPLOYMENT_APPROVED","inputSHA256":hash,"outputSHA256":SHA256.hash(data:output).map{String(format:"%02x",$0)}.joined(),"changes":changes,"signature":"invalidated; not re-signed","limitations":"Game Center unsupported. Extracted cache dylib is analysis-only. Runtime semantics and rollback unverified."]
++  try output.write(to:URL(fileURLWithPath:out),options:.withoutOverwriting)
++  try JSONSerialization.data(withJSONObject:manifest,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:out+".json"),options:.withoutOverwriting)
++  print("EXPERIMENTAL COPY",out)
++ }
++} catch {fputs("ERROR: \(error)\n",stderr);exit(1)}
+diff --git a/Research/Guest/ota_software_update_block.md b/Research/Guest/ota_software_update_block.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6f939cd5cb71cea7d4464689b581bb695eff1eb
+--- /dev/null
++++ b/Research/Guest/ota_software_update_block.md
+@@ -0,0 +1,138 @@
++# Blocking OTA software updates on a guest
++
++How to stop a vphone guest from ever checking for, downloading, or installing
++an iOS OTA update — the update that would try to replace the research firmware.
++Measured live on 2026-10-06 on `panetest-iphone` (iPhone17,3 iOS 27.0 (24A435),
++cloudOS 26.4, bundle 2.6.0-local.92448989), driven over vphoned
++(`vphone-launchpad-cli guest rpc <name> …`).
++
++## TL;DR
++
++Disable the three software-update launch daemons with `services.disable`
++(persists in the data-volume launchd override DB) and reboot. After the reboot
++none of them load, and Settings › General › Software Update shows **"Unable to
++Check for Update."** No binary patch, no system-volume write.
++
++| Daemon | role | action |
++| --- | --- | --- |
++| `com.apple.mobile.softwareupdated` | OTA check / download engine | disable |
++| `com.apple.softwareupdateservicesd` | the scan the Settings pane drives | disable |
++| `com.apple.OTATaskingAgent` | schedules background OTA tasks | disable |
++
++Leave `com.apple.mobileassetd` **enabled** — it serves many non-OTA assets
++(dictionaries, keyboards, Siri, fonts); disabling it breaks unrelated features.
++Leave `akd` alone.
++
++## The daemons and why these three
++
++`services.list` on the guest, filtered to update machinery, shows the OTA set
++running on a fresh boot:
++
++```
++pid 61  com.apple.mobile.softwareupdated
++pid 439 com.apple.softwareupdateservicesd
++pid 397 com.apple.OTATaskingAgent
++pid 92  com.apple.OTACrashCopier                       # copies crash logs post-OTA; harmless
++pid 373 com.apple.MobileSoftwareUpdate.CleanupPreparePathService
++pid 118 com.apple.mobileassetd                         # NOT OTA-only — leave enabled
++```
++
++- `softwareupdated` is the engine that checks for and downloads the OTA, and
++  posts the "update available" badge.
++- `softwareupdateservicesd` is what the Settings pane and MDM drive to scan.
++- `OTATaskingAgent` schedules the background automatic-update work.
++
++Disabling those three removes both the automatic path and the manual scan. The
++Settings pane launches `softwareupdateservicesd` on demand; with it disabled
++launchd will not start it, so the pane errors instead of scanning — the desired
++"blocked" surface.
++
++## The recipe (measured)
++
++```sh
++G=panetest-iphone
++for L in com.apple.mobile.softwareupdated \
++         com.apple.softwareupdateservicesd \
++         com.apple.OTATaskingAgent; do
++  vphone-launchpad-cli guest rpc $G services.disable "{\"label\":\"$L\",\"force\":true}"
++done
++vphone-launchpad-cli vm stop  $G
++vphone-launchpad-cli vm start $G --wait
++```
++
++`services.disable` → `launchctl disable`, which writes the override to
++`/var/db/com.apple.xpc.launchd/` on the **data volume** — writable and durable,
++no system-volume (sealed) write needed. `services.disabled` reads the three back
++as `true`.
++
++**`services.stop` does not work here** and is not needed: it returns
++`launchd status 144` ("stop requires launchctl service-configure privilege"),
++and so do `unload` / `remove` / `start`. The running daemons therefore keep
++running (and KeepAlive-respawn after a `processes.kill`) for the rest of the
++current boot; the reboot is the clean stop. `disable` itself does **not** hit
++the 144 wall.
++
++### What was measured
++
++| Check | Result |
++| --- | --- |
++| `services.disabled` after disabling the three | all three `true` |
++| same boot, `processes.list` | still running (KeepAlive; `stop`/`unload` blocked by priv 144) |
++| after a full reboot, `processes.list {softwareupdate}` / `{OTATasking}` | **empty** — none load |
++| after a full reboot, `services.disabled` | all three still `true` (override DB persisted) |
++| Settings › General › Software Update (post-reboot) | **"Unable to Check for Update — An error occurred while checking for a software update."** |
++| after a `vm stop` / `vm start` cycle | unchanged — daemons stay down |
++
++"Automatic Updates" in that pane may still read **On** — it is a stored
++preference, inert once the daemons that would act on it are gone.
++
++## Endpoint blackhole (optional hardening — not required, and not trivial here)
++
++With the daemons disabled, nothing contacts Apple's update catalog, so a DNS
++block is belt-and-suspenders only. Two obvious routes are both closed on this
++guest:
++
++- **`/etc/hosts`**: `files.write` fails with `errno 30 Read-only file system`.
++  `/etc` → `/private/etc` lives on the **sealed root volume**; writing it needs
++  the `mount -u -w /` remount path (`environment.install` uses it) and may not
++  persist. Not done.
++- **`network.static_names`** (LocalOnly A records via mDNSResponder): usable,
++  but `vphone-vm` calls `network.static_names.set` with the Mac's `.local` name
++  **after every connect**, which replaces the table — so a gdmf/mesu entry put
++  there does not survive the next connect. Not durable.
++
++If a catalog block is ever wanted anyway, the hosts the OTA scan uses are
++`gdmf.apple.com` (the modern Pallas catalog) and `mesu.apple.com` (legacy), plus
++the download CDNs `appldnld.apple.com` / `updates-http.cdn-apple.com` /
++`updates.cdn-apple.com`. **Do not** blackhole `gs.apple.com` — that is the
++TSS / activation signing server. Given the daemon disable fully blocks OTA, the
++endpoint block is left undone.
++
++## Revert
++
++```sh
++for L in com.apple.mobile.softwareupdated \
++         com.apple.softwareupdateservicesd \
++         com.apple.OTATaskingAgent; do
++  vphone-launchpad-cli guest rpc $G services.enable "{\"label\":\"$L\"}"
++done
++# reboot to let them load again
++```
++
++## Productizing
++
++The disable is three idempotent `services.disable` calls that survive reboot —
++a natural `vphone-cli`/vphoned convenience verb (e.g. `cfw block-ota` or a
++vphoned `system.block_ota`) could apply and revert them in one call, and a
++machine `config.plist` flag could reassert them at boot the way
++`unlocksAtStartup` drives `screen.unlock`. Not built yet.
++
++## Reproducing the pane screenshot
++
++```sh
++vphone-launchpad-cli guest unlock $G
++vphone-launchpad-cli guest rpc $G apps.launch '{"bundle_id":"com.apple.Preferences"}'
++# General › Software Update (the App-Prefs:root=General&path=SOFTWARE_UPDATE_LINK
++# URL lands on the iOS 27 "Apps" pane instead; navigate General › Software Update
++# by UI). With the daemons disabled the pane shows "Unable to Check for Update".
++```
+diff --git a/Research/Guest/post_setup_signin_and_appstore.md b/Research/Guest/post_setup_signin_and_appstore.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..cd415abf26a0654181865b3408720fd72d9a006b
+--- /dev/null
++++ b/Research/Guest/post_setup_signin_and_appstore.md
+@@ -0,0 +1,275 @@
++# Post-setup sign-in surfaces and removing the App Store
++
++Companion to `setup_assistant_pane_gating.md`: what the Apple ID / iCloud
++sign-in surfaces look like *after* Setup finishes on a guest that never signed
++in, what it takes to suppress them, and how the App Store — a staged system
++app — is actually removed. Measured 2026-10-06 on `ipad-mini-01` (iPadOS
++26.6.2, setup completed, never signed in, bundle 2.6.0-local.92448989) plus
++static analysis of the iPhone17,3 27.0 (24A435) images; `panetest-iphone`
++(ios 27.0 + cloudOS 26.4) is the fresh-machine testbed for the open items.
++
++## TL;DR
++
++- A finished, never-signed-in guest shows **one** sign-in surface today: the
++  "Apple Account / Sign in to access iCloud data, the App Store…" card at the top of
++  Settings. No Settings badge, no sign-in notification — the follow-up
++  machinery is running (`followupd`, `appleidsetupd`, `akd`) but has posted
++  nothing visible.
++- Suppression ladder: (1) do nothing and re-check after the Setup pane patch
++  lands; (2) disable `followupd` + `appleidsetupd` (two plist writes, kills
++  the naggers at the source); (3) DSC-patch `FLFollowUpController
++  postFollowUpItem*` to return NO (kills every follow-up system-wide). The
++  Settings card itself only disappears by patching Settings.app — an inert
++  row; recommended against.
++- Removable system apps **can** be deleted durably. Their running copies live
++  on the data volume (`/private/var/containers/Bundle/Application/<uuid>/`).
++  `apps.uninstall`'s `LSApplicationWorkspace` fallback refuses them, so the
++  removal is: `apps.unregister` the bundle (LS) → `files.remove` the **whole
++  container** (not just the `.app`) → `system.respring`. Removing only the
++  `.app` is **not durable** — iOS re-materializes the app from the container's
++  `SerializedPlaceholder.ipa` on the next boot (this is why the App Store the
++  prior pass "removed" was back after a reboot). Measured end-to-end on
++  `panetest-iphone` (2026-10-06): News removed, survived a full reboot while a
++  file-only-removed App Store came back; then Home, TV, News, FaceTime, iTunes
++  Store, Messages, Camera and App Store all removed and survived a `vm stop` /
++  `vm start` cycle (app count 258 → 250).
++
++## What "sign-in" surfaces exist after Setup
++
++Measured on `ipad-mini-01` (screenshot 2026-10-06 00:24, Settings root) and,
++after a full fresh Setup walk, on `panetest-iphone` (iOS 27.0, 2026-10-06 —
++the Apple ID pane was skipped by hand via *Set Up Later*, then `setup.skip`
++ended the control run):
++
++| Surface | ipad-mini-01 (setup long done) | panetest-iphone (fresh setup) | Driven by |
++| --- | --- | --- | --- |
++| Settings root card "Apple Account / Sign in to access iCloud data, the App Store, Apple services…" | yes | yes ("Apple Account — Log in voor toegang tot onder andere je iCloud…") | Settings' own root list (Swift `SettingsApp` module; groups built in `FLTopLevelViewModel sapp_groupsWithQueue:completion:`, Preferences binary) from account state |
++| Settings icon badge | none | **yes — red "1"** | pending CoreFollowUp items |
++| "Finish Setting Up Your iPhone" row in Settings | none | **yes** | a follow-up item created by the Apple ID skip / setup completing without an account |
++| "Sign in to iCloud" notifications | none today | not seen in the short window | follow-up items → notifications |
++| Post-setup passcode nag | none (nothing to nag; the pane just fails — `system_keybag_passcode.md`) | none | — |
++
++So the fresh, never-signed-in guest *does* acquire a follow-up (badge +
++"Finish Setting Up" row) even though nothing nags on the older guest. The
++ladder below covers both.
++
++Daemons running on that guest: `followupd` (203), `appleidsetupd` (180),
++`akd` (177), `appstored` (183), `itunesstored` (207), `storekitd` (184).
++
++## The follow-up machinery (static, 27.0)
++
++`CoreFollowUp.framework` in the shared cache carries `FLFollowUpController`,
++the client every poster uses. Method IMPs (unslid, 27.0 cache):
++
++| Method | Address |
++| --- | --- |
++| `-[FLFollowUpController postFollowUpItem:error:]` | `0x2027db700` |
++| `-[FLFollowUpController postFollowUpItem:completion:]` | `0x2027dc744` |
++| `-[FLFollowUpController updateBadgesForTimer]` | `0x2027dd364` |
++| `-[FLFollowUpController clearPendingFollowUpItems...]` / `pendingFollowUpItems...` | see dump |
++
++plus the HSA2 (iCloud Keychain sign-in) notification family
++(`_postHSA2LoginNotification:`, `_postHSA2PasswordChangeForAppleID:` …).
++`com.apple.followupd.plist` is the server; `com.apple.appleidsetupd.plist`
++drives the "finish setting up your Apple ID" flows (`AppleIDSetupDaemon`,
++`AppleIDSetupUIService.app`, `ProximityAppleIDSetup`).
++
++### Suppression ladder
++
++1. **Do nothing (measure first).** Depends on how the guest got here: a
++   fresh setup with a hand-skipped Apple ID pane leaves the badge and the
++   "Finish Setting Up" row (`panetest-iphone`); the older finished guest
++   shows neither. The pane patch in `setup_assistant_pane_gating.md` skips
++   the pane at `controllerNeedsToRun` — nobody presses "Set Up Later" — and
++   may therefore leave no follow-up at all. Verify after that patch lands.
++2. **Disable `appleidsetupd`, clear the item store, keep `followupd`** — the
++   measured recipe (see below). Do it with `services.disable` (persists in the
++   data-volume launchd override DB, `/var/db/com.apple.xpc.launchd/`), not by
++   editing the sealed-volume plists. Disabling `appleidsetupd` stops the Apple
++   ID follow-up from being re-posted; removing
++   `/var/mobile/Library/CoreFollowUp/items.db` (+ `-wal`/`-shm`) drops the
++   pending item; **leaving `followupd` enabled** lets it reconcile the Settings
++   icon badge to 0 on the next boot. Disabling `followupd` **as well** is the
++   trap: it removes the Settings *row* but orphans the icon *badge* (the badge
++   was already pushed to SpringBoard and survives a respring with nothing left
++   to zero it).
++3. **DSC patch.** `postFollowUpItem:error:` and
++   `postFollowUpItem:completion:` → return NO (same leaf-rewrite shape as the
++   pane patch). Suppresses every follow-up item system-wide — including
++   software-update and storage badges; on a research guest that is usually
++   acceptable, but it is broader than the ask.
++4. **The Settings card** would need a Settings.app patch (Swift UI, brittle,
++   and the row is inert). Recommended against; not part of this work.
++
++### Measured (panetest-iphone, 2026-10-06)
++
++The fresh guest showed the red **"1"** on the Settings icon and a **"Finish
++Setting Up Your iPhone"** row at Settings root — confirmed to be the CoreFollowUp
++item created by the hand-skipped Apple ID during setup, stored in
++`/var/mobile/Library/CoreFollowUp/items.db` (SQLite).
++
++```sh
++G=panetest-iphone
++vphone-launchpad-cli guest rpc $G services.disable '{"label":"com.apple.appleidsetupd","force":true}'
++for f in items.db items.db-wal items.db-shm; do
++  vphone-launchpad-cli guest rpc $G files.remove "{\"path\":\"/var/mobile/Library/CoreFollowUp/$f\"}"
++done
++vphone-launchpad-cli guest rpc $G system.respring '{"force":true}'   # row goes now
++vphone-launchpad-cli vm stop $G && vphone-launchpad-cli vm start $G --wait   # badge goes on boot
++```
++
++| Check | Result |
++| --- | --- |
++| after `files.remove items.db` + respring | "Finish Setting Up" **row gone** from Settings root; Settings icon **badge still "1"** (orphaned) |
++| disabling `followupd` too (first attempt) | did **not** clear the badge — confirms the orphan; re-enabled it |
++| after a full reboot (followupd enabled, store empty, `appleidsetupd` disabled) | Settings icon **badge gone**; row stays gone; `items.db` recreated but empty; `apps` all still removed; OTA still blocked |
++
++So the respring clears the row but only a boot (followupd's boot-time badge
++reconciliation) clears the icon badge. `appleidsetupd` stays disabled so the
++Apple ID follow-up is not re-posted; `followupd` stays enabled so it can zero the
++badge. The **"Apple Account — Sign in…" card itself remains** (ladder step 4,
++left intact by recommendation).
++
++## Removing removable system apps (durably)
++
++Measured live on `panetest-iphone` (iPhone17,3 iOS 27.0, 2026-10-06). These
++are the user-facing removable system apps — the ones with a placeholder in
++`/System/Library/AppPlaceholders` (52 of them: App Store, Home, TV, News,
++FaceTime, iTunes Store (`MobileStore`), Messages (`MobileSMS`), Camera, …).
++Each is installed on **first boot** into its own container on the data volume
++(`/private/var/containers/Bundle/Application/<uuid>/`), which is writable and
++not sealed, with `staged_system_apps` emptied afterward.
++
++### The re-stage trap (why the earlier App Store removal came back)
++
++The container holds more than the `.app`:
++
++```
++/private/var/containers/Bundle/Application/<uuid>/
++  AppStore.app/                                 ← the bundle
++  SerializedPlaceholder.ipa                     ← the re-download stub (icon art + install payload)
++  BundleMetadata.plist
++  .com.apple.mobile_container_manager.metadata.plist
++```
++
++Removing **only** the `.app` subdir (the earlier recipe) and resprininging
++hides the icon for that session, but **LaunchServices still has the app
++registered**, so on the next boot installd "repairs" the registered-but-missing
++bundle by re-expanding `SerializedPlaceholder.ipa` — the icon returns (as it did
++for the App Store this pass found still present after a reboot, with a stale
++`apps.list` record at the old path). `/System/Library/AppPlaceholders/<App>.app`
++on the sealed root volume is the master source these placeholders seed from.
++
++### The durable recipe
++
++Three RPCs per app (plus an optional backup):
++
++```sh
++G=panetest-iphone
++APP=/private/var/containers/Bundle/Application/<uuid>/News.app   # from apps.list bundle_path
++CONT=$(dirname "$APP")
++# optional revert backup (container is small: metadata + ~1.3 MB placeholder + thin .app)
++vphone-launchpad-cli guest rpc $G files.copy "{\"from\":\"$CONT\",\"to\":\"/private/var/mobile/Library/removed-system-apps/News.container\"}"
++vphone-launchpad-cli guest rpc $G apps.unregister "{\"path\":\"$APP\",\"force\":true}"   # LS removes the registration
++vphone-launchpad-cli guest rpc $G files.remove    "{\"path\":\"$CONT\",\"recursive\":true}" # whole container, incl. the placeholder
++vphone-launchpad-cli guest rpc $G system.respring '{"force":true}'
++```
++
++`apps.unregister {path, force:true}` is IcliKit's path-based LS unregister (the
++`icli_unregister_app` the earlier note wanted — it **is** exposed). Doing it
++*before* removing the files is what stops installd from re-materializing the app:
++with no registration there is nothing to repair, and with the container (and its
++`SerializedPlaceholder.ipa`) gone there is nothing to repair it from.
++
++Revert: `files.copy` the backup container back, then `apps.register` the `.app`
++inside it (or `system.uicache`), then respring. A full restore also brings the
++app back from the image.
++
++### What was measured
++
++| Check | Result |
++| --- | --- |
++| `apps.uninstall {"bundle_id":"com.apple.news","force":true}` | **refused** (same as App Store — `LSApplicationWorkspace` returns false for a system app) |
++| durable recipe on News → respring | `apps.list` record gone, icon gone |
++| **full `system.reboot`** | News **stays gone**; App Store (file-only-removed earlier, container kept) **comes back** — the clean A/B for the recipe |
++| Home, TV, News, FaceTime, iTunes Store, Messages, Camera, App Store all removed by the durable recipe → respring | all 8 records gone; home reflowed to one page, no dead icons; Messages left the dock (Phone · Safari · Music remain) |
++| **`vm stop` + `vm start`** | all 8 stay gone; app count 258 → 250; no container dirs recreated |
++
++Store daemons (`appstored`, `itunesstored`, `appstorecomponentsd`) keep running
++after the App Store bundle is gone; disable them too (`services.disable`, as in
++`ota_software_update_block.md`) for no store traffic. Keep `storekitd` — apps
++the researcher installs may link StoreKit.
++
++### Still worth a single verb
++
++A vphoned `apps.remove_system` (backup → `apps.unregister` → remove container →
++respring) would fold the durable sequence into one call instead of four RPCs
++with the re-stage foot-gun between them. Not built yet.
++
++## Open items
++
++1. Whether the pane patch (`setup_assistant_pane_gating.md`), which skips the
++   Apple ID pane without anyone pressing "Set Up Later", leaves the badge /
++   "Finish Setting Up" row uncreated — the freshest data point says a
++   hand-skipped pane does create it, so this is the interesting check once
++   the patch builds.
++2. ~~Whether disabling `followupd`/`appleidsetupd` clears the badge.~~
++   **Resolved** (see "Measured" above): disable `appleidsetupd` + clear
++   `items.db` + keep `followupd` enabled; the badge clears on the next boot.
++3. `panetest-iphone` is left **running**. Applied this pass and verified durable
++   across a `vm stop`/`vm start` cycle: Home, TV, News, FaceTime, iTunes Store,
++   Messages, Camera and App Store removed (backups under
++   `/private/var/mobile/Library/removed-system-apps/`); OTA blocked
++   (`ota_software_update_block.md`); the "Finish Setting Up" row/badge cleared.
++   The only sign-in surface left is the inert Settings "Apple Account" card.
++   The purplebuddy domain was restored (2026-10-06, after the pane A/B walks)
++   from the completed-setup backup: all 29 keys back through `settings.set`,
++   `SetupDone` kept, `Passcode4Presented` correctly absent (Setup clears it at
++   buddy-done), so the passcode pane behaves stock — re-entering Setup (delete
++   `SetupDone`) shows it again.
++
++Note on creating `panetest-iphone`: the first attempt timed out — first boot
++reached the vphoned boundary exactly at the create wrapper's 300 s window
++(camera on vsock 1338 connected at the timeout edge; kernel console healthy,
++no panic), and the wrapper tore the machine down. The retry succeeded within
++the window. If 27.0 first boots on a given Mac routinely exceed it, the
++`firstBoot` step's wait needs a look in Launchpad before fresh 27.0 machines
++can be created there at all.
++
++## Reproducing the static bits
++
++Same extraction flow as `setup_assistant_pane_gating.md`. The Preferences
++binary is `/Applications/Preferences.app/Preferences` (Swift-first — only 78
++ObjC classes dump; the root list is `FLTopLevelViewModel
++sapp_groupsWithQueue:completion:`); CoreFollowUp classes via
++`ipsw class-dump <dsc> /System/Library/PrivateFrameworks/CoreFollowUp.framework/CoreFollowUp --re -V`.
++
++## 2026-10-07: Games and Phone app entries
++
++User requested hiding Games and Phone entry points. On panetest-iphone, unregistered `com.apple.games` and `com.apple.mobilephone`, then moved program files into `/var/root/hidden-app-entries-20261007/` rather than deleting them. Games' entire bundle container (including placeholder metadata) was moved to `Games.container`; `/Applications/MobilePhone.app` was moved to `MobilePhone.app`. `com.apple.GameTrampoline` already carries `SBAppTags=[hidden]` and was left intact, as were Game Center widgets/services.
++
++After full reboot, both target registrations remain absent (app count 250 → 248). Screenshots confirm no Games/Phone icon on either home page or in App Library; dock contains Safari and Music. Settings launches with foreground verified. Root is read-only again. The temporary remount job was unloaded, its plist removed and its log deleted.
++
++Original data containers were retained and directory reads succeeded after reboot:
++- Games: `/private/var/mobile/Containers/Data/Application/DBA101EC-66DF-4C79-906F-14C958771D2B`
++- Phone: `/private/var/mobile/Containers/Data/Application/304C2592-BF11-440F-90B9-2D84CF4FF503`
++
++To restore on this guest, temporarily remount root writable, move `Games.container` back to `/private/var/containers/Bundle/Application/90D1ADC8-1429-4D25-96C0-E270D6A3D688` and the saved `MobilePhone.app` back to `/Applications/MobilePhone.app`, register each `.app` path, then reboot. Both backup entries were verified present after reboot. This removes app launchability together with the icon; it does not stop underlying telephony daemons.
++
++Evidence: `/private/tmp/prefs-audit/hidden-apps-post-reboot.json`, `hidden-apps-environment.json`, `hidden-apps-device.json`, `hidden-app-backups-post-reboot.json`, `hidden-apps-home-current.jpg`, `hidden-apps-library.jpg` (second home page), and `hidden-apps-library-final.jpg` (actual App Library). SpringBoard UI-tree requests cannot verify the foreground home scene on this build, so visible icon checks use screenshots rather than treating that API failure as a successful check.
++
++## 2026-10-07: Find My entry removed
++
++Unregistered `com.apple.findmy`, then moved its entire bundle container from `/private/var/containers/Bundle/Application/6EB8CC54-634C-4191-9A18-8287D20C55A1` to `/var/root/hidden-app-entries-20261007/FindMy.container`. The data container `/private/var/mobile/Containers/Data/Application/A3EA4863-9650-4135-B0C6-246E7BF253F9` and Find My auxiliary services were retained. Backup and data directory reads succeeded afterwards.
++
++The first guest-initiated reboot left vphoned disconnected and the window black. Launchpad reported running, panicked=false; serial logs continued APFS activity and no panic record was found. Preserved that log as `/private/tmp/prefs-audit/findmy-pre-recovery-console.log`. Normal `vm stop` then `vm start --wait` with the original bundle restored vphoned in 10 seconds. This recovery does not establish the root cause of the earlier disconnect.
++
++After that complete VM restart, Find My remained absent from registrations (248 → 247); Settings launch had foreground verified, and the second home page screenshot confirmed the Find My icon gone and the UI responsive. Evidence: findmy-post-recovery-apps.json, findmy-backup-verified.json, findmy-data-verified.json, findmy-final-screen.jpg in /private/tmp/prefs-audit. Restore by moving the saved full container back to its original UUID path, registering FindMy.app, then respring/reboot. No kernel patch or host security setting changed during this removal.
++
++## 2026-10-07: Wallet app entry removed
++
++Removed the Wallet main app (`com.apple.Passbook`) from panetest-iphone by unregistering its bundle and moving the complete program container, including placeholder metadata, from `/private/var/containers/Bundle/Application/22E11AE9-A1A6-4533-8F4F-CBF82D1FF026` to `/var/root/hidden-app-entries-20261007/Wallet.container`. The data container `/private/var/mobile/Containers/Data/Application/BFDA90DC-29FB-4885-8CB0-39A165724970` was retained. FinanceStub and Wallet UI/credential helper services were left intact. This app removal is separate from the already implemented Wallet & Apple Pay Settings-row patch.
++
++The first immediate VM stop/start still showed a stale Wallet registration and icon. The original container directory did not exist, and a second unregister reported that the app was not registered, so the evidence does not establish that its program files were restored. After respring, the registration disappeared. A second complete VM stop/start then confirmed persistent absence (247 → 246 registered apps), and a fresh home-screen screenshot showed Settings occupying Wallet's former position. Root remained read-only; no writable remount was required for this data-volume operation.
++
++The backup and retained data directory were read successfully. To restore, move `Wallet.container` back to its original UUID path, register the enclosed `Passbook.app`, and respring before checking a full restart. Host evidence is under `/private/tmp/prefs-audit`: `wallet-final-apps.json`, `wallet-final-environment.json`, `wallet-final-screen.jpg`, `wallet-backup.json` and `wallet-data.json`.
+diff --git a/Research/Guest/settings_app_row_hiding.md b/Research/Guest/settings_app_row_hiding.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c00e105b733de0dc3b5c2923530b595c8398c2a8
+--- /dev/null
++++ b/Research/Guest/settings_app_row_hiding.md
+@@ -0,0 +1,313 @@
++## Current verified state — 2026-10-07
++
++All five requested rows are hidden on panetest and passed rollback/reapply/full-reboot checks. Indexing is excluded. Both Preferences and Software Update cache patch implementations are now in the installer catalogue, standard-blocked and reversible. 52 tests and the complete CLI build pass. No new Bundle was published. See [final report](2026-10-07_reverse-settings-rows-report.md). Older sections below record superseded experiments and blockers.
++
++# Hiding rows in Settings.app with a userland hook
++
++Goal: on a research guest, hide the sign-in / suggestion / update surfaces that
++remain in Settings — the "Apple Account — Sign in…" banner, the CoreFollowUp
++suggestion/upsell groups, the "Software Update" row, and the "Optimising Search
++and Siri" row. Prototyped live on 2026-10-06 on `panetest-iphone` (iPhone17,3
++iOS 27.0, bundle 2.6.0-local.92448989), by injecting a probe dylib into
++`com.apple.Preferences`. Static analysis of the 27.0 Preferences binary
++(`/private/tmp/setupres/Preferences.bin`).
++
++## TL;DR
++
++- **Injecting a dylib into Settings needs no bootstrap.** The shipped
++  launchd→launchdhook→`DYLD_INSERT_LIBRARIES`→SystemHook chain already injects
++  `libbatteryhealthfix.dylib` into `/Applications/Preferences.app/Preferences`.
++  A new `libprefsfix.dylib` ships the same way. Verified: probe injected, ObjC
++  swizzle ran, `os_log` captured, Settings stayed healthy.
++- **Cleanly hookable (ObjC): the CoreFollowUp suggestion groups.**
++  `-[FLTopLevelViewModel sapp_groupsWithQueue:completion:]` ("FL" = FollowUp) is
++  an ObjC category method in the Preferences binary; swizzling it and forwarding
++  an empty array hides `followup.group.{account,services,ndo,device,screentime}`
++  — "Apple Account Suggestions", "Services Included with Purchase", "Add
++  AppleCare Coverage", "More for Your iPhone", "Updates to Your Screen Time".
++  (These are empty on a guest whose `appleidsetupd` is already disabled —
++  `post_setup_signin_and_appstore.md` — so hiding them is belt-and-suspenders.)
++- **NOT cleanly hookable — needs a binary patch: the Apple Account banner, the
++  Software Update row, the "Optimising Search and Siri" row.** These are built
++  by the SwiftUI `SettingsApp` module, which is **stripped of Swift symbols**
++  (`nm` shows only ObjC class metadata, no provider methods), and the account
++  item's content comes from `SettingsHost.NavigationHost.primaryAppleAccount` in
++  the dyld shared cache. There is no ObjC method to swizzle. The Setup.app gate
++  `-[MCProfileConnection effectiveBoolValueForSetting:]` (account modification)
++  does **not** apply: Settings never queries it for the banner (on root render
++  it asked only `allowBluetoothModification` and `allowWritingTools`).
++- **Decision (2026-10-06): hook the FollowUp groups + (TBD) Software Update;
++  binary-patch the Preferences executable for the Apple Account banner.**
++
++## Injection (proven)
++
++`vphone-launchdhook-spawn.log` on the guest shows, for every launch:
++
++```
++event=inserted+batteryhealthfix child=1586 path=/Applications/Preferences.app/Preferences status=0
++```
++
++so Preferences runs with
++`DYLD_INSERT_LIBRARIES=/usr/lib/SystemHook-vphone.dylib:/usr/lib/libbatteryhealthfix.dylib`.
++A probe built as `libbatteryhealthfix.dylib` (arm64e, ad-hoc signed, pushed over
++`files.write` + `environment.install`, Preferences killed to remap) loaded,
++swizzled, and logged. Two gotchas:
++
++- **Settings is sandboxed**: it cannot write `/var/mobile/Library/Caches/…`
++  (SpringBoard/HapticsFix can). Log via `os_log(OS_LOG_DEFAULT,
++  "...%{public}s", …)` and read with `logs.syslog`; `%@`/`NSLog` dynamic args
++  come back `<private>`, so force `%{public}s` with a C string.
++- Build flags (HapticsFix pattern): `xcrun --sdk iphoneos clang -arch arm64e
++  -miphoneos-version-min=26.0 -Os -fobjc-arc -dynamiclib -framework Foundation
++  -Wl,-not_for_dyld_shared_cache`, then `codesign --force --sign -`.
++
++Swizzle template (HapticsFix / CamFix): `dlopen` the defining framework if
++needed, `class_getInstanceMethod` → save `method_getImplementation` → install
++with `method_setImplementation`; install from a `__attribute__((constructor))`
++and fall back to `_dyld_register_func_for_add_image` if the class is not yet
++registered. Use **ObjC swizzling, not `__interpose`** — Preferences framework
++classes live in the shared cache, which interposing does not rebind.
++
++## The FollowUp group hider (works)
++
++`FLTopLevelViewModel` is CoreFollowUp's model. The Settings-app category method
++`-[FLTopLevelViewModel sapp_groupsWithQueue:(id)queue completion:(void(^)(NSArray *groups))completion]`
++builds the follow-up section. Swizzle it, call the original with a wrapper
++completion, and forward `@[]`:
++
++```objc
++static void vpMySappGroups(id self, SEL _cmd, id queue, id completion) {
++    void (^real)(id) = completion;
++    void (^wrap)(id) = ^(id groups) { if (real) real(@[]); };   // drop all follow-up groups
++    gOrigGroups(self, _cmd, queue, wrap);
++}
++```
++
++Observed groups before filtering (iOS 27, class `FLGroupViewModelImpl`, each has
++`-identifier`/`-rowTitle`): `com.apple.followup.group.account` ("Apple Account
++Suggestions"), `.services` ("Services Included with Purchase"), `.none`,
++`.screentime` ("Updates to Your Screen Time"), `.device` ("More for Your
++iPhone"), `.ndo` ("Add AppleCare Coverage"). Forwarding `@[]` left Settings
++healthy (screenshot: root list intact, no follow-up cards). To drop only some,
++filter by `-identifier` instead of returning `@[]`.
++
++## The Apple Account banner — binary patch (chosen route)
++
++The banner is `SettingsSidebarListAppleAccountLink` / `PrimaryAppleAccountLinkModel`,
++produced by `_TtC11SettingsApp35PrimaryAppleAccountListItemProvider` (Swift,
++`_TtCs12_SwiftObject`, no ObjC methods). `nm` on Preferences.bin has no defined
++Swift symbol for it — the module is stripped — and the only account symbols are
++imports (`SettingsHost.NavigationHost.primaryAppleAccount`,
++`ACAccountTypeIdentifierAppleAccount`, `AAAppleAccountInformationCache`). So the
++patch has to be found by **string anchors + xref**, the repo's standard
++patcher technique (`FirmwarePatcher`: string anchors, ADRP+ADD xrefs, no
++hardcoded offsets):
++
++1. Find the cstrings `PrimaryAppleAccountLinkModel` /
++   `SettingsSidebarListAppleAccountLink` in Preferences.bin, and their ADRP+ADD
++   xrefs.
++2. The referencing function is the sidebar-item builder that appends the account
++   link to the root list. Identify where it conditionally adds the account item.
++3. Patch that site so the account item is never appended (make the producing
++   call return empty / skip the append), leaving the rest of the sidebar intact.
++   Shape-verify with Capstone before writing (guardrails), `retab` not `ret`.
++4. Ship as a guest-executable patch of `/Applications/Preferences.app/Preferences`
++   (the same `cfw`/environment flow the Setup.app pane patch uses —
++   `setup_assistant_pane_gating.md`), `.bak` beside it, ad-hoc re-sign.
++
++The Software Update row and "Optimising Search and Siri" row are the same kind
++of SwiftUI item (`GeneralSettingsListItemProvider`,
++`IndexingProgressListItemProvider`); if they are not reachable by a cleaner hook
++they fold into the same Preferences binary patch. (The Software Update row lives
++under General, a sub-list — confirm whether General is still a `PSListController`
++pane, in which case `-[PSListController specifiers]` is an ObjC hook that can
++filter the row without a patch.)
++
++### Binary-patch RE findings (2026-10-06) — no clean anchor to the inclusion decision
++
++Full `__TEXT.__text` disassembly of `Preferences.bin` (`ipsw macho disass -x`,
++string markup) gives exactly four xref regions for the account anchors, and
++**none is the point where the account item is added to the sidebar**:
++
++| Addr | What it is | Patchable to hide? |
++| --- | --- | --- |
++| `0x100021d08` | `SettingsSidebarListItemIdentifier` **rawValue switch** (enum case → `"com.apple.settings.primaryAppleAccount"`); it sits in a huge switch beside every other identifier (`people`, `bluetooth`, `followUp*`, …) | No — only renames the identifier string; the item still renders |
++| `0x1000a914c` | A **navigation-destination `==` / routing** chain (`SettingsHost.NavigationHost.primaryAppleAccount` compared via `Equatable.==`, returns an index) | No — routing, not inclusion |
++| `0x100044404`–`0x1000459d4` | The account link's **SwiftUI `body`** (`SwiftUI.LazyState`, `HorizontalAlignment.leading`, `LabelGroup`; the `.swift` string is only an async-executor assert) | No — patching the view breaks rendering, doesn't remove the row |
++| `0x100052168`, `0x100086a1c` | The account **state/status** logic (`aa_primaryAppleAccount` → `aa_isSuspended`/`aa_isPrimaryEmailVerified`/`aa_suspensionInfo`/`isiCloudSuspended`; builds enum cases `primaryAppleAccountSignIn`, `supervisedDevice`) | No — decides *what* status to show, not *whether* to show |
++
++The sidebar item is added by the `SettingsSidebarListItemIdentifier.primaryAppleAccount`
++**enum case** — an integer tag, so its construction site carries no string and
++no symbol (the `SettingsApp` module is stripped). Finding the append/condition
++therefore needs data-flow from the enum tag, not a string anchor — i.e. a
++Swift-aware decompiler (Hopper/IDA/Ghidra+Swift), not raw `ipsw` disassembly.
++
++**r2 follow-up (2026-10-06):** the only RE tools on the build machine are
++`radare2` (disassembler; no r2ghidra/decompiler plugin) and `ipsw`/Capstone —
++no Ghidra/Hopper/IDA. r2 recovers the account *classes* from Swift metadata
++(`SettingsApp.PrimaryAppleAccountListItemProvider` = swift class 107 /
++objc class 198, `SettingsSidebarListAppleAccountLink` = 108,
++`PrimaryAppleAccountLinkModel` = 106) but **not their methods** (pure Swift,
++protocol-witness, stripped), and `/r` reference searches to the account type
++metadata records return nothing (construction goes through accessors / is
++inlined). So even with r2, the append site is not reachable without a
++Swift-aware **decompiler**, which this machine does not have.
++
++**Assessment:** a reliable guest-executable patch of the banner is **high-effort
++/ low-tractability with the tooling in this repo** (Capstone decode only, no
++Swift decompiler). This vindicates the original "recommended against" note.
++Realistic options: (a) leave the banner (it is an inert "Sign in" prompt) and
++ship only the clean FollowUp-group hook; (b) pinpoint the append with a Swift
++decompiler offline, then patch the single site; (c) a fragile view-body patch
++that renders the account cell empty (leaves a blank row — not recommended).
++
++## Shipping a new hook component (`libprefsfix.dylib`)
++
++Follows `libbatteryhealthfix` exactly (both target only Preferences):
++
++1. `VPhoneGuestComponents/PrefsFix/libprefsfix.m` (the swizzle).
++2. `VPhoneGuestComponents/Makefile`: a target mirroring `BATTERYHEALTHFIX`
++   (`-install_name /usr/lib/libprefsfix.dylib`, `-lobjc`,
++   `-Wl,-not_for_dyld_shared_cache`, `codesign --force --sign -`), add to
++   `ARTIFACTS` and the stage-dir rule.
++3. `VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh`: copy into
++   `Contents/Resources/guest-resources`.
++4. `VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh`: add to the
++   `require_signed_macho` list (or the bundle seal fails).
++5. `VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift` **and**
++   `VPhoneDaemon/Daemon/GuestAPI+Environment.swift`: add the name to both
++   library lists (they must match; `environment.install` rejects unlisted names).
++6. **`VPhoneGuestComponents/SystemHook/SystemHook-vphone.c`** (the approach
++   actually used): `libprefsfix` only swizzles (no interpose), so it does **not**
++   need the DYLD_INSERT slot — SystemHook `dlopen`s it into Preferences from its
++   constructor, exactly as it does `libhapticsfix` into SpringBoard. Added
++   `vpIsPreferences(path)` (suffix `/Preferences.app/Preferences`) and
++   `if (vpIsPreferences(path)) vpLoadLibrary("prefs-fix", VP_PREFS_FIX);` before
++   the app gate. This avoids any change to the launchd/all-process env-building
++   core (`InjectionEnvironment.h` / `vpInsertHooks`) — the lower-risk path. The
++   multi-extra DYLD_INSERT alternative was not needed.
++
++Iteration without a bundle rebuild (once the name is in both Swift lists and on
++the guest): `files.write` the dylib (base64) to
++`/var/root/Library/Caches/vphone-environment/<name>`, `environment.install
++{"libraries":[{"name","sha256"}]}`, kill the app. A brand-new name reaches the
++guest only through the online sync at VM start, so the first deploy needs the
++bundle rebuilt + the VM restarted; after that the fast loop applies
++(`[[guest-hook-iteration]]`).
++
++Doc note: `Research/vphoned_http_api.md`'s "only four names" for
++`environment.install` is **stale** — the real set is the libraries enumerated in
++`VPhoneGuestEnvironment.swift` (7 today: launchdhook, SystemHook, vcamcaptured,
++camfix, misfix, hapticsfix, batteryhealthfix).
++
++## Status & handoff (2026-10-06)
++
++### The rows the user wants hidden — all SwiftUI, all need the binary patch
++
++Exact `SettingsSidebarListItemIdentifier` strings (from `Preferences.bin`):
++
++| Row | identifier |
++| --- | --- |
++| Apple Account banner | `com.apple.settings.primaryAppleAccount` |
++| Game Center | `com.apple.settings.gameCenter` |
++| iCloud | `com.apple.settings.iCloud` |
++| Wallet & Apple Pay | `com.apple.settings.walletAndApplePay` (also `com.apple.settings.paymentAndContactless`) |
++| Software Update (under General) | `com.apple.Settings.PrimarySettingsList.SoftwareUpdateClient` |
++| "Optimising Search and Siri" | `IndexingProgressListItemProvider` (no `com.apple.settings.*` id) |
++
++None is hookable via ObjC (all pure-Swift `SettingsApp` providers). All need the
++Preferences guest-executable binary patch → **blocked on a Swift decompiler**
++(this build machine has only r2 + ipsw/Capstone, no Ghidra/Hopper/IDA).
++
++### The patch, once a decompiler is available
++
++Find the SwiftUI sidebar **item-array builder** (the function that assembles the
++ordered `[SettingsSidebarListItemIdentifier]` / items for the root list and for
++General), and drop the entries above — or force their per-row "should include"
++to false. The identifiers are enum cases (integer tags), so a Swift decompiler is
++needed to locate the append/condition; raw disassembly of the rawValue switch,
++the nav `==` chain, the view bodies and the status logic (all mapped above) does
++**not** reach the inclusion decision. Then ship as a guest-executable patch of
++`/Applications/Preferences.app/Preferences` (same flow as the Setup.app pane
++patch in `setup_assistant_pane_gating.md`): resolve via ObjC/Swift metadata,
++Capstone shape-verify, `ARM64Encoder`/keystone-checked words, `.bak`, ad-hoc
++re-sign. RE artifacts left on disk (until reboot): `/private/tmp/setupres/Preferences.bin`,
++`…/prefs_text.asm` (full `__TEXT.__text` disass with string markup),
++`…/prefs_full.txt` (ObjC class dump).
++
++### The FollowUp-group hook (`libprefsfix`) — built, shipped once, then reverted
++
++Covers only the CoreFollowUp suggestion groups (empty on this guest), **not** any
++row above. It was fully wired and a bundle built, but its load could not be
++cleanly verified live (invisible effect + pid-reuse defeating log tracing), and
++it does not serve the row-hiding goal. **Uncommitted WIP in the working tree**
++(keep or revert — decision pending):
++
++- new `VPhoneGuestComponents/PrefsFix/libprefsfix.m`
++- `VPhoneGuestComponents/Makefile` (PREFSFIX target)
++- `VPhoneGuestComponents/SystemHook/SystemHook-vphone.c` (`vpIsPreferences` + dlopen)
++- `VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh`, `ValidateBundle.sh`
++- `VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift`,
++  `VPhoneDaemon/Daemon/GuestAPI+Environment.swift` (both lib lists)
++
++The experimental bundle `2.6.0-local.0af83bc1` is still in the Launchpad store
++(non-default, unbound).
++
++### panetest state (clean)
++
++Rebound to its original bundle `2.6.0-local.92448989`, original `SystemHook`
++restored, rebooted. Durable earlier results intact and verified: the 8 removed
++system apps stay gone (app count 250), OTA checker/scheduler
++(`softwareupdated`/`OTATaskingAgent`) not running, the "Finish Setting Up"
++row/badge cleared, `appleidsetupd` disabled. Residue: an **inert** orphan
++`/usr/lib/libprefsfix.dylib` (nothing loads it now that the original SystemHook
++is back; `/usr/lib` is read-only, so removing it needs a remount or a full
++`cfw install`). Note: `softwareupdateservicesd` can still spin up **on-demand**
++(disable blocks auto-start, not every XPC launch); the automatic OTA path is
++blocked but a fully airtight block would also neutralise the catalog endpoints
++(deferred — `/etc/hosts` is on the read-only root volume; see
++`ota_software_update_block.md`).
++
++## Correction: 2026-10-07 deployment review
++
++The Codex fixed-offset patch candidates are withdrawn and must not be deployed.
++`0x1000528c8` belongs to Wallet's `0x1000525c4` builder, not iCloud.
++iCloud's optional-result branch is `0x10005201c` inside `0x100051df8`.
++`0x100052d58` is inside the async continuation `0x100052c48`, following TaskPriority metadata setup; it is not a row-inclusion gate.
++The four-site command, manifest declaration and installer call were removed pending a structural patcher and runtime validation.
++The earlier SoftwareUpdateClient identifier is a Dispatch queue label for badge monitoring, not proof of a Software Update row provider. Indexing builder entry is `0x1000ee378`, not the interior address `0x1000ee8cc`.
++No candidate is established as safe by byte matching or build success. Existing built bundles may still contain the withdrawn command; do not run them against a guest.
++
++## 2026-10-07 live verification: four root rows
++
++Scope is five rows; Indexing/Search & Siri is explicitly excluded. The previous six-row plan is superseded.
++
++Corrected candidate now deployed on panetest-iphone, original admitted bundle 2.6.0-local.92448989, iOS 27.0 build 24A435. It hides Apple Account, Game Center, iCloud and Wallet & Apple Pay. Software Update requires a separate GeneralSettingsUI shared-cache patch and is not completed.
++
++Original Preferences SHA256: e59851f14f29409590a6de76ca2fe9b9912341aee526a278692ef0d7a86ee2f3. Deployed signed SHA256: dc92f2f36d1f5fbb3e8f84f52487e000fe353accf99181561b4df590031a75b5. The admitted bundle signer used --merge --identifier com.apple.Preferences --apple-adhoc; codesign verifies the result and all 767 entitlement keys and values equal the original. Candidate upload used the existing VM Files browser, followed by byte-for-byte guest readback; no bundle acceptance override or host API listener was used.
++
++The provider discovery script in /private/tmp/prefs-audit/ExperimentalProviderPatch.swift resolves resilient Swift witness records and identifies the optional nil/cleanup branch structurally. GameCenterRulePatch.swift resolves the MCFeatureGameCenterAllowed import and replaces only the Game Center sharedPad rule with boolean(false,false). These are research scripts, not yet integrated production patchers. Indexing bytes are unchanged.
++
++Live verification completed:
++- Four rows disappeared after replacement and Settings launched successfully (PID 622).
++- Restoring the original executable restored all four rows (PID 629).
++- Reapplying and performing a full reboot preserved the changes; new boot session 7EB4B772-FE5E-4658-A2C1-371EB76BFB84, Settings PID 381, foreground verified.
++- Surrounding Settings rows remained visible.
++
++Evidence directory: /private/tmp/prefs-audit; deployed-root-*.json, rollback-root-*.json, reboot-root-*.json and post-reboot-device.json. Guest backups: /Applications/Preferences.app/Preferences.rows-original-20261007 and Preferences.rows-previous-20261007. Current executable is the tested candidate. Production integration, Software Update deployment, and the complete five-row acceptance remain outstanding.
++
++## Installer integration (source, 2026-10-07)
++
++The four-row transformation is now `CustomFirmwareSettingsRows.patchPreferences`, with native Swift-witness and Mach-O indirect-symbol discovery. It is registered as `system-preferences-exp-root_rows` in Guest System, disabled by the standard preset and available in experimental. `cfw patch-settings-root-rows` patches a staged pristine Preferences binary; the shared installer calls it through `machO`, preserving original entitlements, signing Apple-ad-hoc, maintaining `.bak`, and restoring that backup when deselected. The input SHA gate still restricts application to the reviewed 24A435 original.
++
++This source integration has not been deployed as a new bundle. The existing panetest live four-row result came from the explicitly recorded manual candidate. Software Update remains a distinct cache patch and is not covered by this declaration. Indexing remains excluded. Full build and catalogue tests are recorded separately when complete.
++
++### Source integration verification
++
++Independent Release VPhoneCommand build succeeded under /private/tmp/prefs-audit/integration-build. The built `cfw patch-settings-root-rows --dry-run` preserved the pristine input; real command output exactly matched Preferences.four-target-review. Test scheme was run with ENABLE_TESTABILITY=YES because Release's ordinary product module does not support @testable imports. Both Settings root rows and Bundled patch set catalogue suites passed: 19 tests, including reviewedFixtureAndUndo (not skipped), input rejection, standard opt-out, shipped preset equality, and applicable experimental selections on 18.6.2/26.4/27.0/27.1. Logs: integration-build.log, integration-tests-final.log in /private/tmp/prefs-audit.
++
++Software Update cache candidate is staged and offline rollback verified, but guest cache replacement remains unperformed. Root was verified read-only. Automatic approval rejected the temporary writable-mount launchd request; user approval is pending. Do not treat automatic goal continuation as authorization, and do not use an indirect path around that rejection.
++
++## 2026-10-07 authorization and five-row live closeout
++
++User explicitly authorized the temporary writable mount. Software Update cache candidate was deployed, full-reboot verified absent, restored and full-reboot verified present, then redeployed and full-reboot verified absent again. Final UI also confirms the four root rows remain hidden. Final boot 0980B399-163F-4EBA-B8D0-51A115AD4D80, Settings PID 377. Root is read-only; temporary mount service, plist and log absent. Original cache backup remains as .settings-rows-cache36-original-20261007 beside the active chunk. See [formal report](2026-10-07_reverse-settings-rows-report.md). The earlier permission blocker is resolved. Remaining work is Software Update source installer/catalogue integration; its live test loop is complete.
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/ExecutablePatches/SettingsRows/CustomFirmwareSettingsRows.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/ExecutablePatches/SettingsRows/CustomFirmwareSettingsRows.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..def971c0d5380d5ea947bcdd320cc6bc0e3fd259
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/ExecutablePatches/SettingsRows/CustomFirmwareSettingsRows.swift
+@@ -0,0 +1,360 @@
++import CryptoKit
++import Foundation
++import VPhonePatchKit
++
++/// Reviewed iOS 27 / 24A435 Settings root-row transformation.
++/// Discovery uses Swift witnesses and native Mach-O import tables, never fixed addresses.
++/// Input is deliberately restricted to the reviewed original; apply to the installer's
++/// pristine backup. Signing, deployment, patch selection and receipts belong to the caller.
++public enum CustomFirmwareSettingsRows {
++  public struct Edit: Sendable {
++    public let identifier: String
++    public let address: UInt64
++    public let fileOffset: Int
++    public let before: Data
++    public let after: Data
++  }
++  public struct Result: Sendable {
++    public let data: Data
++    public let edits: [Edit]
++  }
++  private static let rootProviders = [
++    "PrimaryAppleAccountListItemProvider", "iCloudListItemProvider",
++    "WalletAndApplePayOrPaymentAndContactlessListItemProvider",
++  ]
++  public static func patchPreferences(_ original: Data) throws -> Result {
++    let digest = SHA256.hash(data: original).map { String(format: "%02x", $0) }.joined()
++    guard digest == "e59851f14f29409590a6de76ca2fe9b9912341aee526a278692ef0d7a86ee2f3" else {
++      throw InvalidImage(
++        description: "unreviewed Preferences input; use the pristine reviewed backup")
++    }
++    let image = try Image(original)
++    var edits = try providerEdits(image)
++    edits += try gameCenterEdits(image)
++    edits.sort { $0.fileOffset < $1.fileOffset }
++    guard edits.count == 5 else {
++      throw InvalidImage(description: "expected five instructions for four root rows")
++    }
++    var output = original
++    var lastEnd = 0
++    for edit in edits {
++      guard edit.fileOffset >= lastEnd, edit.after.count == 4, edit.before.count == 4 else {
++        throw InvalidImage(description: "overlapping or malformed edits")
++      }
++      try image.check(edit.fileOffset, 4)
++      guard output.subdata(in: edit.fileOffset..<edit.fileOffset + 4) == edit.before else {
++        throw InvalidImage(description: "preimage changed")
++      }
++      output.replaceSubrange(edit.fileOffset..<edit.fileOffset + 4, with: edit.after)
++      lastEnd = edit.fileOffset + 4
++    }
++    return Result(data: output, edits: edits)
++  }
++  private static func makeEdit(_ image: Image, _ name: String, _ va: UInt64, _ bytes: Data) throws
++    -> Edit
++  {
++    let offset = try image.offset(va)
++    try image.check(offset, 4)
++    return Edit(
++      identifier: name, address: va, fileOffset: offset,
++      before: image.data.subdata(in: offset..<offset + 4), after: bytes)
++  }
++  private struct InvalidImage: Error, CustomStringConvertible { let description: String }
++  private struct Image {
++    let data: Data
++    struct Segment {
++      let va: UInt64
++      let size: UInt64
++      let file: Int
++    }
++    struct Section {
++      let name: String
++      let va: UInt64
++      let size: Int
++      let file: Int
++    }
++    var segments: [Segment] = []
++    var sections: [Section] = []
++    var starts: Set<UInt64> = []
++    func check(_ p: Int, _ n: Int) throws {
++      guard p >= 0, n >= 0, p <= data.count, n <= data.count - p else {
++        throw InvalidImage(description: "out of bounds \(p), \(n)")
++      }
++    }
++    func word(_ p: Int) throws -> UInt32 {
++      try check(p, 4)
++      return data.withUnsafeBytes {
++        UInt32(littleEndian: $0.loadUnaligned(fromByteOffset: p, as: UInt32.self))
++      }
++    }
++    func quad(_ p: Int) throws -> UInt64 {
++      try check(p, 8)
++      return data.withUnsafeBytes {
++        UInt64(littleEndian: $0.loadUnaligned(fromByteOffset: p, as: UInt64.self))
++      }
++    }
++    func name(_ p: Int, _ max: Int = 512) throws -> String {
++      try check(p, 1)
++      let end = min(data.count, p + max)
++      guard let z = data[p..<end].firstIndex(of: 0) else {
++        throw InvalidImage(description: "unterminated string")
++      }
++      return String(decoding: data[p..<z], as: UTF8.self)
++    }
++    func offset(_ va: UInt64) throws -> Int {
++      guard let s = segments.first(where: { va >= $0.va && va - $0.va < $0.size }) else {
++        throw InvalidImage(description: "unmapped VA")
++      }
++      let p = s.file + Int(va - s.va)
++      try check(p, 1)
++      return p
++    }
++    func relative(_ va: UInt64) throws -> UInt64 {
++      let delta = Int64(Int32(bitPattern: try word(offset(va))))
++      let value = Int64(va) + delta
++      guard value >= 0 else { throw InvalidImage(description: "negative address") }
++      return UInt64(value)
++    }
++    init(_ data: Data) throws {
++      self.data = data
++      guard try word(0) == 0xfeed_facf, try word(4) == 0x0100_000c else {
++        throw InvalidImage(description: "expected ARM64 Mach-O")
++      }
++      let end = 32 + Int(try word(20))
++      try check(32, end - 32)
++      var p = 32
++      var fs: (Int, Int)?
++      for _ in 0..<(try word(16)) {
++        let cmd = try word(p)
++        let n = Int(try word(p + 4))
++        guard n >= 8, p + n <= end else { throw InvalidImage(description: "bad load command") }
++        if cmd == 0x19 {
++          guard n >= 72 else { throw InvalidImage(description: "short segment") }
++          let count = Int(try word(p + 64))
++          guard count <= (n - 72) / 80 else { throw InvalidImage(description: "short sections") }
++          let file = Int(try quad(p + 40))
++          let size = try quad(p + 48)
++          try check(file, Int(size))
++          segments.append(Segment(va: try quad(p + 24), size: size, file: file))
++          for i in 0..<count {
++            let s = p + 72 + i * 80
++            sections.append(
++              Section(
++                name: String(decoding: data[s..<s + 16].prefix(while: { $0 != 0 }), as: UTF8.self),
++                va: try quad(s + 32), size: Int(try quad(s + 40)), file: Int(try word(s + 48))))
++          }
++        }
++        if cmd == 0x26 {
++          guard n >= 16 else { throw InvalidImage(description: "short function starts") }
++          fs = (Int(try word(p + 8)), Int(try word(p + 12)))
++        }
++        p += n
++      }
++      if let (at, size) = fs, let text = sections.first(where: { $0.name == "__text" }),
++        let base = segments.first(where: { text.va >= $0.va && text.va - $0.va < $0.size })?.va
++      {
++        try check(at, size)
++        var cur = at
++        var va = base
++        while cur < at + size {
++          var value: UInt64 = 0
++          var shift = 0
++          var byte: UInt8
++          repeat {
++            guard cur < at + size, shift < 63 else { throw InvalidImage(description: "bad ULEB") }
++            byte = data[cur]
++            cur += 1
++            value |= UInt64(byte & 127) << shift
++            shift += 7
++          } while byte & 128 != 0
++          if value == 0 { break }
++          va += value
++          starts.insert(va)
++        }
++      }
++    }
++  }
++  private static func instructions(_ image: Image, _ va: UInt64) throws -> [ARM64Instruction] {
++    let decoder = ARM64Disassembler()
++    let end = image.starts.filter { $0 > va }.min() ?? va
++    guard end > va, end - va < 20000 else { return [] }
++    let off = try image.offset(va)
++    try image.check(off, Int(end - va))
++    return decoder.disassemble(Data(image.data[off..<off + Int(end - va)]), at: va)
++  }
++  private static func providerEdits(_ image: Image) throws -> [Edit] {
++    let decoder = ARM64Disassembler()
++    guard let proto = image.sections.first(where: { $0.name == "__swift5_proto" }) else {
++      throw InvalidImage(description: "missing conformance section")
++    }
++    var sites: [String: [(UInt64, Data)]] = [:]
++    let wanted = Set(rootProviders)
++    for i in stride(from: 0, to: proto.size, by: 4) {
++      let c = try image.relative(proto.va + UInt64(i))
++      let cp = try image.offset(c)
++      let flags = try image.word(cp + 12)
++      guard (flags >> 3) & 7 == 0, flags & 0xff00 == 0, flags & 0x10000 != 0 else { continue }
++      let t = try image.relative(c + 4)
++      let name = try image.name(image.offset(image.relative(t + 8)))
++      guard wanted.contains(name) else { continue }
++      let n = Int(try image.word(cp + 16))
++      guard n <= 64 else { throw InvalidImage(description: "witness overflow") }
++      for slot in 0..<n {
++        let impl = try image.relative(c + UInt64(24 + slot * 8))
++        guard image.starts.contains(impl) else { continue }
++        let wrapper = try instructions(image, impl)
++        for call in wrapper where call.mnemonic == "bl" {
++          guard let op = call.detail?.operands.first, op.type == .immediate, op.imm > 0,
++            image.starts.contains(UInt64(op.imm))
++          else { continue }
++          let body = try instructions(image, UInt64(op.imm))
++          for k in 1..<body.count {
++            let prev = body[k - 1]
++            let branch = body[k]
++            guard prev.mnemonic == "cmp", let ops = prev.detail?.operands, ops.count == 2,
++              ops[0].type == .register, ops[0].reg == .w(0), ops[1].type == .immediate,
++              ops[1].imm == 1, branch.mnemonic == "b.ne"
++            else { continue }
++            guard k >= 2, body[k - 2].mnemonic == "blraa",
++              let dest = branch.detail?.operands.first, dest.type == .immediate,
++              dest.imm > Int64(branch.address),
++              let end = body.firstIndex(where: { $0.address == UInt64(dest.imm) }),
++              end > k, end - k <= 40
++            else { continue }
++            let fallthroughBlock = Array(
++              body[(k + 1)..<end].prefix(while: { $0.mnemonic != "b" && !$0.isReturn }))
++            guard fallthroughBlock.contains(where: { $0.mnemonic == "bl" }),
++              k + 1 + fallthroughBlock.count < end,
++              body[k + 1 + fallthroughBlock.count].mnemonic == "b"
++            else {
++              continue
++            }
++            guard
++              let replacement = ARM64Encoder.encodeB(
++                from: Int(branch.address), to: Int(branch.address + 4)),
++              let decoded = decoder.disassembleOne(replacement, at: branch.address),
++              decoded.mnemonic == "b",
++              decoded.detail?.operands.first?.imm == Int64(branch.address + 4)
++            else { throw InvalidImage(description: "encoder round trip failed") }
++            sites[name, default: []].append((branch.address, replacement))
++          }
++        }
++      }
++    }
++    for (name, matches) in sites.sorted(by: { $0.key < $1.key }) {
++      guard matches.count == 1 else {
++        throw InvalidImage(description: "ambiguous sites for \(name)")
++      }
++    }
++    var edits: [Edit] = []
++    for name in rootProviders {
++      guard let candidates = sites[name], candidates.count == 1 else {
++        throw InvalidImage(description: "missing or ambiguous provider \(name)")
++      }
++      edits.append(try makeEdit(image, name, candidates[0].0, candidates[0].1))
++    }
++    return edits
++  }
++  private static func gameCenterEdits(_ image: Image) throws -> [Edit] {
++    // Resolve the named import through LC_SYMTAB, LC_DYSYMTAB and pointer sections.
++    // No exported r2 JSON or absolute GOT address is part of the patch input.
++    var sym: (Int, Int, Int, Int)?
++    var indirect: (Int, Int)?
++    var pointerSections: [(UInt64, Int, Int)] = []
++    var command = 32
++    for _ in 0..<(try image.word(16)) {
++      let kind = try image.word(command)
++      let size = Int(try image.word(command + 4))
++      if kind == 2 {
++        try image.check(command, 24)
++        sym = (
++          Int(try image.word(command + 8)), Int(try image.word(command + 12)),
++          Int(try image.word(command + 16)), Int(try image.word(command + 20))
++        )
++      }
++      if kind == 0xb {
++        try image.check(command, 80)
++        indirect = (Int(try image.word(command + 56)), Int(try image.word(command + 60)))
++      }
++      if kind == 0x19 {
++        let count = Int(try image.word(command + 64))
++        for i in 0..<count {
++          let section = command + 72 + i * 80
++          let flags = try image.word(section + 64) & 0xff
++          if flags == 6 || flags == 7 {
++            pointerSections.append(
++              (
++                try image.quad(section + 32), Int(try image.quad(section + 40)) / 8,
++                Int(try image.word(section + 68))
++              ))
++          }
++        }
++      }
++      command += size
++    }
++    guard let (symbols, symbolCount, strings, stringSize) = sym,
++      let (indirectOffset, indirectCount) = indirect
++    else { throw InvalidImage(description: "missing symbol tables\n") }
++    try image.check(symbols, symbolCount * 16)
++    try image.check(strings, stringSize)
++    try image.check(indirectOffset, indirectCount * 4)
++    var targets: [UInt64] = []
++    for (base, count, first) in pointerSections {
++      guard first <= indirectCount, count <= indirectCount - first else {
++        throw InvalidImage(description: "indirect section out of bounds")
++      }
++      for slot in 0..<count {
++        let symbol = try image.word(indirectOffset + (first + slot) * 4)
++        if symbol & 0xc000_0000 != 0 { continue }
++        guard symbol < symbolCount else { throw InvalidImage(description: "bad symbol index") }
++        let nameOffset = Int(try image.word(symbols + Int(symbol) * 16))
++        guard nameOffset < stringSize else {
++          throw InvalidImage(description: "bad symbol name offset")
++        }
++        if try image.name(strings + nameOffset, stringSize - nameOffset)
++          == "_MCFeatureGameCenterAllowed"
++        {
++          targets.append(base + UInt64(slot * 8))
++        }
++      }
++    }
++    guard targets.count == 1 else { throw InvalidImage(description: "ambiguous named import\n") }
++    let got = targets[0]
++    guard let text = image.sections.first(where: { $0.name == "__text" }) else {
++      throw InvalidImage(description: "missing text")
++    }
++    let decoder = ARM64Disassembler()
++    let code = decoder.disassemble(Data(image.data[text.file..<text.file + text.size]), at: text.va)
++    var candidates: [(Int, Int, UInt32)] = []
++    for i in 8..<code.count {
++      let a = code[i - 1]
++      let l = code[i]
++      guard a.mnemonic == "adrp", l.mnemonic == "ldr", let ao = a.detail?.operands,
++        let lo = l.detail?.operands, ao.count == 2, lo.count == 2, ao[1].type == .immediate,
++        lo[1].type == .memory, ao[0].reg == lo[1].mem.base,
++        UInt64(ao[1].imm) + UInt64(lo[1].mem.disp) == got
++      else { continue }
++      let tag = code[i - 4]
++      let call = code[i - 3]
++      let store = code[i - 7]
++      let arg0 = code[i - 6]
++      guard tag.mnemonic == "mov", let t = tag.detail?.operands, t.count == 2, t[0].reg == .w(2),
++        t[1].imm == 8, call.mnemonic == "bl", store.mnemonic == "strb",
++        let so = store.detail?.operands, so.count == 2, so[1].type == .memory, so[1].mem.disp == 0,
++        arg0.mnemonic == "mov", let args = arg0.detail?.operands, args.count == 2,
++        args[0].reg == .x(0), args[1].reg == so[1].mem.base
++      else { continue }
++      guard let rn = (0..<31).first(where: { so[1].mem.base == .x($0) }) else { continue }
++      candidates.append((i - 7, i - 4, UInt32(rn)))
++    }
++    guard candidates.count == 1 else {
++      throw InvalidImage(description: "expected one construction block, got \(candidates.count)")
++    }
++    let (s, t, rn) = candidates[0]
++    let changes = [
++      (code[s], ARM64Encoder.encodeStrXUnsignedOffset(rt: 31, rn: rn, offset: 0)!),
++      (code[t], ARM64Encoder.encodeMovzW(rd: 2, imm16: 2)!),
++    ]
++    return try changes.map { try makeEdit(image, "GameCenter", $0.0.address, $0.1) }
++  }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheSettingsRowsPatcher.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheSettingsRowsPatcher.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..e06c23da57f9605db87218a33152e48e5287596b
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheSettingsRowsPatcher.swift
+@@ -0,0 +1,196 @@
++import CryptoKit
++import Foundation
++import VPhonePatchKit
++
++/// GeneralSettingsUI's reviewed SoftwareUpdateListItemProvider Optional gate.
++/// Locates the image by its type-name string, checks its UUID, follows resilient
++/// Swift witnesses, and validates the cleanup path. No fixed address is used.
++public enum DyldSharedCacheSettingsRowsPatcher {
++  public struct Failure: Error, CustomStringConvertible { public let description: String }
++  public struct Site: Sendable {
++    public let address: UInt64
++    public let before: Data
++    public let replacement: Data
++    public let alreadyPatched: Bool
++  }
++  private static let provider = "SoftwareUpdateListItemProvider"
++  private static let installName =
++    "/System/Library/PrivateFrameworks/Settings/GeneralSettingsUI.framework/GeneralSettingsUI"
++  private static let uuid = Data([
++    0xf8, 0xc2, 0x94, 0xb7, 0x2c, 0xfb, 0x31, 0x2f, 0xa2, 0xab, 0xf8, 0x72, 0x3f, 0x2b, 0x91, 0x07,
++  ])
++  public static func discover(in chunks: DyldSharedCacheChunkSet) throws -> Site {
++    func fail(_ text: String) -> Failure { Failure(description: text) }
++    func word(_ va: UInt64) throws -> UInt32 {
++      try chunks.readAtVMA(va, length: 4).loadLE(UInt32.self, at: 0)
++    }
++    func relative(_ va: UInt64) throws -> UInt64 {
++      let result = Int64(va) + Int64(Int32(bitPattern: try word(va)))
++      guard result > 0 else { throw fail("invalid relative address") }
++      return UInt64(result)
++    }
++    var headers = Set<UInt64>()
++    for string in try chunks.findStringVMAs(Data((provider + "\0").utf8)) {
++      if let h = try chunks.findMachOHeaderBefore(string),
++        chunks.readInstallName(atHeaderVMA: h) == installName
++      {
++        headers.insert(h)
++      }
++    }
++    guard headers.count == 1, let header = headers.first else {
++      throw fail("GeneralSettingsUI missing or ambiguous")
++    }
++    let head = try chunks.readAtVMA(header, length: 65536, allowShort: true)
++    guard head.count >= 32 else { throw fail("short header") }
++    let commandEnd = 32 + Int(head.loadLE(UInt32.self, at: 20))
++    let commandCount = Int(head.loadLE(UInt32.self, at: 16))
++    guard commandEnd <= head.count, commandCount <= 256 else { throw fail("invalid load commands") }
++    var p = 32
++    var proto: (UInt64, Int)?
++    var link: (UInt64, UInt64, UInt64)?
++    var startsInfo: (UInt64, Int)?
++    var imageUUID: Data?
++    for _ in 0..<commandCount {
++      guard p + 8 <= commandEnd else { throw fail("short command") }
++      let cmd = head.loadLE(UInt32.self, at: p)
++      let size = Int(head.loadLE(UInt32.self, at: p + 4))
++      guard size >= 8, size <= commandEnd - p else { throw fail("invalid command size") }
++      if cmd == 0x1b {
++        guard size >= 24 else { throw fail("short UUID") }
++        imageUUID = head.subdata(in: p + 8..<p + 24)
++      }
++      if cmd == 0x26 {
++        guard size >= 16 else { throw fail("short starts") }
++        startsInfo = (
++          UInt64(head.loadLE(UInt32.self, at: p + 8)), Int(head.loadLE(UInt32.self, at: p + 12))
++        )
++      }
++      if cmd == 0x19 {
++        guard size >= 72 else { throw fail("short segment") }
++        let name = String(decoding: head[p + 8..<p + 24].prefix(while: { $0 != 0 }), as: UTF8.self)
++        if name == "__LINKEDIT" {
++          link = (
++            head.loadLE(UInt64.self, at: p + 24), head.loadLE(UInt64.self, at: p + 40),
++            head.loadLE(UInt64.self, at: p + 48)
++          )
++        }
++        let count = Int(head.loadLE(UInt32.self, at: p + 64))
++        guard count <= (size - 72) / 80 else { throw fail("bad sections") }
++        for i in 0..<count {
++          let s = p + 72 + i * 80
++          let name = String(decoding: head[s..<s + 16].prefix(while: { $0 != 0 }), as: UTF8.self)
++          if name == "__swift5_proto" {
++            proto = (
++              head.loadLE(UInt64.self, at: s + 32), Int(head.loadLE(UInt64.self, at: s + 40))
++            )
++          }
++        }
++      }
++      p += size
++    }
++    guard imageUUID == uuid else { throw fail("unreviewed GeneralSettingsUI UUID") }
++    guard let (pv, ps) = proto, ps > 0, ps < 1_048_576, ps % 4 == 0, let (lv, lf, ls) = link,
++      let (fo, fs) = startsInfo, fo >= lf, fo - lf <= ls, fs > 0, fs <= 1_048_576,
++      UInt64(fs) <= ls - (fo - lf)
++    else { throw fail("missing or invalid discovery metadata") }
++    let encoded = try chunks.readAtVMA(lv + fo - lf, length: fs)
++    var starts = Set<UInt64>()
++    var cursor = 0
++    var address = header
++    while cursor < encoded.count {
++      var value: UInt64 = 0
++      var shift = 0
++      var byte: UInt8
++      repeat {
++        guard cursor < encoded.count, shift < 63 else { throw fail("invalid function starts") }
++        byte = encoded[cursor]
++        cursor += 1
++        value |= UInt64(byte & 127) << shift
++        shift += 7
++      } while byte & 128 != 0
++      if value == 0 { break }
++      guard address <= UInt64.max - value else { throw fail("start overflow") }
++      address += value
++      starts.insert(address)
++    }
++    let decoder = ARM64Disassembler()
++    func body(_ start: UInt64) throws -> [ARM64Instruction] {
++      guard starts.contains(start), let end = starts.filter({ $0 > start }).min(),
++        end - start < 20000
++      else { return [] }
++      return decoder.disassemble(try chunks.readAtVMA(start, length: Int(end - start)), at: start)
++    }
++    var sites: [UInt64: Site] = [:]
++    for i in stride(from: 0, to: ps, by: 4) {
++      let c = try relative(pv + UInt64(i))
++      let flags = try word(c + 12)
++      guard (flags >> 3) & 7 == 0, flags & 0xff00 == 0, flags & 0x10000 != 0 else { continue }
++      let type = try relative(c + 4)
++      let nameVA = try relative(type + 8)
++      let name = try chunks.readAtVMA(nameVA, length: 128, allowShort: true)
++      guard String(decoding: name.prefix(while: { $0 != 0 }), as: UTF8.self) == provider else {
++        continue
++      }
++      let count = try word(c + 16)
++      guard count <= 64 else { throw fail("invalid witness count") }
++      for slot in 0..<count {
++        let witness = try relative(c + UInt64(24 + slot * 8))
++        for call in try body(witness) where call.mnemonic == "bl" {
++          guard let op = call.detail?.operands.first, op.type == .immediate, op.imm > 0 else {
++            continue
++          }
++          let instructions = try body(UInt64(op.imm))
++          for k in 2..<max(2, instructions.count) {
++            let branch = instructions[k]
++            let cmp = instructions[k - 1]
++            guard instructions[k - 2].mnemonic == "blraa", cmp.mnemonic == "cmp",
++              let operands = cmp.detail?.operands, operands.count == 2, operands[0].reg == .w(0),
++              operands[1].type == .immediate, operands[1].imm == 1
++            else { continue }
++            let patched =
++              branch.mnemonic == "b"
++              && branch.detail?.operands.first?.imm == Int64(branch.address + 4)
++            guard branch.mnemonic == "b.ne" || patched else { continue }
++            let tail = Array(instructions.dropFirst(k + 1).prefix(40))
++            guard let merge = tail.firstIndex(where: { $0.mnemonic == "b" || $0.isReturn }),
++              tail[merge].mnemonic == "b",
++              tail.prefix(merge).contains(where: { $0.mnemonic == "bl" })
++            else { continue }
++            let normal = tail[merge].address + 4
++            guard patched || branch.detail?.operands.first?.imm == Int64(normal) else { continue }
++            guard
++              let replacement = ARM64Encoder.encodeB(
++                from: Int(branch.address), to: Int(branch.address + 4))
++            else { throw fail("branch encoding failed") }
++            let before = try chunks.readAtVMA(branch.address, length: 4)
++            sites[branch.address] = Site(
++              address: branch.address, before: before, replacement: replacement,
++              alreadyPatched: patched)
++          }
++        }
++      }
++    }
++    guard sites.count == 1, let site = sites.values.first else {
++      throw fail("missing or ambiguous Optional cleanup branch")
++    }
++    return site
++  }
++  public static func patch(in chunks: DyldSharedCacheChunkSet, dryRun: Bool = false) throws -> Site
++  {
++    let site = try discover(in: chunks)
++    guard !dryRun else { return site }
++    // Validate the signature before any write; no silent skipped attestation.
++    let span = DyldSharedCacheWriteSpan(vma: site.address, length: 4)
++    let preview = try DyldSharedCacheCodeSignature.reattest(
++      in: chunks, modifiedSpans: [span], dryRun: true, log: nil)
++    guard preview.isFullyAttested, preview.pagesAttested == 1 else {
++      throw Failure(description: "cannot attest target page")
++    }
++    if !site.alreadyPatched { try chunks.write(at: site.address, site.replacement) }
++    let result = try DyldSharedCacheCodeSignature.reattest(in: chunks, modifiedSpans: [span])
++    guard result.isFullyAttested, result.pagesAttested == 1 else {
++      throw Failure(description: "target page not attested")
++    }
++    return site
++  }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
+index 4efa14215da05cb33ccedb12d87ac2f3875c194d..4b2a1e2c188c0c97c1f3470bd20102529519786e 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwareGuestSystemPatchSet.swift
+@@ -15,6 +15,10 @@ import VPhonePatchKit
+ public enum FirmwareGuestSystemPatchSet {
+     public static let identifier = "com.vphone.patchset.guest.system"
+ 
++    public static let settingsRootRows = "system-preferences-exp-root_rows"
++    public static let settingsSoftwareUpdate = "dyld-exp-settings_software_update_row"
++    public static let settingsRowPatches: Set<String> = [settingsRootRows, settingsSoftwareUpdate]
++
+     private static let ios27 = VPhonePatchApplicability(iOSBase: .major(27))
+ 
+     /// The bases where short-circuiting `checkTrustAndAuthorization` in the
+@@ -88,6 +92,22 @@ public enum FirmwareGuestSystemPatchSet {
+                 applicability: misTrustAuthBases,
+             ),
+ 
++            VPhonePatchDeclaration(
++                identifier: settingsRootRows,
++                title: "Hide selected Settings root rows",
++                summary: "Hides Apple Account, Game Center, iCloud and Wallet on reviewed 24A435 Preferences. Does not hide Indexing or Software Update. Other binary revisions are refused.",
++                target: .guestExecutable(path: "/Applications/Preferences.app/Preferences"),
++                applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 0)),
++            ),
++
++            VPhonePatchDeclaration(
++                identifier: settingsSoftwareUpdate,
++                title: "Hide Software Update in Settings",
++                summary: "Hides the General Software Update row in reviewed 24A435 GeneralSettingsUI. Uses cache-page re-attestation and the normal undo log; other image UUIDs are refused.",
++                target: .dyldSharedCache,
++                applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 0)),
++            ),
++
+             // MARK: System Daemons
+ 
+             VPhonePatchDeclaration(
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift
+index 0b93b69cd349632134623ebdfa2aa11553a411bd..3829be6b2fb18be3d8be1b32a66fd2a7a896463f 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift
+@@ -64,7 +64,7 @@ public enum FirmwarePatchSetCatalog {
+         Set(FirmwareKernelFridaPatchSet.manifest.patches.map(\.identifier))
+             .union(hypervisorConcealmentPatches)
+             .union(experimentalIdentityPatches)
+-            .union([misTrustAuthPatch, displayRefreshPatch])
++            .union([misTrustAuthPatch, displayRefreshPatch, FirmwareGuestSystemPatchSet.settingsRootRows, FirmwareGuestSystemPatchSet.settingsSoftwareUpdate])
+ 
+     /// The 120 Hz timing for the paravirtual display.
+     ///
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareSettingsRowsTests.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareSettingsRowsTests.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..c6247fdf0674bbae39d4f1d88e7145a65688dcee
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareSettingsRowsTests.swift
+@@ -0,0 +1,33 @@
++import CryptoKit
++import FirmwarePatcher
++import Foundation
++import Testing
++
++@Suite("Settings root rows")
++struct CustomFirmwareSettingsRowsTests {
++    @Test(arguments: [0, 31, 64, 4096])
++    func rejectsUnreviewedInput(size: Int) {
++        #expect(throws: (any Error).self) {
++            try CustomFirmwareSettingsRows.patchPreferences(Data(repeating: 0, count: size))
++        }
++    }
++
++    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_SETTINGS_FIXTURE"] != nil))
++    func reviewedFixtureAndUndo() throws {
++        let path = try #require(ProcessInfo.processInfo.environment["VPHONE_SETTINGS_FIXTURE"])
++        let original = try Data(contentsOf: URL(fileURLWithPath: path))
++        let result = try CustomFirmwareSettingsRows.patchPreferences(original)
++        let hash = SHA256.hash(data: result.data).map { String(format: "%02x", $0) }.joined()
++        #expect(hash == "de1d55444059bd4f017aa945de625ff834a07b9ae56f346732856b087e25d74e")
++        #expect(result.edits.count == 5)
++        var restored = result.data
++        for edit in result.edits {
++            #expect(edit.before != edit.after)
++            restored.replaceSubrange(edit.fileOffset..<edit.fileOffset + 4, with: edit.before)
++        }
++        #expect(restored == original)
++        #expect(throws: (any Error).self) {
++            try CustomFirmwareSettingsRows.patchPreferences(result.data)
++        }
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/SettingsRowsStoreEncodingTests.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/SettingsRowsStoreEncodingTests.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..d9ff2362204ca82d8c0a0f000f2d8e4cac369965
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/SettingsRowsStoreEncodingTests.swift
+@@ -0,0 +1,17 @@
++import Foundation
++import Testing
++import VPhonePatchKit
++
++@Suite("Settings rule store encoding")
++struct SettingsRowsStoreEncodingTests {
++    @Test func encodesZeroPayloadStore() {
++        #expect(ARM64Encoder.encodeStrXUnsignedOffset(rt: 31, rn: 23, offset: 0) == Data([0xff, 0x02, 0x00, 0xf9]))
++        #expect(ARM64Encoder.encodeStrXUnsignedOffset(rt: 0, rn: 31, offset: 32760) != nil)
++    }
++    @Test func rejectsInvalidOperands() {
++        #expect(ARM64Encoder.encodeStrXUnsignedOffset(rt: 32, rn: 0, offset: 0) == nil)
++        #expect(ARM64Encoder.encodeStrXUnsignedOffset(rt: 0, rn: 32, offset: 0) == nil)
++        #expect(ARM64Encoder.encodeStrXUnsignedOffset(rt: 0, rn: 0, offset: 4) == nil)
++        #expect(ARM64Encoder.encodeStrXUnsignedOffset(rt: 0, rn: 0, offset: 32768) == nil)
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheSettingsRowsTests.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheSettingsRowsTests.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..50db947a4a5b0a38d3705935f3d2040afb86bd78
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheSettingsRowsTests.swift
+@@ -0,0 +1,42 @@
++import CryptoKit
++import Darwin
++import FirmwarePatcher
++import Foundation
++import Testing
++
++@Suite("Settings Software Update cache")
++struct DyldSharedCacheSettingsRowsTests {
++    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_SETTINGS_CACHE_FIXTURE"] != nil))
++    func fixturePatchRepeatAndUndo() throws {
++        let fm = FileManager.default
++        let source = URL(fileURLWithPath: try #require(ProcessInfo.processInfo.environment["VPHONE_SETTINGS_CACHE_FIXTURE"]))
++        let work = fm.temporaryDirectory.appendingPathComponent("settings-cache-test-\(UUID().uuidString)")
++        try fm.createDirectory(at: work, withIntermediateDirectories: true)
++        defer { try? fm.removeItem(at: work) }
++        for url in try fm.contentsOfDirectory(at: source, includingPropertiesForKeys: nil)
++        where url.lastPathComponent.hasPrefix("dyld_shared_cache_arm64e") {
++            let to = work.appendingPathComponent(url.lastPathComponent)
++            guard clonefile(url.path, to.path, 0) == 0 else { throw CocoaError(.fileWriteUnknown) }
++        }
++        let chunks = try DyldSharedCacheChunkSet(directory: work, captureUndo: true)
++        let dry = try DyldSharedCacheSettingsRowsPatcher.patch(in: chunks, dryRun: true)
++        #expect(!dry.alreadyPatched)
++        #expect(chunks.takeUndoLog()?.records.isEmpty == true)
++        let (file, _) = try chunks.fileRange(of: DyldSharedCacheWriteSpan(vma: dry.address, length: 4))
++        let original = try Data(contentsOf: file)
++        _ = try DyldSharedCacheSettingsRowsPatcher.patch(in: chunks)
++        let patched = try Data(contentsOf: file)
++        #expect(SHA256.hash(data: patched).map { String(format: "%02x", $0) }.joined()
++            == "dd79a85eb90dbe9dab116220ad2a5cde32109054e6f8bef5bee9e131690240c4")
++        var undo = try #require(chunks.takeUndoLog())
++        #expect(undo.records.count == 1)
++        undo.stamp(patchID: FirmwareGuestSystemPatchSet.settingsSoftwareUpdate)
++        let repeatSite = try DyldSharedCacheSettingsRowsPatcher.patch(in: chunks)
++        #expect(repeatSite.alreadyPatched)
++        #expect(chunks.takeUndoLog()?.records.isEmpty == true)
++        #expect(try Data(contentsOf: file) == patched)
++        let spans = try undo.restore(patchIDs: undo.patchIDs, in: work)
++        #expect(try DyldSharedCacheCodeSignature.reattest(in: chunks, modifiedSpans: spans).isFullyAttested)
++        #expect(try Data(contentsOf: file) == original)
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift
+index 04197ac418447045edb2af2c6ec04fca8e5259ed..b852afa458d4d8ba3f30d794e3f2162c750e420a 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/PatchSets/FirmwarePatchSetCatalogTests.swift
+@@ -134,21 +134,31 @@ struct FirmwarePatchSetCatalogTests {
+     }
+ 
+     @Test
+-    func `Extended is standard plus the manual-only patches, and nothing else`() throws {
+-        let standard = try VPhonePatchPlan.resolve(
+-            preset: FirmwarePatchSetCatalog.standardPreset,
+-            patchSets: FirmwarePatchSetCatalog.bundled,
+-            iOSBase: VPhoneVersion("26.4"),
+-            cloudOS: VPhoneVersion("26.4"),
+-        )
+-        let experimental = try VPhonePatchPlan.resolve(
+-            preset: FirmwarePatchSetCatalog.experimentalPreset,
+-            patchSets: FirmwarePatchSetCatalog.bundled,
+-            iOSBase: VPhoneVersion("26.4"),
+-            cloudOS: VPhoneVersion("26.4"),
+-        )
+-        #expect(experimental.enabled.subtracting(standard.enabled) == FirmwarePatchSetCatalog.manualOnlyPatches)
+-        #expect(standard.enabled.subtracting(experimental.enabled).isEmpty)
++    func `Extended adds exactly the manual-only patches applicable to each base`() throws {
++        for base in ["18.6.2", "26.4", "27.0", "27.1"] {
++            let version = VPhoneVersion(base)
++            let cloud = VPhoneVersion("26.4")
++            let standard = try VPhonePatchPlan.resolve(
++                preset: FirmwarePatchSetCatalog.standardPreset,
++                patchSets: FirmwarePatchSetCatalog.bundled,
++                iOSBase: version,
++                cloudOS: cloud,
++            )
++            let experimental = try VPhonePatchPlan.resolve(
++                preset: FirmwarePatchSetCatalog.experimentalPreset,
++                patchSets: FirmwarePatchSetCatalog.bundled,
++                iOSBase: version,
++                cloudOS: cloud,
++            )
++            let applicableManual = Set(FirmwarePatchSetCatalog.allDeclarations.filter {
++                FirmwarePatchSetCatalog.manualOnlyPatches.contains($0.identifier)
++                    && $0.applicability.matches(iOSBase: version, cloudOS: cloud)
++            }.map(\.identifier))
++            #expect(experimental.enabled.subtracting(standard.enabled) == applicableManual)
++            #expect(standard.enabled.subtracting(experimental.enabled).isEmpty)
++            #expect(experimental.isEnabled(FirmwareGuestSystemPatchSet.settingsRootRows) == (base == "27.0"))
++            #expect(experimental.isEnabled(FirmwareGuestSystemPatchSet.settingsSoftwareUpdate) == (base == "27.0"))
++        }
+     }
+ 
+     @Test
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareDyldSharedCacheVerbsCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareDyldSharedCacheVerbsCommand.swift
+index 04b9f22d93fcf84150b277718481026205bc768f..85f007d0eb8163ee19445a04e16fcfad2532a4ab 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareDyldSharedCacheVerbsCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareDyldSharedCacheVerbsCommand.swift
+@@ -72,6 +72,7 @@ enum VPhoneCustomFirmwareDyldSharedCacheVerbs {
+     /// Registered into `vphone-cli cfw` by `VPhoneCustomFirmwareCommand`.
+     static var all: [ParsableCommand.Type] {
+         [
++            VPhoneCustomFirmwarePatchSettingsSoftwareUpdateCommand.self,
+             VPhoneCustomFirmwareDyldSharedCacheRevertCommand.self,
+             VPhoneCustomFirmwarePatchHypervisorVirtualMachineDyldSharedCacheCommand.self,
+             VPhoneCustomFirmwarePatchIOMFBSwapEndCommand.self,
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+index 032fbab931fa474da1206fd8a6a6bd65d8c028ea..6ea59d6df326617ab6966fe81fd05c83c10e8922 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+@@ -999,9 +999,10 @@ struct VPhoneCustomFirmwareInstaller {
+ 
+         /// Whether the VM's plan (its guest half re-resolved from the current
+         /// selection) turned this guest patch on. A VM with no plan gets every
+-        /// patch, which is what it was restored with.
++        /// legacy patch, which is what it was restored with. New Settings-row
++        /// preferences still require an explicit plan.
+         func on(_ identifier: String) -> Bool {
+-            guard let plan else { return true }
++            guard let plan else { return !FirmwareGuestSystemPatchSet.settingsRowPatches.contains(identifier) }
+             guard plan.isEnabled(identifier) else {
+                 print("  [·] \(identifier): off in preset \(plan.presetIdentifier)")
+                 return false
+@@ -1126,6 +1127,7 @@ struct VPhoneCustomFirmwareInstaller {
+             dyld.append(("dyld-boot-iomfb_swapend", "patch-iomfb-swapend", [dsc, "--target-size", "0x560"]))
+         }
+         dyld += [
++            (FirmwareGuestSystemPatchSet.settingsSoftwareUpdate, "patch-settings-software-update", [dsc]),
+             (FirmwarePatchSetCatalog.misTrustAuthPatch, "patch-mis-trust-auth", [dsc]),
+             ("dyld-exp-hv_vmm", "patch-hv-vmm-dsc", [dsc]),
+             ("dyld-cfw-camera", "patch-camera-dsc", [dsc, (dsc as NSString).appendingPathComponent("dyld_shared_cache_arm64e")]),
+@@ -1162,6 +1164,14 @@ struct VPhoneCustomFirmwareInstaller {
+         }
+ 
+         machO("system-seputil-boot-gigalocker_uuid", path: "usr/libexec/seputil", verbs: ["patch-seputil"], codeIdentifier: "com.apple.seputil")
++        machO(
++            FirmwareGuestSystemPatchSet.settingsRootRows,
++            path: "Applications/Preferences.app/Preferences",
++            verbs: ["patch-settings-root-rows"],
++            codeIdentifier: "com.apple.Preferences",
++            preserveEntitlements: true,
++        )
++
+         if version.hasPrefix("27.") {
+             machO("system-diskimagesiod-cfw-is_mount_complete", path: "usr/libexec/diskimagesiod", verbs: ["patch-diskimagesiod"], preserveEntitlements: true)
+         }
+@@ -1339,7 +1349,7 @@ struct VPhoneCustomFirmwareInstaller {
+         live: inout Set<String>,
+         failures: inout [String],
+     ) {
+-        func enabled(_ id: String) -> Bool { plan?.isEnabled(id) ?? true }
++        func enabled(_ id: String) -> Bool { plan?.isEnabled(id) ?? !FirmwareGuestSystemPatchSet.settingsRowPatches.contains(id) }
+         let undoAbsolute = (dsc as NSString).appendingPathComponent(Self.dscUndoLogLeaf)
+         let undoRelative = "\(Self.dscCacheRelative)/\(Self.dscUndoLogLeaf)"
+         let recorded = (try? system.readData(undoRelative))
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareMachOVerbsCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareMachOVerbsCommand.swift
+index 7f3e6b845369f42774a6f32a15dfb0a4d92367ac..831e84b295d33ace8149772964dad96c4fe3d70d 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareMachOVerbsCommand.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareMachOVerbsCommand.swift
+@@ -515,6 +515,7 @@ enum VPhoneCustomFirmwareMachOVerbs {
+     /// Python's usage block read in the same order.
+     static var all: [ParsableCommand.Type] {
+         [
++            VPhoneCustomFirmwarePatchSettingsRootRowsCommand.self,
+             VPhoneCustomFirmwarePatchSeputilCommand.self,
+             VPhoneCustomFirmwarePatchLaunchdCacheLoaderCommand.self,
+             VPhoneCustomFirmwarePatchMobileactivationdCommand.self,
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsRootRowsCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsRootRowsCommand.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..1b419ecb5e344fb98f9392197914a8a3e77f7fab
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsRootRowsCommand.swift
+@@ -0,0 +1,31 @@
++import ArgumentParser
++import FirmwarePatcher
++import Foundation
++
++/// Operates only on the installer's staged pristine backup. The common Mach-O
++/// installer handles signing, ownership, selection, receipt and restoration.
++struct VPhoneCustomFirmwarePatchSettingsRootRowsCommand: ParsableCommand {
++    static let configuration = CommandConfiguration(
++        commandName: "patch-settings-root-rows",
++        abstract: "Hide four root rows in reviewed 24A435 Preferences; caller must re-sign",
++    )
++
++    @Argument(help: "Pristine Preferences Mach-O staged for patching", transform: URL.init(fileURLWithPath:))
++    var binary: URL
++
++    @Flag(help: "Discover and validate all edits without writing")
++    var dryRun = false
++
++    func run() throws {
++        let original = try Data(contentsOf: binary)
++        let result = try CustomFirmwareSettingsRows.patchPreferences(original)
++        for edit in result.edits {
++            let before = edit.before.map { String(format: "%02x", $0) }.joined()
++            let after = edit.after.map { String(format: "%02x", $0) }.joined()
++            print("\(edit.identifier): file+0x\(String(edit.fileOffset, radix: 16)) \(before) -> \(after)")
++        }
++        if !dryRun {
++            try result.data.write(to: binary, options: .atomic)
++        }
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsSoftwareUpdateCommand.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsSoftwareUpdateCommand.swift
+new file mode 100644
+index 0000000000000000000000000000000000000000..76303cf9e67d319541a1ce66dc001d415289d8a4
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwarePatchSettingsSoftwareUpdateCommand.swift
+@@ -0,0 +1,22 @@
++import ArgumentParser
++import FirmwarePatcher
++import Foundation
++
++struct VPhoneCustomFirmwarePatchSettingsSoftwareUpdateCommand: ParsableCommand {
++    static let configuration = CommandConfiguration(
++        commandName: "patch-settings-software-update",
++        abstract: "Hide Software Update in reviewed GeneralSettingsUI and re-attest its cache page",
++    )
++    @Argument(transform: URL.init(fileURLWithPath:)) var chunksDirectory: URL
++    @Flag var dryRun = false
++    @OptionGroup var undo: DyldSharedCacheUndoOptions
++
++    func run() throws {
++        let chunks = try DyldSharedCacheChunkSet(directory: chunksDirectory, captureUndo: undo.captures)
++        let site = try DyldSharedCacheSettingsRowsPatcher.patch(in: chunks, dryRun: dryRun)
++        let before = site.before.map { String(format: "%02x", $0) }.joined()
++        let after = site.replacement.map { String(format: "%02x", $0) }.joined()
++        print("SoftwareUpdateListItemProvider: 0x\(String(site.address, radix: 16)) \(before) -> \(after), already patched: \(site.alreadyPatched)")
++        if let captured = chunks.takeUndoLog() { try undo.persist(captured, dryRun: dryRun) }
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhonePatchKit/ARM64/ARM64Encoder.swift b/VPhoneExecutable/VPhoneCommand/VPhonePatchKit/ARM64/ARM64Encoder.swift
+index 6ca426b68ced5faca8a00c09f529bcee8612a2ea..8b0ad723b6e3d728f26597ddb46bb88c44fb739d 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhonePatchKit/ARM64/ARM64Encoder.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhonePatchKit/ARM64/ARM64Encoder.swift
+@@ -223,6 +223,27 @@ public enum ARM64Encoder {
+ 
+     // MARK: - Stores
+ 
++    /// Encode `STR Xt, [Xn, #offset]` — 64-bit store, unsigned scaled offset.
++    ///
++    /// The unsigned immediate uses `opc = 00`; `imm12` is
++    /// scaled by 8, so `offset` must be a multiple of 8 in `0...32760`.
++    /// `rn == 31` means SP.
++    public static func encodeStrXUnsignedOffset(rt: UInt32, rn: UInt32, offset: UInt32) -> Data? {
++        guard rt < 32, rn < 32 else { return nil }
++        guard offset % 8 == 0 else { return nil }
++        let imm12 = offset / 8
++        guard imm12 < 4096 else { return nil }
++
++        var insn: UInt32 = 0b11 << 30 // size
++        insn |= 0b111 << 27
++        insn |= 0b01 << 24
++        insn |= 0b00 << 22 // opc = STR
++        insn |= imm12 << 10
++        insn |= rn << 5
++        insn |= rt
++        return ARM64.encodeU32(insn)
++    }
++
+     /// Encode `STP Xt1, Xt2, [Xn, #offset]` — 64-bit store pair, signed scaled
+     /// offset, no writeback.
+     ///
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings b/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings
+index be882f69e7fd88d074a10bc92ceba58029c5863e..fa8a47614c859da21ae210601bbd88da78fee1bb 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Localizable.xcstrings
+@@ -312,6 +312,41 @@
+         }
+       }
+     },
++    "The guest shuts down, then the virtual machine stops. A guest still running after 15 seconds is turned off, as pulling the power would." : {
++      "extractionState" : "manual",
++      "localizations" : {
++        "en" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "The guest shuts down, then the virtual machine stops. A guest still running after 15 seconds is turned off, as pulling the power would."
++          }
++        },
++        "ja" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "ゲストをシステム終了してから仮想マシンを停止します。15 秒たってもゲストが動作している場合は、電源を抜いたときのようにオフになります。"
++          }
++        },
++        "ko" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "게스트를 종료한 다음 가상 머신을 중지합니다. 15초가 지나도 게스트가 실행 중이면 전원을 뽑은 것처럼 꺼집니다."
++          }
++        },
++        "vi" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "Máy khách sẽ tắt máy, sau đó máy ảo dừng. Nếu sau 15 giây máy khách vẫn chạy, nó sẽ bị tắt như khi rút nguồn."
++          }
++        },
++        "zh-Hans" : {
++          "stringUnit" : {
++            "state" : "translated",
++            "value" : "客户机先关机，然后虚拟机停止。如果 15 秒后客户机仍在运行，将如同拔掉电源一样关闭它。"
++          }
++        }
++      }
++    },
+     "The virtual machine stopped and the keyboard setting was saved. Launch this machine again. Unable to restart: %@" : {
+       "extractionState" : "manual",
+       "localizations" : {
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist
+index 51b067a7b0a6297c81e22c4c23a63ed1e7fab97f..0bf7060b51f28ad299a7577f12178b547d240806 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist
+@@ -121,6 +121,8 @@
+ 			<string>devicetree-exp-arm_io_soc_generation</string>
+ 			<string>preboot-exp-devicetree_identity</string>
+ 			<string>dyld-exp-mis_trust_auth</string>
++			<string>system-preferences-exp-root_rows</string>
++			<string>dyld-exp-settings_software_update_row</string>
+ 			<string>kernel-exp-display_refresh_120hz</string>
+ 		</array>
+ 	</dict>
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift
+index 580aef269ce5b6a5e391b6eb4da45ccfd78dab9d..7b33a2de58e4ababe1325f921e650b7006e1d6f8 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneVirtualMachineAppDelegate.swift
+@@ -26,6 +26,13 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
+     /// from `vm stop` or Launchpad, which must not wait for an answer.
+     private var stopConfirmed = false
+     private var isConfirmingStop = false
++    /// The guest was asked to shut down and the process waits for it to stop.
++    private var isShuttingDownGuest = false
++    /// The next quit ends the process, and the virtual machine with it.
++    private var powersOffOnQuit = false
++    /// How long a quit waits for the guest to shut down before turning it
++    /// off. `vm stop` sends SIGKILL after 20 s by default, so it stays below.
++    private static let guestShutdownTimeout: Duration = .seconds(15)
+ 
+     init(command: VPhoneBootCommand) {
+         self.command = command
+@@ -51,7 +58,7 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
+             self?.stopConfirmed = true
+             if self?.isConfirmingStop == true {
+                 // A quit is waiting on the question; this answers it.
+-                NSApp.reply(toApplicationShouldTerminate: true)
++                self?.answerStopQuestion()
+             } else {
+                 NSApp.terminate(nil)
+             }
+@@ -490,25 +497,89 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
+         stopControlServices()
+     }
+ 
+-    /// Quitting turns the guest off at once, so a quit from the window or ⌘Q
+-    /// asks first while the VM runs. A SIGINT stop, a headless VM and a VM
+-    /// that never started quit straight away.
++    /// Quitting shuts the guest down first and turns the virtual machine off
++    /// once it has, or when it has not within `guestShutdownTimeout`. A guest
++    /// that cannot be asked (in DFU, still starting up, or a vphoned without
++    /// `system.shutdown`) is turned off at once. A quit from the window or ⌘Q
++    /// asks first while the VM runs; a SIGINT stop and a headless VM do not.
++    /// A second SIGINT while the guest shuts down, as a second Control-C,
++    /// turns it off without waiting.
+     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
+-        guard !command.noGraphics, !stopConfirmed, vm != nil else { return .terminateNow }
++        guard !powersOffOnQuit, vm != nil else { return .terminateNow }
++        if isShuttingDownGuest {
++            return stopConfirmed ? .terminateNow : .terminateCancel
++        }
++        guard !command.noGraphics, !stopConfirmed else { return stopGuest() }
+         guard !isConfirmingStop else { return .terminateCancel }
+         isConfirmingStop = true
+         VPhoneAlert.present(
+             title: "Stop the Virtual Machine?",
+-            message: "Quitting turns the guest off at once, as pulling the power would. Anything not saved in the guest is lost.",
++            message: canShutDownGuest
++                ? "The guest shuts down, then the virtual machine stops. A guest still running after 15 seconds is turned off, as pulling the power would."
++                : "Quitting turns the guest off at once, as pulling the power would. Anything not saved in the guest is lost.",
+             style: .warning,
+             buttons: ["Stop", "Cancel"],
+         ) { [weak self] response in
+-            self?.isConfirmingStop = false
+-            NSApp.reply(toApplicationShouldTerminate: response == .alertFirstButtonReturn)
++            // A SIGINT that came while the question was up has answered it.
++            guard let self, isConfirmingStop else { return }
++            isConfirmingStop = false
++            guard response == .alertFirstButtonReturn else {
++                NSApp.reply(toApplicationShouldTerminate: false)
++                return
++            }
++            NSApp.reply(toApplicationShouldTerminate: stopGuest() == .terminateNow)
+         }
+         return .terminateLater
+     }
+ 
++    /// Answers a quit waiting on the stop question, as a SIGINT does.
++    @MainActor
++    private func answerStopQuestion() {
++        isConfirmingStop = false
++        if let window = VPhoneAlert.hostWindow, let sheet = window.attachedSheet {
++            window.endSheet(sheet)
++        }
++        NSApp.reply(toApplicationShouldTerminate: stopGuest() == .terminateNow)
++    }
++
++    @MainActor
++    private var canShutDownGuest: Bool {
++        guard !command.dfu, let control else { return false }
++        return control.isConnected && control.guestCapabilities.contains("system_shutdown")
++    }
++
++    /// Asks the guest to shut down and cancels the quit, or turns the guest off
++    /// now when it cannot be asked. `guestDidStop` exits the process once the
++    /// guest has stopped.
++    @MainActor
++    private func stopGuest() -> NSApplication.TerminateReply {
++        guard canShutDownGuest, let control else { return .terminateNow }
++        isShuttingDownGuest = true
++        print("[vphone] Asking the guest to shut down")
++        Task { @MainActor [weak self] in
++            do {
++                try await control.shutDownGuest()
++            } catch let VPhoneGuestControl.ControlError.guestError(message) {
++                print("[vphone] Guest refused to shut down: \(message); turning it off")
++                self?.powerOff()
++            } catch {
++                // The guest can stop before it replies, so the connection drops.
++            }
++        }
++        Task { @MainActor [weak self] in
++            try? await Task.sleep(for: Self.guestShutdownTimeout)
++            print("[vphone] Guest still running after \(Self.guestShutdownTimeout); turning it off")
++            self?.powerOff()
++        }
++        return .terminateCancel
++    }
++
++    @MainActor
++    private func powerOff() {
++        powersOffOnQuit = true
++        NSApp.terminate(nil)
++    }
++
+     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
+         !command.noGraphics && !isRestartingVirtualMachine
+     }
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadRootView.swift b/VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadRootView.swift
+index 85fd528bbc237df64993abcf48cdb23989a3af32..1c09bed3710749925878b66885f6c3fa4ca7494e 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadRootView.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadRootView.swift
+@@ -17,9 +17,18 @@ struct VPhoneLaunchpadRootView: View {
+             }
+             .navigationTitle("Machines")
+             .task { await model.start() }
++            // Free space changes as machines restore and IPSWs download; the
++            // Host Setup row follows it.
++            .task {
++                while !Task.isCancelled {
++                    try? await Task.sleep(for: .seconds(5))
++                    host.refreshDiskSpace()
++                }
++            }
+             // Coming back from Settings, with or without Host Setup open.
+             .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                 host.refreshDeveloperTools()
++                host.refreshDiskSpace()
+             }
+             .sheet(item: $model.panel, onDismiss: model.panelDidDismiss) { panel in
+                 Group {
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHostSetup.swift b/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHostSetup.swift
+index 24f4d210dad27c88550c6b4a2dabdb6ed7365fe2..4618a650557ef0da9276e59720c469d6e180fc62 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHostSetup.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHostSetup.swift
+@@ -157,6 +157,19 @@ final class VPhoneLaunchpadHostSetup {
+         update(.resources, Self.resources())
+     }
+ 
++    /// Re-reads the free space alone. The window does so every few seconds,
++    /// so a restore or a download filling the volume shows without a recheck.
++    /// An unchanged amount leaves the row alone.
++    func refreshDiskSpace() {
++        let result = Self.diskSpace(libraryRoot)
++        guard let check = checks.first(where: { $0.kind == .diskSpace }),
++              check.status != result.0 || check.detail != result.1
++        else {
++            return
++        }
++        update(.diskSpace, result)
++    }
++
+     /// Re-reads Developer Tools access alone, for when the app comes back
+     /// from Settings.
+     func refreshDeveloperTools() {
+@@ -301,7 +314,9 @@ final class VPhoneLaunchpadHostSetup {
+     }
+ 
+     private nonisolated static func diskSpace(_ root: URL) -> (VPhoneLaunchpadStatus, String) {
+-        let url = existingAncestor(of: root)
++        var url = existingAncestor(of: root)
++        // The URL may be the library root itself, which keeps what it read.
++        url.removeAllCachedResourceValues()
+         let values = try? url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+         guard let available = values?.volumeAvailableCapacityForImportantUsage else {
+             return (.warning, String(localized: "Unknown"))
