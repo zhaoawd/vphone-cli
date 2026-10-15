@@ -20,6 +20,8 @@ struct VPhoneVMCommand: ParsableCommand {
             VPhoneVMImportCommand.self,
             VPhoneVMLaunchCommand.self,
             VPhoneVMStopCommand.self,
+            VPhoneVMUpdateKernelCommand.self,
+            VPhoneVMRollbackKernelCommand.self,
             VPhoneVMCreateCommand.self,
             VPhoneVMCreateStatusCommand.self,
         ]

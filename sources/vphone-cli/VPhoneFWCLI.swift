@@ -7,7 +7,7 @@ struct VPhoneFWCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "fw",
         abstract: "Firmware pipeline: prepare (download/merge IPSWs) and patch",
-        subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWPatchCommand.self,
+        subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWGenerationPrepareCommand.self, VPhoneFWPatchCommand.self,
                       VPhoneFWRecordCommand.self, VPhoneFWInspectCommand.self, VPhoneFWPlanCommand.self,
                       VPhoneFWCacheCommand.self, VPhoneFWSelectionPreviewCommand.self,
                       VPhoneFWSelectionMigrateCommand.self, VPhoneFWDesiredPlanCommand.self])
@@ -193,7 +193,7 @@ struct VPhoneFWPatchCommand: ParsableCommand {
                 : "firmware NOT written (--allow-ablation-output also requires complete required declaration evidence)"
             print("[fw patch] ABLATION RUN\(allowAblationOutput ? "" : " (dry)"): \(report.ablation.count) step(s) ablated; \(mode)")
         }
-        print("[fw patch] applied \(report.allRecords.count) patches for \(variant.rawValue)")
+        print("[fw patch] recorded \(report.allRecords.count) byte records (including verified unchanged outputs) for \(variant.rawValue)")
 
         if !report.failedRequired.isEmpty {
             throw PatcherError.patchSiteNotFound(

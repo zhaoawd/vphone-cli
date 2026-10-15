@@ -9,6 +9,7 @@
 import CryptoKit
 import Darwin
 import Foundation
+import VPhoneKernelIOTrace
 
 // MARK: - Run Trace
 
@@ -372,7 +373,7 @@ extension PatchExperimentRecord {
                 }
             }
             try inject(.fsync)
-            guard fsync(fd) == 0 else { throw posix() }
+            guard KernelIOTrace.synchronize(fd, phase: "PatchExperimentRecord.fsync") == 0 else { throw posix() }
             close(fd); fd = -1
             try inject(.rename)
             guard rename(temporary.path, url.path) == 0 else { throw posix() }
@@ -381,7 +382,7 @@ extension PatchExperimentRecord {
             let dirFD = open(directory.path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
             guard dirFD >= 0 else { throw posix() }
             defer { close(dirFD) }
-            guard fsync(dirFD) == 0 else { throw posix() }
+            guard KernelIOTrace.synchronize(dirFD, phase: "PatchExperimentRecord.directoryFsync") == 0 else { throw posix() }
         } catch {
             if fd >= 0 { close(fd) }
             unlink(renamed ? url.path : temporary.path)

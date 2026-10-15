@@ -160,8 +160,14 @@ public enum FirmwareComponentReceipt {
         }
         guard record.fileOffset >= 0, !record.patchedBytes.isEmpty,
               record.fileOffset <= payload.count,
-              record.patchedBytes.count <= payload.count - record.fileOffset,
-              payload.subdata(in: record.fileOffset ..< record.fileOffset + record.patchedBytes.count) == record.patchedBytes else {
+              record.patchedBytes.count <= payload.count - record.fileOffset else {
+            throw failure("required effect absent from final output: \(record.patchID)")
+        }
+        // Patch records use payload-relative offsets; DER payload views can
+        // retain a nonzero Data startIndex from their enclosing container.
+        let start = payload.index(payload.startIndex, offsetBy: record.fileOffset)
+        let end = payload.index(start, offsetBy: record.patchedBytes.count)
+        guard payload[start..<end] == record.patchedBytes else {
             throw failure("required effect absent from final output: \(record.patchID)")
         }
     }

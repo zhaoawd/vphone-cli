@@ -1,6 +1,7 @@
 import CryptoKit
 import Darwin
 import Foundation
+import VPhoneKernelIOTrace
 import VPhoneArchiveKit
 
 /// Shared by the explicit sudo CLI and the future authorized helper service.
@@ -73,7 +74,7 @@ public struct VPhoneCoreBundleStore: Sendable {
             guard fd >= 0 else { throw failure("create receipt", receiptURL) }
             let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
             try output.write(contentsOf: receipt.encoded())
-            try output.synchronize()
+            try KernelIOTrace.measure("VPhoneCoreBundleStore.fileHandleSynchronize", aggregate: true) { _ in try output.synchronize() }
             try output.close()
             try secureTree(publication, normalize: true)
             // One atomic, exclusive rename publishes both bundle and receipt.
@@ -149,29 +150,31 @@ public struct VPhoneCoreBundleStore: Sendable {
     }
 
     private func verifiedReceipt(_ version: String) throws -> VPhoneBundleReceipt {
-        let directory = directory(version)
-        try secureTree(directory, normalize: false)
-        let receiptURL = directory.appendingPathComponent("receipt.json")
-        let info = try requireEntry(receiptURL, type: S_IFREG)
-        guard info.st_size > 0, info.st_size <= 65536 else {
-            throw VPhoneBundleStoreError("Invalid Core Bundle receipt size \(info.st_size) (1–65536 bytes): \(receiptURL.path)")
-        }
-        let receipt: VPhoneBundleReceipt
-        do { receipt = try VPhoneBundleReceipt.decode(Data(contentsOf: receiptURL)) } catch {
-            throw VPhoneBundleStoreError("Invalid Core Bundle receipt: expected JSON with version, sha256, installedAt and cdhashes: \(receiptURL.path)")
-        }
-        try Self.requireReceipt(receipt, version: version)
-        let bundle = directory.appendingPathComponent("VPhone.bundle")
-        try requireBundleLayout(bundle, version: version)
-        try VPhoneBundleCodeSignature.verify(bundle)
-        for executable in VPhoneBundleExecutable.allCases {
-            let expected = receipt.cdhashes[executable.rawValue]!
-            let actual = try VPhoneBundleCodeSignature.cdhash(executableURL(bundle, executable))
-            guard actual == expected else {
-                throw VPhoneBundleStoreError("Installed \(executable.rawValue) cdhash \(actual) differs from its receipt (\(expected)).")
+        return try KernelIOTrace.measure("store.verifiedReceipt") { _ in
+            let directory = directory(version)
+            try KernelIOTrace.measure("store.secureTree") { _ in try secureTree(directory, normalize: false) }
+            let receiptURL = directory.appendingPathComponent("receipt.json")
+            let info = try requireEntry(receiptURL, type: S_IFREG)
+            guard info.st_size > 0, info.st_size <= 65536 else {
+                throw VPhoneBundleStoreError("Invalid Core Bundle receipt size \(info.st_size) (1–65536 bytes): \(receiptURL.path)")
             }
+            let receipt: VPhoneBundleReceipt
+            do { receipt = try KernelIOTrace.measure("store.receiptReadDecode", labels: ["byte_semantics": "unknown"]) { _ in try VPhoneBundleReceipt.decode(Data(contentsOf: receiptURL)) } } catch {
+                throw VPhoneBundleStoreError("Invalid Core Bundle receipt: expected JSON with version, sha256, installedAt and cdhashes: \(receiptURL.path)")
+            }
+            try Self.requireReceipt(receipt, version: version)
+            let bundle = directory.appendingPathComponent("VPhone.bundle")
+            try KernelIOTrace.measure("store.requireBundleLayout") { _ in try requireBundleLayout(bundle, version: version) }
+            try VPhoneBundleCodeSignature.verify(bundle)
+            for executable in VPhoneBundleExecutable.allCases {
+                let expected = receipt.cdhashes[executable.rawValue]!
+                let actual = try VPhoneBundleCodeSignature.cdhash(executableURL(bundle, executable))
+                guard actual == expected else {
+                    throw VPhoneBundleStoreError("Installed \(executable.rawValue) cdhash \(actual) differs from its receipt (\(expected)).")
+                }
+            }
+            return receipt
         }
-        return receipt
     }
 
     /// Receipt fields checked before any signature work, one reason per failure.

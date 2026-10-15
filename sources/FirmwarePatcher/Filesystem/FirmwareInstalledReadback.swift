@@ -72,7 +72,7 @@ struct FirmwareInstalledReadback {
     }
 
     func withReadOnlyVolumes<T>(body: (Volumes) throws -> T) throws -> T {
-        try withReadOnlyVolumes(operations: liveOperations(), body: body)
+        try withReadOnlyVolumes(operations: Self.liveOperations(transaction: transaction), body: body)
     }
 
     func withReadOnlyVolumes<T>(operations: Operations, body: (Volumes) throws -> T) throws -> T {
@@ -124,9 +124,9 @@ struct FirmwareInstalledReadback {
         try binding.validate(journal: journal, directory: transaction.vmDirectory, currentCatalog: true)
     }
 
-    static func validate(_ attachment: Attachment, observation: Observation) throws {
+    static func validate(_ attachment: Attachment, observation: Observation, writablePreboot: Bool = false) throws {
         let images = try dictionary(observation.images)["images"] as? [[String: Any]] ?? []
-        let matches = images.filter { ($0["image-path"] as? String) == attachment.image.path }
+        let matches = images.filter { sameHostPath($0["image-path"] as? String, attachment.image.path) }
         guard matches.count == 1, let entries = matches[0]["system-entities"] as? [[String: Any]],
               attachment.device.range(of: "^/dev/disk[0-9]+$", options: .regularExpression) != nil,
               entries.filter({ ($0["dev-entry"] as? String) == attachment.device }).count == 1 else {
@@ -143,16 +143,62 @@ struct FirmwareInstalledReadback {
             throw FirmwareGeneration.fail("Installed APFS physical-store association differs")
         }
         for (name, volume) in attachment.volumes {
+            let members = volumes.filter { ($0["DeviceIdentifier"] as? String) == volume.device }
             guard let slice = slices[name], volume.device == reference + slice,
-                  volumes.filter({ ($0["DeviceIdentifier"] as? String) == volume.device && ($0["MountPoint"] as? String) == volume.root.path }).count == 1,
-                  let raw = observation.volumes[name] else { throw FirmwareGeneration.fail("Installed volume association differs") }
+                  members.count == 1, let raw = observation.volumes[name] else {
+                throw FirmwareGeneration.fail("Installed volume association differs")
+            }
+            // `diskutil apfs list -plist` establishes container membership but
+            // does not always include MountPoint. The per-device `info -plist`
+            // observation below must always establish the exact mount path.
+            if let mount = members[0]["MountPoint"] {
+                guard sameHostPath(mount as? String, volume.root.path) else {
+                    throw FirmwareGeneration.fail("Installed APFS mount observation differs")
+                }
+            }
             let info = try dictionary(raw)
+            if members[0]["APFSVolumeUUID"] != nil || info["VolumeUUID"] != nil {
+                guard let memberUUID = members[0]["APFSVolumeUUID"] as? String,
+                      let infoUUID = info["VolumeUUID"] as? String,
+                      let expected = UUID(uuidString: memberUUID),
+                      let observed = UUID(uuidString: infoUUID), expected == observed else {
+                    throw FirmwareGeneration.fail("Installed APFS volume UUID differs")
+                }
+            }
             guard (info["DeviceIdentifier"] as? String) == volume.device,
-                  (info["MountPoint"] as? String) == volume.root.path,
-                  (info["ReadOnlyVolume"] as? Bool) == true else {
+                  sameHostPath(info["MountPoint"] as? String, volume.root.path),
+                  try Self.volumeReadOnly(info) == !(writablePreboot && name == "preboot") else {
                 throw FirmwareGeneration.fail("Installed volume is not the exact readonly mount")
             }
         }
+    }
+
+    /// Foundation can retain /tmp and /var while diskutil reports their
+    /// /private paths. Normalize only those macOS system aliases; do not resolve
+    /// arbitrary symlinks or dot components supplied by an observation.
+    static func sameHostPath(_ observed: String?, _ expected: String) -> Bool {
+        guard let observed else { return false }
+        func normalize(_ path: String) -> String {
+            for alias in ["/tmp", "/var"] where path == alias || path.hasPrefix(alias + "/") {
+                return "/private" + path
+            }
+            return path
+        }
+        return normalize(observed) == normalize(expected)
+    }
+
+    static func volumeReadOnly(_ info: [String: Any]) throws -> Bool {
+        let readonly = info["ReadOnlyVolume"] as? Bool
+        let writable = info["WritableVolume"] as? Bool
+        guard readonly != nil || writable != nil,
+              info["ReadOnlyVolume"] == nil || readonly != nil,
+              info["WritableVolume"] == nil || writable != nil else {
+            throw FirmwareGeneration.fail("Installed volume write state is unknown")
+        }
+        if let readonly, let writable {
+            guard readonly != writable else { throw FirmwareGeneration.fail("Installed volume write state contradicts itself") }
+        }
+        return readonly ?? !writable!
     }
 
     private static func dictionary(_ data: Data) throws -> [String: Any] {
@@ -162,14 +208,14 @@ struct FirmwareInstalledReadback {
         return value
     }
 
-    private func liveOperations() -> Operations {
+    static func liveOperations(transaction: FirmwareTransaction, writablePreboot: Bool = false) -> Operations {
         let run: (String, [String]) throws -> Data = { try transaction.runTool($0, $1) }
         return Operations(attach: { image, work in
-            let raw = try run("/usr/bin/hdiutil", ["attach", "-readonly", "-nomount", "-nobrowse", "-plist", image.path])
+            let raw = try run("/usr/bin/hdiutil", ["attach"] + (writablePreboot ? [] : ["-readonly"]) + ["-nomount", "-nobrowse", "-plist", image.path])
             let entities = try Self.dictionary(raw)["system-entities"] as? [[String: Any]] ?? []
-            let devices = entities.compactMap { $0["dev-entry"] as? String }.filter { $0.range(of: "^/dev/disk[0-9]+$", options: .regularExpression) != nil }
-            guard devices.count == 1 else { throw FirmwareGeneration.fail("New readonly attachment has no unique base device; retain pending transaction") }
-            let device = devices[0]
+            let device = try FirmwareTransaction.detachDevice(entries: entities, inspect: { device in
+                try Self.dictionary(run("/usr/sbin/diskutil", ["info", "-plist", device]))
+            })
             do {
                 let listing = try Self.dictionary(run("/usr/sbin/diskutil", ["apfs", "list", "-plist"]))
                 let physical = String(device.dropFirst(5)) + "s1"
@@ -187,7 +233,7 @@ struct FirmwareInstalledReadback {
                     guard volumes.filter({ ($0["DeviceIdentifier"] as? String) == volume }).count == 1 else { throw FirmwareGeneration.fail("Installed APFS volume missing") }
                     let root = mount.appendingPathComponent(name)
                     try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
-                    _ = try run("/sbin/mount_apfs", ["-o", "rdonly", "/dev/" + volume, root.path])
+                    _ = try run("/sbin/mount_apfs", ["-o", writablePreboot && name == "preboot" ? "rw" : "rdonly", "/dev/" + volume, root.path])
                     roots[name] = Volume(device: volume, root: root)
                 }
                 return Attachment(image: image, device: device, volumes: roots)

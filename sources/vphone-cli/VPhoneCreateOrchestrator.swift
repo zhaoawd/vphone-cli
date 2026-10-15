@@ -752,7 +752,7 @@ public struct VPhoneCreateOrchestrator {
             noBinpack: false, noVphoned: false, forceExcGuard: false,
             enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount, generationID: generationID)
         let records = try pipeline.patchAll()
-        print("[fw patch] applied \(records.count) patches for \(variant.rawValue)")
+        print("[fw patch] recorded \(records.count) byte records (including verified unchanged outputs) for \(variant.rawValue)")
         return records.count
     }
 

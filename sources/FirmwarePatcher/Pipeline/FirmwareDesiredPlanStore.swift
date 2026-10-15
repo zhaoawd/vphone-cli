@@ -1,6 +1,7 @@
 import CryptoKit
 import Darwin
 import Foundation
+import VPhoneKernelIOTrace
 import VPhoneCore
 
 /// Desired state is independent of transaction evidence. Call mutations under the VM lock.
@@ -222,17 +223,17 @@ public enum FirmwareDesiredPlanStore {
         defer { close(fd) }
         try FileHandle(fileDescriptor: fd, closeOnDealloc: false).write(contentsOf: data)
         try beforeSync()
-        guard fsync(fd) == 0 else { throw Failure.unreadable(errno) }
+        guard KernelIOTrace.synchronize(fd, phase: "FirmwareDesiredPlanStore.fsync") == 0 else { throw Failure.unreadable(errno) }
     }
     private static func syncFile(_ url: URL) throws {
         let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC)
         guard fd >= 0 else { throw Failure.unreadable(errno) }; defer { close(fd) }
-        guard fsync(fd) == 0 else { throw Failure.unreadable(errno) }
+        guard KernelIOTrace.synchronize(fd, phase: "FirmwareDesiredPlanStore.fsync") == 0 else { throw Failure.unreadable(errno) }
     }
     private static func syncDirectory(_ url: URL) throws {
         let fd = open(url.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard fd >= 0 else { throw Failure.unreadable(errno) }; defer { close(fd) }
-        guard fsync(fd) == 0 else { throw Failure.unreadable(errno) }
+        guard KernelIOTrace.synchronize(fd, phase: "FirmwareDesiredPlanStore.fsync") == 0 else { throw Failure.unreadable(errno) }
     }
     private static func encoded<T: Encodable>(_ value: T) throws -> Data {
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]

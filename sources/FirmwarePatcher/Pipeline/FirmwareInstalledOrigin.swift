@@ -1,4 +1,5 @@
 import Foundation
+import VPhoneKernelIOTrace
 import Img4tool
 import VPhoneBundleStore
 import VPhoneCore
@@ -41,13 +42,13 @@ enum FirmwareInstalledOrigin {
     }
 
     struct ProducedBinary {
-        fileprivate let session: Session
-        fileprivate let transactionID: String
-        fileprivate let component: String
-        fileprivate let input: URL
-        fileprivate let inputSHA256: String
-        fileprivate let payload: Data
-        fileprivate let records: [PatchRecord]
+        let session: Session
+        let transactionID: String
+        let component: String
+        let input: URL
+        let inputSHA256: String
+        let payload: Data
+        let records: [PatchRecord]
     }
 
     final class Session {
@@ -80,6 +81,13 @@ enum FirmwareInstalledOrigin {
                 throw FirmwareGeneration.fail("Installed binary has no current frozen producer")
             }
             try journal.planBinding?.validate(journal: journal, directory: transaction.vmDirectory, currentCatalog: true)
+            if let rollback = journal.rollbackSelection {
+                try rollback.validateStructure(journal: journal)
+                try rollback.validate(in: transaction.vmDirectory)
+                guard version == rollback.sourceVersion, executableSHA256 == rollback.sourceExecutableSHA256 else {
+                    throw FirmwareGeneration.fail("Kernel rollback requires the same live verified producer executable")
+                }
+            }
             let roots = try FirmwareGeneration.originalURLs(in: transaction.vmDirectory, id: id)
             let restores = roots.filter { $0.lastPathComponent.contains("Restore") }
             guard restores.count == 1 else { throw FirmwareGeneration.fail("Ambiguous pristine restore input") }
@@ -102,7 +110,7 @@ enum FirmwareInstalledOrigin {
             }
             // A complete result must retain every emitted effect and be explained
             // by the producer's exact ordered byte changes from the pristine input.
-            var reconstructed = bytes
+            var reconstructed = Data(bytes)
             for record in records {
                 guard record.component.lowercased() == component.lowercased(), record.fileOffset >= 0,
                       record.fileOffset <= reconstructed.count,
@@ -220,11 +228,13 @@ enum FirmwareInstalledOrigin {
             return try reader.withReadOnlyVolumes(body: body)
         }
 
-        func recheck() throws {
-            guard active else { throw FirmwareGeneration.fail("Installed origin source callback expired") }
-            try verify()
-            guard try FirmwareGeneration.fileSHA256(executable) == executableSHA256 else {
-                throw FirmwareGeneration.fail("Effective executable changed during installed origin qualification")
+        func recheck(file: String = #fileID, line: Int = #line, function: String = #function) throws {
+            try KernelIOTrace.measure("installedOrigin.recheck", file: file, line: line, function: function) { _ in
+                guard active else { throw FirmwareGeneration.fail("Installed origin source callback expired") }
+                try verify()
+                guard try FirmwareGeneration.fileSHA256(executable) == executableSHA256 else {
+                    throw FirmwareGeneration.fail("Effective executable changed during installed origin qualification")
+                }
             }
         }
     }

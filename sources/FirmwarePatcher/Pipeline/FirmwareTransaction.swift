@@ -1,6 +1,7 @@
 import CryptoKit
 import Darwin
 import Foundation
+import VPhoneKernelIOTrace
 import VPhoneCore
 
 /// Owns the staged firmware tree, durable publication journal and recovery.
@@ -46,6 +47,9 @@ final class FirmwareTransaction {
         var phase: Phase = .building
         var entries: [Entry]
         var failure: String?
+        var kernelDisk: FirmwareKernelDisk? = nil
+        var kernelOnly: Bool? = nil
+        var rollbackSelection: FirmwareKernelRollbackSelection? = nil
     }
     enum RecordFailure: Error, Equatable, LocalizedError {
         case missing
@@ -111,68 +115,80 @@ final class FirmwareTransaction {
 
     private func verifyOrigin(_ origin: InstalledOrigin, point: InstalledOrigin.Point,
                               bindingPublished: Bool, bindingBackedUp: Bool = false, prepared: Bool = true) throws {
-        let receipt = origin.receipt
-        guard origin.transactionID == journal.id, origin.layer != .host,
-              receipt.schemaVersion == 1, receipt.scope == .installedComponent, receipt.state == .committed,
-              receipt.generationID == journal.options["generationID"],
-              receipt.planSHA256 == journal.planBinding?.planSHA256,
-              receipt.desiredSHA256 == journal.options["desiredSHA256"],
-              !receipt.outputs.isEmpty, !receipt.effects.isEmpty, !origin.proof.isEmpty else {
-            throw Self.error("Missing live installed-component origin qualification")
-        }
-        // Generated Restore/AVP outputs cannot become installed evidence by
-        // changing a Codable scope value. C must identify a separate real target.
-        for output in receipt.outputs {
-            let file = vmDirectory.appendingPathComponent(output.path)
-            guard try FirmwareComponentReceipt.relative(file, in: vmDirectory) == output.path,
-                  !journal.entries.contains(where: { $0.name == output.path.split(separator: "/").first.map(String.init) }),
-                  try FirmwareGeneration.fileSHA256(file) == output.sha256 else { throw Self.error("Installed origin target differs") }
-        }
-        let paths = Set(receipt.outputs.map(\.path))
-        guard receipt.effects.allSatisfy({ paths.contains($0.outputPath) }),
-              Set(receipt.outputs.map(\.path)).count == receipt.outputs.count else { throw Self.error("Installed proof target association differs") }
-        let version: String?
-        let components: Set<String>
-        switch origin.layer {
-        case .kernel: version = origin.binding.kernel; components = ["kernelcache"]
-        case .guestEnvironment: version = origin.binding.guestEnvironment; components = ["guestenvironment"]
-        case .bootChain: version = origin.binding.bootChain; components = ["bootchain", "ibss", "ibec", "llb", "txm", "avpbooter", "devicetree"]
-        case .host: version = nil; components = []
-        }
-        guard components.contains(receipt.component.lowercased()) else { throw Self.error("Installed receipt layer differs") }
-        guard let version, try origin.expected.binding.replacingOrigin(origin.layer, with: version) == origin.binding else {
-            throw Self.error("Origin publication would change unrelated layers")
-        }
-        if prepared {
-            guard let publication = try readPublication(), publication.installed == receipt,
-                  publication.originLayer == origin.layer,
-                  publication.originProofSHA256 == Self.sha256(origin.proof),
-                  try FirmwareGeneration.fileSHA256(root.appendingPathComponent("installed-component-proof.json")) == publication.originProofSHA256 else {
-                throw Self.error("Installed proof differs from this journal")
+        try KernelIOTrace.measure("transaction.verifyOrigin", labels: ["point": point == .candidate ? "candidate" : "published"]) { _ in
+            let receipt = origin.receipt
+            if let rollback = journal.rollbackSelection {
+                guard origin.expected.sha256 == rollback.bindingSHA256 else { throw Self.error("Kernel rollback binding CAS differs") }
             }
-        }
-        try origin.recheck(point)
-        if prepared {
-            guard try FirmwareGeneration.fileSHA256(root.appendingPathComponent("installed-component-proof.json")) == Self.sha256(origin.proof) else {
-                throw Self.error("Installed proof changed during qualification")
+            if journal.kernelOnly == true {
+                guard origin.layer == .kernel, receipt.outputs.count == 1,
+                      receipt.outputs.first?.path == "Disk.img", let disk = journal.kernelDisk,
+                      receipt.outputs.first?.sha256 == disk.candidateSHA256 else {
+                    throw Self.error("Kernel origin does not describe the prepared disk")
+                }
             }
-        }
-        try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
-        try validateReport(forCommit: true)
-        if bindingBackedUp {
-            guard try Self.metadataDigest(vmDirectory.appendingPathComponent("launchpad.json")) == nil,
-                  try Self.metadataDigest(backup.appendingPathComponent("launchpad.json")) == origin.expected.sha256 else {
-                throw Self.error("VM origin backup changed during publication")
+            guard origin.transactionID == journal.id, origin.layer != .host,
+                  receipt.schemaVersion == 1, receipt.scope == .installedComponent, receipt.state == .committed,
+                  receipt.generationID == journal.options["generationID"],
+                  receipt.planSHA256 == journal.planBinding?.planSHA256,
+                  receipt.desiredSHA256 == journal.options["desiredSHA256"],
+                  !receipt.outputs.isEmpty, !receipt.effects.isEmpty, !origin.proof.isEmpty else {
+                throw Self.error("Missing live installed-component origin qualification")
             }
-        } else {
-            let binding = try VPhoneMachineBinding.transactionSnapshot(vmDirectory)
-            guard bindingPublished ? binding?.binding == origin.binding : binding == origin.expected else {
-                throw Self.error("VM origin binding changed during publication")
+            // Generated Restore/AVP outputs cannot become installed evidence by
+            // changing a Codable scope value. C must identify a separate real target.
+            for output in receipt.outputs {
+                let file = vmDirectory.appendingPathComponent(output.path)
+                guard try FirmwareComponentReceipt.relative(file, in: vmDirectory) == output.path,
+                      !journal.entries.contains(where: { $0.name == output.path.split(separator: "/").first.map(String.init) }),
+                      (try (journal.kernelOnly == true && point == .candidate || FirmwareGeneration.fileSHA256(file) == output.sha256)) else { throw Self.error("Installed origin target differs") }
             }
-        }
-        for output in receipt.outputs {
-            guard try FirmwareGeneration.fileSHA256(vmDirectory.appendingPathComponent(output.path)) == output.sha256 else {
-                throw Self.error("Installed target changed during qualification")
+            let paths = Set(receipt.outputs.map(\.path))
+            guard receipt.effects.allSatisfy({ paths.contains($0.outputPath) }),
+                  Set(receipt.outputs.map(\.path)).count == receipt.outputs.count else { throw Self.error("Installed proof target association differs") }
+            let version: String?
+            let components: Set<String>
+            switch origin.layer {
+            case .kernel: version = origin.binding.kernel; components = ["kernelcache"]
+            case .guestEnvironment: version = origin.binding.guestEnvironment; components = ["guestenvironment"]
+            case .bootChain: version = origin.binding.bootChain; components = ["bootchain", "ibss", "ibec", "llb", "txm", "avpbooter", "devicetree"]
+            case .host: version = nil; components = []
+            }
+            guard components.contains(receipt.component.lowercased()) else { throw Self.error("Installed receipt layer differs") }
+            guard let version, try origin.expected.binding.replacingOrigin(origin.layer, with: version) == origin.binding else {
+                throw Self.error("Origin publication would change unrelated layers")
+            }
+            if prepared {
+                guard let publication = try readPublication(), publication.installed == receipt,
+                      publication.originLayer == origin.layer,
+                      publication.originProofSHA256 == Self.sha256(origin.proof),
+                      try FirmwareGeneration.fileSHA256(root.appendingPathComponent("installed-component-proof.json")) == publication.originProofSHA256 else {
+                    throw Self.error("Installed proof differs from this journal")
+                }
+            }
+            try origin.recheck(point)
+            if prepared {
+                guard try FirmwareGeneration.fileSHA256(root.appendingPathComponent("installed-component-proof.json")) == Self.sha256(origin.proof) else {
+                    throw Self.error("Installed proof changed during qualification")
+                }
+            }
+            try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
+            try validateReport(forCommit: true)
+            if bindingBackedUp {
+                guard try Self.metadataDigest(vmDirectory.appendingPathComponent("launchpad.json")) == nil,
+                      try Self.metadataDigest(backup.appendingPathComponent("launchpad.json")) == origin.expected.sha256 else {
+                    throw Self.error("VM origin backup changed during publication")
+                }
+            } else {
+                let binding = try VPhoneMachineBinding.transactionSnapshot(vmDirectory)
+                guard bindingPublished ? binding?.binding == origin.binding : binding == origin.expected else {
+                    throw Self.error("VM origin binding changed during publication")
+                }
+            }
+            for output in receipt.outputs where journal.kernelOnly != true || point == .published {
+                guard try FirmwareGeneration.fileSHA256(vmDirectory.appendingPathComponent(output.path)) == output.sha256 else {
+                    throw Self.error("Installed target changed during qualification")
+                }
             }
         }
     }
@@ -200,6 +216,8 @@ final class FirmwareTransaction {
     init(vmDirectory: URL, inputs: [URL], options: [String: String],
          plan: VariantPlanResolver.VariantPlan? = nil,
          versionInputs: FirmwareVersionInputs? = nil,
+         kernelOnly: Bool = false,
+         rollbackSelection: FirmwareKernelRollbackSelection? = nil,
          inject: @escaping (Event) throws -> Void = { _ in },
          mounts: @escaping (URL, Bool) throws -> Void = FirmwareTransaction.checkMounts,
          filesystemReadback: @escaping (FirmwareFilesystemEvidence, URL, FirmwareTransaction, [String: String]) throws -> Void = {
@@ -212,8 +230,14 @@ final class FirmwareTransaction {
         self.filesystemReadback = filesystemReadback
         guard !Self.exists(root) else { throw Self.error("Pending firmware transaction; run patch-firmware --recover first") }
         var entries: [Entry] = []
-        for input in inputs {
-            guard input.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath() == self.vmDirectory else {
+        let allowedInputs: [URL]
+        if kernelOnly {
+            guard let id = options["generationID"] else { throw Self.error("Missing kernel generation") }
+            allowedInputs = try FirmwareGeneration.originalURLs(in: self.vmDirectory, id: id)
+            guard Set(inputs) == Set(allowedInputs) else { throw Self.error("Kernel inputs must be the verified generation originals") }
+        } else { allowedInputs = inputs }
+        for input in allowedInputs {
+            guard kernelOnly || input.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath() == self.vmDirectory else {
                 throw Self.error("Firmware input must be directly inside the VM directory")
             }
             try Self.validateName(input.lastPathComponent)
@@ -232,13 +256,26 @@ final class FirmwareTransaction {
         }
         journal = Journal(version: binding == nil ? 1 : 2, id: UUID().uuidString.lowercased(), vmPath: self.vmDirectory.path,
                           options: options, plan: plan, versionInputs: versionInputs, planBinding: binding, entries: entries)
+        if kernelOnly {
+            guard binding != nil, options["generationID"] != nil, options["desiredSHA256"] != nil else {
+                throw Self.error("Kernel transaction requires a bound desired generation")
+            }
+            journal.version = 3
+            journal.kernelOnly = true
+        }
+        if let rollbackSelection {
+            journal.version = 4
+            journal.rollbackSelection = rollbackSelection
+            try rollbackSelection.validateStructure(journal: journal)
+            try rollbackSelection.validate(in: self.vmDirectory)
+        }
         // mkdir is exclusive. Never reuse another run's transaction directory.
         guard mkdir(root.path, 0o700) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         try Self.syncDirectory(self.vmDirectory)
         try saveJournal()
         for directory in [stage, backup, work] { try fm.createDirectory(at: directory, withIntermediateDirectories: false) }
         do {
-            for entry in entries {
+            for entry in entries where !kernelOnly {
                 try inject(.beforeCopy(entry.name))
                 let source = self.vmDirectory.appendingPathComponent(entry.name)
                 let target = stage.appendingPathComponent(entry.name)
@@ -262,7 +299,7 @@ final class FirmwareTransaction {
         try Self.requireRegularFile(url)
         journal = try Self.readJournal(at: url)
         try journal.planBinding?.validate(journal: journal, directory: self.vmDirectory, currentCatalog: false)
-        guard (journal.version == 1 || journal.version == 2), (journal.planBinding?.schemaVersion == 2 || journal.vmPath == self.vmDirectory.path),
+        guard (journal.version == 1 || journal.version == 2 || journal.version == 3 || journal.version == 4), (journal.planBinding?.schemaVersion == 2 || journal.vmPath == self.vmDirectory.path),
               UUID(uuidString: journal.id) != nil, !journal.entries.isEmpty,
               Set(journal.entries.map(\.name)).count == journal.entries.count else {
             throw Self.error("Invalid firmware transaction journal")
@@ -287,10 +324,14 @@ final class FirmwareTransaction {
         struct Header: Decodable { let version: Int }
         let version: Int
         do { version = try JSONDecoder().decode(Header.self, from: data).version } catch { throw RecordFailure.corrupt }
-        guard version == 1 || version == 2 else { throw RecordFailure.unsupportedSchema(version) }
+        guard version == 1 || version == 2 || version == 3 || version == 4 else { throw RecordFailure.unsupportedSchema(version) }
         let result: Journal
         do { result = try JSONDecoder().decode(Journal.self, from: data) } catch { throw RecordFailure.corrupt }
-        guard (version == 2) == (result.planBinding != nil) else { throw RecordFailure.bindingMismatch("journal schema/binding") }
+        guard (version >= 2) == (result.planBinding != nil), (version >= 3) == (result.kernelOnly == true), (version == 4) == (result.rollbackSelection != nil), result.kernelOnly == true || result.kernelDisk == nil else { throw RecordFailure.bindingMismatch("journal schema/binding") }
+        if result.kernelOnly == true, [.ready, .publishing, .committed].contains(result.phase), result.kernelDisk == nil {
+            throw RecordFailure.bindingMismatch("kernel publication has no disk recovery relationship")
+        }
+        try result.rollbackSelection?.validateStructure(journal: result)
         return result
     }
 
@@ -310,7 +351,10 @@ final class FirmwareTransaction {
 
     /// Reads the existing report; no applied set is inferred from enabled steps.
     private func validateReport(forCommit: Bool) throws {
-        if forCommit, let expected = journal.options["desiredSHA256"] {
+        if forCommit, let rollback = journal.rollbackSelection {
+            try rollback.validateStructure(journal: journal)
+            try rollback.validate(in: vmDirectory)
+        } else if forCommit, let expected = journal.options["desiredSHA256"] {
             guard case .ready(let desired) = try FirmwareDesiredPlanStore.read(in: vmDirectory),
                   try desired.sha256 == expected, desired.plan == journal.plan,
                   desired.generationID == journal.options["generationID"] else {
@@ -337,8 +381,27 @@ final class FirmwareTransaction {
         let report = try JSONDecoder().decode(PatchRunReport.self, from: bytes)
         if forCommit {
             guard report.failedRequired.isEmpty else { throw Self.error("Required patch failure in recorded report") }
-            if let plan = journal.plan { try PatchDeclarationGate.enforce(report: report, plan: plan) }
+            if let plan = journal.plan { try enforceReport(report, plan: plan) }
         }
+    }
+
+    private func enforceReport(_ report: PatchRunReport, plan: VariantPlanResolver.VariantPlan) throws {
+        if journal.kernelOnly == true { try PatchDeclarationGate.enforceKernel(report: report, plan: plan) }
+        else { try PatchDeclarationGate.enforce(report: report, plan: plan) }
+    }
+
+    func prepareKernelReceipts(report: PatchRunReport) throws {
+        guard journal.kernelOnly == true, journal.phase == .building, journal.kernelDisk != nil,
+              journal.componentReceiptsSHA256 == nil, let plan = journal.plan,
+              journal.reportSHA256 == Self.sha256(try Self.encoder.encode(report)) else {
+            throw Self.error("Kernel receipt requires this transaction's saved report and disk")
+        }
+        try enforceReport(report, plan: plan)
+        let publication = ComponentPublication(schemaVersion: 1, transactionID: journal.id,
+            records: [], filesystem: nil, filesystemProofSHA256: nil)
+        let bytes = try Self.encoder.encode(publication)
+        try Self.writeDurably(bytes, to: root.appendingPathComponent("component-receipts.json"))
+        try prepareMetadata(name: ComponentPublication.filename, bytes: bytes)
     }
 
     private static func sha256(_ data: Data) -> String {
@@ -348,7 +411,7 @@ final class FirmwareTransaction {
     /// Collects actual records only after all writers have finished. Neither a
     /// decoded report nor an enabled declaration substitutes for final readback.
     func prepareComponentReceipts(report: PatchRunReport, outputs: [String: URL]) throws {
-        guard journal.phase == .building, journal.componentReceiptsSHA256 == nil,
+        guard journal.kernelOnly != true, journal.phase == .building, journal.componentReceiptsSHA256 == nil,
               let plan = journal.plan, let id = journal.options["generationID"],
               let reportSHA = journal.reportSHA256,
               try Self.sha256(Self.encoder.encode(report)) == reportSHA else {
@@ -427,7 +490,7 @@ final class FirmwareTransaction {
         guard Self.sha256(bytes) == expected else { throw Self.error("Component receipts differ from journal") }
         let publication = try JSONDecoder().decode(ComponentPublication.self, from: bytes)
         guard publication.schemaVersion == 1, publication.transactionID == journal.id,
-              !publication.records.isEmpty,
+              (!publication.records.isEmpty || journal.kernelOnly == true),
               Set(publication.records.map { $0.component.lowercased() }).count == publication.records.count,
               journal.metadata?.first(where: { $0.name == ComponentPublication.filename })?.output == expected else {
             throw Self.error("Invalid component receipt publication")
@@ -437,7 +500,10 @@ final class FirmwareTransaction {
         guard Self.sha256(reportBytes) == reportSHA else { throw Self.error("Receipt report differs from journal") }
         let report = try JSONDecoder().decode(PatchRunReport.self, from: reportBytes)
         let groups = Dictionary(grouping: report.allRecords, by: { $0.component.lowercased() })
-        guard groups == Dictionary(uniqueKeysWithValues: publication.records.map { ($0.component.lowercased(), $0.effects.map(\.record)) }),
+        let evidenceRecords = journal.kernelOnly == true ? publication.installed.map { [$0] } ?? [] : publication.records
+        let preparedKernel = journal.kernelOnly == true && publication.installed == nil && journal.phase == .building
+        guard (preparedKernel || groups == Dictionary(uniqueKeysWithValues: evidenceRecords.map { ($0.component.lowercased(), $0.effects.map(\.record)) })),
+              journal.kernelOnly != true || (publication.records.isEmpty && publication.filesystem == nil),
               (publication.filesystem != nil) == publication.records.contains(where: { $0.component.lowercased() == "filesystem" }),
               (publication.filesystem != nil) == (publication.filesystemProofSHA256 != nil),
               (publication.installed != nil) == (publication.originLayer != nil),
@@ -483,7 +549,7 @@ final class FirmwareTransaction {
             let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC)
             guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
             defer { close(fd) }
-            guard fsync(fd) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+            guard KernelIOTrace.synchronize(fd, phase: "FirmwareTransaction.fsync") == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         }
         return digest
     }
@@ -511,18 +577,33 @@ final class FirmwareTransaction {
                 }
             }
             try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
-            for index in journal.entries.indices {
+            for index in journal.entries.indices where journal.kernelOnly != true {
                 let entry = journal.entries[index]
                 guard try Self.digest(vmDirectory.appendingPathComponent(entry.name)) == entry.original else {
                     throw Self.error("Original firmware changed before commit: \(entry.name)")
                 }
                 journal.entries[index].output = try Self.digest(stage.appendingPathComponent(entry.name), sync: true)
+                if journal.kernelOnly == true, journal.entries[index].output != entry.original {
+                    throw Self.error("Kernel update cannot publish firmware roots")
+                }
+            }
+            if journal.kernelDisk != nil {
+                guard journal.kernelOnly == true, qualifiedOrigin != nil else {
+                    throw Self.error("Kernel disk commit requires installed kernel qualification")
+                }
             }
             journal.phase = .ready
             try saveJournal()
             journal.phase = .publishing
             try saveJournal()
-            for entry in journal.entries where entry.original != entry.output {
+            if var disk = journal.kernelDisk {
+                try mounts(vmDirectory, false)
+                try disk.publish(directory: vmDirectory, root: root, save: { value in
+                    self.journal.kernelDisk = value; try self.saveJournal()
+                }, afterWrite: { _ in try self.inject(.afterPublish("Disk.img")) })
+                if let qualifiedOrigin { try verifyOrigin(qualifiedOrigin, point: .published, bindingPublished: false) }
+            }
+            for entry in journal.entries where journal.kernelOnly != true && entry.original != entry.output {
                 try inject(.beforeBackup(entry.name))
                 try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
                 let destination = vmDirectory.appendingPathComponent(entry.name)
@@ -544,7 +625,7 @@ final class FirmwareTransaction {
                 if let publication { try verifyPublication(publication, in: vmDirectory, rootName: entry.name) }
             }
             // Include unchanged entries: a no-op is evidence only after readback.
-            for entry in journal.entries {
+            for entry in journal.entries where journal.kernelOnly != true {
                 guard try Self.digest(vmDirectory.appendingPathComponent(entry.name), sync: true) == entry.output else {
                     throw Self.error("Published firmware differs from journal: \(entry.name)")
                 }
@@ -587,9 +668,15 @@ final class FirmwareTransaction {
             // Callbacks and final effect readers may run after the earlier root
             // check. Bind every member, including unchanged/unreceipted files,
             // to the output digest immediately before committing the journal.
-            for entry in journal.entries {
+            for entry in journal.entries where journal.kernelOnly != true {
                 guard try Self.digest(vmDirectory.appendingPathComponent(entry.name), sync: true) == entry.output else {
                     throw Self.error("Final firmware root differs from journal: \(entry.name)")
+                }
+            }
+            if let disk = journal.kernelDisk {
+                try disk.validate(directory: vmDirectory, root: root)
+                guard disk.direction == .forward, !disk.pending, disk.cursor == disk.offsets.count else {
+                    throw Self.error("Kernel disk publication is incomplete")
                 }
             }
             journal.phase = .committed
@@ -629,14 +716,34 @@ final class FirmwareTransaction {
         return try transaction.withWorkerLock {
             try mounts(transaction.root, true)
             if transaction.journal.phase == .committed { try transaction.validateReport(forCommit: false) }
+            if let disk = transaction.journal.kernelDisk {
+                try mounts(transaction.vmDirectory, false)
+                try disk.validate(directory: transaction.vmDirectory, root: transaction.root)
+                if transaction.journal.phase == .committed {
+                    guard disk.direction == .forward, !disk.pending, disk.cursor == disk.offsets.count else {
+                        throw Self.error("Committed kernel disk is incomplete")
+                    }
+                }
+            }
             try transaction.restoreOrVerify()
             return try transaction.archive()
         }
     }
 
+    func prepareKernelDisk(candidate: URL) throws {
+        guard journal.kernelOnly == true, journal.phase == .building, journal.kernelDisk == nil, journal.planBinding != nil else {
+            throw Self.error("Kernel disk requires a new bound transaction")
+        }
+        _ = try FirmwareComponentReceipt.relative(candidate, in: work)
+        try mounts(vmDirectory, false)
+        journal.kernelDisk = try FirmwareKernelDisk.capture(directory: vmDirectory, root: root, candidate: candidate)
+        if journal.version != 4 { journal.version = 3 }
+        try saveJournal()
+    }
+
     private func restoreOrVerify() throws {
         // Validate every entry before changing any entry. Preserve unknown external edits.
-        for entry in journal.entries {
+        for entry in journal.entries where journal.kernelOnly != true {
             let destination = vmDirectory.appendingPathComponent(entry.name)
             let saved = backup.appendingPathComponent(entry.name)
             if journal.phase == .committed {
@@ -693,6 +800,11 @@ final class FirmwareTransaction {
         }
         journal.phase = .rollingBack
         try saveJournal()
+        if var disk = journal.kernelDisk {
+            try disk.reverse(directory: vmDirectory, root: root, save: { value in
+                self.journal.kernelDisk = value; try self.saveJournal()
+            }, afterWrite: { _ in try self.inject(.afterRestore("Disk.img")) })
+        }
         // Restore metadata first; the same journal remains noncommitted until all
         // original roots and metadata have been restored and archived.
         for entry in (journal.metadata ?? []).reversed() {
@@ -708,7 +820,7 @@ final class FirmwareTransaction {
                 try inject(.afterRestore(entry.name))
             }
         }
-        for entry in journal.entries {
+        for entry in journal.entries where journal.kernelOnly != true {
             let saved = backup.appendingPathComponent(entry.name)
             guard Self.exists(saved) else { continue }
             let destination = vmDirectory.appendingPathComponent(entry.name)
@@ -730,7 +842,8 @@ final class FirmwareTransaction {
         return destination
     }
 
-    private func withWorkerLock<T>(_ body: () throws -> T) throws -> T {
+    func withWorkerLock<T>(_ body: () throws -> T) throws -> T {
+        if workerLockFD != nil { return try body() }
         // Like the bundle lease, lock the directory inode rather than a removable file.
         let fd = open(root.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
@@ -770,9 +883,11 @@ final class FirmwareTransaction {
     }
 
     private func saveJournal() throws {
-        try Self.writeDurably(try Self.encoder.encode(journal), to: root.appendingPathComponent("journal.json"), beforeSync: {
-            try self.inject(.beforeJournalSync(self.journal.phase))
-        })
+        try KernelIOTrace.measure("transaction.saveJournal", aggregate: true) { _ in
+            try Self.writeDurably(try KernelIOTrace.measure("transaction.journal.encode", aggregate: true) { _ in try Self.encoder.encode(journal) }, to: root.appendingPathComponent("journal.json"), beforeSync: {
+                try self.inject(.beforeJournalSync(self.journal.phase))
+            })
+        }
     }
 
     private static var encoder: JSONEncoder {
@@ -831,27 +946,29 @@ final class FirmwareTransaction {
                 hash.update(data: data)
                 return true
             }) {}
-            if sync, fsync(handle.fileDescriptor) != 0 { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+            if sync, KernelIOTrace.synchronize(handle.fileDescriptor, phase: "FirmwareTransaction.fsync") != 0 { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         default: throw error("Symlinks and special firmware files are not supported: \(url.path)")
         }
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
     private static func writeDurably(_ data: Data, to url: URL, beforeSync: () throws -> Void = {}) throws {
-        let temporary = url.deletingLastPathComponent().appendingPathComponent(".write-" + UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: temporary) }
-        try data.write(to: temporary, options: .withoutOverwriting)
-        let handle = try FileHandle(forWritingTo: temporary)
-        defer { try? handle.close() }
-        try beforeSync()
-        try handle.synchronize()
-        guard rename(temporary.path, url.path) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
-        try syncDirectory(url.deletingLastPathComponent())
+        try KernelIOTrace.measure("transaction.writeDurably", aggregate: true) { _ in
+            let temporary = url.deletingLastPathComponent().appendingPathComponent(".write-" + UUID().uuidString)
+            defer { try? FileManager.default.removeItem(at: temporary) }
+            try data.write(to: temporary, options: .withoutOverwriting)
+            let handle = try FileHandle(forWritingTo: temporary)
+            defer { try? handle.close() }
+            try beforeSync()
+            try KernelIOTrace.measure("FirmwareTransaction.fileHandleSynchronize", aggregate: true) { _ in try handle.synchronize() }
+            guard rename(temporary.path, url.path) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+            try syncDirectory(url.deletingLastPathComponent())
+        }
     }
     private static func syncDirectory(_ url: URL) throws {
         let fd = open(url.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         defer { close(fd) }
-        guard fsync(fd) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        guard KernelIOTrace.synchronize(fd, phase: "FirmwareTransaction.fsync") == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
     }
     private static func move(_ source: URL, to destination: URL) throws {
         guard !exists(destination) else { throw error("Refusing to replace existing transaction path: \(destination.path)") }

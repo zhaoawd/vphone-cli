@@ -2,6 +2,7 @@ import CryptoKit
 import Darwin
 import Foundation
 import VPhoneCore
+import VPhoneKernelIOTrace
 
 /// Content-addressed originals produced by a fresh, verified preparation.
 /// A manifest is recovery evidence, not a signature or an applied-patch receipt.
@@ -71,15 +72,35 @@ public enum FirmwareGeneration {
 
     /// Call under the VM bundle lock, as the create path does.
     public static func prepare(in directory: URL, inputs: [URL], source: Source) throws -> Prepared {
+        try capture(in: directory, sourceDirectory: directory, inputs: inputs, source: source)
+    }
+
+    /// Only the fresh archive preparation adapter uses a separate producer tree.
+    /// The public capture API continues to require originals in the target VM.
+    static func prepareFreshSource(in directory: URL, sourceDirectory: URL, source: Source) throws -> Prepared {
+        let directory = directory.standardizedFileURL.resolvingSymlinksInPath()
+        let scratch = sourceDirectory.standardizedFileURL
+        guard scratch == scratch.resolvingSymlinksInPath(), scratch.deletingLastPathComponent() == directory,
+              scratch.lastPathComponent.hasPrefix(".firmware-generation-prepare-") else {
+            throw fail("fresh source must belong to the private VM preparation directory")
+        }
+        return try capture(in: directory, sourceDirectory: scratch,
+            inputs: source.originals.map { scratch.appendingPathComponent($0.name) }, source: source)
+    }
+
+    private static func capture(in directory: URL, sourceDirectory: URL, inputs: [URL], source: Source) throws -> Prepared {
         try checkCancellation()
         let directory = directory.standardizedFileURL.resolvingSymlinksInPath()
-        guard source.directory == directory, !inputs.isEmpty else { throw fail("source belongs to another preparation") }
+        let sourceDirectory = sourceDirectory.standardizedFileURL.resolvingSymlinksInPath()
+        guard source.directory == sourceDirectory, !inputs.isEmpty else { throw fail("source belongs to another preparation") }
         let names = inputs.map(\.lastPathComponent).sorted()
         guard names == source.originals.map(\.name), Set(names).count == names.count else {
             throw fail("original set differs from verified preparation")
         }
         for input in inputs {
-            guard input.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath() == directory else {
+            // Directory URL hints can add a trailing slash without changing
+            // the filesystem path (notably for VPhoneLibrary URLs).
+            guard input.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath().path == sourceDirectory.path else {
                 throw fail("original is outside the VM directory")
             }
         }
@@ -106,7 +127,7 @@ public enum FirmwareGeneration {
         try FileManager.default.createDirectory(at: originals, withIntermediateDirectories: false)
         for original in source.originals {
             try checkCancellation()
-            let input = directory.appendingPathComponent(original.name)
+            let input = sourceDirectory.appendingPathComponent(original.name)
             guard try treeDigest(input) == original.sha256 else { throw fail("prepared original changed: \(original.name)") }
             try copy(input, to: originals.appendingPathComponent(original.name))
             guard try treeDigest(input) == original.sha256,
@@ -160,19 +181,21 @@ public enum FirmwareGeneration {
         return try loadVerified(in: prepared.directory, id: manifest.id)
     }
 
-    public static func loadVerified(in directory: URL, id: String) throws -> Manifest {
-        guard validDigest(id) else { throw fail("invalid generation ID") }
-        let root = try storage(in: directory, create: false).appendingPathComponent(id)
-        try ensureDirectory(root, create: false)
-        let manifest = try readManifest(root.appendingPathComponent("manifest.json"))
-        guard manifest.schemaVersion == 1, manifest.id == id,
-              try digest(manifest.content) == id,
-              manifest.content.source.recognition == "fresh-local-ipsw-prepare-v1",
-              try VPhoneFirmwareIdentity.read(in: directory) == manifest.content.identity else {
-            throw fail("generation manifest or VM identity differs")
+    public static func loadVerified(in directory: URL, id: String, file: String = #fileID, line: Int = #line, function: String = #function) throws -> Manifest {
+        return try KernelIOTrace.measure("generation.loadVerified", file: file, line: line, function: function) { span in
+            guard validDigest(id) else { throw fail("invalid generation ID") }
+            let root = try storage(in: directory, create: false).appendingPathComponent(id)
+            try ensureDirectory(root, create: false)
+            let manifest = try readManifest(root.appendingPathComponent("manifest.json"))
+            guard manifest.schemaVersion == 1, manifest.id == id,
+                  try digest(manifest.content) == id,
+                  manifest.content.source.recognition == "fresh-local-ipsw-prepare-v1",
+                  try VPhoneFirmwareIdentity.read(in: directory) == manifest.content.identity else {
+                throw fail("generation manifest or VM identity differs")
+            }
+            try verifyOriginals(manifest, at: root)
+            return manifest
         }
-        try verifyOriginals(manifest, at: root)
-        return manifest
     }
 
     /// Returned paths remain subject to the caller's transaction lock and readback.
@@ -225,78 +248,93 @@ public enum FirmwareGeneration {
         }
         guard info.st_mode & S_IFMT == S_IFDIR else { throw fail("linked or invalid generation directory") }
     }
-    static func verifyOriginals(_ manifest: Manifest, at directory: URL) throws {
-        let originals = directory.appendingPathComponent("originals")
-        try ensureDirectory(originals, create: false)
-        let names = manifest.content.originals.map(\.name)
-        guard !names.isEmpty, names == names.sorted(), Set(names).count == names.count,
-              names.allSatisfy({ !$0.isEmpty && !$0.contains("/") && !$0.contains("\0") && $0 != "." && $0 != ".." }),
-              try FileManager.default.contentsOfDirectory(atPath: originals.path).sorted() == names else {
-            throw fail("invalid original set")
-        }
-        for original in manifest.content.originals {
-            try checkCancellation()
-            guard validDigest(original.sha256), try treeDigest(originals.appendingPathComponent(original.name)) == original.sha256 else {
-                throw fail("generation original differs: \(original.name)")
+    static func verifyOriginals(_ manifest: Manifest, at directory: URL, file: String = #fileID, line: Int = #line, function: String = #function) throws {
+        try KernelIOTrace.measure("generation.verifyOriginals", file: file, line: line, function: function) { span in
+            let originals = directory.appendingPathComponent("originals")
+            try ensureDirectory(originals, create: false)
+            let names = manifest.content.originals.map(\.name)
+            guard !names.isEmpty, names == names.sorted(), Set(names).count == names.count,
+                  names.allSatisfy({ !$0.isEmpty && !$0.contains("/") && !$0.contains("\0") && $0 != "." && $0 != ".." }),
+                  try FileManager.default.contentsOfDirectory(atPath: originals.path).sorted() == names else {
+                throw fail("invalid original set")
+            }
+            for original in manifest.content.originals {
+                try checkCancellation()
+                guard validDigest(original.sha256), try treeDigest(originals.appendingPathComponent(original.name)) == original.sha256 else {
+                    throw fail("generation original differs: \(original.name)")
+                }
             }
         }
     }
 
     /// Includes every byte, relative name, type and empty directory. Opened files
     /// reject symlinks/hardlinks and are checked again after the streaming read.
-    static func treeDigest(_ url: URL) throws -> String {
-        var info = stat()
-        guard lstat(url.path, &info) == 0 else { throw fail("missing input: \(url.lastPathComponent)") }
-        var hash = SHA256()
-        if info.st_mode & S_IFMT == S_IFDIR {
-            hash.update(data: Data("directory\0".utf8))
-            let names = try FileManager.default.contentsOfDirectory(atPath: url.path).sorted()
-            for name in names {
-                hash.update(data: Data((name + "\0" + (try treeDigest(url.appendingPathComponent(name))) + "\0").utf8))
+    static func treeDigest(_ url: URL, file: String = #fileID, line: Int = #line, function: String = #function) throws -> String {
+        return try KernelIOTrace.measure("generation.treeDigest", labels: KernelIOTrace.labels(url, byteSemantics: "descendants_only"), file: file, line: line, function: function) { span in
+            var info = stat()
+            guard lstat(url.path, &info) == 0 else { throw fail("missing input: \(url.lastPathComponent)") }
+            var hash = SHA256()
+            if info.st_mode & S_IFMT == S_IFDIR {
+                hash.update(data: Data("directory\0".utf8))
+                let names = try FileManager.default.contentsOfDirectory(atPath: url.path).sorted()
+                for name in names {
+                    hash.update(data: Data((name + "\0" + (try treeDigest(url.appendingPathComponent(name))) + "\0").utf8))
+                }
+                var after = stat()
+                guard lstat(url.path, &after) == 0, after.st_mode & S_IFMT == S_IFDIR,
+                      info.st_dev == after.st_dev, info.st_ino == after.st_ino,
+                      names == (try FileManager.default.contentsOfDirectory(atPath: url.path).sorted()) else {
+                    throw fail("directory changed while hashing")
+                }
+            } else {
+                guard info.st_mode & S_IFMT == S_IFREG, info.st_nlink == 1 else { throw fail("linked or special input") }
+                hash.update(data: Data("file\0".utf8))
+                try readFile(url) { hash.update(data: $0) }
             }
-            var after = stat()
-            guard lstat(url.path, &after) == 0, after.st_mode & S_IFMT == S_IFDIR,
-                  info.st_dev == after.st_dev, info.st_ino == after.st_ino,
-                  names == (try FileManager.default.contentsOfDirectory(atPath: url.path).sorted()) else {
-                throw fail("directory changed while hashing")
-            }
-        } else {
-            guard info.st_mode & S_IFMT == S_IFREG, info.st_nlink == 1 else { throw fail("linked or special input") }
-            hash.update(data: Data("file\0".utf8))
-            try readFile(url) { hash.update(data: $0) }
+            return hash.finalize().map { String(format: "%02x", $0) }.joined()
         }
-        return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
 
-    static func fileSHA256(_ url: URL) throws -> String {
-        var hash = SHA256()
-        try readFile(url) { hash.update(data: $0) }
-        return hash.finalize().map { String(format: "%02x", $0) }.joined()
+    static func fileSHA256(_ url: URL, file: String = #fileID, line: Int = #line, function: String = #function) throws -> String {
+        return try KernelIOTrace.measure("generation.fileSHA256", labels: KernelIOTrace.labels(url, byteSemantics: "consumer_actual"), file: file, line: line, function: function) { span in
+            var consumed: Int64 = 0
+            defer { span?.set("bytes", consumed) }
+            var hash = SHA256()
+            try readFile(url) { consumed += Int64($0.count); hash.update(data: $0) }
+            return hash.finalize().map { String(format: "%02x", $0) }.joined()
+        }
     }
 
-    static func readFile(_ url: URL, consume: (Data) throws -> Void) throws {
-        let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
-        guard fd >= 0 else { throw fail("unreadable or linked input") }
-        defer { close(fd) }
-        var before = stat(), after = stat(), named = stat()
-        guard fstat(fd, &before) == 0, before.st_mode & S_IFMT == S_IFREG, before.st_nlink == 1 else { throw fail("invalid input type") }
-        let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: false)
-        var count: Int64 = 0
-        while try autoreleasepool(invoking: { () throws -> Bool in
-            try checkCancellation()
-            guard let bytes = try handle.read(upToCount: 1 << 20), !bytes.isEmpty else { return false }
-            count += Int64(bytes.count)
-            try consume(bytes)
-            return true
-        }) {}
-        guard fstat(fd, &after) == 0, lstat(url.path, &named) == 0,
-              named.st_mode & S_IFMT == S_IFREG, named.st_nlink == 1,
-              before.st_dev == named.st_dev, before.st_ino == named.st_ino, before.st_size == count,
-              before.st_size == after.st_size,
-              before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
-              before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
-              before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
-              before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec else { throw fail("input changed while hashing") }
+    static func readFile(_ url: URL, file: String = #fileID, line: Int = #line, function: String = #function, consume: (Data) throws -> Void) throws {
+        try KernelIOTrace.measure("generation.readFile", labels: KernelIOTrace.labels(url, byteSemantics: "stream_read_actual"), file: file, line: line, function: function) { span in
+            var readCalls: Int64 = 0, actualBytes: Int64 = 0
+            defer { span?.set("read_calls", readCalls); span?.set("bytes", actualBytes) }
+            let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+            guard fd >= 0 else { throw fail("unreadable or linked input") }
+            defer { close(fd) }
+            var before = stat(), after = stat(), named = stat()
+            guard fstat(fd, &before) == 0, before.st_mode & S_IFMT == S_IFREG, before.st_nlink == 1 else { throw fail("invalid input type") }
+            let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: false)
+            var count: Int64 = 0
+            while try autoreleasepool(invoking: { () throws -> Bool in
+                try checkCancellation()
+                readCalls += 1
+                let read = try handle.read(upToCount: 1 << 20)
+                actualBytes += Int64(read?.count ?? 0)
+                guard let bytes = read, !bytes.isEmpty else { return false }
+                count += Int64(bytes.count)
+                try consume(bytes)
+                return true
+            }) {}
+            guard fstat(fd, &after) == 0, lstat(url.path, &named) == 0,
+                  named.st_mode & S_IFMT == S_IFREG, named.st_nlink == 1,
+                  before.st_dev == named.st_dev, before.st_ino == named.st_ino, before.st_size == count,
+                  before.st_size == after.st_size,
+                  before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
+                  before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
+                  before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
+                  before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec else { throw fail("input changed while hashing") }
+        }
     }
 
     static func logicalBytes(_ url: URL) throws -> Int64 {
@@ -329,14 +367,14 @@ public enum FirmwareGeneration {
             let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
             defer { try? output.close() }
             try readFile(source) { try output.write(contentsOf: $0) }
-            try output.synchronize()
+            try KernelIOTrace.measure("generation.fileHandleSynchronize", aggregate: true) { _ in try output.synchronize() }
         }
     }
     static func sync(_ directory: URL) throws {
         let fd = open(directory.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard fd >= 0 else { throw fail("cannot synchronize directory") }
         defer { close(fd) }
-        guard fsync(fd) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        guard KernelIOTrace.synchronize(fd, phase: "generation.fsync") == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
     }
     static func write(_ data: Data, to url: URL) throws {
         let temporary = url.deletingLastPathComponent().appendingPathComponent(".write-" + UUID().uuidString)
@@ -344,7 +382,7 @@ public enum FirmwareGeneration {
         try data.write(to: temporary, options: .withoutOverwriting)
         let handle = try FileHandle(forWritingTo: temporary)
         defer { try? handle.close() }
-        try handle.synchronize()
+        try KernelIOTrace.measure("generation.fileHandleSynchronize", aggregate: true) { _ in try handle.synchronize() }
         guard renamex_np(temporary.path, url.path, UInt32(RENAME_EXCL)) == 0 else {
             throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
         }

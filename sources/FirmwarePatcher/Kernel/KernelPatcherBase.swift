@@ -113,6 +113,21 @@ open class KernelPatcherBase {
         }
     }
 
+    /// Record a semantically located, already-applied output without writing.
+    /// StructuredExecution independently binds it to the step's input hash.
+    func emitVerifiedOutput(_ offset: Int, expected: Data, patchID: String, description: String) -> RawStepResult {
+        guard !expected.isEmpty, offset >= 0, offset <= buffer.data.count,
+              expected.count <= buffer.data.count - offset,
+              buffer.readBytes(at: offset, count: expected.count) == expected else { return .noMatch }
+        let instruction = disasm.disassembleOne(in: buffer.data, at: offset)
+        let text = instruction.map { "\($0.mnemonic) \($0.operandString)" } ?? "???"
+        patches.append(PatchRecord(patchID: patchID, component: "kernelcache", fileOffset: offset,
+            virtualAddress: fileOffsetToVA(offset), originalBytes: expected, patchedBytes: expected,
+            beforeDisasm: text, afterDisasm: text,
+            description: "Verified already-applied \(description) (no byte change)"))
+        return .idempotent
+    }
+
     /// Apply all collected patches to the buffer.
     public func applyPatches() -> Int {
         for record in patches {

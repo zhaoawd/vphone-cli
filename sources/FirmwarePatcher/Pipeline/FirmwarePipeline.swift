@@ -542,7 +542,7 @@ public final class FirmwarePipeline {
         if report.failedRequired.isEmpty {
             log("  \(components.count) components processed"
                 + (report.isAblationRun ? " (ablation run: \(ablatedIDs.count) step(s) ablated)" : "")
-                + " (\(report.allRecords.count) total patches)")
+                + " (\(report.allRecords.count) byte records, including verified unchanged outputs)")
         } else {
             log("  REQUIRED FAILURES: \(report.failedRequired.map(\.description).joined(separator: ", "))")
         }
@@ -694,6 +694,12 @@ public final class FirmwarePipeline {
     /// report. No output is written by this operation.
     func reproduceInstalledComponent(_ name: String, input: Data,
                                      plan: VariantPlanResolver.VariantPlan) throws -> (Data, [PatchRecord]) {
+        let (output, reports) = try reproduceInstalledComponentReport(name, input: input, plan: plan)
+        return (output, reports.flatMap(\.records))
+    }
+
+    func reproduceInstalledComponentReport(_ name: String, input: Data,
+        plan: VariantPlanResolver.VariantPlan) throws -> (Data, [ComponentReport]) {
         guard plan.variant == variant.rawValue else { throw FirmwareGeneration.fail("Installed producer variant differs") }
         iosBaseIs18 = plan.gates.iosBaseIs18
         iosBaseIs27 = plan.gates.iosBaseIs27
@@ -709,7 +715,7 @@ public final class FirmwarePipeline {
         guard !reports.isEmpty, reports.allSatisfy({ !$0.hasRequiredFailure }) else {
             throw FirmwareGeneration.fail("Installed binary producer failed required effects")
         }
-        return (output, reports.flatMap(\.records))
+        return (output, reports)
     }
 
     // MARK: - Component List Builder
