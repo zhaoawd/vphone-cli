@@ -53,7 +53,7 @@ enum GuestOperationFailure {
     }
 }
 enum GuestAPI {
-    static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
+    static func execute(method: String, params: [String: Any], externalProxy: Bool) throws -> [String: Any] {
         createTemporary()
         if method == "fail" { throw IcliError.commandFailed([:]) }
         return ["value": "retained response"]
@@ -63,7 +63,7 @@ enum GuestAPI {
 // operation must release its own ObjC temporary on both result paths.
 autoreleasepool {
     for method in ["ok", "fail", "ok", "fail"] {
-        let reply = APIWire.execute(APIRequest(method: method))
+        let reply = APIWire.execute(APIRequest(method: method), externalProxy: false)
         guard liveCount() == 0 else {
             fputs("temporary survived operation return\\n", stderr); exit(1)
         }

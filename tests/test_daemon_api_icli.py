@@ -4,7 +4,7 @@ T08 (IcliKit 0.7.5/0.7.6): IPA and deb entry names are read with a thread-local
 UTF-8 LC_CTYPE while the caller stays in the C locale, and Mac metadata
 (`__MACOSX/`, `._name`) is skipped during IPA extraction. The checks compile the
 resolved checkout's own Archive.m/Deb.m and its Tests/ArchiveLocale harness
-against the macOS slice of the resolved libarchive. The 0.7.16 harness also
+against the macOS slice of the resolved libarchive. The pinned 0.8.5 harness also
 checks deb hard links, symlink escapes and JSON guards. They need the package
 checkout left by `make daemon_api_build`; iOS launchd, installd and container
 registration are not exercised.
