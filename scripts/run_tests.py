@@ -78,6 +78,25 @@ LATENCY_TESTS = "|".join((
     "timeoutBoundsPipesInheritedByDescendant",
     "timeoutIncludesBlockedSendAndReleasesPendingSlot",
     "a changed entity or a server without ranges restarts from byte zero",
+    # Loopback readiness and mock sends have producer deadlines; concurrent
+    # signing/process fixtures can prevent their observing tasks from running.
+    "realHTTPRPCHealthAndProtocolErrors",
+    "refusesRedirectAndOversizedResponses",
+    "webSocketRefusesRedirect",
+    "realWebSocketUsesBearerAndCorrelatesConcurrentReplies",
+    "fixtureRetainsTimelyServerWhenObserverResumesLate",
+    "fixtureRejectsServerThatActuallyStartsAfterDeadline",
+    "correlatesOutOfOrderRepliesAndInterleavedEvents",
+    "cancellationAndLateReplyCannotCompleteNextRequest",
+    "disconnectFailsAllAndOldGenerationCannotAffectNewSocket",
+    "boundsPendingRequestsAndCloseCompletesWaiters",
+    "malformedMessageFailsPendingRequests",
+    "eventOverflowClosesConnectionInsteadOfSilentlyDropping",
+    "remoteErrorOnlyFailsItsMatchingRequest",
+    "fixtureRetainsOnTimeMessageWhenObserverResumesAfterDeadline",
+    "fixtureRejectsMessageActuallySentAfterDeadline",
+    "twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply",
+    "escapedPipeWriterTimesOutWithoutLosingTailAndReopensCommandGate",
 ))
 
 

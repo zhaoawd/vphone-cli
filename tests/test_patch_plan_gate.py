@@ -113,6 +113,113 @@ class FrozenGateTests(unittest.TestCase):
     def load(self):
         return gate.load_plan(self.path,self.digest,self.context)
 
+    def test_obsolete_implementation_refused_before_real_entrypoint_side_effects(self):
+        self.plan['gates']['iosBaseIs27'] = True
+        identifier = 'dyld-boot-iomfb_force_kern'
+        _, digest = guest_write.target_table()
+        self.entries.append(dict(id=identifier, disposition='guestUncovered', recordRules=[
+            {'literal':'guest-target-map-v1:'+digest+':'+identifier, 'hexadecimalOffsetSuffix':False}]))
+        self.publish()
+        environment = dict(os.environ, VPHONE_FROZEN_PLAN_SHA256=self.digest,
+                           VPHONE_FROZEN_CONTEXT=json.dumps(self.context))
+        chunks = self.mount / 'mnt1/dsc'; chunks.mkdir()
+        target = chunks / 'dyld_shared_cache_arm64e'
+        commands = [
+            [sys.executable, str(ROOT/'scripts/patchers/cfw.py'), 'patch-iomfb-force-kern', str(chunks)],
+            [sys.executable, str(ROOT/'scripts/patchers/plan_gate.py'), 'entry', 'cfw_install_host.sh'],
+            [sys.executable, str(ROOT/'scripts/patchers/plan_gate.py'), 'verify-final'],
+            ['/bin/zsh', str(ROOT/'scripts/cfw_install.sh'), str(self.vm)],
+        ]
+        # Qualification must not depend on whether input looks new, old or
+        # corrupt: none supplies authenticated originals or a current writer.
+        for payload in (b'pristine-test-cache', b'previously-patched-test-cache', b''):
+            target.write_bytes(payload)
+            for command in commands:
+                with self.subTest(payload=payload, command=command[1]):
+                    result = subprocess.run(command, env=environment,
+                                            capture_output=True, text=True)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn('target implementation unavailable', result.stderr)
+                    self.assertEqual(target.read_bytes(), payload)
+                    self.assertFalse(self.evidence.parent.exists())
+                    self.assertNotIn('force-kern complete', result.stdout)
+
+    def test_direct_writer_context_refuses_before_creating_evidence(self):
+        self.entries.append(dict(id='dyld-boot-iomfb_force_kern', disposition='guestUncovered'))
+        self.publish()
+        plan = self.load()
+        with self.assertRaisesRegex(ValueError, 'target implementation unavailable'):
+            gate.require_write_context(plan)
+        self.assertFalse(self.evidence.parent.exists())
+
+    def test_excluded_implementation_does_not_block_other_writes(self):
+        self.plan['gates']['iosBaseIs27'] = True
+        source = self.stage / 'dropbear.plist'
+        for group in ('excludedByVersion', 'excludedByVariant', 'excludedByOptIn', 'notImplemented'):
+            with self.subTest(group=group):
+                self.plan[group] = [dict(id='dyld-boot-iomfb_force_kern', disposition=group)]
+                self.publish()
+                source.write_bytes(plistlib.dumps({'ProgramArguments':['dropbear']}))
+                before = source.read_bytes()
+                with patch.dict(os.environ, {'VPHONE_FROZEN_PLAN_SHA256': self.digest,
+                                             'VPHONE_FROZEN_CONTEXT': json.dumps(self.context)}), \
+                     patch.object(sys, 'argv', ['cfw.py', 'patch-dropbear-plist', str(source)]):
+                    cfw.main()
+                self.assertNotEqual(source.read_bytes(), before)
+                row = json.loads(self.evidence.read_text().splitlines()[-1])
+                self.assertEqual(row['declarationID'], 'system-launchdaemons-boot-install')
+                self.assertEqual(row['afterSHA256'], hashlib.sha256(source.read_bytes()).hexdigest())
+                self.plan[group] = []
+
+    def test_ios26_and_ios18_uncovered_id_allow_regular_write_but_not_legacy_writer(self):
+        self.entries.append(dict(id='dyld-boot-iomfb_force_kern', disposition='guestUncovered'))
+        source = self.stage / 'dropbear.plist'
+        for ios18 in (False, True):
+            with self.subTest(iosBaseIs18=ios18):
+                self.plan['gates'].update(iosBaseIs27=False, iosBaseIs18=ios18)
+                self.publish()
+                source.write_bytes(plistlib.dumps({'ProgramArguments':['dropbear']}))
+                with patch.dict(os.environ, {'VPHONE_FROZEN_PLAN_SHA256': self.digest,
+                                             'VPHONE_FROZEN_CONTEXT': json.dumps(self.context)}):
+                    with patch.object(sys, 'argv', ['cfw.py', 'patch-dropbear-plist', str(source)]):
+                        cfw.main()
+                    previous = self.evidence.read_bytes()
+                    with patch.object(sys, 'argv', ['cfw.py', 'patch-iomfb-force-kern', str(self.mount)]):
+                        with self.assertRaisesRegex(ValueError, 'target implementation unavailable'):
+                            cfw.main()
+                    self.assertEqual(self.evidence.read_bytes(), previous)
+                row = json.loads(previous.splitlines()[-1])
+                self.assertEqual(row['declarationID'], 'system-launchdaemons-boot-install')
+                self.assertEqual(row['afterSHA256'], hashlib.sha256(source.read_bytes()).hexdigest())
+
+    def test_old_target_refuses_new_execution_without_changing_evidence(self):
+        self.record['upstreamTarget'] = '2d21d21fbdd4f51f013616273ceda9b35a3e0789'
+        self.context['upstreamTarget'] = self.record['upstreamTarget']
+        self.publish()
+        before = self.path.read_bytes()
+        with patch.dict(os.environ, {'VPHONE_FROZEN_PLAN_SHA256': self.digest,
+                                     'VPHONE_FROZEN_CONTEXT': json.dumps(self.context)}), \
+             patch.object(sys, 'argv', ['cfw.py', 'patch-iomfb-force-kern', str(self.mount)]):
+            with self.assertRaisesRegex(ValueError, 'desired plan encoding/target mismatch'):
+                cfw.main()
+        self.assertEqual(self.path.read_bytes(), before)
+        self.assertFalse(self.evidence.parent.exists())
+
+    def test_selected_implementation_is_also_refused(self):
+        self.plan['selected'] = [dict(id='dyld-boot-iomfb_force_kern', disposition='selected')]
+        self.publish()
+        with self.assertRaisesRegex(ValueError, 'target implementation unavailable'):
+            gate.require_supported_implementations(self.load())
+
+    def test_force_kern_dry_run_is_explicitly_isolated_and_read_only(self):
+        output = io.StringIO()
+        with patch.object(sys, 'argv', ['cfw.py', 'patch-iomfb-force-kern', '/unused', '--dry-run']), \
+             patch.object(cfw, '_dispatch') as dispatch, contextlib.redirect_stdout(output):
+            cfw.main()
+        dispatch.assert_called_once_with(dry_run=True)
+        self.assertIn('ISOLATED diagnostic only', output.getvalue())
+        self.assertFalse(self.evidence.parent.exists())
+
     def test_real_guarded_copy_and_patch_records_actual_bytes(self):
         target=self.mount/'mnt1/System/Library/LaunchDaemons/dropbear.plist';target.parent.mkdir(parents=True)
         target.write_bytes(b'old-target')
@@ -244,7 +351,8 @@ class FrozenGateTests(unittest.TestCase):
                          hashlib.sha256(source.read_bytes()).hexdigest())
         cache=self.stage/'CryptexSystemOS.dmg';cache.write_bytes(b'unknown-decrypted-cache')
         def produce(input_path, output_path):
-            self.assertEqual(input_path,source)
+            self.assertEqual(input_path,self.vm/'.firmware-generations'/self.context['generationID']/'originals'/source.relative_to(self.vm))
+            self.assertEqual(input_path.read_bytes(),source.read_bytes())
             self.assertFalse(output_path.exists())
             self.assertFalse(helper.marker(output_path).exists())
             output_path.write_bytes(b'controlled-decryption-result')
@@ -444,7 +552,7 @@ class FrozenGateTests(unittest.TestCase):
         original=self.vm/'Disk.img'
         if not original.exists(): original.write_bytes(b'original synthetic disk')
         staged=self.evidence.parent/'Disk.img';staged.write_bytes(b'staged synthetic disk')
-        record={'version':1,'id':name,'status':'staged','vm':str(self.vm),
+        record={'version':2,'provenanceMode':'required','id':name,'status':'staged','vm':str(self.vm),
                 'original':cfw_disk_txn.identity(original.stat()),'staged':cfw_disk_txn.identity(staged.stat())}
         (self.evidence.parent/'transaction.json').write_text(json.dumps(record))
         return name
@@ -748,7 +856,7 @@ class FrozenGateTests(unittest.TestCase):
         target=self.mount/'mnt1/System/Library/LaunchDaemons/dropbear.plist';target.parent.mkdir(parents=True)
         guest_write.run(plan,['cp',str(source),str(target)])
         work=self.evidence.parent;image=work/'Disk.img';image.write_bytes(b'staged fixture')
-        (work/'transaction.json').write_text(json.dumps({'version':1,'status':'staged','vm':str(self.vm),'staged':cfw_disk_txn.identity(image.stat())}))
+        (work/'transaction.json').write_text(json.dumps({'version':2,'provenanceMode':'required','status':'staged','vm':str(self.vm),'staged':cfw_disk_txn.identity(image.stat())}))
         readonly=True
         def query(argv):
             if argv==['/usr/sbin/diskutil','info','-plist','/dev/disk42s1']:

@@ -10,6 +10,7 @@ script carries no fault hooks; this wrapper replaces its functions.
 """
 import errno
 import importlib.util
+import json
 import os
 from pathlib import Path
 import sys
@@ -20,6 +21,16 @@ txn = importlib.util.module_from_spec(spec)
 sys.modules['cfw_disk_txn'] = txn
 spec.loader.exec_module(txn)
 faults = set(filter(None, os.environ.get('CFW_TXN_FAULTS', '').split(',')))
+
+# This suite isolates disk copy/swap/cleanup and uses a disposable installer.
+# Actual provenance production and publication are exercised in
+# test_undo_provenance; there is no production bypass flag.
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+from patchers import undo_provenance
+def synthetic_provenance(work, record):
+    if record.get('version') != 2 or record.get('provenanceMode') != 'required':
+        raise ValueError('old records permit recovery only')
+undo_provenance.verify_publication = synthetic_provenance
 
 
 def failing(code):
@@ -58,6 +69,10 @@ if 'excl-publish' in faults:
     txn.move_exclusive = move
 
 status = txn.main(sys.argv[2:])
+if status == 0 and sys.argv[2:3] == ['stage'] and 'legacy-record' in faults:
+    work = Path(sys.argv[-1]); record = txn.load_record(work)
+    record['version'] = 1; record.pop('provenanceMode')
+    txn.save_record(work,record)
 if status == 0 and sys.argv[2:3] == ['stage'] and 'replace-after-stage' in faults:
     vm = Path(os.environ['TEST_MOUNTS']).parent
     os.rename(vm / 'Disk.img', vm / 'Disk.img.moved')

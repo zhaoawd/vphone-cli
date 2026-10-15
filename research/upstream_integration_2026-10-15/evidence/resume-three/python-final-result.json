@@ -1,0 +1,16 @@
+{
+  "command": "make test_python",
+  "exit_code": 2,
+  "source_packages": "/Users/qcz3840/github/vphone-cli/.build/daemon-api-8a75092/Xcode/SourcePackages",
+  "tests": 835,
+  "skipped": 1,
+  "failures": 1,
+  "duration_seconds": 420.289,
+  "failure": "obsolete Launchpad deletion boundary assertion",
+  "resolution": {
+    "command": ".venv/bin/python -B -m unittest tests.test_launchpad_bundle -v",
+    "tests": 23,
+    "exit_code": 0,
+    "full_entrypoint_rerun": false
+  }
+}

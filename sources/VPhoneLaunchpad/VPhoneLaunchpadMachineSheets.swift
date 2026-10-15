@@ -239,7 +239,7 @@ struct VPhoneLaunchpadExportView: View {
                     }
                 }
                 Section {
-                    Text("vphone-cli reports no progress to Launchpad; the machine shows Exporting… until the archive is written. Cancel Export stops it and removes the partial archive it created.")
+                    Text("Export creates a new archive. Choose a destination that does not already exist. Cancel Export requests cancellation; completed archives are kept.")
                         .foregroundStyle(.secondary)
                 }
             }
@@ -265,8 +265,8 @@ struct VPhoneLaunchpadExportView: View {
             let densest = densest
             let includeIPSW = includeIPSW
             panel.present { url in
-                // The save panel has asked before replacing an existing file.
-                Task { await library.export([(machine, url)], densest: densest, includeIPSW: includeIPSW, replacing: true) }
+                // The library still refuses an occupied destination.
+                Task { await library.export([(machine, url)], densest: densest, includeIPSW: includeIPSW, replacing: false) }
                 dismiss()
             }
             return

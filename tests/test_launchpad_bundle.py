@@ -204,14 +204,11 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         # The value exists only through the factories.
         self.assertIn('private init(_ kind: Kind, _ arguments: [String])', code)
 
-    def test_b3_only_a_cancelled_export_removes_a_file(self):
+    def test_b3_cancelled_export_does_not_remove_final_paths(self):
         code = re.sub(r'//.*', '', self.EDIT_FILE.read_text(encoding='utf-8'))
-        self.assertEqual(re.findall(self.FILE_REMOVAL, code), ['unlink('])
-        cleanup = code.split('public static func removeCancelled', 1)[1]
-        self.assertRegex(cleanup, r'guard !existedBefore, lstat\(url\.path, &info\) == 0, info\.st_mode & S_IFMT == S_IFREG')
+        self.assertIsNone(re.search(self.FILE_REMOVAL, code))
         library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
-        self.assertEqual(library.count('removeCancelled('), 1)
-        self.assertRegex(library, r'if Task\.isCancelled \{\s*VPhoneLaunchpadExportOutput\.removeCancelled\(destination, existedBefore: existedBefore\)')
+        self.assertNotIn('removeCancelled(', library)
 
     def test_b5_whitelist_builds_only_read_only_commands(self):
         code = re.sub(r'//.*', '', self.WHITELIST.read_text(encoding='utf-8'))

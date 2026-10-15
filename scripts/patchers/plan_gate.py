@@ -132,10 +132,35 @@ def load_plan(path, expected_sha256, context) -> FrozenPlan:
 
 def from_environment():
     try:
-        return load_plan(os.environ['VPHONE_FROZEN_PLAN'], os.environ['VPHONE_FROZEN_PLAN_SHA256'],
+        plan = load_plan(os.environ['VPHONE_FROZEN_PLAN'], os.environ['VPHONE_FROZEN_PLAN_SHA256'],
                          json.loads(os.environ['VPHONE_FROZEN_CONTEXT']))
+        require_supported_implementations(plan)
+        return plan
     except (KeyError, OSError, json.JSONDecodeError) as error:
         raise ValueError('missing or invalid frozen plan/context: ' + str(error)) from error
+
+
+def require_supported_implementations(plan, *, command=None):
+    """A declaration ID alone does not prove the target's implementation.
+
+    The isolated IOMFB algorithm implements the conditional dispatcher, but
+    existing effect blobs are not authenticated first originals or a committed
+    Undo log. Algorithm availability cannot authorize production migration.
+    Refuse the complete execution before any staging/evidence side effects.
+    guestUncovered includes this ID even on older OS versions; the verified
+    iosBaseIs27 gate determines whether installation will execute it. An
+    explicit command cannot bypass missing migration/publication qualification.
+    """
+    enabled = {entry['id'] for group in ('selected', 'guestUncovered')
+               for entry in plan.record['plan'][group]}
+    ios27 = plan.record['plan']['gates'].get('iosBaseIs27')
+    if (command == 'patch-iomfb-force-kern'
+            or ('dyld-boot-iomfb_force_kern' in enabled and ios27 is not False)):
+        raise ValueError(
+            'dyld-boot-iomfb_force_kern: target implementation unavailable for production; '
+            'the conditional algorithm for ' + TARGET + ' has no qualified migration/publication chain. Trusted original/Undo '
+            'provenance and transactional migration are not implemented; '
+            'existing patch IDs, current bytes, or effect blobs cannot authorize migration')
 
 
 def recheck(plan):
@@ -164,6 +189,7 @@ def private_path(plan, path):
 
 def require_write_context(plan):
     """Real writers must inherit the VM lock and a private evidence sink."""
+    require_supported_implementations(plan)
     from vm_lock import check_inherited
     vm = Path(plan.context['vmDirectory'])
     if plan.context['variant'] == 'less':
@@ -319,6 +345,8 @@ def main():
         destination=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'guest-effects-final.json'
         if destination.is_symlink(): raise ValueError('linked final evidence destination')
         destination.write_bytes(canonical(result))
+        from .undo_provenance import seal
+        seal(destination.parent,result)
         return
     if len(sys.argv) == 3 and sys.argv[1] == 'entry':
         validate_entry(plan, Path(sys.argv[2]).name)

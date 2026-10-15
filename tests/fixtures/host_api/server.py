@@ -290,6 +290,13 @@ class Server(ThreadingHTTPServer):
         pass
 
 
+startup_delay = next((float(arg.split('=', 1)[1]) for arg in sys.argv[2:]
+                      if arg.startswith('--startup-delay=')), 0)
+if startup_delay:
+    time.sleep(startup_delay)
 server = Server(('127.0.0.1', 0), Handler)
+# Record when bind/listen completed, independently of the Swift observer.
+ready_at = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
 (root / 'port').write_text(str(server.server_port))
+(root / 'ready.json').write_text(json.dumps({'port': server.server_port, 'readyAt': ready_at}))
 server.serve_forever()

@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 import Testing
 @testable import VPhoneAPIKit
@@ -8,12 +9,20 @@ final class APIHTTPFixture {
     let directory: URL
     let port: Int
 
-    init(behindProxy: Bool = false, managedSession: Bool = false, waitForPeerClose: Bool = false) async throws {
+    private struct Ready: Decodable {
+        let port: Int
+        let readyAt: UInt64
+    }
+
+    init(behindProxy: Bool = false, managedSession: Bool = false, waitForPeerClose: Bool = false,
+         startupTimeout: TimeInterval = 30, startupDelay: TimeInterval = 0,
+         poll: () async throws -> Void = { try await Task.sleep(for: .milliseconds(10)) }) async throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("vphone-api-\(UUID())")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         process.executableURL = root.appendingPathComponent(".venv/bin/python3")
         process.arguments = [root.appendingPathComponent("tests/fixtures/host_api/server.py").path, directory.path]
+        if startupDelay > 0 { process.arguments?.append("--startup-delay=\(startupDelay)") }
         if managedSession { process.arguments?.append("--managed-session") }
         if behindProxy { process.arguments?.append("--behind-proxy") }
         if waitForPeerClose { process.arguments?.append("--wait-for-peer-close") }
@@ -23,20 +32,34 @@ final class APIHTTPFixture {
         process.terminationHandler = { [exited] _ in exited.leave() }
         do { try process.run() }
         catch { exited.leave(); throw error }
-        let deadline = ContinuousClock.now + .seconds(30)
+        // The Python producer uses the same Darwin monotonic clock.
+        let deadline = clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW) + UInt64(startupTimeout * 1_000_000_000)
         var boundPort: Int?
-        while ContinuousClock.now < deadline, process.isRunning {
-            if let text = try? String(contentsOf: directory.appendingPathComponent("port"), encoding: .utf8), let value = Int(text) {
-                boundPort = value
-                break
+        var observedReady: Ready?
+        var started = false
+        let childProcess = process, childExit = exited, fixtureDirectory = directory
+        defer {
+            if !started { Self.stop(process: childProcess, exited: childExit, directory: fixtureDirectory) }
+        }
+        while process.isRunning {
+            if let data = try? Data(contentsOf: directory.appendingPathComponent("ready.json")),
+               let record = try? JSONDecoder().decode(Ready.self, from: data) {
+                observedReady = record
+                if record.readyAt <= deadline {
+                    boundPort = record.port
+                    break
+                }
             }
-            try await Task.sleep(for: .milliseconds(10))
+            guard clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW) < deadline else { break }
+            try await poll()
         }
         guard let boundPort else {
-            Self.stop(process: process, exited: exited, directory: directory)
-            throw URLError(.cannotConnectToHost)
+            var details: [String: Any] = ["fixtureDeadline": deadline]
+            if let observedReady { details["fixtureReadyAt"] = observedReady.readyAt }
+            throw URLError(.cannotConnectToHost, userInfo: details)
         }
         port = boundPort
+        started = true
     }
 
     func client(_ path: String = "", timeout: TimeInterval = 30) throws -> VPhoneAPIClient {
@@ -60,6 +83,29 @@ final class APIHTTPFixture {
 }
 
 struct APIHTTPTests {
+    @Test func fixtureRetainsTimelyServerWhenObserverResumesLate() async throws {
+        let fixture = try await APIHTTPFixture(startupTimeout: 1) {
+            try await Task.sleep(for: .seconds(2))
+        }
+        defer { fixture.stop() }
+        #expect(try await fixture.client().health().ios == "26.0")
+    }
+
+    @Test func fixtureRejectsServerThatActuallyStartsAfterDeadline() async throws {
+        do {
+            let fixture = try await APIHTTPFixture(startupTimeout: 1, startupDelay: 1.5) {
+                try await Task.sleep(for: .seconds(2))
+            }
+            defer { fixture.stop() }
+            Issue.record("late server satisfied the readiness deadline")
+        } catch let error as URLError {
+            #expect(error.code == .cannotConnectToHost)
+            let readyAt = try #require(error.userInfo["fixtureReadyAt"] as? UInt64)
+            let deadline = try #require(error.userInfo["fixtureDeadline"] as? UInt64)
+            #expect(readyAt > deadline)
+        }
+    }
+
     @Test func realHTTPRPCHealthAndProtocolErrors() async throws {
         let fixture = try await APIHTTPFixture()
         defer { fixture.stop() }

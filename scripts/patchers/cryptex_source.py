@@ -73,8 +73,18 @@ def attach(plan, cache, root):
         if stamp.get('transition'): raise ValueError('Cryptex transformation cannot be restarted')
         stamp['imageBefore']=observation(cache)
         stamp['baselineTree']=tree(root)
+    elif root.name=='mnt_sysos' and not stamp.get('transition'):
+        # First-member provenance is captured only on the original readonly
+        # image. Installed files and writable transformed caches cannot create it.
+        from .undo_provenance import capture_baseline
+        stamp['originalDSC']=capture_baseline(plan,root,cache,stamp)
+    previous = gate.strict_bytes(marker(cache))
     marker(cache).write_bytes(gate.canonical(stamp))
-    mounted(plan,root)
+    try:
+        mounted(plan,root)
+    except Exception:
+        marker(cache).write_bytes(previous)
+        raise
 
 
 def prepare(plan, kind, source, cache):
@@ -83,9 +93,10 @@ def prepare(plan, kind, source, cache):
     vm = Path(plan.context['vmDirectory'])
     if vm not in source.parents or source.is_symlink(): raise ValueError('Cryptex input outside bound VM')
     original = vm / '.firmware-generations' / plan.context['generationID'] / 'originals' / source.relative_to(vm)
-    if file_sha(source) != file_sha(original): raise ValueError('Cryptex input differs from verified generation')
+    original_before = observation(original)
+    if file_sha(source) != original_before['sha256']: raise ValueError('Cryptex input differs from verified generation')
     binding = dict(schemaVersion=1,generationID=plan.context['generationID'],planDigest=plan.record['planSHA256'],
-                   source=str(original),sourceSHA256=file_sha(original))
+                   source=str(original),sourceSHA256=original_before['sha256'])
     stamp = marker(cache)
     if stamp.exists() and cache.exists():
         old=json.loads(gate.strict_bytes(stamp))
@@ -93,9 +104,10 @@ def prepare(plan, kind, source, cache):
     if cache.exists(): cache.unlink()
     if kind=='systemos':
         from cache_systemos import cache_systemos
-        cache_systemos(source,cache)
-    elif kind=='appos': shutil.copyfile(source,cache)
+        cache_systemos(original,cache)
+    elif kind=='appos': shutil.copyfile(original,cache)
     else: raise ValueError('unknown Cryptex kind')
+    if observation(original) != original_before: raise ValueError('Cryptex original changed during cache creation')
     stamp.write_bytes(gate.canonical(dict(binding,cacheSHA256=file_sha(cache))))
 
 

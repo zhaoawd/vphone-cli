@@ -1,0 +1,21 @@
+test_broken_progress_pipe_does_not_abort_data_write (tests.test_progress_pipe.ProgressPipeTests.test_broken_progress_pipe_does_not_abort_data_write) ... FAIL
+test_initial_pipe_remains_silent (tests.test_progress_pipe.ProgressPipeTests.test_initial_pipe_remains_silent) ... ok
+test_interrupt_and_terminate_still_stop_transfer (tests.test_progress_pipe.ProgressPipeTests.test_interrupt_and_terminate_still_stop_transfer) ... ok
+test_normal_terminal_progress (tests.test_progress_pipe.ProgressPipeTests.test_normal_terminal_progress) ... ok
+
+======================================================================
+FAIL: test_broken_progress_pipe_does_not_abort_data_write (tests.test_progress_pipe.ProgressPipeTests.test_broken_progress_pipe_does_not_abort_data_write)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/tests/test_progress_pipe.py", line 60, in test_broken_progress_pipe_does_not_abort_data_write
+    self.run_transfer('broken-ignored')
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/github/vphone-cli/tests/test_progress_pipe.py", line 50, in run_transfer
+    self.assertEqual(process.returncode, 0, stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: -6 != 0 : b''
+
+----------------------------------------------------------------------
+Ran 4 tests in 4.095s
+
+FAILED (failures=1)

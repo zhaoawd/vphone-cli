@@ -31,6 +31,9 @@ struct NativeTransferTests {
             var exported: [(Int64, Int64)] = []
             try VPhoneBundleOps.export(bundleNamed: "source", to: archive, includeIPSW: false,
                 compression: compression, in: library, backend: exporter, progress: { exported.append(($0, $1)) })
+            let exportCounts = exported.map { $0.0 }
+            #expect(!exportCounts.isEmpty)
+            #expect(exportCounts == exportCounts.sorted())
             for importer in VPhoneBundleOps.ArchiveBackend.allCases {
                 let destination = VPhoneLibrary(root: root.appendingPathComponent(importer.rawValue))
                 var progress: [(Int64, Int64)] = []
@@ -54,6 +57,131 @@ struct NativeTransferTests {
                 #expect(exported.last?.0 == exported.last?.1)
                 #expect(exported.allSatisfy { $0.0 <= $0.1 })
             }
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func exportRefusesExistingFilesAndSymlinkLeaves(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, _ in
+            let target = root.appendingPathComponent("keep")
+            let sentinel = Data("existing archive".utf8)
+            try sentinel.write(to: target)
+            for kind in ["file", "symlink", "dangling"] {
+                let output = root.appendingPathComponent("\(kind).tzst")
+                if kind == "file" { try sentinel.write(to: output) }
+                else {
+                    try FileManager.default.createSymbolicLink(atPath: output.path,
+                        withDestinationPath: kind == "symlink" ? target.path : root.appendingPathComponent("missing").path)
+                }
+                #expect(throws: (any Error).self) {
+                    try VPhoneBundleOps.export(bundleNamed: "source", to: output, includeIPSW: false,
+                                              in: library, backend: backend)
+                }
+                if kind == "file" { #expect(try Data(contentsOf: output) == sentinel) }
+                else { #expect(VPhoneNativeTransfer.fileType(at: output) == S_IFLNK) }
+                #expect(try Data(contentsOf: target) == sentinel)
+            }
+            let remaining = try FileManager.default.contentsOfDirectory(atPath: root.path)
+            #expect(!remaining.contains { $0.hasPrefix(".vphone-export-") })
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func exportRejectsMissingParentSourceTreeAndAutomaticNameCollision(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, source in
+            let collision = root.appendingPathComponent("source.tzst")
+            try Data("keep".utf8).write(to: collision)
+            for destination in [root, root.appendingPathComponent("missing/out.tzst"),
+                                source.url.appendingPathComponent("out.tzst")] {
+                #expect(throws: (any Error).self) {
+                    try VPhoneBundleOps.export(bundleNamed: "source", to: destination, includeIPSW: false,
+                                              in: library, backend: backend)
+                }
+            }
+            #expect(try Data(contentsOf: collision) == Data("keep".utf8))
+            #expect(!FileManager.default.fileExists(atPath: root.appendingPathComponent("missing").path))
+            #expect(!FileManager.default.fileExists(atPath: source.url.appendingPathComponent("out.tzst").path))
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func exportResolvesParentDirectoryAlias(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, _ in
+            let directory = root.appendingPathComponent("exports")
+            let alias = root.appendingPathComponent("alias")
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
+            try FileManager.default.createSymbolicLink(atPath: alias.path, withDestinationPath: directory.path)
+            let output = try VPhoneBundleOps.export(bundleNamed: "source", to: alias, includeIPSW: false,
+                                                   in: library, backend: backend)
+            #expect(output == directory.appendingPathComponent("source.tzst").resolvingSymlinksInPath())
+            let imported = try VPhoneBundleOps.importArchive(from: output, name: "copy", in: library, backend: backend)
+            #expect(try Data(contentsOf: imported.url.appendingPathComponent("Disk.img")) == Data("Disk.img contents".utf8))
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func exportCancellationRemovesPrivateOutput(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, source in
+            let destination = root.appendingPathComponent("cancelled.tzst")
+            let before = try Data(contentsOf: source.url.appendingPathComponent("Disk.img"))
+            let cancellation = VPhoneChildCancellation(log: { _ in })
+            defer { cancellation.complete() }
+            var observed = false
+            #expect(throws: (any Error).self) {
+                try VPhoneChildCancellation.$current.withValue(cancellation) {
+                    try VPhoneBundleOps.export(bundleNamed: "source", to: destination, includeIPSW: false,
+                        in: library, backend: backend, isCancelled: { cancellation.isRequested },
+                        progress: { _, _ in
+                            guard !observed else { return }
+                            observed = true
+                            let staging = (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil))?.first { $0.lastPathComponent.hasPrefix(".vphone-export-") }
+                            #expect(staging != nil)
+                            if let staging {
+                                var info = stat()
+                                #expect(lstat(staging.path, &info) == 0 && info.st_mode & 0o777 == 0o700)
+                            }
+                            #expect(!FileManager.default.fileExists(atPath: destination.path))
+                            cancellation.request(signal: SIGTERM)
+                        })
+                }
+            }
+            #expect(observed)
+            #expect(cancellation.settle())
+            #expect(!FileManager.default.fileExists(atPath: destination.path))
+            let remaining = try FileManager.default.contentsOfDirectory(atPath: root.path)
+            #expect(!remaining.contains { $0.hasPrefix(".vphone-export-") })
+            #expect(try Data(contentsOf: source.url.appendingPathComponent("Disk.img")) == before)
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases, [false, true])
+    func exportProgressCannotPublishAfterCancellationOrReplaceCompetitor(
+        backend: VPhoneBundleOps.ArchiveBackend, cancel: Bool
+    ) throws {
+        try withFixture { root, library, _ in
+            let destination = root.appendingPathComponent("publish.tzst")
+            var cancelled = false
+            var observed = false
+            #expect(throws: (any Error).self) {
+                try VPhoneBundleOps.export(bundleNamed: "source", to: destination, includeIPSW: false,
+                    in: library, backend: backend, isCancelled: { cancelled }, progress: { done, total in
+                        let staging = (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil))?.first { $0.lastPathComponent.hasPrefix(".vphone-export-") }
+                        guard !observed, done >= total, let staging else { return }
+                        if backend == .native,
+                           !FileManager.default.fileExists(atPath: staging.appendingPathComponent("output").path) { return }
+                        observed = true
+                        if cancel { cancelled = true }
+                        else {
+                            do { try Data("competitor".utf8).write(to: destination, options: .withoutOverwriting) }
+                            catch { Issue.record("could not create competing destination: \(error)") }
+                        }
+                    })
+            }
+            #expect(observed)
+            if cancel { #expect(!FileManager.default.fileExists(atPath: destination.path)) }
+            else { #expect(try Data(contentsOf: destination) == Data("competitor".utf8)) }
+            let remaining = try FileManager.default.contentsOfDirectory(atPath: root.path)
+            #expect(!remaining.contains { $0.hasPrefix(".vphone-export-") })
         }
     }
 
@@ -178,6 +306,67 @@ struct NativeTransferTests {
                 #expect(a == b)
                 return !a.isEmpty
             }) {}
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func importCancellationRemovesStagingAndDoesNotPublish(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, source in
+            let archive = root.appendingPathComponent("cancel.tar")
+            try VPhoneArchiveWriter.create(archive: archive, from: source.url, topLevel: "source")
+            let originalArchive = try Data(contentsOf: archive)
+            let originalDisk = try Data(contentsOf: source.url.appendingPathComponent("Disk.img"))
+            let cancellation = VPhoneChildCancellation(log: { _ in })
+            defer { cancellation.complete() }
+            var observed = false
+            #expect(throws: (any Error).self) {
+                try VPhoneChildCancellation.$current.withValue(cancellation) {
+                    try VPhoneBundleOps.importArchive(from: archive, name: "cancelled", in: library,
+                        backend: backend, isCancelled: { cancellation.isRequested }, progress: { _, _ in
+                            observed = true
+                            cancellation.request(signal: SIGTERM)
+                        })
+                }
+            }
+            #expect(observed)
+            #expect(cancellation.settle())
+            #expect(!FileManager.default.fileExists(atPath: library.url(forName: "cancelled").path))
+            let remaining = try FileManager.default.contentsOfDirectory(atPath: library.root.path)
+            #expect(!remaining.contains { $0.hasPrefix(".import-") })
+            #expect(try Data(contentsOf: archive) == originalArchive)
+            #expect(try Data(contentsOf: source.url.appendingPathComponent("Disk.img")) == originalDisk)
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func importCancellationImmediatelyBeforePublication(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, source in
+            let archive = root.appendingPathComponent("cancel-publish.tar")
+            try VPhoneArchiveWriter.create(archive: archive, from: source.url, topLevel: "source")
+            var cancelled = false
+            #expect(throws: CancellationError.self) {
+                try VPhoneBundleOps.importArchive(from: archive, name: "cancelled", in: library,
+                    backend: backend, isCancelled: { cancelled }, progress: nil,
+                    afterNameCheck: { cancelled = true })
+            }
+            #expect(cancelled)
+            #expect(!FileManager.default.fileExists(atPath: library.url(forName: "cancelled").path))
+            let remaining = try FileManager.default.contentsOfDirectory(atPath: library.root.path)
+            #expect(!remaining.contains { $0.hasPrefix(".import-") })
+            #expect(FileManager.default.fileExists(atPath: source.url.path))
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func importRejectsFIFOWithoutCreatingStaging(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, _ in
+            let fifo = root.appendingPathComponent("input.tar")
+            #expect(mkfifo(fifo.path, 0o600) == 0)
+            #expect(throws: VPhoneBundleOpsError.self) {
+                try VPhoneBundleOps.importArchive(from: fifo, name: "cancelled", in: library, backend: backend)
+            }
+            let remaining = try FileManager.default.contentsOfDirectory(atPath: library.root.path)
+            #expect(!remaining.contains { $0.hasPrefix(".import-") })
         }
     }
 

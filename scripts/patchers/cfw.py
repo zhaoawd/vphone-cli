@@ -35,13 +35,11 @@ Commands:
         then re-attest the modified DSC page hash.
 
     patch-iomfb-force-kern <chunks_dir> [--dry-run]
-        iOS 27 VZ-view fix: retarget IOMobileFramebuffer's public
-        _IOMobileFramebufferSwap* dispatch trampolines to their _kern_Swap*
-        siblings, forcing present onto the userclient method-5 path the 26.4
-        paravirt GPU scans out to the host (27 defaults to the _virt_* callback
-        path the paravirt GPU never receives). Re-attests modified DSC pages.
-        Pairs with the KernelJBPatchIomfbSwap kernel patches (accept 27's 0x6e0
-        SwapEnd struct).
+        Conditional IOMFB dispatch for the fixed 24A446 connection layout:
+        connections with an IOConnect port use _kern_Swap*, otherwise _virt_*.
+        Preserves the original null branch and re-attests touched DSC pages.
+        Production writes remain refused pending trusted Undo/migration and
+        transactional publication. --dry-run inspects the isolated algorithm.
 
     patch-dsc-maxslide <chunks_dir> [--dry-run] [--force]
         Zero the dyld_cache_header maxSlide when the userland cache would overflow
@@ -359,11 +357,16 @@ def main():
         "patch-camera-dsc", "patch-watchdogd", "patch-post-restore-dt", "patch-build-version"}
     option_start = 4 if sys.argv[1] in {'patch-build-version', 'patch-camera-dsc'} else 3
     if sys.argv[1] in dry_commands and "--dry-run" in sys.argv[option_start:]:
+        if sys.argv[1] == 'patch-iomfb-force-kern':
+            print('[.] ISOLATED diagnostic only: conditional force-kern; '
+                  'this dry-run does not authorize production Undo/migration '
+                  'or payload/Receipt publication')
         return _dispatch(dry_run=True)
     from patchers import plan_gate as gate
     from patchers.guest_write import logical, no_link_parents
     from pathlib import Path
     plan = gate.from_environment()
+    gate.require_supported_implementations(plan, command=sys.argv[1])
     gate.require_write_context(plan)
     command = sys.argv[1]
     if '--force' in sys.argv[2:]: raise ValueError('force override has no frozen authorization')
@@ -441,11 +444,19 @@ def main():
         if path.is_symlink(): raise ValueError("linked guest patch target")
         observations.append((path, target, gate.snapshot(path), component_effects.capture_input(path, effect_store)))
     gate.recheck(plan)
+    implementation = None
+    if command in dsc:
+        from patchers.undo_provenance import implementation as producer_implementation
+        implementation = producer_implementation()
     try:
         return _dispatch()
     finally:
         for item, target, before, effect_input in observations:
             effect = component_effects.capture_change(effect_input, item, effect_store)
+            if implementation is not None:
+                if producer_implementation() != implementation:
+                    raise ValueError('DSC producer source changed during execution')
+                effect['implementation'] = implementation
             gate.append_evidence(plan, declaration, target, item, before, gate.snapshot(item), source_image=source_image, effect=effect, source_binding=source_binding)
 
 

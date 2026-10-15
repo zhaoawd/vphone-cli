@@ -1,9 +1,9 @@
 import Foundation
+import Synchronization
 import Testing
 @testable import VPhoneDaemonWire
 
 struct EnvironmentOperationTests {
-    static func wait(_ semaphore: DispatchSemaphore) -> Bool { semaphore.wait(timeout: .now() + 5) == .success }
     func context() -> [String: String] {
         var value = Dictionary(uniqueKeysWithValues: EnvironmentOperation.hashes.map { ($0, String(repeating: "a", count: 64)) })
         for key in EnvironmentOperation.identifiers { value[key] = UUID().uuidString }
@@ -62,23 +62,55 @@ struct EnvironmentOperationTests {
     }
 
     @Test func guestGateExcludesConcurrentWritersWithoutBlockingOrdinaryReads() async throws {
-        let gate = GuestMaintenanceGate()
-        let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)
-        let first = Task.detached {
-            try gate.run(method: "environment.install") {
-                entered.signal()
-                #expect(release.wait(timeout: .now() + 5) == .success)
+        let methods = ["environment.restore", "bootstrap.install", "system.shutdown", "environment.status"]
+        // Both synchronous participants need dedicated threads. Suspending the
+        // observer onto the cooperative executor can outlast the writer's
+        // five-second release deadline when other tests block that executor.
+        let observation: (rejected: [Bool], read: Int, released: Bool, sealed: Bool) =
+            try await withCheckedThrowingContinuation { continuation in
+                Thread.detachNewThread {
+                    let gate = GuestMaintenanceGate()
+                    let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)
+                    let completed = DispatchSemaphore(value: 0)
+                    let result = Mutex<Result<Bool, Error>?>(nil)
+                    Thread.detachNewThread {
+                        let outcome = Result {
+                            try gate.run(method: "environment.install") {
+                                entered.signal()
+                                return release.wait(timeout: .now() + 5) == .success
+                            }
+                        }
+                        result.withLock { $0 = outcome }
+                        completed.signal()
+                    }
+                    defer { release.signal() }
+                    do {
+                        guard entered.wait(timeout: .now() + 5) == .success else { throw POSIXError(.ETIMEDOUT) }
+                        let rejected = methods.map { method in
+                            var bodyRan = false
+                            do { try gate.run(method: method) { bodyRan = true }; return false }
+                            catch { return !bodyRan }
+                        }
+                        let read = try gate.run(method: "device.info") { 42 }
+                        release.signal()
+                        guard completed.wait(timeout: .now() + 5) == .success,
+                              let outcome = result.withLock({ $0 }) else { throw POSIXError(.ETIMEDOUT) }
+                        let released = try outcome.get()
+                        try gate.run(method: "system.shutdown") {}
+                        let sealed: Bool
+                        do { try gate.run(method: "environment.install") {}; sealed = false }
+                        catch { sealed = true }
+                        continuation.resume(returning: (rejected, read, released, sealed))
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                }
             }
+        for (method, rejected) in zip(methods, observation.rejected) {
+            #expect(rejected, "overlapping writer: \(method)")
         }
-        let started = await Task.detached { Self.wait(entered) }.value
-        #expect(started)
-        for method in ["environment.restore", "bootstrap.install", "system.shutdown", "environment.status"] {
-            #expect(throws: Error.self) { try gate.run(method: method) { Issue.record("overlapping writer") } }
-        }
-        #expect(try gate.run(method: "device.info") { 42 } == 42)
-        release.signal()
-        try await first.value
-        try gate.run(method: "system.shutdown") {}
-        #expect(throws: Error.self) { try gate.run(method: "environment.install") {} }
+        #expect(observation.read == 42)
+        #expect(observation.released)
+        #expect(observation.sealed)
     }
 }

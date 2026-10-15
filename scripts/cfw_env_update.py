@@ -697,9 +697,15 @@ def apply_mounted(root, vm, components, report_path, manifest=None, *, frozen_pl
                 from patchers import plan_gate as gate
                 gate.authorize(frozen_plan, 'system-launchdaemons-boot-environment', 'system:/' + row['guest_path'].lstrip('/'))
                 actual_before = gate.snapshot(target)
+                from patchers import component_effects as effects
+                effect_store = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
+                effect_before = effects.capture_input(target,effect_store)
+                effect_source = effects.capture_input(row['expected_source'],effect_store)
             replace_file(row['expected_source'], target)
             if frozen_plan is not None:
-                gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', 'system:/' + row['guest_path'].lstrip('/'), target, actual_before, gate.snapshot(target))
+                effect = effects.capture_copy(effect_source,target,effect_store,before=effect_before)
+                effect['sourcePath'] = str(row['expected_source'])
+                gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', 'system:/' + row['guest_path'].lstrip('/'), target, actual_before, gate.snapshot(target), effect=effect)
             record['replaced'].append(name)
             print(f'  [+] {row["guest_path"]}: {row["actual_sha256"][:16]} -> {row["expected_sha256"][:16]}')
         after = assess(root, vm, components, manifest)

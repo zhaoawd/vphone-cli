@@ -361,8 +361,10 @@ extension FirmwareReceiptPublicationTests {
                 let deadline = Date().addingTimeInterval(10)
                 while !FileManager.default.fileExists(atPath: started.path), Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
                 guard FileManager.default.fileExists(atPath: started.path) else { throw POSIXError(.ETIMEDOUT) }
+                // Recovery must run independently of the shared dispatch pool:
+                // the child is waiting for this observer before it can finish.
                 observer.enter()
-                DispatchQueue.global().async {
+                Thread.detachNewThread {
                     defer { observer.leave() }
                     // Give the erroneous early-return path time to unlock. The
                     // child waits for this actual recovery attempt before output.

@@ -208,27 +208,11 @@ public extension VPhoneLaunchpadCommandLine {
 
 // MARK: - Export output
 
-/// The archive file an export writes. Launchpad removes a file only after
-/// cancelling the export that created it: the path held nothing when the
-/// export started, and now holds a regular file (not a link, not a folder).
-/// Nothing else in Launchpad removes files; machines are deleted only by
-/// `vphone-cli vm delete`.
+/// Checks destination occupancy without following the final path component.
 public enum VPhoneLaunchpadExportOutput {
     /// True when anything, even a dangling link, is at `url`.
     public static func exists(_ url: URL) -> Bool {
         var info = stat()
         return lstat(url.path, &info) == 0
-    }
-
-    /// Removes the partial archive a cancelled export left at `url`. Call
-    /// only when `exists(url)` was false before that export started. False
-    /// when nothing was removed.
-    @discardableResult
-    public static func removeCancelled(_ url: URL, existedBefore: Bool) -> Bool {
-        var info = stat()
-        guard !existedBefore, lstat(url.path, &info) == 0, info.st_mode & S_IFMT == S_IFREG else {
-            return false
-        }
-        return unlink(url.path) == 0
     }
 }

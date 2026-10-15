@@ -22,12 +22,16 @@ struct CommandTerminationTests {
     @Test func terminationWaitsForOrdinaryPanicTailAndClosedLog() async throws {
         let temp = try LaunchpadTemporaryDirectory()
         let script = temp.url.appendingPathComponent("interrupt-writer")
+        let cleanup = temp.url.appendingPathComponent("release-fixture")
+        defer { try? Data().write(to: cleanup) }
         try """
         #!/bin/sh
         trap 'printf "kernel panic: ordinary interrupted tail"; exit 130' INT
         i=0; while [ "$i" -lt 10000 ]; do printf 'line:%s\\n' "$i"; i=$((i + 1)); done
         printf 'ready\\n'
-        while :; do /bin/sleep 0.02; done
+        # Only a failed test releases this path, without the expected panic tail.
+        while [ ! -e '\(cleanup.path)' ] && [ -d '\(temp.url.path)' ]; do /bin/sleep 0.02; done
+        exit 124
         """.write(to: script, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: script.path)
         let history = VPhoneLaunchpadCommandHistory()
@@ -37,8 +41,10 @@ struct CommandTerminationTests {
         let run = Task { try await command.run([]) { lines.append($0) } }
         #expect(await eventually(5) { lines.all.last == "ready" })
         #expect(command.hasActiveCommands)
-        #expect(await command.prepareForTermination() == .drained)
+        let termination = await command.prepareForTermination()
+        #expect(termination == .drained)
         #expect(!command.hasActiveCommands)
+        if termination != .drained { try Data().write(to: cleanup) }
         let result = try await run.value
         #expect(result.status == 130)
         #expect(result.outputDrained)

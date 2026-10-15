@@ -442,10 +442,8 @@ else
   fi
 fi
 
-if [[ "$MODE" != environment ]]; then
-  echo "[*] verifying final guest effects on the staged image..."
-  "$PY" "$SCRIPT_DIR/patchers/plan_gate.py" verify-final || exit $?
-fi
+echo "[*] verifying final guest effects on the staged image..."
+"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" verify-final || exit $?
 
 if ! cleanup; then
   CLEANUP_DONE=1

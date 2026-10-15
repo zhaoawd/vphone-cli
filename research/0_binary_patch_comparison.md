@@ -1,5 +1,23 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-15 DSC 原件及操作前像的生产关联（恢复批次）
+
+固定上游仍为 `8a75092013eda87a4e30ed029b72028cb9279ac4`。本批未新增指令替换，接入 generation 原件、只读 DSC 基线、实际复制/变更记录、逐操作前后 blob 和生产者源码摘要的持久索引；final_guest 生成索引，journal 绑定摘要，发布前重新构建并校验。新磁盘事务 schema 2 统一要求证明，环境更新也记录实际复制效果并执行最终读取；旧 schema 1 保留恢复/清理，拒绝继续发布。相关 157 项组合中的旧输入路径断言已修正，最终 36 项补跑全部通过。具体范围见 [T32/T33 记录](upstream_integration_2026-10-15/T32_T33_implementation_migration.md)。
+
+索引仅证明来源和已观察操作链。verify-final 后仍有 APFS snapshot 变换，尚未证明变换后的最终语义；逆向 Undo、旧实现迁移和 payload/Undo/Receipt 共同发布仍未完成。IOMFB 生产迁移门控保持，未执行真实固件写入或 VM 验收。
+
+## 2026-10-15 IOMFB 条件分派算法（第二批）
+
+固定目标仍为 `8a75092013eda87a4e30ed029b72028cb9279ac4`。Python IOMFB writer 已从单条无条件分支改为四指令条件分派：保留原空连接失败目标，读取连接的 IOConnect 端口，有端口时跳到 kern 路径，否则跳到 virt 路径。端口布局 `0x14` 的来源证据仅覆盖上游 24A446；本批临时 DSC fixture 验证不扩大真实固件适用范围。符号和 Capstone 语义识别原始、当前、旧实现及未知状态；旧实现或未知完整三符号入口拒绝，SwapSignal 按固定上游明确例外保持原路径。预检全部改写范围和 CodeDirectory 槽，覆盖 16 字节跨页重签及最终读回。35 项算法、既有语义和约束检查通过，旧 writer 四项反证失败，另三项入口对照通过。
+
+当前算法可在隔离副本和 dry-run 验证；生产写入仍受准入拒绝约束。可信 Undo、旧实现撤销重打和 payload/Undo/Receipt 事务发布尚未实现。未执行真实固件写入、VZ 显示或 DeviceHub 运行验收。详见 [T32/T33 第二批记录](upstream_integration_2026-10-15/T32_T33_implementation_migration.md)。下节保留第一批实施时的状态。
+
+## 2026-10-15 同 ID 实现资格拒绝与幂等证据回归
+
+固定目标为 `8a75092013eda87a4e30ed029b72028cb9279ac4`。本地 `dyld-boot-iomfb_force_kern` 仍写入旧无条件分派，尚无当前条件分派及可信 Undo 消费/事务发布链。本批不增加指令替换；Python 冻结计划准入在 iOS 27 启用该声明时拒绝安装，在显式调用旧 writer 时拒绝执行，均在写入和证据创建前发生。缺少可信原件时不从已补丁字节推定原件。iOS 26/18 的其他授权写入保持可用，dry-run 明确标为旧算法诊断。50 项门控回归通过；未建立当前目标的 IOMFB 输出等价或迁移验收。详见 [T32/T33 记录](upstream_integration_2026-10-15/T32_T33_implementation_migration.md)。
+
+JB post-validation 生产算法保持。原幂等测试失败实际发生于第二次调用：新增同位置、前后字节相等的已应用验证记录。测试现分别核验实际修改、观察记录和结构化声明摘要，21 项相关回归通过；移除观察的反证使两个增强测试失败。仅合成 fixture，未运行真实 kernel/VM。详见 [T30 记录](upstream_integration_2026-10-15/T30_kernel_idempotence.md)。
+
 ## 2026-10-14 kernel-only IM4P 字段保留修复（Task 8）
 
 第七版实际容器对照确认，固定 description 重建 IM4P 删除了原始 PAYP，并将 `KernelManagement_host-487.0.4` 改为 `kernelcache`。更新前后解码 payload 相同，IM4M 原字节相同；该差异与 guest 未就绪的因果关系尚未验证。新增回归已在现有生产封装路径两次复现字段丢失。修复从摘要匹配的可信 generation 原始 IM4P 保留 description/PAYP 原始 TLV；未压缩输出移除原 LZFSE 压缩元数据，未知或不一致结构拒绝，LZSS 原件明确拒绝。候选和发布后均核验完整 IM4P，proof 增加其摘要。37 项定向测试汇总退出 0，含 1 个独立 region fixture 入口跳过；实际元数据回归执行并将错误容器恢复为与基线逐字节一致。独立审查未发现阻断问题，见 [修复证据](evidence/2026-10-13-task8/acceptance/payp-preservation/diagnosis.md)。内核补丁算法未改变。第八版及第九版计划 A 的实际更新、读回和已授权第四版 guest 启动通过；description/PAYP 同时恢复，不能单独确定此前启动异常的原因。提交后回退实现与回归已通过独立审查，不同 payload 的 B 更新、读回及第四版 guest 启动已通过，公开回退 A 的实际验收继续执行，见 [验收进度](evidence/2026-10-13-task8/acceptance/acceptance-progress.md)。

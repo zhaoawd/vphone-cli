@@ -93,6 +93,8 @@ class DiskTransactionTests(HostDriverFixture):
                 self.assertEqual(list(vm.glob('.cfw_disk.*')), [])
                 record = self.records(vm)[0]
                 self.assertEqual(record['status'], 'published')
+                self.assertEqual(record['version'],2)
+                self.assertEqual(record['provenanceMode'],'required')
                 self.assertEqual(record['method'], 'clone')
                 self.assertTrue(record['original_check']['unchanged'])
 
@@ -113,6 +115,16 @@ class DiskTransactionTests(HostDriverFixture):
         self.assertEqual(disk.stat().st_size, DISK_SIZE)
         self.assertLess(disk.stat().st_blocks * 512, DISK_SIZE // 2)
         self.assertEqual(disk.read_bytes()[512:523], b'CFW-PATCHED')
+
+    def test_old_transaction_refuses_publication_but_cleanup_keeps_original(self):
+        vm, digest, inode = self.make_disk()
+        _, proc = self.start(CFW_TXN_FAULTS='legacy-record')
+        rc, output = self.finish(proc)
+        self.assertNotEqual(rc, 0, output)
+        self.assertIn('recovery only',output)
+        self.assert_original_intact(vm,digest,inode)
+        self.assert_no_staged_copy(vm)
+        self.assert_failed_record(vm)
 
     # MARK: - Staging refusals
 

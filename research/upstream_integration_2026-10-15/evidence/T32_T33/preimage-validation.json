@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-15",
+  "scope": "qualified generation-backed DSC preimages; not migration or final payload attestation",
+  "targetUpstreamSHA": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+  "productionIOMFBGate": "retained",
+  "initialRelated": {
+    "tests": 157,
+    "passed": 156,
+    "failures": 1,
+    "reason": "fixture expected mutable source path; producer now reads verified generation original"
+  },
+  "finalTargeted": {
+    "tests": 36,
+    "passed": 36,
+    "seconds": 59.956,
+    "includes": [
+      "15 Undo provenance tests",
+      "corrected source path fixture",
+      "environment final-proof refusal",
+      "19 disk transaction/recovery tests"
+    ]
+  },
+  "environment": "disposable fixtures and disk command doubles; authorized outside sandbox retry after EPERM; no VM or real firmware writes",
+  "limitations": [
+    "no Undo reversal/reapply",
+    "no installed Receipt transaction",
+    "no post-snapshot final payload semantic proof",
+    "no real 24A446 conditional algorithm acceptance"
+  ],
+  "logs": [
+    {
+      "path": "preimage-related-initial.log.gz",
+      "sha256": "2743960fb76a1bcaf4559f60518d3494842cdb01969ef9d9aba697ce0b03a96c",
+      "uncompressedSHA256": "10d08d5a95f9feca2b869e07bc92546b3e212b941d228ae6d6cb8a9c5729a1b2"
+    },
+    {
+      "path": "preimage-final-targeted.log.gz",
+      "sha256": "cf442c7d2dba9f33759b9ec7e769727a8ebc28c7217089a02f5251f36c6e7426",
+      "uncompressedSHA256": "5aaae18fa7444c35f2190d192f188aba279e56f6c15d3336a49e678f406092c2"
+    },
+    {
+      "path": "preimage-sandbox-environment-failures.log.gz",
+      "sha256": "739faaee8e3b218026d87295b485fe917dfa963a7864efaf588ec7effd4c6616",
+      "uncompressedSHA256": "60757f969761d54fe5b5948a6f7a7ad5eddcec786716ed2629ee9a452a756e3b"
+    }
+  ],
+  "sourceSHA256": {
+    "scripts/patchers/undo_provenance.py": "bb0ab6af7dd67b4f00c23b11ca7d9a4100df6248c5b329f2824f931409ab7dc5",
+    "scripts/patchers/cryptex_source.py": "1c17ce0c77b2a0b2781e6b82f21129250e5b5984b3f82d6cebe82e570918a14c",
+    "scripts/patchers/final_guest.py": "70ae4da7cd81c8a45cd45d825f8209c0e9458011b1ef7c62730d7c93fb23b7ba",
+    "scripts/patchers/cfw.py": "43e630af13de7a921e55f8ef82d367cf293e954dc5a496560931b7d9920ca6bc",
+    "scripts/patchers/plan_gate.py": "313fc7fb88f7dda8158a3e8628dde7e56ce62b4c5c52e2249fd78acb88e9c7cf",
+    "scripts/patchers/guest_write.py": "8e0e6180252b4a3f6b9f9834c8babf231e9ac50103215ee81786dd73fa6e75f3",
+    "scripts/cfw_disk_txn.py": "d892c7561ce3898007c01ddbd32ac4cd8eb26c355cb1b79e6ce5e1071057e767",
+    "scripts/cfw_env_update.py": "e70dde3035550196483153c5a00dd032b34435dde543d5f599feae8128bbad5a",
+    "scripts/cfw_install_host.sh": "7e8a837390fdacba32bdce479577f9b445a2003b4caed00789006303a38beb7d",
+    "tests/test_undo_provenance.py": "1ef7177bb6cea322fe7c32aebb957370fb5384335d6fa09d50c088606dcf757e",
+    "tests/test_patch_plan_gate.py": "8e690a7ec2756c4815704fb79eb9266c56f793a8e2de706b4d8132d651c06feb",
+    "tests/test_cfw_disk_transaction.py": "71ed7db5c88d979fe22404fb3af9984b8fcdad1c5a1a13a1a7c449c9979ede47",
+    "tests/test_cfw_env_update.py": "8b87514f83ae02086a44b8c77aaa16399a45727d49dadbf09ad844dc4b9cb352",
+    "tests/cfw_disk_txn_faults.py": "8dcb7f10f96ee219493842e3d2a9465e280459181fb1a3dff588e73cc52f1e24",
+    "tests/cfw_disk_txn_native.py": "0ca916ea5bd16e417d171aaa042304f17bf94e3e7338953419afd7a9849f397d",
+    "tests/cfw_env_update_harness.py": "709050141a06cd9b572fb12af7a68c294da15f32fe264d9104bb7ab1a2c51286"
+  }
+}

@@ -149,7 +149,7 @@ if __name__ == '__main__':
         plan_gate.validate_entry = lambda *_: None
         plan_gate.require_write_context = lambda *_: None
         plan_gate.authorize = lambda *_: None
-        plan_gate.append_evidence = lambda *_: None
+        plan_gate.append_evidence = lambda *_, **__: None
     if Path(sys.argv[1]).stem == 'cfw_env_install':
         import plistlib
         import subprocess

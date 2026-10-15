@@ -304,7 +304,7 @@ def stage(args):
     work_info = os.lstat(work)
     if not stat.S_ISDIR(work_info.st_mode) or work.parent != vm or os.listdir(work):
         raise Refused(f'work directory {work} must be an empty directory inside {vm}')
-    record = {'version': 1, 'id': f'{datetime.datetime.now(datetime.timezone.utc):%Y%m%dT%H%M%SZ}-{work.name.rsplit(".", 1)[-1]}',
+    record = {'version': 2, 'provenanceMode': 'required', 'id': f'{datetime.datetime.now(datetime.timezone.utc):%Y%m%dT%H%M%SZ}-{work.name.rsplit(".", 1)[-1]}',
               'vm': str(vm), 'started_at': now(), 'status': 'staging',
               'original': identity(held), 'method': None, 'clone_error': None, 'copy': None,
               'staged': None, 'checks': [], 'failure': None}
@@ -427,6 +427,14 @@ def publish_by_exclusive_rename(args, record):
 def publish(args):
     record = staged_record(args.work)
     run_checks('pre-publish', args, record)
+    from patchers.undo_provenance import verify_publication
+    try:
+        verify_publication(args.work,record)
+    except (ValueError,KeyError,OSError) as error:
+        raise Refused('Undo provenance publication refused: ' + str(error)) from error
+    # Source/effect qualification can be lengthy; recheck disk holders and
+    # original/staged identities after that work, before publication.
+    run_checks('pre-publish-qualified', args, record)
     # Keep the renames and the record write together; a signal received here
     # is delivered after the record is saved (finish also reconciles by identity).
     signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM, signal.SIGHUP})

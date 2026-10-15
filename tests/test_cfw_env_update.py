@@ -741,6 +741,18 @@ class DriverUpdateTests(EnvironmentDriverFixture):
         self.assertIn(f'chown -h {self.sudo_invoker()["SUDO_UID"]}', calls)
         self.assertFalse(list(vm.glob('.cfw_disk.*')))
 
+    def test_final_effect_failure_refuses_environment_publication(self):
+        vm, _ = self.make_vm(self.offline_versions())
+        disk = vm/'Disk.img'; original = (disk.stat().st_ino,sha(disk.read_bytes()))
+        rc, output = self.run_update(vm,FAIL_FINAL_EFFECT='1')
+        self.assertNotEqual(rc,0,output)
+        self.assertEqual((disk.stat().st_ino,sha(disk.read_bytes())),original)
+        calls = (self.root/'calls').read_text()
+        self.assertIn('verify-final',calls)
+        self.assertNotIn('cfw_disk_txn.py publish',calls)
+        record = next((vm/'.cfw-history').iterdir())
+        self.assertEqual(json.loads((record/'transaction.json').read_text())['status'],'failed')
+
     def test_full_migration_is_refused_and_the_disk_is_not_published(self):
         vm, _ = self.make_vm({name: 'v2' for name in LOCAL}, omit=('libcamfix.dylib',))
         disk = vm / 'Disk.img'

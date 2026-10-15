@@ -1,0 +1,27 @@
+{
+  "reason": "user_requested_handoff_pause",
+  "status": "interrupted_not_a_test_result",
+  "root_pid": 91283,
+  "processes": {
+    "91283": {
+      "ppid": 91277,
+      "command": "/Applications/Xcode.app/Contents/Developer/usr/bin/make test_python"
+    },
+    "91300": {
+      "ppid": 91283,
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python scripts/run_tests.py python"
+    },
+    "91314": {
+      "ppid": 91300,
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -B -m unittest discover -s tests -p test_*.py -v"
+    },
+    "96826": {
+      "ppid": 91314,
+      "command": "/bin/zsh /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 6ndu78l6/scripts/cfw_install_host.sh --variant exp /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/cfw host test 6ndu78l6/vm"
+    },
+    "96904": {
+      "ppid": 96826,
+      "command": "sleep 1"
+    }
+  }
+}

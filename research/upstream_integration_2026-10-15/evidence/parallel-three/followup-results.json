@@ -1,0 +1,40 @@
+[
+  {
+    "name": "swift-latency",
+    "command": [
+      "swift",
+      "test",
+      "--disable-sandbox",
+      "--cache-path",
+      ".build/test-cache",
+      "--skip-build",
+      "--filter",
+      "xpcRejectsClientWithoutConfiguredSigningIdentity|cancellingARunInterruptsOnlyItsChild|deadlineAndCallerCancellationEndHTTPWait|supervisorRejectsFailureAndStopsTimedOutWorker|pipedCLIForwardsStopSignalAndWaitsForVMExit|timeoutKillsChildIgnoringTermination|timeoutBoundsPipesInheritedByDescendant|timeoutIncludesBlockedSendAndReleasesPendingSlot|a changed entity or a server without ranges restarts from byte zero"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "tar-memory",
+    "command": [
+      "/Users/qcz3840/github/vphone-cli/..venv.generations/env-9asn3gud/bin/python",
+      "scripts/check_tar_pipe_memory.py"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "digest-memory",
+    "command": [
+      "/Users/qcz3840/github/vphone-cli/..venv.generations/env-9asn3gud/bin/python",
+      "scripts/check_file_digest_memory.py"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "guest-components",
+    "command": [
+      "make",
+      "test_guest_components"
+    ],
+    "exit_code": 0
+  }
+]

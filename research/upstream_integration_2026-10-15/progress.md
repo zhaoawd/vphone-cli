@@ -1,5 +1,39 @@
 # 8a75092 范围核验与本地对账（2026-10-15）
 
+## 2026-10-15 恢复批次结果
+
+三个子范围已实施并完成相关验证。标准 Swift 全入口退出 0：XCTest321项跳7，常规SwiftTesting1507项和时限组26项通过，内存和guest组件宿主检查通过。Python恢复基线818项通过；实施后835项仅一条旧取消删除静态断言失败，更新契约后受影响模块23项通过，未重跑完整入口。具体结果、审查与未完成范围见 [恢复批次汇总](evidence/resume-three/README.md)。
+
+剩余 TODO：snapshot变换后readonly语义核验；逆向Undo与旧IOMFB实现迁移；payload/Undo/Receipt共同发布；导入队列及完整退出状态；真实固件/VM验收。本轮不将T30/T32/T33/T60整项提升为accepted。提交与推送状态见 Git 历史。
+
+## 2026-10-15 从 handoff 恢复
+
+用户要求先重跑 Python 全量，再继续三个 TODO。handoff 的 16 个源码摘要全部匹配；原依赖缓存已不存在，改用已核对固定 IcliKit revision 的 `.build/daemon-api-8a75092/Xcode/SourcePackages`。Python 全量 818 项通过，跳过 1 项，425.507 秒，退出 0；见 `evidence/resume-three/python-result.json`。已恢复 Swift 剩余失败、IOMFB 可信 Undo/迁移和导出取消三个并行子任务。下文暂停状态属于上一阶段。
+
+## 2026-10-15 三项继续实施
+
+**暂停状态：** 用户要求准备 handoff 并暂停。最终标准 Swift 自然结束：XCTest 321 项（跳过 7 项）无失败，Swift Testing 1514 项保留 14 issues，本次修改的三个测试通过；后续限时组、内存和 guest 组件检查通过。Python 全量按用户要求主动中断，恢复后需重跑，不能引用上一批 798 项覆盖本批。详见 [第二批汇总](evidence/parallel-three-followup/README.md)。
+
+用户要求继续并行推进三项。本批沿用上一批工作区，不改动原 Capstone overlay。
+
+- Swift 验证：已复现环境测试的协作线程池阻塞，以及 worker 测试观察者的全局队列排队延迟。同步工作改用专用线程，结果回到原测试任务断言；保留等待期限、写互斥、读取放行、子进程完整输出与锁拒绝检查。因果实验、标准入口结果和剩余失败见 [Swift 后续记录](T30_swift_validation_followup.md)。
+- T32/T33：已实现四指令 IOMFB 条件分派、状态识别、全部范围预检、跨页重签与最终读回。35 项定向检查及 3 项入口对照通过；旧算法四项反证失败。端口布局证据仅限上游 24A446，生产门控仍拒绝没有可信 Undo/迁移/事务发布资格的写入。见 [条件分派记录](T32_T33_implementation_migration.md)。
+- T60：真实 import 接入 SIGINT/TERM 取消控制器，两种提取后端均检查取消，tar 子进程登记并回收，发布前检查取消并清理本次 staging。常规 1 GiB 归档的 system-tar/native × SIGINT/SIGTERM 四项真实 CLI 验收通过：退出 130/143，无残留 staging、无目标发布、无存活 tar，原归档摘要及已有目录标记保持。见 [导入取消记录](T60_import_cancellation.md)。
+
+完整任务状态仍以具体接口和运行验收证据为准。可信 Undo 事务迁移、导出取消、队列及完整退出矩阵仍待处理；本批不提升整项 accepted。
+
+## 2026-10-15 三项并行实施
+
+基线为 `2df4be8ceab956d498f2cc7d79b26f4ddbdee467`。用户要求同时推进三个 TODO，本批分别处理内核幂等测试、同 ID 实现资格和进度输出断开；三个实施代理各自验证后交叉只读审查。原 Capstone 生成 overlay 保留。
+
+- 内核幂等：原失败实际发生在第二次调用之后。已有生产代码生成同位置、前后字节相等的已应用观察，未再次改变数据；旧测试仍要求记录数不变。更新测试以区分实际修改和验证观察，另验证正式结构化执行的声明归属及输入/输出摘要。相关 21 项通过，临时移除观察的反证使两个增强测试失败。生产补丁未修改。见 [T30 记录](T30_kernel_idempotence.md)。
+- T32/T33：本地 IOMFB 仍是旧无条件分派，缺少新条件分派及可信 Undo 生产链。本批在当前目标的 iOS 27 安装准入和显式 writer 入口拒绝旧实现，拒绝发生在创建证据或写入前。审查发现 guestUncovered 不自动按版本过滤，已修正为依据冻结的 iosBaseIs27 判断，iOS 26/18 的其他实际写入回归通过。最终 50 项门控测试通过。完整迁移尚未实现，不能将 T32/T33 标为 accepted。见 [迁移记录](T32_T33_implementation_migration.md)。
+- T60/T46：进度写入改用 throwing API，并在每次写入前重验 TTY。真实 PTY、断管、tar 提取、正常输出及信号回归共 7 项通过；未改变信号处理器或描述符标志。队列、传输中断清理及完整退出矩阵仍未验收。见 [进度输出记录](T60_progress_pipe.md)。
+
+集成验证与命令退出码见 [本批证据](evidence/parallel-three/README.md)。本批未操作真实 VM、系统 Store、AMFI/TCC 或已安装冻结工件。下文“最新进展”保留本批之前的阶段记录。
+
+本批最终验证：Python 798 项通过（跳过 3 项）；Swift 限时组 9 项、tar/文件摘要内存检查及 guest 组件检查通过。标准 Swift 两次均未通过，分别为 8 / 46 issues；首次失败定向复核 3 项通过。原幂等失败均未再出现，其余失败原因未查明。未将任务整体标记为 accepted。
+
 **最新进展：** T37 的 SIGTERM 与主窗口关闭已接入原关机及写入等待，Python 786 项通过，最终窗口回归及限时组通过，标准 Swift 仍保留 1 项既有内核幂等 issue，见 [T37 记录](T37_exit_routing.md)。前一批 T59 设备状态轮询与独立 iOS 候选见 [T59 记录](T59_event_polling.md)，IcliKit/声明层适配见 [T08/T09 记录](T08_T09_adaptation.md)。第 1–5 节保留首次 Git 核验阶段的范围和结果，其中“本轮”适用于该首次阶段。
 
 已取得官方固定目标的完整可达对象，完成新增范围与附件集合核验，并建立 61 项任务的本地路径/历史证据对账。没有切换分支、merge、cherry-pick、修改生产代码、构建或操作 VM。原有未提交修改保持。

@@ -394,16 +394,15 @@ public final class VPhoneLaunchpadMachineLibrary {
     public private(set) var exports: [Path: Export] = [:]
 
     /// Exports each machine to its destination file, one at a time: each
-    /// export reads a whole disk image. Without `replacing`, a destination
-    /// that already exists is refused for that machine (a folder chosen for
-    /// several machines); with it, the user has agreed to replace the file
-    /// (the save panel asked).
+    /// export reads a whole disk image. Existing destinations are refused,
+    /// including when a legacy caller passes `replacing: true`. A save-panel
+    /// confirmation cannot make an older CLI publish transactionally.
     public func export(
-        _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing: Bool
+        _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing _: Bool
     ) async {
         var queued: [(machine: Path, destination: URL)] = []
         for item in items where exports[item.machine] == nil {
-            if !replacing, VPhoneLaunchpadExportOutput.exists(item.destination) {
+            if VPhoneLaunchpadExportOutput.exists(item.destination) {
                 actionError = VPhoneLaunchpadError(
                     String(localized: "Unable to Export \(item.machine.name)"),
                     detail: String(localized: "\(item.destination.path) already exists."))
@@ -441,15 +440,12 @@ public final class VPhoneLaunchpadMachineLibrary {
     }
 
     private func runExport(_ machine: Path, to destination: URL, densest: Bool, includeIPSW: Bool) async {
-        let existedBefore = VPhoneLaunchpadExportOutput.exists(destination)
         await perform(String(localized: "Exporting…"), on: machine,
                       VPhoneLaunchpadEditCommand.export(machine, to: destination, densest: densest, includeIPSW: includeIPSW),
                       failure: String(localized: "Unable to Export \(machine.name)"))
-        // `vm export` writes the archive in place, so a cancelled one leaves
-        // a partial file behind. Only a file this export created is removed.
-        if Task.isCancelled {
-            VPhoneLaunchpadExportOutput.removeCancelled(destination, existedBefore: existedBefore)
-        }
+        // The CLI owns its private staging cleanup. A final-path file may be
+        // committed output or another writer's file; cancellation proves neither
+        // ownership nor incompleteness. Keep legacy CLI leftovers as well.
     }
 
     // MARK: - Running edits

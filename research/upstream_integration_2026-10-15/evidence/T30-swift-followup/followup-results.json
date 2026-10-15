@@ -1,0 +1,40 @@
+[
+  {
+    "name": "latency",
+    "command": [
+      "swift",
+      "test",
+      "--disable-sandbox",
+      "--cache-path",
+      "/Users/qcz3840/github/vphone-cli/.build/test-cache",
+      "--skip-build",
+      "--filter",
+      "xpcRejectsClientWithoutConfiguredSigningIdentity|cancellingARunInterruptsOnlyItsChild|deadlineAndCallerCancellationEndHTTPWait|supervisorRejectsFailureAndStopsTimedOutWorker|pipedCLIForwardsStopSignalAndWaitsForVMExit|timeoutKillsChildIgnoringTermination|timeoutBoundsPipesInheritedByDescendant|timeoutIncludesBlockedSendAndReleasesPendingSlot|a changed entity or a server without ranges restarts from byte zero"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "tar-memory",
+    "command": [
+      "/Users/qcz3840/github/vphone-cli/..venv.generations/env-9asn3gud/bin/python3",
+      "/Users/qcz3840/github/vphone-cli/scripts/check_tar_pipe_memory.py"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "digest-memory",
+    "command": [
+      "/Users/qcz3840/github/vphone-cli/..venv.generations/env-9asn3gud/bin/python3",
+      "/Users/qcz3840/github/vphone-cli/scripts/check_file_digest_memory.py"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "guest-components",
+    "command": [
+      "make",
+      "test_guest_components"
+    ],
+    "exitCode": 0
+  }
+]

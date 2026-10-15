@@ -43,7 +43,7 @@ def run(plan):
     evidence=Path(os.environ['VPHONE_GUEST_EVIDENCE']);work=evidence.parent
     image=gate.private_path(plan,work/'Disk.img')
     record=json.loads(gate.strict_bytes(work/'transaction.json'))
-    if record.get('version')!=1 or record.get('status')!='staged' or record.get('vm')!=plan.context['vmDirectory']:
+    if record.get('version')!=2 or record.get('provenanceMode')!='required' or record.get('status')!='staged' or record.get('vm')!=plan.context['vmDirectory']:
         raise ValueError('final reader requires this VM staged transaction')
     transaction.require_staged(work,record['staged'])
     rows=[json.loads(line) for line in gate.strict_bytes(evidence).splitlines()]
@@ -82,16 +82,23 @@ def run(plan):
     image_before=transaction.identity(image.lstat())
     evidence_sha=effects.digest(evidence)
     outputs=effects.verify_rows(plan,rows,roots,work/'effect-blobs')
-    transaction.require_staged(work,record['staged']);gate.recheck(plan)
-    if evidence_sha!=effects.digest(evidence) or attachments(image)!=mounted:
-        raise ValueError('final image attachment or operation evidence changed during readback')
-    if transaction.identity(image.lstat())!=image_before:
-        raise ValueError('staged image changed during readonly effect readback')
-    if any(volume_info(reference+VOLUMES[volume][1]).get('ReadOnlyVolume') is not True for volume in wanted):
-        raise ValueError('final volume lost readonly state')
-    if any((root.lstat().st_dev,root.lstat().st_ino)!=identities[volume] for volume,root in roots.items() if volume!='dsc'):
-        raise ValueError('final mount identity changed during readback')
+    def recheck_final():
+        transaction.require_staged(work,record['staged']);gate.recheck(plan)
+        if evidence_sha!=effects.digest(evidence) or attachments(image)!=mounted:
+            raise ValueError('final image attachment or operation evidence changed during readback')
+        if transaction.identity(image.lstat())!=image_before:
+            raise ValueError('staged image changed during readonly effect readback')
+        if any(volume_info(reference+VOLUMES[volume][1]).get('ReadOnlyVolume') is not True for volume in wanted):
+            raise ValueError('final volume lost readonly state')
+        if any((root.lstat().st_dev,root.lstat().st_ino)!=identities[volume] for volume,root in roots.items() if volume!='dsc'):
+            raise ValueError('final mount identity changed during readback')
+    recheck_final()
+    from .undo_provenance import persist, recheck_sources
+    undo_sha = persist(plan,rows,outputs,work)
+    recheck_sources(plan,rows,work/'effect-blobs')
+    recheck_final()
     return {'schemaVersion':1,'planDigest':plan.record['planSHA256'],'desiredSHA256':plan.raw_sha256,
             'generationID':plan.context['generationID'],'operationsSHA256':evidence_sha,
+            'undoProvenanceSHA256':undo_sha,
             'stagedImage':str(image),'stagedIdentity':image_before,'outputs':outputs,
             'roots':{volume:str(root) for volume,root in roots.items()}}

@@ -42,12 +42,26 @@ struct VPhoneVMExportCommand: ParsableCommand {
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let compression: VPhoneBundleOps.ExportCompression = max ? .max : .fast
         let bar = VPhoneProgressBar(label: "exporting \(name)")
-        let outURL = try VPhoneBundleOps.export(
-            bundleNamed: name, to: URL(fileURLWithPath: out), includeIPSW: includeIpsw,
-            compression: compression, in: lib.library, backend: archiveBackend,
-            progress: { done, total in bar.update(done: done, total: total) })
-        bar.finish()
-        print("exported \(name) → \(outURL.path)")
+        let cancellation = VPhoneChildCancellation(log: { _ in })
+        cancellation.install()
+        defer { cancellation.complete(); cancellation.uninstall() }
+        do {
+            let outURL = try VPhoneChildCancellation.$current.withValue(cancellation) {
+                try VPhoneBundleOps.export(
+                    bundleNamed: name, to: URL(fileURLWithPath: out), includeIPSW: includeIpsw,
+                    compression: compression, in: lib.library, backend: archiveBackend,
+                    isCancelled: { cancellation.isRequested },
+                    progress: { done, total in bar.update(done: done, total: total) })
+            }
+            bar.finish()
+            print("exported \(name) → \(outURL.path)")
+        } catch {
+            if let signal = cancellation.requestedSignal {
+                cancellation.settle()
+                throw ExitCode(128 + signal)
+            }
+            throw error
+        }
     }
 }
 
@@ -64,10 +78,24 @@ struct VPhoneVMImportCommand: ParsableCommand {
 
     func run() throws {
         let bar = VPhoneProgressBar(label: "importing")
-        let bundle = try VPhoneBundleOps.importArchive(
-            from: URL(fileURLWithPath: input), name: name, in: lib.library, backend: archiveBackend,
-            progress: { done, total in bar.update(done: done, total: total) })
-        bar.finish()
-        print("imported → \(bundle.name)")
+        let cancellation = VPhoneChildCancellation(log: { _ in })
+        cancellation.install()
+        defer { cancellation.complete(); cancellation.uninstall() }
+        do {
+            let bundle = try VPhoneChildCancellation.$current.withValue(cancellation) {
+                try VPhoneBundleOps.importArchive(
+                    from: URL(fileURLWithPath: input), name: name, in: lib.library, backend: archiveBackend,
+                    isCancelled: { cancellation.isRequested },
+                    progress: { done, total in bar.update(done: done, total: total) })
+            }
+            bar.finish()
+            print("imported → \(bundle.name)")
+        } catch {
+            if let signal = cancellation.requestedSignal {
+                cancellation.settle()
+                throw ExitCode(128 + signal)
+            }
+            throw error
+        }
     }
 }
