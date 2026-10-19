@@ -25,11 +25,11 @@
     "sign-prefix copy metadata fix; full Python908 (2 skipped), signed build and 4-resource parity passed"
   ],
   "pending": [
-    "complete fresh Cryptex publication andnew installed proof",
-    "preboot Undo andrestored original/full pages",
-    "restored API boots andpost-boot reader",
-    "explicit same-generation reapplication/proof/API boots/reader",
-    "archive actual results andcommit/push; broader incomplete T32/T33 scope unchanged"
+    "real fresh Cryptex reinstall with corrected signed resources",
+    "new installed proof then preboot Undo publication",
+    "restored original/full pages/API boots/postboot reader",
+    "same-generation explicit reapplication/full proof/API boots/reader",
+    "broader Mach-O/Preboot/arbitrary-middle/trusted guest-origin acceptance incomplete"
   ],
   "validation_limitations": [
     "Full make test_swift failed from unchanged APIProxy XCTest line 312; isolated test passed. Cause unknown.",
@@ -257,6 +257,118 @@
     "cryptex-reinstall-20261019/vm-execution.json": {
       "bytes": 713,
       "sha256": "a00707a2e4233e2c0411d357f4fbe9ba52e07f62e06402b51c806173974be6aa"
+    },
+    "cryptex-symlink-20261020/after-undo-state.json": {
+      "bytes": 300,
+      "sha256": "a38342fafa663a46a8eb779fc66c98e73f3b1eac98348cb530ccb5e28e746da1"
+    },
+    "cryptex-symlink-20261020/cfw.log": {
+      "bytes": 955,
+      "sha256": "2fcf7ecd54826b82e423e81f73295f079e69824058b9213df9221874dc7b8249"
+    },
+    "cryptex-symlink-20261020/check-current-image.py": {
+      "bytes": 1052,
+      "sha256": "fcfdb0fa0050f611201080ec59f14a2ba801443f267aa8ab0102d687c55d9456"
+    },
+    "cryptex-symlink-20261020/composition-symlink-red.log": {
+      "bytes": 1577,
+      "sha256": "77e23733527c6624c541efa4a8c1804f8c3023bfa833f5a086d04e9f492ec162"
+    },
+    "cryptex-symlink-20261020/continuation.json": {
+      "bytes": 164,
+      "sha256": "ed78d180cd98b7c2139f9fdc9bde39e58d0d724605e22fbfe5f9f44de299f36c"
+    },
+    "cryptex-symlink-20261020/current-image-check.json": {
+      "bytes": 556,
+      "sha256": "245b0dd91fdc6655a04b21991b755eb638f2111fb1be96cd8b283fa7c205cad9"
+    },
+    "cryptex-symlink-20261020/deletion-witnesses.json": {
+      "bytes": 2520,
+      "sha256": "b0701f82bcbbefe929b070bed8a589f831de1c13626d6a715d579ca66e114543"
+    },
+    "cryptex-symlink-20261020/failed-journal/guest-changes.jsonl": {
+      "bytes": 2577453,
+      "sha256": "43284901fc3b1c16cbf63f252e75cfe3339df6a59a96d1c2cbb567898e941ffa"
+    },
+    "cryptex-symlink-20261020/failed-journal/transaction.json": {
+      "bytes": 1632,
+      "sha256": "5e9f8e8f1b5a676b8e5e6504108b56e1b15a420a366dfc0f000e35b24973f560"
+    },
+    "cryptex-symlink-20261020/final-replay-green.log": {
+      "bytes": 84,
+      "sha256": "b3860298d2dbaa555e9c311fa5d3ca8c9eddd30ac03a3b50a18cb95921403532"
+    },
+    "cryptex-symlink-20261020/final-replay-red.log": {
+      "bytes": 636,
+      "sha256": "8782cb8c24dae228582a12df8887d7d878b5282efec887fd6166772c953ac343"
+    },
+    "cryptex-symlink-20261020/installation-processes.jsonl": {
+      "bytes": 161041,
+      "sha256": "4c455636f669ea5028311a14754f2785fe109237de28d1bb00cab1ed63930dcf"
+    },
+    "cryptex-symlink-20261020/manifest.json": {
+      "bytes": 8826,
+      "sha256": "3c7ab0515cbc2f7510b886b285e526d6f594975157134b706e375689775d3603"
+    },
+    "cryptex-symlink-20261020/replay-symlink-final.py": {
+      "bytes": 1183,
+      "sha256": "ae38f4df44887ab70b121625d07fa99fb6310693518cb577b0c139f003367d12"
+    },
+    "cryptex-symlink-20261020/retry-start-state.json": {
+      "bytes": 785,
+      "sha256": "391794a634c0fa12eb1f26b67bd0fb195f3fd87f4980cf1401036496ce3db05a"
+    },
+    "cryptex-symlink-20261020/run-acceptance.py": {
+      "bytes": 6067,
+      "sha256": "f5f6b141b36631d01c83e068265a992577c28326740e9be1fff8261bf9bf2d86"
+    },
+    "cryptex-symlink-20261020/symlink-bundle-parity.json": {
+      "bytes": 1201,
+      "sha256": "0e7d8b389412a261a5fb88dea69418b88fc972d6f50ba72fba678785d6af82eb"
+    },
+    "cryptex-symlink-20261020/symlink-green.log": {
+      "bytes": 3631,
+      "sha256": "344e666ee9fedf9980640f4eeb4fd183a9acf30af012e14179af3a006819855d"
+    },
+    "cryptex-symlink-20261020/symlink-package-final.log": {
+      "bytes": 2811,
+      "sha256": "2b40a2ef5296fa4631ada42a3a2c5e0e233e39ed06ad85437af3380d92cc1eb7"
+    },
+    "cryptex-symlink-20261020/symlink-python-final.log": {
+      "bytes": 158890,
+      "sha256": "7a998872a5975fa45217363fb8666ced0697998c1357546d5358bf75718eacf6"
+    },
+    "cryptex-symlink-20261020/symlink-red.log": {
+      "bytes": 3104,
+      "sha256": "de347d873df7a96eaf42b939dc317edd9190b59e7e4ca9c6905ac5dac4974859"
+    },
+    "cryptex-symlink-20261020/symlink-related-final.log": {
+      "bytes": 12044,
+      "sha256": "08059335993e4aa68330bae3b68c2ba23fef0d031b403d78266820e2b9b772e9"
+    },
+    "cryptex-symlink-20261020/symlink-related-host.log": {
+      "bytes": 12044,
+      "sha256": "4b47bf7ce6f9f8f7b844389bc505cb6ce43cdec0157371eaca892e142acc503f"
+    },
+    "cryptex-symlink-20261020/symlink-related.log": {
+      "bytes": 15681,
+      "sha256": "526a37ae5cb6fb710bd11deab918f44f87cdeb6fd4aba0d6005a95b060a8e812"
+    },
+    "cryptex-symlink-20261020/trailing-link-red.log": {
+      "bytes": 1231,
+      "sha256": "59eaecc131595b25524567f18c43e50e840895981c153b94e673c52b364c4b8b"
+    },
+    "cryptex-symlink-20261020/verify-symlink-package.py": {
+      "bytes": 2122,
+      "sha256": "094b9615d0c8711b9a81cb73c71f541df94a7f5a6251342df32cf9c8fe453073"
+    },
+    "cryptex-symlink-20261020/writer-final-green.log": {
+      "bytes": 623,
+      "sha256": "32f22358b996c23ed6072467f93a43fe33c9bc55a4fb323ddbea30bbbd108f7d"
+    },
+    "cryptex-symlink-20261020/writer-red.log": {
+      "bytes": 3148,
+      "sha256": "0405decadc3116b8bf5f5d31e02f557b06620dbcae8796c1b2108e519978cfe1"
     },
     "dsc-companions-20261019/attachment.plist": {
       "bytes": 1126,
@@ -1643,7 +1755,7 @@
       "sha256": "e939c4068e0e034cdae9dadfc7cbf29f22338fe585ed7727213e0a3100972044"
     }
   },
-  "updated_at": "2026-10-19T01:36:42.446148+00:00",
+  "updated_at": "2026-10-19T23:23:26.232831+00:00",
   "follow_up_evidence": "signing-copy-metadata-20261019/manifest.json",
   "active_dsc_restore": {
     "state": "completed",
@@ -1651,7 +1763,7 @@
     "normal_boot": false,
     "cfw": true,
     "undo": false,
-    "next": "explicit Cryptex reinstall; newproof before boot; immediate Undo; restored boots; explicit reapplication",
+    "next": "corrected explicit Cryptex reinstall, then new installed proof and preboot Undo",
     "accepted": false
   },
   "runtime_boundary": {
@@ -1868,7 +1980,7 @@
     },
     "files": "dsc-companions-20261019/manifest.json"
   },
-  "latest_evidence": "cryptex-composition-20261019/manifest.json",
+  "latest_evidence": "cryptex-symlink-20261020/manifest.json",
   "dsc_publication": {
     "schemaVersion": 1,
     "recordedAt": "2026-10-19T07:37:01.964725+00:00",
@@ -2261,5 +2373,114 @@
     ],
     "sourceSHA256": "0357f698787ed5a8a3359886bf2fde996cad687d42712d2bbff906dcfd56b852",
     "files": "cryptex-composition-20261019/manifest.json"
+  },
+  "cryptex_symlink": {
+    "schemaVersion": 1,
+    "recordedAt": "2026-10-19T23:23:26.232831+00:00",
+    "vm": "vm-t32-t33-dsc-20261018",
+    "generation": "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+    "scope": "Cryptex reinstall directory-symlink semantics and strict final output verification",
+    "realFailure": {
+      "transaction": "20261019T124601Z-vZh3Hh4C",
+      "exitCode": 1,
+      "publication": false,
+      "originalUnchangedScope": "dev/inode/size/mtime and66 samples",
+      "stagedRemoved": true,
+      "continuationsStopped": true,
+      "undoExecuted": false,
+      "vmBooted": false,
+      "firstMismatchingTargetRecorded": false
+    },
+    "reproduction": {
+      "command": ".venv/bin/python .build/t32-cryptex-reinstall-debug/replay-symlink-final.py",
+      "before": "ValueError: final transported member differs from recorded output",
+      "after": "PASS",
+      "observedSeam": "real installer with existing directory symlinks plus two real deletion observations",
+      "limitation": "Failed staged image was removed; complete actual final-state readback was unavailable. Reproduced mechanism does not establish absence of additional real-image mismatches."
+    },
+    "fix": {
+      "commands": "regular/default-skip/explicit-copy anddevelopment use ln -sfn",
+      "writer": "refuse following directory symlinks, trailing-slash directory targets and actual directory destinations before write",
+      "finalReader": "strict equality unchanged; include target and differing field names in refusal"
+    },
+    "python": {
+      "tests": 948,
+      "seconds": 259.925,
+      "skipped": 2,
+      "exitCode": 0
+    },
+    "related": {
+      "tests": 43,
+      "seconds": 12.775,
+      "exitCode": 0
+    },
+    "bundle": {
+      "hostCLI": "/Users/kolar/github/vphone-cli/.build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli",
+      "hostSHA256": "4b4462290673f7bae7eb04d5820b4de70914fc1663ebadcf9da29174247a132f",
+      "hostExecutableContentUnchanged": true,
+      "hostSignatureRefreshed": true,
+      "hostContentSHA256": "ab88f07a1d2af1d38037514379db0ac0db35b9c0b629ca5c224ba7d47900db45",
+      "bootExecutable": "/Users/kolar/github/vphone-cli/.build/t32-dsc-companions-final.app/Contents/MacOS/vphone-vm",
+      "bootSHA256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+      "bootInode": 246999022,
+      "bootDevice": 16777231,
+      "bootBytesAndIdentityUnchanged": true,
+      "nestedVMBytesMatchOriginal": true,
+      "approvedCDHash": "89b70a253cad2adea133b3e875519afaf72c5d17",
+      "scripts": {
+        "cfw_install.sh": "af9a4e37c1c66eff6a221ba28b6ba617642fd20d4c484d05ecbb58a98bc04825",
+        "cfw_install_dev.sh": "da2594d4f907457ac70f37b761fd34afd5f5871d5c0db21593b3df789d26ebe7",
+        "patchers/guest_write.py": "948db0fb59c15a7af09417470e43f87284017887c5ef8ce564ee4255f0480a94",
+        "patchers/component_transport.py": "771efdf6de56159ba1c278ed84a009f5690d7f779c8442db985260e4b6acce79"
+      },
+      "bundleValidationPassed": true
+    },
+    "retry": {
+      "state": "install-cfw",
+      "vm": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018",
+      "runtimeEffectsValidated": false,
+      "graphicsValidated": false,
+      "recordedAt": "2026-10-19T23:20:06.944270+00:00",
+      "argv": [
+        "/Users/kolar/github/vphone-cli/.build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli",
+        "cfw",
+        "install",
+        "vm-t32-t33-dsc-20261018",
+        "--library-root",
+        "/Users/kolar/github/vphone-cli",
+        "--variant",
+        "regular",
+        "--guest-environment",
+        "classic",
+        "--keep-artifacts",
+        "--reinstall-cryptex",
+        "--root-popup"
+      ],
+      "childPID": 4097,
+      "nativeAuthentication": {
+        "state": "waiting",
+        "osascriptPID": 10018,
+        "observedAt": "2026-10-19T23:23:12.678830+00:00",
+        "rootInstallerObserved": false
+      }
+    },
+    "acceptedAtNewTarget": false,
+    "pending": [
+      "real fresh Cryptex reinstall with corrected signed resources",
+      "new installed proof then preboot Undo publication",
+      "restored original/full pages/API boots/postboot reader",
+      "same-generation explicit reapplication/full proof/API boots/reader",
+      "broader Mach-O/Preboot/arbitrary-middle/trusted guest-origin acceptance incomplete"
+    ],
+    "sourceSHA256": {
+      "scripts/cfw_install.sh": "af9a4e37c1c66eff6a221ba28b6ba617642fd20d4c484d05ecbb58a98bc04825",
+      "scripts/cfw_install_dev.sh": "da2594d4f907457ac70f37b761fd34afd5f5871d5c0db21593b3df789d26ebe7",
+      "scripts/patchers/guest_write.py": "948db0fb59c15a7af09417470e43f87284017887c5ef8ce564ee4255f0480a94",
+      "scripts/patchers/component_transport.py": "771efdf6de56159ba1c278ed84a009f5690d7f779c8442db985260e4b6acce79",
+      "tests/test_cfw_cryptex_reinstall.py": "1ab25777cb789e0d117b4bd1768b951e11fbf640ae0bdfe71efed02ab1211663",
+      "tests/test_guest_undo_transaction.py": "a5ccfd50a97209c8aaace1bc5d9164290b661d9f57e0313a537d4e6ec661fe8d",
+      "tests/test_component_effects.py": "6e60316cc5dcea8747061303a9b13c8be0e884a3846ec236d7e829a242d650e4"
+    },
+    "files": "cryptex-symlink-20261020/manifest.json"
   }
 }

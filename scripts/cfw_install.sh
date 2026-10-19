@@ -134,9 +134,9 @@ if [[ "${VPHONE_REINSTALL_CRYPTEX:-0}" == 0 && "${CRYPTEX_OS_COUNT:-0}" -gt 0 &&
     echo "  [*] Cryptexes already installed (OS=${CRYPTEX_OS_COUNT} entries, App=${CRYPTEX_APP_COUNT} entries), skipping"
 
     # Still ensure dyld symlinks exist
-    cfw_guest_write /bin/ln -sf ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
+    cfw_guest_write /bin/ln -sfn ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
         $MNT1/System/Library/Caches/com.apple.dyld
-    cfw_guest_write /bin/ln -sf ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
+    cfw_guest_write /bin/ln -sfn ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
         $MNT1/System/DriverKit/System/Library/dyld
 
     echo "  [+] Cryptex skipped (already present)"
@@ -175,11 +175,11 @@ else
     cfw_guest_write cp -R "$MNT_SYSOS/." "$MNT1/System/Cryptexes/OS"
     cfw_guest_write cp -R "$MNT_APPOS/." "$MNT1/System/Cryptexes/App"
 
-    # Create dyld symlinks (ln -sf is idempotent)
+    # Replace dyld symlinks without following existing directory links
     echo "  Creating dyld symlinks..."
-    cfw_guest_write /bin/ln -sf ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
+    cfw_guest_write /bin/ln -sfn ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
         $MNT1/System/Library/Caches/com.apple.dyld
-    cfw_guest_write /bin/ln -sf ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
+    cfw_guest_write /bin/ln -sfn ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
         $MNT1/System/DriverKit/System/Library/dyld
 
     # Unmount Cryptex DMGs

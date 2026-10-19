@@ -10,6 +10,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 
 from tests.test_cfw_host_isolation import HostDriverFixture
+from tests import test_patch_plan_gate as gate_fixtures
+from patchers import guest_write
 
 
 class CryptexReinstallDriverTests(HostDriverFixture):
@@ -56,7 +58,7 @@ class CryptexReinstallDriverTests(HostDriverFixture):
 
 
 class CryptexReinstallTests(unittest.TestCase):
-    def run_installer(self, reinstall):
+    def run_installer(self, reinstall, *, existing_symlinks=False):
         tmp = tempfile.TemporaryDirectory(prefix='cfw cryptex reinstall ')
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name); scripts = root/'scripts'; (scripts/'lib').mkdir(parents=True)
@@ -72,6 +74,12 @@ class CryptexReinstallTests(unittest.TestCase):
             if name == 'OS':
                 for tree in [old, source]:
                     (tree/'System/Library/Caches/com.apple.dyld').mkdir(parents=True)
+                    (tree/'System/DriverKit/System/Library/dyld').mkdir(parents=True)
+        if existing_symlinks:
+            (system/'System/Library/Caches/com.apple.dyld').symlink_to(
+                '../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld')
+            (system/'System/DriverKit/System/Library/dyld').symlink_to(
+                '../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld')
         restore=vm/'restore'; restore.mkdir()
         for name in ['SystemOS.dmg','AppOS.dmg']: (restore/name).write_bytes(b'bound source standin')
         runtime=root/'python'; runtime.write_text('''#!/bin/zsh
@@ -133,3 +141,62 @@ die() { print -u2 -r -- "$*"; exit 1; }
         self.assertIn(b'invalid Cryptex reinstall setting',child.stderr)
         self.assertTrue((system/'System/Cryptexes/OS/old-member').exists())
         self.assertNotIn('mount-cryptex',calls)
+
+    def test_existing_directory_symlinks_do_not_modify_cryptex_members(self):
+        for reinstall in (None, '1'):
+            with self.subTest(reinstall=reinstall):
+                child, system, _ = self.run_installer(reinstall, existing_symlinks=True)
+                self.assertEqual(child.returncode, 75, child.stderr.decode())
+                for relative in ('System/Library/Caches/com.apple.dyld',
+                                 'System/DriverKit/System/Library/dyld'):
+                    link = system/relative
+                    self.assertTrue(link.is_symlink())
+                    self.assertEqual(list(link.resolve().iterdir()), [])
+
+
+class GuestSymlinkWriteTests(unittest.TestCase):
+    setUp = gate_fixtures.FrozenGateTests.setUp
+    publish = gate_fixtures.FrozenGateTests.publish
+    load = gate_fixtures.FrozenGateTests.load
+
+    def link_target(self):
+        _, digest = guest_write.target_table()
+        self.entries.append(dict(id='system-cryptex-boot-install', disposition='guestUncovered',
+            recordRules=[dict(literal='guest-target-map-v1:'+digest+':system-cryptex-boot-install',
+                              hexadecimalOffsetSuffix=False)]))
+        self.publish()
+        target = self.mount/'mnt1/System/Library/Caches/com.apple.dyld'
+        target.parent.mkdir(parents=True)
+        directory = self.mount/'mnt1/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld'
+        directory.mkdir(parents=True)
+        relative = '../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld'
+        return target, directory, relative
+
+    def test_following_directory_symlink_refuses_before_write(self):
+        target, directory, relative = self.link_target()
+        target.symlink_to(relative)
+        for flags, suffix in (('-sf', ''), ('-sfn', '/')):
+            with self.subTest(flags=flags, suffix=suffix):
+                with self.assertRaisesRegex(ValueError, 'guest link command follows target directory'):
+                    guest_write.run(self.load(), ['ln', flags, relative, str(target)+suffix])
+                self.assertEqual(list(directory.iterdir()), [])
+
+    def test_nofollow_link_replaces_exact_symlink_and_records_output(self):
+        target, directory, relative = self.link_target()
+        target.symlink_to(relative)
+        guest_write.run(self.load(), ['ln', '-sfn', relative, str(target)])
+        self.assertTrue(target.is_symlink())
+        self.assertEqual(os.readlink(target), relative)
+        self.assertEqual(list(directory.iterdir()), [])
+        import json
+        rows = [json.loads(line) for line in self.evidence.read_bytes().splitlines()]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['target'], 'system:/System/Library/Caches/com.apple.dyld')
+        self.assertEqual(rows[0]['effect']['after']['link'], relative)
+
+    def test_actual_directory_target_refuses_before_write(self):
+        target, _, relative = self.link_target()
+        target.mkdir()
+        with self.assertRaisesRegex(ValueError, 'guest link command follows target directory'):
+            guest_write.run(self.load(), ['ln', '-sfn', relative, str(target)])
+        self.assertEqual(list(target.iterdir()), [])

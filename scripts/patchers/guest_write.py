@@ -158,7 +158,7 @@ def run(plan, argv):
     args = argv[1:]
     flags = {
         'cp': {'-R', '-r', '-p'}, 'mv': set(), 'rm': {'-rf', '-f', '-r'},
-        'mkdir': {'-p'}, 'chmod': {'-R'}, 'chown': {'-R'}, 'ln': {'-sf'},
+        'mkdir': {'-p'}, 'chmod': {'-R'}, 'chown': {'-R'}, 'ln': {'-sf', '-sfn'},
         'tar': {'-xf', '-f', '-C', '--preserve-permissions', '--no-overwrite-dir', '--warning=no-unknown-keyword'},
         'gtar': {'-xf', '-f', '-C', '--preserve-permissions', '--no-overwrite-dir', '--warning=no-unknown-keyword'},
         'find': {'-name', '-delete'},
@@ -282,6 +282,9 @@ def run(plan, argv):
         no_link_parents(path)
         target=logical(path) or staged_targets.get(path)
         declaration=owner(plan,target)
+        if command == 'ln' and path.is_dir() and (
+                not path.is_symlink() or '-sfn' not in args or operands[-1].endswith('/')):
+            raise ValueError('guest link command follows target directory')
         if path.is_symlink() and command not in {'rm','mv','ln'}:
             raise ValueError('guest operation follows target symlink')
         if path.exists() and path.is_file() and path.stat().st_nlink != 1:

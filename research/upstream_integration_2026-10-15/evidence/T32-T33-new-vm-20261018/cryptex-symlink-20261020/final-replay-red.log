@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/.build/t32-cryptex-reinstall-debug/replay-symlink-final.py", line 17, in <module>
+    outputs=transport.verify(tombstones,{'system':root},root/'unused-blobs',SimpleNamespace(context={}))
+  File "/Users/kolar/github/vphone-cli/scripts/patchers/component_transport.py", line 253, in verify
+    if actual!=node['after']: raise ValueError('final transported member differs from recorded output')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: final transported member differs from recorded output

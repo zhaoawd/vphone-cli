@@ -35,7 +35,7 @@ class GuestUndoTransactionTests(unittest.TestCase):
         self.sequence += 1
         work = self.vm/f'.cfw_disk.undo{self.sequence}'; work.mkdir(mode=0o700)
         mount = self.vm/f'.cfw_mount.undo{self.sequence}'; mount.mkdir()
-        shutil.copytree(self.current_root, mount/'mnt1')
+        shutil.copytree(self.current_root, mount/'mnt1', symlinks=True)
         fd = os.open(self.vm/'Disk.img', os.O_RDONLY); self.addCleanup(os.close, fd)
         self.args = SimpleNamespace(vm=self.vm, work=work, fd=fd, owner_pid=os.getpid(), guest_evidence=True,
             generation=self.fixture.generation, declaration=list(declarations), exit_code=0, retain_staged=False)
@@ -117,6 +117,12 @@ class GuestUndoTransactionTests(unittest.TestCase):
         self.assertEqual(txn.preview_guest_undo(self.vm, self.fixture.generation, ['dyld-cfw-camera'])['state'], 'undo-preview')
 
     def test_replacing_existing_cryptex_from_originals_qualifies_a_new_undo(self):
+        self.reinstall_and_undo(existing_symlinks=False)
+
+    def test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo(self):
+        self.reinstall_and_undo(existing_symlinks=True)
+
+    def reinstall_and_undo(self, *, existing_symlinks):
         source_fixture = self.fixture.fixture
         installed = source_fixture.dsc.read_bytes()
         work = self.vm/'.cfw_disk.reinstall'; work.mkdir(mode=0o700)
@@ -136,6 +142,12 @@ class GuestUndoTransactionTests(unittest.TestCase):
         source_fixture.source_dsc.write_bytes(fixtures.fixtures.cache(b'initial'))
         source_fixture.target = mount/'mnt1/System/Cryptexes/OS'
         source_fixture.dsc = source_fixture.target/fixtures.fixtures.undo.DSC_MEMBER/'dyld_shared_cache_arm64e'
+        link = mount/'mnt1/System/Library/Caches/com.apple.dyld'
+        relative = '../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld'
+        if existing_symlinks:
+            link.parent.mkdir(parents=True)
+            link.symlink_to(relative)
+            (source_fixture.dsc.parent/'com.apple.dyld').symlink_to(relative)
         self.assertEqual(source_fixture.dsc.read_bytes(), installed)
         self.assertEqual(installed[512:519], b'second!')
         import cache_systemos
@@ -148,7 +160,11 @@ class GuestUndoTransactionTests(unittest.TestCase):
         with patch.object(cryptex_source.subprocess, 'check_output', side_effect=source_fixture.source_query):
             guest_write.run(source_fixture.plan, ['rm', '-rf', str(source_fixture.target)])
             guest_write.run(source_fixture.plan, ['mkdir', '-p', str(source_fixture.target)])
-        source_fixture.produce(); source_fixture.finalize()
+        source_fixture.produce()
+        if existing_symlinks:
+            guest_write.run(source_fixture.plan, ['ln', '-sfn', relative, str(link)])
+            self.assertFalse((source_fixture.dsc.parent/'com.apple.dyld').is_symlink())
+        source_fixture.finalize()
         txn.seal(args); txn.publish(args)
         with contextlib.redirect_stdout(io.StringIO()): txn.finish(args)
         candidate = txn.preview_guest_undo(self.vm, self.fixture.generation, ['dyld-cfw-camera'])

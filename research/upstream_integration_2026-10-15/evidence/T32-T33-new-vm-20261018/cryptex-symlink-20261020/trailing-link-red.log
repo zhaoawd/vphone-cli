@@ -1,0 +1,16 @@
+test_following_directory_symlink_refuses_before_write (tests.test_cfw_cryptex_reinstall.GuestSymlinkWriteTests.test_following_directory_symlink_refuses_before_write) ... 
+  test_following_directory_symlink_refuses_before_write (tests.test_cfw_cryptex_reinstall.GuestSymlinkWriteTests.test_following_directory_symlink_refuses_before_write) (flags='-sfn', suffix='/') ... FAIL
+
+======================================================================
+FAIL: test_following_directory_symlink_refuses_before_write (tests.test_cfw_cryptex_reinstall.GuestSymlinkWriteTests.test_following_directory_symlink_refuses_before_write) (flags='-sfn', suffix='/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_cryptex_reinstall.py", line 180, in test_following_directory_symlink_refuses_before_write
+    with self.assertRaisesRegex(ValueError, 'guest link command follows target directory'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.186s
+
+FAILED (failures=1)

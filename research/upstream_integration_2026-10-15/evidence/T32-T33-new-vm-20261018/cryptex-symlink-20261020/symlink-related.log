@@ -1,0 +1,114 @@
+test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it) ... 
+  test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it) (options=('--reinstall-cryptex',)) ... FAIL
+  test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it) (options=()) ... FAIL
+test_sudo_reexec_preserves_the_explicit_option (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_sudo_reexec_preserves_the_explicit_option) ... ok
+test_unsupported_modes_and_profiles_refuse_before_staging (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_unsupported_modes_and_profiles_refuse_before_staging) ... ok
+test_default_preserves_existing_cryptex_skip (tests.test_cfw_cryptex_reinstall.CryptexReinstallTests.test_default_preserves_existing_cryptex_skip) ... ok
+test_existing_directory_symlinks_do_not_modify_cryptex_members (tests.test_cfw_cryptex_reinstall.CryptexReinstallTests.test_existing_directory_symlinks_do_not_modify_cryptex_members) ... ok
+test_explicit_reinstall_reads_sources_and_replaces_both_trees (tests.test_cfw_cryptex_reinstall.CryptexReinstallTests.test_explicit_reinstall_reads_sources_and_replaces_both_trees) ... ok
+test_invalid_reinstall_value_refuses_before_guest_writes (tests.test_cfw_cryptex_reinstall.CryptexReinstallTests.test_invalid_reinstall_value_refuses_before_guest_writes) ... ok
+test_actual_directory_target_refuses_before_write (tests.test_cfw_cryptex_reinstall.GuestSymlinkWriteTests.test_actual_directory_target_refuses_before_write) ... ok
+test_following_directory_symlink_refuses_before_write (tests.test_cfw_cryptex_reinstall.GuestSymlinkWriteTests.test_following_directory_symlink_refuses_before_write) ... ok
+test_nofollow_link_replaces_exact_symlink_and_records_output (tests.test_cfw_cryptex_reinstall.GuestSymlinkWriteTests.test_nofollow_link_replaces_exact_symlink_and_records_output) ... ok
+test_archive_rename_interruption_leaves_a_readable_committed_receipt (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_archive_rename_interruption_leaves_a_readable_committed_receipt) ... [*] previous Disk.img retained as /private/tmp/tmpte074rxg/vm/.cfw-history/initial/Disk.img
+ok
+test_changed_applied_report_or_receipt_cannot_publish (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_changed_applied_report_or_receipt_cannot_publish) ... [*] previous Disk.img retained as /private/tmp/tmphdpjs8a_/vm/.cfw-history/initial/Disk.img
+ok
+test_changed_target_refuses_before_any_write (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_changed_target_refuses_before_any_write) ... [*] previous Disk.img retained as /private/tmp/tmpmnqz_s9a/vm/.cfw-history/initial/Disk.img
+ok
+test_exclusive_rename_first_step_recovers_old_disk_and_preserves_origin (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_exclusive_rename_first_step_recovers_old_disk_and_preserves_origin) ... [*] previous Disk.img retained as /private/tmp/tmp7kop8hsz/vm/.cfw-history/initial/Disk.img
+[-] CFW install did not change /private/tmp/tmp7kop8hsz/vm/Disk.img; record: /private/tmp/tmp7kop8hsz/vm/.cfw-history/20261019T231528Z-undo1/transaction.json
+ok
+test_exclusive_rename_second_step_recovers_new_disk_and_unknown_origin (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_exclusive_rename_second_step_recovers_new_disk_and_unknown_origin) ... [*] previous Disk.img retained as /private/tmp/tmpmqjg6dfd/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpmqjg6dfd/vm/.cfw-history/20261019T231528Z-undo1/Disk.img
+ok
+test_final_readback_failure_keeps_original_and_origins (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_final_readback_failure_keeps_original_and_origins) ... [*] previous Disk.img retained as /private/tmp/tmpe4j7e7oe/vm/.cfw-history/initial/Disk.img
+ok
+test_missing_binding_is_not_created_by_undo (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_missing_binding_is_not_created_by_undo) ... [*] previous Disk.img retained as /private/tmp/tmp10p7p_31/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmp10p7p_31/vm/.cfw-history/20261019T231529Z-undo1/Disk.img
+ok
+test_missing_binding_stays_unknown_and_host_rebind_does_not_erase_undo (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_missing_binding_stays_unknown_and_host_rebind_does_not_erase_undo) ... [*] previous Disk.img retained as /private/tmp/tmp0poxfxcx/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmp0poxfxcx/vm/.cfw-history/20261019T231529Z-undo1/Disk.img
+ok
+test_origin_competition_refuses_before_swap_and_after_swap_preserves_both_disks (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_origin_competition_refuses_before_swap_and_after_swap_preserves_both_disks) ... [*] previous Disk.img retained as /private/tmp/tmphq4tbhms/vm/.cfw-history/initial/Disk.img
+ok
+test_origin_published_before_status_write_recovers_without_rewriting_other_layers (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_origin_published_before_status_write_recovers_without_rewriting_other_layers) ... [*] previous Disk.img retained as /private/tmp/tmph94ouidu/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmph94ouidu/vm/.cfw-history/20261019T231530Z-undo1/Disk.img
+ok
+test_parent_tampering_after_prepare_refuses_before_write (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_parent_tampering_after_prepare_refuses_before_write) ... [*] previous Disk.img retained as /private/tmp/tmpyx4o4d06/vm/.cfw-history/initial/Disk.img
+ok
+test_readonly_allocation_change_still_refuses_final_readback (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_readonly_allocation_change_still_refuses_final_readback) ... [*] previous Disk.img retained as /private/tmp/tmp9aacve9j/vm/.cfw-history/initial/Disk.img
+ok
+test_receipt_corruption_after_seal_refuses_before_disk_exchange (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_receipt_corruption_after_seal_refuses_before_disk_exchange) ... [*] previous Disk.img retained as /private/tmp/tmp612pfe2m/vm/.cfw-history/initial/Disk.img
+ok
+test_recovery_refuses_attached_images_without_removing_the_staged_copy (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_recovery_refuses_attached_images_without_removing_the_staged_copy) ... [*] previous Disk.img retained as /private/tmp/tmpmmxb3b5c/vm/.cfw-history/initial/Disk.img
+ok
+test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo) ... [*] previous Disk.img retained as /private/tmp/tmp1dpy3m93/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmp1dpy3m93/vm/.cfw-history/20261019T231532Z-reinstall/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmp1dpy3m93/vm/.cfw-history/20261019T231532Z-undo1/Disk.img
+ok
+test_replacing_existing_cryptex_from_originals_qualifies_a_new_undo (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_replacing_existing_cryptex_from_originals_qualifies_a_new_undo) ... [*] previous Disk.img retained as /private/tmp/tmpv68xicqv/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpv68xicqv/vm/.cfw-history/20261019T231532Z-reinstall/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpv68xicqv/vm/.cfw-history/20261019T231532Z-undo1/Disk.img
+ok
+test_runtime_disk_writes_preserve_historical_parent_and_actual_target_checks (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_runtime_disk_writes_preserve_historical_parent_and_actual_target_checks) ... [*] previous Disk.img retained as /private/tmp/tmpcw5kzjgc/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpcw5kzjgc/vm/.cfw-history/20261019T231532Z-undo1/Disk.img
+ok
+test_swap_interruption_recovers_origin_and_receipts_from_same_journal (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_swap_interruption_recovers_origin_and_receipts_from_same_journal) ... [*] previous Disk.img retained as /private/tmp/tmpsq7bit6l/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpsq7bit6l/vm/.cfw-history/20261019T231533Z-undo1/Disk.img
+ok
+test_target_metadata_change_and_linked_parent_refuse (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_target_metadata_change_and_linked_parent_refuse) ... [*] previous Disk.img retained as /private/tmp/tmp9r3mx0tp/vm/.cfw-history/initial/Disk.img
+ok
+test_writable_allocation_change_preserves_mount_binding_and_publication (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_writable_allocation_change_preserves_mount_binding_and_publication) ... [*] previous Disk.img retained as /private/tmp/tmpmxtdreya/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpmxtdreya/vm/.cfw-history/20261019T231533Z-undo1/Disk.img
+ok
+test_writable_volume_schema_covers_undo_write_and_readonly_seal (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_writable_volume_schema_covers_undo_write_and_readonly_seal) ... [*] previous Disk.img retained as /private/tmp/tmpm8bd1rye/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpm8bd1rye/vm/.cfw-history/20261019T231534Z-undo1/Disk.img
+ok
+test_writable_volume_uuid_change_after_write_refuses_publication (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_writable_volume_uuid_change_after_write_refuses_publication) ... [*] previous Disk.img retained as /private/tmp/tmp8yik1l97/vm/.cfw-history/initial/Disk.img
+ok
+test_write_publish_and_second_undo_preserve_retained_effects (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_write_publish_and_second_undo_preserve_retained_effects) ... [*] previous Disk.img retained as /private/tmp/tmpidxyazk8/vm/.cfw-history/initial/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpidxyazk8/vm/.cfw-history/20261019T231534Z-undo1/Disk.img
+[*] previous Disk.img retained as /private/tmp/tmpidxyazk8/vm/.cfw-history/20261019T231535Z-undo2/Disk.img
+ok
+test_copy_baseline_permits_declared_patch_but_not_unknown_changes (tests.test_component_effects.ComponentEffectsTests.test_copy_baseline_permits_declared_patch_but_not_unknown_changes) ... ok
+test_disjoint_binary_effects_survive_final_readback (tests.test_component_effects.ComponentEffectsTests.test_disjoint_binary_effects_survive_final_readback) ... ok
+test_large_file_capture_and_proof_are_streamed (tests.test_component_effects.ComponentEffectsTests.test_large_file_capture_and_proof_are_streamed) ... ok
+test_later_copy_cannot_replace_required_symlink (tests.test_component_effects.ComponentEffectsTests.test_later_copy_cannot_replace_required_symlink) ... ok
+test_macho_loader_effect_also_preserves_nonstructural_changes (tests.test_component_effects.ComponentEffectsTests.test_macho_loader_effect_also_preserves_nonstructural_changes) ... ok
+test_plist_projections_allow_reserialization_and_disjoint_changes (tests.test_component_effects.ComponentEffectsTests.test_plist_projections_allow_reserialization_and_disjoint_changes) ... ok
+test_retained_hardware_copy_drift_refuses_final_transport (tests.test_component_effects.ComponentEffectsTests.test_retained_hardware_copy_drift_refuses_final_transport) ... ok
+test_signing_copy_transport_keeps_destination_metadata (tests.test_component_effects.ComponentEffectsTests.test_signing_copy_transport_keeps_destination_metadata) ... ok
+test_signing_copy_transport_preserves_explicit_metadata_requirements (tests.test_component_effects.ComponentEffectsTests.test_signing_copy_transport_preserves_explicit_metadata_requirements) ... ok
+test_valid_hash_chain_cannot_erase_earlier_required_effect (tests.test_component_effects.ComponentEffectsTests.test_valid_hash_chain_cannot_erase_earlier_required_effect) ... ok
+
+======================================================================
+FAIL: test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it) (options=('--reinstall-cryptex',))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_cryptex_reinstall.py", line 31, in test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it
+    self.assertEqual(child.returncode,0,(child.stdout+child.stderr).decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : [*] host-mode CFW install: variant=regular vm=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm mounts=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/.cfw_mount.NxMIaDMj staging=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/.cfw_disk.4NbgVC8H
+[-] CFW disk stage: EPERM: Operation not permitted
+[-] CFW install did not change /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/Disk.img; record: /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/.cfw-history/20261019T231524Z-4NbgVC8H/transaction.json
+[!] ownership of host-side artifacts NOT restored: invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)
+
+
+======================================================================
+FAIL: test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it) (options=())
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_cryptex_reinstall.py", line 31, in test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it
+    self.assertEqual(child.returncode,0,(child.stdout+child.stderr).decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : [*] host-mode CFW install: variant=regular vm=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm mounts=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/.cfw_mount.YDEpzWeu staging=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/.cfw_disk.XC7ipzBF
+[-] CFW disk stage: EPERM: Operation not permitted
+[-] CFW install did not change /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/Disk.img; record: /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test 6mhaz4x_/vm/.cfw-history/20261019T231524Z-XC7ipzBF/transaction.json
+[!] ownership of host-side artifacts NOT restored: invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)
+
+
+----------------------------------------------------------------------
+Ran 43 tests in 11.081s
+
+FAILED (failures=2)

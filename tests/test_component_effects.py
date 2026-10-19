@@ -31,7 +31,9 @@ class ComponentEffectsTests(unittest.TestCase):
                     target.write_bytes(source.read_bytes()); target.chmod(0o600)
                     if change == 'bytes': target.write_bytes(b'changed runtime member')
                     else: target.chmod(0o644)
-                    with self.assertRaisesRegex(ValueError, 'final transported member differs'):
+                    with self.assertRaisesRegex(ValueError,
+                            r'final transported member differs from recorded output: hardware:/AA.gl \(fields: '+
+                            ('sha256' if change == 'bytes' else 'mode')+r'\)'):
                         verify()
 
     def signing_copy_chain(self, root, *, explicit_mode=False):
