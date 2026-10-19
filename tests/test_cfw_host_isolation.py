@@ -79,6 +79,7 @@ exit 0
             (scripts / f'cfw_install{variant}.sh').write_text('''#!/bin/zsh
 print -r -- "${CFW_HOST_MNT:-missing}" > "$PWD/run-dir"
 print -r -- "${0:t} ${FORCE_DSC_MAXSLIDE-<unset>}" > "$PWD/installer-env"
+print -r -- "${VPHONE_REINSTALL_CRYPTEX-<unset>}" > "$PWD/cryptex-reinstall-env"
 [[ -n ${CFW_HOST_MNT:-} && -d $CFW_HOST_MNT ]] || exit 72
 mkdir -p "$CFW_HOST_MNT/mnt1" "$CFW_HOST_MNT/mnt_sysos_hv_vmm"
 print -r -- "/dev/disk92s1 on $CFW_HOST_MNT/mnt1 (apfs, local)" > "$TEST_MOUNTS"

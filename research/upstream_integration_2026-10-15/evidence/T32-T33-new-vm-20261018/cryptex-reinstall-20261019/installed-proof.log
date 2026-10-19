@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/tools/verify_dsc_publication.py", line 140, in <module>
+    if __name__ == '__main__': main()
+                               ~~~~^^
+  File "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/tools/verify_dsc_publication.py", line 80, in main
+    preview = guest_undo.preview(vm, checkpoint['generationID'], [DECLARATION], _committed=committed)
+  File "/Users/kolar/github/vphone-cli/scripts/patchers/guest_undo.py", line 103, in preview
+    if not selected.issubset(available): raise ValueError('selected declaration has no qualified DSC Undo')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: selected declaration has no qualified DSC Undo

@@ -1,6 +1,6 @@
 # T32/T33 当前执行清单
 
-2026-10-19 当前状态：aeb1651e 已 push。修复后 Undo 事务 20261019T081934Z-JTYX6fft 的实际写回、6885 代码页和可写挂载复核通过；首次最终核验因保留文件不符而拒绝，未交换。只读检查当前磁盘 4686 个输出，无读取错误；hardware:/AA.gl 的内容摘要 e221f140…→4779643e…，其余内容/类型/链接/权限位一致。自动挂载未保留属主视图，UID/GID 不作结论；正常卸载且磁盘身份保持。保留严格拒绝条件，已发起同一独立 VM 的完整 CFW 重装，待未启动发布后立即撤销，再完成启停和重新应用；T32/T33 未 accepted。
+2026-10-19 当前状态：f1739ebc 已 push。同一独立 DSC VM 的重装事务 20261019T090232Z-27r0QIUW 已完成两次最终核验、交换及归档，退出0；未启动。随后持锁验收发现安装器跳过已有 Cryptex，SwapEnd 幂等且无新只读原件复制链，撤销候选正确拒绝，顺序脚本停止，未执行 Undo。已新增显式 regular/classic --reinstall-cryptex 入口，默认跳过行为保持；隔离脚本回归已从失败转为通过，Swift相关12项通过。宿主驱动回归、完整Python和单独host CLI构建进行中。下一次基线安装与最终重新应用均使用该显式入口，再证明原件/补丁/6885代码页和同generation on→off→on；原已批准VM程序保持，T32/T33未accepted。
 
 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
@@ -243,3 +243,18 @@
 - [x] 无需额外管理员对话框的只读挂载核对 4686 输出；AA.gl 内容摘要不同，其他内容/类型/链接/权限位一致；属主视图不可靠，不据此报告属主变化。正常卸载、磁盘身份保持。
 - [x] 保存 copy-only hardware 内容和权限漂移拒绝回归，0.021 秒通过；未修改生产拒绝条件。
 - [ ] 同一独立 VM 的 CFW 重装 session55770/CLI13075 已开始预检；发布后先执行 Undo，保持启动前边界，再验证撤销后启停与同 generation 重新应用。
+
+- [x] 续跑核对：原生验证已生效，重装 root19942/session55770 正在 staged `.cfw_disk.27r0QIUW` 安装；无需重复验证或启动第二份安装。
+- [ ] 重装发布后保存新的 installed 证明到 `.build/t32-dsc-v4-rebaseline`；后续 restored 证明必须引用此新事务，不能引用首次安装事务。新发布核验及 Undo 前不启动 VM。
+
+- [x] 保存有上限的续跑脚本 `.build/t32-rebaseline-debug/after-install.py`（session99202）：等待 CLI13075 结束并要求完整发布成功日志，持锁保存新 installed 证明，再自动发起同 generation/声明的未启动 Undo；任一步失败即停止。当前等待安装，无 VM 启动。
+
+
+## 2026-10-19：已有Cryptex的重新安装与撤销来源
+
+- [x] 重装事务20261019T090232Z-27r0QIUW退出0、两次最终核验/交换/归档通过；新发布整盘SHA fcae888a5b9759efab692c4adbad80226dc33c779e876aaed28733059ea0d676，未启动。
+- [x] 新 installed 证明正确拒绝：Cryptex已存在而跳过复制，SwapEnd已0x560，未建立新的只读来源/可逆操作链；顺序脚本session99202停止，未执行Undo。
+- [x] 新增实际regular安装脚本的隔离失败回归，并实现显式regular/classic --reinstall-cryptex；从绑定原始固件重走既有复制及补丁链，默认跳过行为保持。未知设置、其他variant/profile/mode拒绝，sudo重执行与root-popup参数传递保持。
+- [x] Swift相关12项通过；单独host CLI构建、驱动回归及完整Python回归正在执行。原boot程序SHA/inode和已批准CDHash核对保持，参数路径64。
+- [ ] 将验证后的新host应用用于显式Cryptex重装，持锁保存新installed证明，不启动；随即执行Undo，再保存restored证明和两次API启停/运行后读取。
+- [ ] 最终重新应用也明确使用 --reinstall-cryptex，保存新的来源/代码页证明、两次API启停与运行后读取，再提交push完成证据。

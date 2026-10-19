@@ -1,6 +1,6 @@
 # 8a75092 范围核验与本地对账（2026-10-15）
 
-2026-10-19 当前状态：aeb1651e 已 push。真实 Undo 重试的实际写回、完整代码页和可写挂载复核通过；首次最终核验发现保留文件不符，事务20261019T081934Z-JTYX6fft未发布，原盘身份/mtime与66样本保持。只读检查4686个输出，无读取错误，hardware:/AA.gl内容摘要从e221f140…变为4779643e…；其余内容/类型/链接/权限位一致。自动用户挂载未保留属主视图，UID/GID不作结论；正常卸载、镜像身份保持。未放宽生产校验。相关31项回归通过；同一独立VM完整CFW重装等待原生验证，之后先撤销未启动发布，再执行启停及同generation重新应用。运行后保留AA.gl变化的撤销仍拒绝，T32/T33未accepted。
+2026-10-19 当前状态：f1739ebc已push。重装事务20261019T090232Z-27r0QIUW已发布且未启动；新验收发现已有Cryptex被跳过、SwapEnd幂等，缺新原件复制链，撤销候选正确拒绝，未执行Undo。已新增显式regular/classic --reinstall-cryptex，保持默认跳过与全部证据门。真实安装脚本隔离回归从失败转为通过；相关Python33项、全量942项（跳过2项）254.634秒、Swift参数/传递12函数及实际release verifier3函数（5写入设置、8身份变化）通过。新host应用签名、依赖、资源和entitlement通过，原boot程序字节/inode/CDHash保持。显式原件重装已发起（CLI20039/session28495），新发布核验、未启动Undo、撤销后启停及显式重新应用仍待验收，T32/T33未accepted。
 
 ## 2026-10-16 roothide journal 实际核对
 
@@ -286,3 +286,16 @@ DSC 验收组合已更正：regular 26.1 没有默认 DSC 字节操作，r2 仅�
 只读挂载对4686个发布输出进行比较：`hardware:/AA.gl`内容摘要由`e221f140369bf7b0b540793d068f72c7d7d086357aa70c9bd0ace7e7da1c6dd0`变为`4779643ee5398bcbea5eb5056e3966bccd31aa21fbb33ee2e5e5ad0ae1b31d9a`；其他输出内容、类型、链接与权限位一致，无读取错误。自动挂载的UID/GID视图未保留真实guest属主，不能据此判断属主变化。镜像身份保持，正常卸载。该文件变化的具体时间与原因未直接观测；最终拒绝符合保留效果严格核验，未修改生产校验。
 
 新增copy-only hardware字节或权限变化拒绝回归，相关31项2.563秒退出0。下一次完整CFW重装后先验证未启动发布，再立即Undo；此边界与此前实际运行后Undo拒绝分开记录。继续保留真实Undo发布、恢复后启停和重新应用未完成状态。证据：`evidence/T32-T33-new-vm-20261018/retained-drift-20261019/manifest.json`。
+
+
+## 2026-10-19：显式Cryptex重新安装
+
+2026-10-19 当前状态：f1739ebc已push。重装事务20261019T090232Z-27r0QIUW已发布且未启动；新验收发现已有Cryptex被跳过、SwapEnd幂等，缺新原件复制链，撤销候选正确拒绝，未执行Undo。已新增显式regular/classic --reinstall-cryptex，保持默认跳过与全部证据门。真实安装脚本隔离回归从失败转为通过；相关Python33项、全量942项（跳过2项）254.634秒、Swift参数/传递12函数及实际release verifier3函数（5写入设置、8身份变化）通过。新host应用签名、依赖、资源和entitlement通过，原boot程序字节/inode/CDHash保持。显式原件重装已发起（CLI20039/session28495），新发布核验、未启动Undo、撤销后启停及显式重新应用仍待验收，T32/T33未accepted。
+
+重装事务整盘发布SHA为`fcae888a5b9759efab692c4adbad80226dc33c779e876aaed28733059ea0d676`，生产v4核验确认当前与发布摘要相同。安装日志记录Cryptex已存在而跳过复制，SwapEnd已0x560且重新证明代码页未改变；新Undo索引entries为空。验收脚本在撤销候选处拒绝，顺序脚本停止，未启动或执行Undo。不得把旧journal或当前已安装字节补造为此新事务的原件。
+
+新增`cfw install --reinstall-cryptex`，仅regular/classic，解析与冻结variant核对均限制范围。host驱动在sudo重执行中保留该参数，并显式向安装器传递0/1，环境变量本身不能启用。安装器在该选项下从绑定原始固件重新执行现有缓存、只读来源捕获、Cryptex复制和语义补丁流程；所有修改先在staged磁盘执行。默认已有Cryptex跳过规则保持，dev/jb/exp、v2、Undo/environment组合拒绝。
+
+实际regular脚本在隔离树上的最小回归0.628秒确认原跳过现象；新增选项后3项0.651秒通过。实际host驱动及既有撤销/隔离回归33项53.325秒通过；首次沙箱EPERM记录保留，原断言在宿主重跑通过。完整Python942项（跳过2项）254.634秒退出0。Swift参数/传递12函数和最终签名CLI的3个verifier函数（5写入设置、8身份变化）通过。新host应用完整封签与7个原生依赖检查通过，原VM启动程序字节/inode与获批CDHash保持。
+
+下一次基线和最终重新应用均明确使用新选项，避免再次只得到幂等记录。先保存新事务installed证明，再执行未启动Undo；随后验证原件/6885代码页、两次API启停与运行后读取。此前运行后AA.gl漂移拒绝仍是独立结果，不据此放宽保留效果检查。证据：`evidence/T32-T33-new-vm-20261018/cryptex-reinstall-20261019/manifest.json`。

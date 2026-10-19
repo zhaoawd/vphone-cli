@@ -1,0 +1,23 @@
+.FF
+======================================================================
+FAIL: test_explicit_reinstall_reads_sources_and_replaces_both_trees (tests.test_cfw_cryptex_reinstall.CryptexReinstallTests.test_explicit_reinstall_reads_sources_and_replaces_both_trees)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_cryptex_reinstall.py", line 79, in test_explicit_reinstall_reads_sources_and_replaces_both_trees
+    self.assertEqual(calls.count(' mount-cryptex '),2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_invalid_reinstall_value_refuses_before_guest_writes (tests.test_cfw_cryptex_reinstall.CryptexReinstallTests.test_invalid_reinstall_value_refuses_before_guest_writes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_cryptex_reinstall.py", line 87, in test_invalid_reinstall_value_refuses_before_guest_writes
+    self.assertNotEqual(child.returncode,75)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 75 == 75
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.628s
+
+FAILED (failures=2)

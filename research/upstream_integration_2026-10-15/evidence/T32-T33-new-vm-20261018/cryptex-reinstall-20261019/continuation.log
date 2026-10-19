@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/.build/t32-rebaseline-debug/after-install.py", line 28, in <module>
+    run('installed-proof',[str(python),str(r/'scripts/vm_lock.py'),str(vm),'fw-receipts','--',str(python),str(r/'research/upstream_integration_2026-10-15/tools/verify_dsc_publication.py'),'--vm',str(vm),'--phase','installed','--source-diagnostic',str(r/'.build/t32-dsc-readonly-source/result.json'),'--out',str(proof)],env)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kolar/github/vphone-cli/.build/t32-rebaseline-debug/after-install.py", line 14, in run
+    if code:raise RuntimeError(label+' exited '+str(code))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: installed-proof exited 1

@@ -43,10 +43,12 @@ GUEST_ENVIRONMENT_GIVEN=0
 REPORT=""
 UNDO_GENERATION=""
 UNDO_DECLARATIONS=()
+REINSTALL_CRYPTEX=0
 VM_DIR="$PROJ/vm"
 while (( $# )); do
   case "$1" in
     --variant) VARIANT="$2"; shift 2 ;;
+    --reinstall-cryptex) REINSTALL_CRYPTEX=1; shift ;;
     --guest-environment)
       (( $# >= 2 )) || { echo "[-] --guest-environment needs classic|v2" >&2; exit 1; }
       GUEST_ENVIRONMENT="$2"; GUEST_ENVIRONMENT_GIVEN=1; shift 2 ;;
@@ -74,6 +76,9 @@ case "$GUEST_ENVIRONMENT" in
 esac
 if (( GUEST_ENVIRONMENT_GIVEN )) && [[ "$MODE" != install ]]; then
   echo "[-] --guest-environment is only valid for CFW installation" >&2; exit 1
+fi
+if (( REINSTALL_CRYPTEX )) && [[ "$MODE" != install || "$VARIANT" != regular || "$GUEST_ENVIRONMENT" != classic ]]; then
+  echo "[-] --reinstall-cryptex requires regular/classic CFW installation" >&2; exit 1
 fi
 # B1 profile contract: initial v2 rollout supports regular only.
 if [[ "$GUEST_ENVIRONMENT" == v2 && "$VARIANT" != regular ]]; then
@@ -106,6 +111,7 @@ else
   esac
   MODE_ARGS=(--variant "$VARIANT")
   [[ "$GUEST_ENVIRONMENT" == classic ]] || MODE_ARGS+=(--guest-environment "$GUEST_ENVIRONMENT")
+  (( ! REINSTALL_CRYPTEX )) || MODE_ARGS+=(--reinstall-cryptex)
 fi
 
 # The canonical restore-info writer uses this literal JSON field. Refuse a
@@ -458,7 +464,7 @@ elif [[ "$MODE" == undo ]]; then
 else
   echo "[*] running $INSTALLER (files placed on host mounts)..."
   # via env: an expansion-produced ${VAR:+NAME=val} isn't parsed as a shell assignment.
-  ( exec {DISK_FD}<&-; cd "$VM_DIR" && env CFW_HOST_CONTAINER="$CONT" _VPHONE_PATH="$P" \
+  ( exec {DISK_FD}<&-; cd "$VM_DIR" && env CFW_HOST_CONTAINER="$CONT" _VPHONE_PATH="$P" VPHONE_REINSTALL_CRYPTEX="$REINSTALL_CRYPTEX" \
       ${SPOOF_BUILD:+SPOOF_BUILD="$SPOOF_BUILD"} \
       ${VPHONE_FRIDA:+VPHONE_FRIDA="$VPHONE_FRIDA"} \
       zsh "$SCRIPT_DIR/$INSTALLER" . )
