@@ -25,11 +25,11 @@
     "sign-prefix copy metadata fix; full Python908 (2 skipped), signed build and 4-resource parity passed"
   ],
   "pending": [
-    "explicit original-Cryptex reinstall andnew installed proof",
-    "immediate preboot Undo publication/original and6885 code pages",
-    "restored two API boots andpost-boot reader",
-    "same-generation explicit Cryptex reapplication/DSC proof/API boots/reader",
-    "Mach-O/Preboot/arbitrary middle replay andtrusted guest origin incomplete"
+    "complete fresh Cryptex publication andnew installed proof",
+    "preboot Undo andrestored original/full pages",
+    "restored API boots andpost-boot reader",
+    "explicit same-generation reapplication/proof/API boots/reader",
+    "archive actual results andcommit/push; broader incomplete T32/T33 scope unchanged"
   ],
   "validation_limitations": [
     "Full make test_swift failed from unchanged APIProxy XCTest line 312; isolated test passed. Cause unknown.",
@@ -97,6 +97,26 @@
     "create-r2.log": {
       "bytes": 61190,
       "sha256": "369ed4d0501f4272d52c607099bd2ae2195fc5633825086de2e2d5f0550e6080"
+    },
+    "cryptex-composition-20261019/after-undo-state.json": {
+      "bytes": 214,
+      "sha256": "b1ab68e799f6d25e9dad6943dc615d3dbfa2c3027e8fe51a06c898e29a841a79"
+    },
+    "cryptex-composition-20261019/after-undo.py": {
+      "bytes": 5576,
+      "sha256": "3bb80e01cc4407a32b00fdced6e19bc94b7e1d3ad84bbced8cecd4a40c7199dd"
+    },
+    "cryptex-composition-20261019/manifest.json": {
+      "bytes": 2189,
+      "sha256": "c33289a38326b798128b073c8b953b56906f3f45e041d35a48e18eaf6695f702"
+    },
+    "cryptex-composition-20261019/reinstall-undo-composition.log": {
+      "bytes": 408,
+      "sha256": "86883599e1f0beba252401c4ebdcc34e533fae6765bf31659c8ab95eda4b7022"
+    },
+    "cryptex-composition-20261019/reinstall-undo-related.log": {
+      "bytes": 3598,
+      "sha256": "947ffb7dc130e16a802edd62d3a7ca1d7c2c5d48bf6334b4cdd89c3275d948ad"
     },
     "cryptex-readonly-real.json": {
       "bytes": 3388,
@@ -1848,7 +1868,7 @@
     },
     "files": "dsc-companions-20261019/manifest.json"
   },
-  "latest_evidence": "cryptex-reinstall-20261019/manifest.json",
+  "latest_evidence": "cryptex-composition-20261019/manifest.json",
   "dsc_publication": {
     "schemaVersion": 1,
     "recordedAt": "2026-10-19T07:37:01.964725+00:00",
@@ -2201,5 +2221,45 @@
       "tests/VPhoneCLITests/CFWCryptexReinstallTests.swift": "8901f624f534e9bd4d9ad51b544fffe967294d20dccfb9b64d9449f651febb79"
     },
     "files": "cryptex-reinstall-20261019/manifest.json"
+  },
+  "cryptex_composition": {
+    "schemaVersion": 1,
+    "recordedAt": "2026-10-19T13:02:07.020145+00:00",
+    "scope": "firmware-free composition regression andexplicit real-install continuation",
+    "regression": {
+      "command": ".venv/bin/python3 -m unittest tests.test_guest_undo_transaction tests.test_cfw_cryptex_reinstall",
+      "tests": 28,
+      "seconds": 10.297,
+      "exitCode": 0,
+      "case": "nonempty previously patched Cryptex is removed after original readonly source qualification; copied originals/new patch/new journal produce qualified first-original Undo, then actual writer/final reader/seal/publish returns original"
+    },
+    "productionCodeChanged": false,
+    "priorFullPython": {
+      "tests": 942,
+      "skipped": 2,
+      "seconds": 254.634,
+      "exitCode": 0,
+      "newTestAddedAfterThisRun": true
+    },
+    "live": {
+      "vm": "vm-t32-t33-dsc-20261018",
+      "rootPID": 25634,
+      "execSession": 28495,
+      "staged": ".cfw_disk.vZh3Hh4C",
+      "state": "explicit SystemOS source-cache gate executing; no publication yet",
+      "prebootUndoContinuation": 39110,
+      "afterUndoContinuation": 22627,
+      "afterUndoState": "waiting-undo; no boot requested yet"
+    },
+    "acceptedAtNewTarget": false,
+    "pending": [
+      "complete fresh Cryptex publication andnew installed proof",
+      "preboot Undo andrestored original/full pages",
+      "restored API boots andpost-boot reader",
+      "explicit same-generation reapplication/proof/API boots/reader",
+      "archive actual results andcommit/push; broader incomplete T32/T33 scope unchanged"
+    ],
+    "sourceSHA256": "0357f698787ed5a8a3359886bf2fde996cad687d42712d2bbff906dcfd56b852",
+    "files": "cryptex-composition-20261019/manifest.json"
   }
 }

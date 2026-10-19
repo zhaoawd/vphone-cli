@@ -1,6 +1,6 @@
 # T32/T33 当前执行清单
 
-2026-10-19 当前状态：2e0e0dea 已 push。显式 regular/classic --reinstall-cryptex 已实现并验证：相关Python33项、完整Python942项（跳过2项）254.634秒、Swift参数/传递12函数及最终签名CLI的verifier3函数（5写入设置、8身份变化）通过。新host应用 .build/t32-cryptex-reinstall-final.app 的资源/依赖/签名/entitlement通过；原已批准VM程序字节/inode/CDHash保持。显式原件重装 session28495/CLI20039 已通过前置核验，当前 osascript21116 等待系统管理员验证，尚无root安装进程。随后由session39110顺序核对新发布、发起未启动Undo；撤销后启停和显式重新应用仍待验收，T32/T33未accepted。
+2026-10-19 当前状态：6de04f15已push。显式Cryptex重装已获系统验证，root25634/session28495在staged .cfw_disk.vZh3Hh4C执行SystemOS缓存入口，未发布；已确认不走已有Cryptex跳过分支。新增已有补丁Cryptex整树替换→新发布→原件Undo组合回归通过，相关28项10.297秒退出0；生产代码未再修改，先前全量942项（跳过2项）结果保持，其后新增1项组合测试，未声称新全量943项已跑。顺序脚本session39110负责新发布证明及未启动Undo，session22627负责撤销后证明/API启停/读取、显式重新应用及重复验证，失败即停止。实际撤销发布和on→off→on尚待验收，T32/T33未accepted。
 
 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
@@ -263,3 +263,11 @@
 - [x] 新入口和证据提交并push为2e0e0dea，远端一致；394个归档文件摘要与大小一致。
 - [ ] 显式原件重装 session28495/CLI20039 已完成预检，osascript21116 等待macOS原生管理员验证；尚无root进程，新日志 `.build/t32-cryptex-reinstall-debug/cfw.log`。
 - [ ] 续跑 session39110/`.build/t32-cryptex-reinstall-debug/after-install.py` 等待安装；新 installed 证明使用 `.build/t32-dsc-v4-rebaseline-fresh`，通过后同generation/同声明Undo，任何失败即停止，等待上限12小时；未启动VM。
+
+- [x] 用户完成原生验证；显式Cryptex重装 root25634/session28495 已开始，正在核验generation与保存计划。续跑session39110保持等待新发布，不提前启动VM。
+
+- [x] 显式重装已通过安装前入口核验并建立 staged `.cfw_disk.vZh3Hh4C`；regular安装器已启动，尚未发布，原Disk.img未交换。
+
+- [x] 保存并启动撤销后顺序验收 `.build/t32-cryptex-reinstall-debug/after-undo.py`（session22627）：等待先前Undo成功发布；持锁核对restored原件/代码页，再两次API启停及运行后读取；显式重新应用Cryptex后再核对DSC、两次启停和读取。同generation/三份不同journal及原件/补丁摘要必须一致，失败即停止，不修改Git或宿主放行。当前仅等待，未启动VM。
+
+- [x] 已有Cryptex整树替换、新发布及原件Undo组合回归通过；相关28项10.297秒退出0。实际root25634进入SystemOS源缓存入口，原件重装分支已执行，未发布。

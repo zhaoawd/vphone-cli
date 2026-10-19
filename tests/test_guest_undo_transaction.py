@@ -12,7 +12,7 @@ import unittest
 from unittest.mock import patch
 
 from tests import test_guest_undo as fixtures
-from patchers import component_effects as effects, final_guest, guest_undo, plan_gate as gate
+from patchers import component_effects as effects, final_guest, guest_undo, guest_write, plan_gate as gate
 import cfw_disk_txn as txn
 
 
@@ -115,6 +115,50 @@ class GuestUndoTransactionTests(unittest.TestCase):
             stream.seek(0); stream.write(b'S'); stream.flush(); os.fsync(stream.fileno())
         self.assertEqual(txn.inspect_guest(self.vm)['state'], 'committed-publication')
         self.assertEqual(txn.preview_guest_undo(self.vm, self.fixture.generation, ['dyld-cfw-camera'])['state'], 'undo-preview')
+
+    def test_replacing_existing_cryptex_from_originals_qualifies_a_new_undo(self):
+        source_fixture = self.fixture.fixture
+        installed = source_fixture.dsc.read_bytes()
+        work = self.vm/'.cfw_disk.reinstall'; work.mkdir(mode=0o700)
+        mount = self.vm/'.cfw_mount.reinstall'; mount.mkdir()
+        shutil.copytree(self.current_root, mount/'mnt1')
+        fd = os.open(self.vm/'Disk.img', os.O_RDONLY); self.addCleanup(os.close, fd)
+        args = SimpleNamespace(vm=self.vm, work=work, fd=fd, owner_pid=os.getpid(),
+            guest_evidence=True, exit_code=0, retain_staged=False)
+        os.environ.update(VPHONE_GUEST_EVIDENCE=str(work/'guest-changes.jsonl'), CFW_HOST_MNT=str(mount))
+        with contextlib.redirect_stdout(io.StringIO()): txn.stage(args)
+        source_fixture.work = work
+        source_fixture.f.evidence = work/'guest-changes.jsonl'
+        source_fixture.f.mount = mount
+        source_fixture.mount = mount/'mnt_sysos'; source_fixture.mount.mkdir()
+        source_fixture.source_dsc = source_fixture.mount/fixtures.fixtures.undo.DSC_MEMBER/'dyld_shared_cache_arm64e'
+        source_fixture.source_dsc.parent.mkdir(parents=True)
+        source_fixture.source_dsc.write_bytes(fixtures.fixtures.cache(b'initial'))
+        source_fixture.target = mount/'mnt1/System/Cryptexes/OS'
+        source_fixture.dsc = source_fixture.target/fixtures.fixtures.undo.DSC_MEMBER/'dyld_shared_cache_arm64e'
+        self.assertEqual(source_fixture.dsc.read_bytes(), installed)
+        self.assertEqual(installed[512:519], b'second!')
+        import cache_systemos
+        from patchers import cryptex_source
+        with patch.object(cache_systemos, 'cache_systemos', side_effect=shutil.copyfile):
+            cryptex_source.prepare(source_fixture.plan, 'systemos', source_fixture.source, source_fixture.image)
+        with patch.object(cryptex_source.subprocess, 'run'), \
+             patch.object(cryptex_source.subprocess, 'check_output', side_effect=source_fixture.source_query):
+            cryptex_source.attach(source_fixture.plan, source_fixture.image, source_fixture.mount)
+        with patch.object(cryptex_source.subprocess, 'check_output', side_effect=source_fixture.source_query):
+            guest_write.run(source_fixture.plan, ['rm', '-rf', str(source_fixture.target)])
+            guest_write.run(source_fixture.plan, ['mkdir', '-p', str(source_fixture.target)])
+        source_fixture.produce(); source_fixture.finalize()
+        txn.seal(args); txn.publish(args)
+        with contextlib.redirect_stdout(io.StringIO()): txn.finish(args)
+        candidate = txn.preview_guest_undo(self.vm, self.fixture.generation, ['dyld-cfw-camera'])
+        self.assertEqual(candidate['entries'][0]['restoredSHA256'], gate.sha(fixtures.fixtures.cache(b'initial')))
+        self.assertTrue(candidate['entries'][0]['restoresFirstOriginal'])
+        self.current_root = mount/'mnt1'
+        self.prepare(['dyld-cfw-camera']); self.apply(); self.seal()
+        txn.publish(self.args); self.finish()
+        self.assertEqual(self.target.read_bytes(), fixtures.fixtures.cache(b'initial'))
+        self.assertEqual(txn.inspect_guest(self.vm)['componentReceipts']['removedDeclarations'], ['dyld-cfw-camera'])
 
     def test_writable_volume_schema_covers_undo_write_and_readonly_seal(self):
         self.prepare()
