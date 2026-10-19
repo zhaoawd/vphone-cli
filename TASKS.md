@@ -1,6 +1,6 @@
 # T32/T33 当前执行清单
 
-2026-10-19 当前状态：f1739ebc 已 push。同一独立 DSC VM 的重装事务 20261019T090232Z-27r0QIUW 已完成两次最终核验、交换及归档，退出0；未启动。随后持锁验收发现安装器跳过已有 Cryptex，SwapEnd 幂等且无新只读原件复制链，撤销候选正确拒绝，顺序脚本停止，未执行 Undo。已新增显式 regular/classic --reinstall-cryptex 入口，默认跳过行为保持；隔离脚本回归已从失败转为通过，Swift相关12项通过。宿主驱动回归、完整Python和单独host CLI构建进行中。下一次基线安装与最终重新应用均使用该显式入口，再证明原件/补丁/6885代码页和同generation on→off→on；原已批准VM程序保持，T32/T33未accepted。
+2026-10-19 当前状态：2e0e0dea 已 push。显式 regular/classic --reinstall-cryptex 已实现并验证：相关Python33项、完整Python942项（跳过2项）254.634秒、Swift参数/传递12函数及最终签名CLI的verifier3函数（5写入设置、8身份变化）通过。新host应用 .build/t32-cryptex-reinstall-final.app 的资源/依赖/签名/entitlement通过；原已批准VM程序字节/inode/CDHash保持。显式原件重装 session28495/CLI20039 已通过前置核验，当前 osascript21116 等待系统管理员验证，尚无root安装进程。随后由session39110顺序核对新发布、发起未启动Undo；撤销后启停和显式重新应用仍待验收，T32/T33未accepted。
 
 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
@@ -258,3 +258,8 @@
 - [x] Swift相关12项通过；单独host CLI构建、驱动回归及完整Python回归正在执行。原boot程序SHA/inode和已批准CDHash核对保持，参数路径64。
 - [ ] 将验证后的新host应用用于显式Cryptex重装，持锁保存新installed证明，不启动；随即执行Undo，再保存restored证明和两次API启停/运行后读取。
 - [ ] 最终重新应用也明确使用 --reinstall-cryptex，保存新的来源/代码页证明、两次API启停与运行后读取，再提交push完成证据。
+
+- [x] 相关Python33项、完整Python942项（跳过2项）254.634秒、Swift参数/传递12函数和新签名CLI的verifier3函数（5设置/8身份变化）全部通过；新应用签名/资源/依赖/entitlement通过，原获批VM程序保持。
+- [x] 新入口和证据提交并push为2e0e0dea，远端一致；394个归档文件摘要与大小一致。
+- [ ] 显式原件重装 session28495/CLI20039 已完成预检，osascript21116 等待macOS原生管理员验证；尚无root进程，新日志 `.build/t32-cryptex-reinstall-debug/cfw.log`。
+- [ ] 续跑 session39110/`.build/t32-cryptex-reinstall-debug/after-install.py` 等待安装；新 installed 证明使用 `.build/t32-dsc-v4-rebaseline-fresh`，通过后同generation/同声明Undo，任何失败即停止，等待上限12小时；未启动VM。
