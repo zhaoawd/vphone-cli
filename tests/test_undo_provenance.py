@@ -114,7 +114,25 @@ class UndoProvenanceTests(unittest.TestCase):
         self.assertEqual(self.finalize(),index)
 
     def test_readonly_data_companion_survives_copy_patch_and_final_qualification(self):
-        companion = self.source_dsc.with_name('dyld_shared_cache_arm64e.33.dylddata')
+        self.assert_readonly_companion('dyld_shared_cache_arm64e.33.dylddata')
+
+    def test_readonly_companion_survives_copy_patch_and_final_qualification(self):
+        self.assert_readonly_companion('dyld_shared_cache_arm64e.34.dyldreadonly')
+
+    def test_linkedit_companion_survives_copy_patch_and_final_qualification(self):
+        self.assert_readonly_companion('dyld_shared_cache_arm64e.35.dyldlinkedit')
+
+    def test_atlas_companion_survives_copy_patch_and_final_qualification(self):
+        companion = self.source_dsc.with_name('dyld_shared_cache_arm64e.atlas')
+        companion.write_bytes(b'AA01 original atlas')
+        self.produce()
+        self.assertEqual(self.dsc.with_name(companion.name).read_bytes(), companion.read_bytes())
+        index = self.finalize()
+        self.assertEqual(len(index['entries']), 1)
+        undo.verify_publication(self.work, cfw_disk_txn.load_record(self.work))
+
+    def assert_readonly_companion(self, name):
+        companion = self.source_dsc.with_name(name)
         data = bytearray(cache(b'unchanged data'))
         struct.pack_into('<II', data, 0x10, 0x100, 1)
         struct.pack_into('<QQQII', data, 0x100, 0x200000000, 4096, 0, 5, 5)
@@ -129,12 +147,24 @@ class UndoProvenanceTests(unittest.TestCase):
         undo.verify_publication(self.work, cfw_disk_txn.load_record(self.work))
 
     def test_data_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.33.dylddata')
+
+    def test_readonly_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.34.dyldreadonly')
+
+    def test_linkedit_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.35.dyldlinkedit')
+
+    def test_atlas_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.atlas')
+
+    def assert_companion_changes_refuse(self, name):
         for change in ('bytes', 'identity', 'metadata', 'added', 'removed'):
             with self.subTest(change=change):
                 case = UndoProvenanceTests(methodName='runTest')
                 case.setUp()
                 try:
-                    companion = case.source_dsc.with_name('dyld_shared_cache_arm64e.33.dylddata')
+                    companion = case.source_dsc.with_name(name)
                     companion.write_bytes(cache(b'original companion'))
                     write = Path.write_bytes
                     def write_with_change(path, data):

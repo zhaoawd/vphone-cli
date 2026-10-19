@@ -55,6 +55,9 @@ def publish(index):
             dsc = source_mount/guest_undo.undo.DSC_MEMBER/'dyld_shared_cache_arm64e'
             dsc.parent.mkdir(parents=True); dsc.write_bytes(cache(b'initial'))
             dsc.with_name('dyld_shared_cache_arm64e.33.dylddata').write_bytes(cache(b'original companion'))
+            dsc.with_name('dyld_shared_cache_arm64e.34.dyldreadonly').write_bytes(cache(b'original readonly'))
+            dsc.with_name('dyld_shared_cache_arm64e.35.dyldlinkedit').write_bytes(cache(b'original linkedit'))
+            dsc.with_name('dyld_shared_cache_arm64e.atlas').write_bytes(b'AA01 original atlas')
             def source_query(argv):
                 if argv[0] == '/usr/sbin/diskutil':
                     return plistlib.dumps({'ReadOnlyVolume':True,'MountPoint':str(source_mount)})

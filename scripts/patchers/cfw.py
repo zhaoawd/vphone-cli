@@ -346,14 +346,14 @@ def dylib_command(binary, dylib):
 
 
 def _readonly_dsc_inputs(directory):
-    """Observe numbered .dylddata companions without granting write targets."""
+    """Observe known DSC companions without granting write targets."""
     import re
     from . import plan_gate as gate
     from .guest_write import no_link_parents
     keys = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns', 'st_mode', 'st_uid', 'st_gid', 'st_nlink')
     result = {}
     for path in sorted(directory.iterdir()):
-        if not re.fullmatch(r'dyld_shared_cache_arm64e\.[0-9]{1,2}\.dylddata', path.name):
+        if not re.fullmatch(r'dyld_shared_cache_arm64e(?:\.[0-9]{1,2}\.(?:dylddata|dyldreadonly|dyldlinkedit)|\.atlas)', path.name):
             continue
         if path.is_symlink() or not path.is_file():
             raise ValueError('DSC readonly input must be a non-linked regular file')

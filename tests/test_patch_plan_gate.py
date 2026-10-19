@@ -481,6 +481,18 @@ class FrozenGateTests(unittest.TestCase):
         self.assertEqual(self.evidence.read_bytes(),b'')
 
     def test_data_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.33.dylddata')
+
+    def test_readonly_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.34.dyldreadonly')
+
+    def test_linkedit_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.35.dyldlinkedit')
+
+    def test_atlas_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.atlas')
+
+    def assert_companion_symlink_refuses(self, name):
         from tests.test_dsc_maxslide import build_cache
         _, digest = guest_write.target_table()
         self.entries.append(dict(id='dyld-boot-maxslide', disposition='guestUncovered',
@@ -490,7 +502,7 @@ class FrozenGateTests(unittest.TestCase):
         original = build_cache(size=0x17D504000, max_slide=0x20000000)
         (directory/'dyld_shared_cache_arm64e').write_bytes(original)
         outside = self.root/'companion-external'; outside.write_bytes(original)
-        (directory/'dyld_shared_cache_arm64e.33.dylddata').symlink_to(outside)
+        (directory/name).symlink_to(outside)
         with patch.dict(os.environ, dict(VPHONE_FROZEN_PLAN_SHA256=self.digest, VPHONE_FROZEN_CONTEXT=json.dumps(self.context))), \
              patch.object(sys, 'argv', ['cfw.py','patch-dsc-maxslide',str(directory)]), \
              patch.object(cfw, '_dispatch') as dispatch:

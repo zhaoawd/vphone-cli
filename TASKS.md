@@ -1,6 +1,6 @@
 # T32/T33 当前执行清单
 
-2026-10-19 当前状态：合并已完成，r2 第五次 CFW 发布、提示符启动及额外两次 API 正常关机通过；v4 独立发布副本与运行后历史证据已实现。独立 DSC 首次 CFW 在后续 producer 枚举 .33.dylddata 时拒绝，原磁盘身份及 66 段采样保持，未交换。已完成只读来源检查和输入保留修复；完整 Python 922 项（跳过 2 项）、相关 Swift 12 个测试函数及实际 release verifier 通过。资源更新、依赖、签名和 entitlement 核验通过，VM CDHash 保持获批 89b70a253cad2adea133b3e875519afaf72c5d17。重试 session82810 等待原生管理员验证。用户已要求提交并 push；真实 DSC 发布、撤销及后续启动仍待验收，T32/T33 未 accepted。
+2026-10-19 当前状态：b00e1d3c 已提交并 push。独立 DSC 第二次 CFW 在 .34.dyldreadonly 枚举处拒绝，原磁盘身份/mtime 与 66 段采样保持，未交换。完整只读清单确认 80 个成员及 10 个伴随输入。精确输入保持修复、实际隔离副本补丁与 6885 代码页验证通过；完整 Python 931 项（跳过 2 项）、相关 Swift 12 个测试函数及实际 release verifier 通过。签名资源/依赖/entitlement 核验通过，VM 字节及获批 CDHash 保持。第三次安装 session69696 等待原生管理员验证 PID39449；放行进程恢复等待 PID22867。真实发布、撤销与正常启动仍未验收，T32/T33 未 accepted。
 
 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
@@ -162,5 +162,17 @@
 - [x] 完整 Python 922 项（跳过 2 项），237.452 秒，退出 0；新 release verifier 的 Swift 相关 12 个测试函数通过。
 - [x] 已构建签名应用副本更新 Python 资源并重新封签；VM 二进制与获批 CDHash 保持。
 - [x] 用户明确要求完成后提交并 push；已 fetch，当前 HEAD 与 origin 分支无差异。
-- [ ] DSC 安装重试等待当前原生验证：CLI10804、osascript11566、session82810。
+- [x] DSC 安装重试的原生验证完成：CLI10804、osascript11566、session82810；root 安装已开始。
+- [x] 代码和已有证据提交 b00e1d3c，并正常 push 至原分支；Capstone overlay 与 stash 保留。
 - [ ] 正式发布、DSC 撤销与新实例正常启动验收。
+
+## 2026-10-19：DSC 完整伴随输入清单
+
+- [x] 保存第二次安装拒绝及事务 20261019T055918Z-bAM1VrQr；原磁盘采样检查保持，未交换。
+- [x] 最小 producer 回归复现 .dyldreadonly 拒绝；核对绑定只读来源的完整 80 成员及 10 个额外后缀输入。
+- [x] 新增精确 dyldreadonly/dyldlinkedit/atlas 输入保持规则及正向、五类变更拒绝、符号链接拒绝回归。
+- [x] 实际隔离副本 SwapEnd 补丁仅修改 .42，全部伴随文件保持，6885 代码页通过。
+- [x] Swift 12 个测试函数及实际签名 verifier 通过，含全部伴随输入；资源/依赖/签名/entitlement 核验通过，获批 VM 保持。
+- [x] 完整 Python 931 项（跳过 2 项）通过，242.969 秒，退出 0。
+- [ ] 第三次 CFW 安装等待原生验证 PID39449/session69696；放行进程恢复等待 PID22867。
+- [ ] 真实发布、正向撤销及正常启动验收。
