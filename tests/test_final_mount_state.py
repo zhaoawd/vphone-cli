@@ -1,4 +1,5 @@
 """Final staged mount qualification uses device and path observations."""
+import copy
 import os
 from pathlib import Path
 import sys
@@ -12,6 +13,32 @@ from patchers import final_guest as reader
 
 
 class FinalMountStateTests(unittest.TestCase):
+    def test_writable_attachment_ignores_only_observed_allocation_counters(self):
+        before = dict(ContainerReference='disk42', APFSContainerUUID='container', CapacityFree=2048,
+            CapacityCeiling=4096, PhysicalStores=[dict(DeviceIdentifier='disk41s1', DiskUUID='store', Size=4096)],
+            Volumes=[dict(DeviceIdentifier='disk42s1', APFSVolumeUUID='volume', CapacityInUse=1024, Roles=[])])
+        after = copy.deepcopy(before)
+        after['CapacityFree'] = 1024; after['Volumes'][0]['CapacityInUse'] = 2048
+        self.assertEqual(reader.writable_attachment_state(before), reader.writable_attachment_state(after))
+        self.assertEqual(before['CapacityFree'], 2048)
+        self.assertEqual(before['Volumes'][0]['CapacityInUse'], 1024)
+        changes = [dict(ContainerReference='disk99'), dict(APFSContainerUUID='other'),
+            dict(CapacityCeiling=8192), dict(unknown='changed'),
+            dict(PhysicalStores=[dict(DeviceIdentifier='disk99s1', DiskUUID='store', Size=4096)]),
+            dict(PhysicalStores=[dict(DeviceIdentifier='disk41s1', DiskUUID='other', Size=4096)]),
+            dict(Volumes=[])]
+        for key, value in [('DeviceIdentifier', 'disk99s1'), ('APFSVolumeUUID', 'other'),
+                           ('Roles', ['Data']), ('MountPoint', '/other'), ('unknown', 'changed')]:
+            volume = copy.deepcopy(before['Volumes'][0]); volume[key] = value
+            changes.append(dict(Volumes=[volume]))
+        for changed in changes:
+            with self.subTest(changed=changed):
+                self.assertNotEqual(reader.writable_attachment_state(before),
+                                    reader.writable_attachment_state(dict(before, **changed)))
+        for volumes in [None, {}, [None]]:
+            with self.subTest(volumes=volumes), self.assertRaises(ValueError):
+                reader.writable_attachment_state(dict(before, Volumes=volumes))
+
     def test_only_explicit_unmounted_state_allows_missing_mountpoint(self):
         self.assertIsNone(reader.mount_point({'DeviceIdentifier':'disk42s1','Mounted':False},'disk42s1'))
         for value in ('','Not Mounted'):

@@ -134,6 +134,59 @@ class GuestUndoTransactionTests(unittest.TestCase):
         self.assertEqual(receipt['removedDeclarations'], ['dyld-boot-maxslide'])
         self.assertEqual(receipt['guestOrigin']['state'], 'unknown')
 
+    def test_writable_allocation_change_preserves_mount_binding_and_publication(self):
+        self.prepare()
+        original_query = self.query
+        def changing_capacity(readonly):
+            query = original_query(readonly)
+            def observe(args):
+                value = plistlib.loads(query(args))
+                if args[1:3] == ['apfs', 'list']:
+                    value['Containers'][0]['CapacityFree'] = (
+                        1024 if (self.args.work/guest_undo.APPLIED).exists() else 2048)
+                return plistlib.dumps(value)
+            return observe
+        with patch.object(self, 'query', side_effect=changing_capacity):
+            self.apply(); self.seal(); txn.publish(self.args); self.finish()
+        self.assertEqual(self.target.read_bytes(), fixtures.fixtures.cache(b'changed'))
+        self.assertEqual(txn.inspect_guest(self.vm)['componentReceipts']['removedDeclarations'],
+                         ['dyld-boot-maxslide'])
+
+    def test_writable_volume_uuid_change_after_write_refuses_publication(self):
+        self.prepare()
+        original = effects.digest(self.vm/'Disk.img')
+        original_query = self.query
+        def changing_uuid(readonly):
+            query = original_query(readonly)
+            def observe(args):
+                value = plistlib.loads(query(args))
+                if args[1:3] == ['apfs', 'list']:
+                    value['Containers'][0]['Volumes'][0]['APFSVolumeUUID'] = (
+                        'replacement' if (self.args.work/guest_undo.APPLIED).exists() else 'original')
+                return plistlib.dumps(value)
+            return observe
+        with patch.object(self, 'query', side_effect=changing_uuid):
+            with self.assertRaisesRegex(ValueError, 'writable mount changed'): self.apply()
+        self.assertTrue((self.args.work/guest_undo.APPLIED).exists())
+        self.assertFalse((self.args.work/'guest-publication.json').exists())
+        self.assertEqual(effects.digest(self.vm/'Disk.img'), original)
+
+    def test_readonly_allocation_change_still_refuses_final_readback(self):
+        self.prepare(); self.apply()
+        query = self.query(True)
+        count = 0
+        def observe(args):
+            nonlocal count
+            value = plistlib.loads(query(args))
+            if args[1:3] == ['apfs', 'list']:
+                count += 1
+                value['Containers'][0]['CapacityFree'] = count
+            return plistlib.dumps(value)
+        with patch.object(self, 'query', return_value=observe):
+            with self.assertRaisesRegex(ValueError, 'attachment or operation evidence changed'):
+                self.seal()
+        self.assertFalse((self.args.work/'guest-publication.json').exists())
+
     def test_changed_target_refuses_before_any_write(self):
         self.prepare(); self.target.write_bytes(b'unknown DSC member')
         before = self.target.read_bytes()

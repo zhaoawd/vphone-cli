@@ -259,10 +259,11 @@ def apply(args):
         raise ValueError('guest Undo parent selection changed')
     plan = transaction.current_guest_plan()
     roots, mounted, identities = final_guest.mount_roots(plan, args.work / 'Disk.img', {'system'}, read_only=False)
+    attachment = final_guest.writable_attachment_state(mounted)
     def check_mount():
         info = roots['system'].lstat()
         if ((info.st_dev,info.st_ino) != identities['system']
-                or final_guest.attachments(args.work/'Disk.img') != mounted):
+                or final_guest.writable_attachment_state(final_guest.attachments(args.work/'Disk.img')) != attachment):
             raise ValueError('guest Undo writable mount changed')
         final_guest.require_mount(roots['system'],mounted['ContainerReference']+'s1',False)
     targets = []

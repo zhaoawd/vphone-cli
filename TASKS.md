@@ -1,6 +1,6 @@
 # T32/T33 当前执行清单
 
-2026-10-19 当前状态：83d4e69d 已提交并 push。独立 DSC 第三次 CFW 退出0，v4事务20261019T065441Z-XzJThk9M完成两次最终核验、快照、封存、交换及归档。未启动磁盘原件/补丁各6885代码页通过，w3从0x548改为0x560。首次启动与两次API正常启动/关机通过，读回26.0/23A341；运行后Receipt及generation verifier通过，当前镜像与发布镜像摘要分开，runtimeValidated:false。获批CDHash放行已生效。实际Undo的原生验证已完成，root73597/session58124开始；撤销、撤销后启动及重新应用的on→off→on仍待验收，T32/T33未accepted。
+2026-10-19 当前状态：aef7f99c已push，独立DSC安装、原件/补丁各6885代码页、首次启动、两次API正常关机及运行后v4读取均通过。首次真实Undo事务20261019T074108Z-8MSU4jQD在staged恢复后报guest Undo writable mount changed，未发布；原磁盘身份/mtime及66段采样保持。最小回归与隔离原生APFS确认CapacityFree和Volumes[].CapacityInUse变化足以触发同一错误；修复仅在可写Undo比较中排除此二字段，其余字段、UUID、设备/路径/根inode及最终只读严格比较保持。相关27项和Swift12函数、新应用签名/依赖核验通过，完整Python935项（跳过2项）244.185秒退出0。新host应用.build/t32-undo-mount-final.app；后续启动继续用原.build/t32-dsc-companions-final.app/Contents/MacOS/vphone-vm，字节/inode保持获批89b70a25...。周期探测已停止。实际Undo重试、撤销后启动、重新应用on→off→on待验收；T32/T33未accepted。
 
 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
@@ -209,3 +209,22 @@
 
 - [x] 用户完成实际Undo原生验证，root73597/session58124已执行；固定generation，仅dyld-boot-iomfb_swapend。
 - [x] 发布与真实启动证据归档至dsc-publication-20261019；原VM保持范围沿用已有记录，未新增旧VM写入。
+
+- [x] 发布/启动证据提交并push为aef7f99c，远端与本地一致。
+- [x] 周期参数探测session72154已通过stop文件停止，92次记录，最后返回64；其间helper68388再次记录目标退出后结束，同一VM程序仍可进入参数解析，无需重复放行。
+- [x] 实际Undo prepare-undo通过；staged目录`.cfw_disk.8MSU4jQD`，root73597/session58124正在apply-undo（PID79623）。
+
+## 2026-10-19：Undo可写APFS分配统计
+
+- [x] 首次Undo失败事务已保留，.42在staged写回e41db9aa...并完成写回/代码页检查，随后挂载复核拒绝；原盘未交换，身份和66样本保持。
+- [x] 最小事务回归red.log在2.496秒复现写入后同一错误。
+- [x] 全新128MiB隔离APFS写8MiB：仅CapacityFree及卷CapacityInUse改变，root身份、实际设备/路径/可写状态保持；正常卸载。
+- [x] 可写Undo比较仅排除两个实际分配统计字段；保留其他完整容器字段及实际root/设备/路径核验；最终只读比较未改。
+- [x] 相关26项加只读严格性1项通过；实际新签名hostCLI的Swift12函数通过；新资源/依赖/签名/entitlement通过，原boot程序inode及字节保持。
+- [ ] 完整Python回归session95763，日志.build/t32-undo-mount-debug/python-full.log。
+- [ ] 使用新host应用重试同generation、同声明Undo；使用原已放行VM路径启动。
+
+- [x] 完整Python935项、跳过2项，244.185秒，退出0；日志python-full.log。
+- [ ] 修复后Undo重试已发起，新host应用.build/t32-undo-mount-final.app，日志.build/t32-undo-mount-debug/undo-retry.log；原生验证待核对。
+
+- [ ] 修复后Undo重试session99319/CLI97676/osascript98151正等待原生管理员验证，尚无新事务。

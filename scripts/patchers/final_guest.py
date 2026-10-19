@@ -42,6 +42,18 @@ def volume_info(device):
     return plistlib.loads(subprocess.check_output(['/usr/sbin/diskutil','info','-plist',target]))
 
 
+def writable_attachment_state(container):
+    """Keep attachment observations except allocation counters changed by writes."""
+    state = dict(container)
+    state.pop('CapacityFree', None)
+    volumes = state.get('Volumes')
+    if not isinstance(volumes, list) or any(not isinstance(item, dict) for item in volumes):
+        raise ValueError('writable APFS volume inventory is unknown')
+    state['Volumes'] = [{key: value for key, value in item.items() if key != 'CapacityInUse'}
+                        for item in volumes]
+    return state
+
+
 def mount_point(details, expected):
     if details.get('DeviceIdentifier')!=expected:
         raise ValueError('mounted volume device differs from staged APFS volume')
