@@ -1,6 +1,6 @@
 # T32/T33 当前执行清单
 
-2026-10-19 当前状态：b00e1d3c 已提交并 push。独立 DSC 第二次 CFW 在 .34.dyldreadonly 枚举处拒绝，原磁盘身份/mtime 与 66 段采样保持，未交换。完整只读清单确认 80 个成员及 10 个伴随输入。精确输入保持修复、实际隔离副本补丁与 6885 代码页验证通过；完整 Python 931 项（跳过 2 项）、相关 Swift 12 个测试函数及实际 release verifier 通过。签名资源/依赖/entitlement 核验通过，VM 字节及获批 CDHash 保持。第三次安装 session69696 等待原生管理员验证 PID39449；放行进程恢复等待 PID22867。真实发布、撤销与正常启动仍未验收，T32/T33 未 accepted。
+2026-10-19 当前状态：83d4e69d 已提交并 push。独立 DSC 第三次 CFW 退出0，v4事务20261019T065441Z-XzJThk9M完成两次最终核验、快照、封存、交换及归档。未启动磁盘原件/补丁各6885代码页通过，w3从0x548改为0x560。首次启动与两次API正常启动/关机通过，读回26.0/23A341；运行后Receipt及generation verifier通过，当前镜像与发布镜像摘要分开，runtimeValidated:false。获批CDHash放行已生效。实际Undo的原生验证已完成，root73597/session58124开始；撤销、撤销后启动及重新应用的on→off→on仍待验收，T32/T33未accepted。
 
 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
@@ -174,5 +174,38 @@
 - [x] 实际隔离副本 SwapEnd 补丁仅修改 .42，全部伴随文件保持，6885 代码页通过。
 - [x] Swift 12 个测试函数及实际签名 verifier 通过，含全部伴随输入；资源/依赖/签名/entitlement 核验通过，获批 VM 保持。
 - [x] 完整 Python 931 项（跳过 2 项）通过，242.969 秒，退出 0。
-- [ ] 第三次 CFW 安装等待原生验证 PID39449/session69696；放行进程恢复等待 PID22867。
+- [x] 用户完成第三次安装的原生验证；root PID55255、session69696 已执行 staged 事务。
+- [x] 放行恢复 PID22867 已返回；worker57100 报附加失败并退出，VM 参数探测137。
+- [ ] 当前 amfid57825 上的同范围重试 PID58131/session27265 等待原生验证。
+- [x] 第三次 CFW 已通过 DSC 枚举与 SwapEnd producer，正在处理后续组件；尚未最终核验或发布。
 - [ ] 真实发布、正向撤销及正常启动验收。
+
+## 2026-10-19：第三次安装与真实验收续跑
+
+- [x] 原生安装验证已生效；第三次 staged 事务 `.cfw_disk.XzJThk9M` 已完成文件安装，root PID55255/session69696 正在首次 `verify-final`。
+- [x] 原 helper worker57100 附加失败并退出；之后观察到 amfid57825 出现及再次退出，原 LLDB 错误细节缺失，原因未完全确认。
+- [ ] 同一获批 CDHash 的重试 osascript58131/session27265 等待原生验证。
+- [ ] 受限参数探测 session72154 正在执行：每20秒只进入非法参数路径，SHA/CDHash核对，不启动VM；一小时上限或建立 `.build/t32-dyldreadonly-debug/stop-execution-probe` 后停止。当前 amfid62017 已持续运行。
+- [ ] 两次最终只读核验、封存和正式发布；未启动磁盘中的实际 DSC 原件/补丁/完整代码页证明。
+- [ ] 首次启动、两次API正常启动/停止及运行后历史证据读取。
+- [ ] 实际DSC撤销、未启动磁盘原件/代码页证明、撤销后两次API正常启动/停止。
+- [ ] 同一generation重新安装CFW并验证补丁/代码页与正常启动，完成DSC效果on→off→on；不提前登记T32/T33 accepted。
+
+- [x] 第三次 CFW 两次最终核验、封存、交换及归档通过，session69696 退出0；v4事务 `20261019T065441Z-XzJThk9M`。
+- [x] 放行重试 PID58131 完成；worker68388 附加 amfid62017，参数探测连续64；仅获批 CDHash。
+- [ ] 首次启动前 DSC 证明 session52797 正在执行，输出 `.build/t32-dsc-v4-installed`。
+
+- [x] 首次启动前DSC证明通过：发布与当前整盘SHA一致，.42原件e41db9aa...与来源诊断一致，补丁件2fc23949...，w3 0x548→0x560，原件/补丁件各6885代码页通过。
+- [ ] 正式首次启动脚本正在执行，输出`.build/t32-dsc-v4-first-boot`。
+
+- [x] 第三次CFW后首次启动通过：生产7条命令、提示符匹配、退出0、Guest stopped，无框架强制停止，磁盘/目录锁释放，配置与daemon摘要保持。
+- [ ] 安装后两次API正常启动/停止正在执行，输出`.build/t32-dsc-v4-api-installed`。
+
+- [x] 安装后两次API正常启动/停止通过；iOS26.0/23A341，启动时间/会话UUID不同，apiAccepted、Guest stopped，无强制框架停止，配置/daemon保持，磁盘和目录锁释放。
+- [ ] 真实启动后的Receipt与generation verifier正在执行，输出`.build/t32-dsc-v4-postboot-installed`。
+
+- [x] 安装后真实两次启动的Receipt/verify-plan通过，runtimeImageChanged:true、runtimeValidated:false，发布镜像SHA ff453e...与当前SHA 5948a0...分开。
+- [ ] 已发起独立DSC实际Undo命令，日志`.build/t32-dyldreadonly-debug/undo.log`；同一generation，仅dyld-boot-iomfb_swapend，原生验证结果待核对。
+
+- [x] 用户完成实际Undo原生验证，root73597/session58124已执行；固定generation，仅dyld-boot-iomfb_swapend。
+- [x] 发布与真实启动证据归档至dsc-publication-20261019；原VM保持范围沿用已有记录，未新增旧VM写入。

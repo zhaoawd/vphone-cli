@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "state": "passed",
+  "vm": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018",
+  "productionPatternsSHA256": "c349a131e89691a6aaddd14ec2ba3347b6d95da3cd1c551821c3f167a23b097c",
+  "commands": [
+    "export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11:/usr/games:/iosbinpack64/usr/local/sbin:/iosbinpack64/usr/local/bin:/iosbinpack64/usr/sbin:/iosbinpack64/usr/bin:/iosbinpack64/sbin:/iosbinpack64/bin'",
+    "cp /iosbinpack64/etc/profile /var/profile",
+    "cp /iosbinpack64/etc/motd /var/motd",
+    "mkdir -p /var/dropbear",
+    "dropbearkey -t rsa -f /var/dropbear/dropbear_rsa_host_key",
+    "dropbearkey -t ecdsa -f /var/dropbear/dropbear_ecdsa_host_key",
+    "shutdown -h now"
+  ],
+  "commandsSent": 7,
+  "promptMatched": true,
+  "pid": 70887,
+  "exitCode": 0,
+  "guestStopped": true,
+  "forcedFrameworkStop": false,
+  "diskAndDirectoryLockReleased": true,
+  "configAndDaemonUnchanged": true
+}
