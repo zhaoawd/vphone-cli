@@ -1,0 +1,1 @@
+do shell script "/usr/bin/python3 -I -S -B /Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/tools/inspect_roothide_journals.py" with administrator privileges with prompt "只读核对 vm-roothide-b33-20261010 的 CFW 事务与磁盘占用，不修改或恢复 VM。"

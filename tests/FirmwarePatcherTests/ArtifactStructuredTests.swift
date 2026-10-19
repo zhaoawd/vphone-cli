@@ -113,6 +113,7 @@ struct ArtifactStructuredTests {
         let manifest = try PropertyListSerialization.data(
             fromPropertyList: ["ProductVersion": "26.1"], format: .xml, options: 0)
         try manifest.write(to: dir.appendingPathComponent("FixtureRestore/iPhone-BuildManifest.plist"))
+        try manifest.write(to: dir.appendingPathComponent("FixtureRestore/BuildManifest.plist"))
         let pipeline = FirmwarePipeline(vmDirectory: dir, variant: .dev, verbose: false)
         // Later component inputs deliberately do not exist: accessing them would throw.
         try saveSyntheticDesiredPlan(pipeline)
@@ -141,6 +142,9 @@ struct ArtifactStructuredTests {
                 fromPropertyList: ["ProductVersion": ios18 ? "18.6.2" : "26.1"],
                 format: .xml, options: 0)
             try manifest.write(to: restore.appendingPathComponent("iPhone-BuildManifest.plist"))
+            let cloudManifest = try PropertyListSerialization.data(
+                fromPropertyList: ["ProductVersion": "26.1"], format: .xml, options: 0)
+            try cloudManifest.write(to: restore.appendingPathComponent("BuildManifest.plist"))
             let bytes = Data(repeating: 0, count: 0x400)
             try bytes.write(to: dir.appendingPathComponent("AVPBooter.fixture.bin"))
             let pipeline = FirmwarePipeline(vmDirectory: dir,

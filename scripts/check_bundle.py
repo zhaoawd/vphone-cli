@@ -10,7 +10,7 @@ import tempfile
 REQUIRED = (
     'AppIcon.icns', 'build-dependencies.json', 'requirements.txt', 'debs.list', 'README.md',
     'scripts/fw_prepare.sh', 'scripts/ipsw_cache_entry.py',
-    'scripts/cfw_install_host.sh', 'scripts/cfw_disk_txn.py', 'scripts/sparse_file.py',
+    'scripts/cfw_install_host.sh', 'scripts/cfw_disk_txn.py', 'scripts/cfw_guest_evidence.py', 'scripts/sparse_file.py',
     'scripts/cfw_env_update.py', 'scripts/cfw_env_install.py', 'scripts/guest_environment.json',
     'scripts/cfw_install.sh', 'scripts/cfw_install_dev.sh',
     'scripts/cfw_install_jb.sh', 'scripts/cfw_install_exp.sh',
@@ -23,6 +23,7 @@ REQUIRED = (
     'scripts/licenses/OpenSSL.txt', 'scripts/licenses/GPL-3.0.txt',
     'scripts/boot_host_preflight.sh', 'scripts/pymobiledevice3_bridge.py',
     'scripts/check_python_runtime.py', 'scripts/python_environment.py', 'scripts/patchers/cfw.py',
+    'scripts/patchers/guest_undo.py',
     'dependencies/python-darwin-arm64-3.13.lock', 'dependencies/python-darwin-arm64-3.14.lock',
     'dependencies/python-darwin-arm64-3.13.json', 'dependencies/python-darwin-arm64-3.14.json',
     'scripts/resources/cfw_input.tar.zst', 'scripts/resources/cfw_jb_input.tar.zst',

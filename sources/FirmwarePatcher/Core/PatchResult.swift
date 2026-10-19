@@ -12,6 +12,8 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
     public let variant: String
     public let iosBaseIs18: Bool
     public let iosBaseIs27: Bool
+    /// Numeric cloudOS >= 26.4 predicate, independent of opt-in. Retains the
+    /// historical encoded name so existing gate snapshots keep their identity.
     public let cloudOSIsFridaCapable: Bool
     public let forceExcGuard: Bool
     public let enableFrida: Bool

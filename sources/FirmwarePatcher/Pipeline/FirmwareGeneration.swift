@@ -190,7 +190,7 @@ public enum FirmwareGeneration {
             guard manifest.schemaVersion == 1, manifest.id == id,
                   try digest(manifest.content) == id,
                   manifest.content.source.recognition == "fresh-local-ipsw-prepare-v1",
-                  try VPhoneFirmwareIdentity.read(in: directory) == manifest.content.identity else {
+                  try FirmwareGuestDiskIdentity.matches(manifest.content.identity, generationID: id, in: directory) else {
                 throw fail("generation manifest or VM identity differs")
             }
             try verifyOriginals(manifest, at: root)

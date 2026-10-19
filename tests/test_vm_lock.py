@@ -121,6 +121,14 @@ class VMLockTests(unittest.TestCase):
         finally:
             os.close(fd)
 
+    def test_pending_cfw_blocks_new_boot_and_write_but_allows_inspection_recovery(self):
+        (self.vm / '.cfw_disk.interrupted').mkdir()
+        for operation in ('boot', 'dfu', 'cfw', 'fw-patch', 'export', 'delete', 'cfw-record', 'fw-receipts'):
+            result = subprocess.run([sys.executable, str(HELPER), str(self.vm), operation, '--', sys.executable, '-c', 'pass'],
+                capture_output=True, timeout=5)
+            self.assertEqual(result.returncode == 0, operation in ('cfw-record', 'fw-receipts'), (operation, result.stderr))
+        self.assertTrue((self.vm / '.cfw_disk.interrupted').is_dir())
+
 
 if __name__ == '__main__':
     unittest.main()

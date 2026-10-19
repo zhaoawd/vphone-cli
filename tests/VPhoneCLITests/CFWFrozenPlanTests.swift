@@ -4,11 +4,65 @@ import CryptoKit
 import Foundation
 import Testing
 import Virtualization
+import VPhoneCore
 @testable import vphone_cli
 
 private final class CFWFrozenTestBundle: NSObject {}
 
 @Suite struct CFWFrozenPlanTests {
+    @Test(arguments: ["valid", "checkpoint", "disk", "machine", "retained", "postimage", "postimage-replaced", "runtime-resized"])
+    func committedCFWSwapPreservesActualSwiftGenerationQualification(change: String) throws {
+        let vm = try fixture(profile: false, variant: .exp)
+        defer { try? FileManager.default.removeItem(at: vm) }
+        let context = try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: nil, guestEnvironment: "classic", spoofBuild: "")
+        let original = try VPhoneFirmwareIdentity.read(in: vm)
+        let verifier = try executable()
+        var object = try #require(JSONSerialization.jsonObject(with: Data(context.json.utf8)) as? [String: Any])
+        object["verifierPath"] = verifier.path
+        object["verifierSHA256"] = SHA256.hash(data: try Data(contentsOf: verifier)).map { String(format: "%02x", $0) }.joined()
+        var env = ProcessInfo.processInfo.environment.merging(try context.environment) { _, new in new }
+        env["VPHONE_FROZEN_CONTEXT"] = String(decoding: try JSONSerialization.data(withJSONObject: object,
+            options: [.sortedKeys,.withoutEscapingSlashes]), as: UTF8.self)
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let python = root.appendingPathComponent(".venv/bin/python3")
+        let result = try VPhoneProcessRunner.runCapturing(python,[root.appendingPathComponent("scripts/vm_lock.py").path,
+            vm.path,"cfw-record","--",python.path,root.appendingPathComponent("tests/cfw_identity_bridge_fixture.py").path,vm.path],env:env)
+        #expect(result.succeeded, Comment(rawValue: result.stdout + result.stderr))
+        #expect(try VPhoneFirmwareIdentity.read(in: vm) != original)
+        #expect(try FirmwareGeneration.loadVerified(in: vm,id:context.generationID).content.identity == original)
+        #expect(try VPhoneCFWFrozenContext.prepare(in: vm,requestedVariant:nil,guestEnvironment:"classic",spoofBuild:"").generationID == context.generationID)
+        if change == "valid" { return }
+        let archive = try #require(FileManager.default.contentsOfDirectory(at: vm.appendingPathComponent(".cfw-history"),
+            includingPropertiesForKeys: nil).first(where: { $0.lastPathComponent.hasSuffix("identity2") }))
+        switch change {
+        case "checkpoint":
+            let file = archive.appendingPathComponent("guest-publication.json")
+            var bytes = try Data(contentsOf: file); bytes.append(32); try bytes.write(to: file)
+        case "disk":
+            let file = vm.appendingPathComponent("Disk.img"), data = try Data(contentsOf: file)
+            try FileManager.default.moveItem(at: file, to: vm.appendingPathComponent("unrelated-old"))
+            try data.write(to: file)
+        case "postimage":
+            let file = archive.appendingPathComponent("guest-postimage.img")
+            let stream = try FileHandle(forWritingTo: file)
+            try stream.write(contentsOf: Data([0x52])); try stream.close()
+        case "postimage-replaced":
+            let file = archive.appendingPathComponent("guest-postimage.img"), data = try Data(contentsOf: file)
+            try FileManager.default.moveItem(at: file, to: archive.appendingPathComponent("held-postimage"))
+            try data.write(to: file)
+        case "runtime-resized":
+            let stream = try FileHandle(forWritingTo: vm.appendingPathComponent("Disk.img"))
+            try stream.seekToEnd(); try stream.write(contentsOf: Data([0x52])); try stream.close()
+        case "machine":
+            let file = vm.appendingPathComponent("config.plist")
+            var config = try #require(PropertyListSerialization.propertyList(from: Data(contentsOf: file),format:nil) as? [String:Any])
+            config["machineIdentifier"] = VZMacMachineIdentifier().dataRepresentation
+            try PropertyListSerialization.data(fromPropertyList:config,format:.xml,options:0).write(to:file)
+        case "retained": try Data("changed retained disk".utf8).write(to:archive.appendingPathComponent("Disk.img"))
+        default: Issue.record("Unknown identity fixture")
+        }
+        #expect(throws: (any Error).self) { try FirmwareGeneration.loadVerified(in:vm,id:context.generationID) }
+    }
     private func fixture(profile: Bool, variant: FirmwarePipeline.Variant = .regular) throws -> URL {
         let path = FileManager.default.temporaryDirectory.appendingPathComponent("cfw-frozen-" + UUID().uuidString)
         try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
@@ -24,6 +78,7 @@ private final class CFWFrozenTestBundle: NSObject {}
             try PropertyListSerialization.data(fromPropertyList: ["ProductVersion": "26.1", "ProductBuildVersion": "23B85"],
                 format: .xml, options: 0).write(to: restore.appendingPathComponent(name))
         }
+        try Data("generation SystemOS fixture".utf8).write(to: restore.appendingPathComponent("SystemOS.dmg"))
         let pipeline = FirmwarePipeline(vmDirectory: vm, variant: variant, verbose: false, guestEnvironmentV2: profile)
         let plan = try pipeline.resolvedPlan(), inputs = try pipeline.transactionRoots()
         let source = FirmwareGeneration.Source(provenance: .init(recognition: "fresh-local-ipsw-prepare-v1",

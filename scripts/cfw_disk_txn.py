@@ -37,9 +37,11 @@ import signal
 import stat
 import subprocess
 import sys
+import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import vm_lock  # noqa: E402
+import cfw_guest_evidence as guest_evidence  # noqa: E402
 # Hole-aware ranges; a decmpfs file, an ENOTTY/ENXIO/other seek error is read in
 # full, never taken for zeros (scripts/sparse_file.py, shared with
 # tools/apfs_snap_rename.py).
@@ -197,19 +199,32 @@ def identity(info):
 
 def load_record(work):
     path = work / RECORD
-    if not path.exists():
-        return None
-    return json.loads(path.read_text())
+    try: raw = guest_evidence.read(path)
+    except FileNotFoundError: return None
+    record = json.loads(raw)
+    if not isinstance(record, dict) or type(record.get('version')) is not int or record['version'] not in (1, 2, 3, 4):
+        raise Refused('unsupported CFW journal version')
+    if record['version'] < 3 and ('guestEvidenceRequired' in record or 'guestEvidenceSHA256' in record):
+        raise Refused('guest evidence requires a v3/v4 CFW journal; old records permit recovery only')
+    if record['version'] in (2, 3, 4) and record.get('provenanceMode') != 'required':
+        raise Refused('CFW journal requires Undo provenance')
+    if record['version'] in (3, 4) and record.get('guestEvidenceRequired') is not True:
+        raise Refused('CFW journal v3/v4 requires sealed guest evidence')
+    if (record['version'] == 4) != (record.get('runtimeImageEvidenceRequired') is True):
+        raise Refused('CFW runtime evidence requirement differs from journal version')
+    return record
 
 
 def save_record(directory, record):
-    temporary = directory / (RECORD + '.tmp')
-    with open(temporary, 'w') as stream:
-        json.dump(record, stream, indent=2, sort_keys=True)
-        stream.write('\n')
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temporary, directory / RECORD)
+    fd, temporary = tempfile.mkstemp(prefix='.transaction-', dir=directory)
+    try:
+        with os.fdopen(fd, 'w') as stream:
+            json.dump(record, stream, indent=2, sort_keys=True)
+            stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
+        os.replace(temporary, directory / RECORD)
+        guest_evidence.sync_directory(directory)
+    finally:
+        if os.path.exists(temporary): os.unlink(temporary)
 
 
 # MARK: - Checks
@@ -278,6 +293,7 @@ def run_checks(phase, args, record):
     """Raise Refused('<phase> check: ...'); record the failure or the pass."""
     vm, work = args.vm, args.work
     try:
+        if record.get('vm') != str(vm): raise Refused('CFW journal belongs to another VM')
         require_lock(vm)
         require_original(args.fd, vm, record['original'])
         require_staged(work, record['staged'])
@@ -308,6 +324,8 @@ def stage(args):
               'vm': str(vm), 'started_at': now(), 'status': 'staging',
               'original': identity(held), 'method': None, 'clone_error': None, 'copy': None,
               'staged': None, 'checks': [], 'failure': None}
+    if getattr(args, 'guest_evidence', False):
+        record.update(version=4, guestEvidenceRequired=True, runtimeImageEvidenceRequired=True)
     record['original']['sample'] = sample_digest(fd, held.st_size)
     save_record(work, record)
     destination = work / DISK
@@ -395,6 +413,75 @@ def check(args):
     return 0
 
 
+def current_guest_plan():
+    from patchers import plan_gate
+    plan = plan_gate.from_environment()
+    # Writers and their mounts have already been released. Requalify the plan,
+    # inherited VM lock and private evidence path without requiring a live mount.
+    vm = Path(plan.context['vmDirectory'])
+    require_lock(vm)
+    sink = plan_gate.private_path(plan, os.environ['VPHONE_GUEST_EVIDENCE'])
+    if sink.parent.parent != vm or not sink.parent.name.startswith('.cfw_disk.') or sink.name != guest_evidence.OPERATIONS:
+        raise Refused('guest seal evidence path differs from the private transaction')
+    return plan
+
+
+def seal(args):
+    record = staged_record(args.work)
+    if record.get('version') not in (3, 4):
+        raise Refused('guest seal requires v3/v4; old records permit recovery only')
+    if not record.get('guestEvidenceRequired') or record.get('guestEvidenceSHA256'):
+        raise Refused('guest seal requires an unsealed v3/v4 CFW transaction')
+    run_checks('pre-publish', args, record)
+    if Path(os.environ['VPHONE_GUEST_EVIDENCE']) != args.work / guest_evidence.OPERATIONS:
+        raise Refused('guest evidence belongs to another transaction work directory')
+    plan = current_guest_plan()
+    if plan.context['vmDirectory'] != str(args.vm): raise Refused('guest plan belongs to another VM')
+    try:
+        image_sha = checked_image_digest(args.work / DISK)
+        checkpoint = guest_evidence.prepare(args.work, record, plan, image_sha)
+        run_checks('pre-publish', args, record)
+        fresh = current_guest_plan()
+        if fresh.record_json != plan.record_json or fresh.context_json != plan.context_json:
+            raise Refused('qualified guest plan changed during seal')
+        record['guestEvidenceSHA256'] = checkpoint
+        record['sealed_at'] = now()
+        save_record(args.work, record)
+        verify_guest_evidence(args.work, record, args.work / DISK)
+    except (ValueError, OSError, KeyError) as error:
+        raise Refused('guest evidence seal: ' + describe(error)) from error
+    return 0
+
+
+def verify_guest_evidence(work, record, image, *, allow_runtime=False, check_operation=True):
+    if record.get('version') in (3, 4):
+        try:
+            fd = os.open(image, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+            try:
+                before = os.fstat(fd)
+                value = guest_evidence.verify(work, record, image, checked_image_digest(image),
+                    allow_runtime=allow_runtime, check_operation=check_operation)
+                guest_evidence.unchanged(image, fd, before)
+                return value
+            finally: os.close(fd)
+        except (ValueError, OSError, KeyError) as error:
+            raise Refused('guest publication evidence: ' + describe(error)) from error
+    return None
+
+
+def checked_image_digest(image):
+    fd = os.open(image, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        os.fsync(fd)
+        before = os.fstat(fd)
+        if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+            raise Refused('guest image is not a private regular file')
+        value = digest_fd(fd, before.st_size)
+        guest_evidence.unchanged(image, fd, before)
+        return value
+    finally: os.close(fd)
+
+
 def publish_by_exclusive_rename(args, record):
     """Fallback where RENAME_SWAP is unsupported (HFS+): two renames, no replace.
 
@@ -405,12 +492,16 @@ def publish_by_exclusive_rename(args, record):
     """
     original, staged, previous = args.vm / DISK, args.work / DISK, args.work / PREVIOUS
     move_exclusive(original, previous)
+    if record.get('version') in (2, 3, 4):
+        guest_evidence.sync_directory(args.vm); guest_evidence.sync_directory(args.work)
     moved = os.lstat(previous)
     if (moved.st_dev, moved.st_ino) != (record['original']['dev'], record['original']['ino']):
         move_exclusive(previous, original)
         raise Refused('Disk.img changed while publishing; it was moved back and nothing was published')
     try:
         move_exclusive(staged, original)
+        if record.get('version') in (2, 3, 4):
+            guest_evidence.sync_directory(args.vm); guest_evidence.sync_directory(args.work)
     except OSError as error:
         try:
             move_exclusive(previous, original)
@@ -432,9 +523,26 @@ def publish(args):
         verify_publication(args.work,record)
     except (ValueError,KeyError,OSError) as error:
         raise Refused('Undo provenance publication refused: ' + str(error)) from error
+    try:
+        proof = verify_guest_evidence(args.work, record, args.work / DISK)
+        if proof is not None:
+            if Path(os.environ['VPHONE_GUEST_EVIDENCE']) != args.work / guest_evidence.OPERATIONS:
+                raise Refused('guest evidence belongs to another transaction work directory')
+            plan = current_guest_plan()
+            if plan.raw_sha256 != proof['desiredSHA256'] or plan.context['vmDirectory'] != record['vm']:
+                raise Refused('qualified guest plan changed before publication')
+    except (Refused, ValueError, OSError, KeyError) as error:
+        record['failure'] = 'publish qualification: ' + describe(error)
+        save_record(args.work, record)
+        raise Refused(record['failure']) from error
     # Source/effect qualification can be lengthy; recheck disk holders and
     # original/staged identities after that work, before publication.
     run_checks('pre-publish-qualified', args, record)
+    if record.get('operation') is not None:
+        from patchers import guest_undo
+        request = guest_undo.request_for(args.work, record)
+        current, before, _ = guest_undo.check_origin(args.vm, request['origin'])
+        if current != before: raise Refused('guest origin changed before disk publication')
     # Keep the renames and the record write together; a signal received here
     # is delivered after the record is saved (finish also reconciles by identity).
     signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM, signal.SIGHUP})
@@ -455,6 +563,9 @@ def publish(args):
             record['failure'] = f'publish: {describe(error)}'
             save_record(args.work, record)
             raise Refused(record['failure'])
+        if record.get('operation') is not None:
+            from patchers.guest_undo import publish_origin
+            publish_origin(args.work, record)
         record['status'] = 'published'
         record['published_at'] = now()
         published = os.lstat(args.vm / DISK)
@@ -465,6 +576,9 @@ def publish(args):
             'published_is_staged': (published.st_dev, published.st_ino) == (record['staged']['dev'], record['staged']['ino']),
             'previous_is_original': (retained.st_dev, retained.st_ino) == (record['original']['dev'], record['original']['ino']),
         }
+        if record.get('version') in (2, 3, 4):
+            guest_evidence.sync_directory(args.vm)
+            guest_evidence.sync_directory(args.work)
         save_record(args.work, record)
     finally:
         signal.pthread_sigmask(signal.SIG_UNBLOCK, {signal.SIGINT, signal.SIGTERM, signal.SIGHUP})
@@ -505,8 +619,10 @@ def finish(args):
     record = load_record(work) or {'version': 1, 'id': f'{datetime.datetime.now(datetime.timezone.utc):%Y%m%dT%H%M%SZ}-{work.name.rsplit(".", 1)[-1]}',
                                     'vm': str(vm), 'status': 'failed', 'failure': 'no transaction record'}
     original, staged_id = record.get('original'), record.get('staged')
+    if record.get('vm') != str(vm): raise Refused('CFW finish journal belongs to another VM')
     staged, previous = work / DISK, work / PREVIOUS
     published = record.get('status') == 'published'
+    require_lock(vm)
     # Decide from identities, not only from the record: an interrupt can land
     # between a completed rename and the record write.
     if not published and staged_id and is_same(vm / DISK, staged_id):
@@ -518,11 +634,33 @@ def finish(args):
     if not published and original and is_same(previous, original) and not os.path.lexists(vm / DISK):
         move_exclusive(previous, vm / DISK)
         record['note'] = 'original moved back to Disk.img after an interrupted publication'
+    if published:
+        try:
+            if record.get('version') in (2, 3, 4) and sum(is_same(path, original) for path in (staged, previous)) != 1:
+                raise Refused('published guest has no unique retained original disk')
+            verify_guest_evidence(work, record, vm / DISK)
+        except Refused as error:
+            record['status'] = 'publication-uncertain'
+            record['failure'] = str(error)
+            save_record(work, record)
+            raise
     record['exit_code'] = args.exit_code
     if not published:
         record['status'] = 'failed'
         record['failure'] = record.get('failure') or f'install step exited with status {args.exit_code}'
     record['original_check'] = verify_original(args.fd, record)
+    if record.get('version') in (2, 3, 4) and record['original_check']['unchanged'] is False:
+        record['status'] = 'publication-uncertain'
+        record['failure'] = 'original disk content changed; retain both images and evidence'
+        save_record(work, record)
+        raise Refused(record['failure'])
+    if published and record.get('operation') is not None:
+        from patchers.guest_undo import publish_origin
+        try: publish_origin(work, record)
+        except (ValueError, OSError) as error:
+            record['status'] = 'publication-uncertain'; record['failure'] = str(error)
+            save_record(work, record)
+            raise Refused(str(error)) from error
     record['staged_retained'] = False
     if not published and os.path.lexists(staged):
         # Delete only the staged image: never the original's inode, never an
@@ -547,7 +685,17 @@ def finish(args):
         except FileNotFoundError:
             os.mkdir(history, 0o755)
         location = history / record['id']
+        if Path(record['id']).name != record['id'] or record['id'] in ('.', '..'):
+            raise Refused('invalid CFW history transaction ID')
+        if os.path.lexists(location): raise Refused('CFW history transaction already exists')
+        # The directory rename is the committed-history boundary. Persist all
+        # completion evidence before crossing it so a crash before the final
+        # informational write cannot strand an otherwise complete publication.
+        record['location'] = str(location)
+        save_record(work, record)
         os.rename(work, location)
+        guest_evidence.sync_directory(history)
+        guest_evidence.sync_directory(vm)
     record['location'] = str(location)
     save_record(location, record)
     unchanged = record['original_check']['unchanged']
@@ -564,24 +712,142 @@ def finish(args):
     return 0 if unchanged is not False else 3
 
 
+def committed_guest_evidence(vm, image=None, ignore_work=None):
+    """Resolve the unique sealed publication associated with the current disk."""
+    require_lock(vm)
+    image = image if image is not None else vm / DISK
+    for work in vm.glob('.cfw_disk.*'):
+        if work == ignore_work: continue
+        if work.is_symlink() or not work.is_dir(): raise Refused('unknown CFW staging entry')
+        pending = load_record(work)
+        if pending and (pending.get('status') == 'publication-uncertain' or is_same(image, pending.get('staged'))):
+            raise Refused('CFW publication requires finish/recovery before evidence inspection')
+    history = vm / HISTORY
+    if not os.path.lexists(history): return None
+    if history.is_symlink() or not history.is_dir(): raise Refused('invalid CFW history directory')
+    candidates = []
+    for archive in history.iterdir():
+        if archive.is_symlink() or not archive.is_dir(): raise Refused('invalid CFW history entry')
+        record = load_record(archive)
+        if not record or record.get('version') not in (3, 4) or not is_same(image, record.get('staged')): continue
+        if (record.get('status') != 'published' or record.get('id') != archive.name or record.get('vm') != str(vm)
+                or record.get('original_check', {}).get('unchanged') is not True):
+            raise Refused('guest history is not a completed publication')
+        value = verify_guest_evidence(archive, record, image, allow_runtime=True)
+        final = json.loads(guest_evidence.read(archive / guest_evidence.FINAL))
+        candidates.append((archive, record, value, final))
+    if len(candidates) > 1: raise Refused('ambiguous guest publication history')
+    return candidates[0] if candidates else None
+
+
+def inspect_guest(vm):
+    """Read archived publication evidence; never grant new execution or origin."""
+    committed = committed_guest_evidence(vm)
+    if committed is None: return None
+    _, record, value, final = committed
+    result = dict(schemaVersion=1, state='committed-effects', transactionID=record['id'],
+        generationID=value['generationID'], planDigest=value['planDigest'], desiredSHA256=value['desiredSHA256'],
+        imageSHA256=value['imageSHA256'], outputs=final['outputs'],
+        originalEvidence='observed-prior-state', originQualified=False, runtimeValidated=False)
+    if record['version'] == 4:
+        result.update(currentImageSHA256=value['currentImageSHA256'], runtimeImageChanged=value['runtimeImageChanged'])
+        if value['runtimeImageChanged']: result['state'] = 'committed-publication'
+    if record.get('operation') is not None:
+        from patchers.guest_undo import RECEIPTS
+        result['componentReceipts'] = json.loads(guest_evidence.read(committed[0]/RECEIPTS))
+    return result
+
+
+def preview_guest_undo(vm, generation, declarations):
+    from patchers.guest_undo import preview
+    try: return preview(vm, generation, declarations)
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        raise Refused('guest Undo preview: ' + describe(error)) from error
+
+
+def prepare_guest_undo(args):
+    from patchers.guest_undo import prepare
+    prepare(args)
+    return 0
+
+
+def apply_guest_undo(args):
+    from patchers.guest_undo import apply
+    apply(args)
+    return 0
+
+
+def recover(args):
+    """Reopen the recorded original without acquiring new write authority."""
+    require_lock(args.vm)
+    record = load_record(args.work)
+    if not record or record.get('version') not in (2, 3, 4) or record.get('vm') != str(args.vm):
+        raise Refused('recovery requires this VM provenance-qualified transaction')
+    if record.get('operation') is not None:
+        import plistlib
+        report = plistlib.loads(subprocess.check_output(['/usr/bin/hdiutil', 'info', '-plist']))
+        images = report.get('images')
+        paths = {str(args.vm/DISK), str(args.work/DISK), str(args.work/PREVIOUS)}
+        if (not isinstance(images, list) or any(not isinstance(item, dict) or not isinstance(item.get('image-path'), str) for item in images)
+                or any(str(Path(item['image-path']).resolve()) in paths for item in images)):
+            raise Refused('Undo recovery requires released image attachments; unmount and detach normally before recovery')
+    matches = [path for path in (args.vm / DISK, args.work / DISK, args.work / PREVIOUS)
+               if is_same(path, record.get('original'))]
+    if len(matches) != 1: raise Refused('recovery has no unique recorded original; retain all files')
+    fd = os.open(matches[0], os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        args.fd = fd
+        if verify_original(fd, record)['unchanged'] is not True:
+            raise Refused('recovery original differs; retain all files')
+        return finish(args)
+    finally: os.close(fd)
+
+
 def main(argv):
     parser = argparse.ArgumentParser(prog='cfw_disk_txn.py')
-    parser.add_argument('command', choices=('stage', 'check', 'publish', 'finish'))
-    parser.add_argument('--fd', type=int, required=True)
-    parser.add_argument('--owner-pid', type=int, required=True)
+    parser.add_argument('command', choices=('stage', 'check', 'seal', 'publish', 'finish', 'inspect', 'preview-undo', 'prepare-undo', 'apply-undo', 'recover'))
+    parser.add_argument('--fd', type=int)
+    parser.add_argument('--owner-pid', type=int)
     parser.add_argument('--phase', choices=('pre-mount', 'pre-install'))
     parser.add_argument('--exit-code', type=int, default=1)
     parser.add_argument('--retain-staged', action='store_true')
+    parser.add_argument('--guest-evidence', action='store_true', help='stage a v4 journal requiring provenance and sealed guest effects')
+    parser.add_argument('--generation', help='expected committed generation for read-only Undo preview')
+    parser.add_argument('--declaration', action='append', default=[], help='declaration to preview undo for; repeatable')
     parser.add_argument('vm', type=Path)
-    parser.add_argument('work', type=Path)
+    parser.add_argument('work', type=Path, nargs='?')
     args = parser.parse_args(argv)
     if args.command == 'check' and not args.phase:
         parser.error('check requires --phase')
+    if args.guest_evidence and args.command != 'stage': parser.error('--guest-evidence requires stage')
+    if args.command not in ('inspect', 'preview-undo', 'recover') and (args.fd is None or args.owner_pid is None or args.work is None):
+        parser.error('disk mutation commands require --fd, --owner-pid and work directory')
+    if args.command in ('inspect', 'preview-undo') and (args.fd is not None or args.owner_pid is not None or args.work is not None):
+        parser.error('read-only commands take only the VM directory')
+    if args.command in ('preview-undo', 'prepare-undo'):
+        if not args.generation or not args.declaration: parser.error('preview-undo requires --generation and --declaration')
+    elif args.generation is not None or args.declaration:
+        parser.error('--generation and --declaration require preview-undo or prepare-undo')
+    if args.command == 'recover' and (args.work is None or args.fd is not None):
+        parser.error('recover requires a work directory and opens the recorded original itself')
     try:
         args.vm = args.vm.resolve(strict=True)
+        if args.command == 'preview-undo':
+            print(json.dumps(preview_guest_undo(args.vm, args.generation, args.declaration), sort_keys=True))
+            return 0
+        if args.command == 'inspect':
+            value = inspect_guest(args.vm)
+            print(json.dumps(value if value is not None else {'schemaVersion': 1, 'state': 'unknown'}, sort_keys=True))
+            return 0
         args.work = args.work.resolve(strict=True)
-        return {'stage': stage, 'check': check, 'publish': publish, 'finish': finish}[args.command](args)
-    except (Refused, OSError) as error:
+        if args.work.parent != args.vm or not args.work.name.startswith('.cfw_disk.'):
+            raise Refused('CFW work directory must be private staging inside this VM')
+        if args.command == 'recover':
+            args.owner_pid = os.getpid()
+            return recover(args)
+        return {'stage': stage, 'check': check, 'seal': seal, 'publish': publish, 'finish': finish,
+                'prepare-undo': prepare_guest_undo, 'apply-undo': apply_guest_undo}[args.command](args)
+    except (Refused, OSError, ValueError, KeyError) as error:
         print(f'[-] CFW disk {args.command}: {describe(error)}', file=sys.stderr)
         return 1
 

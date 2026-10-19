@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-19T05:53:21.517763+00:00",
+  "firstDSCAttempt": {
+    "transaction": "20261019T023809Z-DTtoRGeo",
+    "status": "failed before DSC dispatcher; Cryptex copy completed",
+    "originalCheck": "dev/inode/size/mtime and 66 sampled windows unchanged; no full raw disk hash",
+    "operations": 10
+  },
+  "sourceObservation": "3 regular numbered .dylddata members; genuine dyld headers and mappings including execute permission; readonly cache SHA unchanged",
+  "correction": "keep target rules unchanged; exact numbered companions observed as inputs; bytes/identity/metadata/member-set changes refuse after dispatcher",
+  "fullPython": {
+    "tests": 922,
+    "skipped": 2,
+    "seconds": 237.452,
+    "exitCode": 0
+  },
+  "relatedSwift": {
+    "testFunctions": 12,
+    "identityCases": 8,
+    "releaseVerifier": true,
+    "companionIncluded": true,
+    "exitCode": 0
+  },
+  "bundle": "resource-only update to previously fully built app; resource manifest and outer signature refreshed; bundle/native closure/guest manifests/entitlements verified",
+  "vmCDHash": "89b70a253cad2adea133b3e875519afaf72c5d17",
+  "vmBytesUnchanged": true,
+  "hostAllowance": "final hash explicitly approved; scoped helper30267; allowAll false; no paths; no persistent allowlist loaded/modified; current and retained VM argument parsing observed exit64 for invalid option",
+  "retry": {
+    "bundle": ".build/t32-dylddata-final.app",
+    "execSession": 82810,
+    "cliPID": 10804,
+    "osascriptPID": 11566,
+    "status": "native administrator authentication requested; no new disk journal at last observation"
+  },
+  "acceptedAtNewTarget": false,
+  "pending": [
+    "real v4 DSC CFW publication",
+    "immediate installed member/code-page proof",
+    "first boot and API normal on/off/on",
+    "actual DSC suffix Undo and restored original/code-page proof",
+    "post-Undo API normal on/off/on"
+  ],
+  "sourceFingerprints": {
+    "scripts/patchers/cfw.py": "8a1f99bbe89a7084739cd26c466cd67ef280f502a13bd10cf9bead2062834d9b",
+    "tests/test_undo_provenance.py": "cdbdafcf3f87c1a706e3c1adb21c7945e0daaadd6c18fc3a1681456531774d74",
+    "tests/test_patch_plan_gate.py": "54f2291f0eeaaf20ce3e49bd5f9905f37b40c991aca9d4808433414905594d15",
+    "tests/cfw_identity_bridge_fixture.py": "59e18807535f4fe4ad0610ec5c565a2df2b2449fdece0245b0dad8fceaa1934e",
+    "research/upstream_integration_2026-10-15/tools/start_scoped_amfidont.py": "b447e36120e1686706ae0c4ac2c2827637d81c6b0083c606686351b99812533b",
+    "research/upstream_integration_2026-10-15/tools/verify_dsc_publication.py": "b4f78ec1ceae690af4b0b51f1c959d7d62379c3f738ff854597126f916fe5240",
+    "research/upstream_integration_2026-10-15/tools/verify_first_boot.py": "2da90c8a738bcccfe766ae0907a6340fbc678cf378b5f61202515900a639ec0b",
+    "research/upstream_integration_2026-10-15/tools/verify_post_boot_cfw.py": "9122d3e6b46c36633ef1747db5d9260dadd59a62c8bf9804a6b849d93cabca28",
+    "research/upstream_integration_2026-10-15/tools/verify_legacy_vm_boot.py": "001940d5f882ef64a20b5b51e9738d14a7b604817ddda64337b68f6d7c2a3a16"
+  },
+  "files": {
+    "attachment.plist": {
+      "bytes": 1122,
+      "sha256": "15250d498086fa7309f8620959810960e1934028720f2708c7a20d7b5af24930"
+    },
+    "bundle-check.log": {
+      "bytes": 1387,
+      "sha256": "55422cd5c1b265402ed481b9dcd61f13397b11925d28104db652a3f46a74a6b5"
+    },
+    "bundle-parity.json": {
+      "bytes": 323,
+      "sha256": "f7b2d56b2d35b45653b2cf81f68e4d6a7490b8d1721f8f09ca7b225fecb03912"
+    },
+    "dsc-v4-cfw-install.log": {
+      "bytes": 967,
+      "sha256": "eec87da83575e78c8762abc5640f3a33189de088785c6d112fcdce062112286e"
+    },
+    "existing-vms-before-commit.json": {
+      "bytes": 2987,
+      "sha256": "6a5580778e411012ca15b963cc39f69085465e7a5ab5f960c2ec6e4b36de4920"
+    },
+    "final-amfi-launcher.log": {
+      "bytes": 79,
+      "sha256": "f4d4d9b90dbd0f38e54ab84b9f5cd7ae9bb4565271d325f23a29e3502b1c524f"
+    },
+    "final-vm-argument-validation.json": {
+      "bytes": 961,
+      "sha256": "9b86aa6fbb2052220d60076c717886061db6b7fd52225b8899fc0afb4ac39dc7"
+    },
+    "final-vm-execution.json": {
+      "bytes": 449,
+      "sha256": "ef069f7e8c563bd84e672c313a229f91619b1a15435b30ab89b3a4fd5c0ce8d0"
+    },
+    "first-failed-guest-changes.jsonl": {
+      "bytes": 1068672,
+      "sha256": "2b9703adec5bd2583b98593ec6d61086c73bc86604e5a9c94a994b5da702dc30"
+    },
+    "first-failed-transaction.json": {
+      "bytes": 1632,
+      "sha256": "6732671100541bffe0938f7821fd0be7ffc939e12fcbe3217dd5cb6000002223"
+    },
+    "green-first.log": {
+      "bytes": 101,
+      "sha256": "96a0a6a6540eabe6991f2ad50daaadcad8b8980fc281623005c0284d67b5a193"
+    },
+    "python-full.log": {
+      "bytes": 153120,
+      "sha256": "e451629e6f485bd74cf0d227d8f6d3c2a032abbdc3423515798f560bf00f3c45"
+    },
+    "red.log": {
+      "bytes": 1036,
+      "sha256": "e5ea14e27d0a8c65a75ff35ba728bf0988b4697c7baf928a58a664595cfc61e5"
+    },
+    "related.log": {
+      "bytes": 5945,
+      "sha256": "4bf4017291f8c9508c90c0003f20dc7f81f79e5aa77cf881d46e042d8209d6f9"
+    },
+    "resource-record.log": {
+      "bytes": 1176,
+      "sha256": "1d2f0c2c8802fb9cf5f69b49bec7807c1b4de1cae0227a0e1eefb5aaebe6866a"
+    },
+    "scoped-amfidont-89b70a25.log": {
+      "bytes": 1092,
+      "sha256": "2176123b379e599560d367f36885f309fed39b374797cd4110daaeba5515674a"
+    },
+    "scoped-helper.py": {
+      "bytes": 1427,
+      "sha256": "b447e36120e1686706ae0c4ac2c2827637d81c6b0083c606686351b99812533b"
+    },
+    "source-inspection.log": {
+      "bytes": 3095,
+      "sha256": "f4e11086f98049578b5997c792c8777720d230c644c231e046e71f7e85b64dde"
+    },
+    "source-result.json": {
+      "bytes": 4262,
+      "sha256": "2cdba4347eabd6e107b4927622a5efc1d3ad5156bce79515b814bb7ae04c8f77"
+    },
+    "swift-release-verifier.log": {
+      "bytes": 86298,
+      "sha256": "667548ab42ec867e25ec026f2948c81d37becebe8515814e99ed44c469ef4346"
+    },
+    "volume.plist": {
+      "bytes": 3117,
+      "sha256": "0383bfb4416ae9a18651ef91f8a04b75f21961ff28df2affe7e1df7332ea008a"
+    }
+  },
+  "oldVMs": "listed metadata and recorded small-file SHA unchanged before commit; no full disk hash"
+}

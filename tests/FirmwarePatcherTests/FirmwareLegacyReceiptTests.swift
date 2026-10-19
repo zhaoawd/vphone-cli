@@ -69,6 +69,58 @@ extension FirmwareLegacyReceiptTests {
 }
 
 extension FirmwareLegacyReceiptTests {
+    @Test func changedDesiredPlanPreservesEvidenceOfActualCommittedPlan() throws {
+        let f = try FirmwareComponentUndoTests().committed()
+        let old = try #require(try FirmwareComponentReceipt.readCommitted(in: f.vm))
+        guard case .ready(let desired) = try FirmwareDesiredPlanStore.read(in: f.vm) else { throw POSIXError(.EINVAL) }
+        let plan = try FirmwarePipeline(vmDirectory: f.vm, variant: .dev, verbose: false).resolvedPlan()
+        #expect(plan != f.plan)
+        let pending = try FirmwareDesiredPlanStore.prepare(in: f.vm, plan: plan, generation: f.generation)
+        _ = try FirmwareDesiredPlanStore.publish(pending, expectedSHA256: desired.sha256)
+        #expect(try FirmwareComponentReceipt.readCommitted(in: f.vm) == old)
+        let snapshot = try FirmwareComponentUndo.load(in: f.vm, component: "avpbooter", generationID: f.generation.id)
+        #expect(try snapshot.restoring(declarations: Set(snapshot.receipt.effects.map(\.declarationID))).data == Data([0]))
+    }
+
+    @Test(arguments: ["missing", "corrupt"])
+    func absentOrCorruptArchivedProducerReportCannotAuthorizeReceipt(_ fault: String) throws {
+        let f = try FirmwareComponentUndoTests().committed()
+        let history = f.vm.appendingPathComponent(".firmware-history")
+        let archive = try #require(FileManager.default.contentsOfDirectory(at: history, includingPropertiesForKeys: nil).first)
+        let report = archive.appendingPathComponent("report.json")
+        if fault == "missing" { try FileManager.default.removeItem(at: report) }
+        else { try Data("broken".utf8).write(to: report) }
+        #expect(throws: (any Error).self) { try FirmwareComponentReceipt.readCommitted(in: f.vm) }
+    }
+
+    @Test func receiptCannotInventUndoOriginalAbsentFromSavedProducerReport() throws {
+        let f = try FirmwareComponentUndoTests().committed()
+        let live = f.vm.appendingPathComponent(".firmware-component-receipts.json")
+        var publication = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: live)) as? [String: Any])
+        let transactionID = try #require(publication["transactionID"] as? String)
+        var records = try #require(publication["records"] as? [[String: Any]])
+        var effects = try #require(records[0]["effects"] as? [[String: Any]])
+        var record = try #require(effects[0]["record"] as? [String: Any])
+        record["originalBytes"] = Data([9]).base64EncodedString()
+        effects[0]["record"] = record; records[0]["effects"] = effects; publication["records"] = records
+        let bytes = try JSONSerialization.data(withJSONObject: publication, options: .sortedKeys)
+        let archive = f.vm.appendingPathComponent(".firmware-history/" + transactionID)
+        try bytes.write(to: live)
+        try bytes.write(to: archive.appendingPathComponent("component-receipts.json"))
+        let journalFile = archive.appendingPathComponent("journal.json")
+        var journal = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: journalFile)) as? [String: Any])
+        let digest = DeclarationExecutionEvidence.digest(bytes)
+        journal["componentReceiptsSHA256"] = digest
+        var metadata = try #require(journal["metadata"] as? [[String: Any]])
+        let index = try #require(metadata.firstIndex { $0["name"] as? String == ".firmware-component-receipts.json" })
+        metadata[index]["output"] = digest; journal["metadata"] = metadata
+        try JSONSerialization.data(withJSONObject: journal).write(to: journalFile)
+        // Receipt hashes and current output still agree. The immutable producer
+        // report is the remaining evidence that this claimed original is false.
+        #expect(throws: (any Error).self) { try FirmwareComponentReceipt.readCommitted(in: f.vm) }
+        #expect(try Data(contentsOf: f.file) == Data([1]))
+    }
+
     @Test func diskImportPreservesRawAndDoesNotTreatUnreadableAsMissing() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)

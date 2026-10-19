@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "source": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/Disk.img",
+  "clone": "/Users/kolar/github/vphone-cli/.build/t32-post-snapshot-mount-regression/Disk.img",
+  "scope": "native isolated clone; plan private-path boundary replaced, all mount queries real",
+  "phases": [
+    {
+      "readOnly": true,
+      "volumes": {
+        "system": {
+          "DeviceIdentifier": "disk19s1",
+          "MountPoint": "/Users/kolar/github/vphone-cli/.build/t32-post-snapshot-mount-regression/mnt1",
+          "Mounted": null,
+          "WritableVolume": false,
+          "ReadOnlyVolume": null
+        },
+        "hardware": {
+          "DeviceIdentifier": "disk19s3",
+          "MountPoint": "/Users/kolar/github/vphone-cli/.build/t32-post-snapshot-mount-regression/mnt3",
+          "Mounted": null,
+          "WritableVolume": false,
+          "ReadOnlyVolume": null
+        }
+      },
+      "inventoryMountpoints": {
+        "disk19s1": null,
+        "disk19s2": null,
+        "disk19s3": null,
+        "disk19s4": null,
+        "disk19s5": null,
+        "disk19s6": null,
+        "disk19s7": null
+      }
+    }
+  ],
+  "state": "passed",
+  "snapshotFlip": {
+    "exitCode": 0,
+    "stdout": "detected snapshot: com.apple.os.update-8AAB8DBA5C8F1F756928411675F4A892087B04559CFB084B9E400E661ABAD119\nrecords: 2 in 1 block(s): ['0xfbffff000']\nblock @0xfbffff000: renamed 2 record(s), checksum fixed\ndone: root snapshot renamed -> orig-fs.disabled.rn-* (VM will boot the live volume)\n",
+    "stderr": ""
+  },
+  "sourceIdentityUnchanged": true,
+  "cleanup": {
+    "exitCode": 0,
+    "stdout": "\"disk18\" ejected.\n",
+    "stderr": "hdiutil: WARNING: 'hdiutil detach ...' is deprecated. Please use 'diskutil eject ...' instead.\n"
+  }
+}

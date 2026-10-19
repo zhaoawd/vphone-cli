@@ -11,6 +11,44 @@ from patchers import component_effects as effects
 
 
 class ComponentEffectsTests(unittest.TestCase):
+    def signing_copy_chain(self, root, *, explicit_mode=False):
+        from tests.test_component_signatures import signed_macho
+        source, staged, target, store = [root/name for name in ('source','staged','target','proofs')]
+        source.write_bytes(signed_macho(b'original'));source.chmod(0o644)
+        target.write_bytes(signed_macho(b'previous'));target.chmod(0o755)
+        staged.write_bytes(source.read_bytes());staged.chmod(0o644)
+        copied=effects.capture_copy(source,staged,store,before={'kind':'missing'})
+        before=effects.capture_input(staged,store)
+        staged.write_bytes(signed_macho(b'Original'))
+        patched=effects.capture_change(before,staged,store)
+        chain=[copied,patched]
+        if explicit_mode:
+            before=effects.capture_input(staged,store);staged.chmod(0o600)
+            changed=effects.capture_change(before,staged,store);changed['command']='chmod'
+            chain.append(changed)
+        before=effects.capture_input(staged,store)
+        staged.write_bytes(signed_macho(b'Original',entitlements={'resigned':True}))
+        signed=dict(schemaVersion=1,operation='sign',before=before,
+                    after=effects.capture_input(staged,store),projection={'kind':'signature'})
+        before=effects.capture_input(target,store)
+        target.write_bytes(staged.read_bytes())
+        published=effects.capture_copy(staged,target,store,before=before)
+        return chain+[signed,published],target,store
+
+    def test_signing_copy_transport_keeps_destination_metadata(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proofs,target,store=self.signing_copy_chain(Path(tmp))
+            effects.verify(proofs,target,store)
+            self.assertEqual(target.stat().st_mode & 0o777,0o755)
+            target.chmod(0o700)
+            with self.assertRaises(ValueError):effects.verify(proofs,target,store)
+
+    def test_signing_copy_transport_preserves_explicit_metadata_requirements(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proofs,target,store=self.signing_copy_chain(Path(tmp),explicit_mode=True)
+            with self.assertRaisesRegex(ValueError,'required metadata effect was overwritten'):
+                effects.verify(proofs,target,store)
+
     def test_disjoint_binary_effects_survive_final_readback(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); file = root/'binary'; store = root/'proofs'

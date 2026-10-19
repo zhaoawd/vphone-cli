@@ -108,6 +108,9 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
               errno == ENOENT else {
             throw VPhoneMachineBindingError("Pending firmware transaction; component origins are unavailable until recovery")
         }
+        guard !(try FileManager.default.contentsOfDirectory(atPath: machine.path)).contains(where: { $0.hasPrefix(".cfw_disk.") }) else {
+            throw VPhoneMachineBindingError("Pending CFW disk transaction; component origins are unavailable until recovery")
+        }
         return directory
     }
 

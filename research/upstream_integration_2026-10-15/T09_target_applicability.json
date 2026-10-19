@@ -10,7 +10,8 @@
     "uncoveredGuest": "Outside variant membership the resolver does not emit a guest entry; excludedByVariant in this table records the membership decision.",
     "presets": "Fixed target T09_declaration_delta.json preset sets before version gates; descriptive only, never imported as local defaults.",
     "migration": "117 dotted aliases, the intermediate paravirt rename and the released ProMotion rename. Canonical IDs are current-target IDs; preserve explicit intent and reject duplicate or conflicting aliases.",
-    "fixed_target_revision_note": "Preserve all 140 unchanged implementation/mode/version/default decisions; recognize ProMotion rename while keeping it disabled/unimplemented; refuse seven newly declared unimplemented capabilities."
+    "fixed_target_revision_note": "Preserve all 140 unchanged implementation/mode/version/default decisions; recognize ProMotion rename while keeping it disabled/unimplemented; refuse seven newly declared unimplemented capabilities.",
+    "bootx_20261018_amendment": "The iBEC bootx local version rule was amended after real 26.1 publication failure; the prior decisions are retained in evidence/T32-T33-new-vm-20261018/T09-before-bootx-amendment.json. The matrix still uses cloudOS >=26.4, so its dispositions remain unchanged."
   },
   "decisions": [
     {
@@ -563,7 +564,7 @@
     {
       "id": "ibec-boot-bootx_precondition",
       "decision": "preserveLocal",
-      "reason": "Preserve the existing local binding, mode membership, rule and opt-in. Fixed-target declaration identity is established; upstream binary equivalence is not established.",
+      "reason": "2026-10-18: real cloudOS 26.1/23B85 iBEC lacks the 26.4+ bootx construct. The optional executable step contradicted the always-required declaration and publication failed. Require both step and declaration only on cloudOS >=26.4, independently of Frida opt-in; retain failure on absent or ambiguous modern anchors. No instruction-discovery or replacement change.",
       "upstream": {
         "title": "iBEC bootx precondition",
         "applicability": ".always (default)",
@@ -591,7 +592,7 @@
         ],
         "optIn": "none",
         "required": true,
-        "versionRule": "always",
+        "versionRule": "cloudOSIs26_4OrNewer",
         "upstreamIDs": [
           "ibec-boot-bootx_precondition"
         ],
@@ -603,7 +604,10 @@
       },
       "localEvidence": [
         "sources/FirmwarePatcher/IBoot/IBootPatcher.swift",
-        "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift"
+        "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+        "tests/FirmwarePatcherTests/BootxVersionGateTests.swift",
+        "research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md",
+        "research/upstream_integration_2026-10-15/evidence/T32-T33-new-vm-20261018/patch-failed-report.json"
       ],
       "indivisibleWith": [],
       "applicability": {
@@ -637,6 +641,13 @@
           "27": "selected",
           "other": "selected"
         }
+      },
+      "localAmendment": {
+        "date": "2026-10-18",
+        "field": "versionRule",
+        "before": "always",
+        "after": "cloudOSIs26_4OrNewer",
+        "reason": "Reconcile source-version applicability between the executable step and declaration after real publication refusal; original decision file retained as evidence."
       }
     },
     {

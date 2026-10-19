@@ -9,8 +9,8 @@ import subprocess
 from . import plan_gate as gate
 
 
-def file_sha(path):
-    return gate.snapshot(path).sha256
+def file_sha(path, *, readonly_source=False):
+    return gate.snapshot(path,readonly_source=readonly_source).sha256
 
 
 def observation(path):
@@ -166,13 +166,13 @@ def refresh(plan, cache):
     stamp.write_bytes(gate.canonical(binding))
 
 
-def tree(path):
+def tree(path, *, readonly_source=False):
     from .guest_write import walk
     root=Path(path);result={}
     for entry in walk(root):
         relative=str(entry.relative_to(root))
         if entry.is_symlink(): result[relative]={'kind':'link','link':os.readlink(entry)}
         elif entry.is_dir(): result[relative]={'kind':'directory'}
-        elif entry.is_file(): result[relative]={'kind':'file','sha256':file_sha(entry)}
+        elif entry.is_file(): result[relative]={'kind':'file','sha256':file_sha(entry,readonly_source=readonly_source)}
         else: raise ValueError('unsupported Cryptex source member')
     return result

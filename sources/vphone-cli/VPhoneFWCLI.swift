@@ -10,7 +10,8 @@ struct VPhoneFWCommand: ParsableCommand {
         subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWGenerationPrepareCommand.self, VPhoneFWPatchCommand.self,
                       VPhoneFWRecordCommand.self, VPhoneFWInspectCommand.self, VPhoneFWPlanCommand.self,
                       VPhoneFWCacheCommand.self, VPhoneFWSelectionPreviewCommand.self,
-                      VPhoneFWSelectionMigrateCommand.self, VPhoneFWDesiredPlanCommand.self])
+                      VPhoneFWSelectionMigrateCommand.self, VPhoneFWDesiredPlanCommand.self,
+                      VPhoneFWReceiptsCommand.self])
 }
 
 // MARK: - catalog

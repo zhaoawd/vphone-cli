@@ -31,6 +31,53 @@ def sha256(path):
 
 
 class DiskTransactionTests(HostDriverFixture):
+    def test_post_snapshot_readback_and_seal_precede_publish_and_history_is_readable(self):
+        vm, digest, inode = self.make_disk()
+        _, process = self.start(REAL_LSOF='1')
+        rc, output = self.finish(process)
+        self.assertEqual(rc, 0, output)
+        calls = self.calls()
+        first = calls.index('verify-final')
+        snapshot = calls.index('apfs_snap_rename.py')
+        readonly = calls.index('-nomount -readonly')
+        final = calls.index('verify-final', first + 1)
+        self.assertLess(first, snapshot); self.assertLess(snapshot, readonly); self.assertLess(readonly, final)
+        self.assertLess(final, calls.index(' seal ')); self.assertLess(calls.index(' seal '), calls.index(' publish '))
+        result = subprocess.run([sys.executable, str(ROOT / 'scripts/vm_lock.py'), str(vm), 'cfw-record', '--',
+            sys.executable, str(ROOT / 'scripts/cfw_disk_txn.py'), 'inspect', str(vm)], capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        evidence = json.loads(result.stdout)
+        self.assertEqual(evidence['state'], 'committed-effects')
+        self.assertFalse(evidence['originQualified']); self.assertFalse(evidence['runtimeValidated'])
+        self.assertEqual(evidence['imageSHA256'], sha256(vm / 'Disk.img'))
+        original = next(vm.glob('.cfw-history/*/Disk.img'))
+        self.assertEqual((sha256(original), original.stat().st_ino), (digest, inode))
+
+    def test_post_snapshot_readback_failure_does_not_publish(self):
+        vm, digest, inode = self.make_disk()
+        _, process = self.start(FAIL_POST_SNAPSHOT_EFFECT='1')
+        rc, output = self.finish(process)
+        self.assertNotEqual(rc, 0, output)
+        self.assertIn('apfs_snap_rename.py', self.calls())
+        self.assertNotIn(' publish ', self.calls())
+        self.assert_original_intact(vm, digest, inode)
+        self.assert_failed_record(vm)
+
+    def test_failed_finish_does_not_print_complete_or_release_recovery_boundary(self):
+        vm, digest, inode = self.make_disk()
+        _, process = self.start(CFW_TXN_FAULTS='corrupt-after-publish')
+        rc, output = self.finish(process)
+        self.assertNotEqual(rc, 0, output)
+        self.assertNotIn('host-mode CFW install complete', output)
+        self.assertIn('finalization is incomplete', output)
+        work = next(vm.glob('.cfw_disk.*'))
+        self.assertEqual(json.loads((work / 'transaction.json').read_bytes())['status'], 'publication-uncertain')
+        self.assertEqual((sha256(work / 'Disk.img'), (work / 'Disk.img').stat().st_ino), (digest, inode))
+        self.assertEqual((vm / 'Disk.img').read_bytes()[512:523], b'CFW-PATCHED')
+        result = subprocess.run([sys.executable, str(ROOT / 'scripts/vm_lock.py'), str(vm), 'boot', '--', '/usr/bin/true'], capture_output=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(b'pending CFW disk transaction', result.stderr)
+
     def make_disk(self, name='vm'):
         vm = self.root / name
         vm.mkdir(exist_ok=True)
@@ -93,8 +140,12 @@ class DiskTransactionTests(HostDriverFixture):
                 self.assertEqual(list(vm.glob('.cfw_disk.*')), [])
                 record = self.records(vm)[0]
                 self.assertEqual(record['status'], 'published')
-                self.assertEqual(record['version'],2)
+                self.assertEqual(record['version'],4)
+                self.assertIs(record['runtimeImageEvidenceRequired'], True)
                 self.assertEqual(record['provenanceMode'],'required')
+                self.assertIs(record['guestEvidenceRequired'], True)
+                self.assertEqual(len(record['guestEvidenceSHA256']), 64)
+                self.assertEqual(len(record['undoProvenance']['indexSHA256']), 64)
                 self.assertEqual(record['method'], 'clone')
                 self.assertTrue(record['original_check']['unchanged'])
 
@@ -308,7 +359,9 @@ class InterruptedPublicationTests(unittest.TestCase):
         spec.loader.exec_module(self.txn)
 
     def run_txn(self, command, *extra):
-        args = [sys.executable, str(ROOT / 'scripts/vm_lock.py'), str(self.vm), 'test', '--', sys.executable,
+        # Existing-journal replay uses the explicit recovery operation; ordinary
+        # boot/write operations must now reject this retained work directory.
+        args = [sys.executable, str(ROOT / 'scripts/vm_lock.py'), str(self.vm), 'cfw-record', '--', sys.executable,
                 str(ROOT / 'scripts/cfw_disk_txn.py'), command, '--fd', str(self.fd), '--owner-pid', str(os.getpid()),
                 *extra, str(self.vm), str(self.work)]
         env = {k: v for k, v in os.environ.items() if k != 'VPHONE_VM_LOCK_FD'}
