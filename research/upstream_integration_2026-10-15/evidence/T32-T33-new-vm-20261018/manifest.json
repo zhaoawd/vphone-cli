@@ -25,11 +25,12 @@
     "sign-prefix copy metadata fix; full Python908 (2 skipped), signed build and 4-resource parity passed"
   ],
   "pending": [
-    "real corrected Undo publication",
-    "restored original and6885 code pages before boot",
-    "post-Undo API normal boots and historical reader",
-    "same-generation reapplication and normal boots for DSC effect on/off/on",
-    "Mach-O/Preboot/arbitrary middle replay and trusted guest origin incomplete"
+    "complete rebaseline CFW installation",
+    "Undo before the new publication is booted",
+    "restored original and6885 pages; post-Undo normal boots andhistorical reader",
+    "same-generation reapplication andboots for DSC on/off/on",
+    "post-boot Undo with changed retained AA.gl remains refused; no permission to infer retained effects",
+    "Mach-O/Preboot/arbitrary middle replay andtrusted guest origin incomplete"
   ],
   "validation_limitations": [
     "Full make test_swift failed from unchanged APIProxy XCTest line 312; isolated test passed. Cause unknown.",
@@ -709,6 +710,66 @@
     "recover-first.log": {
       "bytes": 137,
       "sha256": "ca8c458e3d5674bf75dbed54ccade91e635b2810ec47f8dc358a641a140de04b"
+    },
+    "retained-drift-20261019/failed-journal/guest-changes.jsonl": {
+      "bytes": 1883102,
+      "sha256": "84a95e44c705ccd141cfb3abb17797f4c7679e8081641d4e95f3a7b5c25513d6"
+    },
+    "retained-drift-20261019/failed-journal/guest-undo-applied.json": {
+      "bytes": 324,
+      "sha256": "1fe7c0f109b1b00682d5b9fa916edb2dc678060a0d45faf1e0b129800a50231c"
+    },
+    "retained-drift-20261019/failed-journal/guest-undo-request.json": {
+      "bytes": 1690,
+      "sha256": "1054700401108d8044705419763fe20e1b791fba891cfe7d7820a9722ac26829"
+    },
+    "retained-drift-20261019/failed-journal/transaction.json": {
+      "bytes": 2076,
+      "sha256": "4e7dbeaf826a13a2c3bc164db35616cbb452d9ffa62e5b103ae608df3be063d7"
+    },
+    "retained-drift-20261019/final-mismatch-red.log": {
+      "bytes": 714,
+      "sha256": "dace48a63a61f311c1afffc7b8d5e24bcd6d50e4c1d559447f27fec04a82c145"
+    },
+    "retained-drift-20261019/inspect-retained.py": {
+      "bytes": 2814,
+      "sha256": "557766f2310af832e87eded97ccebfb938c492588a4371e30bbbe569ef753b27"
+    },
+    "retained-drift-20261019/manifest.json": {
+      "bytes": 4888,
+      "sha256": "ed6f49f3122fa33627ae71b1f4e7addbed953feb88404efe3be63cc28c424f60"
+    },
+    "retained-drift-20261019/observe-retry.py": {
+      "bytes": 754,
+      "sha256": "a7abc2b0eabb7a1ce2a11ee1b06bb5c1670cfb41876faef2ddda689b8d0a57bf"
+    },
+    "retained-drift-20261019/readonly/attach.plist": {
+      "bytes": 3856,
+      "sha256": "6af3cd8b969d6328afa304c1dcdfe89efac9f09420954069ac30e23d52f78b1d"
+    },
+    "retained-drift-20261019/readonly/result.json": {
+      "bytes": 2085846,
+      "sha256": "e58608ef98061a37dcf16371f7e20b0faaaeb116d34ca9c56e229f4110a2dfab"
+    },
+    "retained-drift-20261019/repro-final-mismatch.py": {
+      "bytes": 1393,
+      "sha256": "293f3742c38281d1d1034ac860215be0aa3ef82844786486113d9f8e78c4905d"
+    },
+    "retained-drift-20261019/retained-drift-related.log": {
+      "bytes": 130,
+      "sha256": "388eaeb77d551a58696860dc947fd7c0d98c2b88cf32ee31adbe63e5a5ed850e"
+    },
+    "retained-drift-20261019/retained-drift-test.log": {
+      "bytes": 98,
+      "sha256": "76e4dd0da49684bfecf1d0b1e43bef5ffc0afd07b37a4a33fcb60d2406e7b8d3"
+    },
+    "retained-drift-20261019/retry-processes.jsonl": {
+      "bytes": 10233,
+      "sha256": "01df9e573591542dbe53f074673adc60644bb460d2bde6e0eca5538f95482f9e"
+    },
+    "retained-drift-20261019/undo-retry.log": {
+      "bytes": 531,
+      "sha256": "c5f23d3f16767dbff71cfb60b5585bbb9a7c4a3d5cc286ac3a40aacea531648f"
     },
     "runtime-boundary-20261019/api-two-boots/boot-1/SystemVersion.plist": {
       "bytes": 570,
@@ -1438,7 +1499,9 @@
     "evidence": "volume-state-fix/dsc-restore-result.json",
     "normal_boot": true,
     "cfw": true,
-    "undo": false
+    "undo": false,
+    "next": "rebaseline full CFW, then preboot Undo, post-Undo boots, andsame-generation reapplication",
+    "accepted": false
   },
   "runtime_boundary": {
     "schemaVersion": 1,
@@ -1654,7 +1717,7 @@
     },
     "files": "dsc-companions-20261019/manifest.json"
   },
-  "latest_evidence": "undo-allocation-20261019/manifest.json",
+  "latest_evidence": "retained-drift-20261019/manifest.json",
   "dsc_publication": {
     "schemaVersion": 1,
     "recordedAt": "2026-10-19T07:37:01.964725+00:00",
@@ -1833,5 +1896,76 @@
       "tests/test_guest_undo_transaction.py": "ad6ec0d2f250d89908f998c4b5ad408232b761325d10b11ba046d815d3878b74"
     },
     "files": "undo-allocation-20261019/manifest.json"
+  },
+  "retained_drift": {
+    "schemaVersion": 1,
+    "recordedAt": "2026-10-19T08:41:37.136271+00:00",
+    "vm": "vm-t32-t33-dsc-20261018",
+    "generation": "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+    "transaction": "20261019T081934Z-JTYX6fft",
+    "exitCode": 1,
+    "undo": {
+      "applied": true,
+      "fullCodePagesChecked": true,
+      "postWriteWritableMountRecheckPassed": true,
+      "firstFinalReadonlyCheck": "refused: final transported member differs from recorded output",
+      "published": false,
+      "originalCheck": {
+        "checked_at": "2026-10-19T08:35:00Z",
+        "detail": "dev/inode/size/mtime equal; sampled:66 SHA-256 equal",
+        "unchanged": true
+      },
+      "originalCheckScope": "dev/inode/size/mtime and66 sampled windows; no full image hash at failed cleanup"
+    },
+    "readonlyInspection": {
+      "outputsChecked": 4686,
+      "readErrors": 0,
+      "contentTypeLinkAndModeDifferences": [
+        {
+          "target": "hardware:/AA.gl",
+          "expected": {
+            "kind": "file",
+            "mode": 384,
+            "sha256": "e221f140369bf7b0b540793d068f72c7d7d086357aa70c9bd0ace7e7da1c6dd0"
+          },
+          "actual": {
+            "mode": 384,
+            "kind": "file",
+            "sha256": "4779643ee5398bcbea5eb5056e3966bccd31aa21fbb33ee2e5e5ad0ae1b31d9a"
+          }
+        }
+      ],
+      "uidGidQualified": false,
+      "uidGidLimitation": "automatic user mount did not preserve owner view; observations of uid/gid are not guest owner evidence",
+      "normalDetach": true,
+      "imageIdentityUnchanged": true
+    },
+    "interpretation": "AA.gl differs from the preserved publication; strict retained-effect final equality refuses this current state. The time and cause of this file change were not observed directly. No production guard was relaxed.",
+    "regression": {
+      "command": ".venv/bin/python3 -m unittest tests.test_component_effects",
+      "tests": 31,
+      "seconds": 2.563,
+      "exitCode": 0,
+      "case": "copy-only hardware content and mode drift refuse final transport"
+    },
+    "rebaseline": {
+      "state": "native administrator authentication pending",
+      "cliPID": 13075,
+      "osascriptPID": 13648,
+      "execSession": 55770,
+      "scope": "same independent VM andgeneration; complete CFW install, then immediate preboot Undo, followed by boots and reapplication"
+    },
+    "acceptedAtNewTarget": false,
+    "runtimeEffectsValidated": false,
+    "graphicsValidated": false,
+    "pending": [
+      "complete rebaseline CFW installation",
+      "Undo before the new publication is booted",
+      "restored original and6885 pages; post-Undo normal boots andhistorical reader",
+      "same-generation reapplication andboots for DSC on/off/on",
+      "post-boot Undo with changed retained AA.gl remains refused; no permission to infer retained effects",
+      "Mach-O/Preboot/arbitrary middle replay andtrusted guest origin incomplete"
+    ],
+    "files": "retained-drift-20261019/manifest.json"
   }
 }

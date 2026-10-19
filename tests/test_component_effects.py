@@ -11,6 +11,29 @@ from patchers import component_effects as effects
 
 
 class ComponentEffectsTests(unittest.TestCase):
+    def test_retained_hardware_copy_drift_refuses_final_transport(self):
+        from types import SimpleNamespace
+        from patchers import component_transport as transport
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); hardware = root/'hardware'; hardware.mkdir()
+            source, target, store = root/'source.gl', hardware/'AA.gl', root/'proofs'
+            source.write_bytes(b'published hardware member')
+            target.write_bytes(source.read_bytes()); target.chmod(0o600)
+            proof = effects.capture_copy(source, target, store, before={'kind':'missing'})
+            proof['command'] = 'cp'
+            row = dict(path=str(target), target='hardware:/AA.gl', phase='guest',
+                       declarationID='hardware-copy', effect=proof)
+            def verify():
+                return transport.verify([row], {'hardware':hardware}, store, SimpleNamespace(context={}))
+            self.assertEqual(verify()[0]['state'], proof['after'])
+            for change in ('bytes', 'mode'):
+                with self.subTest(change=change):
+                    target.write_bytes(source.read_bytes()); target.chmod(0o600)
+                    if change == 'bytes': target.write_bytes(b'changed runtime member')
+                    else: target.chmod(0o644)
+                    with self.assertRaisesRegex(ValueError, 'final transported member differs'):
+                        verify()
+
     def signing_copy_chain(self, root, *, explicit_mode=False):
         from tests.test_component_signatures import signed_macho
         source, staged, target, store = [root/name for name in ('source','staged','target','proofs')]

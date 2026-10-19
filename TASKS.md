@@ -1,6 +1,6 @@
 # T32/T33 当前执行清单
 
-2026-10-19 当前状态：aef7f99c已push，独立DSC安装、原件/补丁各6885代码页、首次启动、两次API正常关机及运行后v4读取均通过。首次真实Undo事务20261019T074108Z-8MSU4jQD在staged恢复后报guest Undo writable mount changed，未发布；原磁盘身份/mtime及66段采样保持。最小回归与隔离原生APFS确认CapacityFree和Volumes[].CapacityInUse变化足以触发同一错误；修复仅在可写Undo比较中排除此二字段，其余字段、UUID、设备/路径/根inode及最终只读严格比较保持。相关27项和Swift12函数、新应用签名/依赖核验通过，完整Python935项（跳过2项）244.185秒退出0。新host应用.build/t32-undo-mount-final.app；后续启动继续用原.build/t32-dsc-companions-final.app/Contents/MacOS/vphone-vm，字节/inode保持获批89b70a25...。周期探测已停止。实际Undo重试、撤销后启动、重新应用on→off→on待验收；T32/T33未accepted。
+2026-10-19 当前状态：aeb1651e 已 push。修复后 Undo 事务 20261019T081934Z-JTYX6fft 的实际写回、6885 代码页和可写挂载复核通过；首次最终核验因保留文件不符而拒绝，未交换。只读检查当前磁盘 4686 个输出，无读取错误；hardware:/AA.gl 的内容摘要 e221f140…→4779643e…，其余内容/类型/链接/权限位一致。自动挂载未保留属主视图，UID/GID 不作结论；正常卸载且磁盘身份保持。保留严格拒绝条件，已发起同一独立 VM 的完整 CFW 重装，待未启动发布后立即撤销，再完成启停和重新应用；T32/T33 未 accepted。
 
 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
@@ -228,3 +228,18 @@
 - [ ] 修复后Undo重试已发起，新host应用.build/t32-undo-mount-final.app，日志.build/t32-undo-mount-debug/undo-retry.log；原生验证待核对。
 
 - [ ] 修复后Undo重试session99319/CLI97676/osascript98151正等待原生管理员验证，尚无新事务。
+
+- [x] 撤销重试的原生管理员验证完成（osascript 98151）；root 安装进程 2004 已开始，当前核验 generation、保存计划及父事务证据。
+- [ ] 完成修复后的撤销发布、原件及 6885 代码页核验、撤销后 API 启停与运行后读取；随后完成同 generation 重新应用及启停验证。
+
+- [x] 修复后重试 prepare-undo 完成，staged `.cfw_disk.JTYX6fft`；root2004/session99319 已进入 apply-undo。远端与本地 aeb1651e 一致。
+
+- [x] 修复后真实 apply-undo 完成，已进入首次 verify-final；原失败处的写入后可写挂载复核通过，尚未发布。
+
+
+## 2026-10-19：保留文件漂移拒绝
+
+- [x] 修复后的 apply-undo、实际写回和可写挂载复核通过；首次最终核验拒绝，事务 20261019T081934Z-JTYX6fft 未发布，原盘身份/mtime 与 66 样本保持。
+- [x] 无需额外管理员对话框的只读挂载核对 4686 输出；AA.gl 内容摘要不同，其他内容/类型/链接/权限位一致；属主视图不可靠，不据此报告属主变化。正常卸载、磁盘身份保持。
+- [x] 保存 copy-only hardware 内容和权限漂移拒绝回归，0.021 秒通过；未修改生产拒绝条件。
+- [ ] 同一独立 VM 的 CFW 重装 session55770/CLI13075 已开始预检；发布后先执行 Undo，保持启动前边界，再验证撤销后启停与同 generation 重新应用。
