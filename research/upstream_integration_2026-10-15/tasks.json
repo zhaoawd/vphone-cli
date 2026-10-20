@@ -5218,16 +5218,20 @@
       "historical_status_target": null,
       "target_review": {
         "target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
-        "status": "import_export_cancellation_and_exclusive_publication_validated_queue_pending",
+        "status": "real_cli_import_termination_validated_live_ui_and_full_vm_matrix_pending",
         "assessment": "existing_foundation_delta_pending",
         "evidence": [
           "local_reconciliation.json#T60",
           "T60_progress_pipe.md",
           "evidence/parallel-three/README.md",
           "T60_import_cancellation.md",
-          "T60_export_cancellation.md"
+          "T60_export_cancellation.md",
+          "T60_import_queue.md",
+          "evidence/T60-import-queue-20261020/manifest.json",
+          "evidence/T60-import-state-20261020/manifest.json",
+          "evidence/T60-real-import-termination-20261020/manifest.json"
         ],
-        "finding": "导出接入两后端信号取消与私有staging、排他发布，已有目标保持；Launchpad取消盲删修复。真实CLI4取消+2正常往返通过，进度回退经41项修复回归；队列与完整退出状态仍待验收。"
+        "finding": "导出接入两后端信号取消与私有staging、排他发布，已有目标保持；Launchpad取消盲删修复。真实CLI4取消+2正常往返通过，进度回退经41项修复回归；队列与完整退出状态仍待验收。 2026-10-20补充FIFO导入、批量选择、等待取消和退出门关闭接线；26项定向及210项LaunchpadKit通过，6项配置性跳过。逐项队列/进度/取消UI、签名UI和完整退出矩阵仍待验收。 后续新增逐项状态/取消UI和退出时取消转移接线；31项定向、216项LaunchpadKit、独立签名候选及1项真实CLI并发导入/完整摘要检查通过。真实UI、字节进度和完整VM/混合版本退出矩阵仍待验收。 2026-10-20新增真实CLI导入中退出协调回归，两个测试9.065秒通过；等待项未启动、CLI退出130、输出排空、无残留与指定摘要保持。AppKit实际交互和完整VM矩阵仍待验收。"
       },
       "release_scope": "candidate"
     }
