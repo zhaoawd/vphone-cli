@@ -1,23 +1,26 @@
 {
   "schema_version": 2,
-  "document_revision": 1,
-  "date": "2026-10-15",
-  "title": "vphone-cli 8a75092 合入计划台账",
-  "status": "dependency_and_declaration_adaptations_implemented_acceptance_pending",
+  "document_revision": 2,
+  "date": "2026-10-20",
+  "title": "vphone-cli 上游合入计划台账：8a75092 实施基线与 2a0d3ac 审阅候选",
+  "status": "plan_revised_new_target_source_audit_pending",
   "upstream_target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
   "previous_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
   "historical_ledger": "../upstream_integration_2026-10-06/tasks.json",
   "documents": {
     "plan": "plan.md",
     "ledger": "tasks.json",
-    "task_cards": "inputs/plan_delta.md"
+    "task_cards": "inputs/plan_delta.md",
+    "current_revision": "revision_2026-10-20.md"
   },
   "task_counts": {
-    "total": 61,
+    "total": 66,
     "historical_units": 47,
-    "added_candidate_units": 14,
+    "added_candidate_units": 19,
     "historical_accepted": 9,
-    "accepted_at_new_target": 0
+    "accepted_at_new_target": 0,
+    "added_candidate_units_this_revision": 5,
+    "accepted_at_review_target": 0
   },
   "evidence_boundary": {
     "public_history_records": 194,
@@ -29,14 +32,16 @@
     "endpoint_deletions": 6018,
     "content_exclusions": [
       "repository-root TODO.md"
-    ]
+    ],
+    "target": "8a75092013eda87a4e30ed029b72028cb9279ac4"
   },
   "local_baseline": "local_baseline.json",
-  "authorization_this_revision": "Direct user request: semantic reconciliation, necessary adaptations and relevant validation; preserve current WIP and keep ProMotion default off. No guest deployment or VM acceptance performed.",
+  "authorization_this_revision": "用户明确要求更新计划内容；本轮只修订计划与台账，不授权由本修订自动启动功能移植、部署或 VM 操作。",
   "state_semantics": {
     "status": "T00–T46 原样保留旧 tasks.json 状态，适用目标见 historical_status_target；不代表新目标通过。",
-    "target_review": "本轮固定目标的增量核对状态；与历史完成状态独立。",
-    "execution_dependencies": "dependencies 表示接受条件前置；批次不能绕过依赖。T52 先接入共同边界，各入口在后续能力任务中接线，不反向要求 T15 等等待完整 T52。"
+    "target_review": "既有实施目标的增量核对及验收状态，target 字段明确其适用 SHA；本次原样保留，不表示 review_target 通过。",
+    "execution_dependencies": "dependencies 表示接受条件前置；批次不能绕过依赖。T52 先接入共同边界，各入口在后续能力任务中接线，不反向要求 T15 等等待完整 T52。",
+    "planning_review": "2026-10-20 新审阅目标的计划增量，仅定义待办与条件，不建立实现或验收结论。"
   },
   "tasks": [
     {
@@ -96,6 +101,12 @@
           "local_reconciliation.json#T00"
         ],
         "finding": "完整目标对象、祖先、194/51/143 和附件集合一致，端点路径与摘要已归档。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标完整对象和当前本地基线，统计 8a75092..2a0d3ac；不沿用附件从 2d21d21 起算的数量。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -154,6 +165,12 @@
           "local_reconciliation.json#T01"
         ],
         "finding": "所有可读且不超过 8 MiB 的原未提交文件已复制；2 权限受限、2 大文件仅采集元数据，均保持原位。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "保存当前未提交实现、台账和证据；新审阅目标不覆盖既有工作。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -243,6 +260,12 @@
           "local_reconciliation.json#T02"
         ],
         "finding": "61 项有当前路径/历史证据映射，194 条已绑定完整 Git 元数据；逐提交语义审查未完成。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "逐提交核验新范围和最终源码；区分等价、适配、替代、延后、未知，并确认五项新候选精确依赖。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -426,6 +449,12 @@
         "evidence": [
           "local_reconciliation.json#T03"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "按实际新候选和写盘范围重验完整恢复点；快照不替代离盘备份。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -493,6 +522,12 @@
         "evidence": [
           "local_reconciliation.json#T04"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -568,6 +603,12 @@
         "evidence": [
           "local_reconciliation.json#T05"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -651,6 +692,12 @@
         "evidence": [
           "local_reconciliation.json#T06"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -729,6 +776,12 @@
         "evidence": [
           "local_reconciliation.json#T07"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -900,6 +953,12 @@
           "evidence/T08-T09-adaptation/semantic-reconciliation.json"
         ],
         "finding": "IcliKit 0.8.5 exact pin、120 个公开调用名候选的签名核对、实际 iOS 编译/链接和候选校验完成；JPEG overlay 重新绑定。宿主 harness 通过；新 guest 安装/RootHide/截图与内存验收未执行。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新固定目标依赖与实际构建入口；X1 工具链要求只在对应范围接入。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1011,6 +1070,12 @@
           "evidence/T08-T09-adaptation/semantic-reconciliation.json"
         ],
         "finding": "148 个固定声明均有源 blob 和明确本地决定；140 项旧本地 declaration/矩阵和 11 项 local-only 保持。发布 ProMotion 更名接入，7 个新增 ID 仅声明且拒绝执行。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "补 OpenROM/tvOS/X1 的适用条件与选择迁移，保持本地默认值。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1142,6 +1207,12 @@
           "evidence/T08-T09-adaptation/semantic-reconciliation.json"
         ],
         "finding": "当前 catalog 共159项；版本/模式/默认执行集合保持，Python guest gate 与 Swift binding 统一8a75092；相关回归通过。新上游指令实现等价性和标准套件既有失败未关闭。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "新增补丁与兼容组合必须经过 mode/OS/build/device 门控；不扩大既有支持结论。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1251,6 +1322,12 @@
           "evidence/T08-T09-adaptation/semantic-reconciliation.json"
         ],
         "finding": "当前执行核对 upstreamTarget/catalogRevision/catalog摘要；旧目标记录拒绝新执行但在原摘要/身份/原件核验后可恢复。未改写实际 VM desired/generation/Receipt。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "快照后重新核对 desired/applied/source；保留检查点恢复，补模板阶段与工具链变化验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1327,6 +1404,12 @@
           "local_reconciliation.json#T12"
         ],
         "finding": "未提交源码已有 VM/generation/desired 关联、分组件 Receipt、实际效果和 Undo 当前字节校验。上游 installer 使用 hasOutdatedImplementation 识别同 ID 旧实现再撤销重打；现有通用 Undo 不能据此认定已覆盖该迁移。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "补 ROM/OTA/GPU 来源与摘要；模板 Build 和 generation 分别绑定。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1401,6 +1484,12 @@
         "evidence": [
           "local_reconciliation.json#T13"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1477,6 +1566,12 @@
         "evidence": [
           "local_reconciliation.json#T14"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1561,6 +1656,12 @@
           "local_reconciliation.json#T15"
         ],
         "finding": "本地已有目录 flock、online-operation lease、CFW staging 和每调用私有目录；shell CFW 仍用 hdiutil attach，未发现 work-parent 入口。新增 snapshot/template/rebase 入口尚未注册。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1642,6 +1743,12 @@
         "evidence": [
           "local_reconciliation.json#T16"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1729,6 +1836,12 @@
         "evidence": [
           "local_reconciliation.json#T17"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1815,6 +1928,12 @@
           "local_reconciliation.json#T18"
         ],
         "finding": "本地 Irisin 已有物理根、完成标记和应用注销/目录保护；InjectionEnvironment 当前只插入 SystemHook 并保留禁用变量门控。上游多库插入、persona、DeviceHub 和实际 jbroot/dpkg 调整不能直接判为等价。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1887,6 +2006,12 @@
         "evidence": [
           "local_reconciliation.json#T19"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -1964,6 +2089,12 @@
           "local_reconciliation.json#T20"
         ],
         "finding": "本地宿主定位已有外部控制 token、持久化来源、重连回放和 revision 校验；上游最终 per-VM 同步与 locationd watchdog/cohorting 需适配，本地所有权合约须保留。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2037,6 +2168,12 @@
           "local_reconciliation.json#T21"
         ],
         "finding": "本地 Irisin 已有物理根、完成标记和应用注销/目录保护；InjectionEnvironment 当前只插入 SystemHook 并保留禁用变量门控。上游多库插入、persona、DeviceHub 和实际 jbroot/dpkg 调整不能直接判为等价。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2118,6 +2255,12 @@
         "evidence": [
           "local_reconciliation.json#T22"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2195,6 +2338,12 @@
         "evidence": [
           "local_reconciliation.json#T23"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2355,6 +2504,12 @@
         "evidence": [
           "local_reconciliation.json#T24"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "审查 AMFI requirement 内容判断修复的本地适用性；新视频和文件接口沿用认证、路径与 owner 约束。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2438,6 +2593,12 @@
         "evidence": [
           "local_reconciliation.json#T25"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "复用本地磁盘检查点与 Launchpad 恢复入口；模板跨重启恢复和副作用结果查询单独验证。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2515,6 +2676,12 @@
         "evidence": [
           "local_reconciliation.json#T26"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2596,6 +2763,12 @@
         "evidence": [
           "local_reconciliation.json#T27"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2703,6 +2876,12 @@
         "evidence": [
           "local_reconciliation.json#T28"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "更新 ROM、模板密钥、快照遗漏项、文件与视频协议、兼容语义及未验证组合。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2791,6 +2970,12 @@
         "evidence": [
           "local_reconciliation.json#T29"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "冻结实际候选与 ROM 摘要；X1 纳入时检查工具链和最终 escalator 切片，不以版本号证明实现。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2847,6 +3032,12 @@
           "T30_swift_validation_followup.md"
         ],
         "finding": "本轮修复HTTP/WebSocket测试夹具的按时完成晚观察误判和子进程完成时刻误判；时限用例精确分组且保留原期限。标准Swift完整通过：XCTest321项跳7，SwiftTesting1507+26项，内存和guest组件宿主检查通过；不替代VM集成矩阵。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "增加 ROM/内存/宿主/设备/固件/工具链组合；针对实际纳入候选执行测试及 VM 验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2898,6 +3089,12 @@
         "evidence": [
           "local_reconciliation.json#T31"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "对选定候选完成整组恢复；配置、ROM、记录、原件与实际磁盘分别核对。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -2979,6 +3176,12 @@
           "evidence/parallel-three/README.md"
         ],
         "finding": "可信generation原件、只读DSC基线、复制/变更链和源码摘要已生成持久索引，final_guest与发布入口消费；schema2统一要求证明。snapshot后语义验证、迁移及共同发布仍未完成。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "承接已实现 installed Receipt/Undo/磁盘共同发布及 staged DSC 迁移；补真实 24A446、snapshot 与大镜像成本。统一来源查询复用已有记录。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3056,6 +3259,12 @@
           "evidence/parallel-three/README.md"
         ],
         "finding": "原件与逐操作前像分别记录，发布前重建并核对journal绑定。缺来源、混代、索引破坏和降级路径拒绝；不授予逆向Undo或旧VM迁移权，IOMFB门控保持。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "承接已实现受控 DSC 迁移，补真实 snapshot 创建/离线改名/完整迁移及公开历史安装回滚；EPERM 原因未查明。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3138,6 +3347,12 @@
           "local_reconciliation.json#T34"
         ],
         "finding": "当前 WIP 已有公开 update-kernel/rollback-kernel、持久游标、共享区域/DSC/读回和分组件发布。五任务计划记录 V9 真机样本及后续 I/O 合入；当前 catalog 仍为旧目标，不代表新目标 kernel/DSC 资格已满足。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3218,6 +3433,12 @@
           "local_reconciliation.json#T35"
         ],
         "finding": "当前 WIP 已有公开 update-kernel/rollback-kernel、持久游标、共享区域/DSC/读回和分组件发布。五任务计划记录 V9 真机样本及后续 I/O 合入；当前 catalog 仍为旧目标，不代表新目标 kernel/DSC 资格已满足。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3323,6 +3544,12 @@
         "evidence": [
           "local_reconciliation.json#T36"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "新视频/文件能力沿用 instance/generation；为有副作用操作定义断线和结果查询，请求 ID 不自动构成幂等保证。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3435,6 +3662,12 @@
           ],
           "limitation": "仅修正夹具目录前置条件，不新增完整停止矩阵或真实 VM 验收。"
         }
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3510,6 +3743,12 @@
         "evidence": [
           "local_reconciliation.json#T38"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3610,6 +3849,12 @@
         "evidence": [
           "local_reconciliation.json#T39"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3762,6 +4007,12 @@
           "local_reconciliation.json#T40"
         ],
         "finding": "本地有 Store、binding、attempt 资源/ROM 捕获及四层来源基础；五任务计划 Task 9/10 仍有外部工具链/创建绑定未完成项。模板 Build 与快照来源尚无当前管理入口。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "统一查询固件/OTA/GPU/补丁实现/ROM/Bundle/精简与实际验收；保留四层来源、attempt 资源和旧 VM 绑定边界。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3844,6 +4095,12 @@
         "evidence": [
           "local_reconciliation.json#T41"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -3938,6 +4195,12 @@
         "evidence": [
           "local_reconciliation.json#T42"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -4027,6 +4290,12 @@
           "local_reconciliation.json#T43"
         ],
         "finding": "本地 Irisin 已有物理根、完成标记和应用注销/目录保护；InjectionEnvironment 当前只插入 SystemHook 并保留禁用变量门控。上游多库插入、persona、DeviceHub 和实际 jbroot/dpkg 调整不能直接判为等价。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -4109,6 +4378,12 @@
         "evidence": [
           "local_reconciliation.json#T44"
         ]
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -4171,6 +4446,12 @@
           "evidence/T08-T09-adaptation/semantic-reconciliation.json"
         ],
         "finding": "旧 display_refresh ID 识别为 display_promotion；开关意图保留、重复/矛盾拒绝。五模式默认关闭，当前notImplemented仍拒绝显式执行。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -4315,6 +4596,12 @@
           "evidence/parallel-three/README.md"
         ],
         "finding": "进度写入使用throwing API并重验TTY；7项PTY/pipe/实际tar及信号回归通过，不改变信号处理器。完整console/helper/吞吐矩阵仍待验收。"
+      },
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "保留 ACK/取消合同；文件写入与其他副作用操作明确重复提交和回复丢失的处理。",
+        "definition": "revision_2026-10-20.md"
       }
     },
     {
@@ -4359,7 +4646,13 @@
         ],
         "finding": "vm clone 当前只接收源/目标名称并保留设备身份，Core clone 无 newIdentity 参数；没有注册新身份选项。保身份恢复克隆应复用。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "保留保身份 clone，新增显式新身份选项；不同 ECID/MAC/UDID 不证明独立密钥。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T48",
@@ -4405,7 +4698,13 @@
         ],
         "finding": "vm 子命令列表未注册 snapshot，当前 Core 无 VPhoneMachineSnapshots 产品实现。已有 create 资源 snapshot 与内核回退是不同范围。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "补本地 host-local Receipt/history 与路径/inode 绑定处置；快照遗漏配置/ROM/输入明确展示，恢复后重验资格。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T49",
@@ -4458,7 +4757,13 @@
         ],
         "finding": "vm 子命令无 template，create 仍调用 createBundle/prepare 阶段；未发现 TemplateSource/模板 Build 管理实现。IPSW 缓存与 resourceSnapshot 继续复用但不等于模板。"
       },
-      "release_scope": "candidate_explicit_enable"
+      "release_scope": "candidate_explicit_enable",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "复用 checkpoint；Key/Build/消费者来源及实现代际分别校验；采用 OpenROM 的模板等待 T61 对应组合，Apple ROM 路径不等待完整 T61。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T50",
@@ -4508,7 +4813,13 @@
         ],
         "finding": "当前 API 路由和源码未见 services.profile/setup.settle/apps.remove_system/apps.restore_system/apfs.snapshots；现有 first-boot/less 不能据此判等价。"
       },
-      "release_scope": "candidate_explicit_enable"
+      "release_scope": "candidate_explicit_enable",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "精简配置作为实验条件，保持显式选择；不直接沿用到 tvOS。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T51",
@@ -4550,7 +4861,13 @@
         ],
         "finding": "vm 子命令无 rebase，Core 未见 VPhoneDiskRebase；本地 APFS clone 仅提供复制基础。"
       },
-      "release_scope": "deferred_optional"
+      "release_scope": "deferred_optional",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T52",
@@ -4597,7 +4914,13 @@
         ],
         "finding": "本地已有目录 flock、online-operation lease、CFW staging 和每调用私有目录；shell CFW 仍用 hdiutil attach，未发现 work-parent 入口。新增 snapshot/template/rebase 入口尚未注册。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T53",
@@ -4647,7 +4970,13 @@
         ],
         "finding": "当前 GuestComponents 未见 DeviceHubFix/FlutterRemapFix/InstallCoordinationPersona 产品组件；只有既有 SystemHook/LaunchHook 基础。新兼容链需整体适配。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "DeviceHub/Flutter 与宿主视频分开验收，保留 DSC/kernel 完整前置链。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T54",
@@ -4689,7 +5018,13 @@
         ],
         "finding": "当前 API 路由和产品源码未见 gyroscope/attitude 端点及运动面板；已有输入/旋转不覆盖传感器模拟。"
       },
-      "release_scope": "candidate_explicit_enable"
+      "release_scope": "candidate_explicit_enable",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T55",
@@ -4731,7 +5066,13 @@
         ],
         "finding": "当前 API 未见 device.name 路由，注入头仅 SystemHook；已有 VM 文件夹重命名不等于 guest 名称同步。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T56",
@@ -4769,7 +5110,13 @@
         ],
         "finding": "当前 API 未见 time.clock，已有 GuestAPI+TimeZone 仅处理时区；宿主时钟同步类尚未接入。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T57",
@@ -4808,7 +5155,13 @@
         ],
         "finding": "本地 IPSWCache 已有流式写入、Range/If-Range、strong ETag/Last-Modified 和排他发布；未见 connections/segmentSize 多连接调度。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T58",
@@ -4852,7 +5205,13 @@
         ],
         "finding": "当前 GuestComponents 未见 SignInFix/PrefsFix 组件；新增 Settings 隐藏和登录提示抑制未获默认启用决定。"
       },
-      "release_scope": "decision_required"
+      "release_scope": "decision_required",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T59",
@@ -4898,7 +5257,13 @@
         ],
         "finding": "APIEventHub 已接入首/末订阅通知；GuestEventPublisher 无订阅时停用定时器，恢复时立即调度，并处理快速重连摘要、回调乱序和释放。生产源码调度夹具和独立 iOS Release 候选通过；客户机 CPU/wakeups/首响应、实例切换及其他组件仍待验收。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
+        "definition": "revision_2026-10-20.md"
+      }
     },
     {
       "id": "T60",
@@ -4951,7 +5316,221 @@
         ],
         "finding": "导出接入两后端信号取消与私有staging、排他发布，已有目标保持；Launchpad取消盲删修复。真实CLI4取消+2正常往返通过，进度回退经41项修复回归；队列与完整退出状态仍待验收。"
       },
-      "release_scope": "candidate"
+      "release_scope": "candidate",
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "承接版本化进度、队列和 native 硬链接/稀疏文件 CLI 验收；补 GUI/Finder/混合 Bundle/退出与源并发修改合同；system-tar 未知总量及默认后端保持。",
+        "definition": "revision_2026-10-20.md"
+      }
+    },
+    {
+      "id": "T61",
+      "title": "OpenAVB/OpenSEP 与恢复协议",
+      "suggested_batch": "U1/U3",
+      "priority": "P1",
+      "scope": "candidate_explicit_enable",
+      "release_scope": "candidate_explicit_enable",
+      "required_for_release": false,
+      "origin": "2026-10-20_review_candidate",
+      "dependencies": [
+        "T02",
+        "T03",
+        "T12",
+        "T13",
+        "T24",
+        "T40"
+      ],
+      "extends_existing": [
+        "T49"
+      ],
+      "proposed_work": "固定 ROM pin/摘要，接入恢复协议、停机显式切换和临时 PCC/GPU 路径；必须包含低内存最终修复。",
+      "acceptance": [
+        "旧 VM 绑定升级不自动替换 ROM；缺失/损坏/来源不符拒绝",
+        "默认与低内存组合分别完成 DFU、恢复、首次启动和连续重启",
+        "切换失败保留原配置；ROM 来源进入 attempt 与实验记录",
+        "采用 OpenROM 的模板依赖对应组合通过"
+      ],
+      "rollback_unit": "ROM 文件、选择和来源成组恢复；恢复流程试验使用完整恢复点。",
+      "status": "candidate_pending_source_audit",
+      "local_audit_status": "pending_source_audit",
+      "implementation_status": "not_started",
+      "historical_status_target": null,
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "固定 ROM pin/摘要，接入恢复协议、停机显式切换和临时 PCC/GPU 路径；必须包含低内存最终修复。",
+        "definition": "revision_2026-10-20.md"
+      },
+      "verification_evidence": []
+    },
+    {
+      "id": "T62",
+      "title": "宿主视频接口与客户端",
+      "suggested_batch": "U6",
+      "priority": "P1",
+      "scope": "candidate",
+      "release_scope": "candidate",
+      "required_for_release": false,
+      "origin": "2026-10-20_review_candidate",
+      "dependencies": [
+        "T02",
+        "T23",
+        "T24",
+        "T36",
+        "T40"
+      ],
+      "extends_existing": [
+        "T53",
+        "T59"
+      ],
+      "proposed_work": "核验并接入宿主采集/编码、请求取帧与客户端；复用认证和实例生命周期。",
+      "acceptance": [
+        "GUI/headless 均可采集与交互",
+        "重连/实例切换/迟到帧/方向/尺寸变化可验证",
+        "背压、延迟、CPU/内存及零订阅恢复有测量",
+        "旧 capability 降级明确且不扩大 TCP 默认范围"
+      ],
+      "rollback_unit": "关闭新能力并释放会话和编码器，保留既有控制与截图。",
+      "status": "candidate_pending_source_audit",
+      "local_audit_status": "pending_source_audit",
+      "implementation_status": "not_started",
+      "historical_status_target": null,
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验并接入宿主采集/编码、请求取帧与客户端；复用认证和实例生命周期。",
+        "definition": "revision_2026-10-20.md"
+      },
+      "verification_evidence": []
+    },
+    {
+      "id": "T63",
+      "title": "客体文件流传输与文件浏览器",
+      "suggested_batch": "U6",
+      "priority": "P1",
+      "scope": "candidate",
+      "release_scope": "candidate",
+      "required_for_release": false,
+      "origin": "2026-10-20_review_candidate",
+      "dependencies": [
+        "T02",
+        "T06",
+        "T24",
+        "T25",
+        "T36",
+        "T46"
+      ],
+      "extends_existing": [
+        "T60"
+      ],
+      "proposed_work": "核验 HTTP/socket/CLI/GUI 文件链，接入有界内存流传输、完整性检查和临时目标发布。",
+      "acceptance": [
+        "大文件 CLI/GUI 分别测内存和进度",
+        "磁盘满/短读/摘要失败/取消/断线保留原目标并收尾",
+        "结果查询和重复提交语义明确，请求 ID 不自动作为幂等键",
+        "路径权限、旧 guest/CLI 回退覆盖；不与 VM 归档传输混淆"
+      ],
+      "rollback_unit": "只清理本次临时文件；成功但回复丢失由查询确定，不盲目重写。",
+      "status": "candidate_pending_source_audit",
+      "local_audit_status": "pending_source_audit",
+      "implementation_status": "not_started",
+      "historical_status_target": null,
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验 HTTP/socket/CLI/GUI 文件链，接入有界内存流传输、完整性检查和临时目标发布。",
+        "definition": "revision_2026-10-20.md"
+      },
+      "verification_evidence": []
+    },
+    {
+      "id": "T64",
+      "title": "tvOS HD/4K 固件组合与运行适配",
+      "suggested_batch": "optional_followup",
+      "priority": "P2",
+      "scope": "candidate_optional_followup",
+      "release_scope": "candidate_optional_followup",
+      "required_for_release": false,
+      "origin": "2026-10-20_review_candidate",
+      "dependencies": [
+        "T02",
+        "T09",
+        "T10",
+        "T13",
+        "T14",
+        "T21",
+        "T32",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "extends_existing": [],
+      "proposed_work": "HD/4K 分别记录 IPSW/OTA/GPU/PCC 来源，设置平台和版本门控，核验 RootHide 父目录修复。",
+      "acceptance": [
+        "固件来源和摘要可追溯",
+        "HD/4K 的恢复、启动、输入、应用服务和长时间显示分别验收",
+        "不继承未经确认的 iOS 模板/精简策略",
+        "原型和未测组合明确，不阻塞已有 iPhone/iPad 范围"
+      ],
+      "rollback_unit": "独立测试 VM 和候选资源，不改变既有 iOS 默认行为。",
+      "status": "candidate_pending_source_audit",
+      "local_audit_status": "pending_source_audit",
+      "implementation_status": "not_started",
+      "historical_status_target": null,
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "HD/4K 分别记录 IPSW/OTA/GPU/PCC 来源，设置平台和版本门控，核验 RootHide 父目录修复。",
+        "definition": "revision_2026-10-20.md"
+      },
+      "verification_evidence": []
+    },
+    {
+      "id": "T65",
+      "title": "ARM64E_X1 工具链与运行兼容",
+      "suggested_batch": "optional_followup",
+      "priority": "P2",
+      "scope": "candidate_optional_followup",
+      "release_scope": "candidate_optional_followup",
+      "required_for_release": false,
+      "origin": "2026-10-20_review_candidate",
+      "dependencies": [
+        "T02",
+        "T04",
+        "T09",
+        "T10",
+        "T12",
+        "T24",
+        "T32",
+        "T35",
+        "T43",
+        "T44"
+      ],
+      "extends_existing": [
+        "T08",
+        "T29",
+        "T53"
+      ],
+      "proposed_work": "核验 X1 工具链、最终切片、启动/DSC/kernel/runtime 完整链；逐项记录兼容转换语义。",
+      "acceptance": [
+        "实际工具链与最终 escalator arm64e.x1 切片核验",
+        "转换适用条件、安全语义和可信撤销来源有记录",
+        "完整恢复、卷验证、vphoned/应用与非 X1 回归分别验收",
+        "新补丁遵守目标证据/语义匹配约束并同步补丁比较文档"
+      ],
+      "rollback_unit": "boot/kernel/DSC/guest 成组恢复；缺可信来源拒绝局部撤销并使用完整恢复点。",
+      "status": "candidate_pending_source_audit",
+      "local_audit_status": "pending_source_audit",
+      "implementation_status": "not_started",
+      "historical_status_target": null,
+      "planning_review": {
+        "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "status": "pending_source_audit",
+        "required_delta": "核验 X1 工具链、最终切片、启动/DSC/kernel/runtime 完整链；逐项记录兼容转换语义。",
+        "definition": "revision_2026-10-20.md"
+      },
+      "verification_evidence": []
     }
   ],
   "execution_evidence": {
@@ -4964,5 +5543,33 @@
     "T59_event_polling": "T59_event_polling.md",
     "T37_exit_routing": "T37_exit_routing.md"
   },
-  "initial_plan_authorization": "plan_and_evidence_documentation_only"
+  "initial_plan_authorization": "plan_and_evidence_documentation_only",
+  "review_target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "previous_revision_status": "dependency_and_declaration_adaptations_implemented_acceptance_pending",
+  "previous_revision_authorization": "Direct user request: semantic reconciliation, necessary adaptations and relevant validation; preserve current WIP and keep ProMotion default off. No guest deployment or VM acceptance performed.",
+  "planning_revision": {
+    "date": "2026-10-20",
+    "scope": "plan_and_ledger_only",
+    "implementation_baseline": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+    "review_target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+    "range": "8a75092013eda87a4e30ed029b72028cb9279ac4..2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+    "git_range_verified": false,
+    "commit_count": null,
+    "input": {
+      "path": "/Users/qcz3840/.codex/attachments/286c5df3-5bea-4013-ba62-60d298e6d780/已粘贴的文本.txt",
+      "sha256": "d6d55b9d452fbeb683eedc057e9dcd0eb20a49053f113a1112575ee3ca9e4ced",
+      "kind": "user_supplied_analysis"
+    },
+    "local_progress": "../upstream_integration_2026-10-17/progress_migration.md",
+    "source_boundary": "前一轮分析读取部分上游 PR；新目标完整对象、增量集合、固定源码和最新依赖待 T00–T02 核验。附件统计不作为本轮核验结果。",
+    "defaults": "保留五模式、默认 regular、权限与来源约束；模板/精简/ProMotion/native 后端/ROM 默认值不变。",
+    "execution_order": [
+      "新目标 T00–T02 对账",
+      "T32/T33/T60 剩余验收及适用的独立修复",
+      "T47–T50；采用 OpenROM 时先完成 T61 对应组合",
+      "T62/T63 与客户端",
+      "可选 T64/T65",
+      "T28–T31 选定候选验收"
+    ]
+  }
 }
