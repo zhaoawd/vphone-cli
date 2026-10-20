@@ -345,6 +345,29 @@ def dylib_command(binary, dylib):
     return [insert_dylib_bin, "--weak", "--inplace", "--all-yes", str(dylib), str(binary)]
 
 
+def _readonly_dsc_inputs(directory):
+    """Observe known DSC companions without granting write targets."""
+    import re
+    from . import plan_gate as gate
+    from .guest_write import no_link_parents
+    keys = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns', 'st_mode', 'st_uid', 'st_gid', 'st_nlink')
+    result = {}
+    for path in sorted(directory.iterdir()):
+        if not re.fullmatch(r'dyld_shared_cache_arm64e(?:\.[0-9]{1,2}\.(?:dylddata|dyldreadonly|dyldlinkedit)|\.atlas)', path.name):
+            continue
+        if path.is_symlink() or not path.is_file():
+            raise ValueError('DSC readonly input must be a non-linked regular file')
+        no_link_parents(path)
+        before = path.lstat()
+        snapshot = gate.snapshot(path)
+        after = path.lstat()
+        identity = tuple(getattr(before, key) for key in keys)
+        if identity != tuple(getattr(after, key) for key in keys):
+            raise ValueError('DSC readonly input changed during observation')
+        result[path.name] = (identity, snapshot)
+    return result
+
+
 def main():
     if len(sys.argv) < 2 or sys.argv[1] == "cryptex-paths":
         return _dispatch()
@@ -385,6 +408,7 @@ def main():
 
     path = Path(os.path.abspath(sys.argv[2]))
     observations = []
+    readonly_dsc_inputs = None
     from patchers import component_effects
     effect_store = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent / 'effect-blobs'
     source_image = None
@@ -415,7 +439,10 @@ def main():
             source_image = mounted(plan, mount / 'mnt_sysos_hv_vmm')
             from patchers.cryptex_source import proof
             source_binding = proof(plan,source_image)
+        readonly_dsc_inputs = _readonly_dsc_inputs(path)
         for item in sorted(path.iterdir()):
+            if item.name in readonly_dsc_inputs:
+                continue
             if item.name.startswith('dyld_shared_cache_arm64e') and not item.name.endswith('.map') and not re.fullmatch(r"dyld_shared_cache_arm64e(?:\.[0-9]{1,2}|\.symbols)?", item.name):
                 raise ValueError("undeclared DSC write member: " + item.name)
             if re.fullmatch(r"dyld_shared_cache_arm64e(?:\.[0-9]{1,2}|\.symbols)?", item.name):
@@ -451,6 +478,8 @@ def main():
     try:
         return _dispatch()
     finally:
+        if readonly_dsc_inputs is not None and _readonly_dsc_inputs(path) != readonly_dsc_inputs:
+            raise ValueError('DSC readonly input changed during patching')
         for item, target, before, effect_input in observations:
             effect = component_effects.capture_change(effect_input, item, effect_store)
             if implementation is not None:

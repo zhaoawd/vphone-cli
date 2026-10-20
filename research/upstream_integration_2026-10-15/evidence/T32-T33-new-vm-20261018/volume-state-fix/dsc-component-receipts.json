@@ -1,0 +1,963 @@
+{
+  "records" : [
+    {
+      "component" : "avpbooter",
+      "desiredSHA256" : "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "effects" : [
+        {
+          "declarationID" : "avpbooter-boot-dgst_bypass",
+          "outputPath" : "AVPBooter.vresearch1.bin",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "mov x0, x20",
+            "component" : "avpbooter",
+            "fileOffset" : 11112,
+            "originalBytes" : "4AMUqg==",
+            "patchDescription" : "DGST validation bypass: force x0=0 return value",
+            "patchID" : "avpbooter.dgst_bypass",
+            "patchedBytes" : "AACA0g=="
+          }
+        }
+      ],
+      "generationID" : "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "outputs" : [
+        {
+          "path" : "AVPBooter.vresearch1.bin",
+          "sha256" : "0b8be61be526a94b0ef778df383cb2e1d308e6577f1d2a15f00dcad6833e0e20"
+        }
+      ],
+      "planSHA256" : "ce85a6b802b412c37bbefde745b02885659df693561d036195e70deabdbb2d68",
+      "schemaVersion" : 1,
+      "scope" : "generatedFirmware",
+      "state" : "committed"
+    },
+    {
+      "component" : "devicetree",
+      "desiredSHA256" : "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "effects" : [
+        {
+          "declarationID" : "devicetree-cfw-serial_number",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/DeviceTree.vphone600ap.im4p",
+          "record" : {
+            "afterDisasm" : "",
+            "beforeDisasm" : "",
+            "component" : "devicetree",
+            "fileOffset" : 296,
+            "originalBytes" : "c3lzY2ZnL1NyTm0v",
+            "patchDescription" : "Set serial number to vphone-1337",
+            "patchID" : "devicetree.serial_number",
+            "patchedBytes" : "dnBob25lLTEzMzcA"
+          }
+        },
+        {
+          "declarationID" : "devicetree-cfw-home_button_type",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/DeviceTree.vphone600ap.im4p",
+          "record" : {
+            "afterDisasm" : "",
+            "beforeDisasm" : "",
+            "component" : "devicetree",
+            "fileOffset" : 1316,
+            "originalBytes" : "c3lzYw==",
+            "patchDescription" : "Set home button type to 2",
+            "patchID" : "devicetree.home_button_type",
+            "patchedBytes" : "AgAAAA=="
+          }
+        },
+        {
+          "declarationID" : "devicetree-cfw-artwork_device_subtype",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/DeviceTree.vphone600ap.im4p",
+          "record" : {
+            "afterDisasm" : "",
+            "beforeDisasm" : "",
+            "component" : "devicetree",
+            "fileOffset" : 53672,
+            "originalBytes" : "c3lzYw==",
+            "patchDescription" : "Set artwork device subtype to 2556",
+            "patchID" : "devicetree.artwork_device_subtype",
+            "patchedBytes" : "\/AkAAA=="
+          }
+        },
+        {
+          "declarationID" : "devicetree-cfw-island_notch_location",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/DeviceTree.vphone600ap.im4p",
+          "record" : {
+            "afterDisasm" : "",
+            "beforeDisasm" : "",
+            "component" : "devicetree",
+            "fileOffset" : 54000,
+            "originalBytes" : "c3lzYw==",
+            "patchDescription" : "Set island notch location to 144",
+            "patchID" : "devicetree.island_notch_location",
+            "patchedBytes" : "kAAAAA=="
+          }
+        }
+      ],
+      "generationID" : "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "outputs" : [
+        {
+          "path" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/DeviceTree.vphone600ap.im4p",
+          "sha256" : "3a6013602c5c57dc96722681bcb28af8994025a556495287f6f4852a9d6e8e64"
+        }
+      ],
+      "planSHA256" : "ce85a6b802b412c37bbefde745b02885659df693561d036195e70deabdbb2d68",
+      "schemaVersion" : 1,
+      "scope" : "generatedFirmware",
+      "state" : "committed"
+    },
+    {
+      "component" : "ibec",
+      "desiredSHA256" : "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "effects" : [
+        {
+          "declarationID" : "ibec-cfw-serial_label",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"Loaded iBEC\"",
+            "beforeDisasm" : "",
+            "component" : "ibec",
+            "fileOffset" : 541513,
+            "originalBytes" : "PT09PT09PT09PT0=",
+            "patchDescription" : "serial label",
+            "patchID" : "ibec.serial_label",
+            "patchedBytes" : "TG9hZGVkIGlCRUM="
+          }
+        },
+        {
+          "declarationID" : "ibec-cfw-serial_label",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"Loaded iBEC\"",
+            "beforeDisasm" : "",
+            "component" : "ibec",
+            "fileOffset" : 541684,
+            "originalBytes" : "PT09PT09PT09PT0=",
+            "patchDescription" : "serial label",
+            "patchID" : "ibec.serial_label",
+            "patchedBytes" : "TG9hZGVkIGlCRUM="
+          }
+        },
+        {
+          "declarationID" : "ibec-boot-image4_callback",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "b.ne 0x9e4c",
+            "component" : "ibec",
+            "fileOffset" : 40208,
+            "originalBytes" : "4QkAVA==",
+            "patchDescription" : "image4 callback: b.ne → nop",
+            "patchID" : "ibec.image4_callback_bne",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        },
+        {
+          "declarationID" : "ibec-boot-image4_callback",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "mov x0, x22",
+            "component" : "ibec",
+            "fileOffset" : 40212,
+            "originalBytes" : "4AMWqg==",
+            "patchDescription" : "image4 callback: mov x0,x22 → mov x0,#0",
+            "patchID" : "ibec.image4_callback_mov",
+            "patchedBytes" : "AACA0g=="
+          }
+        },
+        {
+          "declarationID" : "ibec-boot-boot_args",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"serial=3 -v debug=0x2014e %s\"",
+            "beforeDisasm" : "",
+            "component" : "ibec",
+            "fileOffset" : 147568,
+            "originalBytes" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "patchDescription" : "boot-args string",
+            "patchID" : "ibec.boot_args_string",
+            "patchedBytes" : "c2VyaWFsPTMgLXYgZGVidWc9MHgyMDE0ZSAlcw=="
+          }
+        },
+        {
+          "declarationID" : "ibec-boot-boot_args",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "adrp x2, 0x24000",
+            "beforeDisasm" : "adrp x2, 0x85000",
+            "component" : "ibec",
+            "fileOffset" : 74452,
+            "originalBytes" : "ggMA8A==",
+            "patchDescription" : "boot-args: adrp x2 → new string page",
+            "patchID" : "ibec.boot_args_adrp",
+            "patchedBytes" : "ggAA0A=="
+          }
+        },
+        {
+          "declarationID" : "ibec-boot-boot_args",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "add x2, x2, #0x70",
+            "beforeDisasm" : "add x2, x2, #0x86a",
+            "component" : "ibec",
+            "fileOffset" : 74456,
+            "originalBytes" : "QqghkQ==",
+            "patchDescription" : "boot-args: add x2 → new string offset",
+            "patchID" : "ibec.boot_args_add",
+            "patchedBytes" : "QsABkQ=="
+          }
+        }
+      ],
+      "generationID" : "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "outputs" : [
+        {
+          "path" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBEC.vresearch101.RELEASE.im4p",
+          "sha256" : "9532a11c86baf39f3923cbd15a09411439bf0f15090a1284b55d5eb3ae060e72"
+        }
+      ],
+      "planSHA256" : "ce85a6b802b412c37bbefde745b02885659df693561d036195e70deabdbb2d68",
+      "schemaVersion" : 1,
+      "scope" : "generatedFirmware",
+      "state" : "committed"
+    },
+    {
+      "component" : "ibss",
+      "desiredSHA256" : "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "effects" : [
+        {
+          "declarationID" : "ibss-cfw-serial_label",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBSS.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"Loaded iBSS\"",
+            "beforeDisasm" : "",
+            "component" : "ibss",
+            "fileOffset" : 541513,
+            "originalBytes" : "PT09PT09PT09PT0=",
+            "patchDescription" : "serial label",
+            "patchID" : "ibss.serial_label",
+            "patchedBytes" : "TG9hZGVkIGlCU1M="
+          }
+        },
+        {
+          "declarationID" : "ibss-cfw-serial_label",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBSS.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"Loaded iBSS\"",
+            "beforeDisasm" : "",
+            "component" : "ibss",
+            "fileOffset" : 541684,
+            "originalBytes" : "PT09PT09PT09PT0=",
+            "patchDescription" : "serial label",
+            "patchID" : "ibss.serial_label",
+            "patchedBytes" : "TG9hZGVkIGlCU1M="
+          }
+        },
+        {
+          "declarationID" : "ibss-boot-image4_callback",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBSS.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "b.ne 0x9e4c",
+            "component" : "ibss",
+            "fileOffset" : 40208,
+            "originalBytes" : "4QkAVA==",
+            "patchDescription" : "image4 callback: b.ne → nop",
+            "patchID" : "ibss.image4_callback_bne",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        },
+        {
+          "declarationID" : "ibss-boot-image4_callback",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBSS.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "mov x0, x22",
+            "component" : "ibss",
+            "fileOffset" : 40212,
+            "originalBytes" : "4AMWqg==",
+            "patchDescription" : "image4 callback: mov x0,x22 → mov x0,#0",
+            "patchID" : "ibss.image4_callback_mov",
+            "patchedBytes" : "AACA0g=="
+          }
+        }
+      ],
+      "generationID" : "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "outputs" : [
+        {
+          "path" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/dfu\/iBSS.vresearch101.RELEASE.im4p",
+          "sha256" : "bcf87be79febc37f020e2c9c0ec296b863a77cd222fc21b0e6c61102e27aba00"
+        }
+      ],
+      "planSHA256" : "ce85a6b802b412c37bbefde745b02885659df693561d036195e70deabdbb2d68",
+      "schemaVersion" : 1,
+      "scope" : "generatedFirmware",
+      "state" : "committed"
+    },
+    {
+      "component" : "kernelcache",
+      "desiredSHA256" : "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "effects" : [
+        {
+          "declarationID" : "kernel-boot-apfs_root_snapshot",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "tbnz w8, #5, 0x2476b6c",
+            "component" : "kernelcache",
+            "fileOffset" : 38234468,
+            "originalBytes" : "SBAoNw==",
+            "patchDescription" : "NOP tbnz w8, #5, 0x2476b6c (sealed vol check) [_apfs_vfsop_mount]",
+            "patchID" : "kernel.apfs_root_snapshot",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-apfs_seal_broken",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "tbnz w0, #0xe, 0x23cfe10",
+            "component" : "kernelcache",
+            "fileOffset" : 37551588,
+            "originalBytes" : "YAFwNw==",
+            "patchDescription" : "NOP tbnz (seal broken) [_authapfs_seal_is_broken]",
+            "patchID" : "kernel.apfs_seal_broken",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-bsd_init_rootvp",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "cbnz w0, 0xf6dbc8",
+            "component" : "kernelcache",
+            "fileOffset" : 16177504,
+            "originalBytes" : "QBMANQ==",
+            "patchDescription" : "NOP cbnz (rootvp auth) [_bsd_init]",
+            "patchID" : "kernel.bsd_init_rootvp",
+            "patchedBytes" : "HyAD1Q==",
+            "virtualAddress" : 18446741874819930464
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-launch_constraints",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov w0, #0",
+            "beforeDisasm" : "pacibsp ",
+            "component" : "kernelcache",
+            "fileOffset" : 23299644,
+            "originalBytes" : "fyMD1Q==",
+            "patchDescription" : "mov w0,#0 [_proc_check_launch_constraints]",
+            "patchID" : "launch_constraints_mov",
+            "patchedBytes" : "AACAUg==",
+            "virtualAddress" : 18446741874827052604
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-launch_constraints",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "ret ",
+            "beforeDisasm" : "sub sp, sp, #0x180",
+            "component" : "kernelcache",
+            "fileOffset" : 23299648,
+            "originalBytes" : "\/wMG0Q==",
+            "patchDescription" : "ret [_proc_check_launch_constraints]",
+            "patchID" : "launch_constraints_ret",
+            "patchedBytes" : "wANf1g==",
+            "virtualAddress" : 18446741874827052608
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-debugger",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov x0, #1",
+            "beforeDisasm" : "adrp x8, 0x784000",
+            "component" : "kernelcache",
+            "fileOffset" : 19693880,
+            "originalBytes" : "6KX\/kA==",
+            "patchDescription" : "mov x0,#1 [_PE_i_can_has_debugger]",
+            "patchID" : "kernel.debugger.mov_x0_1",
+            "patchedBytes" : "IACA0g==",
+            "virtualAddress" : 18446741874823446840
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-debugger",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "ret ",
+            "beforeDisasm" : "cbz x0, 0x12c8158",
+            "component" : "kernelcache",
+            "fileOffset" : 19693884,
+            "originalBytes" : "4AAAtA==",
+            "patchDescription" : "ret [_PE_i_can_has_debugger]",
+            "patchID" : "kernel.debugger.ret",
+            "patchedBytes" : "wANf1g==",
+            "virtualAddress" : 18446741874823446844
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-post_validation",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "tbnz w8, #0, 0xffac80",
+            "component" : "kernelcache",
+            "fileOffset" : 16755608,
+            "originalBytes" : "SAcANw==",
+            "patchDescription" : "NOP tbnz w8, #0, 0xffac80 [txm post-validation]",
+            "patchID" : "kernel.post_validation.nop_tbnz",
+            "patchedBytes" : "HyAD1Q==",
+            "virtualAddress" : 18446741874820508568
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-post_validation",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "cmp w0, w0",
+            "beforeDisasm" : "cmp w0, #2",
+            "component" : "kernelcache",
+            "fileOffset" : 23332268,
+            "originalBytes" : "HwgAcQ==",
+            "patchDescription" : "cmp w0,w0 (was cmp w0,#imm) [postValidation]",
+            "patchID" : "kernel.post_validation.cmp_w0_w0",
+            "patchedBytes" : "HwAAaw==",
+            "virtualAddress" : 18446741874827085228
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-dyld_policy",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov w0, #1",
+            "beforeDisasm" : "bl 0xff9304",
+            "component" : "kernelcache",
+            "fileOffset" : 23335100,
+            "originalBytes" : "kuDmlw==",
+            "patchDescription" : "mov w0,#1 (was BL) [_check_dyld_policy_internal @1]",
+            "patchID" : "dyld_policy_1",
+            "patchedBytes" : "IACAUg==",
+            "virtualAddress" : 18446741874827088060
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-dyld_policy",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov w0, #1",
+            "beforeDisasm" : "bl 0x1638384",
+            "component" : "kernelcache",
+            "fileOffset" : 23335112,
+            "originalBytes" : "r9z\/lw==",
+            "patchDescription" : "mov w0,#1 (was BL) [_check_dyld_policy_internal @2]",
+            "patchID" : "dyld_policy_2",
+            "patchedBytes" : "IACAUg==",
+            "virtualAddress" : 18446741874827088072
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-apfs_graft",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov w0, #0",
+            "beforeDisasm" : "bl 0x246d398",
+            "component" : "kernelcache",
+            "fileOffset" : 37880092,
+            "originalBytes" : "nzQBlA==",
+            "patchDescription" : "mov w0,#0 [_apfs_graft]",
+            "patchID" : "apfs_graft",
+            "patchedBytes" : "AACAUg==",
+            "virtualAddress" : 18446741874841633052
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-apfs_vfsop_mount",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "cmp x0, x0",
+            "beforeDisasm" : "cmp x0, x8",
+            "component" : "kernelcache",
+            "fileOffset" : 38228036,
+            "originalBytes" : "HwAI6w==",
+            "patchDescription" : "cmp x0,x0 (was cmp x0, x8) [_apfs_vfsop_mount]",
+            "patchID" : "kernel.apfs_vfsop_mount.cmp_x0_x0",
+            "patchedBytes" : "HwAA6w==",
+            "virtualAddress" : 18446741874841980996
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-apfs_mount_upgrade_checks",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov w0, #0",
+            "beforeDisasm" : "tbnz w0, #0xe, 0x2476c0c",
+            "component" : "kernelcache",
+            "fileOffset" : 38235136,
+            "originalBytes" : "YABwNw==",
+            "patchDescription" : "mov w0,#0 [_apfs_mount_upgrade_checks]",
+            "patchID" : "kernel.apfs_mount_upgrade_checks.mov_w0_0",
+            "patchedBytes" : "AACAUg==",
+            "virtualAddress" : 18446741874841988096
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-handle_fsioc_graft",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov w0, #0",
+            "beforeDisasm" : "bl 0x2416bd4",
+            "component" : "kernelcache",
+            "fileOffset" : 38324224,
+            "originalBytes" : "9Sj+lw==",
+            "patchDescription" : "mov w0,#0 [_handle_fsioc_graft]",
+            "patchID" : "kernel.handle_fsioc_graft.mov_w0_0",
+            "patchedBytes" : "AACAUg==",
+            "virtualAddress" : 18446741874842077184
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-handle_get_dev_by_role",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "cbz x0, 0x248abd8",
+            "component" : "kernelcache",
+            "fileOffset" : 38316880,
+            "originalBytes" : "QAQAtA==",
+            "patchDescription" : "NOP [handle_get_dev_by_role entitlement gate -> 0x248ABD8]",
+            "patchID" : "kernel.handle_get_dev_by_role.gate_248AB50",
+            "patchedBytes" : "HyAD1Q==",
+            "virtualAddress" : 18446741874842069840
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-handle_get_dev_by_role",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "cbz w0, 0x248abd8",
+            "component" : "kernelcache",
+            "fileOffset" : 38316900,
+            "originalBytes" : "oAMANA==",
+            "patchDescription" : "NOP [handle_get_dev_by_role entitlement gate -> 0x248ABD8]",
+            "patchID" : "kernel.handle_get_dev_by_role.gate_248AB64",
+            "patchedBytes" : "HyAD1Q==",
+            "virtualAddress" : 18446741874842069860
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-handle_get_dev_by_role",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "cbz w0, 0x248adac",
+            "component" : "kernelcache",
+            "fileOffset" : 38317092,
+            "originalBytes" : "QAwANA==",
+            "patchDescription" : "NOP [handle_get_dev_by_role entitlement gate -> 0x248ADAC]",
+            "patchID" : "kernel.handle_get_dev_by_role.gate_248AC24",
+            "patchedBytes" : "HyAD1Q==",
+            "virtualAddress" : 18446741874842070052
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-sandbox_file_check_mmap",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "pacibsp ",
+            "component" : "kernelcache",
+            "fileOffset" : 37405992,
+            "originalBytes" : "fyMD1Q==",
+            "patchDescription" : "mov x0,#0 [_hook_file_check_mmap]",
+            "patchID" : "kernel.sandbox.file_check_mmap.mov_x0_0",
+            "patchedBytes" : "AACA0g==",
+            "virtualAddress" : 18446741874841158952
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-sandbox_file_check_mmap",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "ret ",
+            "beforeDisasm" : "stp x28, x27, [sp, #-0x30]!",
+            "component" : "kernelcache",
+            "fileOffset" : 37405996,
+            "originalBytes" : "\/G+9qQ==",
+            "patchDescription" : "ret [_hook_file_check_mmap]",
+            "patchID" : "kernel.sandbox.file_check_mmap.ret",
+            "patchedBytes" : "wANf1g==",
+            "virtualAddress" : 18446741874841158956
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-sandbox_mount_check_mount",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "pacibsp ",
+            "component" : "kernelcache",
+            "fileOffset" : 37399384,
+            "originalBytes" : "fyMD1Q==",
+            "patchDescription" : "mov x0,#0 [_hook_mount_check_mount]",
+            "patchID" : "kernel.sandbox.mount_check_mount.mov_x0_0",
+            "patchedBytes" : "AACA0g==",
+            "virtualAddress" : 18446741874841152344
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-sandbox_mount_check_mount",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "ret ",
+            "beforeDisasm" : "stp x28, x27, [sp, #-0x30]!",
+            "component" : "kernelcache",
+            "fileOffset" : 37399388,
+            "originalBytes" : "\/G+9qQ==",
+            "patchDescription" : "ret [_hook_mount_check_mount]",
+            "patchID" : "kernel.sandbox.mount_check_mount.ret",
+            "patchedBytes" : "wANf1g==",
+            "virtualAddress" : 18446741874841152348
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-sandbox_mount_check_remount",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "pacibsp ",
+            "component" : "kernelcache",
+            "fileOffset" : 37398944,
+            "originalBytes" : "fyMD1Q==",
+            "patchDescription" : "mov x0,#0 [_hook_mount_check_remount]",
+            "patchID" : "kernel.sandbox.mount_check_remount.mov_x0_0",
+            "patchedBytes" : "AACA0g==",
+            "virtualAddress" : 18446741874841151904
+          }
+        },
+        {
+          "declarationID" : "kernel-boot-sandbox_mount_check_remount",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "ret ",
+            "beforeDisasm" : "stp x28, x27, [sp, #-0x40]!",
+            "component" : "kernelcache",
+            "fileOffset" : 37398948,
+            "originalBytes" : "\/G+8qQ==",
+            "patchDescription" : "ret [_hook_mount_check_remount]",
+            "patchID" : "kernel.sandbox.mount_check_remount.ret",
+            "patchedBytes" : "wANf1g==",
+            "virtualAddress" : 18446741874841151908
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-sandbox_mount_check_umount",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "pacibsp ",
+            "component" : "kernelcache",
+            "fileOffset" : 37398540,
+            "originalBytes" : "fyMD1Q==",
+            "patchDescription" : "mov x0,#0 [_hook_mount_check_umount]",
+            "patchID" : "kernel.sandbox.mount_check_umount.mov_x0_0",
+            "patchedBytes" : "AACA0g==",
+            "virtualAddress" : 18446741874841151500
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-sandbox_mount_check_umount",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "ret ",
+            "beforeDisasm" : "stp x28, x27, [sp, #-0x40]!",
+            "component" : "kernelcache",
+            "fileOffset" : 37398544,
+            "originalBytes" : "\/G+8qQ==",
+            "patchDescription" : "ret [_hook_mount_check_umount]",
+            "patchID" : "kernel.sandbox.mount_check_umount.ret",
+            "patchedBytes" : "wANf1g==",
+            "virtualAddress" : 18446741874841151504
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-sandbox_vnode_check_rename",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "pacibsp ",
+            "component" : "kernelcache",
+            "fileOffset" : 37377300,
+            "originalBytes" : "fyMD1Q==",
+            "patchDescription" : "mov x0,#0 [_hook_vnode_check_rename]",
+            "patchID" : "kernel.sandbox.vnode_check_rename.mov_x0_0",
+            "patchedBytes" : "AACA0g==",
+            "virtualAddress" : 18446741874841130260
+          }
+        },
+        {
+          "declarationID" : "kernel-cfw-sandbox_vnode_check_rename",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "record" : {
+            "afterDisasm" : "ret ",
+            "beforeDisasm" : "stp d9, d8, [sp, #-0x70]!",
+            "component" : "kernelcache",
+            "fileOffset" : 37377304,
+            "originalBytes" : "6SO5bQ==",
+            "patchDescription" : "ret [_hook_vnode_check_rename]",
+            "patchID" : "kernel.sandbox.vnode_check_rename.ret",
+            "patchedBytes" : "wANf1g==",
+            "virtualAddress" : 18446741874841130264
+          }
+        }
+      ],
+      "generationID" : "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "outputs" : [
+        {
+          "path" : "iPhone17,3_26.0_23A341_Restore\/kernelcache.research.vphone600",
+          "sha256" : "a966653992081e11268c67206d698ddcd5b8118c7b2b506a96d02d98b967e441"
+        }
+      ],
+      "planSHA256" : "ce85a6b802b412c37bbefde745b02885659df693561d036195e70deabdbb2d68",
+      "schemaVersion" : 1,
+      "scope" : "generatedFirmware",
+      "state" : "committed"
+    },
+    {
+      "component" : "llb",
+      "desiredSHA256" : "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "effects" : [
+        {
+          "declarationID" : "llb-cfw-serial_label",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"Loaded LLB\"",
+            "beforeDisasm" : "",
+            "component" : "llb",
+            "fileOffset" : 541513,
+            "originalBytes" : "PT09PT09PT09PQ==",
+            "patchDescription" : "serial label",
+            "patchID" : "llb.serial_label",
+            "patchedBytes" : "TG9hZGVkIExMQg=="
+          }
+        },
+        {
+          "declarationID" : "llb-cfw-serial_label",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"Loaded LLB\"",
+            "beforeDisasm" : "",
+            "component" : "llb",
+            "fileOffset" : 541684,
+            "originalBytes" : "PT09PT09PT09PQ==",
+            "patchDescription" : "serial label",
+            "patchID" : "llb.serial_label",
+            "patchedBytes" : "TG9hZGVkIExMQg=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-image4_callback",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "b.ne 0x9e4c",
+            "component" : "llb",
+            "fileOffset" : 40208,
+            "originalBytes" : "4QkAVA==",
+            "patchDescription" : "image4 callback: b.ne → nop",
+            "patchID" : "llb.image4_callback_bne",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-image4_callback",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "mov x0, x22",
+            "component" : "llb",
+            "fileOffset" : 40212,
+            "originalBytes" : "4AMWqg==",
+            "patchDescription" : "image4 callback: mov x0,x22 → mov x0,#0",
+            "patchID" : "llb.image4_callback_mov",
+            "patchedBytes" : "AACA0g=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-boot_args",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "\"serial=3 -v debug=0x2014e %s\"",
+            "beforeDisasm" : "",
+            "component" : "llb",
+            "fileOffset" : 147568,
+            "originalBytes" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "patchDescription" : "boot-args string",
+            "patchID" : "llb.boot_args_string",
+            "patchedBytes" : "c2VyaWFsPTMgLXYgZGVidWc9MHgyMDE0ZSAlcw=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-boot_args",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "adrp x2, 0x24000",
+            "beforeDisasm" : "adrp x2, 0x85000",
+            "component" : "llb",
+            "fileOffset" : 74452,
+            "originalBytes" : "ggMA8A==",
+            "patchDescription" : "boot-args: adrp x2 → new string page",
+            "patchID" : "llb.boot_args_adrp",
+            "patchedBytes" : "ggAA0A=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-boot_args",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "add x2, x2, #0x70",
+            "beforeDisasm" : "add x2, x2, #0x86a",
+            "component" : "llb",
+            "fileOffset" : 74456,
+            "originalBytes" : "QqghkQ==",
+            "patchDescription" : "boot-args: add x2 → new string offset",
+            "patchID" : "llb.boot_args_add",
+            "patchedBytes" : "QsABkQ=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-rootfs",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "b 0x2b014",
+            "beforeDisasm" : "cbz w0, 0x2b014",
+            "component" : "llb",
+            "fileOffset" : 176104,
+            "originalBytes" : "YAEANA==",
+            "patchDescription" : "rootfs: skip sig check (0x3B7)",
+            "patchID" : "llb.rootfs_cbz_0x3b7",
+            "patchedBytes" : "CwAAFA=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-rootfs",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "b.hs 0x2adfc",
+            "component" : "llb",
+            "fileOffset" : 175264,
+            "originalBytes" : "4goAVA==",
+            "patchDescription" : "rootfs: NOP b.hs size check (0x400)",
+            "patchID" : "llb.rootfs_bhs_0x400",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-rootfs",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "b 0x2ade4",
+            "beforeDisasm" : "cbz w0, 0x2ade4",
+            "component" : "llb",
+            "fileOffset" : 176188,
+            "originalBytes" : "QO3\/NA==",
+            "patchDescription" : "rootfs: skip sig verify (0x3C2)",
+            "patchID" : "llb.rootfs_cbz_0x3c2",
+            "patchedBytes" : "av\/\/Fw=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-rootfs",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "cbz x8, 0x2ed54",
+            "component" : "llb",
+            "fileOffset" : 191724,
+            "originalBytes" : "SAMAtA==",
+            "patchDescription" : "rootfs: NOP cbz x8 null check (#0x78)",
+            "patchID" : "llb.rootfs_null_check_0x78",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-rootfs",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "b 0x2ef0c",
+            "beforeDisasm" : "cbz w0, 0x2ef0c",
+            "component" : "llb",
+            "fileOffset" : 192232,
+            "originalBytes" : "IAEANA==",
+            "patchDescription" : "rootfs: skip size verify (0x110)",
+            "patchID" : "llb.rootfs_cbz_0x110",
+            "patchedBytes" : "CQAAFA=="
+          }
+        },
+        {
+          "declarationID" : "llb-boot-panic_bypass",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "record" : {
+            "afterDisasm" : "nop ",
+            "beforeDisasm" : "cbnz w0, 0x1a6e4",
+            "component" : "llb",
+            "fileOffset" : 108108,
+            "originalBytes" : "wAQANQ==",
+            "patchDescription" : "panic bypass: NOP cbnz w0",
+            "patchID" : "llb.panic_bypass",
+            "patchedBytes" : "HyAD1Q=="
+          }
+        }
+      ],
+      "generationID" : "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "outputs" : [
+        {
+          "path" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/all_flash\/LLB.vresearch101.RELEASE.im4p",
+          "sha256" : "67476790419509b8aeda2532dd871fdb308f3658b3a05269509f5d5710321d35"
+        }
+      ],
+      "planSHA256" : "ce85a6b802b412c37bbefde745b02885659df693561d036195e70deabdbb2d68",
+      "schemaVersion" : 1,
+      "scope" : "generatedFirmware",
+      "state" : "committed"
+    },
+    {
+      "component" : "txm",
+      "desiredSHA256" : "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "effects" : [
+        {
+          "declarationID" : "txm-boot-trustcache_bypass",
+          "outputPath" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/txm.iphoneos.research.im4p",
+          "record" : {
+            "afterDisasm" : "mov x0, #0",
+            "beforeDisasm" : "bl 0x2ac70",
+            "component" : "txm",
+            "fileOffset" : 180728,
+            "originalBytes" : "nvr\/lw==",
+            "patchDescription" : "trustcache bypass: legacy binary-search call → mov x0, #0",
+            "patchID" : "txm.trustcache_bypass",
+            "patchedBytes" : "AACA0g=="
+          }
+        }
+      ],
+      "generationID" : "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "outputs" : [
+        {
+          "path" : "iPhone17,3_26.0_23A341_Restore\/Firmware\/txm.iphoneos.research.im4p",
+          "sha256" : "9cff34cab1f83b18442ae4ba1376c2bc90a61b62180c9844aabf1c214c06a106"
+        }
+      ],
+      "planSHA256" : "ce85a6b802b412c37bbefde745b02885659df693561d036195e70deabdbb2d68",
+      "schemaVersion" : 1,
+      "scope" : "generatedFirmware",
+      "state" : "committed"
+    }
+  ],
+  "schemaVersion" : 1,
+  "transactionID" : "c1c3bbd5-e615-4ba5-8700-0fc885925167"
+}

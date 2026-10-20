@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-18T13:54:15.592936+00:00",
+  "scope": "Strict diskutil volume schema correction and independent DSC target preparation",
+  "tests": {
+    "related": 87,
+    "pythonFull": 892,
+    "pythonSkipped": 2,
+    "pythonFailures": 0,
+    "signedBuild": "passed"
+  },
+  "r2CFW": "retry awaiting native administrator authentication; Mac reported locked",
+  "dscTarget": {
+    "vm": "vm-t32-t33-dsc-20261018",
+    "iOS": "26.0 23A341",
+    "cloudOS": "26.1 23B85",
+    "generation": "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+    "prepare": "succeeded",
+    "generationPrepare": "succeeded",
+    "patch": "committed c1c3bbd5-e615-4ba5-8700-0fc885925167; 7 groups, 58 records",
+    "restore": "succeeded; SHSH and restore exit 0; DFU exit 0; diskReleased true",
+    "cfw": "not started",
+    "undo": "not executed",
+    "sourceDiagnostic": {
+      "readOnly": true,
+      "verifiedCodePages": 6885,
+      "runtimeValidated": false
+    },
+    "udid": "0000FE01-BD5CF084277BE6B5",
+    "normalBoot": "not executed"
+  },
+  "limitations": [
+    "Full Swift retained previously reported unchanged APIProxy failure; isolated test passed.",
+    "Isolated v3 same-inode same-size raw-image change is rejected; whether actual boot triggers this remains unverified.",
+    "Newly frozen and rebuilt VM executable return -9; prior approved frozen executable still returns 0. All have approved CDHash; no new host change made in this phase.",
+    "No new-target acceptance status advanced.",
+    "DFU stopped through framework stop after graceful requestStop timeout; no normal guest shutdown acceptance."
+  ],
+  "files": {
+    "amfi-recheck.log": {
+      "bytes": 1535,
+      "sha256": "60666167f7b7b58d51e11e7c1834ad93f7cf3adaa99e0572b48b68ae1e3431d7"
+    },
+    "current-vm-execution-check.json": {
+      "bytes": 146,
+      "sha256": "5b33869424d307415badb5f2aba4c50bf9eedabb63c667e44617616a51a0cea9"
+    },
+    "download-transition.json": {
+      "bytes": 233,
+      "sha256": "e532165bf19c351d08053184c29429aafc3f973f3e01cb62c57f1c9ffc9a3373"
+    },
+    "dsc-committed-journal.json": {
+      "bytes": 211403,
+      "sha256": "0e453f51c65bf27bd35b10a50e2d1cbb6de399390738f8761c717c72c210f46a"
+    },
+    "dsc-committed-report.json": {
+      "bytes": 57917,
+      "sha256": "452282c5fc98c78ea7f5aa7f14450b5f12368c7c480e026a34cb86a433f525ee"
+    },
+    "dsc-component-receipts.json": {
+      "bytes": 40034,
+      "sha256": "c53013eaf21100e609df3c68fa0e9f712ad1bf013fe23184f4bbf47fbc46b194"
+    },
+    "dsc-desired-plan.json": {
+      "bytes": 64276,
+      "sha256": "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c"
+    },
+    "dsc-generation-manifest.json": {
+      "bytes": 1222,
+      "sha256": "54a4e8605aea2be0fb8ebb5544c0e798a140e4b4250c5166df1c39cbc7981881"
+    },
+    "dsc-generation-prepare.log": {
+      "bytes": 334,
+      "sha256": "cb6921cb1b5ec5eaffd26914fd7c03738a3ddd788bdca07c39cfeac176deea66"
+    },
+    "dsc-patch-record.json": {
+      "bytes": 322568,
+      "sha256": "6d82e5f2e225880132a9abe352e4c06f2a279889aeac6841f3a4fa5386a8cb54"
+    },
+    "dsc-patch.log": {
+      "bytes": 12058,
+      "sha256": "fed69f090caee808353de9e06364986975967f3bebef5d50be533c26bd0712c9"
+    },
+    "dsc-prepare.log": {
+      "bytes": 191,
+      "sha256": "77c7edd72fa40a0f6218e00c2bbc4b7aac1bc9f8743e94e4a9ddfd262a249ad5"
+    },
+    "dsc-readonly-attachment.plist": {
+      "bytes": 1127,
+      "sha256": "62507ab09bdb962d36d4cf217e12fb9e9f366daee1d3b1fb5ff23d2b49a3523d"
+    },
+    "dsc-readonly-source.json": {
+      "bytes": 725,
+      "sha256": "ce87d3a5ed535d3af033940418eaec9c2ff7f65e217657dde95a09bbee5ae460"
+    },
+    "dsc-readonly-source.log": {
+      "bytes": 1622,
+      "sha256": "d13f9676476c0b61fa28dd077ece92d91b7cf233d3b5cc7b047fe3a4e380f7d8"
+    },
+    "dsc-readonly-volume.plist": {
+      "bytes": 3122,
+      "sha256": "0644580b2e0e9dbe1195e68519f05bc268f034c669f26943e699226462a95a18"
+    },
+    "dsc-restore-dfu-runtime.json": {
+      "bytes": 254,
+      "sha256": "fe181a0b0cf95d054caca3461fcdde64165d3e7542a2b40dc88afb062873da23"
+    },
+    "dsc-restore-dfu.log": {
+      "bytes": 466241,
+      "sha256": "57e329eef36fba1f06d36cebb3591f3ca5a5f897ceb7f69f5d2d6bcf29a21392"
+    },
+    "dsc-restore-disk-holders.json": {
+      "bytes": 52,
+      "sha256": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130"
+    },
+    "dsc-restore-restore.log": {
+      "bytes": 46277,
+      "sha256": "7c81ddc943e839b57a1e92912c6988239359a42990110931573890ce29cb8fec"
+    },
+    "dsc-restore-restored-baseline.json": {
+      "bytes": 1915,
+      "sha256": "c3417e5be9c9a03c1b9c9db8e02d237b5d932748edb7cc9728744db50fe82561"
+    },
+    "dsc-restore-result.json": {
+      "bytes": 1436,
+      "sha256": "f1a6a9b58b6b867010cd8c5b1c17633f9d9077c0f27e306a3948712ba4f08e3a"
+    },
+    "dsc-restore-shsh.log": {
+      "bytes": 394,
+      "sha256": "f31ff6edde42d1bbeb0655157e2fe12675fcded99d5089ce4ad1b75bb0c6da29"
+    },
+    "dsc-source.json": {
+      "bytes": 492,
+      "sha256": "51d47a9d9b9e30ffd093d88aeec5893dc18f7859e716de8a7041d56e1555e94e"
+    },
+    "frozen-vm-execution-check.json": {
+      "bytes": 472,
+      "sha256": "ef84254712400f0f5e461b6ec54b778cdeef8a30b6eea5f5515f7d050006b075"
+    },
+    "frozen-volume-fix-parity.json": {
+      "bytes": 2407,
+      "sha256": "fd93773b51c1f09f3b47f6fcdfaeb85aafaa5d7bfa3f98991a81a989d2cf8727"
+    },
+    "host-before-retry.json": {
+      "bytes": 280,
+      "sha256": "7463fc0b6bd33340201534b6fb5b358ced1d09ec3911d6981d77e9dc4d05fa11"
+    },
+    "python-full.log": {
+      "bytes": 146567,
+      "sha256": "bf0652931d5d8f49ce00bdb09164256a28b0d71f8feba7a5a27523e8101bfc6b"
+    },
+    "r2-cfw-retry-checkpoint.json": {
+      "bytes": 13014,
+      "sha256": "9cada5a69288e1e544fb7b3acf8b25e612f08a41a4f841840c5d571cc65ae63e"
+    },
+    "regression-red.log": {
+      "bytes": 1465,
+      "sha256": "d0c038ddc81767d5b67e64c04696f4f251118ba52be0cfad77f6aa014dd1ea16"
+    },
+    "related-final.log": {
+      "bytes": 3366,
+      "sha256": "b806655772c61eac34249c5eb3d033eaee13d79f819fb4fdaf2d5cb577fc02cf"
+    },
+    "related-first.log": {
+      "bytes": 5245,
+      "sha256": "a4dff0d3ac9a46445236dddb8d40e40f5145e15cd9028836e55a56185e3f2055"
+    },
+    "runtime-image-boundary.json": {
+      "bytes": 446,
+      "sha256": "555e5e09d04094ddf571782deba0d8fd4561216e4ae5f7fe58eb4088fe4b194b"
+    },
+    "signed-build.log": {
+      "bytes": 13872,
+      "sha256": "edb9ca09986319f06266bb592ab56f184243a3126cdca9c92d47f30e2c20f30a"
+    },
+    "source-fingerprints.json": {
+      "bytes": 1034,
+      "sha256": "e6d7c2dc48a86fafea851112c0ea8283543a4fbb706a1795b523d668cd40b09e"
+    },
+    "vm-signature.log": {
+      "bytes": 918,
+      "sha256": "e939c4068e0e034cdae9dadfc7cbf29f22338fe585ed7727213e0a3100972044"
+    }
+  },
+  "commands": {
+    "fullPython": "VPHONE_DAEMON_API_BUILD_DIR=\"$PWD/.build/daemon-api-t59-20261015\" make test_python",
+    "signedBuild": "CLANG_MODULE_CACHE_PATH=\"$PWD/.build/build-module-cache\" SWIFT_MODULECACHE_PATH=\"$PWD/.build/build-module-cache\" PATH=\"$PWD/.tools/bin:$PWD/.venv/bin:$PATH\" zsh scripts/build.sh --no-vphoned",
+    "sourceDiagnostic": "PATH=\"$PWD/.tools/bin:$PWD/.venv/bin:/opt/homebrew/bin:$PATH\" .venv/bin/python3 research/upstream_integration_2026-10-15/tools/verify_dsc_swapend_source.py vm-t32-t33-dsc-20261018/iPhone17,3_26.0_23A341_Restore .build/t32-dsc-readonly-source",
+    "restore": "research/upstream_integration_2026-10-15/tools/verify_dsc_vm_restore.py with approved frozen VM binary; exact per-step argv in dsc-restore-result.json"
+  },
+  "frozenFixParity": "All four Python producer/reader modules exactly match source, signed bundle resources and pending CFW frozen snapshot.",
+  "existingVMs": "Listed metadata and recorded small-file digests matched after independent DSC restore; no full old-VM disk hash this phase."
+}

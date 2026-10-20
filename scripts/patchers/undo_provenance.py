@@ -13,6 +13,7 @@ import stat
 
 from . import component_effects as effects
 from . import plan_gate as gate
+from .volume_state import volume_read_only
 
 FILENAME = 'guest-undo-provenance.json'
 DSC_MEMBER = 'System/Library/Caches/com.apple.dyld/'
@@ -79,7 +80,7 @@ def capture_baseline(plan, root, cache, binding):
     root = Path(root); cache = Path(cache)
     def readonly():
         info = plistlib.loads(subprocess.check_output(['/usr/sbin/diskutil','info','-plist',str(root)]))
-        if info.get('ReadOnlyVolume') is not True or info.get('MountPoint') != str(root):
+        if not volume_read_only(info) or info.get('MountPoint') != str(root):
             raise ValueError('Undo baseline requires exact readonly Cryptex volume')
     readonly()
     if mounted(plan,root) != cache: raise ValueError('Undo baseline mount differs from source cache')
@@ -215,7 +216,7 @@ def seal(work, proof):
 
 
 def verify_publication(work, record):
-    if record.get('version') != 2 or record.get('provenanceMode') != 'required':
+    if record.get('version') not in (2, 3, 4) or record.get('provenanceMode') != 'required':
         raise ValueError('publication requires a new provenance-qualified transaction; old records permit recovery only')
     anchor = record.get('undoProvenance')
     if anchor is None:

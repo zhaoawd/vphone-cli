@@ -206,9 +206,10 @@ public enum VariantPlanResolver {
                 excludedByOptIn.append(entry(declaration, .excludedByOptIn, "needs --frida opt-in"))
                 continue
             }
-            if !cloudOSVersionKnown, declaration.versionRule == .cloudOSFridaCapable {
+            if !cloudOSVersionKnown, let rule = declaration.versionRule,
+               rule == .cloudOSFridaCapable || rule == .cloudOSIs26_4OrNewer {
                 throw PatchDeclarationCatalog.CatalogError.versionIndeterminate(
-                    id: declaration.id, rule: .cloudOSFridaCapable)
+                    id: declaration.id, rule: rule)
             }
             if PatchDeclarationCatalog.ruleHolds(declaration, gates) {
                 selected.append(entry(declaration, .selected, dispositionReason(declaration)))

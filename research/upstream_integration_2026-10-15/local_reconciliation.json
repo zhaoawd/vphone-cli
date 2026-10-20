@@ -3205,8 +3205,8 @@
       ],
       "historical_capability_ledger": "../upstream_integration_2026-10-06/capability_ledger.json#T32",
       "current_delta_review": {
-        "assessment": "existing_foundation_delta_pending",
-        "finding": "未提交源码已有 VM/generation/desired 关联、分组件 Receipt、实际效果和 Undo 当前字节校验。上游 installer 使用 hasOutdatedImplementation 识别同 ID 旧实现再撤销重打；现有通用 Undo 不能据此认定已覆盖该迁移。",
+        "assessment": "qualified_dsc_suffix_undo_implemented_acceptance_pending",
+        "finding": "已实现 staged DSC 后缀撤销、完整代码页复核、效果 Receipt、guest 来源 unknown 转换、同 journal 发布/恢复及真实 Swift generation 身份连续性校验。仅限同一 live plan；任意中间操作、Mach-O/Preboot、受信新 guest 来源和真实 VM 验收未完成。",
         "local_paths": [
           "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift",
           "sources/FirmwarePatcher/Pipeline/FirmwareGeneration.swift",
@@ -3217,9 +3217,107 @@
           "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
           "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift"
         ],
-        "next_action": "复用当前可信状态与读回，逐实现代际补迁移资格；未知或无可信 Undo 时拒绝。"
+        "next_action": "具名测试 VM 的实际写入/启动验收；继续处理任意中间操作、Mach-O/Preboot 和受信来源推进。"
       },
-      "runtime_validation_this_turn": false
+      "runtime_validation_this_turn": false,
+      "execution_2026_10_15_receipt_undo": {
+        "baseline": "2df4be8c",
+        "finding": "已提交 Receipt 读取核对归档 producer report 的完整记录、原计划、generation 和输出；desired 改变仍保留旧应用事实。新增 fw receipts 检查入口。guest 磁盘交换与 Receipt/Undo/来源的同 journal 发布尚未完成。",
+        "evidence": [
+          "T32_T33_receipt_undo.md",
+          "evidence/T32-T33-undo/manifest.json"
+        ],
+        "runtime_validation": false
+      },
+      "guest_undo_preview_2026_10_15": {
+        "status": "committed_dsc_suffix_preview_implemented",
+        "evidence": [
+          "T32_T33_guest_undo_candidates.md",
+          "evidence/T32-T33-guest-undo/manifest.json"
+        ],
+        "disk_write": false,
+        "installed_origin_update": false,
+        "actual_VM_acceptance": false,
+        "accepted": false,
+        "validation": {
+          "relatedTests": 65,
+          "pythonFullTests": 869,
+          "skipped": 2,
+          "exitCode": 0
+        }
+      },
+      "guest_undo_publication_2026_10_16": {
+        "baseline": "fcd19e78 plus preserved WIP",
+        "status": "qualified_dsc_suffix_undo_implemented_acceptance_pending",
+        "finding": "已实现 staged DSC 后缀撤销、完整代码页复核、效果 Receipt、guest 来源 unknown 转换、同 journal 发布/恢复及真实 Swift generation 身份连续性校验。仅限同一 live plan；任意中间操作、Mach-O/Preboot、受信新 guest 来源和真实 VM 验收未完成。",
+        "evidence": [
+          "T32_T33_guest_undo_publication.md",
+          "evidence/T32-T33-guest-undo-publication/manifest.json"
+        ],
+        "python_full": {
+          "tests": 886,
+          "skipped": 2,
+          "exit_code": 0
+        },
+        "swift_full": {
+          "XCTest": 325,
+          "skipped": 7,
+          "SwiftTestingRegular": 1529,
+          "SwiftTestingTimed": 26,
+          "exit_code": 0
+        },
+        "runtime_validation": false,
+        "accepted": false
+      },
+      "guest_undo_vm_new_2026_10_16": {
+        "vm": "vm-new",
+        "vmDirectory": "/Users/kolar/github/vphone-cli/vm-new",
+        "missing_evidence_refusal": "passed",
+        "baseline_boot_cycles": 2,
+        "normal_stop_cycles": 2,
+        "disk_released": true,
+        "positive_undo_validated": false,
+        "accepted": false,
+        "evidence": [
+          "T32_T33_vm_new_acceptance.md",
+          "evidence/T32-T33-vm-new-acceptance/manifest.json"
+        ],
+        "next_action": "正向撤销需独立原始固件、generation 及新的记录化 CFW 安装；扩大到重新安装前等待用户明确选择。"
+      },
+      "existing_journal_search_2026_10_16": {
+        "user_choice": "use another VM with complete existing journal; do not reinstall vm-new",
+        "scope": "read-only known VM roots and registered worktree roots",
+        "VMs": 7,
+        "readable_published_v1_journals": 4,
+        "unreadable_history_journals": 1,
+        "qualified_candidates": [],
+        "next_action": "等待用户提供目标 VM 名称或路径，再核对当前磁盘、generation 和完整发布检查点。",
+        "evidence": "evidence/T32-T33-existing-journal-search/inventory.json",
+        "accepted": false
+      },
+      "roothide_journal_inspection_2026_10_16": {
+        "vm": "vm-roothide-b33-20261010",
+        "status": "inspection_complete_ineligible",
+        "journal_versions": [
+          1,
+          1,
+          1
+        ],
+        "published": 1,
+        "failed_retained": 2,
+        "missing": [
+          "generation",
+          "desired plan",
+          "guest-publication checkpoint",
+          "DSC source/effect chain"
+        ],
+        "VM_writes": false,
+        "accepted": false,
+        "evidence": [
+          "T32_T33_roothide_journal_inspection.md",
+          "evidence/T32-T33-roothide-journal-inspection/manifest.json"
+        ]
+      }
     },
     {
       "id": "T33",
@@ -3285,8 +3383,8 @@
       ],
       "historical_capability_ledger": "../upstream_integration_2026-10-06/capability_ledger.json#T33",
       "current_delta_review": {
-        "assessment": "existing_foundation_delta_pending",
-        "finding": "未提交源码已有 VM/generation/desired 关联、分组件 Receipt、实际效果和 Undo 当前字节校验。上游 installer 使用 hasOutdatedImplementation 识别同 ID 旧实现再撤销重打；现有通用 Undo 不能据此认定已覆盖该迁移。",
+        "assessment": "qualified_dsc_suffix_undo_implemented_acceptance_pending",
+        "finding": "已实现 staged DSC 后缀撤销、完整代码页复核、效果 Receipt、guest 来源 unknown 转换、同 journal 发布/恢复及真实 Swift generation 身份连续性校验。仅限同一 live plan；任意中间操作、Mach-O/Preboot、受信新 guest 来源和真实 VM 验收未完成。",
         "local_paths": [
           "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift",
           "sources/FirmwarePatcher/Pipeline/FirmwareGeneration.swift",
@@ -3297,9 +3395,107 @@
           "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
           "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift"
         ],
-        "next_action": "复用当前可信状态与读回，逐实现代际补迁移资格；未知或无可信 Undo 时拒绝。"
+        "next_action": "具名测试 VM 的实际写入/启动验收；继续处理任意中间操作、Mach-O/Preboot 和受信来源推进。"
       },
-      "runtime_validation_this_turn": false
+      "runtime_validation_this_turn": false,
+      "execution_2026_10_15_receipt_undo": {
+        "baseline": "2df4be8c",
+        "finding": "已接入从已提交 Receipt/report 恢复撤销预检，重复应用保留首次原件；核对保留补丁当前字节，撤销/重打只返回新副本与剩余日志。IOMFB 同 ID 仅判定记录形状，未移植新指令；DSC/Mach-O/Preboot 的签名及磁盘发布、真实 VM 验收仍待完成。",
+        "evidence": [
+          "T32_T33_receipt_undo.md",
+          "evidence/T32-T33-undo/manifest.json"
+        ],
+        "runtime_validation": false
+      },
+      "guest_undo_preview_2026_10_15": {
+        "status": "committed_dsc_suffix_preview_implemented",
+        "evidence": [
+          "T32_T33_guest_undo_candidates.md",
+          "evidence/T32-T33-guest-undo/manifest.json"
+        ],
+        "disk_write": false,
+        "installed_origin_update": false,
+        "actual_VM_acceptance": false,
+        "accepted": false,
+        "validation": {
+          "relatedTests": 65,
+          "pythonFullTests": 869,
+          "skipped": 2,
+          "exitCode": 0
+        }
+      },
+      "guest_undo_publication_2026_10_16": {
+        "baseline": "fcd19e78 plus preserved WIP",
+        "status": "qualified_dsc_suffix_undo_implemented_acceptance_pending",
+        "finding": "已实现 staged DSC 后缀撤销、完整代码页复核、效果 Receipt、guest 来源 unknown 转换、同 journal 发布/恢复及真实 Swift generation 身份连续性校验。仅限同一 live plan；任意中间操作、Mach-O/Preboot、受信新 guest 来源和真实 VM 验收未完成。",
+        "evidence": [
+          "T32_T33_guest_undo_publication.md",
+          "evidence/T32-T33-guest-undo-publication/manifest.json"
+        ],
+        "python_full": {
+          "tests": 886,
+          "skipped": 2,
+          "exit_code": 0
+        },
+        "swift_full": {
+          "XCTest": 325,
+          "skipped": 7,
+          "SwiftTestingRegular": 1529,
+          "SwiftTestingTimed": 26,
+          "exit_code": 0
+        },
+        "runtime_validation": false,
+        "accepted": false
+      },
+      "guest_undo_vm_new_2026_10_16": {
+        "vm": "vm-new",
+        "vmDirectory": "/Users/kolar/github/vphone-cli/vm-new",
+        "missing_evidence_refusal": "passed",
+        "baseline_boot_cycles": 2,
+        "normal_stop_cycles": 2,
+        "disk_released": true,
+        "positive_undo_validated": false,
+        "accepted": false,
+        "evidence": [
+          "T32_T33_vm_new_acceptance.md",
+          "evidence/T32-T33-vm-new-acceptance/manifest.json"
+        ],
+        "next_action": "正向撤销需独立原始固件、generation 及新的记录化 CFW 安装；扩大到重新安装前等待用户明确选择。"
+      },
+      "existing_journal_search_2026_10_16": {
+        "user_choice": "use another VM with complete existing journal; do not reinstall vm-new",
+        "scope": "read-only known VM roots and registered worktree roots",
+        "VMs": 7,
+        "readable_published_v1_journals": 4,
+        "unreadable_history_journals": 1,
+        "qualified_candidates": [],
+        "next_action": "等待用户提供目标 VM 名称或路径，再核对当前磁盘、generation 和完整发布检查点。",
+        "evidence": "evidence/T32-T33-existing-journal-search/inventory.json",
+        "accepted": false
+      },
+      "roothide_journal_inspection_2026_10_16": {
+        "vm": "vm-roothide-b33-20261010",
+        "status": "inspection_complete_ineligible",
+        "journal_versions": [
+          1,
+          1,
+          1
+        ],
+        "published": 1,
+        "failed_retained": 2,
+        "missing": [
+          "generation",
+          "desired plan",
+          "guest-publication checkpoint",
+          "DSC source/effect chain"
+        ],
+        "VM_writes": false,
+        "accepted": false,
+        "evidence": [
+          "T32_T33_roothide_journal_inspection.md",
+          "evidence/T32-T33-roothide-journal-inspection/manifest.json"
+        ]
+      }
     },
     {
       "id": "T34",
@@ -5202,5 +5398,40 @@
       },
       "runtime_validation_this_turn": false
     }
-  ]
+  ],
+  "new_vm_2026_10_18": {
+    "date": "2026-10-18",
+    "document": "research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md",
+    "evidence": "research/upstream_integration_2026-10-15/evidence/T32-T33-new-vm-20261018/manifest.json",
+    "vm": "vm-t32-t33-20261018-r2",
+    "prepare": "succeeded",
+    "patch": "succeeded; committed 2fe057e3-eaeb-4fa9-acac-bca9ae92b168, 7 component groups, 58 records",
+    "restore": "succeeded; SHSH and restore update exit 0",
+    "guest_undo": "not executed",
+    "runtime": "Two additional current classic API normal boot/poweroff cycles passed; distinct boot time/UUID; disk and directory lock released; config/daemon SHA unchanged",
+    "accepted_at_new_target": false,
+    "tests": "Python942(2 skipped),254.634s exit0; related33; SwiftCLI12 functions andsigned verifier3 functions(5 settings/8 identity cases); full signed bundle7-image closure passed; original boot bytes/inode/CDHash unchanged",
+    "cfw": "Fifth attempt published 20261019T013451Z-H0YWJ2mL; both readonly effect readbacks and create exit0; prompt boots passed",
+    "host_execute_recheck": "Native helper and install authentication completed. Approved current and fifth frozen VM help0. Four frozen fixed scripts match. No new allowance scope.",
+    "dsc_target": {
+      "vm": "vm-t32-t33-dsc-20261018",
+      "firmware": "iOS 26.0 23A341 + cloudOS 26.1 23B85 regular/classic",
+      "generation": "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "prepare": "succeeded",
+      "patch": "committed c1c3bbd5-e615-4ba5-8700-0fc885925167; 7 component groups, 58 records",
+      "restore": "SHSH and restore exit 0; DFU exit 0; disk and directory lock released",
+      "source_diagnostic": "readonly SwapEnd 0x548 -> 0x560; corresponding 6885 CodeDirectory pages verified; source unchanged",
+      "cfw": "Explicit reinstall 20261019T124601Z-vZh3Hh4C failed strict final verification; original metadata and 66 samples unchanged; directory-symlink mechanism reproduced and fixed; corrected bundle retry CLI4097/session59096 started; current stage in acceptance-state.json",
+      "guest_undo": "Previous continuations stopped on install failure; no Undo or boot; corrected on/off/on runner prepared; actual acceptance pending",
+      "normal_boot": "Earlier first publication boots passed; new rebaseline notbooted. No current reapplication acceptance.",
+      "accepted": false,
+      "installed_dsc_proof": "original e41db9aa... and installed2fc23949...; w3 0x548->0x560;6885 pages each; unbooted raw/publication SHA match",
+      "post_boot": "actual receipts and Swift verify-plan exit0; committed-publication; runtimeImageChanged true; runtimeValidated false",
+      "on_off_on": "Pending explicit Cryptex reinstall, preboot Undo, restored boots, explicit reapplication andboots"
+    },
+    "current_evidence": "evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json",
+    "runtime_evidence_boundary": "v3 post-boot raw SHA/mtime mismatch refuses receipts and plan qualification; checkpoint, 5 files and 297 blobs unchanged; v4 independent postimage under implementation",
+    "runtime_publication_v4": "implemented; independent postimage and historical association; current target verification required for Undo; legacy v3 remains strict",
+    "final_host_allowance": "89b70a253cad2adea133b3e875519afaf72c5d17 explicitly authorized and scoped helper executed; argument-validation probes passed"
+  }
 }

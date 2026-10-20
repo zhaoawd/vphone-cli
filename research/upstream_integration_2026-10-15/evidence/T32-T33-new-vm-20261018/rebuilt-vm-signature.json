@@ -1,0 +1,22 @@
+{
+  "path": "/Users/kolar/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+  "sha256": "fcd672ae92e2ca78069dc4270faa2e912151d2c96e2b15297890c57dac7b518c",
+  "cdhash": "cad3fa35fa16672ad522b31564352ffd4276b469",
+  "host_policy_changed": true,
+  "proposed_host_action": {
+    "tool": "/Users/kolar/Library/Python/3.9/bin/amfidont",
+    "arguments": [
+      "daemon",
+      "--cdhash",
+      "cad3fa35fa16672ad522b31564352ffd4276b469",
+      "--spoof-apple"
+    ],
+    "requires_user_approval": false
+  },
+  "host_action_authorization": {
+    "answer": "允许按 CDHash 放行并继续",
+    "scope": "Start existing amfidont with this CDHash and --spoof-apple, then restore, install CFW and validate undo on the new VM",
+    "cdhash": "cad3fa35fa16672ad522b31564352ffd4276b469",
+    "status": "effective: matching frozen VM --help exited 0"
+  }
+}

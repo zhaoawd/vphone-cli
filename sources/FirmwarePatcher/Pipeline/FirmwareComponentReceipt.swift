@@ -54,6 +54,16 @@ public enum FirmwareComponentReceipt {
               desired.plan == plan, desired.generationID == generation.id else {
             throw failure("generation/desired qualification differs")
         }
+        return try captureQualified(component: component, plan: plan, generation: generation,
+            desiredSHA256: desired.sha256, records: records, outputs: outputs, root: root)
+    }
+
+    private static func captureQualified(component: String, plan: VariantPlanResolver.VariantPlan,
+        generation: FirmwareGeneration.Manifest, desiredSHA256: String, records: [PatchRecord],
+        outputs: [URL], root: URL) throws -> Record {
+        guard !records.isEmpty, outputs.count == 1 else {
+            throw failure("component requires actual records and one unambiguous payload output")
+        }
         let path = try relative(outputs[0], in: root)
         let digest = try FirmwareGeneration.fileSHA256(outputs[0])
         let payload = Data(try IM4PHandler.load(contentsOf: outputs[0]).payload)
@@ -77,7 +87,7 @@ public enum FirmwareComponentReceipt {
         guard try FirmwareGeneration.fileSHA256(outputs[0]) == digest else { throw failure("output changed during readback") }
         return Record(schemaVersion: 1, component: component, scope: .generatedFirmware, state: .generated,
                       generationID: generation.id, planSHA256: try FirmwareGeneration.planDigest(plan),
-                      desiredSHA256: try desired.sha256, outputs: [Output(path: path, sha256: digest)], effects: effects)
+                      desiredSHA256: desiredSHA256, outputs: [Output(path: path, sha256: digest)], effects: effects)
     }
 
     public static func verify(_ record: Record, in directory: URL) throws {
@@ -128,9 +138,31 @@ public enum FirmwareComponentReceipt {
                   try FirmwareGeneration.fileSHA256(archive.appendingPathComponent("component-receipts.json")) == digest else {
                 throw failure("receipt has no matching committed journal")
             }
-            for record in publication.records { try verify(record, in: directory) }
+            try verifySavedReport(publication, journal: journal, archive: archive)
+            guard let plan = journal.plan, let generationID = journal.options["generationID"],
+                  let desiredSHA256 = journal.options["desiredSHA256"], FirmwareGeneration.validDigest(desiredSHA256),
+                  let binding = journal.planBinding, binding.payload.generationID == generationID else {
+                throw failure("receipt has no saved plan qualification")
+            }
+            try binding.validate(journal: journal, directory: directory, currentCatalog: false)
+            let generation = try FirmwareGeneration.loadVerified(in: directory, id: generationID)
+            // Applied evidence belongs to the plan that produced it. A later
+            // desired selection must neither erase this evidence nor relabel it.
+            for record in publication.records {
+                guard record.schemaVersion == 1, record.scope == .generatedFirmware, record.state == .committed,
+                      record.generationID == generationID, record.desiredSHA256 == desiredSHA256 else {
+                    throw failure("archived receipt qualification differs")
+                }
+                var rebuilt = try captureQualified(component: record.component, plan: plan, generation: generation,
+                    desiredSHA256: desiredSHA256, records: record.effects.map(\.record),
+                    outputs: record.outputs.map { directory.appendingPathComponent($0.path) }, root: directory)
+                rebuilt.state = .committed
+                guard rebuilt == record else { throw failure("archived receipt effect or ownership differs") }
+            }
             if let installed = publication.installed {
-                guard installed.scope == .installedComponent, installed.state == .committed,
+                guard installed.schemaVersion == 1, installed.scope == .installedComponent, installed.state == .committed,
+                      installed.generationID == generationID, installed.desiredSHA256 == desiredSHA256,
+                      installed.planSHA256 == (try FirmwareGeneration.planDigest(plan)),
                       let proof = publication.originProofSHA256, publication.originLayer != nil,
                       try FirmwareGeneration.fileSHA256(archive.appendingPathComponent("installed-component-proof.json")) == proof else {
                     throw failure("installed receipt has no committed proof")
@@ -141,8 +173,33 @@ public enum FirmwareComponentReceipt {
                           try FirmwareGeneration.fileSHA256(url) == output.sha256 else { throw failure("installed receipt output differs") }
                 }
             }
-            guard try FirmwareGeneration.fileSHA256(file) == digest else { throw failure("receipt changed during read") }
+            guard try FirmwareGeneration.fileSHA256(file) == digest,
+                  try FirmwareGeneration.fileSHA256(archive.appendingPathComponent("report.json")) == journal.reportSHA256,
+                  try FirmwareTransaction.readJournal(at: archive.appendingPathComponent("journal.json")) == journal else {
+                throw failure("receipt or committed evidence changed during read")
+            }
             return publication.records + (publication.installed.map { [$0] } ?? [])
+        }
+    }
+
+    private static func verifySavedReport(_ publication: FirmwareTransaction.ComponentPublication,
+        journal: FirmwareTransaction.Journal, archive: URL) throws {
+        guard let expected = journal.reportSHA256 else { throw failure("receipt has no saved report") }
+        let bytes = try VPhoneCreateDigest.strictFileData(archive.appendingPathComponent("report.json"), maximumBytes: 64 << 20)
+        guard VPhoneCreateDigest.sha256(bytes) == expected else { throw failure("saved receipt report differs") }
+        let report = try JSONDecoder().decode(PatchRunReport.self, from: bytes)
+        let evidence = journal.kernelOnly == true ? publication.installed.map { [$0] } ?? [] : publication.records
+        guard !report.allRecords.isEmpty, report.failedRequired.isEmpty,
+              (!publication.records.isEmpty || journal.kernelOnly == true),
+              journal.kernelOnly != true || (publication.records.isEmpty && publication.filesystem == nil && publication.installed != nil),
+              (publication.filesystem != nil) == publication.records.contains(where: { $0.component.lowercased() == "filesystem" }),
+              (publication.filesystem != nil) == (publication.filesystemProofSHA256 != nil),
+              (publication.installed != nil) == (publication.originLayer != nil),
+              (publication.installed != nil) == (publication.originProofSHA256 != nil),
+              Set(evidence.map { $0.component.lowercased() }).count == evidence.count,
+              Dictionary(grouping: report.allRecords, by: { $0.component.lowercased() }) ==
+                Dictionary(uniqueKeysWithValues: evidence.map { ($0.component.lowercased(), $0.effects.map(\.record)) }) else {
+            throw failure("receipt does not cover exact saved producer records")
         }
     }
 

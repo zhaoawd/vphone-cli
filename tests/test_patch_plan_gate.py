@@ -480,6 +480,37 @@ class FrozenGateTests(unittest.TestCase):
         self.assertEqual((directory/'dyld_shared_cache_arm64e').read_bytes(),original)
         self.assertEqual(self.evidence.read_bytes(),b'')
 
+    def test_data_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.33.dylddata')
+
+    def test_readonly_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.34.dyldreadonly')
+
+    def test_linkedit_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.35.dyldlinkedit')
+
+    def test_atlas_companion_symlink_refuses_before_dispatch(self):
+        self.assert_companion_symlink_refuses('dyld_shared_cache_arm64e.atlas')
+
+    def assert_companion_symlink_refuses(self, name):
+        from tests.test_dsc_maxslide import build_cache
+        _, digest = guest_write.target_table()
+        self.entries.append(dict(id='dyld-boot-maxslide', disposition='guestUncovered',
+            recordRules=[dict(literal='guest-target-map-v1:'+digest+':dyld-boot-maxslide', hexadecimalOffsetSuffix=False)]))
+        self.publish()
+        directory = self.mount/'mnt1/dsc'; directory.mkdir()
+        original = build_cache(size=0x17D504000, max_slide=0x20000000)
+        (directory/'dyld_shared_cache_arm64e').write_bytes(original)
+        outside = self.root/'companion-external'; outside.write_bytes(original)
+        (directory/name).symlink_to(outside)
+        with patch.dict(os.environ, dict(VPHONE_FROZEN_PLAN_SHA256=self.digest, VPHONE_FROZEN_CONTEXT=json.dumps(self.context))), \
+             patch.object(sys, 'argv', ['cfw.py','patch-dsc-maxslide',str(directory)]), \
+             patch.object(cfw, '_dispatch') as dispatch:
+            with self.assertRaisesRegex(ValueError, 'non-linked regular'): cfw.main()
+            dispatch.assert_not_called()
+        self.assertEqual(outside.read_bytes(), original)
+        self.assertEqual(self.evidence.read_bytes(), b'')
+
     def test_explicit_signer_records_patch_sign_copy_and_rejects_code_restoration(self):
         from patchers import component_effects as effects
         from tests.test_component_signatures import signed_macho
@@ -859,7 +890,8 @@ class FrozenGateTests(unittest.TestCase):
         (work/'transaction.json').write_text(json.dumps({'version':2,'provenanceMode':'required','status':'staged','vm':str(self.vm),'staged':cfw_disk_txn.identity(image.stat())}))
         readonly=True
         def query(argv):
-            if argv==['/usr/sbin/diskutil','info','-plist','/dev/disk42s1']:
+            if argv in (['/usr/sbin/diskutil','info','-plist','/dev/disk42s1'],
+                        ['/usr/sbin/diskutil','info','-plist',str(self.mount/'mnt1')]):
                 return plistlib.dumps({'DeviceIdentifier':'disk42s1','MountPoint':str(self.mount/'mnt1'),'ReadOnlyVolume':readonly})
             if argv==['/usr/bin/hdiutil','info','-plist']:
                 return plistlib.dumps({'images':[{'image-path':str(image),'system-entities':[{'dev-entry':'/dev/disk41'}]}]})
@@ -867,9 +899,10 @@ class FrozenGateTests(unittest.TestCase):
                 return plistlib.dumps({'Containers':[{'ContainerReference':'disk42','PhysicalStores':[{'DeviceIdentifier':'disk41s1'}],
                     'Volumes':[{'DeviceIdentifier':'disk42s1','MountPoint':str(self.mount/'mnt1')}]}]})
             self.fail(str(argv))
-        with patch.object(final_guest.subprocess,'check_output',side_effect=query):
+        with patch.object(final_guest.subprocess,'check_output',side_effect=query) as observed:
             result=final_guest.run(plan)
             self.assertEqual(result['operationsSHA256'],effects.digest(self.evidence))
+            observed.assert_any_call(['/usr/sbin/diskutil','info','-plist',str(self.mount/'mnt1')])
             target.write_bytes(b'overwritten')
             with self.assertRaises(ValueError): final_guest.run(plan)
             target.write_bytes(b'required')

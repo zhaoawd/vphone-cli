@@ -1,0 +1,45 @@
+FF.....[*] previous Disk.img retained as /private/tmp/tmprr39pvaz/vm/.cfw-history/initial/Disk.img
+F
+======================================================================
+FAIL: test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it) (options=('--reinstall-cryptex',))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_cryptex_reinstall.py", line 29, in test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it
+    self.assertEqual(child.returncode,0,(child.stdout+child.stderr).decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : [*] host-mode CFW install: variant=regular vm=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm mounts=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/.cfw_mount.Cmb1u7GY staging=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/.cfw_disk.svzFMHZ7
+[-] CFW disk stage: EPERM: Operation not permitted
+[-] CFW install did not change /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/Disk.img; record: /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/.cfw-history/20261019T121656Z-svzFMHZ7/transaction.json
+[!] ownership of host-side artifacts NOT restored: invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)
+
+
+======================================================================
+FAIL: test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it (tests.test_cfw_cryptex_reinstall.CryptexReinstallDriverTests.test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it) (options=())
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_cryptex_reinstall.py", line 29, in test_explicit_option_reaches_installer_and_ambient_value_does_not_enable_it
+    self.assertEqual(child.returncode,0,(child.stdout+child.stderr).decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : [*] host-mode CFW install: variant=regular vm=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm mounts=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/.cfw_mount.rArwWE43 staging=/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/.cfw_disk.P42lluPU
+[-] CFW disk stage: EPERM: Operation not permitted
+[-] CFW install did not change /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/Disk.img; record: /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d0yrf2ie/vm/.cfw-history/20261019T121656Z-P42lluPU/transaction.json
+[!] ownership of host-side artifacts NOT restored: invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)
+
+
+======================================================================
+FAIL: test_actual_driver_restores_publishes_and_retains_install_inputs (tests.test_cfw_guest_undo_driver.GuestUndoDriverTests.test_actual_driver_restores_publishes_and_retains_install_inputs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_cfw_guest_undo_driver.py", line 51, in test_actual_driver_restores_publishes_and_retains_install_inputs
+    self.assertEqual(result.returncode,0,result.stdout.decode()+result.stderr.decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : [*] host-mode CFW install: variant=regular vm=/private/tmp/tmprr39pvaz/vm mounts=/private/tmp/tmprr39pvaz/vm/.cfw_mount.CUA5wojA staging=/private/tmp/tmprr39pvaz/vm/.cfw_disk.YSWDvvCa
+[-] CFW disk stage: EPERM: Operation not permitted
+[-] CFW install did not change /private/tmp/tmprr39pvaz/vm/Disk.img; record: /private/tmp/tmprr39pvaz/vm/.cfw-history/20261019T121658Z-YSWDvvCa/transaction.json
+[!] ownership of host-side artifacts NOT restored: invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)
+
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.642s
+
+FAILED (failures=3)

@@ -4,11 +4,14 @@ import Foundation
 public enum VPhoneVMLockError: Error, CustomStringConvertible, LocalizedError {
     case unavailable(String, Int32)
     case firmwareRecoveryRequired(String)
+    case cfwRecoveryRequired(String)
 
     public var errorDescription: String? { description }
 
     public var description: String {
         switch self {
+        case let .cfwRecoveryRequired(path):
+            return "Pending CFW disk transaction at \(path); inspect/recover it before using this VM"
         case let .firmwareRecoveryRequired(path):
             return "Pending firmware transaction at \(path); run patch-firmware --recover before using this VM"
         case let .unavailable(path, code):
@@ -60,6 +63,10 @@ public final class VPhoneVMLock {
             if operation != VPhoneVMOperation.fwPatch, operation != VPhoneVMOperation.createCheckpoint,
                lstat(pendingPath, &pending) == 0 {
                 throw VPhoneVMLockError.firmwareRecoveryRequired(pendingPath)
+            }
+            if operation != VPhoneVMOperation.cfwRecord, operation != VPhoneVMOperation.fwReceipts,
+               let pending = try FileManager.default.contentsOfDirectory(atPath: directory.path).first(where: { $0.hasPrefix(".cfw_disk.") }) {
+                throw VPhoneVMLockError.cfwRecoveryRequired(directory.appendingPathComponent(pending).path)
             }
             var info = stat()
             guard fstat(fd, &info) == 0 else { throw VPhoneVMLockError.unavailable(directory.path, errno) }

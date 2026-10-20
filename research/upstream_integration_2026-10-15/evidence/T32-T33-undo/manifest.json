@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-15",
+  "baseline": "2df4be8ceab956d498f2cc7d79b26f4ddbdee467",
+  "upstreamTarget": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+  "scope": "committed receipt/report qualification, reversible generated-payload previews and read-only CLI; guest disk publication pending",
+  "sources": {
+    "sources/FirmwarePatcher/Core/VPhonePatchUndoLog.swift": "668620357290678b12254f07288fbb9b8fda54019e49d1035aa8ac24e97eba1a",
+    "sources/FirmwarePatcher/Pipeline/FirmwareComponentReceipt.swift": "6c94fa1b8432cacfd5d14ad252d3dfcdbee329008f058a0f467ec7e9f31ac59b",
+    "sources/FirmwarePatcher/Pipeline/FirmwareComponentUndo.swift": "19f13d7eb5aefc53d1e441a6e9025ace1858502a911bd67da30f7807f127f7c0",
+    "sources/VPhoneCore/VPhoneVMRuntimeState.swift": "b79905a7bb512a9accd68117e3f38b949965aeb273e1f8793b64977a5605e347",
+    "sources/vphone-cli/VPhoneFWCLI.swift": "41dc36ebf8160126067b0ed442e3fc8ff59860e8b40610bd36784fc76cd9c805",
+    "sources/vphone-cli/VPhoneFWReceiptsCLI.swift": "0a8262e5997d075175b01fe409d03a50c7f2e540531c3864ee18a424bd4aea3f",
+    "tests/FirmwarePatcherTests/PatchUndoLogTests.swift": "616886da0affb7d022cc742133069bfe7ba25f18cecb251c640439e7bfcd9bc9",
+    "tests/FirmwarePatcherTests/FirmwareComponentUndoTests.swift": "2d627c9cb582f051f571cb39882b0e10404d8a5f40bb7217a512b606b624c26d",
+    "tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift": "5796de23049acbc68f1f1c38c9243c681cd18519d97c27859e80fdbf3c6abe55",
+    "tests/VPhoneCLITests/FWReceiptsCLITests.swift": "97ed185814238a3de68de0e7e240f65d44b8bc856b88d5045cccc9ae3b4be1ac"
+  },
+  "checks": [
+    {
+      "command": "swift test --disable-sandbox --cache-path .build/test-cache --filter PatchUndoLogTests",
+      "log": "red.log",
+      "exit_code": 1,
+      "result": "two original behavior failures captured"
+    },
+    {
+      "command": "python3 .build/t32-t33-receipt-control.py",
+      "log": "receipt-baseline-control.log",
+      "test_exit_code": 1,
+      "wrapper_exit_code": 0,
+      "result": "three expected baseline failures; candidate restored"
+    },
+    {
+      "command": "CLANG_MODULE_CACHE_PATH=$PWD/.build/test-module-cache SWIFT_MODULECACHE_PATH=$PWD/.build/test-module-cache swift test --disable-sandbox --cache-path $PWD/.build/test-cache --filter 'PatchUndoLogTests|FirmwareComponentUndoTests|FirmwareComponentReceiptTests|FirmwareReceiptPublicationTests|FirmwareLegacyReceiptTests|FirmwareKernelUpdateTests|FirmwareKernelRollbackTests|FWReceiptsCLITests|testActiveConnectionLimitAndStopDuringConnect'",
+      "log": "final-related-host.log",
+      "exit_code": 0,
+      "swift_testing": 72,
+      "xctest": 1,
+      "result": "passed; includes APIProxy recheck"
+    },
+    {
+      "command": "make test_swift",
+      "log": "full-swift.log",
+      "exit_code": 2,
+      "scope": "intermediate sandbox execution",
+      "result": "failed; includes loopback/process permission failures"
+    },
+    {
+      "command": "make test_swift",
+      "log": "full-swift-host.log",
+      "exit_code": 2,
+      "runner_exit_code": 1,
+      "swift_testing": 1527,
+      "swift_testing_issues": 1,
+      "xctest_failures": 1,
+      "known_issue": "KernelStructuredMergeTests.postValidationRecognizesIdempotenceWithoutEmitting: emittedRecords=2, expected=1",
+      "additional_failure": "APIProxyTests.testActiveConnectionLimitAndStopDuringConnect; independent recheck passed, initial cause unknown"
+    },
+    {
+      "command": "python3 research/upstream_integration_2026-10-15/evidence/T32-T33-undo/run_followup.py",
+      "exit_code": 0,
+      "results": [
+        {
+          "name": "latency",
+          "command": [
+            "swift",
+            "test",
+            "--disable-sandbox",
+            "--cache-path",
+            "/Users/kolar/github/vphone-cli/.build/test-cache",
+            "--skip-build",
+            "--filter",
+            "xpcRejectsClientWithoutConfiguredSigningIdentity|cancellingARunInterruptsOnlyItsChild|deadlineAndCallerCancellationEndHTTPWait|supervisorRejectsFailureAndStopsTimedOutWorker|pipedCLIForwardsStopSignalAndWaitsForVMExit|timeoutKillsChildIgnoringTermination|timeoutBoundsPipesInheritedByDescendant|timeoutIncludesBlockedSendAndReleasesPendingSlot|a changed entity or a server without ranges restarts from byte zero"
+          ],
+          "exit_code": 0,
+          "log": "latency-host.log"
+        },
+        {
+          "name": "tar-memory",
+          "command": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "scripts/check_tar_pipe_memory.py"
+          ],
+          "exit_code": 0,
+          "log": "tar-memory-host.log"
+        },
+        {
+          "name": "digest-memory",
+          "command": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "scripts/check_file_digest_memory.py"
+          ],
+          "exit_code": 0,
+          "log": "digest-memory-host.log"
+        },
+        {
+          "name": "guest-components",
+          "command": [
+            "make",
+            "test_guest_components"
+          ],
+          "exit_code": 0,
+          "log": "guest-components-host.log"
+        }
+      ]
+    }
+  ],
+  "not_run": [
+    "full Python suite (no Python production changes)",
+    "real firmware comparisons",
+    "complete signed App build",
+    "guest deployment",
+    "actual VM acceptance",
+    "DSC/Mach-O/Preboot disk undo publication"
+  ],
+  "capstone": {
+    "head": "ea98aa0a31693d7ea2930c4372f9b5858b0bc7a3",
+    "overlay_sha256": "d3d6fa57f79c1c56bed08321fae8a64c479a340a2d761f322d9271452b9fa77a",
+    "pinned_overlay_matches": true
+  },
+  "history_and_new_target_accepted_counts_unchanged": true,
+  "artifacts": {
+    "digest-memory-host.log": "89f9b6b964dacf2b26e00fed27fa15af8e837e337d5f05d2bea012050ef5bd38",
+    "final-related-host.log": "3fd20fe4cea0a1e3b9d46f340e9da13c1ba252df27007005cfee515fc980faa5",
+    "followup-results.json": "6dcf4d8961735da73f91409c2b2d80e3e8918fcb98a882d6888d72b1932ba73c",
+    "full-swift-host.log": "b91d182d7871c9c1822a64ab63c87928076de463d168a632c5f8f61a7f375b80",
+    "full-swift.log": "2addfc73d33a401b517b6cb81fecfe06cd92a9aafe92501dbc6f9e0ccd022179",
+    "guest-components-host.log": "85c58290825edb63e7ba5137eb9677849755410460be24713425968c0cae369d",
+    "latency-host.log": "02ccdeef47a7a521e2eaeeba09dfcebbfae376d1ef847485a3359aee6a8597ca",
+    "receipt-baseline-control.log": "2c4ca2dd34f31569f981a8b16c3873f5aa1d0bb3aba926f8eb9b26728b15ab37",
+    "receipt-baseline.swift.txt": "420344494a44d4e7db56f376d98540a55c578471fa724a8d40685471dcba2bbd",
+    "receipt-candidate.swift.txt": "fc5fbbdc239b54452fb91a668fc69f6cdcdb5febbfd403152ad84c6641d3b352",
+    "red.log": "0619651bcb32707868a9dffab21938228ef9f6edb22a9ced90eaeace7fb68075",
+    "related-final.log": "a3fb3f978b550f27797e8f7d142dd9c5ff9b223ff90850908114650a5565c368",
+    "related-initial.log": "4df74d5f6738888aec55134705014ac74a1a5433e9c56ee68e6e08b9ed9bc240",
+    "related.log": "56f5ac211584d16c88887d6e839a197abeebf90eadb22d04f01c83b35d49dc72",
+    "run_followup.py": "8d9abe28169a127108a3bdc161b727a1af2bee0946eb95f66c0ec196378edff1",
+    "tar-memory-host.log": "f0644a916dce646e69364e123873c7c5146d227bfb0b6119e2474d9dcc203377",
+    "validate_ledger.py": "2f55b456d5a2e4d0966bafffe631ba7fb59fe75ea39615e80041d9284142c2d9",
+    "ledger-validation.json": "5886eac1d345748762f83b311eee578fbcc9529281754e0761ce412001ed0f1d"
+  },
+  "ledger_validation": {
+    "tasks": 61,
+    "ids_and_dependencies": "passed",
+    "historical_fields_and_counts_preserved": true,
+    "new_target_acceptance_not_promoted": true,
+    "evidence_links": "passed"
+  },
+  "final_source_and_artifact_hash_check": "passed",
+  "updated_document_relative_links": "passed"
+}

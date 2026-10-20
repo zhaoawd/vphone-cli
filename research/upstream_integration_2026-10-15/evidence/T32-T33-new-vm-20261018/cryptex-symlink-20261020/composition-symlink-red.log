@@ -1,0 +1,21 @@
+test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo) ... [*] previous Disk.img retained as /private/tmp/tmp5ozd2pvo/vm/.cfw-history/initial/Disk.img
+ERROR
+
+======================================================================
+ERROR: test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo (tests.test_guest_undo_transaction.GuestUndoTransactionTests.test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_guest_undo_transaction.py", line 123, in test_replacing_cryptex_with_existing_directory_symlinks_qualifies_a_new_undo
+    self.reinstall_and_undo(existing_symlinks=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kolar/github/vphone-cli/tests/test_guest_undo_transaction.py", line 165, in reinstall_and_undo
+    guest_write.run(source_fixture.plan, ['ln', '-sfn', relative, str(link)])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kolar/github/vphone-cli/scripts/patchers/guest_write.py", line 167, in run
+    raise ValueError('unsupported guarded guest command option')
+ValueError: unsupported guarded guest command option
+
+----------------------------------------------------------------------
+Ran 1 test in 0.173s
+
+FAILED (errors=1)

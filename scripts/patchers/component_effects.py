@@ -29,19 +29,34 @@ def digest(path):
 
 
 class regular:
-    def __init__(self,path): self.path=Path(path)
+    def __init__(self,path, *, readonly_source=False):
+        self.path=Path(path)
+        self.readonly_source=readonly_source
+    def require_readonly(self):
+        if not os.fstatvfs(self.fd).f_flag & os.ST_RDONLY:
+            raise ValueError('hard-linked source filesystem is not readonly')
     def __enter__(self):
         self.fd=os.open(self.path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
-        self.before=os.fstat(self.fd)
-        if not stat.S_ISREG(self.before.st_mode) or self.before.st_nlink!=1:
-            os.close(self.fd);raise ValueError('effect input is not an unlinked regular file')
+        try:
+            self.before=os.fstat(self.fd)
+            if not stat.S_ISREG(self.before.st_mode) or self.before.st_nlink<1:
+                raise ValueError('effect input is not an unlinked regular file')
+            if self.before.st_nlink!=1:
+                if not self.readonly_source:
+                    raise ValueError('effect input is not an unlinked regular file')
+                self.require_readonly()
+        except BaseException:
+            os.close(self.fd)
+            raise
         self.stream=os.fdopen(self.fd,'rb');return self.stream
     def __exit__(self,*args):
         try:
             after=os.fstat(self.fd);named=self.path.lstat()
-            keys=('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns')
+            keys=('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns','st_nlink','st_mode','st_uid','st_gid')
             if any(getattr(self.before,k)!=getattr(after,k) or getattr(after,k)!=getattr(named,k) for k in keys):
                 raise ValueError('effect input changed during read')
+            if self.before.st_nlink!=1:
+                self.require_readonly()
         finally: self.stream.close()
 
 
@@ -50,17 +65,21 @@ def metadata(path):
     return {'mode':stat.S_IMODE(info.st_mode),'uid':info.st_uid,'gid':info.st_gid}
 
 
-def state(path, recursive=True):
+def state(path, recursive=True, *, readonly_source=False):
     path=Path(path)
     try: info=path.lstat()
     except FileNotFoundError: return {'kind':'missing'}
     result=metadata(path)
     if stat.S_ISLNK(info.st_mode): return dict(result,kind='symlink',link=os.readlink(path))
-    if stat.S_ISREG(info.st_mode): return dict(result,kind='file',sha256=digest(path))
+    if stat.S_ISREG(info.st_mode):
+        with regular(path,readonly_source=readonly_source) as stream:
+            h=hashlib.sha256()
+            while block:=stream.read(CHUNK): h.update(block)
+        return dict(result,kind='file',sha256=h.hexdigest())
     if stat.S_ISDIR(info.st_mode):
         if not recursive: return dict(result,kind='directory')
         names=sorted(os.listdir(path))
-        result=dict(result,kind='directory',children={n:state(path/n) for n in names})
+        result=dict(result,kind='directory',children={n:state(path/n,readonly_source=readonly_source) for n in names})
         after=path.lstat()
         if (info.st_dev,info.st_ino,info.st_mtime_ns,info.st_ctime_ns)!=(after.st_dev,after.st_ino,after.st_mtime_ns,after.st_ctime_ns) or names!=sorted(os.listdir(path)):
             raise ValueError('effect tree changed during read')
@@ -68,13 +87,13 @@ def state(path, recursive=True):
     raise ValueError('special file in effect tree')
 
 
-def persist(path,store):
+def persist(path,store, *, readonly_source=False):
     store=Path(store)
     store.mkdir(mode=0o700,parents=False,exist_ok=True)
     if store.is_symlink() or not store.is_dir(): raise ValueError('linked effect store')
     fd,name=tempfile.mkstemp(prefix='.input-',dir=store)
     try:
-        with os.fdopen(fd,'wb') as out, regular(path) as source:
+        with os.fdopen(fd,'wb') as out, regular(path,readonly_source=readonly_source) as source:
             h=hashlib.sha256()
             while block:=source.read(CHUNK): out.write(block);h.update(block)
             out.flush();os.fsync(out.fileno())
@@ -97,10 +116,10 @@ def blob(store,key):
     return path
 
 
-def capture_input(path,store,recursive=True):
-    value=state(path,recursive)
+def capture_input(path,store,recursive=True, *, readonly_source=False):
+    value=state(path,recursive,readonly_source=readonly_source)
     if value['kind']=='file':
-        key=persist(path,store)
+        key=persist(path,store,readonly_source=readonly_source)
         if key!=value['sha256']: raise ValueError('input changed during preservation')
     return value
 
@@ -372,6 +391,9 @@ def verify(proofs,path,store,*,_final_state=None):
         verify(proofs[:sign_index],blob(store,boundary['sha256']),store,_final_state=boundary)
         signatures.verify_signing(blob(store,boundary['sha256']),path)
         for earlier in proofs[:sign_index]:
+            # Copy associates content; a later copy can retain the destination's
+            # metadata. Only changed metadata effects cross the signing boundary.
+            if earlier['operation']=='copy': continue
             for key in ('mode','uid','gid'):
                 if earlier['before'].get(key)!=earlier['after'].get(key) and state(path,False).get(key)!=earlier['after'].get(key):
                     raise ValueError('required metadata effect was overwritten')

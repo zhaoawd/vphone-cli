@@ -21,14 +21,26 @@ import Testing
         #expect(throws: PatchDeclarationCatalog.CatalogError.versionIndeterminate(
             id: "kernel-exp-frida_thread_set_state_entitlement_flag", rule: .cloudOSFridaCapable)) {
             _ = try VariantPlanResolver.resolve(variant: .jb,
-                gates: VariantPlanTests.snapshots(.jb)[3], cloudOSVersionKnown: false)
+                gates: BootxVersionGateTests.gates(modernCloudOS: false, frida: true, variant: "jb"),
+                cloudOSVersionKnown: false,
+                block: [BootxVersionGateTests.declarationID])
         }
     }
 
-    @Test func unknownCloudOSDoesNotBlockAPlanWithoutFrida() throws {
+    @Test func bootxRequiresKnownCloudOSWithoutFrida() {
+        #expect(throws: PatchDeclarationCatalog.CatalogError.versionIndeterminate(
+            id: BootxVersionGateTests.declarationID, rule: .cloudOSIs26_4OrNewer)) {
+            _ = try VariantPlanResolver.resolve(variant: .jb,
+                gates: VariantPlanTests.snapshots(.jb)[0], cloudOSVersionKnown: false)
+        }
+    }
+
+    @Test func unknownCloudOSCanStillExcludeBothCloudOSConsumersExplicitly() throws {
         let plan = try VariantPlanResolver.resolve(variant: .jb,
-            gates: VariantPlanTests.snapshots(.jb)[0], cloudOSVersionKnown: false)
+            gates: BootxVersionGateTests.gates(modernCloudOS: false, variant: "jb"), cloudOSVersionKnown: false,
+            block: [BootxVersionGateTests.declarationID])
         #expect(plan.excludedByOptIn.contains { $0.id == "kernel-exp-frida_thread_set_state_entitlement_flag" })
+        #expect(plan.excludedByOptIn.contains { $0.id == BootxVersionGateTests.declarationID })
     }
 
 }

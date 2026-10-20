@@ -381,13 +381,21 @@ struct BundleOpsTests {
         try Data([0]).write(to: b.url.appendingPathComponent("cfw_jb_input/f"))
         try fm.createDirectory(at: b.url.appendingPathComponent(".cfw_temp"), withIntermediateDirectories: true)
         try Data([0]).write(to: b.url.appendingPathComponent(".cfw_temp/f"))
-        // T15: unpublished staged copy and the CFW history (previous Disk.img).
+        // Pending CFW work cannot be exported. Keep the original exclusion
+        // checks after the staging directory has been recovered/released.
         try fm.createDirectory(at: b.url.appendingPathComponent(".cfw_disk.AbCd1234"), withIntermediateDirectories: true)
         try Data([0]).write(to: b.url.appendingPathComponent(".cfw_disk.AbCd1234/staged-marker"))
         try fm.createDirectory(at: b.url.appendingPathComponent(".cfw-history/20261001T000000Z-AbCd1234"), withIntermediateDirectories: true)
         try Data([0]).write(to: b.url.appendingPathComponent(".cfw-history/20261001T000000Z-AbCd1234/previous-marker"))
 
         let archive = root.appendingPathComponent("orig.tgz")
+        #expect(throws: (any Error).self) {
+            try VPhoneBundleOps.export(bundleNamed: "orig", to: archive, includeIPSW: false, in: lib)
+        }
+        #expect(!fm.fileExists(atPath: archive.path))
+        let recovered = root.appendingPathComponent("recovered-cfw-staging")
+        try fm.moveItem(at: b.url.appendingPathComponent(".cfw_disk.AbCd1234"), to: recovered)
+        #expect(try Data(contentsOf: recovered.appendingPathComponent("staged-marker")) == Data([0]))
         try VPhoneBundleOps.export(bundleNamed: "orig", to: archive, includeIPSW: false, in: lib)
         let listing = try VPhoneProcessRunner.runCapturing(
             URL(fileURLWithPath: "/usr/bin/tar"), ["-tf", archive.path])

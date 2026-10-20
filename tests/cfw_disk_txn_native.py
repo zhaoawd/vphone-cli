@@ -29,7 +29,7 @@ def sha256(path):
 
 def txn(command, fd, vm, work, *extra):
     # Each command takes the VM lock like the driver's operation tree does.
-    args = [sys.executable, str(ROOT / 'scripts/vm_lock.py'), str(vm), 'cfw-native', '--',
+    args = [sys.executable, str(ROOT / 'scripts/vm_lock.py'), str(vm), 'cfw-record', '--',
             sys.executable, str(ROOT / 'tests/cfw_disk_txn_faults.py'), str(ROOT / 'scripts/cfw_disk_txn.py'), command, '--fd', str(fd),
             '--owner-pid', str(os.getpid()), *extra, str(vm), str(work)]
     return subprocess.run(args, pass_fds=(fd,), capture_output=True, text=True)

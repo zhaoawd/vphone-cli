@@ -114,7 +114,7 @@ extension PatchDeclarationCatalog {
             variants: ["regular", "dev", "jb", "exp", "less"],
             optIn: .none,
             required: true,
-            versionRule: .always,
+            versionRule: .cloudOSIs26_4OrNewer,
             upstreamIDs: ["ibec-boot-bootx_precondition"],
             upstreamApplicability: ".always (default)",
             requires: [],

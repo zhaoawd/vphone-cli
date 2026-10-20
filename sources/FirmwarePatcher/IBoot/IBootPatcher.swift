@@ -5,7 +5,7 @@
 //
 // Patch schedule by mode:
 //   ibss — serial labels + image4 callback
-//   ibec — serial labels + image4 callback + boot-args + bootx precondition (if present)
+//   ibec — serial labels + image4 callback + boot-args + bootx precondition (cloudOS 26.4+)
 //   llb  — serial labels + image4 callback + boot-args + rootfs bypass (5 patches) + panic bypass
 
 import Capstone
@@ -189,7 +189,9 @@ public class IBootPatcher: Patcher, StructuredPatcher {
     }
 
     private func bootxPreconditionStep() -> PatchStep {
-        step("patchBootxPrecondition", .optional) { [self] in rawResult(patchBootxPrecondition()) }
+        step("patchBootxPrecondition", .conditional(.cloudOSIs26_4OrNewer)) { [self] in
+            rawResult(patchBootxPrecondition())
+        }
     }
 
     private func rootfssBypassStep() -> PatchStep {
@@ -808,10 +810,9 @@ public class IBootPatcher: Patcher, StructuredPatcher {
         }
 
         if gates.isEmpty {
-            // 26.4+ construct; genuinely absent on previous iBoot versions. There is no
-            // iBoot-version PatchRule to express this as conditional, so it is reported
-            // as an optional no-anchor (→ notApplicable), never a failure.
-            if verbose { print("  [.] bootx precondition: construct not present (pre-26.4 iBoot) — skipping") }
+            // Structured execution evaluates the source version before discovery;
+            // an active 26.4+ requirement must fail when this anchor is absent.
+            if verbose { print("  [-] bootx precondition: construct not found") }
             return .noAnchor
         }
         if gates.count > 1 {

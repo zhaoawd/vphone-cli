@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-15",
+  "baseline": "fcd19e78 plus preserved uncommitted merge result",
+  "sources": {
+    "scripts/cfw_disk_txn.py": "82af3fa4c896a6a5bc55c404db6f8e51f1d1b04f0261da04d1da8b247bd42b90",
+    "scripts/patchers/guest_undo.py": "a228494c9d0dcbef100fff9e82ac4063a57653a46459cf8bfbb1839e04b26fb0",
+    "scripts/check_bundle.py": "bc84d6c06890db8ca501a0a4745cb3c8fb20d1bb017a738c69b5d446f1029bf5",
+    "tests/test_guest_undo.py": "d801f48a510259d47a23c91e4dfd1279945fc1d2b6990504a037de3883183528"
+  },
+  "tests": {
+    "red": {
+      "command": ".venv/bin/python3 -B -m unittest tests.test_guest_undo -v",
+      "exitCode": 1,
+      "tests": 5,
+      "errors": 5,
+      "reason": "preview API absent before implementation"
+    },
+    "related": {
+      "command": ".venv/bin/python3 -B -m unittest tests.test_guest_undo tests.test_cfw_guest_publication tests.test_undo_provenance tests.test_cfw_disk_transaction -v",
+      "exitCode": 0,
+      "tests": 65,
+      "seconds": 44.711
+    },
+    "pythonFull": {
+      "command": "make test_python",
+      "exitCode": 0,
+      "tests": 869,
+      "skipped": 2,
+      "seconds": 220.26
+    }
+  },
+  "logs": {
+    "red.log.gz": {
+      "sha256": "02ca63432a8e4e212760519cfc31ed77fd1627d0a6ff6051d97ac0b66881329a",
+      "uncompressedSHA256": "eec7bdd04a9de857f837bfbb4bb112cbbc71871ca77aaec9cef54bd97c2ea3f4"
+    },
+    "related.log.gz": {
+      "sha256": "1c74609941a411a135ff7f288b7310776418f767f4ed1ef6316a541b12e1b559",
+      "uncompressedSHA256": "b6e5cba9deb9b4de2a35cb67f38d20949b62f4ab6f71c3229e58c08575f177db"
+    },
+    "python-full.log.gz": {
+      "sha256": "4e7200beeded2e4946262481fb265aff489fb44ee07ff9ae7e5a4902a397f018",
+      "uncompressedSHA256": "5d0fad03effc18942bb106f4445c822224d6913aabb729dce74d485bca64ddc8"
+    }
+  },
+  "limitations": [
+    "read-only suffix Undo candidates; no guest writes",
+    "source mounts, APFS queries and patch algorithm use isolated fixtures",
+    "no Swift source changes; Swift suite not rerun",
+    "no firmware comparisons, real APFS/Preboot, signed app build or VM acceptance",
+    "IOMFB production migration gate retained"
+  ]
+}

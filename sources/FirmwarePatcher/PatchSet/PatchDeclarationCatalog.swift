@@ -134,7 +134,7 @@ public enum PatchDeclarationCatalog {
             case let .notImplementedSelected(id):
                 "declaration \(id) is not implemented locally and cannot be selected"
             case let .versionIndeterminate(id, rule):
-                "declaration \(id) needs version rule \(rule.rawValue), but the \(rule == .cloudOSFridaCapable ? "cloudOS" : "base") version is unknown"
+                "declaration \(id) needs version rule \(rule.rawValue), but the \(rule == .cloudOSFridaCapable || rule == .cloudOSIs26_4OrNewer ? "cloudOS" : "base") version is unknown"
             case let .requiredMissing(variant, id):
                 "required declaration \(id) is not enabled for variant \(variant)"
             case let .contradictorySelection(id):

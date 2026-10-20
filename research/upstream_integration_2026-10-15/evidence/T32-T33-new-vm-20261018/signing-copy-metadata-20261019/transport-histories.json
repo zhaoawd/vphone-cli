@@ -1,0 +1,2621 @@
+[
+  {
+    "target": "system:/System/Cryptexes/App",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "mkdir",
+        "operation": "change",
+        "operationID": "4a386aefaeec44b79cdb9f953fef1add",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "0111f86202644f03b20c513ea3c17883",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "4c0473e26ee247bf92fc4a08d6cc14d9",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt_appos",
+        "sourceTarget": null
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Cryptexes/OS",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "mkdir",
+        "operation": "change",
+        "operationID": "4a386aefaeec44b79cdb9f953fef1add",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "0111f86202644f03b20c513ea3c17883",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "b7b3d74c5eb3434283943b5aab3e8d6a",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt_sysos",
+        "sourceTarget": null
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/Caches/com.apple.dyld",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "symlink",
+          "link": "../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "ln",
+        "operation": "change",
+        "operationID": "155fe0e7147e4ea797aabec864a21a8b",
+        "projection": {
+          "kind": "state"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "symlink",
+      "link": "../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/DriverKit/System/Library/dyld",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "symlink",
+          "link": "../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "ln",
+        "operation": "change",
+        "operationID": "a877492779c14cc6bf2d610ddeec4933",
+        "projection": {
+          "kind": "state"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "symlink",
+      "link": "../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/usr/libexec/seputil",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dbd72af83a52c8c335e8c01a7dd86c27e49af70da40ec18dea65c45dd8033d73",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "e4e40a04dfc848eb868a3d6b0fb6fd7c",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dbd72af83a52c8c335e8c01a7dd86c27e49af70da40ec18dea65c45dd8033d73",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/usr/libexec/seputil",
+        "sourceTarget": "system:/usr/libexec/seputil"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dbd72af83a52c8c335e8c01a7dd86c27e49af70da40ec18dea65c45dd8033d73",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "6a65e76c0a4840f99f648509489f5c85",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dbd72af83a52c8c335e8c01a7dd86c27e49af70da40ec18dea65c45dd8033d73",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/usr/libexec/seputil.bak",
+        "sourceTarget": "system:/usr/libexec/seputil.bak"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "9021e7ace79cbafeeb67b94bb298d8bede8bdf02baedd352584c82e16cce741f",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dbd72af83a52c8c335e8c01a7dd86c27e49af70da40ec18dea65c45dd8033d73",
+          "uid": 0
+        },
+        "operation": "change",
+        "projection": {
+          "kind": "bytes",
+          "ranges": [
+            {
+              "count": 2,
+              "offset": 111601
+            }
+          ]
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "1f5d38b0c7669e2c0dfd224afcaab1e21cbceb5abf5a32bbb6cd7f21d7147911",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "9021e7ace79cbafeeb67b94bb298d8bede8bdf02baedd352584c82e16cce741f",
+          "uid": 0
+        },
+        "operation": "sign",
+        "projection": {
+          "kind": "signature"
+        },
+        "schemaVersion": 1,
+        "signerArguments": [
+          "-S",
+          "-M",
+          "-K/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/cfw_input/signcert.p12",
+          "-Icom.apple.seputil",
+          "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/seputil"
+        ]
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "1f5d38b0c7669e2c0dfd224afcaab1e21cbceb5abf5a32bbb6cd7f21d7147911",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dbd72af83a52c8c335e8c01a7dd86c27e49af70da40ec18dea65c45dd8033d73",
+          "uid": 0
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "ec55433f9eb4452ea6fc5316221bc8d9",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "1f5d38b0c7669e2c0dfd224afcaab1e21cbceb5abf5a32bbb6cd7f21d7147911",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/seputil",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "1f5d38b0c7669e2c0dfd224afcaab1e21cbceb5abf5a32bbb6cd7f21d7147911",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "1f5d38b0c7669e2c0dfd224afcaab1e21cbceb5abf5a32bbb6cd7f21d7147911",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "3f6420748df44edc8bd94a46011f2a7c",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 493,
+      "sha256": "1f5d38b0c7669e2c0dfd224afcaab1e21cbceb5abf5a32bbb6cd7f21d7147911",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 501
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "gtar",
+        "operation": "copy",
+        "operationID": "37329330016a48e0a4c0cddf10f01458",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 501
+        },
+        "sourceArchive": {
+          "archiveName": "AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archivePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archiveSHA256": "e2616b367c40bee916377aaf641b3ce19a40d72cae3dc0120bfd5cd810c56e34",
+          "archiveTarget": "system:/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "destination": "system:/",
+          "member": "System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle"
+        }
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 501
+        },
+        "command": "chown",
+        "operation": "change",
+        "operationID": "4e42657d2b734000830957af4deb5814",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "552615b060254941a89eeb22895b9ed7",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/_CodeSignature",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 501
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "gtar",
+        "operation": "copy",
+        "operationID": "37329330016a48e0a4c0cddf10f01458",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 501
+        },
+        "sourceArchive": {
+          "archiveName": "AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archivePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archiveSHA256": "e2616b367c40bee916377aaf641b3ce19a40d72cae3dc0120bfd5cd810c56e34",
+          "archiveTarget": "system:/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "destination": "system:/",
+          "member": "System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/_CodeSignature"
+        }
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 501
+        },
+        "command": "chown",
+        "operation": "change",
+        "operationID": "4e42657d2b734000830957af4deb5814",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 448,
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "c4d198c56b514ee8a502c60396c6ad6b",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/libAppleParavirtCompilerPluginIOGPUFamily.dylib",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3537b4e6cde3c38166adb00cffdc0accfe69583c701ededa02f53a5a457a4c4f",
+          "uid": 501
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "gtar",
+        "operation": "copy",
+        "operationID": "37329330016a48e0a4c0cddf10f01458",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3537b4e6cde3c38166adb00cffdc0accfe69583c701ededa02f53a5a457a4c4f",
+          "uid": 501
+        },
+        "sourceArchive": {
+          "archiveName": "AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archivePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archiveSHA256": "e2616b367c40bee916377aaf641b3ce19a40d72cae3dc0120bfd5cd810c56e34",
+          "archiveTarget": "system:/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "destination": "system:/",
+          "member": "System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/libAppleParavirtCompilerPluginIOGPUFamily.dylib"
+        }
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3537b4e6cde3c38166adb00cffdc0accfe69583c701ededa02f53a5a457a4c4f",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3537b4e6cde3c38166adb00cffdc0accfe69583c701ededa02f53a5a457a4c4f",
+          "uid": 501
+        },
+        "command": "chown",
+        "operation": "change",
+        "operationID": "4e42657d2b734000830957af4deb5814",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3537b4e6cde3c38166adb00cffdc0accfe69583c701ededa02f53a5a457a4c4f",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3537b4e6cde3c38166adb00cffdc0accfe69583c701ededa02f53a5a457a4c4f",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "b57bdbaab0464cdfa269590529a6243f",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 493,
+      "sha256": "3537b4e6cde3c38166adb00cffdc0accfe69583c701ededa02f53a5a457a4c4f",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/AppleParavirtGPUMetalIOGPUFamily",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "754717559817ae7e31411f04cd59d6ba549aeba71f196025dba22ab891b5e4f3",
+          "uid": 501
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "gtar",
+        "operation": "copy",
+        "operationID": "37329330016a48e0a4c0cddf10f01458",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "754717559817ae7e31411f04cd59d6ba549aeba71f196025dba22ab891b5e4f3",
+          "uid": 501
+        },
+        "sourceArchive": {
+          "archiveName": "AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archivePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archiveSHA256": "e2616b367c40bee916377aaf641b3ce19a40d72cae3dc0120bfd5cd810c56e34",
+          "archiveTarget": "system:/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "destination": "system:/",
+          "member": "System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/AppleParavirtGPUMetalIOGPUFamily"
+        }
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "754717559817ae7e31411f04cd59d6ba549aeba71f196025dba22ab891b5e4f3",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "754717559817ae7e31411f04cd59d6ba549aeba71f196025dba22ab891b5e4f3",
+          "uid": 501
+        },
+        "command": "chown",
+        "operation": "change",
+        "operationID": "4e42657d2b734000830957af4deb5814",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "754717559817ae7e31411f04cd59d6ba549aeba71f196025dba22ab891b5e4f3",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "754717559817ae7e31411f04cd59d6ba549aeba71f196025dba22ab891b5e4f3",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "1faad5318e74479f91e2c57a4a15a5a9",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 493,
+      "sha256": "754717559817ae7e31411f04cd59d6ba549aeba71f196025dba22ab891b5e4f3",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/Info.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "24b49fbd4a682bf76d09b2915dd113f20670bd7a9db137f20967caf8646c1876",
+          "uid": 501
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "gtar",
+        "operation": "copy",
+        "operationID": "37329330016a48e0a4c0cddf10f01458",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "24b49fbd4a682bf76d09b2915dd113f20670bd7a9db137f20967caf8646c1876",
+          "uid": 501
+        },
+        "sourceArchive": {
+          "archiveName": "AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archivePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archiveSHA256": "e2616b367c40bee916377aaf641b3ce19a40d72cae3dc0120bfd5cd810c56e34",
+          "archiveTarget": "system:/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "destination": "system:/",
+          "member": "System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/Info.plist"
+        }
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "24b49fbd4a682bf76d09b2915dd113f20670bd7a9db137f20967caf8646c1876",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "24b49fbd4a682bf76d09b2915dd113f20670bd7a9db137f20967caf8646c1876",
+          "uid": 501
+        },
+        "command": "chown",
+        "operation": "change",
+        "operationID": "4e42657d2b734000830957af4deb5814",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "24b49fbd4a682bf76d09b2915dd113f20670bd7a9db137f20967caf8646c1876",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "24b49fbd4a682bf76d09b2915dd113f20670bd7a9db137f20967caf8646c1876",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "a6c642db9fc1430786505816f6ce4695",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "24b49fbd4a682bf76d09b2915dd113f20670bd7a9db137f20967caf8646c1876",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/_CodeSignature/CodeResources",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "3c727b0f043e463c0227db49cef54c5567715986d08a46c98923c9bb73585e5a",
+          "uid": 501
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "gtar",
+        "operation": "copy",
+        "operationID": "37329330016a48e0a4c0cddf10f01458",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "3c727b0f043e463c0227db49cef54c5567715986d08a46c98923c9bb73585e5a",
+          "uid": 501
+        },
+        "sourceArchive": {
+          "archiveName": "AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archivePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "archiveSHA256": "e2616b367c40bee916377aaf641b3ce19a40d72cae3dc0120bfd5cd810c56e34",
+          "archiveTarget": "system:/AppleParavirtGPUMetalIOGPUFamily.tar",
+          "destination": "system:/",
+          "member": "System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/_CodeSignature/CodeResources"
+        }
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "3c727b0f043e463c0227db49cef54c5567715986d08a46c98923c9bb73585e5a",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "3c727b0f043e463c0227db49cef54c5567715986d08a46c98923c9bb73585e5a",
+          "uid": 501
+        },
+        "command": "chown",
+        "operation": "change",
+        "operationID": "4e42657d2b734000830957af4deb5814",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "3c727b0f043e463c0227db49cef54c5567715986d08a46c98923c9bb73585e5a",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 448,
+          "sha256": "3c727b0f043e463c0227db49cef54c5567715986d08a46c98923c9bb73585e5a",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "fda17f59407a4a32892ec20257db2ee9",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "3c727b0f043e463c0227db49cef54c5567715986d08a46c98923c9bb73585e5a",
+      "uid": 0
+    }
+  },
+  {
+    "target": "hardware:/dropbear",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "mkdir",
+        "operation": "change",
+        "operationID": "7e71b18f4771471283d012331dd2027f",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/usr/libexec/launchd_cache_loader",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "cb4b502a1d0d34516d2cec2963100ffecea84c74a4dec87744f8d121306a115f",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "a59821b9ca234610898eca55079f2a8b",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "cb4b502a1d0d34516d2cec2963100ffecea84c74a4dec87744f8d121306a115f",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/usr/libexec/launchd_cache_loader",
+        "sourceTarget": "system:/usr/libexec/launchd_cache_loader"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "cb4b502a1d0d34516d2cec2963100ffecea84c74a4dec87744f8d121306a115f",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "5b0f5e15e8ed45deaef60f7cc2232e9f",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "cb4b502a1d0d34516d2cec2963100ffecea84c74a4dec87744f8d121306a115f",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/usr/libexec/launchd_cache_loader.bak",
+        "sourceTarget": "system:/usr/libexec/launchd_cache_loader.bak"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dcd96ef6fd68a06ec1cf09f61d73710cbfc943c58fa5e3a93563cc5cfe73b3b9",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "cb4b502a1d0d34516d2cec2963100ffecea84c74a4dec87744f8d121306a115f",
+          "uid": 0
+        },
+        "operation": "change",
+        "projection": {
+          "kind": "bytes",
+          "ranges": [
+            {
+              "count": 4,
+              "offset": 2904
+            }
+          ]
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "da23c088ec062739d5fcd6e2015487e041466229fcc766e95811a27de1c5872b",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "dcd96ef6fd68a06ec1cf09f61d73710cbfc943c58fa5e3a93563cc5cfe73b3b9",
+          "uid": 0
+        },
+        "operation": "sign",
+        "projection": {
+          "kind": "signature"
+        },
+        "schemaVersion": 1,
+        "signerArguments": [
+          "-S",
+          "-M",
+          "-K/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/cfw_input/signcert.p12",
+          "-Icom.apple.launchd_cache_loader",
+          "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/launchd_cache_loader"
+        ]
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "da23c088ec062739d5fcd6e2015487e041466229fcc766e95811a27de1c5872b",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "cb4b502a1d0d34516d2cec2963100ffecea84c74a4dec87744f8d121306a115f",
+          "uid": 0
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "db75a02fcb73454ba1a7b25929daea15",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "da23c088ec062739d5fcd6e2015487e041466229fcc766e95811a27de1c5872b",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/launchd_cache_loader",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "da23c088ec062739d5fcd6e2015487e041466229fcc766e95811a27de1c5872b",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "da23c088ec062739d5fcd6e2015487e041466229fcc766e95811a27de1c5872b",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "61f9fae2886f4f2d95b9bb87f3a2be7e",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 493,
+      "sha256": "da23c088ec062739d5fcd6e2015487e041466229fcc766e95811a27de1c5872b",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/usr/libexec/mobileactivationd",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "aae7f368925cfbbdfdd1180ddcedf375114c96678c0f7f56e1e2175d95f814be",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "42639c6238a34f28bf501d8df2653080",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "aae7f368925cfbbdfdd1180ddcedf375114c96678c0f7f56e1e2175d95f814be",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/usr/libexec/mobileactivationd",
+        "sourceTarget": "system:/usr/libexec/mobileactivationd"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "aae7f368925cfbbdfdd1180ddcedf375114c96678c0f7f56e1e2175d95f814be",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "7afc2eca67c0470199af4ec185ac452f",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "aae7f368925cfbbdfdd1180ddcedf375114c96678c0f7f56e1e2175d95f814be",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/usr/libexec/mobileactivationd.bak",
+        "sourceTarget": "system:/usr/libexec/mobileactivationd.bak"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "0ef535f056469ca9185fa8bb3b166dec3da6508e5846501c5e3eadc7b1331f5d",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "aae7f368925cfbbdfdd1180ddcedf375114c96678c0f7f56e1e2175d95f814be",
+          "uid": 0
+        },
+        "operation": "change",
+        "projection": {
+          "kind": "bytes",
+          "ranges": [
+            {
+              "count": 4,
+              "offset": 3104644
+            }
+          ]
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "f3808af6fc65bace8d7e2196d58cacf1ad14ad5849d0d0437a5cc1c16289e9b9",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "0ef535f056469ca9185fa8bb3b166dec3da6508e5846501c5e3eadc7b1331f5d",
+          "uid": 0
+        },
+        "operation": "sign",
+        "projection": {
+          "kind": "signature"
+        },
+        "schemaVersion": 1,
+        "signerArguments": [
+          "-S",
+          "-M",
+          "-K/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/cfw_input/signcert.p12",
+          "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/mobileactivationd"
+        ]
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "f3808af6fc65bace8d7e2196d58cacf1ad14ad5849d0d0437a5cc1c16289e9b9",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "aae7f368925cfbbdfdd1180ddcedf375114c96678c0f7f56e1e2175d95f814be",
+          "uid": 0
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "5caa75c10dc04484b2af8f2bb7e4cf41",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "f3808af6fc65bace8d7e2196d58cacf1ad14ad5849d0d0437a5cc1c16289e9b9",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/mobileactivationd",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "f3808af6fc65bace8d7e2196d58cacf1ad14ad5849d0d0437a5cc1c16289e9b9",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "f3808af6fc65bace8d7e2196d58cacf1ad14ad5849d0d0437a5cc1c16289e9b9",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "a9a4616f396e4b2d84868434d01a3436",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 493,
+      "sha256": "f3808af6fc65bace8d7e2196d58cacf1ad14ad5849d0d0437a5cc1c16289e9b9",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/usr/bin/vphoned",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "ad3d292c05134f83bfcb7b871e0637eff0e7ca41f975cd80ff1e8895e252ab62",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "61a9cca3587d4884a17ac87794893cb5",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "ad3d292c05134f83bfcb7b871e0637eff0e7ca41f975cd80ff1e8895e252ab62",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/vphoned",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "ad3d292c05134f83bfcb7b871e0637eff0e7ca41f975cd80ff1e8895e252ab62",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "ad3d292c05134f83bfcb7b871e0637eff0e7ca41f975cd80ff1e8895e252ab62",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "4e03ec0c2140428187f138be1b8cb4bf",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 493,
+      "sha256": "ad3d292c05134f83bfcb7b871e0637eff0e7ca41f975cd80ff1e8895e252ab62",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/usr/libexec",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "command": "mkdir",
+        "operation": "change",
+        "operationID": "3e2cb3af985140aca3e251cdf4f41eaf",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/LaunchDaemons",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "directory",
+          "mode": 493,
+          "uid": 0
+        },
+        "command": "mkdir",
+        "operation": "change",
+        "operationID": "3e2cb3af985140aca3e251cdf4f41eaf",
+        "projection": {
+          "kind": "directory"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/usr/libexec/vphoned-api",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "35aa407c68ffe72232e1c6618f9eb55904fa4a89d78741d33394cdfeea84a57b",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "2391203cef20445bae70f130cad7ef1f",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "35aa407c68ffe72232e1c6618f9eb55904fa4a89d78741d33394cdfeea84a57b",
+          "uid": 501
+        },
+        "sourcePath": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/f196cab9-1254-494b-9d91-6e3a4667ba33/VPhone.bundle/Contents/Resources/guest-resources/api/vphoned",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "35aa407c68ffe72232e1c6618f9eb55904fa4a89d78741d33394cdfeea84a57b",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "35aa407c68ffe72232e1c6618f9eb55904fa4a89d78741d33394cdfeea84a57b",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "a9e8b2958153406c837a80c5c98c518c",
+        "projection": {
+          "kind": "bytes",
+          "ranges": []
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 493,
+      "sha256": "35aa407c68ffe72232e1c6618f9eb55904fa4a89d78741d33394cdfeea84a57b",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/LaunchDaemons/vphoned-api.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "7b29eecc1e08106437688bcfbd2efecdab5fd091a23fd917a1fcd8e47c89e8c9",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "cee94ac0028e464f9e4f2e33844c5784",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "7b29eecc1e08106437688bcfbd2efecdab5fd091a23fd917a1fcd8e47c89e8c9",
+          "uid": 501
+        },
+        "sourcePath": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/f196cab9-1254-494b-9d91-6e3a4667ba33/VPhone.bundle/Contents/Resources/guest-resources/api/vphoned.plist",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "7b29eecc1e08106437688bcfbd2efecdab5fd091a23fd917a1fcd8e47c89e8c9",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "7b29eecc1e08106437688bcfbd2efecdab5fd091a23fd917a1fcd8e47c89e8c9",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "9e1f89eb7d4546c2bf7bf11b2c27ead3",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "7b29eecc1e08106437688bcfbd2efecdab5fd091a23fd917a1fcd8e47c89e8c9",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/LaunchDaemons/bash.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "c199c57f80213f46539827f5956a17e4db35991c3d8704105a9853c0db7ea43c",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "be20aec9da9a408b9954b0852dacef95",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "c199c57f80213f46539827f5956a17e4db35991c3d8704105a9853c0db7ea43c",
+          "uid": 501
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/cfw_input/jb/LaunchDaemons/bash.plist",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "c199c57f80213f46539827f5956a17e4db35991c3d8704105a9853c0db7ea43c",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "c199c57f80213f46539827f5956a17e4db35991c3d8704105a9853c0db7ea43c",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "76d4a8b63a474e8ca798dbe3122012e2",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "c199c57f80213f46539827f5956a17e4db35991c3d8704105a9853c0db7ea43c",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/LaunchDaemons/dropbear.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "dea283a2d8b417c39a282e5dd221bb3e6cfc78246b27cf9fab9cc20150388100",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "2f6b05e7eeeb98559a3eb389a9c8fcb6083c2ccb9f2c105d6b132c76eece78a5",
+          "uid": 0
+        },
+        "operation": "change",
+        "projection": {
+          "changes": [
+            {
+              "path": [
+                "ProgramArguments"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWWsAwQFBgcICQoLDAsNXxAkL2lvc2JpbnBhY2s2NC91c3IvbG9jYWwvYmluL2Ryb3BiZWFyVy0tc2hlbGxfEBYvaW9zYmlucGFjazY0L2Jpbi9iYXNoUi1FUi1GUi1wVTIyMjIyUi1hUi1yXxAjL3Zhci9kcm9wYmVhci9kcm9wYmVhcl9yc2FfaG9zdF9rZXlfECUvdmFyL2Ryb3BiZWFyL2Ryb3BiZWFyX2VjZHNhX2hvc3Rfa2V5CAsRHkVNZmlsb3V4e6EAAAAAAAABAQAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAyQ=="
+            }
+          ],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "dea283a2d8b417c39a282e5dd221bb3e6cfc78246b27cf9fab9cc20150388100",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "cc5c607d9ba94411b457fc24e0953434",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "dea283a2d8b417c39a282e5dd221bb3e6cfc78246b27cf9fab9cc20150388100",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/dropbear.plist",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "dea283a2d8b417c39a282e5dd221bb3e6cfc78246b27cf9fab9cc20150388100",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "dea283a2d8b417c39a282e5dd221bb3e6cfc78246b27cf9fab9cc20150388100",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "ce1a77bf07b34566b173a6c592acba13",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "dea283a2d8b417c39a282e5dd221bb3e6cfc78246b27cf9fab9cc20150388100",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/LaunchDaemons/trollvnc.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "9d0cc81fcc89c1e6c5b0ad621bb2e71f8ce0e5065ecea30c9efaaefb81369414",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "b49fdcce0148413599bb9a7585b7a650",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "9d0cc81fcc89c1e6c5b0ad621bb2e71f8ce0e5065ecea30c9efaaefb81369414",
+          "uid": 501
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/cfw_input/jb/LaunchDaemons/trollvnc.plist",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "9d0cc81fcc89c1e6c5b0ad621bb2e71f8ce0e5065ecea30c9efaaefb81369414",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "9d0cc81fcc89c1e6c5b0ad621bb2e71f8ce0e5065ecea30c9efaaefb81369414",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "9fdcbe8f7e0b4bd79169dfb414b1284b",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "9d0cc81fcc89c1e6c5b0ad621bb2e71f8ce0e5065ecea30c9efaaefb81369414",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/LaunchDaemons/rpcserver_ios.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "3f2389453e4fdd4874e90d1397a0b15d66146cf42f1d547321a180ecc37343cb",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "07ad363197fd47128c986cefc47ef29f",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "3f2389453e4fdd4874e90d1397a0b15d66146cf42f1d547321a180ecc37343cb",
+          "uid": 501
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/cfw_input/jb/LaunchDaemons/rpcserver_ios.plist",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "3f2389453e4fdd4874e90d1397a0b15d66146cf42f1d547321a180ecc37343cb",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "3f2389453e4fdd4874e90d1397a0b15d66146cf42f1d547321a180ecc37343cb",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "69edb2c8900d45feb9cfd6af049a3497",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "3f2389453e4fdd4874e90d1397a0b15d66146cf42f1d547321a180ecc37343cb",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/LaunchDaemons/vphoned.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "f43676babe48481f9d51000337739faf",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67",
+          "uid": 501
+        },
+        "sourcePath": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/f196cab9-1254-494b-9d91-6e3a4667ba33/VPhone.bundle/Contents/Resources/guest-resources/vphoned.plist",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67",
+          "uid": 0
+        },
+        "before": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "175485b722694c2d90dee8902b9beb02",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 0,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67",
+      "uid": 0
+    }
+  },
+  {
+    "target": "system:/System/Library/xpc/launchd.plist",
+    "proofs": [
+      {
+        "after": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "f432d82bef2de1680bed4799b2d5bdf588cc5679fd138eaeaa66e87ae9f6c854",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "e427e729421f4096baa066cf2463454b",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 80,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "f432d82bef2de1680bed4799b2d5bdf588cc5679fd138eaeaa66e87ae9f6c854",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/System/Library/xpc/launchd.plist",
+        "sourceTarget": "system:/System/Library/xpc/launchd.plist"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "f432d82bef2de1680bed4799b2d5bdf588cc5679fd138eaeaa66e87ae9f6c854",
+          "uid": 0
+        },
+        "before": {
+          "kind": "missing"
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "ab5781a88663434f93e3217c23b0096f",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "f432d82bef2de1680bed4799b2d5bdf588cc5679fd138eaeaa66e87ae9f6c854",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_mount.3c2Agllm/mnt1/System/Library/xpc/launchd.plist.bak",
+        "sourceTarget": "system:/System/Library/xpc/launchd.plist.bak"
+      },
+      {
+        "after": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+          "uid": 0
+        },
+        "before": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "f432d82bef2de1680bed4799b2d5bdf588cc5679fd138eaeaa66e87ae9f6c854",
+          "uid": 0
+        },
+        "operation": "change",
+        "projection": {
+          "changes": [
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "EnablePressuredExit"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "Label"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVeY29tLmFwcGxlLmJhc2gICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAIA=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "POSIXSpawnType"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVbSW50ZXJhY3RpdmUICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAHQ=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "ProgramArguments"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWWhA18QFi9pb3NiaW5wYWNrNjQvYmluL2Jhc2gICxETAAAAAAAAAQEAAAAAAAAABAAAAAAAAAAAAAAAAAAAACw="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "RunAtLoad"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "StandardErrorPath"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVcL2Rldi9jb25zb2xlCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAB4="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "StandardInPath"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVcL2Rldi9jb25zb2xlCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAB4="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "StandardOutPath"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVcL2Rldi9jb25zb2xlCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAB4="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "Umask"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUQAAgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/bash.plist",
+                "UserName"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVUcm9vdAgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAW"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "CFBundleIdentifier"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBJjb20uYXBwbGUuZHJvcGJlYXIICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAJg=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "EnablePressuredExit"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "EnableTransactions"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "HighPriorityIO"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "KeepAlive"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "Label"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVYRHJvcGJlYXIICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAGg=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "POSIXSpawnType"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVbSW50ZXJhY3RpdmUICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAHQ=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "ProgramArguments"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWWsAwQFBgcICQoLDAsNXxAkL2lvc2JpbnBhY2s2NC91c3IvbG9jYWwvYmluL2Ryb3BiZWFyVy0tc2hlbGxfEBYvaW9zYmlucGFjazY0L2Jpbi9iYXNoUi1FUi1GUi1wVTIyMjIyUi1hUi1yXxAjL3Zhci9kcm9wYmVhci9kcm9wYmVhcl9yc2FfaG9zdF9rZXlfECUvdmFyL2Ryb3BiZWFyL2Ryb3BiZWFyX2VjZHNhX2hvc3Rfa2V5CAsRHkVNZmlsb3V4e6EAAAAAAAABAQAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAyQ=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "RunAtLoad"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "Umask"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUQAAgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/dropbear.plist",
+                "UserName"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVUcm9vdAgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAW"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "CFBundleIdentifier"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBZjb20uZG9yb256ODgucnBjc2VydmVyCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAACo="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "EnablePressuredExit"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "EnableTransactions"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "HighPriorityIO"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "KeepAlive"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "Label"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVZcnBjc2VydmVyCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABs="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "POSIXSpawnType"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVbSW50ZXJhY3RpdmUICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAHQ=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "ProgramArguments"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWWhA18QKS9pb3NiaW5wYWNrNjQvdXNyL2xvY2FsL2Jpbi9ycGNzZXJ2ZXJfaW9zCAsREwAAAAAAAAEBAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA/"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "RunAtLoad"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "Umask"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUQAAgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/rpcserver_ios.plist",
+                "UserName"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVUcm9vdAgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAW"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "CFBundleIdentifier"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBJjb20uYXBwbGUudHJvbGx2bmMICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAJg=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "EnablePressuredExit"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "EnableTransactions"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "EnvironmentVariables",
+                "DISABLE_TWEAKS"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVRMQgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "EnvironmentVariables",
+                "TROLLVNC_PASSWORD"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVWYWxwaW5lCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABg="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "EnvironmentVariables",
+                "TROLLVNC_REPEATER_RETRY_INTERVAL"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVUMzAuMAgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAW"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "ExitTimeOut"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUQAwgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "GroupName"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVWbW9iaWxlCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABg="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "HighPriorityIO"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "KeepAlive"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "Label"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBJjb20uYXBwbGUudHJvbGx2bmMICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAJg=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "POSIXSpawnType"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVTQXBwCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABU="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "ProcessType"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVbSW50ZXJhY3RpdmUICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAHQ=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "ProgramArguments"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWWiAwRfECAvaW9zYmlucGFjazY0L2Jpbi90cm9sbHZuY3NlcnZlclctZGFlbW9uCAsRFDcAAAAAAAABAQAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAPw=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "RunAtLoad"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "StandardErrorPath"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBgvdG1wL3Ryb2xsdm5jLXN0ZGVyci5sb2cICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAALA=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "StandardOutPath"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBgvdG1wL3Ryb2xsdm5jLXN0ZG91dC5sb2cICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAALA=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "ThrottleInterval"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUQBQgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "UserName"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVWbW9iaWxlCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABg="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "_AdditionalProperties",
+                "RunningBoard",
+                "Managed"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/trollvnc.plist",
+                "_AdditionalProperties",
+                "RunningBoard",
+                "Reported"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUICAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "EnvironmentVariables",
+                "VPHONE_DISABLE_CAMERA"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVRMQgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "KeepAlive"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "Label"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBZjb20udnBob25lLnZwaG9uZWQtYXBpCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAACo="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "ProcessType"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVbSW50ZXJhY3RpdmUICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAHQ=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "ProgramArguments"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWWhA18QGC91c3IvbGliZXhlYy92cGhvbmVkLWFwaQgLERMAAAAAAAABAQAAAAAAAAAEAAAAAAAAAAAAAAAAAAAALg=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "RunAtLoad"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "StandardErrorPath"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBgvdmFyL2xvZy92cGhvbmVkLWFwaS5sb2cICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAALA=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "StandardOutPath"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBgvdmFyL2xvZy92cGhvbmVkLWFwaS5sb2cICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAALA=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned-api.plist",
+                "ThrottleInterval"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUQAQgLEQAAAAAAAAEBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAT"
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned.plist",
+                "KeepAlive"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned.plist",
+                "Label"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWVfEBJjb20udnBob25lLnZwaG9uZWQICxEAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAJg=="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned.plist",
+                "ProgramArguments"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWWhA18QEC91c3IvYmluL3ZwaG9uZWQICxETAAAAAAAAAQEAAAAAAAAABAAAAAAAAAAAAAAAAAAAACY="
+            },
+            {
+              "path": [
+                "LaunchDaemons",
+                "/System/Library/LaunchDaemons/vphoned.plist",
+                "RunAtLoad"
+              ],
+              "value": "YnBsaXN0MDDRAQJVdmFsdWUJCAsRAAAAAAAAAQEAAAAAAAAAAwAAAAAAAAAAAAAAAAAAABI="
+            }
+          ],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      },
+      {
+        "after": {
+          "gid": 80,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+          "uid": 0
+        },
+        "before": {
+          "gid": 80,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "f432d82bef2de1680bed4799b2d5bdf588cc5679fd138eaeaa66e87ae9f6c854",
+          "uid": 0
+        },
+        "command": "cp",
+        "operation": "copy",
+        "operationID": "dddeb80352cb479c971fc3a3fdaa0b3f",
+        "projection": {
+          "kind": "copy"
+        },
+        "schemaVersion": 1,
+        "source": {
+          "gid": 20,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+          "uid": 0
+        },
+        "sourcePath": "/Users/kolar/github/vphone-cli/vm-t32-t33-20261018-r2/.cfw_temp/launchd.plist",
+        "sourceTarget": null
+      },
+      {
+        "after": {
+          "gid": 80,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+          "uid": 0
+        },
+        "before": {
+          "gid": 80,
+          "kind": "file",
+          "mode": 420,
+          "sha256": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+          "uid": 0
+        },
+        "command": "chmod",
+        "operation": "change",
+        "operationID": "84dde61e58ef4a3aab169a6447cf567c",
+        "projection": {
+          "changes": [],
+          "kind": "plist"
+        },
+        "schemaVersion": 1
+      }
+    ],
+    "final": {
+      "gid": 80,
+      "kind": "file",
+      "mode": 420,
+      "sha256": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+      "uid": 0
+    }
+  }
+]

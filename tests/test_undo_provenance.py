@@ -113,6 +113,117 @@ class UndoProvenanceTests(unittest.TestCase):
         # Repeated qualification has identical content, not another first original.
         self.assertEqual(self.finalize(),index)
 
+    def test_readonly_data_companion_survives_copy_patch_and_final_qualification(self):
+        self.assert_readonly_companion('dyld_shared_cache_arm64e.33.dylddata')
+
+    def test_readonly_companion_survives_copy_patch_and_final_qualification(self):
+        self.assert_readonly_companion('dyld_shared_cache_arm64e.34.dyldreadonly')
+
+    def test_linkedit_companion_survives_copy_patch_and_final_qualification(self):
+        self.assert_readonly_companion('dyld_shared_cache_arm64e.35.dyldlinkedit')
+
+    def test_atlas_companion_survives_copy_patch_and_final_qualification(self):
+        companion = self.source_dsc.with_name('dyld_shared_cache_arm64e.atlas')
+        companion.write_bytes(b'AA01 original atlas')
+        self.produce()
+        self.assertEqual(self.dsc.with_name(companion.name).read_bytes(), companion.read_bytes())
+        index = self.finalize()
+        self.assertEqual(len(index['entries']), 1)
+        undo.verify_publication(self.work, cfw_disk_txn.load_record(self.work))
+
+    def assert_readonly_companion(self, name):
+        companion = self.source_dsc.with_name(name)
+        data = bytearray(cache(b'unchanged data'))
+        struct.pack_into('<II', data, 0x10, 0x100, 1)
+        struct.pack_into('<QQQII', data, 0x100, 0x200000000, 4096, 0, 5, 5)
+        data[4168:4200] = hashlib.sha256(data[:4096]).digest()
+        companion.write_bytes(data)
+        self.produce()
+        installed = self.dsc.with_name(companion.name)
+        self.assertEqual(installed.read_bytes(), bytes(data))
+        index = self.finalize()
+        self.assertEqual(len(index['entries']), 1)
+        self.assertEqual(index['entries'][0]['target'], 'dsc:/dyld_shared_cache_arm64e')
+        undo.verify_publication(self.work, cfw_disk_txn.load_record(self.work))
+
+    def test_data_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.33.dylddata')
+
+    def test_readonly_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.34.dyldreadonly')
+
+    def test_linkedit_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.35.dyldlinkedit')
+
+    def test_atlas_companion_changes_refuse_before_publication(self):
+        self.assert_companion_changes_refuse('dyld_shared_cache_arm64e.atlas')
+
+    def assert_companion_changes_refuse(self, name):
+        for change in ('bytes', 'identity', 'metadata', 'added', 'removed'):
+            with self.subTest(change=change):
+                case = UndoProvenanceTests(methodName='runTest')
+                case.setUp()
+                try:
+                    companion = case.source_dsc.with_name(name)
+                    companion.write_bytes(cache(b'original companion'))
+                    write = Path.write_bytes
+                    def write_with_change(path, data):
+                        if path == case.dsc and data == cache(b'changed'):
+                            current = case.dsc.with_name(companion.name)
+                            if change == 'bytes': write(current, cache(b'unrecorded data change'))
+                            elif change == 'metadata': os.chmod(current, 0o600)
+                            elif change == 'added': write(current.with_name('dyld_shared_cache_arm64e.70.dylddata'), cache(b'extra'))
+                            else:
+                                original = current.read_bytes()
+                                current.rename(current.with_name(current.name+'.held'))
+                                if change == 'identity': write(current, original)
+                        return write(path, data)
+                    with patch.object(Path, 'write_bytes', new=write_with_change):
+                        with case.assertRaisesRegex(ValueError, 'readonly input changed'): case.produce()
+                    case.assertFalse((case.work/'guest-publication.json').exists())
+                finally: case.doCleanups()
+
+    def test_real_diskutil_writable_volume_schema_reaches_publication(self):
+        # The actual readonly Cryptex probe uses WritableVolume:false and omits
+        # ReadOnlyVolume. Exercise both source capture and final staged readback.
+        source_query, final_query = self.source_query, self.final_query
+        def modern(query, args):
+            info = plistlib.loads(query(args))
+            if args[0] == '/usr/sbin/diskutil' and args[1:3] != ['apfs', 'list']:
+                info['WritableVolume'] = not info.pop('ReadOnlyVolume')
+                info['WritableMedia'] = False
+                info['Writable'] = False
+            return plistlib.dumps(info)
+        with patch.object(self, 'source_query', side_effect=lambda args: modern(source_query, args)):
+            self.produce()
+        with patch.object(self, 'final_query', side_effect=lambda args: modern(final_query, args)):
+            index = self.finalize()
+        self.assertEqual(len(index['entries']), 1)
+        undo.verify_publication(self.work, cfw_disk_txn.load_record(self.work))
+
+    def test_readonly_cryptex_hardlinks_are_copied_as_independent_files(self):
+        from types import SimpleNamespace
+        first = self.mount/'CodeResources'
+        first.write_bytes(b'original resource seal')
+        os.link(first, self.mount/'CodeResources-linked')
+        with patch.object(os, 'fstatvfs', return_value=SimpleNamespace(f_flag=os.ST_RDONLY)):
+            self.produce()
+        self.assertEqual((self.target/'CodeResources').stat().st_nlink, 1)
+        self.assertEqual((self.target/'CodeResources-linked').stat().st_nlink, 1)
+        self.assertEqual((self.target/'CodeResources').read_bytes(), first.read_bytes())
+        index = self.finalize()
+        self.assertEqual(len(index['entries']), 1)
+        undo.verify_publication(self.work, cfw_disk_txn.load_record(self.work))
+
+    def test_writable_cryptex_hardlinks_refuse_before_copy(self):
+        from types import SimpleNamespace
+        first = self.mount/'CodeResources'
+        first.write_bytes(b'original resource seal')
+        os.link(first, self.mount/'CodeResources-linked')
+        with patch.object(os, 'fstatvfs', return_value=SimpleNamespace(f_flag=0)):
+            with self.assertRaisesRegex(ValueError, 'not readonly'): self.produce()
+        self.assertFalse(self.dsc.exists())
+
     def test_generation_source_mutation_refuses_final_qualification(self):
         self.produce(); self.original.write_bytes(b'mutated generation original')
         with self.assertRaisesRegex(ValueError,'manifest original tree'): self.finalize()

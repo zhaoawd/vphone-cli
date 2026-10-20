@@ -263,7 +263,7 @@ class FileSnapshot:
     metadata: dict
 
 
-def snapshot(path):
+def snapshot(path, *, readonly_source=False):
     """Hash actual file/link metadata and bytes; directories enumerate exact children."""
     path = Path(path)
     try:
@@ -274,20 +274,16 @@ def snapshot(path):
     if stat.S_ISLNK(info.st_mode):
         return canonical(dict(metadata, kind='symlink', link=os.readlink(path)))
     if stat.S_ISREG(info.st_mode):
-        fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
-        try:
-            before=os.fstat(fd);digest=hashlib.sha256()
-            while data := os.read(fd,1 << 20): digest.update(data)
-            after,named=os.fstat(fd),path.lstat()
-            keys=('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns')
-            if before.st_nlink != 1 or any(getattr(before,k)!=getattr(after,k) or getattr(before,k)!=getattr(named,k) for k in keys):
-                raise ValueError('guest file changed during snapshot')
+        from .component_effects import regular
+        with regular(path,readonly_source=readonly_source) as stream:
+            before=os.fstat(stream.fileno());digest=hashlib.sha256()
+            metadata={'mode':stat.S_IMODE(before.st_mode),'uid':before.st_uid,'gid':before.st_gid}
+            while data := stream.read(1 << 20): digest.update(data)
             return FileSnapshot(digest.hexdigest(), metadata)
-        finally: os.close(fd)
     if stat.S_ISDIR(info.st_mode):
         children = {}
         for item in sorted(path.iterdir()):
-            child = snapshot(item)
+            child = snapshot(item,readonly_source=readonly_source)
             children[item.name] = dict(child.metadata, kind='file', sha256=child.sha256) if isinstance(child, FileSnapshot) else json.loads(child)
         return canonical(dict(metadata, kind='directory', children=children))
     raise ValueError('unsupported guest target file type: ' + str(path))
@@ -343,8 +339,8 @@ def main():
         from .final_guest import run
         result=run(plan)
         destination=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'guest-effects-final.json'
-        if destination.is_symlink(): raise ValueError('linked final evidence destination')
-        destination.write_bytes(canonical(result))
+        from cfw_guest_evidence import write_final
+        write_final(destination, canonical(result))
         from .undo_provenance import seal
         seal(destination.parent,result)
         return

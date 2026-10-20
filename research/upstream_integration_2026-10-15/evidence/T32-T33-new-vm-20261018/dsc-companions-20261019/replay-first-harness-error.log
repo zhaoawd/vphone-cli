@@ -1,0 +1,17 @@
+hdiutil: WARNING: 'hdiutil attach -readonly -nobrowse -owners -mountpoint ...' is deprecated. Please use 'diskutil image attach --readOnly --mountOptions nobrowse --mountOptions owners --mountPoint ...' instead.
+/dev/disk16         	                               	
+/dev/disk17         	EF57347C-0000-11AA-AA11-0030654	
+/dev/disk17s1       	41504653-0000-11AA-AA11-0030654	/Users/kolar/github/vphone-cli/.build/t32-dyldreadonly-debug/replay-readonly
+hdiutil: WARNING: 'hdiutil detach ...' is deprecated. Please use 'diskutil eject ...' instead.
+"disk16" ejected.
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/.build/t32-dyldreadonly-debug/replay_source.py", line 29, in <module>
+    readonly = cfw._readonly_dsc_inputs(work)
+  File "/Users/kolar/github/vphone-cli/scripts/patchers/cfw.py", line 360, in _readonly_dsc_inputs
+    no_link_parents(path)
+    ~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/kolar/github/vphone-cli/scripts/patchers/guest_write.py", line 57, in no_link_parents
+    root = Path(os.environ['CFW_HOST_MNT'])
+                ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 709, in __getitem__
+KeyError: 'CFW_HOST_MNT'

@@ -1,0 +1,229 @@
+{
+  "date": "2026-10-16",
+  "baseline": "fcd19e78 plus preserved uncommitted merge result",
+  "scope": "qualified DSC suffix Undo, component effect receipts, guest unknown origin and recoverable disk publication",
+  "sources": {
+    "scripts/cfw_disk_txn.py": "c57875b916eeafb2325ade2e563578480fa9f47ec222746a792bb5fdcc314b25",
+    "scripts/cfw_guest_evidence.py": "01a62abb692f9a96960c318e0e2410e62b00e5b0e885ffdc7f2c3023a3d8a7eb",
+    "scripts/cfw_install_host.sh": "5e00cac110102551cb247d327e846141df810908d049ba2a675085fd18ec1da6",
+    "scripts/patchers/guest_undo.py": "266293accf963802fe16cd95f161ae21ee27e3a9d97e54f3a07a4f67e7dcf5e9",
+    "scripts/patchers/final_guest.py": "e84ec0e597d3a617c99738a03db5bc89df5309405fc1b2dd9e4402ae0bee1067",
+    "sources/VPhoneCore/VPhoneMachineBinding.swift": "abc6e667119b1b76768d406cbf0076c1552aefe70df00ef7305db622b052a3c3",
+    "sources/vphone-cli/VPhoneCFWUndoCLI.swift": "c66cbc13e33d4fc3fa1e2a57761c992b4cbec7f8d70490fccb6259c0591b99c5",
+    "sources/vphone-cli/VPhoneRestoreCLI.swift": "264d577f0dc7814db056fec225e95850df12dce8f2bfa1cf0281c44f0e4bbd0c",
+    "tests/test_guest_undo_transaction.py": "3c9065c13c814b5b400724e57e78272467a167ca6ffdf542637020747e17310a",
+    "tests/test_cfw_guest_undo_driver.py": "9cff9635102944238980a82f1991d1b6530249a15befbd03170d3c95e8de7467",
+    "tests/cfw_guest_undo_driver_fixture.py": "269e6abe53b8ec833ae79beb482dfbaf16a2857dbdb17231a80f270064104b00",
+    "tests/VPhoneCLITests/CFWUndoCLITests.swift": "92844c335ffdee7c71b9bcc0e298fc48d77c8ae463319be95569143dc4a486e8",
+    "tests/VPhoneCoreTests/FirmwareRecoveryLockTests.swift": "7f9979f9d872ca2fa44aea9d14551cbf55e3f753db26c14b8d2b1a353908ce25",
+    "sources/FirmwarePatcher/Pipeline/FirmwareGeneration.swift": "d7541f64cacdd35ab0a40fa905d33023aa1c94720d83f0367715571c368caaf1",
+    "sources/FirmwarePatcher/Pipeline/FirmwareGuestDiskIdentity.swift": "faac8729771077155df8648a1d1f0d29a12cc66ac7b51cd32d0f3c0501d0bd65",
+    "tests/VPhoneCLITests/CFWFrozenPlanTests.swift": "45e9de3eb7931b8efcd78a12e402dae86720aa24f5cc391a67176851ab944ec7",
+    "tests/VPhoneCoreTests/BundleOpsTests.swift": "33bd0c857d7e2d5eead5c408426dc99b31f4ff471b646f1d7fccc2bc0b44d204",
+    "tests/cfw_identity_bridge_fixture.py": "6d227b3aa0e0734cda78e79d8fc0387556c6662dd4ae00611f3b9fb8eebb7a15",
+    "tests/test_guest_undo.py": "d801f48a510259d47a23c91e4dfd1279945fc1d2b6990504a037de3883183528",
+    "scripts/check_bundle.py": "bc84d6c06890db8ca501a0a4745cb3c8fb20d1bb017a738c69b5d446f1029bf5",
+    "scripts/patchers/plan_gate.py": "48ae4c1e23dac511352000f4b5fb54980864a61f21378db7da8004b01b3849a4",
+    "scripts/patchers/guest_write.py": "a138f6db444bb08cc791973d3426824c84424ed7038d25a155cd76d39940e3b5",
+    "scripts/patchers/undo_provenance.py": "60f0e6925d594f664679c6c3c9a588d3cbb0e53b568873c952202b2d9e99471d",
+    "scripts/vm_lock.py": "1547d8821e12f0a801b952a539bee0d92c9452d7b062290e116b96c6dbe39745"
+  },
+  "pythonFullSources": {
+    "scripts/cfw_disk_txn.py": "c57875b916eeafb2325ade2e563578480fa9f47ec222746a792bb5fdcc314b25",
+    "scripts/cfw_guest_evidence.py": "01a62abb692f9a96960c318e0e2410e62b00e5b0e885ffdc7f2c3023a3d8a7eb",
+    "scripts/cfw_install_host.sh": "5e00cac110102551cb247d327e846141df810908d049ba2a675085fd18ec1da6",
+    "scripts/patchers/guest_undo.py": "12391dda4a9cb7f31a0dcf574225f0be5a24cf10e26efbbb3a49394bf17205df",
+    "scripts/patchers/final_guest.py": "e84ec0e597d3a617c99738a03db5bc89df5309405fc1b2dd9e4402ae0bee1067",
+    "sources/VPhoneCore/VPhoneMachineBinding.swift": "abc6e667119b1b76768d406cbf0076c1552aefe70df00ef7305db622b052a3c3",
+    "sources/vphone-cli/VPhoneCFWUndoCLI.swift": "c66cbc13e33d4fc3fa1e2a57761c992b4cbec7f8d70490fccb6259c0591b99c5",
+    "sources/vphone-cli/VPhoneRestoreCLI.swift": "264d577f0dc7814db056fec225e95850df12dce8f2bfa1cf0281c44f0e4bbd0c",
+    "tests/test_guest_undo_transaction.py": "3c9065c13c814b5b400724e57e78272467a167ca6ffdf542637020747e17310a",
+    "tests/test_cfw_guest_undo_driver.py": "9cff9635102944238980a82f1991d1b6530249a15befbd03170d3c95e8de7467",
+    "tests/cfw_guest_undo_driver_fixture.py": "269e6abe53b8ec833ae79beb482dfbaf16a2857dbdb17231a80f270064104b00",
+    "tests/VPhoneCLITests/CFWUndoCLITests.swift": "92844c335ffdee7c71b9bcc0e298fc48d77c8ae463319be95569143dc4a486e8",
+    "tests/VPhoneCoreTests/FirmwareRecoveryLockTests.swift": "7f9979f9d872ca2fa44aea9d14551cbf55e3f753db26c14b8d2b1a353908ce25"
+  },
+  "sourceNotes": [
+    "guest_undo.py module docstring updated after the full Python run; reconstructed original hash and identical executable AST verified",
+    "Swift identity bridge and its Python fixture validated by final make test_swift",
+    "identity fixture module docstring corrected after final Swift run to state all mocked boundaries; executable AST unchanged"
+  ],
+  "tests": {
+    "archiveInterruptionRed": {
+      "exitCode": 1,
+      "log": "archive-interruption-red.log.gz",
+      "finding": "archive rename before completion record leaves committed evidence unreadable"
+    },
+    "identityRed": {
+      "exitCode": 1,
+      "log": "identity-red.log.gz",
+      "finding": "actual Swift verifier rejects generation after committed CFW inode swap"
+    },
+    "pythonRelated": {
+      "tests": 157,
+      "seconds": 112.494,
+      "exitCode": 0,
+      "log": "python-related.log.gz"
+    },
+    "pythonRecoveryFinal": {
+      "tests": 17,
+      "seconds": 9.672,
+      "exitCode": 0,
+      "log": "python-recovery-final.log.gz"
+    },
+    "pythonFullFirst": {
+      "command": "make test_python",
+      "tests": 885,
+      "skipped": 2,
+      "errors": 2,
+      "exitCode": 2,
+      "log": "python-full-first.log.gz",
+      "finding": "interrupted-install timeout and cleanup killpg EPERM; isolated recheck passed; cause not established"
+    },
+    "pythonFullFinal": {
+      "command": "make test_python",
+      "tests": 886,
+      "skipped": 2,
+      "seconds": 241.068,
+      "exitCode": 0,
+      "log": "python-full-final.log.gz"
+    },
+    "swiftFullFirst": {
+      "command": "make test_swift",
+      "exitCode": 2,
+      "log": "swift-full-first.log.gz",
+      "finding": "pending-CFW export contract conflict fixed while retaining all export assertions; ArchiveKit permission comparison failed once, focused and final full passed unchanged; cause not established"
+    },
+    "realVerifierFlow": {
+      "tests": 1,
+      "parameterCases": 5,
+      "seconds": 2.358,
+      "exitCode": 0,
+      "log": "real-verifier-flow-final.log.gz",
+      "scope": "two normal committed CFW swaps then actual qualified DSC Undo; actual Swift CLI plan verifier; checkpoint/disk/machine/retained-disk rejection"
+    },
+    "swiftFullFinal": {
+      "command": "make test_swift",
+      "exitCode": 0,
+      "XCTest": 325,
+      "XCTestSkipped": 7,
+      "SwiftTestingRegular": 1529,
+      "SwiftTestingTimed": 26,
+      "SwiftTestingGroups": [
+        37,
+        75,
+        203,
+        19,
+        29,
+        430,
+        183,
+        40,
+        42,
+        19,
+        452,
+        2,
+        2,
+        3,
+        2,
+        17
+      ],
+      "tarPipeMemory": "passed",
+      "fileDigestMemory": "passed",
+      "guestComponentHostChecks": "passed",
+      "log": "swift-full-final.log.gz"
+    },
+    "static": {
+      "commands": [
+        "git diff --check",
+        "zsh -n scripts/cfw_install_host.sh"
+      ],
+      "exitCode": 0
+    }
+  },
+  "logs": {
+    "archive-interruption-red.log.gz": {
+      "sha256": "d04e07a17f05967f69c457ced3f9fcaf280fb79199d849b479533924defebc35",
+      "uncompressedSHA256": "b8b841e48c1a2d04248167bcf0e0b0243fc9939f8bba2bf8d762c0550ab62a60",
+      "source": ".build/guest-undo-archive-red.log"
+    },
+    "python-related.log.gz": {
+      "sha256": "1e6428b950d69a62910e56267bc372a36f61289179501d72683645403601e72e",
+      "uncompressedSHA256": "410f5c31ae7fc43d9f332249e305781011751138c53148f9cb19b260a8080fa5",
+      "source": ".build/guest-undo-write-final-related.log"
+    },
+    "python-recovery-final.log.gz": {
+      "sha256": "b4988bf36b53d2a18750ede9777b93e52cbed5cb33d16f8862098f7f684ffa1d",
+      "uncompressedSHA256": "0e0ca77b0e65825d675efe86263cecb846cfac6385945dd175455ea4c94a68b3",
+      "source": ".build/guest-undo-write-recovery-final.log"
+    },
+    "python-full-first.log.gz": {
+      "sha256": "311dab9e83d75b56fc4ecfd3b1d793f6d78a3c422db5c14fa90a00df915b1440",
+      "uncompressedSHA256": "d9ad6d583a8931bca93988d73c7c97c380e6b26dee2c3ed283257a60c044f10d",
+      "source": ".build/guest-undo-write-python-full.log"
+    },
+    "python-interrupted-recheck.log.gz": {
+      "sha256": "dfe82fe48f30570517a691e5afdcb2fa45e948e940ad0dba78046f4ce97b7814",
+      "uncompressedSHA256": "38fea3e1b2aa9350c0692f497bb6bf36b01e422a303bd0f1239df8a22b7646a5",
+      "source": ".build/guest-undo-interrupted-recheck.log"
+    },
+    "python-full-final.log.gz": {
+      "sha256": "9a7dc3e70de6a957a463b3d61aec18cb12801ce047729311e1b01b9eb3b71acb",
+      "uncompressedSHA256": "667d956e4cc17275d9a1fa4adc385a50769f36a0a92a5d40cc2ba5bf4393d898",
+      "source": ".build/guest-undo-write-python-final.log"
+    },
+    "swift-focused.log.gz": {
+      "sha256": "9fd232ea707aa0929159611ecdde2c794da03d46bde8f1c8819f9238812dab25",
+      "uncompressedSHA256": "a84ae29bde6e9f419186f71113bbcaf11aea5d5109f1e788681c784146589582",
+      "source": ".build/guest-undo-write-swift-final-focused.log"
+    },
+    "swift-full-first.log.gz": {
+      "sha256": "474a64bcc0085a76319723b979990ebd9f3cbaa9d428c2c4175682f70de03b3c",
+      "uncompressedSHA256": "1f5c8518cc5e329187000eddec951d4a3f4772ce6e4654565eff46b5e40ec132",
+      "source": ".build/guest-undo-write-swift-full.log"
+    },
+    "identity-red.log.gz": {
+      "sha256": "94b1127c641b9c1092943b60cc13b742b52fb08abb925b7e873caf436c23a6b1",
+      "uncompressedSHA256": "cf3a4b51a2f85d9b655111493a6bc7227ccc94fa9c4475487fe40ff050ac53c6",
+      "source": ".build/guest-undo-identity-red.log"
+    },
+    "identity-focused.log.gz": {
+      "sha256": "d497c7cfed6180342a133bd032ee1752652d6d5ca2bea25c4a67cff85324f709",
+      "uncompressedSHA256": "c8122b75a97cf3bcbc648970b4125204d3449603aea585973065c6a979a3d1aa",
+      "source": ".build/guest-undo-identity-complete-focused.log"
+    },
+    "real-verifier-fixture-first.log.gz": {
+      "sha256": "b6be71929548c5dd426ac3dec74af0c730bfd11504b95faeb41f7944e61bb9c2",
+      "uncompressedSHA256": "0808f33e780a92e236d7b86f4a383c34e49c678e6929d7937a8c5a45fd49d251",
+      "source": ".build/guest-undo-real-verifier-flow.log"
+    },
+    "real-verifier-fixture-path.log.gz": {
+      "sha256": "da6da014de73dd4de50fd2061f144f90df9ee1c56cd97ba64aa8db8d262371b3",
+      "uncompressedSHA256": "036c135fad8e0ba8aa533d9e9bab100696f0cc6c072bc75b146f519f844624c9",
+      "source": ".build/guest-undo-real-verifier-flow-fixed.log"
+    },
+    "real-verifier-fixture-copy.log.gz": {
+      "sha256": "5aae03841e8fc5d66f84df7b609ddbf3fa4dad123440c194b7c373511cf575b4",
+      "uncompressedSHA256": "7ad2c85f4cd439cc0d0e4031cc653aaceddc700e2f2050db9e8b6fb9533c1968",
+      "source": ".build/guest-undo-real-verifier-flow-fixed2.log"
+    },
+    "real-verifier-flow-final.log.gz": {
+      "sha256": "7f3ebe507c95d623cded765adbd723cb75f6750e8ca7494fe8a2045ff9e052af",
+      "uncompressedSHA256": "30f4c3a4319864e1d09c4671a1380ec0364adb08d08db71d6d8b35f35bef3866",
+      "source": ".build/guest-undo-real-verifier-flow-fixed3.log"
+    },
+    "swift-full-final.log.gz": {
+      "sha256": "087d0b54aab40f2a1bbf5581258c9eb2c83849ba08348f02aa4b3b13cdda2017",
+      "uncompressedSHA256": "a32c395e46852b2b7a433084d0c059a80df463726e642c7ca5459f63d1cef468",
+      "source": ".build/guest-undo-write-swift-final.log"
+    }
+  },
+  "limitations": [
+    "No named real VM was provided; no VM writes, boot or runtime acceptance",
+    "APFS attachments and volume queries use isolated fixtures; DSC producer algorithm and raw image flush modeled in the Swift/Python flow",
+    "Suffix DSC Undo only; arbitrary middle replay, Mach-O and Preboot remain pending",
+    "Same live plan required for writes; generation continuity requires retained ancestry, bounded to 64 CFW swaps and eight nested Undo journals",
+    "Guest origin stays unknown; no trusted new Core Bundle guest origin advancement",
+    "IOMFB production migration gate retained; T32/T33 not accepted",
+    "No signed app build, real firmware comparison or deployment"
+  ]
+}

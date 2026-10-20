@@ -250,7 +250,11 @@ def verify(rows,roots,store,plan):
         if node['target'] is None: continue
         final=final_path(node['target'],roots)
         actual=effects.state(final,False)
-        if actual!=node['after']: raise ValueError('final transported member differs from recorded output')
+        if actual!=node['after']:
+            fields=sorted(key for key in actual.keys()|node['after'].keys()
+                          if actual.get(key)!=node['after'].get(key))
+            raise ValueError('final transported member differs from recorded output: '+node['target']+
+                             ' (fields: '+', '.join(fields)+')')
         if node['history']:
             proofs=[proof for _,proof in node['history']]
             # Copy-only leaves need no duplicated content blob: both observed

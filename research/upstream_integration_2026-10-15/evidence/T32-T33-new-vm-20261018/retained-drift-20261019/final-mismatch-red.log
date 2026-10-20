@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/.build/t32-undo-mount-debug/repro-final-mismatch.py", line 20, in <module>
+    transport.verify([row],{'system':root},archive/'effect-blobs',SimpleNamespace(context={}))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kolar/github/vphone-cli/scripts/patchers/component_transport.py", line 253, in verify
+    if actual!=node['after']: raise ValueError('final transported member differs from recorded output')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: final transported member differs from recorded output

@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-16",
+  "vm": "/Users/kolar/github/vphone-cli/vm-new",
+  "baseline": "fcd19e78 plus preserved WIP",
+  "scope": "legacy missing-evidence refusal and two real boots; no positive Undo",
+  "authorization": "User selected vm-new in reply to request for a writable Undo and boot acceptance VM",
+  "offline": {
+    "exitCode": 0,
+    "result": "offline-final/offline-result.json",
+    "seconds": 67.77358245803043,
+    "diskUnchanged": true
+  },
+  "runtime": {
+    "exitCode": 0,
+    "result": "runtime/runtime-result.json",
+    "cycles": 2,
+    "bothGuestConnected": true,
+    "bothNormalStop": true,
+    "diskReleased": true,
+    "positiveUndoValidated": false
+  },
+  "build": {
+    "firstExitCode": 2,
+    "firstFailure": "default IcliKit cache revision differs from locked 0.8.5",
+    "finalExitCode": 0,
+    "finalCommand": "zsh scripts/build.sh --no-vphoned",
+    "preparedResources": "VPHONE_DAEMON_API_BUILD_DIR=.build/daemon-api-t59-20261015 zsh scripts/build_daemon_api.sh; check_guest_api.py --stage-api .build/daemon-api-t59-20261015/candidate .build/guest --record",
+    "completeBundleVerified": true
+  },
+  "hostPreflight": {
+    "exitCode": 0,
+    "releaseHelpExitCode": 0,
+    "signedDebugControlExitCode": 137
+  },
+  "helperFirstFailure": "writer safely refused; acceptance helper expected an error text from a different interface; exact source-backed assertion corrected",
+  "productionSourcesUnchangedSinceFullSuites": true,
+  "fullSuiteEvidence": "../T32-T33-guest-undo-publication/manifest.json",
+  "sources": {
+    "research/upstream_integration_2026-10-15/tools/verify_legacy_guest_undo.py": "a8960982fd075e4c37867e740c4f9d8aeaf06f21b1cfc7331c95721188eef094",
+    "research/upstream_integration_2026-10-15/tools/verify_legacy_vm_boot.py": "f496845c32bc6ddf2a1a774a0e4a3b695e403232ebc6b31599cf9f0c3c7beb23"
+  },
+  "logs": {
+    "build-first.log.gz": {
+      "sha256": "3d09f235f1b0d15142663bea8364904d32fd0ad048e7ad05119b106e90d6d28b",
+      "uncompressedSHA256": "0c5b790364e26823df5cd324e2b83286dd25f1dfd767267707efe25c2350431b"
+    },
+    "daemon-build.log.gz": {
+      "sha256": "4133493f92527aa373267513054047cc4f6465335e08f30a03acabd52d734675",
+      "uncompressedSHA256": "135393a23f142a4a1d5e851ad3954e0797ca6adff4a107c021a458c6d7d93d82"
+    },
+    "cohort.log.gz": {
+      "sha256": "a3bb7a185c5f69f829037a41b7de930112ef4b7b2be3504a1d844d1776831b0b",
+      "uncompressedSHA256": "5187e97a86495575bae824b7ee4166839564951a22936396a6a0eb3b28a8ada6"
+    },
+    "build-final.log.gz": {
+      "sha256": "8d243e4d4a0df0478ef8b88fd01833583ae44c90994dcd2f89ea1ea5c2dd7816",
+      "uncompressedSHA256": "30e9d21ccdfee34825be1b709187ac3f53570bc595875b35d92d04ec8224ca5a"
+    },
+    "host-preflight.log.gz": {
+      "sha256": "2b48fd7a21470995d75777e98b79ef6b8e03f940edacbc69a08e4f8fbd4b5a9b",
+      "uncompressedSHA256": "f3dae75b258e35c12e98c362f04054e45b2cdd6520c027e7a34884a19c593ee1"
+    },
+    "offline-first.log.gz": {
+      "sha256": "3714f48452eb271588361ef9bf0f456c0ec7f51444382a5b262760a1daa4e86a",
+      "uncompressedSHA256": "d43a24257446c03b413007737e2bae996dfd3f1434414933097bf833510d008f"
+    },
+    "offline-final.log.gz": {
+      "sha256": "0eb1371f858d6f3c6aec7f13bebd9d9aa140545534e301f7742ac2423d1d150c",
+      "uncompressedSHA256": "988077a810a8a4e651ff88b6f25e6929c84dfe358bd723aabc0e146fc44b7cba"
+    },
+    "runtime.log.gz": {
+      "sha256": "53ede76ff718fd038a4ab180f46a86919721273f908af3b55608ac93c9b7f7cf",
+      "uncompressedSHA256": "c87b60233d7474b9c15a5e83323ea7b350ee93c363b9545edd87e39923a7044f"
+    }
+  },
+  "files": {
+    "build-final.log.gz": "8d243e4d4a0df0478ef8b88fd01833583ae44c90994dcd2f89ea1ea5c2dd7816",
+    "build-first.log.gz": "3d09f235f1b0d15142663bea8364904d32fd0ad048e7ad05119b106e90d6d28b",
+    "runtime-sources.json": "9fdd01110edefd268c2f154039f6b7ff49e1972917cb58a095cbd1131054711a",
+    "cohort.log.gz": "a3bb7a185c5f69f829037a41b7de930112ef4b7b2be3504a1d844d1776831b0b",
+    "daemon-build.log.gz": "4133493f92527aa373267513054047cc4f6465335e08f30a03acabd52d734675",
+    "runtime-before.json": "0a5c596525654b522d38b61fd838efd7ef5fb915cecefa6a7f8212d84728f464",
+    "host-preflight.log.gz": "2b48fd7a21470995d75777e98b79ef6b8e03f940edacbc69a08e4f8fbd4b5a9b",
+    "runtime.log.gz": "53ede76ff718fd038a4ab180f46a86919721273f908af3b55608ac93c9b7f7cf",
+    "offline-first.log.gz": "3714f48452eb271588361ef9bf0f456c0ec7f51444382a5b262760a1daa4e86a",
+    "offline-before.json": "e59e2ef7344a5106cdf6084b0192e04d065b8870a1a7384a360291e00505c913",
+    "offline-final.log.gz": "0eb1371f858d6f3c6aec7f13bebd9d9aa140545534e301f7742ac2423d1d150c",
+    "initial-files.json": "32cb3f235e9ae71771d97293b4e55cb098fcb275d0e806c14e43da016e6721c3",
+    "final-state.json": "2e45738273cda8a6e7941479ae90641ad2d170cd0e99b1870a4cc7be2eb1c425",
+    "offline-commands.json": "1e01d1cd2215c2f21c3150378ddd918657da50766507dc1ad495fd51cc7fc3bd",
+    "offline-final/offline-after.json": "e59e2ef7344a5106cdf6084b0192e04d065b8870a1a7384a360291e00505c913",
+    "offline-final/offline-before.json": "e59e2ef7344a5106cdf6084b0192e04d065b8870a1a7384a360291e00505c913",
+    "offline-final/offline-result.json": "4c19e32075dc95bae73a7b9a273539db8dec7b66691b4a9f1786db64b9d14144",
+    "offline-final/offline-commands.json": "1e01d1cd2215c2f21c3150378ddd918657da50766507dc1ad495fd51cc7fc3bd",
+    "runtime/runtime-result.json": "4e5b851c66eb86199402cfcaee45531598c4825e9d2e6d345b16a48a7fdc818d",
+    "runtime/boot-1/runtime.json": "37f4b465f3ffe74d0a260007a14cb75a50f298b2a2b068c0992062e3c93d8cfe",
+    "runtime/boot-1/capabilities.json": "10c5bab9cf40bbfc5fbdffed4a1cad4309dccd0c2b097fd2ad4587eedffba2c2",
+    "runtime/boot-1/disk-holders.json": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130",
+    "runtime/boot-1/requests.jsonl": "ab386b551bd62929066e8beda5189277ef6d1a48fbc63470ba3a0c9f1be3f5b6",
+    "runtime/boot-1/serial.log": "8441bd0a32ec61a0e80cd5a54e0abce7a9eebd7b26466d6e0b218a547e0c2136",
+    "runtime/boot-1/boottime.json": "03f1d9c0d356b48a1bb2404b06bbae46a5dc6bea9ab5346d9f51474d8960a730",
+    "runtime/boot-1/stop.json": "32a630e9375c12d8411a0308de76763e78b6316559edd0f0855a5110469ab977",
+    "runtime/boot-1/SystemVersion.plist": "2a2a4b045059edc470dffc0363071bd65a1a81aca81cbcfb9d4ac9f91a00aeb4",
+    "runtime/boot-2/runtime.json": "dc2dbaec0e67d0e9f14178cdd5f41ce35f720188d9df57f20d3b1844423ceba4",
+    "runtime/boot-2/capabilities.json": "77a6e67adc87d72879528097347623f29b37ab97d6c32896d18586b1a66d9437",
+    "runtime/boot-2/disk-holders.json": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130",
+    "runtime/boot-2/requests.jsonl": "c78a88e5f0dcba28bc37930f749306258a898fda19f42bfdc5a192563fdcc61b",
+    "runtime/boot-2/serial.log": "e0e00efba7accc2876132090d43d77a52c90e21ceb8a444a19ad6594fa2bcbcb",
+    "runtime/boot-2/boottime.json": "a698131b9710ca5cb01583f95071ecba3e020d44aebea17d91ce457f83a0ced6",
+    "runtime/boot-2/stop.json": "050091a8e3b2d86c82fd94fa3658b5735a370ede033c87d5945e6102b0c84e5b",
+    "runtime/boot-2/SystemVersion.plist": "2a2a4b045059edc470dffc0363071bd65a1a81aca81cbcfb9d4ac9f91a00aeb4"
+  },
+  "limitations": [
+    "No generation, desired plan or committed CFW journal on this VM",
+    "No real positive DSC Undo or Undo/reinstall runtime acceptance",
+    "No real Undo interruption recovery or complete DSC/Preboot acceptance",
+    "No guest daemon update, new CFW installation or origin advancement",
+    "T32/T33 not accepted"
+  ]
+}

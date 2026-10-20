@@ -1,5 +1,31 @@
 # 8a75092 范围核验与本地对账（2026-10-15）
 
+2026-10-20 当前状态：21ae78d3已push。显式Cryptex重装事务20261019T124601Z-vZh3Hh4C最终核验拒绝，原盘身份/mtime与66样本保持，两个顺序验收脚本停止，未执行Undo或启动。已用真实删除记录与实际安装脚本复现已有目录符号链接的ln -sf额外写入，改用ln -sfn，并在写入入口拒绝跟随目录或尾斜杠；最终严格比较保持并新增目标/字段诊断。相关43项及最终完整Python948项（跳过2项）通过，签名应用和原VM程序保持核验通过。修复后重试CLI4097/session59096已发起，Undo及on→off→on尚待验收，T32/T33未accepted。
+
+## 2026-10-16 roothide journal 实际核对
+
+管理员只读检查已完成。指定 VM 的 3 份 journal 均为 v1：1 份已发布 API 安装、2 份失败且保留副本。当前磁盘 inode 匹配发布记录，但 mtime 不同；没有 generation、冻结计划或 guest 发布检查点，不能用于当前正向 DSC 撤销。磁盘无占用或附件，本轮未修改 VM。补充抽样授权请求已取消，未计作通过；见 [核对记录](T32_T33_roothide_journal_inspection.md)。
+
+## 2026-10-16 改用已有 journal 的 VM
+
+用户选择切换验收对象，不重新安装 vm-new。只读核对已知目录中的 7 台 VM，4 份可读已发布日志均为 v1；尚未找到具备 generation、冻结计划及 v3 发布检查点的候选。roothide 的历史因权限未读取，另有未完成事务，未恢复。等待用户提供目标名称或路径；见 [目录核对](evidence/T32-T33-existing-journal-search/inventory.json)。
+
+## 2026-10-16 vm-new 真实验收
+
+用户指定仓库内 `vm-new`。该 VM 缺 generation、desired plan 和 CFW journal；实际 Receipt 返回 unknown，预览及写入拒绝，离线完整磁盘和受保护文件摘要前后一致。完成当前完整签名应用构建；两次真实启动均连接原 vphoned，读回 iOS 26.1/23B85，客户机启动时间不同，两次正常停止并释放磁盘，未更新 daemon。正向撤销和中断恢复仍未验收；重新安装记录化 CFW 的扩大范围等待用户明确选择。见 [验收记录](T32_T33_vm_new_acceptance.md)和[证据清单](evidence/T32-T33-vm-new-acceptance/manifest.json)。
+
+## 2026-10-15 DSC 撤销写入与共同发布
+
+新增 `cfw undo` 和 `cfw receipts`，实际恢复 staged DSC 后缀候选，封存 request/applied/分组件效果 Receipt，并在同一可恢复磁盘 journal 中将 guest 来源置 unknown。157 项相关 Python、11 项 Swift 定向通过；最终 Python 全量 886 项（跳过 2 项）无失败；最终 Swift 完整入口退出 0，XCTest 325 项（跳过 7 项）、常规 Swift Testing 1529 项、限时分组 26 项及后续内存/guest 组件宿主检查通过。补充真实 Swift 验证器的连续两次安装与一次撤销回归，修复 CFW 交换后 generation 原 inode 绑定不能继续读取的问题。归档 rename 前持久化完成证据，新增交换、来源及归档边界恢复回归。真实 VM 对象待用户指定；Mach-O/Preboot、任意中间操作和受信 guest 来源推进仍未完成。见 [实施记录](T32_T33_guest_undo_publication.md)。
+
+## 2026-10-15 已提交 guest DSC 撤销候选
+
+新增 `cfw_disk_txn.py preview-undo`：从当前已提交 v3 journal 重建来源索引，按 declaration 反向核对 DSC 操作链末尾的一组操作，重新计算候选全部 CodeDirectory 代码页摘要。65 项组合回归通过；完整 Python 最终 869 项、跳过 2 项，无失败，退出 0。尚未执行实际 guest 撤销写入或更新安装来源，T32/T33 整项保持未验收。详情见 [专项记录](T32_T33_guest_undo_candidates.md)。
+
+## 2026-10-15 拉取与本地修改合并
+
+已从 `2df4be8c` 快进到远端 `fcd19e78`，恢复并合并本地未提交修改，保留两侧 Undo 来源核验和快照后磁盘检查点。完整安装采用 journal v3，环境更新保留远端 v2。备份 stash 保留，Swift 相关 27 项和 Python 定向 82 项通过；`make test_python` 最终 857 项通过（跳过 2 项），退出 0。详情见 [合并记录](pull_merge_reconciliation.md)。以下各批次结果保留其原验证范围。
+
 ## 2026-10-15 恢复批次结果
 
 三个子范围已实施并完成相关验证。标准 Swift 全入口退出 0：XCTest321项跳7，常规SwiftTesting1507项和时限组26项通过，内存和guest组件宿主检查通过。Python恢复基线818项通过；实施后835项仅一条旧取消删除静态断言失败，更新契约后受影响模块23项通过，未重跑完整入口。具体结果、审查与未完成范围见 [恢复批次汇总](evidence/resume-three/README.md)。
@@ -34,7 +60,7 @@
 
 本批最终验证：Python 798 项通过（跳过 3 项）；Swift 限时组 9 项、tar/文件摘要内存检查及 guest 组件检查通过。标准 Swift 两次均未通过，分别为 8 / 46 issues；首次失败定向复核 3 项通过。原幂等失败均未再出现，其余失败原因未查明。未将任务整体标记为 accepted。
 
-**最新进展：** T37 的 SIGTERM 与主窗口关闭已接入原关机及写入等待，Python 786 项通过，最终窗口回归及限时组通过，标准 Swift 仍保留 1 项既有内核幂等 issue，见 [T37 记录](T37_exit_routing.md)。前一批 T59 设备状态轮询与独立 iOS 候选见 [T59 记录](T59_event_polling.md)，IcliKit/声明层适配见 [T08/T09 记录](T08_T09_adaptation.md)。第 1–5 节保留首次 Git 核验阶段的范围和结果，其中“本轮”适用于该首次阶段。
+**最新进展：** T32/T33 已推进已提交 Receipt/report 核对、首次原件保留、撤销/重打副本预检和 `fw receipts` 入口，详见 [T32/T33 记录](T32_T33_receipt_undo.md)。guest 磁盘事务发布和真实 VM 验收仍未完成。前一批 T37 退出入口见 [T37 记录](T37_exit_routing.md)，T59 设备状态轮询见 [T59 记录](T59_event_polling.md)，依赖/声明层适配见 [T08/T09 记录](T08_T09_adaptation.md)。第 1–5 节保留首次 Git 核验阶段的范围和结果。
 
 已取得官方固定目标的完整可达对象，完成新增范围与附件集合核验，并建立 61 项任务的本地路径/历史证据对账。没有切换分支、merge、cherry-pick、修改生产代码、构建或操作 VM。原有未提交修改保持。
 
@@ -144,3 +170,152 @@ U0 的对象、范围和集合核验已完成；T02 的逐提交语义覆盖仍�
 - [ ] 启动中停止、panic/未就绪/超时/权限的完整矩阵及真实 VM 停止/磁盘释放，继续按 T24/T37/T40 的原计划验收。T32/T33 的同 ID 实现代际与可信 Undo 仍待推进。
 
 最终标准 Swift 常规 1510 项，仅保留 `postValidationRecognizesIdempotenceWithoutEmitting` 的已记录 issue（2 条记录与断言 1 条不符）；未改动该补丁或断言，`run_tests.py`/make 分别退出 1/2。此次没有重新运行标准入口其后的内存和 guest 组件检查，也没有构建/部署完整签名 App 或操作真实 VM、AMFI、TCC、系统 Store。原有已校验 Capstone overlay 保留。
+
+
+## 2026-10-15 后续：T32/T33 Receipt 与撤销预检
+
+起点 `2df4be8c`；保留 Capstone overlay。本轮先处理已有持久化证据与撤销资格，未修改 firmware/kernel/DSC 指令，未操作实际 VM。
+
+- [x] 保存原 Undo 对保留补丁失效字节、无首次原件 no-op 的失败回归。
+- [x] 用 HEAD 原 Receipt 源码复核缺失/损坏 report 仍通过、desired 改变后旧证据不可读的失败；恢复候选源码。
+- [x] 通过归档 producer report、journal 原计划、generation 和当前输出核对已提交记录；Receipt 中的 originalBytes 必须与 producer 一致。
+- [x] 重复应用保留首次原件，保存撤销后剩余日志；同 ID 记录形状判定与重打预检只作用于副本。
+- [x] 新增 `fw receipts` 查看实际持久证据及生成固件撤销预览；缺旧证据保持 unknown，不更新安装来源。
+- [ ] guest DSC/Mach-O/Preboot 撤销、代码页重新证明，以及 Disk.img、Receipt/Undo/来源的同 journal 发布和真实 on→off→on 验收。
+
+具体回归结果及限制见 [专项记录](T32_T33_receipt_undo.md)与[证据清单](evidence/T32-T33-undo/manifest.json)。T32/T33 历史状态和接受计数保持，不能将本轮预检视为实际 guest 更新完成。T08 客户机验收、T09/T10 的指令实现及适用性仍保持未完成；此前优先推进 T32/T33 不表示前三项已经验收。
+
+
+## 2026-10-18：T32/T33 新 VM 验收准备
+
+用户授权新建独立 VM。首个 26.1/23B85 实例的准备成功，固件提交前因 bootx 声明与执行步骤的版本条件矛盾而拒绝。已保留失败证据并通过正式恢复入口归档；修复将两者统一为 cloudOS 26.4 及以后必需，保留现代输入缺少匹配和匹配不唯一时的拒绝。当前 T09 规则清单记录有实际失败证据支持的修订，原清单完整保留，固定上游源码保持。
+
+定向测试、兼容性 Python 14 项、catalog Python 9 项及生成器检查通过。最终常规 Swift Testing 1534 项通过；完整 Swift 入口仍有未修改的 APIProxy XCTest 失败，单独 1 项通过，原因未查明，后续检查未运行。完整签名构建及 bundle 资源/entitlement 校验通过。
+
+第二个实例 `vm-t32-t33-20261018-r2` 已完成原始固件准备；7 个组件、58 条字节记录通过声明校验，组件 Receipt 与事务已提交，patch 检查点 succeeded；随后真实系统恢复 succeeded。用户已明确授权既有 amfidont 按当前 VM CDHash 放行并继续恢复、CFW 和撤销验收；冻结程序 `--help` 退出 0，真实 DFU 恢复已验证放行。首次 CFW 在 readonly Cryptex 的 volume 字段检查失败，原磁盘元数据与 66 段采样摘要保持，v3 失败事务已归档。实际 `WritableVolume:false` 字段兼容性已修复，相关 87 项、完整 Python 892 项（跳过 2 项）及完整签名构建通过。CFW 重试当前等待新的 macOS 管理员验证，Mac 被报告锁屏。两台既有 VM 的指定文件元数据及已有摘要保持。
+
+T32/T33 接受计数保持；真实系统恢复已完成；CFW v3、DSC 撤销及新 VM 正常启动尚未完成。详细证据和后续结果见 [新 VM 记录](T32_T33_new_vm_20261018.md)。
+
+
+DSC 验收组合已更正：regular 26.1 没有默认 DSC 字节操作，r2 仅用于发布/启动验证。独立 `vm-t32-t33-dsc-20261018` 使用已核验的 26.0 23A341 原始归档与 cloudOS 26.1 23B85，已完成 native prepare 和正式 generation 发布，固件事务正在运行。只读原始 DSC 诊断定位 SwapEnd `0x548` → `0x560`，对应 6885 个代码页通过校验；不构成安装或撤销验收。旧 VM 指定文件保持检查通过。
+
+独立 DSC 实例后续已完成固件事务提交（`c1c3bbd5-e615-4ba5-8700-0fc885925167`，7 组、58 条记录）及真实恢复。SHSH、restore、DFU 子进程均退出 0，磁盘与目录锁释放；CFW、DSC 撤销和正常启动仍待验收。r2 CFW 重试等待用户解锁并完成已有原生管理员验证，接受计数保持。
+
+第三次 CFW 前修复实际 readonly Cryptex 的硬链接读取：原文件稳定但 nlink=38 被误拒绝，正式 producer 回归先失败后通过；最终相关 147 项、完整 Python 900 项（跳过 2 项）及真实原始源树读取通过。完整签名与冻结资源核对完成；按已批准的同 CDHash 重启既有 amfidont，未加载持久允许列表。第三次管理员验证已生效，实际 staged 安装正在执行；发布与正常启动仍待核验。
+
+
+## 2026-10-19：最终 APFS 挂载核验
+
+第三次 CFW 已于 2026-10-18T14:47:55Z 退出 1，失败位置是首次 `verify-final`，错误为 `final root is not the exact staged volume mount`。归档 `20261018T142710Z-rDDZL4Bx` 保留 551 条 guest 操作；尚未执行快照切换或磁盘交换。原磁盘 dev/inode/size/mtime 与 66 段采样摘要相同；这不是完整磁盘摘要证明。
+
+独立 APFS 克隆复现同一错误。实际 `diskutil apfs list -plist` 对已挂载卷仍缺少 `MountPoint`；`diskutil info -plist` 对设备和路径返回准确设备标识、挂载路径及 `WritableVolume`。未挂载卷返回空 `MountPoint`，可以不含 `Mounted`。旧最终检查使用 APFS 清单的可选字段，因此误拒绝。
+
+修复保留镜像→物理存储→唯一 APFS 卷绑定，改用卷和实际路径查询核对设备、准确挂载点及读写状态。缺失、矛盾、路径或设备不符仍拒绝；覆盖挂载在卸载前拒绝。Undo 可写入口使用同一核验。隔离原生克隆的可写→只读重新挂载已通过，原镜像身份保持，克隆已正常卸载。逻辑 `hardware` 继续沿用安装器既有 s3 目标，未改变分区映射。
+
+相关 58 项通过；完整签名构建通过。完整 Python 回归正在运行。当前 VM 程序仍为获批 CDHash；宿主放行进程已退出，按既有授权恢复进程，正在等待原生管理员验证。第四次 CFW 尚未启动；真实发布、启动边界和独立 DSC 撤销仍未验收。证据：`evidence/T32-T33-new-vm-20261018/mount-inventory-20261019/manifest.json`。
+
+
+本轮最终验证：`VPHONE_DAEMON_API_BUILD_DIR="$PWD/.build/daemon-api-t59-20261015" make test_python` 执行 906 项、跳过 2 项，无失败，227.751 秒，退出 0。首轮同为 906 项，其中原有测试替身未覆盖新增路径查询，导致 1 项失败；已补齐设备/路径两种查询，并增加实际路径查询断言，原拒绝断言保持。定向 23 项通过。完整签名构建通过，打包的 final_guest、guest_undo、volume_state 与当前源文件摘要一致。旧 VM 指定元数据与小文件摘要复查保持。管理员验证仍未返回（原生 osascript 等待中）；第四次 CFW 尚未启动，真实发布、启动及 DSC 撤销保持待验证。
+
+
+## 2026-10-19：签名前复制属性核验
+
+第四次正式 attempt `009d74f2-b1c0-4639-b08d-8eb7a14b96bb` 已完成 551 条 guest 写入，通过了此前失败的最终挂载核验；首次效果核验拒绝 `required metadata effect was overwritten`。归档为 `20261018T234718Z-5V5rPsLR`，尚未切换快照或交换磁盘。原 Disk.img 的 dev/inode/size/mtime 与 66 段采样摘要保持；这不是完整磁盘摘要证明。
+
+保存记录中的 seputil、launchd_cache_loader、mobileactivationd 均存在同一签名复制关系：临时副本创建时 GID 为 20，最终 guest 文件保留 GID 0。普通复制核验仅关联内容，允许后续复制保留目的文件属性；签名前核验额外将早期复制创建时的属性当作必须保留的修改，因此误拒绝。真实保存字节、完整签名链和 journal 中最终属性观察的重放在修改前复现相同错误。该重放代替的是已由失败清理移除的 staged 文件属性观察，不构成新的物理挂载验收。
+
+修复仅在签名前属性效果检查中跳过 copy 操作，与主核验循环一致；显式 chmod/chown 属性修改仍必须保留。新增真实 Mach-O 的复制→补丁→签名→复制回归先失败后通过，显式 chmod 被覆盖及最终未记录属性变化仍拒绝。三个真实程序的保存字节重放通过；全部 25 份非纯复制的保存操作链也通过，最终属性观察来自最后记录。完整签名构建通过；完整 Python 正在运行。
+
+第五次 CFW 尚未启动。实际最终效果、快照后第二次核验、共同发布、启动及独立 DSC 撤销仍待验证。证据见 `evidence/T32-T33-new-vm-20261018/signing-copy-metadata-20261019/manifest.json`。
+
+
+最终标准入口 `VPHONE_DAEMON_API_BUILD_DIR="$PWD/.build/daemon-api-t59-20261015" make test_python` 通过：908 项、跳过 2 项，无失败，233.414 秒，退出 0。完整签名构建通过，四个相关打包脚本与源码摘要一致，VM CDHash 保持获批值。旧 VM 指定元数据与小文件摘要复查一致。已退出的放行辅助进程按既有授权重新启动，当前等待 macOS 原生管理员验证；第五次 CFW 尚未启动。后续先完成实际最终核验和发布，再运行保存的启动后 journal 验收脚本，独立 DSC 实例仍未安装 CFW 或撤销。
+
+
+用户完成放行进程的管理员验证后，launcher 退出 0，辅助进程 PID 37311，立即执行当前 VM 程序退出 0。第五次正式创建续跑已启动（PID 37596、session 9529、attempt `e8bb6bfd-c484-4121-a636-004d435f755b`）。新冻结副本 `e068c46b-472f-40f6-aea1-21c0c4a97b39` 的四个相关脚本摘要与源码相同，VM CDHash 与获批值相同，冻结 VM `--help` 退出 0。
+
+当前独立 CFW 安装命令仍在等待 macOS 原生管理员验证（wrapper PID 38304）；未发现 root 安装进程或新的 `.cfw_disk.*` 目录，尚未建立磁盘事务。用户已被提示完成当前安装对话框；既有动作授权保持有效。
+
+
+用户已完成第五次安装命令的原生管理员验证。root 安装进程 PID64816 已建立 `.cfw_disk.H0YWJ2mL` 并进入正式 guest 安装；创建续跑 session9529 继续运行。最终核验、磁盘发布、首次启动及独立 DSC 撤销尚未完成。
+
+
+等待第五次安装期间，独立 APFS 克隆使用正式 `apfs_snap_rename.py` 完成两条快照名称记录修改；工具与第五次冻结副本摘要一致。之后 System 与安装器既有 s3 目标的准确设备/路径/只读核验通过，正常卸载。源镜像身份元数据保持，未做完整磁盘摘要；仅替换 .build 的 private-path 资格边界，全部挂载查询真实执行。此项不证明 CFW 效果发布或 guest 启动。
+
+
+2026-10-19 后续结果：r2 第五次 CFW 已发布，事务 `20261019T013451Z-H0YWJ2mL`；正式 create 退出 0，首次及验证提示符启动通过。额外当前 classic API 的两次正常关机回归通过：启动时间和会话 UUID 不同，均收到 Guest stopped，磁盘/目录锁释放，配置与 daemon 摘要保持。运行后 v3 receipts/verify-plan 拒绝；整盘 SHA/mtime 变化，而封存检查点、5 文件、297 blob、配置及 generation 核对通过。正在实现新 v4 的独立发布后镜像和运行身份连续性，不改写历史 v3 journal，不授予当前效果或来源权限。独立 DSC 安装/撤销仍待验证，T32/T33 未 accepted。证据：`evidence/T32-T33-new-vm-20261018/runtime-boundary-20261019/manifest.json`。
+
+
+## 2026-10-19：DSC 完整伴随输入清单
+
+2026-10-19 当前状态：b00e1d3c 已提交并 push。独立 DSC 第二次 CFW 在 .34.dyldreadonly 枚举处拒绝，原磁盘身份/mtime 与 66 段采样保持，未交换。完整只读清单确认 80 个成员及 10 个伴随输入。精确输入保持修复、实际隔离副本补丁与 6885 代码页验证通过；完整 Python 931 项（跳过 2 项）、相关 Swift 12 个测试函数及实际 release verifier 通过。签名资源/依赖/entitlement 核验通过，VM 字节及获批 CDHash 保持。第三次安装 session69696 等待原生管理员验证 PID39449；放行进程恢复等待 PID22867。真实发布、撤销与正常启动仍未验收，T32/T33 未 accepted。
+
+最小 producer 回归在约 1 秒内复现第二次安装的同名拒绝。只读原始 Cryptex 包含 dylddata、dyldreadonly、dyldlinkedit 和 atlas；编号伴随文件包含执行权限的头部映射，未将其归类为纯不可执行数据。修复仅按精确名称保存输入前后完整摘要、身份、属性和集合，现有写入目标映射与 catalog 保持；任何变化仍拒绝发布。真实来源的 80 成员隔离副本中，仅 .42 发生 SwapEnd 0x548→0x560 与相应代码页摘要变化，全部 6885 代码页通过，10 个伴随输入保持。源缓存完整摘要前后相同。该隔离回放没有写入 VM，不构成实际发布或启动验收。
+
+新增三类后缀的正向、五类变化拒绝、符号链接提前拒绝回归；完整 Python 931 项，跳过 2 项，242.969 秒，退出 0。实际签名 release verifier 的 12 个 Swift 测试函数通过，含 8 类身份/篡改参数及全部伴随类型。更新已完整构建应用的 Python 资源，先恢复外层签名，再记录依赖并最终封签；完整 bundle 校验通过，VM 二进制和已获批 CDHash 保持。证据：`evidence/T32-T33-new-vm-20261018/dsc-companions-20261019/manifest.json`。
+
+
+## 2026-10-19：独立 DSC v4 发布与真实启动
+
+2026-10-19 当前状态：83d4e69d 已提交并 push。独立 DSC 第三次 CFW 退出0，v4事务20261019T065441Z-XzJThk9M完成两次最终核验、快照、封存、交换及归档。未启动磁盘原件/补丁各6885代码页通过，w3从0x548改为0x560。首次启动与两次API正常启动/关机通过，读回26.0/23A341；运行后Receipt及generation verifier通过，当前镜像与发布镜像摘要分开，runtimeValidated:false。获批CDHash放行已生效。实际Undo的原生验证已完成，root73597/session58124开始；撤销、撤销后启动及重新应用的on→off→on仍待验收，T32/T33未accepted。
+
+安装后持锁核对真实journal、独立发布副本和原始来源诊断：.42原件SHA为`e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5`，补丁件SHA为`2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac`；Capstone语义读回w3 0x548→0x560，原件及补丁件各6885个CodeDirectory代码页通过。首次启动前当前整盘与发布摘要`ff453e298a2be2109b020f92e08f9f931f65f30a51efcbf347fa2b1f2762d10d`相同。
+
+生产首次启动7条命令、提示符及正常关机通过。之后两次API启动读回26.0/23A341，启动时间和会话UUID不同，均记录apiAccepted、Guest stopped、退出0，无框架强制停止，磁盘/目录锁释放，配置/daemon摘要保持。真实运行后生产Receipt返回committed-publication，currentImageSHA256为`5948a0329f9ad0a469ce9c6ac851cbf90b18a41399e5b03eed6bb58e84c3184d`，runtimeImageChanged:true、runtimeValidated:false；实际Swift generation verifier也退出0。此结果证明已记录的启动和历史读取，不证明当前全部效果或显示行为。
+
+此前放行worker附加失败后退出；之后只读观察到amfid出现及再次退出，原调用未保存LLDB错误细节，原因未完全确认。对同一获批程序执行有时限的非法参数探测后，目标62017持续存在；用户完成重试验证后，现有helper68388附加，精确CDHash放行及参数64通过。未加载或修改持久允许列表。实际Undo现由新staged事务执行，尚未登记成功。证据：`evidence/T32-T33-new-vm-20261018/dsc-publication-20261019/manifest.json`。
+
+
+## 2026-10-19：Undo可写APFS分配统计
+
+2026-10-19 当前状态：aef7f99c已push，独立DSC安装、原件/补丁各6885代码页、首次启动、两次API正常关机及运行后v4读取均通过。首次Undo在staged恢复后因整份可写APFS容器比较而拒绝，未发布；原盘身份/mtime与66样本保持。最小事务与原生隔离APFS确认容量统计变化足以触发同一错误。已仅在可写Undo比较中排除CapacityFree和卷CapacityInUse；其余容器字段、UUID、设备/路径/root身份及最终只读严格比较保持。相关27项、完整Python935项（跳过2项）及实际release verifier的Swift12函数通过，签名/依赖核验通过。修复后Undo已发起，状态见证据清单；真实重试、撤销后启动及重新应用on→off→on仍待验收，T32/T33未accepted。
+
+真实事务`20261019T074108Z-8MSU4jQD`保留了guest-undo-applied：staged .42从2fc23949...写回原件e41db9aa...，实际写回及完整代码页检查已执行；随后第二次check_mount拒绝，未封存或交换。原盘保持检查仅覆盖身份/mtime及66样本，未在失败清理阶段重算整盘摘要。失败staged已按安装器流程移除，journal、请求、实际写入记录和blob保留。
+
+最小事务回归2.496秒复现相同写入后拒绝。全新128MiB隔离APFS写8MiB后，仅CapacityFree与卷CapacityInUse改变，根目录身份、实际设备、路径及可写状态保持，正常卸载。修复仅在可写Undo比较排除此二统计字段，其他字段仍完整比较，最终只读比较未修改。新增写入后UUID变化拒绝、只读容量变化拒绝及容器字段保持回归。真实失败未保存前后完整容器快照，原运行是否仅此触发仍由重试验证。
+
+完整Python935项（跳过2项），244.185秒，退出0；相关27项及新签名release CLI的Swift12函数通过。资源/依赖/签名/entitlement通过。后续boot继续使用原已放行程序，字节/inode保持；先前helper退出后该程序仍返回参数64，无需新增CDHash授权，周期探测已停止。证据：`evidence/T32-T33-new-vm-20261018/undo-allocation-20261019/manifest.json`。
+
+
+## 2026-10-19：运行后保留文件漂移
+
+2026-10-19 当前状态：aeb1651e 已 push。真实 Undo 重试的实际写回、完整代码页和可写挂载复核通过；首次最终核验发现保留文件不符，事务20261019T081934Z-JTYX6fft未发布，原盘身份/mtime与66样本保持。只读检查4686个输出，无读取错误，hardware:/AA.gl内容摘要从e221f140…变为4779643e…；其余内容/类型/链接/权限位一致。自动用户挂载未保留属主视图，UID/GID不作结论；正常卸载、镜像身份保持。未放宽生产校验。相关31项回归通过；同一独立VM完整CFW重装等待原生验证，之后先撤销未启动发布，再执行启停及同generation重新应用。运行后保留AA.gl变化的撤销仍拒绝，T32/T33未accepted。
+
+撤销写回记录为`.42`从`2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac`恢复到原件`e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5`。实际apply-undo退出0并进入第一次verify-final，确认原失败处的写入后可写挂载复核通过。随后保留输出核验拒绝；失败staged按安装器流程清理，journal、请求、写入记录和blob保留。
+
+只读挂载对4686个发布输出进行比较：`hardware:/AA.gl`内容摘要由`e221f140369bf7b0b540793d068f72c7d7d086357aa70c9bd0ace7e7da1c6dd0`变为`4779643ee5398bcbea5eb5056e3966bccd31aa21fbb33ee2e5e5ad0ae1b31d9a`；其他输出内容、类型、链接与权限位一致，无读取错误。自动挂载的UID/GID视图未保留真实guest属主，不能据此判断属主变化。镜像身份保持，正常卸载。该文件变化的具体时间与原因未直接观测；最终拒绝符合保留效果严格核验，未修改生产校验。
+
+新增copy-only hardware字节或权限变化拒绝回归，相关31项2.563秒退出0。下一次完整CFW重装后先验证未启动发布，再立即Undo；此边界与此前实际运行后Undo拒绝分开记录。继续保留真实Undo发布、恢复后启停和重新应用未完成状态。证据：`evidence/T32-T33-new-vm-20261018/retained-drift-20261019/manifest.json`。
+
+
+## 2026-10-19：显式Cryptex重新安装
+
+2026-10-19 当前状态：f1739ebc已push。重装事务20261019T090232Z-27r0QIUW已发布且未启动；新验收发现已有Cryptex被跳过、SwapEnd幂等，缺新原件复制链，撤销候选正确拒绝，未执行Undo。已新增显式regular/classic --reinstall-cryptex，保持默认跳过与全部证据门。真实安装脚本隔离回归从失败转为通过；相关Python33项、全量942项（跳过2项）254.634秒、Swift参数/传递12函数及实际release verifier3函数（5写入设置、8身份变化）通过。新host应用签名、依赖、资源和entitlement通过，原boot程序字节/inode/CDHash保持。显式原件重装已发起（CLI20039/session28495），新发布核验、未启动Undo、撤销后启停及显式重新应用仍待验收，T32/T33未accepted。
+
+重装事务整盘发布SHA为`fcae888a5b9759efab692c4adbad80226dc33c779e876aaed28733059ea0d676`，生产v4核验确认当前与发布摘要相同。安装日志记录Cryptex已存在而跳过复制，SwapEnd已0x560且重新证明代码页未改变；新Undo索引entries为空。验收脚本在撤销候选处拒绝，顺序脚本停止，未启动或执行Undo。不得把旧journal或当前已安装字节补造为此新事务的原件。
+
+新增`cfw install --reinstall-cryptex`，仅regular/classic，解析与冻结variant核对均限制范围。host驱动在sudo重执行中保留该参数，并显式向安装器传递0/1，环境变量本身不能启用。安装器在该选项下从绑定原始固件重新执行现有缓存、只读来源捕获、Cryptex复制和语义补丁流程；所有修改先在staged磁盘执行。默认已有Cryptex跳过规则保持，dev/jb/exp、v2、Undo/environment组合拒绝。
+
+实际regular脚本在隔离树上的最小回归0.628秒确认原跳过现象；新增选项后3项0.651秒通过。实际host驱动及既有撤销/隔离回归33项53.325秒通过；首次沙箱EPERM记录保留，原断言在宿主重跑通过。完整Python942项（跳过2项）254.634秒退出0。Swift参数/传递12函数和最终签名CLI的3个verifier函数（5写入设置、8身份变化）通过。新host应用完整封签与7个原生依赖检查通过，原VM启动程序字节/inode与获批CDHash保持。
+
+下一次基线和最终重新应用均明确使用新选项，避免再次只得到幂等记录。先保存新事务installed证明，再执行未启动Undo；随后验证原件/6885代码页、两次API启停与运行后读取。此前运行后AA.gl漂移拒绝仍是独立结果，不据此放宽保留效果检查。证据：`evidence/T32-T33-new-vm-20261018/cryptex-reinstall-20261019/manifest.json`。
+
+
+## 2026-10-19：已有Cryptex替换与新Undo组合回归
+
+2026-10-19 当前状态：6de04f15已push。显式Cryptex重装已获系统验证，root25634/session28495在staged .cfw_disk.vZh3Hh4C执行SystemOS缓存入口，未发布；已确认不走已有Cryptex跳过分支。新增已有补丁Cryptex整树替换→新发布→原件Undo组合回归通过，相关28项10.297秒退出0；生产代码未再修改，先前全量942项（跳过2项）结果保持，其后新增1项组合测试，未声称新全量943项已跑。顺序脚本session39110负责新发布证明及未启动Undo，session22627负责撤销后证明/API启停/读取、显式重新应用及重复验证，失败即停止。实际撤销发布和on→off→on尚待验收，T32/T33未accepted。
+
+隔离测试使用已有producer、来源核验、整树删除/重建/复制、补丁、最终读取、journal封存和交换。先保留已有两次补丁的目标，重新挂载generation原始来源并替换已有树；新发布生成合格首个原件撤销候选，实际Undo写回原件后再次最终核验及发布通过。APFS调用使用已有隔离挂载替身，原件、效果、索引、代码页和journal代码照常运行；此结果不能替代当前真实VM验收。新增组合单项3.331秒；相关28项10.297秒退出0。
+
+真实安装已通过原生验证，root25634运行并建立staged，当前进入SystemOS缓存入口。源发布前不启动VM。新增顺序验收脚本等待Undo成功后才读回原件及6885页、执行两次API启停和运行后读取；之后显式重新应用，再执行来源/DSC、两次启停和读取。同generation、三份不同journal、原件和补丁摘要一致才输出on/off/on通过；不修改Git、AMFI或VM启动程序，任何失败停止后续。证据：`evidence/T32-T33-new-vm-20261018/cryptex-composition-20261019/manifest.json`。
+
+
+## 2026-10-20：已有目录符号链接与显式Cryptex重装
+
+2026-10-20 当前状态：21ae78d3已push。显式Cryptex重装事务20261019T124601Z-vZh3Hh4C最终核验拒绝，原盘身份/mtime与66样本保持，两个顺序验收脚本停止，未执行Undo或启动。已用真实删除记录与实际安装脚本复现已有目录符号链接的ln -sf额外写入，改用ln -sfn，并在写入入口拒绝跟随目录或尾斜杠；最终严格比较保持并新增目标/字段诊断。相关43项及最终完整Python948项（跳过2项）通过，签名应用和原VM程序保持核验通过。修复后重试CLI4097/session59096已发起，Undo及on→off→on尚待验收，T32/T33未accepted。
+
+真实失败的首次不一致目标未记录，staged已按流程清理，无法直接核对全部最终状态。失败日志包含616条操作；删除记录将Cryptex内com.apple.dyld/com.apple.dyld和dyld/dyld置为missing。隔离运行实际regular安装器时，已有外层目录符号链接使ln -sf在目标目录内新增同名链接；把这两个真实删除观察交给生产最终比较器即可复现相同错误。此机制已复现，真实重试仍需确认是否存在其他不一致。
+
+regular的跳过分支、复制分支与development同类命令改用ln -sfn；guarded writer仅新增此参数，并拒绝会跟随已有目录符号链接、带尾斜杠目录目标或真实目录目标的调用。新增实际安装脚本和写入入口失败回归、带旧内部链接的整树替换/发布/原件Undo组合回归。最终比较仍逐字段严格相等，错误增加目标和不一致字段名，AA.gl漂移拒绝保持。
+
+最终完整Python命令make test_python，948项、跳过2项、259.925秒退出0。相关43项、12.775秒退出0；沙箱fclone EPERM原日志保留，宿主原断言重跑通过。此次未修改Swift和二进制补丁；host CLI仅因资源封签改变签名字节，可执行内容保持；原获批VM程序字节、inode和CDHash保持。证据：`evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json`。

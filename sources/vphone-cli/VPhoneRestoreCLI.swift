@@ -118,7 +118,8 @@ struct VPhoneCFWCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "cfw",
         abstract: "Custom-firmware install (host-mount; VM must be off; re-execs sudo)",
-        subcommands: [VPhoneCFWInstallCommand.self, VPhoneCFWUpdateEnvironmentCommand.self, VPhoneCFWVerifyPlanCommand.self])
+        subcommands: [VPhoneCFWInstallCommand.self, VPhoneCFWUndoCommand.self, VPhoneCFWReceiptsCommand.self,
+                      VPhoneCFWUpdateEnvironmentCommand.self, VPhoneCFWVerifyPlanCommand.self])
 }
 
 struct VPhoneCFWInstallCommand: ParsableCommand {
@@ -133,6 +134,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?
     @Flag(name: .customLong("root-popup"), help: "Elevate via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
     @Flag(name: .customLong("keep-artifacts"), help: "Keep the extracted CFW input dirs (cfw_input/, cfw_jb_input/) after install (default: removed to save space)") var keepArtifacts = false
+    @Flag(name: .customLong("reinstall-cryptex"), help: "Replace existing Cryptex trees from bound original firmware (regular/classic only)") var reinstallCryptex = false
     @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
     var projectRoot: String?
     @Flag(name: .customShort("v"), help: "Increase verbosity: -v tool detail, -vv guest serial, -vvv internal trace")
@@ -140,6 +142,21 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
 
     mutating func validate() throws {
         if let variant { try guestEnvironment.validateVariant(variant) }
+        try Self.validateCryptexReinstall(reinstallCryptex, variant: variant, guestEnvironment: guestEnvironment)
+    }
+
+    static func validateCryptexReinstall(_ enabled: Bool, variant: String?, guestEnvironment: VPhoneGuestEnvironmentProfile) throws {
+        if enabled && (guestEnvironment != .classic || (variant != nil && variant != "regular")) {
+            throw ValidationError("--reinstall-cryptex requires regular/classic CFW installation")
+        }
+    }
+
+    static func arguments(script: URL, directory: URL, variant: String,
+                          guestEnvironment: VPhoneGuestEnvironmentProfile, reinstallCryptex: Bool) -> [String] {
+        var args = [script.path, "--variant", variant]
+        if guestEnvironment == .v2 { args += ["--guest-environment", "v2"] }
+        if reinstallCryptex { args.append("--reinstall-cryptex") }
+        return args + [directory.path]
     }
 
     static func validateRecordedEnvironment(requested: VPhoneGuestEnvironmentProfile, recorded: VPhoneGuestEnvironmentProfile) throws {
@@ -158,6 +175,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
                 guestEnvironment: guestEnvironment.rawValue, spoofBuild: spoofBuild ?? "")
         }
         let variant = frozen.variant
+        try Self.validateCryptexReinstall(reinstallCryptex, variant: variant, guestEnvironment: guestEnvironment)
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
 
         // Env the bundled scripts read: rides along via `sudo -E` by default;
@@ -185,9 +203,8 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
             scriptEnv["VPHONE_GUEST_COMPONENTS"] = ProcessInfo.processInfo.environment["VPHONE_GUEST_COMPONENTS"] ?? resources.guestComponentsStage.path
             scriptEnv["VPHONE_API_DAEMON"] = ProcessInfo.processInfo.environment["VPHONE_API_DAEMON"] ?? resources.daemonAPICandidate.path
         }
-        var args = [resources.cfwInstallHostScript.path, "--variant", variant]
-        if guestEnvironment == .v2 { args += ["--guest-environment", "v2"] }
-        args.append(bundle.url.path)
+        let args = Self.arguments(script: resources.cfwInstallHostScript, directory: bundle.url,
+            variant: variant, guestEnvironment: guestEnvironment, reinstallCryptex: reinstallCryptex)
         // Both paths carry VPHONE_INVOKER_UID/GID so the driver returns the
         // artifacts it creates as root (the popup sets no SUDO_UID).
         let invocation = VPhoneCreateOrchestrator.cfwInvocation(

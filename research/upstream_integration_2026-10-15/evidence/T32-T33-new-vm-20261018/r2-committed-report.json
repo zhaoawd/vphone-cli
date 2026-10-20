@@ -1,0 +1,1757 @@
+{
+  "ablation" : [
+
+  ],
+  "components" : [
+    {
+      "component" : "AVPBooter",
+      "coverage" : "structured",
+      "records" : [
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "mov x0, x20",
+          "component" : "avpbooter",
+          "fileOffset" : 11112,
+          "originalBytes" : "4AMUqg==",
+          "patchDescription" : "DGST validation bypass: force x0=0 return value",
+          "patchID" : "avpbooter.dgst_bypass",
+          "patchedBytes" : "AACA0g=="
+        }
+      ],
+      "results" : [
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "avpbooter",
+              "declarationID" : "avpbooter-boot-dgst_bypass",
+              "fileOffset" : 11112,
+              "recordIndex" : 0
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+          "outcome" : "applied",
+          "recordIndices" : [
+            0
+          ],
+          "requirement" : "required"
+        }
+      ]
+    },
+    {
+      "component" : "iBSS",
+      "coverage" : "structured",
+      "records" : [
+        {
+          "afterDisasm" : "\"Loaded iBSS\"",
+          "beforeDisasm" : "",
+          "component" : "ibss",
+          "fileOffset" : 541513,
+          "originalBytes" : "PT09PT09PT09PT0=",
+          "patchDescription" : "serial label",
+          "patchID" : "ibss.serial_label",
+          "patchedBytes" : "TG9hZGVkIGlCU1M="
+        },
+        {
+          "afterDisasm" : "\"Loaded iBSS\"",
+          "beforeDisasm" : "",
+          "component" : "ibss",
+          "fileOffset" : 541684,
+          "originalBytes" : "PT09PT09PT09PT0=",
+          "patchDescription" : "serial label",
+          "patchID" : "ibss.serial_label",
+          "patchedBytes" : "TG9hZGVkIGlCU1M="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "b.ne 0x9e4c",
+          "component" : "ibss",
+          "fileOffset" : 40208,
+          "originalBytes" : "4QkAVA==",
+          "patchDescription" : "image4 callback: b.ne → nop",
+          "patchID" : "ibss.image4_callback_bne",
+          "patchedBytes" : "HyAD1Q=="
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "mov x0, x22",
+          "component" : "ibss",
+          "fileOffset" : 40212,
+          "originalBytes" : "4AMWqg==",
+          "patchDescription" : "image4 callback: mov x0,x22 → mov x0,#0",
+          "patchID" : "ibss.image4_callback_mov",
+          "patchedBytes" : "AACA0g=="
+        }
+      ],
+      "results" : [
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 11,
+              "component" : "ibss",
+              "declarationID" : "ibss-cfw-serial_label",
+              "fileOffset" : 541513,
+              "recordIndex" : 0
+            },
+            {
+              "byteCount" : 11,
+              "component" : "ibss",
+              "declarationID" : "ibss-cfw-serial_label",
+              "fileOffset" : 541684,
+              "recordIndex" : 1
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "ibss.IBootPatcher.patchSerialLabels",
+          "outcome" : "applied",
+          "recordIndices" : [
+            0,
+            1
+          ],
+          "requirement" : "optional"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "ibss",
+              "declarationID" : "ibss-boot-image4_callback",
+              "fileOffset" : 40208,
+              "recordIndex" : 2
+            },
+            {
+              "byteCount" : 4,
+              "component" : "ibss",
+              "declarationID" : "ibss-boot-image4_callback",
+              "fileOffset" : 40212,
+              "recordIndex" : 3
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "ibss.IBootPatcher.patchImage4Callback",
+          "outcome" : "applied",
+          "recordIndices" : [
+            2,
+            3
+          ],
+          "requirement" : "required"
+        }
+      ]
+    },
+    {
+      "component" : "iBEC",
+      "coverage" : "structured",
+      "records" : [
+        {
+          "afterDisasm" : "\"Loaded iBEC\"",
+          "beforeDisasm" : "",
+          "component" : "ibec",
+          "fileOffset" : 541513,
+          "originalBytes" : "PT09PT09PT09PT0=",
+          "patchDescription" : "serial label",
+          "patchID" : "ibec.serial_label",
+          "patchedBytes" : "TG9hZGVkIGlCRUM="
+        },
+        {
+          "afterDisasm" : "\"Loaded iBEC\"",
+          "beforeDisasm" : "",
+          "component" : "ibec",
+          "fileOffset" : 541684,
+          "originalBytes" : "PT09PT09PT09PT0=",
+          "patchDescription" : "serial label",
+          "patchID" : "ibec.serial_label",
+          "patchedBytes" : "TG9hZGVkIGlCRUM="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "b.ne 0x9e4c",
+          "component" : "ibec",
+          "fileOffset" : 40208,
+          "originalBytes" : "4QkAVA==",
+          "patchDescription" : "image4 callback: b.ne → nop",
+          "patchID" : "ibec.image4_callback_bne",
+          "patchedBytes" : "HyAD1Q=="
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "mov x0, x22",
+          "component" : "ibec",
+          "fileOffset" : 40212,
+          "originalBytes" : "4AMWqg==",
+          "patchDescription" : "image4 callback: mov x0,x22 → mov x0,#0",
+          "patchID" : "ibec.image4_callback_mov",
+          "patchedBytes" : "AACA0g=="
+        },
+        {
+          "afterDisasm" : "\"serial=3 -v debug=0x2014e %s\"",
+          "beforeDisasm" : "",
+          "component" : "ibec",
+          "fileOffset" : 147568,
+          "originalBytes" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+          "patchDescription" : "boot-args string",
+          "patchID" : "ibec.boot_args_string",
+          "patchedBytes" : "c2VyaWFsPTMgLXYgZGVidWc9MHgyMDE0ZSAlcw=="
+        },
+        {
+          "afterDisasm" : "adrp x2, 0x24000",
+          "beforeDisasm" : "adrp x2, 0x85000",
+          "component" : "ibec",
+          "fileOffset" : 74452,
+          "originalBytes" : "ggMA8A==",
+          "patchDescription" : "boot-args: adrp x2 → new string page",
+          "patchID" : "ibec.boot_args_adrp",
+          "patchedBytes" : "ggAA0A=="
+        },
+        {
+          "afterDisasm" : "add x2, x2, #0x70",
+          "beforeDisasm" : "add x2, x2, #0x86a",
+          "component" : "ibec",
+          "fileOffset" : 74456,
+          "originalBytes" : "QqghkQ==",
+          "patchDescription" : "boot-args: add x2 → new string offset",
+          "patchID" : "ibec.boot_args_add",
+          "patchedBytes" : "QsABkQ=="
+        }
+      ],
+      "results" : [
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 11,
+              "component" : "ibec",
+              "declarationID" : "ibec-cfw-serial_label",
+              "fileOffset" : 541513,
+              "recordIndex" : 0
+            },
+            {
+              "byteCount" : 11,
+              "component" : "ibec",
+              "declarationID" : "ibec-cfw-serial_label",
+              "fileOffset" : 541684,
+              "recordIndex" : 1
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "ibec.IBootPatcher.patchSerialLabels",
+          "outcome" : "applied",
+          "recordIndices" : [
+            0,
+            1
+          ],
+          "requirement" : "optional"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "ibec",
+              "declarationID" : "ibec-boot-image4_callback",
+              "fileOffset" : 40208,
+              "recordIndex" : 2
+            },
+            {
+              "byteCount" : 4,
+              "component" : "ibec",
+              "declarationID" : "ibec-boot-image4_callback",
+              "fileOffset" : 40212,
+              "recordIndex" : 3
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "ibec.IBootPatcher.patchImage4Callback",
+          "outcome" : "applied",
+          "recordIndices" : [
+            2,
+            3
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 28,
+              "component" : "ibec",
+              "declarationID" : "ibec-boot-boot_args",
+              "fileOffset" : 147568,
+              "recordIndex" : 4
+            },
+            {
+              "byteCount" : 4,
+              "component" : "ibec",
+              "declarationID" : "ibec-boot-boot_args",
+              "fileOffset" : 74452,
+              "recordIndex" : 5
+            },
+            {
+              "byteCount" : 4,
+              "component" : "ibec",
+              "declarationID" : "ibec-boot-boot_args",
+              "fileOffset" : 74456,
+              "recordIndex" : 6
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "ibec.IBootPatcher.patchBootArgs",
+          "outcome" : "applied",
+          "recordIndices" : [
+            4,
+            5,
+            6
+          ],
+          "requirement" : "optional"
+        },
+        {
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "ibec.IBootPatcher.patchBootxPrecondition",
+          "outcome" : "notApplicable",
+          "reason" : "rule cloudOSIs26_4OrNewer false for this input: variant=regular iosBaseIs18=false iosBaseIs27=false excGuardActive=false applyIOS27=false applyFrida=false",
+          "recordIndices" : [
+
+          ],
+          "requirement" : "conditional",
+          "rule" : "cloudOSIs26_4OrNewer"
+        }
+      ]
+    },
+    {
+      "component" : "LLB",
+      "coverage" : "structured",
+      "records" : [
+        {
+          "afterDisasm" : "\"Loaded LLB\"",
+          "beforeDisasm" : "",
+          "component" : "llb",
+          "fileOffset" : 541513,
+          "originalBytes" : "PT09PT09PT09PQ==",
+          "patchDescription" : "serial label",
+          "patchID" : "llb.serial_label",
+          "patchedBytes" : "TG9hZGVkIExMQg=="
+        },
+        {
+          "afterDisasm" : "\"Loaded LLB\"",
+          "beforeDisasm" : "",
+          "component" : "llb",
+          "fileOffset" : 541684,
+          "originalBytes" : "PT09PT09PT09PQ==",
+          "patchDescription" : "serial label",
+          "patchID" : "llb.serial_label",
+          "patchedBytes" : "TG9hZGVkIExMQg=="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "b.ne 0x9e4c",
+          "component" : "llb",
+          "fileOffset" : 40208,
+          "originalBytes" : "4QkAVA==",
+          "patchDescription" : "image4 callback: b.ne → nop",
+          "patchID" : "llb.image4_callback_bne",
+          "patchedBytes" : "HyAD1Q=="
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "mov x0, x22",
+          "component" : "llb",
+          "fileOffset" : 40212,
+          "originalBytes" : "4AMWqg==",
+          "patchDescription" : "image4 callback: mov x0,x22 → mov x0,#0",
+          "patchID" : "llb.image4_callback_mov",
+          "patchedBytes" : "AACA0g=="
+        },
+        {
+          "afterDisasm" : "\"serial=3 -v debug=0x2014e %s\"",
+          "beforeDisasm" : "",
+          "component" : "llb",
+          "fileOffset" : 147568,
+          "originalBytes" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+          "patchDescription" : "boot-args string",
+          "patchID" : "llb.boot_args_string",
+          "patchedBytes" : "c2VyaWFsPTMgLXYgZGVidWc9MHgyMDE0ZSAlcw=="
+        },
+        {
+          "afterDisasm" : "adrp x2, 0x24000",
+          "beforeDisasm" : "adrp x2, 0x85000",
+          "component" : "llb",
+          "fileOffset" : 74452,
+          "originalBytes" : "ggMA8A==",
+          "patchDescription" : "boot-args: adrp x2 → new string page",
+          "patchID" : "llb.boot_args_adrp",
+          "patchedBytes" : "ggAA0A=="
+        },
+        {
+          "afterDisasm" : "add x2, x2, #0x70",
+          "beforeDisasm" : "add x2, x2, #0x86a",
+          "component" : "llb",
+          "fileOffset" : 74456,
+          "originalBytes" : "QqghkQ==",
+          "patchDescription" : "boot-args: add x2 → new string offset",
+          "patchID" : "llb.boot_args_add",
+          "patchedBytes" : "QsABkQ=="
+        },
+        {
+          "afterDisasm" : "b 0x2b014",
+          "beforeDisasm" : "cbz w0, 0x2b014",
+          "component" : "llb",
+          "fileOffset" : 176104,
+          "originalBytes" : "YAEANA==",
+          "patchDescription" : "rootfs: skip sig check (0x3B7)",
+          "patchID" : "llb.rootfs_cbz_0x3b7",
+          "patchedBytes" : "CwAAFA=="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "b.hs 0x2adfc",
+          "component" : "llb",
+          "fileOffset" : 175264,
+          "originalBytes" : "4goAVA==",
+          "patchDescription" : "rootfs: NOP b.hs size check (0x400)",
+          "patchID" : "llb.rootfs_bhs_0x400",
+          "patchedBytes" : "HyAD1Q=="
+        },
+        {
+          "afterDisasm" : "b 0x2ade4",
+          "beforeDisasm" : "cbz w0, 0x2ade4",
+          "component" : "llb",
+          "fileOffset" : 176188,
+          "originalBytes" : "QO3\/NA==",
+          "patchDescription" : "rootfs: skip sig verify (0x3C2)",
+          "patchID" : "llb.rootfs_cbz_0x3c2",
+          "patchedBytes" : "av\/\/Fw=="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "cbz x8, 0x2ed54",
+          "component" : "llb",
+          "fileOffset" : 191724,
+          "originalBytes" : "SAMAtA==",
+          "patchDescription" : "rootfs: NOP cbz x8 null check (#0x78)",
+          "patchID" : "llb.rootfs_null_check_0x78",
+          "patchedBytes" : "HyAD1Q=="
+        },
+        {
+          "afterDisasm" : "b 0x2ef0c",
+          "beforeDisasm" : "cbz w0, 0x2ef0c",
+          "component" : "llb",
+          "fileOffset" : 192232,
+          "originalBytes" : "IAEANA==",
+          "patchDescription" : "rootfs: skip size verify (0x110)",
+          "patchID" : "llb.rootfs_cbz_0x110",
+          "patchedBytes" : "CQAAFA=="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "cbnz w0, 0x1a6e4",
+          "component" : "llb",
+          "fileOffset" : 108108,
+          "originalBytes" : "wAQANQ==",
+          "patchDescription" : "panic bypass: NOP cbnz w0",
+          "patchID" : "llb.panic_bypass",
+          "patchedBytes" : "HyAD1Q=="
+        }
+      ],
+      "results" : [
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 10,
+              "component" : "llb",
+              "declarationID" : "llb-cfw-serial_label",
+              "fileOffset" : 541513,
+              "recordIndex" : 0
+            },
+            {
+              "byteCount" : 10,
+              "component" : "llb",
+              "declarationID" : "llb-cfw-serial_label",
+              "fileOffset" : 541684,
+              "recordIndex" : 1
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "llb.IBootPatcher.patchSerialLabels",
+          "outcome" : "applied",
+          "recordIndices" : [
+            0,
+            1
+          ],
+          "requirement" : "optional"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-image4_callback",
+              "fileOffset" : 40208,
+              "recordIndex" : 2
+            },
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-image4_callback",
+              "fileOffset" : 40212,
+              "recordIndex" : 3
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "llb.IBootPatcher.patchImage4Callback",
+          "outcome" : "applied",
+          "recordIndices" : [
+            2,
+            3
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 28,
+              "component" : "llb",
+              "declarationID" : "llb-boot-boot_args",
+              "fileOffset" : 147568,
+              "recordIndex" : 4
+            },
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-boot_args",
+              "fileOffset" : 74452,
+              "recordIndex" : 5
+            },
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-boot_args",
+              "fileOffset" : 74456,
+              "recordIndex" : 6
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "llb.IBootPatcher.patchBootArgs",
+          "outcome" : "applied",
+          "recordIndices" : [
+            4,
+            5,
+            6
+          ],
+          "requirement" : "optional"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-rootfs",
+              "fileOffset" : 176104,
+              "recordIndex" : 7
+            },
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-rootfs",
+              "fileOffset" : 175264,
+              "recordIndex" : 8
+            },
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-rootfs",
+              "fileOffset" : 176188,
+              "recordIndex" : 9
+            },
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-rootfs",
+              "fileOffset" : 191724,
+              "recordIndex" : 10
+            },
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-rootfs",
+              "fileOffset" : 192232,
+              "recordIndex" : 11
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "llb.IBootPatcher.patchRootfssBypass",
+          "outcome" : "applied",
+          "recordIndices" : [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "requirement" : "optional"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "llb",
+              "declarationID" : "llb-boot-panic_bypass",
+              "fileOffset" : 108108,
+              "recordIndex" : 12
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "llb.IBootPatcher.patchPanicBypass",
+          "outcome" : "applied",
+          "recordIndices" : [
+            12
+          ],
+          "requirement" : "optional"
+        }
+      ]
+    },
+    {
+      "component" : "TXM",
+      "coverage" : "structured",
+      "records" : [
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "bl 0x2ac70",
+          "component" : "txm",
+          "fileOffset" : 180728,
+          "originalBytes" : "nvr\/lw==",
+          "patchDescription" : "trustcache bypass: legacy binary-search call → mov x0, #0",
+          "patchID" : "txm.trustcache_bypass",
+          "patchedBytes" : "AACA0g=="
+        }
+      ],
+      "results" : [
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "txm",
+              "declarationID" : "txm-boot-trustcache_bypass",
+              "fileOffset" : 180728,
+              "recordIndex" : 0
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "txm.TXMPatcher.patchTrustcacheBypass",
+          "outcome" : "applied",
+          "recordIndices" : [
+            0
+          ],
+          "requirement" : "required"
+        }
+      ]
+    },
+    {
+      "component" : "kernelcache",
+      "coverage" : "structured",
+      "records" : [
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "tbnz w8, #5, 0x2476b6c",
+          "component" : "kernelcache",
+          "fileOffset" : 38234468,
+          "originalBytes" : "SBAoNw==",
+          "patchDescription" : "NOP tbnz w8, #5, 0x2476b6c (sealed vol check) [_apfs_vfsop_mount]",
+          "patchID" : "kernel.apfs_root_snapshot",
+          "patchedBytes" : "HyAD1Q=="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "tbnz w0, #0xe, 0x23cfe10",
+          "component" : "kernelcache",
+          "fileOffset" : 37551588,
+          "originalBytes" : "YAFwNw==",
+          "patchDescription" : "NOP tbnz (seal broken) [_authapfs_seal_is_broken]",
+          "patchID" : "kernel.apfs_seal_broken",
+          "patchedBytes" : "HyAD1Q=="
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "cbnz w0, 0xf6dbc8",
+          "component" : "kernelcache",
+          "fileOffset" : 16177504,
+          "originalBytes" : "QBMANQ==",
+          "patchDescription" : "NOP cbnz (rootvp auth) [_bsd_init]",
+          "patchID" : "kernel.bsd_init_rootvp",
+          "patchedBytes" : "HyAD1Q==",
+          "virtualAddress" : 18446741874819930464
+        },
+        {
+          "afterDisasm" : "mov w0, #0",
+          "beforeDisasm" : "pacibsp ",
+          "component" : "kernelcache",
+          "fileOffset" : 23299644,
+          "originalBytes" : "fyMD1Q==",
+          "patchDescription" : "mov w0,#0 [_proc_check_launch_constraints]",
+          "patchID" : "launch_constraints_mov",
+          "patchedBytes" : "AACAUg==",
+          "virtualAddress" : 18446741874827052604
+        },
+        {
+          "afterDisasm" : "ret ",
+          "beforeDisasm" : "sub sp, sp, #0x180",
+          "component" : "kernelcache",
+          "fileOffset" : 23299648,
+          "originalBytes" : "\/wMG0Q==",
+          "patchDescription" : "ret [_proc_check_launch_constraints]",
+          "patchID" : "launch_constraints_ret",
+          "patchedBytes" : "wANf1g==",
+          "virtualAddress" : 18446741874827052608
+        },
+        {
+          "afterDisasm" : "mov x0, #1",
+          "beforeDisasm" : "adrp x8, 0x784000",
+          "component" : "kernelcache",
+          "fileOffset" : 19693880,
+          "originalBytes" : "6KX\/kA==",
+          "patchDescription" : "mov x0,#1 [_PE_i_can_has_debugger]",
+          "patchID" : "kernel.debugger.mov_x0_1",
+          "patchedBytes" : "IACA0g==",
+          "virtualAddress" : 18446741874823446840
+        },
+        {
+          "afterDisasm" : "ret ",
+          "beforeDisasm" : "cbz x0, 0x12c8158",
+          "component" : "kernelcache",
+          "fileOffset" : 19693884,
+          "originalBytes" : "4AAAtA==",
+          "patchDescription" : "ret [_PE_i_can_has_debugger]",
+          "patchID" : "kernel.debugger.ret",
+          "patchedBytes" : "wANf1g==",
+          "virtualAddress" : 18446741874823446844
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "tbnz w8, #0, 0xffac80",
+          "component" : "kernelcache",
+          "fileOffset" : 16755608,
+          "originalBytes" : "SAcANw==",
+          "patchDescription" : "NOP tbnz w8, #0, 0xffac80 [txm post-validation]",
+          "patchID" : "kernel.post_validation.nop_tbnz",
+          "patchedBytes" : "HyAD1Q==",
+          "virtualAddress" : 18446741874820508568
+        },
+        {
+          "afterDisasm" : "cmp w0, w0",
+          "beforeDisasm" : "cmp w0, #2",
+          "component" : "kernelcache",
+          "fileOffset" : 23332268,
+          "originalBytes" : "HwgAcQ==",
+          "patchDescription" : "cmp w0,w0 (was cmp w0,#imm) [postValidation]",
+          "patchID" : "kernel.post_validation.cmp_w0_w0",
+          "patchedBytes" : "HwAAaw==",
+          "virtualAddress" : 18446741874827085228
+        },
+        {
+          "afterDisasm" : "mov w0, #1",
+          "beforeDisasm" : "bl 0xff9304",
+          "component" : "kernelcache",
+          "fileOffset" : 23335100,
+          "originalBytes" : "kuDmlw==",
+          "patchDescription" : "mov w0,#1 (was BL) [_check_dyld_policy_internal @1]",
+          "patchID" : "dyld_policy_1",
+          "patchedBytes" : "IACAUg==",
+          "virtualAddress" : 18446741874827088060
+        },
+        {
+          "afterDisasm" : "mov w0, #1",
+          "beforeDisasm" : "bl 0x1638384",
+          "component" : "kernelcache",
+          "fileOffset" : 23335112,
+          "originalBytes" : "r9z\/lw==",
+          "patchDescription" : "mov w0,#1 (was BL) [_check_dyld_policy_internal @2]",
+          "patchID" : "dyld_policy_2",
+          "patchedBytes" : "IACAUg==",
+          "virtualAddress" : 18446741874827088072
+        },
+        {
+          "afterDisasm" : "mov w0, #0",
+          "beforeDisasm" : "bl 0x246d398",
+          "component" : "kernelcache",
+          "fileOffset" : 37880092,
+          "originalBytes" : "nzQBlA==",
+          "patchDescription" : "mov w0,#0 [_apfs_graft]",
+          "patchID" : "apfs_graft",
+          "patchedBytes" : "AACAUg==",
+          "virtualAddress" : 18446741874841633052
+        },
+        {
+          "afterDisasm" : "cmp x0, x0",
+          "beforeDisasm" : "cmp x0, x8",
+          "component" : "kernelcache",
+          "fileOffset" : 38228036,
+          "originalBytes" : "HwAI6w==",
+          "patchDescription" : "cmp x0,x0 (was cmp x0, x8) [_apfs_vfsop_mount]",
+          "patchID" : "kernel.apfs_vfsop_mount.cmp_x0_x0",
+          "patchedBytes" : "HwAA6w==",
+          "virtualAddress" : 18446741874841980996
+        },
+        {
+          "afterDisasm" : "mov w0, #0",
+          "beforeDisasm" : "tbnz w0, #0xe, 0x2476c0c",
+          "component" : "kernelcache",
+          "fileOffset" : 38235136,
+          "originalBytes" : "YABwNw==",
+          "patchDescription" : "mov w0,#0 [_apfs_mount_upgrade_checks]",
+          "patchID" : "kernel.apfs_mount_upgrade_checks.mov_w0_0",
+          "patchedBytes" : "AACAUg==",
+          "virtualAddress" : 18446741874841988096
+        },
+        {
+          "afterDisasm" : "mov w0, #0",
+          "beforeDisasm" : "bl 0x2416bd4",
+          "component" : "kernelcache",
+          "fileOffset" : 38324224,
+          "originalBytes" : "9Sj+lw==",
+          "patchDescription" : "mov w0,#0 [_handle_fsioc_graft]",
+          "patchID" : "kernel.handle_fsioc_graft.mov_w0_0",
+          "patchedBytes" : "AACAUg==",
+          "virtualAddress" : 18446741874842077184
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "cbz x0, 0x248abd8",
+          "component" : "kernelcache",
+          "fileOffset" : 38316880,
+          "originalBytes" : "QAQAtA==",
+          "patchDescription" : "NOP [handle_get_dev_by_role entitlement gate -> 0x248ABD8]",
+          "patchID" : "kernel.handle_get_dev_by_role.gate_248AB50",
+          "patchedBytes" : "HyAD1Q==",
+          "virtualAddress" : 18446741874842069840
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "cbz w0, 0x248abd8",
+          "component" : "kernelcache",
+          "fileOffset" : 38316900,
+          "originalBytes" : "oAMANA==",
+          "patchDescription" : "NOP [handle_get_dev_by_role entitlement gate -> 0x248ABD8]",
+          "patchID" : "kernel.handle_get_dev_by_role.gate_248AB64",
+          "patchedBytes" : "HyAD1Q==",
+          "virtualAddress" : 18446741874842069860
+        },
+        {
+          "afterDisasm" : "nop ",
+          "beforeDisasm" : "cbz w0, 0x248adac",
+          "component" : "kernelcache",
+          "fileOffset" : 38317092,
+          "originalBytes" : "QAwANA==",
+          "patchDescription" : "NOP [handle_get_dev_by_role entitlement gate -> 0x248ADAC]",
+          "patchID" : "kernel.handle_get_dev_by_role.gate_248AC24",
+          "patchedBytes" : "HyAD1Q==",
+          "virtualAddress" : 18446741874842070052
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "pacibsp ",
+          "component" : "kernelcache",
+          "fileOffset" : 37405992,
+          "originalBytes" : "fyMD1Q==",
+          "patchDescription" : "mov x0,#0 [_hook_file_check_mmap]",
+          "patchID" : "kernel.sandbox.file_check_mmap.mov_x0_0",
+          "patchedBytes" : "AACA0g==",
+          "virtualAddress" : 18446741874841158952
+        },
+        {
+          "afterDisasm" : "ret ",
+          "beforeDisasm" : "stp x28, x27, [sp, #-0x30]!",
+          "component" : "kernelcache",
+          "fileOffset" : 37405996,
+          "originalBytes" : "\/G+9qQ==",
+          "patchDescription" : "ret [_hook_file_check_mmap]",
+          "patchID" : "kernel.sandbox.file_check_mmap.ret",
+          "patchedBytes" : "wANf1g==",
+          "virtualAddress" : 18446741874841158956
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "pacibsp ",
+          "component" : "kernelcache",
+          "fileOffset" : 37399384,
+          "originalBytes" : "fyMD1Q==",
+          "patchDescription" : "mov x0,#0 [_hook_mount_check_mount]",
+          "patchID" : "kernel.sandbox.mount_check_mount.mov_x0_0",
+          "patchedBytes" : "AACA0g==",
+          "virtualAddress" : 18446741874841152344
+        },
+        {
+          "afterDisasm" : "ret ",
+          "beforeDisasm" : "stp x28, x27, [sp, #-0x30]!",
+          "component" : "kernelcache",
+          "fileOffset" : 37399388,
+          "originalBytes" : "\/G+9qQ==",
+          "patchDescription" : "ret [_hook_mount_check_mount]",
+          "patchID" : "kernel.sandbox.mount_check_mount.ret",
+          "patchedBytes" : "wANf1g==",
+          "virtualAddress" : 18446741874841152348
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "pacibsp ",
+          "component" : "kernelcache",
+          "fileOffset" : 37398944,
+          "originalBytes" : "fyMD1Q==",
+          "patchDescription" : "mov x0,#0 [_hook_mount_check_remount]",
+          "patchID" : "kernel.sandbox.mount_check_remount.mov_x0_0",
+          "patchedBytes" : "AACA0g==",
+          "virtualAddress" : 18446741874841151904
+        },
+        {
+          "afterDisasm" : "ret ",
+          "beforeDisasm" : "stp x28, x27, [sp, #-0x40]!",
+          "component" : "kernelcache",
+          "fileOffset" : 37398948,
+          "originalBytes" : "\/G+8qQ==",
+          "patchDescription" : "ret [_hook_mount_check_remount]",
+          "patchID" : "kernel.sandbox.mount_check_remount.ret",
+          "patchedBytes" : "wANf1g==",
+          "virtualAddress" : 18446741874841151908
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "pacibsp ",
+          "component" : "kernelcache",
+          "fileOffset" : 37398540,
+          "originalBytes" : "fyMD1Q==",
+          "patchDescription" : "mov x0,#0 [_hook_mount_check_umount]",
+          "patchID" : "kernel.sandbox.mount_check_umount.mov_x0_0",
+          "patchedBytes" : "AACA0g==",
+          "virtualAddress" : 18446741874841151500
+        },
+        {
+          "afterDisasm" : "ret ",
+          "beforeDisasm" : "stp x28, x27, [sp, #-0x40]!",
+          "component" : "kernelcache",
+          "fileOffset" : 37398544,
+          "originalBytes" : "\/G+8qQ==",
+          "patchDescription" : "ret [_hook_mount_check_umount]",
+          "patchID" : "kernel.sandbox.mount_check_umount.ret",
+          "patchedBytes" : "wANf1g==",
+          "virtualAddress" : 18446741874841151504
+        },
+        {
+          "afterDisasm" : "mov x0, #0",
+          "beforeDisasm" : "pacibsp ",
+          "component" : "kernelcache",
+          "fileOffset" : 37377300,
+          "originalBytes" : "fyMD1Q==",
+          "patchDescription" : "mov x0,#0 [_hook_vnode_check_rename]",
+          "patchID" : "kernel.sandbox.vnode_check_rename.mov_x0_0",
+          "patchedBytes" : "AACA0g==",
+          "virtualAddress" : 18446741874841130260
+        },
+        {
+          "afterDisasm" : "ret ",
+          "beforeDisasm" : "stp d9, d8, [sp, #-0x70]!",
+          "component" : "kernelcache",
+          "fileOffset" : 37377304,
+          "originalBytes" : "6SO5bQ==",
+          "patchDescription" : "ret [_hook_vnode_check_rename]",
+          "patchID" : "kernel.sandbox.vnode_check_rename.ret",
+          "patchedBytes" : "wANf1g==",
+          "virtualAddress" : 18446741874841130264
+        }
+      ],
+      "results" : [
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-apfs_root_snapshot",
+              "fileOffset" : 38234468,
+              "recordIndex" : 0
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchApfsRootSnapshot",
+          "outcome" : "applied",
+          "recordIndices" : [
+            0
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-apfs_seal_broken",
+              "fileOffset" : 37551588,
+              "recordIndex" : 1
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchApfsSealBroken",
+          "outcome" : "applied",
+          "recordIndices" : [
+            1
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-bsd_init_rootvp",
+              "fileOffset" : 16177504,
+              "recordIndex" : 2
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchBsdInitRootvp",
+          "outcome" : "applied",
+          "recordIndices" : [
+            2
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-launch_constraints",
+              "fileOffset" : 23299644,
+              "recordIndex" : 3
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-launch_constraints",
+              "fileOffset" : 23299648,
+              "recordIndex" : 4
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchLaunchConstraints",
+          "outcome" : "applied",
+          "recordIndices" : [
+            3,
+            4
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-debugger",
+              "fileOffset" : 19693880,
+              "recordIndex" : 5
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-debugger",
+              "fileOffset" : 19693884,
+              "recordIndex" : 6
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchDebugger",
+          "outcome" : "applied",
+          "recordIndices" : [
+            5,
+            6
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-post_validation",
+              "fileOffset" : 16755608,
+              "recordIndex" : 7
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchPostValidationNOP",
+          "outcome" : "applied",
+          "recordIndices" : [
+            7
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-post_validation",
+              "fileOffset" : 23332268,
+              "recordIndex" : 8
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchPostValidationCMP",
+          "outcome" : "applied",
+          "recordIndices" : [
+            8
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-dyld_policy",
+              "fileOffset" : 23335100,
+              "recordIndex" : 9
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-dyld_policy",
+              "fileOffset" : 23335112,
+              "recordIndex" : 10
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchDyldPolicy",
+          "outcome" : "applied",
+          "recordIndices" : [
+            9,
+            10
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-apfs_graft",
+              "fileOffset" : 37880092,
+              "recordIndex" : 11
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchApfsGraft",
+          "outcome" : "applied",
+          "recordIndices" : [
+            11
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-apfs_vfsop_mount",
+              "fileOffset" : 38228036,
+              "recordIndex" : 12
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-apfs_mount_upgrade_checks",
+              "fileOffset" : 38235136,
+              "recordIndex" : 13
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-handle_fsioc_graft",
+              "fileOffset" : 38324224,
+              "recordIndex" : 14
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-handle_get_dev_by_role",
+              "fileOffset" : 38316880,
+              "recordIndex" : 15
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-handle_get_dev_by_role",
+              "fileOffset" : 38316900,
+              "recordIndex" : 16
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-handle_get_dev_by_role",
+              "fileOffset" : 38317092,
+              "recordIndex" : 17
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchApfsMount",
+          "outcome" : "applied",
+          "recordIndices" : [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-sandbox_file_check_mmap",
+              "fileOffset" : 37405992,
+              "recordIndex" : 18
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-sandbox_file_check_mmap",
+              "fileOffset" : 37405996,
+              "recordIndex" : 19
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-sandbox_mount_check_mount",
+              "fileOffset" : 37399384,
+              "recordIndex" : 20
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-sandbox_mount_check_mount",
+              "fileOffset" : 37399388,
+              "recordIndex" : 21
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-sandbox_mount_check_remount",
+              "fileOffset" : 37398944,
+              "recordIndex" : 22
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-boot-sandbox_mount_check_remount",
+              "fileOffset" : 37398948,
+              "recordIndex" : 23
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-sandbox_mount_check_umount",
+              "fileOffset" : 37398540,
+              "recordIndex" : 24
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-sandbox_mount_check_umount",
+              "fileOffset" : 37398544,
+              "recordIndex" : 25
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-sandbox_vnode_check_rename",
+              "fileOffset" : 37377300,
+              "recordIndex" : 26
+            },
+            {
+              "byteCount" : 4,
+              "component" : "kernelcache",
+              "declarationID" : "kernel-cfw-sandbox_vnode_check_rename",
+              "fileOffset" : 37377304,
+              "recordIndex" : 27
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchSandbox",
+          "outcome" : "applied",
+          "recordIndices" : [
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27
+          ],
+          "requirement" : "required"
+        },
+        {
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "kernelcache.KernelPatcher.patchExcGuardBehavior",
+          "outcome" : "notApplicable",
+          "reason" : "rule excGuardActive false for this input: variant=regular iosBaseIs18=false iosBaseIs27=false excGuardActive=false applyIOS27=false applyFrida=false",
+          "recordIndices" : [
+
+          ],
+          "requirement" : "conditional",
+          "rule" : "excGuardActive"
+        }
+      ]
+    },
+    {
+      "component" : "DeviceTree",
+      "coverage" : "structured",
+      "records" : [
+        {
+          "afterDisasm" : "",
+          "beforeDisasm" : "",
+          "component" : "devicetree",
+          "fileOffset" : 296,
+          "originalBytes" : "c3lzY2ZnL1NyTm0v",
+          "patchDescription" : "Set serial number to vphone-1337",
+          "patchID" : "devicetree.serial_number",
+          "patchedBytes" : "dnBob25lLTEzMzcA"
+        },
+        {
+          "afterDisasm" : "",
+          "beforeDisasm" : "",
+          "component" : "devicetree",
+          "fileOffset" : 1316,
+          "originalBytes" : "c3lzYw==",
+          "patchDescription" : "Set home button type to 2",
+          "patchID" : "devicetree.home_button_type",
+          "patchedBytes" : "AgAAAA=="
+        },
+        {
+          "afterDisasm" : "",
+          "beforeDisasm" : "",
+          "component" : "devicetree",
+          "fileOffset" : 53672,
+          "originalBytes" : "c3lzYw==",
+          "patchDescription" : "Set artwork device subtype to 2556",
+          "patchID" : "devicetree.artwork_device_subtype",
+          "patchedBytes" : "\/AkAAA=="
+        },
+        {
+          "afterDisasm" : "",
+          "beforeDisasm" : "",
+          "component" : "devicetree",
+          "fileOffset" : 54000,
+          "originalBytes" : "c3lzYw==",
+          "patchDescription" : "Set island notch location to 144",
+          "patchID" : "devicetree.island_notch_location",
+          "patchedBytes" : "kAAAAA=="
+        }
+      ],
+      "results" : [
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 12,
+              "component" : "devicetree",
+              "declarationID" : "devicetree-cfw-serial_number",
+              "fileOffset" : 296,
+              "recordIndex" : 0
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "devicetree.DeviceTreePatcher.serial_number",
+          "outcome" : "applied",
+          "recordIndices" : [
+            0
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "devicetree",
+              "declarationID" : "devicetree-cfw-home_button_type",
+              "fileOffset" : 1316,
+              "recordIndex" : 1
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "devicetree.DeviceTreePatcher.home_button_type",
+          "outcome" : "applied",
+          "recordIndices" : [
+            1
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "devicetree",
+              "declarationID" : "devicetree-cfw-artwork_device_subtype",
+              "fileOffset" : 53672,
+              "recordIndex" : 2
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "devicetree.DeviceTreePatcher.artwork_device_subtype",
+          "outcome" : "applied",
+          "recordIndices" : [
+            2
+          ],
+          "requirement" : "required"
+        },
+        {
+          "declarationEvidence" : [
+            {
+              "byteCount" : 4,
+              "component" : "devicetree",
+              "declarationID" : "devicetree-cfw-island_notch_location",
+              "fileOffset" : 54000,
+              "recordIndex" : 3
+            }
+          ],
+          "gates" : {
+            "applyFrida" : false,
+            "applyIOS27" : false,
+            "cloudOSIsFridaCapable" : false,
+            "enableFrida" : false,
+            "excGuardActive" : false,
+            "forceExcGuard" : false,
+            "guestEnvironmentV2" : false,
+            "iosBaseIs18" : false,
+            "iosBaseIs27" : false,
+            "variant" : "regular"
+          },
+          "id" : "devicetree.DeviceTreePatcher.island_notch_location",
+          "outcome" : "applied",
+          "recordIndices" : [
+            3
+          ],
+          "requirement" : "required"
+        }
+      ]
+    }
+  ],
+  "gates" : {
+    "applyFrida" : false,
+    "applyIOS27" : false,
+    "cloudOSIsFridaCapable" : false,
+    "enableFrida" : false,
+    "excGuardActive" : false,
+    "forceExcGuard" : false,
+    "guestEnvironmentV2" : false,
+    "iosBaseIs18" : false,
+    "iosBaseIs27" : false,
+    "variant" : "regular"
+  },
+  "variant" : "regular"
+}

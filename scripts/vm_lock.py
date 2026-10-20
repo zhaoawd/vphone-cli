@@ -43,6 +43,8 @@ def main(argv):
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if argv[1] != 'fw-patch' and os.path.lexists(directory / '.firmware-transaction'):
             raise ValueError('pending firmware transaction; run patch-firmware --recover')
+        if argv[1] not in ('cfw-record', 'fw-receipts') and any(directory.glob('.cfw_disk.*')):
+            raise ValueError('pending CFW disk transaction; inspect/recover it before using this VM')
         info = os.fstat(fd)
         record = dict(bundleIdentifier=f'{info.st_dev}:{info.st_ino}', bundlePath=str(directory),
                       pid=os.getpid(), instanceID=str(uuid.uuid4()),

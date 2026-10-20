@@ -1,0 +1,56 @@
+[
+  {
+    "label": "missing guest evidence",
+    "argv": [
+      "/Users/kolar/github/vphone-cli/.build/out/Products/Debug/vphone-cli",
+      "cfw",
+      "receipts",
+      "vm-new",
+      "--library-root",
+      "/Users/kolar/github/vphone-cli",
+      "--json"
+    ],
+    "exitCode": 0,
+    "stdout": "{\"schemaVersion\": 1, \"state\": \"unknown\"}\n",
+    "stderr": ""
+  },
+  {
+    "label": "missing checkpoint preview",
+    "argv": [
+      "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+      "/Users/kolar/github/vphone-cli/scripts/vm_lock.py",
+      "/Users/kolar/github/vphone-cli/vm-new",
+      "fw-receipts",
+      "--",
+      "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+      "/Users/kolar/github/vphone-cli/scripts/cfw_disk_txn.py",
+      "preview-undo",
+      "--generation",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "--declaration",
+      "dyld-cfw-camera",
+      "/Users/kolar/github/vphone-cli/vm-new"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "[-] CFW disk preview-undo: guest Undo preview: no committed guest checkpoint; Undo is unavailable\n"
+  },
+  {
+    "label": "missing live plan writer refusal",
+    "argv": [
+      "/Users/kolar/github/vphone-cli/.build/out/Products/Debug/vphone-cli",
+      "cfw",
+      "undo",
+      "vm-new",
+      "--library-root",
+      "/Users/kolar/github/vphone-cli",
+      "--generation",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "--declaration",
+      "dyld-cfw-camera"
+    ],
+    "exitCode": 64,
+    "stdout": "",
+    "stderr": "Error: CFW requires a current bound desired plan; missing/legacy selection cannot authorize installation\nUsage: vphone-cli <subcommand>\n  See 'vphone-cli --help' for more information.\n"
+  }
+]

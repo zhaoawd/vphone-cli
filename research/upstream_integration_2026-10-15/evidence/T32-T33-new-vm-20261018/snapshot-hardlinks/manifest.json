@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-18T14:28:06.552566+00:00",
+  "scope": "Readonly Cryptex source hardlinks; write targets and blobs remain single-link",
+  "observedSource": {
+    "path": "System/Library/Accounts/DataclassOwners/Bookmarks.bundle/_CodeSignature/CodeResources",
+    "size": 2467,
+    "nlink": 38,
+    "fstatvfsFlags": 3,
+    "ST_RDONLY": 1,
+    "identityStable": true
+  },
+  "tests": {
+    "producerRegression": "red before fix, green after fix",
+    "related": 146,
+    "finalHardlinkTests": 8,
+    "pythonFull": 900,
+    "pythonSkipped": 2,
+    "pythonFailures": 0,
+    "realSourceMembers": 2933,
+    "realSourceFiles": 2093,
+    "signedBuild": "passed",
+    "frozenResourceParity": "passed",
+    "frozenVMExecution": "exit 0",
+    "relatedFinal": 147
+  },
+  "runtime": {
+    "cfwAttempt": "1aac6854-0b8f-4206-9197-d40c599b8495",
+    "cfwPID": 72529,
+    "execSession": 26989,
+    "state": "administrator authentication completed; actual staged CFW installation running",
+    "vm": "vm-t32-t33-20261018-r2",
+    "scopedAMFIHelperPID": 71304,
+    "approvedCDHash": "cad3fa35fa16672ad522b31564352ffd4276b469",
+    "persistentAllowlistsLoaded": false,
+    "persistentAllowlistsModified": false,
+    "SIPOrBootArgumentsModified": false,
+    "workDirectory": ".cfw_disk.rDDZL4Bx"
+  },
+  "limitations": [
+    "Actual repaired CFW publication, guest Undo and normal startup remain unverified.",
+    "Prior full Swift APIProxy failure remains; isolated rerun passed, cause unknown.",
+    "Original r2 Disk.img preserved by exact metadata and 66-region samples; not a full-disk comparison in this phase."
+  ],
+  "commands": {
+    "regression": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python3 -m unittest tests.test_undo_provenance.UndoProvenanceTests.test_readonly_cryptex_hardlinks_are_copied_as_independent_files",
+    "related": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python3 -m unittest tests.test_readonly_source_hardlinks tests.test_undo_provenance tests.test_patch_plan_gate tests.test_component_effects tests.test_guest_undo tests.test_guest_undo_transaction tests.test_cfw_guest_publication",
+    "fullPython": "VPHONE_DAEMON_API_BUILD_DIR=\"$PWD/.build/daemon-api-t59-20261015\" make test_python",
+    "build": "CLANG_MODULE_CACHE_PATH=\"$PWD/.build/build-module-cache\" SWIFT_MODULECACHE_PATH=\"$PWD/.build/build-module-cache\" PATH=\"$PWD/.tools/bin:$PWD/.venv/bin:$PATH\" zsh scripts/build.sh --no-vphoned"
+  },
+  "files": {
+    "amfi-launcher.log": {
+      "bytes": 79,
+      "sha256": "aafba37cdc8d4deb4749e5a97ed29922f14598677d292a56246a2384a00a5ecf"
+    },
+    "cfw-second-failed-changes.jsonl": {
+      "bytes": 5435,
+      "sha256": "5efb82434e8f5f381a262433f1b6c45b6c7142b2634bb198e2ea2d5739d79d41"
+    },
+    "cfw-second-failed-create.log": {
+      "bytes": 1534,
+      "sha256": "1dbaaf959feec62e4462de18afdee2a3ddda17af4ca8e7256ada328071b0b424"
+    },
+    "cfw-second-failed-journal.json": {
+      "bytes": 1590,
+      "sha256": "f76ee8ed63e313cd61d08bc00907fa3701e1ae82a11969592146cd2855c00824"
+    },
+    "cfw-third-running-checkpoint.json": {
+      "bytes": 13920,
+      "sha256": "6246a22e541ab375f3fb9ddc51e485b735cc5d1bc4598a3c5ee2eeb6ab26a916"
+    },
+    "frozen-fix-and-execution.json": {
+      "bytes": 744,
+      "sha256": "02e350529ab4b8ff8c3abd781a8abd29e2c482ac21bcde7de287f2c6657ae81c"
+    },
+    "hardlink-final.log": {
+      "bytes": 106,
+      "sha256": "1ac0caee1e0a0284c6d9267b11fdbe41cb3d40d8b4e1871e8596f1d5b9c9144f"
+    },
+    "hypotheses.json": {
+      "bytes": 928,
+      "sha256": "07aef0765b363cd1c6ce9b1dd019710e035159a09a8a729828e9273b8d6280a7"
+    },
+    "python-full.log": {
+      "bytes": 148062,
+      "sha256": "b1cfc090455af1bee39bba8989df2c576b64d9195aff093ca0b4b92ea8416263"
+    },
+    "real-green-first.log": {
+      "bytes": 279,
+      "sha256": "0162ca0463343459969c13c19fb373c023d055be02f9fce3560d15750b5cf88b"
+    },
+    "real-tree-green.log": {
+      "bytes": 231,
+      "sha256": "252f6216364177a5c831f65623724a0ae4d0a6f85b2e226e7e2ae6dd2e48ebc6"
+    },
+    "regression-green-first.log": {
+      "bytes": 98,
+      "sha256": "614ffb3cc08a9e15356370879c495dd4321dadbe3e5a066e938c9a31de054a18"
+    },
+    "regression-red.log": {
+      "bytes": 1748,
+      "sha256": "887bb387d2c3650d49f6c0177402755600ff61dc614f6f30d90ca6cbcaa045d8"
+    },
+    "related-green.log": {
+      "bytes": 6296,
+      "sha256": "5875d2184d7ca35b25a3e9d801e6c7962302b336492815d0f205c72323a7e235"
+    },
+    "repro-first.log": {
+      "bytes": 524,
+      "sha256": "93fe60aa1b6ac0c32b2db192aa7557090196450d3bfffe31b2dba6c2960552dd"
+    },
+    "signed-build.log": {
+      "bytes": 13825,
+      "sha256": "8cd086f31a39b61c04a27a5d2378fb4358c3ad783d5f9b65a988a4bb8c094410"
+    },
+    "source-fingerprints.json": {
+      "bytes": 791,
+      "sha256": "7d5ea43199a2338286bf8ca4a65ef97485a0f08f5420f437f3f8458cdee1ae2a"
+    },
+    "vm-execution-after-allowance.json": {
+      "bytes": 52,
+      "sha256": "6d620d1c454a90e41ee536109b1fee6ba5177ac2ee9d3aeb3a9f1e108bf3f044"
+    },
+    "related-final.log": {
+      "bytes": 6297,
+      "sha256": "03a52bf57608949b3a3aa9085dd37afeba43e62d99cf8c519875889888f24aeb"
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-19T08:07:07.292473+00:00",
+  "failedTransaction": "20261019T074108Z-8MSU4jQD",
+  "failedPhase": "post-write writable mount recheck; not published",
+  "stagedApplied": {
+    "beforeSHA256": "2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac",
+    "afterSHA256": "e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5",
+    "completeWriteReadbackAndCodePagesChecked": true
+  },
+  "originalCheck": "dev/inode/size/mtime and66 sampled windows unchanged; no full raw-image hash at failed cleanup",
+  "nativeObservation": {
+    "isolatedAPFSSizeMiB": 128,
+    "writeMiB": 8,
+    "changedFields": [
+      "CapacityFree",
+      "Volumes[0].CapacityInUse"
+    ],
+    "rootDevicePathAndWritableStateUnchanged": true,
+    "normalDetach": true,
+    "vmWritten": false
+  },
+  "cause": "whole-container equality wrongly treats writable allocation counters as attachment changes; demonstrated by minimal transaction and native isolated APFS; original failed run did not capture full before/after container snapshots",
+  "correction": "only writable Undo comparison excludes CapacityFree and each volume CapacityInUse; all other fields/root inode/device/path/writable checks retained; final readonly comparison unchanged",
+  "regressions": {
+    "relatedTests": 27,
+    "readonlyCapacityChangeRefuses": true,
+    "postWriteUUIDChangeRefuses": true,
+    "fullPython": {
+      "tests": 935,
+      "skipped": 2,
+      "seconds": 244.185,
+      "exitCode": 0
+    },
+    "swift": {
+      "testFunctions": 12,
+      "identityCases": 8,
+      "actualReleaseVerifier": true,
+      "exitCode": 0
+    }
+  },
+  "bundle": {
+    "host": ".build/t32-undo-mount-final.app",
+    "completeValidationPassed": true,
+    "bootExecutable": ".build/t32-dsc-companions-final.app/Contents/MacOS/vphone-vm",
+    "bootBytesAndInodeUnchanged": true,
+    "cdhash": "89b70a253cad2adea133b3e875519afaf72c5d17"
+  },
+  "hostAllowance": "prior helper68388 exited; same original boot executable still parser64 without helper; no new allowance requested; periodic probe stopped after92 observations",
+  "retry": {
+    "execSession": 99319,
+    "cliPID": 97676,
+    "osascriptPID": 98151,
+    "state": "waiting native administrator authentication; no new transaction at last observation",
+    "hostBundle": ".build/t32-undo-mount-final.app"
+  },
+  "acceptedAtNewTarget": false,
+  "pending": [
+    "real corrected Undo publication",
+    "restored original and6885 code pages before boot",
+    "post-Undo API normal boots and historical reader",
+    "same-generation reapplication and normal boots for DSC effect on/off/on",
+    "Mach-O/Preboot/arbitrary middle replay and trusted guest origin incomplete"
+  ],
+  "sourceFingerprints": {
+    "scripts/patchers/final_guest.py": "9c691588ca9bc3126ce85d7532bd9dd31993a0d05899246ae7d4757c60b6f6a1",
+    "scripts/patchers/guest_undo.py": "7da29b493b60120ced45e80df1679c4a8105aabb91d06fe087d64924c8210420",
+    "tests/test_final_mount_state.py": "f10931cac5c96e6c8a5e167d80ba7aab5e6c01ecf65b7c9a48215be928747043",
+    "tests/test_guest_undo_transaction.py": "ad6ec0d2f250d89908f998c4b5ad408232b761325d10b11ba046d815d3878b74"
+  },
+  "files": {
+    "amfidont-after-exit.log": {
+      "bytes": 2107,
+      "sha256": "1548c76bfca59040c114709d025baa329e463aabfd0eae362daeb788f5f0e223"
+    },
+    "bundle-check.log": {
+      "bytes": 1409,
+      "sha256": "d189e22344140c014f9cf5ad65fac00e9ed8602d9e775a629a756f8f9177c721"
+    },
+    "bundle-parity.json": {
+      "bytes": 617,
+      "sha256": "d4f401cb6fa225aa0993ad336cf0c160be07ab01f4558bc5f1cb1cafc8c52172"
+    },
+    "execution-probes-stopped.json": {
+      "bytes": 17103,
+      "sha256": "29546e6fd93b7e55bd42cd9d47c2394d6d0a8c4f59fe5abea896dde2cc036ff1"
+    },
+    "existing-vm-execution.json": {
+      "bytes": 521,
+      "sha256": "f1f8ac866fa963af01c1e38866db4d0bfed3cca97bbb1b61751b91ced05d187b"
+    },
+    "failed-guest-changes.jsonl": {
+      "bytes": 1883102,
+      "sha256": "84a95e44c705ccd141cfb3abb17797f4c7679e8081641d4e95f3a7b5c25513d6"
+    },
+    "failed-guest-undo-applied.json": {
+      "bytes": 324,
+      "sha256": "0cf65e9bbfaaf3ee10d5470edcf7efa4e795b3057afca5e32da7ef01e997c75c"
+    },
+    "failed-guest-undo-request.json": {
+      "bytes": 1690,
+      "sha256": "85fc44bcc1212f846fe883999b1eb3441e0e8baf97b6cd580604b9182b0fcb85"
+    },
+    "failed-transaction.json": {
+      "bytes": 1972,
+      "sha256": "a53da8180f743d7640b2db5bff9629926f6bea9ed65f5620ece25bdb7c84f414"
+    },
+    "first-undo.log": {
+      "bytes": 519,
+      "sha256": "653810e4feae9945e9394c5abddc3761af79edba76e118db3193f508295d838e"
+    },
+    "green-related.log": {
+      "bytes": 3193,
+      "sha256": "8be63e5d37d1c008788af5618e647b5f4d17bd1d57a206f7ea09d6a766a6c25a"
+    },
+    "native-after.json": {
+      "bytes": 739,
+      "sha256": "b25bcd76e308b8045ba8294a4914fd67dcdbe3229fc717122ae7774054c04c7d"
+    },
+    "native-allocation-fixed.log": {
+      "bytes": 994,
+      "sha256": "da2268490f97f28521f3c0814bf22343920655a3e20ddb3aabd239ceea4bd3cc"
+    },
+    "native-allocation.log": {
+      "bytes": 946,
+      "sha256": "dc2c65995d1544ed622baa268e4701033ae063e5bca1f62afe23f78f47b4b624"
+    },
+    "native-attachment.plist": {
+      "bytes": 1433,
+      "sha256": "bbcb9b4616794c68259d76c51e2dcdc0f3d299c76e50cf75d5de9107e38ed54e"
+    },
+    "native-before.json": {
+      "bytes": 737,
+      "sha256": "9553c48ea1249e457790636b7932277f9f646e893c68a791edd89aa200534f95"
+    },
+    "native-fixed-after.json": {
+      "bytes": 739,
+      "sha256": "b016a4273f0cc307434fe868c154a5628b29a43a6516e00e19ccb788c2b06ddf"
+    },
+    "native-fixed-attachment.plist": {
+      "bytes": 1433,
+      "sha256": "bbcb9b4616794c68259d76c51e2dcdc0f3d299c76e50cf75d5de9107e38ed54e"
+    },
+    "native-fixed-before.json": {
+      "bytes": 737,
+      "sha256": "d12bed7c17334864b150e0e0bb2c5dc889f5f085bc6e6712346e10043c1cfbad"
+    },
+    "native-fixed-result.json": {
+      "bytes": 562,
+      "sha256": "84f2265393452228ab8296925d81942ba83fe89fea5b37896f5a338823ae18ee"
+    },
+    "native-result.json": {
+      "bytes": 518,
+      "sha256": "a9e12cbafae5afdedee0427c10f486c49d5b30ea02efd3f33378f0118b721376"
+    },
+    "native_allocation.py": {
+      "bytes": 2543,
+      "sha256": "b93e119714cb32e044950e6990a8828725b482813b4fdbc2036d95d8aa7a2ec0"
+    },
+    "native_allocation_fixed.py": {
+      "bytes": 2711,
+      "sha256": "1bbdbbe5c4161a791a45df2f2d0d93902baa99a9f795f2a8caf788a2a23cb93d"
+    },
+    "python-full.log": {
+      "bytes": 155787,
+      "sha256": "baa1a5501d45c9b01ca5d2929ffb15ba6419907a777ae1af408a8906d0c9e05f"
+    },
+    "readonly-strict.log": {
+      "bytes": 190,
+      "sha256": "57794dc0eeea54b48d0b2a681ca2868e7c06dae3d3155e6a8952e737447394f8"
+    },
+    "red.log": {
+      "bytes": 1333,
+      "sha256": "86b8d1e5266101da98c53606a0b41d4a48c73997a3fac291a0520cfdbfcb452f"
+    },
+    "resource-record.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "swift-release-verifier.log": {
+      "bytes": 86298,
+      "sha256": "a4da91ca4cb3bbdf57f2dd880ab2cccef6ddc6e322cc139c7d98e34f175660e2"
+    }
+  }
+}

@@ -158,7 +158,7 @@ def run(plan, argv):
     args = argv[1:]
     flags = {
         'cp': {'-R', '-r', '-p'}, 'mv': set(), 'rm': {'-rf', '-f', '-r'},
-        'mkdir': {'-p'}, 'chmod': {'-R'}, 'chown': {'-R'}, 'ln': {'-sf'},
+        'mkdir': {'-p'}, 'chmod': {'-R'}, 'chown': {'-R'}, 'ln': {'-sf', '-sfn'},
         'tar': {'-xf', '-f', '-C', '--preserve-permissions', '--no-overwrite-dir', '--warning=no-unknown-keyword'},
         'gtar': {'-xf', '-f', '-C', '--preserve-permissions', '--no-overwrite-dir', '--warning=no-unknown-keyword'},
         'find': {'-name', '-delete'},
@@ -198,7 +198,7 @@ def run(plan, argv):
                     source_images[Path(destination)]=mounted(plan, expected_mount)
                     source_bindings[Path(destination)]=proof(plan,source_images[Path(destination)])
                     if any(Path(destination).iterdir()): raise ValueError('Cryptex replacement destination is not empty')
-                    cryptex_copies.append((Path(destination),tree(source)))
+                    cryptex_copies.append((Path(destination),tree(source,readonly_source=True)))
                     # Inspect the complete source member table before its whole-image
                     # copy. Parent links are inert data, never followed by cp -R.
                     for member in walk(source):
@@ -246,7 +246,8 @@ def run(plan, argv):
     effect_store.mkdir(mode=0o700,exist_ok=True)
     if effect_store.is_symlink(): raise ValueError('linked effect store')
     source_states = {target: component_effects.capture_input(source,effect_store,
-        logical(target) in {'system:/System/Cryptexes/OS','system:/System/Cryptexes/App'})
+        logical(target) in {'system:/System/Cryptexes/OS','system:/System/Cryptexes/App'},
+        readonly_source=target in source_images)
         for target,source in copy_sources.items()}
     archive_associations = {}
     if command in {'tar','gtar'} and targets:
@@ -281,6 +282,9 @@ def run(plan, argv):
         no_link_parents(path)
         target=logical(path) or staged_targets.get(path)
         declaration=owner(plan,target)
+        if command == 'ln' and path.is_dir() and (
+                not path.is_symlink() or '-sfn' not in args or operands[-1].endswith('/')):
+            raise ValueError('guest link command follows target directory')
         if path.is_symlink() and command not in {'rm','mv','ln'}:
             raise ValueError('guest operation follows target symlink')
         if path.exists() and path.is_file() and path.stat().st_nlink != 1:
@@ -398,7 +402,7 @@ def signing_transaction(plan, transaction_id):
     work=gate.private_path(plan,Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent)
     raw=gate.strict_bytes(work/'transaction.json');record=json.loads(raw)
     if (not isinstance(transaction_id,str) or not transaction_id or record.get('id')!=transaction_id
-            or record.get('version')!=2 or record.get('provenanceMode')!='required' or record.get('status')!='staged'
+            or record.get('version') not in (2,3,4) or record.get('provenanceMode')!='required' or record.get('status')!='staged'
             or record.get('vm')!=plan.context['vmDirectory']):
         raise ValueError('signing requires the current staged transaction')
     fd=os.open(Path(plan.context['vmDirectory'])/'Disk.img',os.O_RDONLY|os.O_NOFOLLOW)

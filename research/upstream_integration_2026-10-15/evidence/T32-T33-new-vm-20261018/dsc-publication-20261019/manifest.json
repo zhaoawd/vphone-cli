@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-19T07:37:01.964725+00:00",
+  "vm": "vm-t32-t33-dsc-20261018",
+  "firmware": "iOS26.0 23A341 + cloudOS26.1 23B85 regular/classic",
+  "generation": "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+  "transaction": "20261019T065441Z-XzJThk9M",
+  "cfw": {
+    "exitCode": 0,
+    "version": 4,
+    "checkpointVersion": 2,
+    "finalReadonlyVerifications": 2,
+    "snapshotCompleted": true,
+    "sealed": true,
+    "published": true,
+    "finished": true
+  },
+  "installedProof": {
+    "schemaVersion": 1,
+    "state": "passed",
+    "vm": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018",
+    "phase": "installed",
+    "runtimeValidated": false,
+    "graphicsValidated": false,
+    "sourceDiagnosticSHA256": "ce87d3a5ed535d3af033940418eaec9c2ff7f65e217657dde95a09bbee5ae460",
+    "transactionID": "20261019T065441Z-XzJThk9M",
+    "generationID": "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+    "imageSHA256": "ff453e298a2be2109b020f92e08f9f931f65f30a51efcbf347fa2b1f2762d10d",
+    "currentRawImageMatchesPublication": true,
+    "declaration": "dyld-boot-iomfb_swapend",
+    "member": "dyld_shared_cache_arm64e.42",
+    "originalSHA256": "e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5",
+    "installedSHA256": "2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac",
+    "originalInstruction": {
+      "register": "w3",
+      "value": 1352,
+      "bytes": "03a98052",
+      "mnemonic": "mov",
+      "operands": "w3, #0x548"
+    },
+    "installedInstruction": {
+      "register": "w3",
+      "value": 1376,
+      "bytes": "03ac8052",
+      "mnemonic": "mov",
+      "operands": "w3, #0x560"
+    },
+    "verifiedOriginalCodePages": 6885,
+    "verifiedInstalledCodePages": 6885
+  },
+  "firstBoot": {
+    "productionCommands": 7,
+    "promptMatched": true,
+    "normalShutdown": true,
+    "exitCode": 0,
+    "diskAndDirectoryLockReleased": true,
+    "configAndDaemonUnchanged": true
+  },
+  "apiBoots": {
+    "cycles": 2,
+    "normalShutdowns": 2,
+    "distinctBootTimes": true,
+    "distinctBootSessionUUIDs": true,
+    "systemVersion": "26.0",
+    "systemBuild": "23A341",
+    "configAndDaemonUnchanged": true,
+    "diskAndDirectoryLockReleased": true
+  },
+  "postBoot": {
+    "receiptsExitCode": 0,
+    "verifyPlanExitCode": 0,
+    "state": "committed-publication",
+    "publicationImageSHA256": "ff453e298a2be2109b020f92e08f9f931f65f30a51efcbf347fa2b1f2762d10d",
+    "currentImageSHA256": "5948a0329f9ad0a469ce9c6ac851cbf90b18a41399e5b03eed6bb58e84c3184d",
+    "runtimeImageChanged": true,
+    "runtimeValidated": false
+  },
+  "hostAllowance": {
+    "cdhash": "89b70a253cad2adea133b3e875519afaf72c5d17",
+    "helperPID": 68388,
+    "targetPID": 62017,
+    "attached": true,
+    "invalidArgumentExitCode": 64,
+    "allowAll": false,
+    "paths": [],
+    "persistentAllowlistLoadedOrModified": false,
+    "temporaryProbe": "20s interval; maximum3600s; parser only, no VM boot; explicitly stopped at acceptance end or expires"
+  },
+  "actualUndo": {
+    "state": "native authentication completed; root73597 started; preview/staging pending at observation",
+    "cliPID": 72809,
+    "osascriptPID": 73385,
+    "execSession": 58124,
+    "declarations": [
+      "dyld-boot-iomfb_swapend"
+    ]
+  },
+  "acceptedAtNewTarget": false,
+  "graphicsValidated": false,
+  "pending": [
+    "actual DSC Undo publication and unbooted original/full code-page proof",
+    "post-Undo API normal on/off/on and historical reading",
+    "same-generation reapplication and boot checks for DSC effect on/off/on",
+    "Mach-O/Preboot and arbitrary middle-operation replay, trusted guest origin remain incomplete"
+  ],
+  "files": {
+    "amfi-restart-live-target.log": {
+      "bytes": 79,
+      "sha256": "17857572feb4677fdd6b7903acff59c7fac6961a72d69b08832e376f476a0bdc"
+    },
+    "api-installed/boot-1/SystemVersion.plist": {
+      "bytes": 571,
+      "sha256": "2b4802c09fc596b7f24c185846743b43a242d78adbe84b29ccf235fbea7551c3"
+    },
+    "api-installed/boot-1/boottime.json": {
+      "bytes": 748,
+      "sha256": "02cc496714413434f7bdaf8d2e671bd09712b0cfe7914e9be05bcb9bb44fbbf7"
+    },
+    "api-installed/boot-1/capabilities.json": {
+      "bytes": 5843,
+      "sha256": "7fc9bbe9ee5e75fc998a7cf9bbd3293b53107f8ad8fec53654330aecde948c8c"
+    },
+    "api-installed/boot-1/disk-holders.json": {
+      "bytes": 52,
+      "sha256": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130"
+    },
+    "api-installed/boot-1/requests.jsonl": {
+      "bytes": 50741,
+      "sha256": "d0191c4fa5e10e3aef15ab23302df0a6b09f5123b702bb2803be83049bcfd25c"
+    },
+    "api-installed/boot-1/runtime.json": {
+      "bytes": 255,
+      "sha256": "0ab9bc6ce9ffee4a35cf382ac4963e84de7b7d826d2eb43a7f0cf867811c5c9c"
+    },
+    "api-installed/boot-1/serial.log": {
+      "bytes": 109098,
+      "sha256": "e9bdf7a86586569878997cfb6a8b529fba017ff8eadd3b779af744684c08acd7"
+    },
+    "api-installed/boot-1/stop.json": {
+      "bytes": 213,
+      "sha256": "f11aa68fa3f845ced2f0649f074889db2d0b7bf800243e7fc6e6b333bef19907"
+    },
+    "api-installed/boot-2/SystemVersion.plist": {
+      "bytes": 571,
+      "sha256": "2b4802c09fc596b7f24c185846743b43a242d78adbe84b29ccf235fbea7551c3"
+    },
+    "api-installed/boot-2/boottime.json": {
+      "bytes": 754,
+      "sha256": "6a852fe4ea2e4dd6baaa4c08c49e1e79e6c2b95171d5b671551be712b8a08395"
+    },
+    "api-installed/boot-2/capabilities.json": {
+      "bytes": 5843,
+      "sha256": "bdb6d77748cb24669c199b814a515da21c679f3662087cbe2a0e61b07c6c1c3c"
+    },
+    "api-installed/boot-2/disk-holders.json": {
+      "bytes": 52,
+      "sha256": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130"
+    },
+    "api-installed/boot-2/requests.jsonl": {
+      "bytes": 27788,
+      "sha256": "3785535ddf468febe7016ea70b18994b4aa37230e1683a0ac7c0170bd294e2e4"
+    },
+    "api-installed/boot-2/runtime.json": {
+      "bytes": 255,
+      "sha256": "fc82260fc85187c818806b9dec1a61678d2fe800b8b59cb10596a3739b35f27f"
+    },
+    "api-installed/boot-2/serial.log": {
+      "bytes": 82009,
+      "sha256": "707a56537f4835a2a68f206feb25eed1a0976dbe1c5e893a84338975c0c0ea71"
+    },
+    "api-installed/boot-2/stop.json": {
+      "bytes": 213,
+      "sha256": "9b0b9993a21a0a3db397bd1c9e7d15c5050e5be033568d4c7a813a9d7b7d4dc5"
+    },
+    "api-installed/runtime-result.json": {
+      "bytes": 2343,
+      "sha256": "52848f90da5261fc5e4f14f14d4d108d7ae99ac2dea1107a2792266a5e362208"
+    },
+    "api-installed.log": {
+      "bytes": 1903,
+      "sha256": "3b09b90e742c9a6a3eb4dc84030840739536a14cac8da09f1c0bcb3c13bcd327"
+    },
+    "cfw-retry.log": {
+      "bytes": 6095,
+      "sha256": "5a1ab4f2c1b16d2f9a70b1ad9a0b4ea51919cbfcf9baacca9aec13aa27f55842"
+    },
+    "execution-probes.json": {
+      "bytes": 14738,
+      "sha256": "075585a039fad530488d2b3972a1f219d31cd5cd841be3625ac77a7e9dbf22ae"
+    },
+    "execution-probes.log": {
+      "bytes": 3668,
+      "sha256": "3e6b91b181185509407a4c52375b36380971121e995e8861dd4bfcb70526cb86"
+    },
+    "first-boot/result.json": {
+      "bytes": 965,
+      "sha256": "59637705d4118c4c863dbcd2e968e8b44203080876bba93c7bf663e8f3a0efa3"
+    },
+    "first-boot/serial.log": {
+      "bytes": 76207,
+      "sha256": "b8fa6f55ee73a2b24d84523890028955f4d6cd0dcbd9918f8fab562a59267647"
+    },
+    "first-boot.log": {
+      "bytes": 905,
+      "sha256": "746da64120be6cfadc4a8aee6dc8d3e65ad658809fddab3b3ca51199014bdf0a"
+    },
+    "installed/guest-effects-final.json": {
+      "bytes": 1448690,
+      "sha256": "31ac869195a312d1f0df8fdf44144fea0bec32438b8a76f5ff93065791612bc6"
+    },
+    "installed/guest-publication.json": {
+      "bytes": 28159,
+      "sha256": "733fde3f51b311110a6db44b42a2daefc35188ede3b9cd07d4ac3e936d639519"
+    },
+    "installed/guest-undo-provenance.json": {
+      "bytes": 1274,
+      "sha256": "977d197640b59e2a0b42e4ef138a6efc076da3b393fb466cffa2f3ce6fccd3c1"
+    },
+    "installed/preview.json": {
+      "bytes": 1567,
+      "sha256": "a6df7927cc38f59cb803ca3b88ee85e7ccb07fcea6312bc16a674d9d1354d297"
+    },
+    "installed/result.json": {
+      "bytes": 1195,
+      "sha256": "bddb10006fff0c9802bb1730bdaef1c32c59740920e2feff396d85d46291a6fd"
+    },
+    "installed/source-diagnostic.json": {
+      "bytes": 725,
+      "sha256": "ce87d3a5ed535d3af033940418eaec9c2ff7f65e217657dde95a09bbee5ae460"
+    },
+    "installed/transaction.json": {
+      "bytes": 2641,
+      "sha256": "b61a459e253ddce23ccca49e5d0b37688750add0041c8b9e27dae26a46590419"
+    },
+    "installed-proof.log": {
+      "bytes": 1107,
+      "sha256": "34e0cc129a7b29bad096819f0c57e52a03c3cc2d38a90ccd32f66c10ad27a5b0"
+    },
+    "journal/guest-changes.jsonl": {
+      "bytes": 1983829,
+      "sha256": "f98a1f57b2f49ea3bf706913353b950e592f076835b5572ec0d7aedf6dc3937f"
+    },
+    "journal/guest-context.json": {
+      "bytes": 914,
+      "sha256": "fd75dc66ad431f9a4e4c33eeaabec95992807a4628fb8cce3cee5aff5a788d52"
+    },
+    "journal/guest-effects-final.json": {
+      "bytes": 1448690,
+      "sha256": "31ac869195a312d1f0df8fdf44144fea0bec32438b8a76f5ff93065791612bc6"
+    },
+    "journal/guest-plan.json": {
+      "bytes": 64276,
+      "sha256": "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c"
+    },
+    "journal/guest-publication.json": {
+      "bytes": 28159,
+      "sha256": "733fde3f51b311110a6db44b42a2daefc35188ede3b9cd07d4ac3e936d639519"
+    },
+    "journal/guest-undo-provenance.json": {
+      "bytes": 1274,
+      "sha256": "977d197640b59e2a0b42e4ef138a6efc076da3b393fb466cffa2f3ce6fccd3c1"
+    },
+    "journal/transaction.json": {
+      "bytes": 2641,
+      "sha256": "b61a459e253ddce23ccca49e5d0b37688750add0041c8b9e27dae26a46590419"
+    },
+    "keep-execution-probe.py": {
+      "bytes": 1681,
+      "sha256": "a37d35a8c23dbb1388170a2ee9a38961b0ec7f4199253021bb3bb70e92749300"
+    },
+    "postboot/api-boot-evidence.json": {
+      "bytes": 2343,
+      "sha256": "52848f90da5261fc5e4f14f14d4d108d7ae99ac2dea1107a2792266a5e362208"
+    },
+    "postboot/guest-effects-final.json": {
+      "bytes": 1448690,
+      "sha256": "31ac869195a312d1f0df8fdf44144fea0bec32438b8a76f5ff93065791612bc6"
+    },
+    "postboot/guest-publication.json": {
+      "bytes": 28159,
+      "sha256": "733fde3f51b311110a6db44b42a2daefc35188ede3b9cd07d4ac3e936d639519"
+    },
+    "postboot/receipts.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "postboot/receipts.stdout": {
+      "bytes": 1516606,
+      "sha256": "aac67066119d0ec8c79c2f5f834d07ea05e6c36708140269565533d55b0a0dcd"
+    },
+    "postboot/result.json": {
+      "bytes": 1442,
+      "sha256": "199e80dec525dbf61f381e82ebcdfe3a2622a84278da3d18f27ed085d2f1154b"
+    },
+    "postboot/transaction.json": {
+      "bytes": 2641,
+      "sha256": "b61a459e253ddce23ccca49e5d0b37688750add0041c8b9e27dae26a46590419"
+    },
+    "postboot/verify-plan.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "postboot/verify-plan.stdout": {
+      "bytes": 64401,
+      "sha256": "b1815528c17fb84d44406e79ecb0b9062efd4645511b95b666323acc99846a41"
+    },
+    "postboot-installed.log": {
+      "bytes": 1196,
+      "sha256": "92504202f9bddaa75391f2fb37333269a5965518a6e65cb16f4496248ffdba68"
+    },
+    "scoped-amfidont-snapshot.log": {
+      "bytes": 2107,
+      "sha256": "1548c76bfca59040c114709d025baa329e463aabfd0eae362daeb788f5f0e223"
+    }
+  }
+}

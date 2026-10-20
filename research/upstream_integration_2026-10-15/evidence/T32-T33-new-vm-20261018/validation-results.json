@@ -1,0 +1,44 @@
+{
+  "schema": "vphone.t32-t33-new-vm-validation/1",
+  "checks": [
+    {
+      "command": "swift test --filter BootxVersionGateTests (pre-fix)",
+      "exit": 1,
+      "result": "10 assertion issues, original regression captured"
+    },
+    {
+      "command": "swift test --skip FirmwareIntegrationTests --filter selected suites",
+      "exit": 0,
+      "result": "64 firmware tests and 2 compatibility tests passed"
+    },
+    {
+      "command": "make test_swift (final)",
+      "exit": 2,
+      "result": "Swift Testing 1534 passed; unchanged APIProxy XCTest line 312 failed; post-fast checks not run"
+    },
+    {
+      "command": "swift test --skip-build --filter APIProxyTests/testActiveConnectionLimitAndStopDuringConnect",
+      "exit": 0,
+      "result": "1 XCTest passed; full-run failure cause unknown"
+    },
+    {
+      "command": ".venv/bin/python3 -m unittest discover -s tests -p test_firmware_compatibility.py",
+      "exit": 0,
+      "result": "14 tests passed"
+    },
+    {
+      "command": ".venv/bin/python3 -m unittest discover -s tests -p test_target_patch_catalog.py",
+      "exit": 0,
+      "result": "9 tests passed"
+    },
+    {
+      "command": ".venv/bin/python3 scripts/generate_target_patch_catalog.py --check",
+      "exit": 0
+    },
+    {
+      "command": "zsh scripts/build.sh --no-vphoned (with project tool PATH and build module cache)",
+      "exit": 0,
+      "result": "complete signed app, 7 host images, guest resources and entitlements verified"
+    }
+  ]
+}
