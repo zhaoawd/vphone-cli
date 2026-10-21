@@ -243,7 +243,7 @@ public enum VPhoneBundleOps {
                                    attributes: [.posixPermissions: 0o700])
             defer { try? fm.removeItem(at: staging) }
             let payload = staging.appendingPathComponent("payload")
-            try copyDirectory(src, payload, [VPhoneVMRuntimeState.filename, "vphone.sock", ".cfw-history"])
+            try copyDirectory(src, payload, cloneRootExclusions(in: src))
             let staged = try VPhoneBundle.load(at: payload)
             // As in importArchive, copying happens privately, then name checking
             // and publication use the library lock. Slow copies do not monopolize it.
@@ -263,6 +263,27 @@ public enum VPhoneBundleOps {
                 return VPhoneBundle(url: dst, manifest: staged.manifest)
             }
         }
+    }
+
+    private static let baseCloneExclusions: Set<String> = [
+        VPhoneVMRuntimeState.filename,
+        "vphone.sock",
+        ".cfw-history",
+        ".disk-rebase-history",
+        VPhoneMachineSnapshots.directoryName,
+        ".template.plist",
+    ]
+
+    /// Excludes runtime records, snapshots, revert journals and host-local
+    /// `.firmware-*` plans/receipts/generations that bind to the source VM's path and inode.
+    private static func cloneRootExclusions(in source: URL) -> Set<String> {
+        var excluded = baseCloneExclusions
+        if let entries = try? FileManager.default.contentsOfDirectory(atPath: source.path) {
+            for entry in entries where entry.hasPrefix(".snapshot-revert-") || entry.hasPrefix(".firmware-") || entry.hasPrefix(".rebase-") {
+                excluded.insert(entry)
+            }
+        }
+        return excluded
     }
 
     // MARK: - Export / Import
@@ -300,8 +321,13 @@ public enum VPhoneBundleOps {
     /// `Disk.img`). `.cfw_disk.*` holds an unpublished staged disk copy and
     /// `.cfw-history` the host-local CFW transaction records and the previous
     /// Disk.img kept for rollback (T15). Always excluded.
-    static let exportExcludePatterns = ["*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*",
-                                        "*.cfw_disk.*", "*.cfw-history*", "*.vphone-runtime.json"]
+    public static let exportExcludePatterns = [
+        "*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*",
+        "*.cfw_disk.*", "*.cfw-history*", "*.vphone-runtime.json", "vphone.sock",
+        VPhoneMachineSnapshots.directoryName, "*.snapshot-revert-*", ".snapshot-revert-*",
+        ".rebase-*", "*.rebase-*", ".disk-rebase-history", "*.disk-rebase-history*",
+    ]
+
 
     /// When `to` is an existing directory, the archive is written inside it as
     /// `<name>.<compression.fileExtension>`. Returns the resolved output URL.
@@ -435,7 +461,12 @@ public enum VPhoneBundleOps {
         for case let url as URL in en {
             let rel = String(url.path.dropFirst(prefix))
             if !includeIPSW, rel.contains("_Restore") { en.skipDescendants(); continue }
-            if exportExcludePatterns.contains(where: { fnmatch($0, rel, 0) == 0 }) { continue }
+            if exportExcludePatterns.contains(where: {
+                fnmatch($0, rel, 0) == 0 || fnmatch($0, url.lastPathComponent, 0) == 0
+            }) {
+                en.skipDescendants()
+                continue
+            }
             guard let vals = try? url.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]),
                   vals.isRegularFile == true else { continue }
             total += Int64(vals.fileSize ?? 0)

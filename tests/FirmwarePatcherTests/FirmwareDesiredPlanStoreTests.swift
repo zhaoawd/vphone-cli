@@ -20,6 +20,23 @@ import VPhoneCore
 
 extension FirmwareDesiredPlanStoreTests {
     typealias Store = FirmwareDesiredPlanStore
+    @Test func bytePreservingRebaseDoesNotReauthorizeTheOldDiskInodeBinding() throws {
+        let (f, prepared) = try ready()
+        _ = try Store.publish(prepared, expectedSHA256: nil)
+        guard case .ready = try Store.read(in: f.vm) else { Issue.record("plan was not ready before rebase"); return }
+        let desired = try Data(contentsOf: f.vm.appendingPathComponent(Store.filename))
+        let disk = try Data(contentsOf: f.disk)
+        let baseURL = f.root.appendingPathComponent("base")
+        try FileManager.default.createDirectory(at: baseURL, withIntermediateDirectories: false)
+        try FileManager.default.copyItem(at: f.disk, to: baseURL.appendingPathComponent("Disk.img"))
+        let manifest = VPhoneVirtualMachineManifest(cpuCount: 2, memorySize: 1024 * 1024,
+            romImages: .init(avpBooter: "rom.bin", avpSEPBooter: "sep.bin"))
+        try VPhoneDiskRebase.rebase(VPhoneBundle(url: f.vm, manifest: manifest),
+            onto: VPhoneBundle(url: baseURL, manifest: manifest))
+        #expect(try Data(contentsOf: f.disk) == disk)
+        #expect(try Data(contentsOf: f.vm.appendingPathComponent(Store.filename)) == desired)
+        #expect(throws: Store.Failure.identityMismatch) { try Store.read(in: f.vm) }
+    }
     @Test func missingIsDistinctFromPermissionDenied() throws {
         let f = try FirmwarePlanBindingTests.Fixture()
         guard case .missing = try Store.read(in: f.root) else { Issue.record("not missing"); return }

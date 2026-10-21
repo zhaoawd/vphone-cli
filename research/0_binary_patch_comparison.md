@@ -1670,3 +1670,13 @@ IcliKit 固定到 `0.8.5 / 815ef234df5461b8eb9455931d38cb1c37992fe6`，原 B22 J
 regular的跳过分支、复制分支与development同类命令改用ln -sfn；guarded writer仅新增此参数，并拒绝会跟随已有目录符号链接、带尾斜杠目录目标或真实目录目标的调用。新增实际安装脚本和写入入口失败回归、带旧内部链接的整树替换/发布/原件Undo组合回归。最终比较仍逐字段严格相等，错误增加目标和不一致字段名，AA.gl漂移拒绝保持。
 
 最终完整Python命令make test_python，948项、跳过2项、259.925秒退出0。相关43项、12.775秒退出0；沙箱fclone EPERM原日志保留，宿主原断言重跑通过。此次未修改Swift和二进制补丁；host CLI仅因资源封签改变签名字节，可执行内容保持；原获批VM程序字节、inode和CDHash保持。证据：`evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json`。
+
+
+### 2026-10-21：T51真实磁盘与实际界面验证范围
+
+独立64GiB已恢复VM副本完成rebase、完整磁盘摘要和源文件身份复核；实际签名Launchpad停止/读进程持有/释放恢复回归通过，修复计量预算及逐文件lsof开销。没有新增固件指令补丁。新/冻结VM程序被AMFI Code -424拒绝，实际启动未执行，guest行为未验证；外置物理卷由用户指示暂缓。详见upstream_integration_2026-10-15/T51_runtime_acceptance_20261021.md。
+
+
+### 2026-10-21：T51具名真实启动续验完成
+
+用户批准仅419d5a6c候选临时AMFI放行后，独立rebase副本两次启动、guest只读查询和生产vm stop正常关机通过，均释放磁盘与目录锁。r2实际运行/停止计量回归通过；helper已停止且PID不存在。未新增固件指令补丁、未更新guest组件，guest图形和应用交互未验证。详见upstream_integration_2026-10-15/T51_runtime_acceptance_20261021.md及authorized-boots/manifest.json。

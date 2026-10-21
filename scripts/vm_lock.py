@@ -12,6 +12,10 @@ import uuid
 FD_ENV = 'VPHONE_VM_LOCK_FD'
 
 
+def pending_rebase(directory):
+    return any(os.path.lexists(path / 'RebaseJournal.json') for path in directory.glob('.rebase-*'))
+
+
 def check_inherited(directory):
     fd = int(os.environ.get(FD_ENV, '-1'))
     actual = os.fstat(fd)
@@ -23,6 +27,8 @@ def check_inherited(directory):
     fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
     if os.path.lexists(directory / '.firmware-transaction'):
         raise ValueError('pending firmware transaction; run patch-firmware --recover')
+    if pending_rebase(directory):
+        raise ValueError('pending disk rebase; run vm rebase --recover')
     return fd
 
 
@@ -45,6 +51,8 @@ def main(argv):
             raise ValueError('pending firmware transaction; run patch-firmware --recover')
         if argv[1] not in ('cfw-record', 'fw-receipts') and any(directory.glob('.cfw_disk.*')):
             raise ValueError('pending CFW disk transaction; inspect/recover it before using this VM')
+        if pending_rebase(directory):
+            raise ValueError('pending disk rebase; run vm rebase --recover')
         info = os.fstat(fd)
         record = dict(bundleIdentifier=f'{info.st_dev}:{info.st_ino}', bundlePath=str(directory),
                       pid=os.getpid(), instanceID=str(uuid.uuid4()),

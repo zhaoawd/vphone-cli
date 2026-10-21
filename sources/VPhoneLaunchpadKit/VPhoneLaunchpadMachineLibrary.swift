@@ -1,12 +1,13 @@
 import Foundation
 import Observation
+import VPhoneCore
 
 /// The VM library, listed through `vphone-cli vm list --json`, started with
 /// `vm launch`, stopped with `vm stop`, edited offline with `vm config`,
 /// `rename`, `clone`, `delete`, `export` and `import`, and created with
-/// `vm create` (`VPhoneLaunchpadCreation`). Launchpad never takes or probes a
-/// VM lock: `vphone-vm` holds it, and the CLI refuses conflicting work
-/// itself.
+/// `vm create` (`VPhoneLaunchpadCreation`). State polling takes no VM lock.
+/// Changed-file disk measurements briefly hold a shared directory lease;
+/// `vphone-vm` and mutation CLIs take exclusive locks.
 ///
 /// Machines can live in several libraries: the default one, and folders in
 /// the `VPhoneLaunchpadLibraryRoots` default. Each library is listed with its
@@ -26,6 +27,9 @@ public final class VPhoneLaunchpadMachineLibrary {
     /// "No Machines" before it knows.
     public private(set) var hasListed = false
     public private(set) var runStates: [Path: VPhoneLaunchpadRunState] = [:]
+    public private(set) var diskUsage: [Path: VPhoneLaunchpadDiskUsage] = [:]
+    private let diskMeter = VPhoneLaunchpadDiskMeter()
+    private var nextDiskMeasurement: ContinuousClock.Instant?
     /// Further libraries, in the order they were added. The default library
     /// is not among them.
     public private(set) var addedRoots: [String]
@@ -240,12 +244,71 @@ public final class VPhoneLaunchpadMachineLibrary {
             }
             return reader.states(processList: processList, machines: paths)
         }.value
+        await refreshDiskUsage()
         if lastReportedCount != machines.count {
             lastReportedCount = machines.count
             // Diagnostic line for the smoke check, written unbuffered; machine
             // names are not printed.
             Self.diagnostic("listed \(machines.count) machines from \(roots.count) libraries")
         }
+    }
+
+    private func mayMeasureDisk(_ machine: Path) -> Bool {
+        VPhoneLaunchpadDiskAccess(
+            isLaunched: launched[machine]?.isRunning == true,
+            isHeld: runStates[machine] != .stopped,
+            isBusy: activities[machine] != nil || exports[machine] != nil || creations[machine]?.isRunning == true,
+            isLibraryBusy: globalActivity != nil || listError != nil
+        ).mayOpen
+    }
+
+    private func refreshDiskUsage() async {
+        let now = ContinuousClock.now
+        guard nextDiskMeasurement.map({ now >= $0 }) ?? true else { return }
+        nextDiskMeasurement = now + .seconds(30)
+        var folders: [VPhoneLaunchpadDiskMeter.Folder] = []
+        var stateFiles: [String: Set<String>] = [:]
+        let paths = Dictionary(uniqueKeysWithValues: machines.map { ($0.path.url.path, $0.path) })
+        for machine in machines {
+            if let manifest = try? VPhoneVirtualMachineManifest.load(from: machine.path.configURL) {
+                stateFiles[machine.path.url.path] = Set([manifest.diskImage, manifest.sepStorage, manifest.nvramStorage])
+            }
+            var allowed = mayMeasureDisk(machine.path)
+            if allowed {
+                let path = machine.path
+                allowed = await Task.detached {
+                    guard let manifest = try? VPhoneVirtualMachineManifest.load(from: path.configURL),
+                          let holders = try? VPhoneLaunchpadDiskHolders.read(path.url.appendingPathComponent(manifest.diskImage)) else { return false }
+                    return holders.isEmpty
+                }.value
+            }
+            folders.append(.init(path: machine.path.url.path, mayOpen: allowed))
+        }
+        let measured = await diskMeter.measure(folders, mayOpenNow: { [weak self] path in
+            guard let machine = paths[path] else { return false }
+            return await self?.mayMeasureDiskNow(machine) == true
+        }, mayMapNow: { [weak self, stateFiles] path, file in
+            guard let machine = paths[path] else { return false }
+            // A non-cooperating reader need not take our directory lease.
+            // Recheck holders immediately before mapping a VM state file.
+            if stateFiles[path]?.contains(URL(fileURLWithPath: file).lastPathComponent) != false {
+                return await self?.mayMeasureDiskNow(machine) == true
+            }
+            return await self?.mayMeasureDisk(machine) == true
+        })
+        diskUsage = Dictionary(uniqueKeysWithValues: measured.compactMap { path, usage in
+            paths[path].map { ($0, usage) }
+        })
+    }
+
+    private func mayMeasureDiskNow(_ machine: Path) async -> Bool {
+        guard mayMeasureDisk(machine) else { return false }
+        let clear = await Task.detached {
+            guard let manifest = try? VPhoneVirtualMachineManifest.load(from: machine.configURL),
+                  let holders = try? VPhoneLaunchpadDiskHolders.read(machine.url.appendingPathComponent(manifest.diskImage)) else { return false }
+            return holders.isEmpty
+        }.value
+        return clear && mayMeasureDisk(machine)
     }
 
     // MARK: - Start and stop

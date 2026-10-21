@@ -1,0 +1,371 @@
+{
+  "date": "2026-10-21",
+  "timezone": "Asia/Shanghai",
+  "recordedAt": "2026-10-21T19:40:11.920424+08:00",
+  "tasks": [
+    "T51",
+    "T52"
+  ],
+  "status": "real_rebase_vm_two_boot_and_signed_gui_scope_validated_review_pending",
+  "baselineManifest": "../manifest.json",
+  "baselineManifestSHA256": "4589753015288b29062de0f7bcc1f2c6b9763df18e55413fc07686d9fc27d983",
+  "preparationManifest": "../authorized-boot-preparation/manifest.json",
+  "preparationManifestSHA256": "75db4a99a450e840f98286a1a00410a9b474530d06025881c5ea24e5b4ff9adc",
+  "head": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "boot": {
+    "schemaVersion": 1,
+    "scope": "legacy-two-boot-baseline",
+    "vm": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/target",
+    "positiveUndoValidated": false,
+    "daemonUpdateRequested": false,
+    "cycles": [
+      {
+        "cycle": 1,
+        "argv": [
+          "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+          "--config",
+          "/Users/kolar/github/vphone-cli/.build/t51rt/lib/target/config.plist",
+          "--headless",
+          "--no-vphoned-update"
+        ],
+        "connected": true,
+        "pid": 8754,
+        "bootSeconds": 1792582426,
+        "systemVersion": {
+          "BuildID": "A3695F3C-B64F-11F0-9F73-6E4CBABDD792",
+          "ProductBuildVersion": "23B85",
+          "ProductCopyright": "1983-2025 Apple Inc.",
+          "ProductName": "iPhone OS",
+          "ProductVersion": "26.1",
+          "SystemImageID": "946C6499-8F02-4693-B695-98575382693D"
+        },
+        "instanceID": "26BACE60-CD60-4BC2-A6D6-B313A8D26717",
+        "stopExitCode": 0,
+        "vmExitCode": 0,
+        "guestStopped": true,
+        "forcedFrameworkStop": false,
+        "diskReleased": true
+      },
+      {
+        "cycle": 2,
+        "argv": [
+          "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+          "--config",
+          "/Users/kolar/github/vphone-cli/.build/t51rt/lib/target/config.plist",
+          "--headless",
+          "--no-vphoned-update"
+        ],
+        "connected": true,
+        "pid": 9350,
+        "bootSeconds": 1792582489,
+        "systemVersion": {
+          "BuildID": "A3695F3C-B64F-11F0-9F73-6E4CBABDD792",
+          "ProductBuildVersion": "23B85",
+          "ProductCopyright": "1983-2025 Apple Inc.",
+          "ProductName": "iPhone OS",
+          "ProductVersion": "26.1",
+          "SystemImageID": "946C6499-8F02-4693-B695-98575382693D"
+        },
+        "instanceID": "A8A28F28-15D9-41AC-ADE4-6FC063761118",
+        "stopExitCode": 0,
+        "vmExitCode": 0,
+        "guestStopped": true,
+        "forcedFrameworkStop": false,
+        "diskReleased": true
+      }
+    ],
+    "state": "passed",
+    "configAndStagedDaemonUnchanged": true,
+    "distinctBootTimes": true
+  },
+  "ui": {
+    "ui-stopped-after-two-boots": {
+      "state": "passed",
+      "running": false,
+      "hardware": "8 核 8 GB 64 GB 36.31 GB 612.3 MB NAT",
+      "instanceID": "A8A28F28-15D9-41AC-ADE4-6FC063761118",
+      "pid": 9350,
+      "recordedAt": "2026-10-21T11:36:51.590Z"
+    },
+    "ui-running-instance": {
+      "state": "passed",
+      "running": true,
+      "hardware": "8 核 8 GB 64 GB 36.47 GB 未知 使用上次磁盘计量结果 NAT",
+      "instanceID": "A8A28F28-15D9-41AC-ADE4-6FC063761118",
+      "pid": 9350,
+      "recordedAt": "2026-10-21T11:35:15.916Z"
+    }
+  },
+  "helperCleanup": {
+    "state": "passed",
+    "helperPID": 8387,
+    "helperProcessPresent": false,
+    "helperState": {
+      "pid": 8387,
+      "cdhash": "419d5a6c67ab6328589d27246c5d09eb8cc18312",
+      "startedAt": 1792582400.859976,
+      "maxSeconds": 900,
+      "state": "stopped",
+      "stoppedAt": 1792582548.876823
+    },
+    "processes": [
+      "33355 Ss   /Users/kolar/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm --config /Users/kolar/github/autophone/../vphone-cli/vm-2607/config.plist",
+      "72030 R    /Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/MacOS/vphone-launchpad"
+    ],
+    "recordedAt": 1792582596.955596,
+    "persistentAllowlistWrittenByHelper": false
+  },
+  "originalSource": {
+    "state": "passed",
+    "persistentFilesUnchanged": true,
+    "signaturesUnchanged": true
+  },
+  "postBootFiles": {
+    "state": "passed",
+    "immutableFiles": [
+      "config.plist",
+      ".vphoned.signed",
+      "AVPBooter.vresearch1.bin",
+      "AVPSEPBooter.vresearch1.bin",
+      "udid-prediction.txt"
+    ],
+    "targetSmallFilesSHA256": {
+      "config.plist": "db424e7fe079ebc9561078dd954bcb775b7e83b0eb03168c8a888821f7f18c93",
+      "SEPStorage": "8b21c6c9e221f2b70599bddd612d1146f5b135e1e1428dddf3c59fe96a192a0b",
+      "nvram.bin": "021e11f298b0491d5e73b88b0161f86d634b9744a2906abc12dfaefc11249e84",
+      ".vphoned.signed": "03b0bd17289bd1e0820041ebda0a3ca70febede0f175456d5d992d36f18475d5",
+      "AVPBooter.vresearch1.bin": "8200ba0d93b0787c3a8759d0b05455f5fbedcd30c6df2a15db5c66425f71cb51",
+      "AVPSEPBooter.vresearch1.bin": "bcfe496234352c000b7ca5c85551b21bef96ea2b2c0b5dfbd7a676169b4f7c78",
+      "udid-prediction.txt": "bdf134c7cffb477f72c7ad43c1493acb97224d05f9cf274abb5e0ade613a307d"
+    },
+    "baseDisk": {
+      "device": 16777231,
+      "inode": 248245284,
+      "size": 68719476736,
+      "mtimeNS": 1792081497500668085,
+      "ctimeNS": 1792576855878729599,
+      "allocated": 24966512640
+    },
+    "baseDiskSignatureUnchanged": true,
+    "targetDisk": {
+      "device": 16777231,
+      "inode": 248276858,
+      "size": 68719476736,
+      "mtimeNS": 1792582547673083234,
+      "ctimeNS": 1792582547673083234,
+      "allocated": 24376086528
+    },
+    "targetDiskInodePreserved": true,
+    "targetDiskMayContainNormalGuestWrites": true
+  },
+  "candidateIdentity": {
+    "launchpad": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/MacOS/vphone-launchpad",
+      "sha256": "ff2d7dbaa5a60fe0fdc1249da5579a2aa33e6ca766cd5a16f9e363d36f2eba57",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/MacOS/vphone-launchpad\nIdentifier=com.vphone.cli.launchpad\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=18481 flags=0x2(adhoc) hashes=571+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=de8723feb06db8336cae0ddaed8f770e9b808bb7\nCandidateCDHashFull sha256=de8723feb06db8336cae0ddaed8f770e9b808bb7028f5f63794bee22a91deff2\nHash choices=sha256\nCMSDigest=de8723feb06db8336cae0ddaed8f770e9b808bb7028f5f63794bee22a91deff2\nCMSDigestType=2\nCDHash=de8723feb06db8336cae0ddaed8f770e9b808bb7\nSignature=adhoc\nInfo.plist entries=21\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=8\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "cli": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "22347003fc5a6045b0c90ca3eff88ea04b7a261b5bd3ed3adac3e38772fdce00",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli\nIdentifier=com.vphone.cli\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=125159 flags=0x2(adhoc) hashes=3905+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=1866ff3ed6638f5950f034d8afbf38e8f742a819\nCandidateCDHashFull sha256=1866ff3ed6638f5950f034d8afbf38e8f742a8196cfc73350e7ac6911ca98f20\nHash choices=sha256\nCMSDigest=1866ff3ed6638f5950f034d8afbf38e8f742a8196cfc73350e7ac6911ca98f20\nCMSDigestType=2\nCDHash=1866ff3ed6638f5950f034d8afbf38e8f742a819\nSignature=adhoc\nInfo.plist entries=15\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=249\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "vm": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "4e0487e69b57f5b77db73b1085e650d87d6f998f8e3ee07c98b2573de6a553c9",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-55554944522711fbad7f35ca8d1043c75e56aa2c\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=125323 flags=0x2(adhoc) hashes=3905+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=419d5a6c67ab6328589d27246c5d09eb8cc18312\nCandidateCDHashFull sha256=419d5a6c67ab6328589d27246c5d09eb8cc18312b2e9a297395aa106b7b5184d\nHash choices=sha256\nCMSDigest=419d5a6c67ab6328589d27246c5d09eb8cc18312b2e9a297395aa106b7b5184d\nCMSDigestType=2\nCDHash=419d5a6c67ab6328589d27246c5d09eb8cc18312\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "frozenCLI": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "b7a52cd94e96a326ddb1cea0a0ecdb037a815f90b6c694d14a6405604d3f1caa",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli\nIdentifier=com.vphone.cli\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=124039 flags=0x2(adhoc) hashes=3870+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766e\nCandidateCDHashFull sha256=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766ea81e829a10864bbb10ce0566\nHash choices=sha256\nCMSDigest=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766ea81e829a10864bbb10ce0566\nCMSDigestType=2\nCDHash=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766e\nSignature=adhoc\nInfo.plist entries=15\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=249\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "frozenVM": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-55554944a366f5b2877032a088495d3adff812f6\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=124075 flags=0x2(adhoc) hashes=3866+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=89b70a253cad2adea133b3e875519afaf72c5d17\nCandidateCDHashFull sha256=89b70a253cad2adea133b3e875519afaf72c5d172054925a2492857ad1ce59a4\nHash choices=sha256\nCMSDigest=89b70a253cad2adea133b3e875519afaf72c5d172054925a2492857ad1ce59a4\nCMSDigestType=2\nCDHash=89b70a253cad2adea133b3e875519afaf72c5d17\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    }
+  },
+  "regressionSHA256": {
+    "research/upstream_integration_2026-10-15/tools/verify_t51_rebase_boot.py": "f7850e69190d94f43f2324eef739250d872f3cd7b9f1df73d75b3aeada7568e5",
+    "research/upstream_integration_2026-10-15/tools/verify_legacy_vm_boot.py": "001940d5f882ef64a20b5b51e9738d14a7b604817ddda64337b68f6d7c2a3a16",
+    "research/upstream_integration_2026-10-15/tools/accept_t51_runtime.py": "1d4ae5d42f0967c3882e48f71047158a433be7233d8b8c26293536fe8ea8474e",
+    "research/upstream_integration_2026-10-15/tools/accept_t51_ui.cua.mjs": "fe63b8541addd7ab06c4674c9b1bc66eb92731a31ca406b1ef3b7b79bd96c39c",
+    "research/upstream_integration_2026-10-15/tools/accept_t51_boot_ui.cua.mjs": "14a02e9c4a745503a4a73d75fea2820ca0d2b6646c5dd9a1a3fac93a4589ffb5",
+    "scripts/host_control_client.py": "ff2641a67e1ffd3eedf0e72a0c8731c2ff5c02cdb8f0f05aaca380fb1a4edd6f",
+    ".build/t51-runtime-20261021/run-authorized-boots.py": "0364db8a6f9ab9e83d633840ae37dd6cd270f84452b54da1c181ce6cc1e4ecd0",
+    ".build/t51-runtime-20261021/scoped-amfidont.py": "47d37888bede71f278b004602a3918a04605d6eb9282845cf36ec123611d6133"
+  },
+  "documentsSHA256": {
+    "TASKS.md": "d81e6a614429f809161a72a230c8a779b5c7430f15e3e2e69479bf7fffe6c1a0",
+    "research/0_binary_patch_comparison.md": "52677764f528889af996b7c9996247b9de494ee2b6b21bb73e346ae1387664d9",
+    "research/upstream_integration_2026-10-15/T51_runtime_acceptance_20261021.md": "952d33b6007a3afa6f9613714956fd52ef0be92d76c217439dd20d53563f5184",
+    "research/upstream_integration_2026-10-15/tasks.json": "9e3a43f2bf9fc194d7b8c35ffead673c3fc5dda63d143612861c94d173c5348c",
+    "research/upstream_integration_2026-10-15/local_reconciliation.json": "2feada7cbd5f6d79ac54e480504c75bcbea56e49d4c54e9a4268f661fbd80272",
+    "research/upstream_integration_2026-10-15/plan.md": "79296de8b559a5406be97c7d48ae0799415d0ae4599c94b0589d86c77cf7bd2f",
+    "research/upstream_integration_2026-10-15/progress.md": "c002d4ec80644234a34a2827f343711ec4e8e4d3ac27c5d9cf14d69d48e9cffe"
+  },
+  "externalPhysicalVolume": "deferred_by_user",
+  "limitations": [
+    "Physical external/cross-device/non-APFS fault acceptance deferred or unverified",
+    "Complete SIGKILL/power-loss matrix and template-base integration unverified",
+    "VM ran headlessly; guest graphics/application interaction and guest component update/CFW install unverified",
+    "No setBundle GUI wiring; overall T52 acceptance not advanced"
+  ],
+  "accepted": false,
+  "committed": false,
+  "pushed": false,
+  "files": {
+    "authorized-parser-probe.json": {
+      "bytes": 52,
+      "sha256": "6d620d1c454a90e41ee536109b1fee6ba5177ac2ee9d3aeb3a9f1e108bf3f044"
+    },
+    "authorized-run.log.gz": {
+      "bytes": 233,
+      "sha256": "415376598ca8df9afb58c289eeae160c91efd86b66672f04dbdbc33b28843988"
+    },
+    "boot-execution.json": {
+      "bytes": 303,
+      "sha256": "24d0acb02a013e13f7cada3a54b842aa6d92aea51c692f049f9a4947ef403aaf"
+    },
+    "candidate-identity.json": {
+      "bytes": 5447,
+      "sha256": "af2bb199f2dbd2227ba9fe70d359124f9ee58e5045126d7bbc1cd04af7f4dc67"
+    },
+    "documents-snapshot.tar.gz": {
+      "bytes": 301395,
+      "sha256": "796a71c3bf656f15cda859439fbc0474283110d36ffd05a3bb237fb2a594b1bc"
+    },
+    "helper-cleanup.json": {
+      "bytes": 694,
+      "sha256": "d6aebc52017d8aca1eacd1fa0b9d6af5be289305ad17f59a542093601e3bd862"
+    },
+    "helper-state.json": {
+      "bytes": 185,
+      "sha256": "30410d882d97302189dbfdae9d8cffdee7aea8ed996ada3a8e50ed89118ac551"
+    },
+    "host-authorization.json": {
+      "bytes": 283,
+      "sha256": "5c9424749f7d72f01383c57b4c118aa279294cd69284c477e51e3d207d7efa12"
+    },
+    "original-source-after-two-boots.json": {
+      "bytes": 91,
+      "sha256": "7ffc81a9aa7b801cc05d50d63a67d65d279ecd63bc34c5c2cc98669b311cd587"
+    },
+    "post-boot-files.json": {
+      "bytes": 1384,
+      "sha256": "5d935f196f50386f10a3abe426a69a7ca01cf6fe89deab735269126c2b6cab38"
+    },
+    "regression-snapshot.tar.gz": {
+      "bytes": 10715,
+      "sha256": "6245ffd6f575c302a44152460669024ebe7853672c307af59cb34b0607c7d6b9"
+    },
+    "running-rebase-refusal.json": {
+      "bytes": 515,
+      "sha256": "0130fddfc3c15f1eb1bc1d67203133d2572858f9a69db3c96ed895e1c719b787"
+    },
+    "scoped-amfidont-419d5a6c.log.gz": {
+      "bytes": 240,
+      "sha256": "3984257a78266bde914cc74245bd2a36d276d79bf8bcbf85b9af2bf2136cd23f"
+    },
+    "sessions/boot-1/SystemVersion.plist": {
+      "bytes": 570,
+      "sha256": "2a2a4b045059edc470dffc0363071bd65a1a81aca81cbcfb9d4ac9f91a00aeb4"
+    },
+    "sessions/boot-1/boottime.json": {
+      "bytes": 163,
+      "sha256": "bcbfbdbd46bbeabb04edccc5f510e8f97ef3148082c01904d98eaec1fc6bae95"
+    },
+    "sessions/boot-1/capabilities.json": {
+      "bytes": 1603,
+      "sha256": "b6b2a9ec2747653cfad7d759b48578c1215aa3650e67b4b45a7e74f4d1ecfe3d"
+    },
+    "sessions/boot-1/disk-holders.json": {
+      "bytes": 52,
+      "sha256": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130"
+    },
+    "sessions/boot-1/requests.jsonl": {
+      "bytes": 29569,
+      "sha256": "13879b44ce3b2222c04e78c62e47e5feafa9614b6152b011f7872569b0c649cb"
+    },
+    "sessions/boot-1/runtime.json": {
+      "bytes": 254,
+      "sha256": "877ad59ea8c4d3500653fa96a5a137cede953ef82e3654acd525f9e689b4fa65"
+    },
+    "sessions/boot-1/serial.log.gz": {
+      "bytes": 21648,
+      "sha256": "fca5774bca5307f45433f19cd7c5ccbd453a298085743f578fb740160f3230bf"
+    },
+    "sessions/boot-1/stop.json": {
+      "bytes": 161,
+      "sha256": "18c2aea7f354eb34bd9fc98bf05aafd15c2869971a1883e118b228c3026295f4"
+    },
+    "sessions/boot-2/SystemVersion.plist": {
+      "bytes": 570,
+      "sha256": "2a2a4b045059edc470dffc0363071bd65a1a81aca81cbcfb9d4ac9f91a00aeb4"
+    },
+    "sessions/boot-2/boottime.json": {
+      "bytes": 163,
+      "sha256": "e46cafb45fb362736ddc05c7d5dcb9604bbe1f0c4b0319b28159ea69ed1ca1a9"
+    },
+    "sessions/boot-2/capabilities.json": {
+      "bytes": 1603,
+      "sha256": "9e6e8945448a101fa55cc2dae4d2d88d60f8ab0cf2bfdfc4b76f9b47ac688b70"
+    },
+    "sessions/boot-2/disk-holders.json": {
+      "bytes": 52,
+      "sha256": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130"
+    },
+    "sessions/boot-2/requests.jsonl": {
+      "bytes": 25905,
+      "sha256": "05570f38c5c3b8daa4106f9f03e22cc93a9d1b21228d32f0ca90e2d3480d8853"
+    },
+    "sessions/boot-2/runtime.json": {
+      "bytes": 254,
+      "sha256": "794baaa89543ce67feedd4c82b9478c0da3f78be77990c938bf884688783e980"
+    },
+    "sessions/boot-2/serial.log.gz": {
+      "bytes": 21368,
+      "sha256": "c582e7dfcaab321800aa7e85937825264c99710bc67281e64f8feba3ac532985"
+    },
+    "sessions/boot-2/stop.json": {
+      "bytes": 161,
+      "sha256": "bbdd8f4cb69f7c4ece8588e5ee265200afaf7fa2d2ced2a055563f92b9139013"
+    },
+    "sessions/runtime-result.json": {
+      "bytes": 2200,
+      "sha256": "abc2e8e0d77fbefb9a1ec780c3fd60ce90947780363968c965d97c20c3ea1b4f"
+    },
+    "source-after-boots.log.gz": {
+      "bytes": 173,
+      "sha256": "244264c1bb37aaaf1fc4ad1dc7e465744d09d9dba14cb6f63f767a33db9143f5"
+    },
+    "two-boots.log.gz": {
+      "bytes": 699,
+      "sha256": "c1d3ffb75dd42bf5c137ed6865df64dc1622816fde0c95606d0cb884c5510663"
+    },
+    "ui-running-instance.ax.txt": {
+      "bytes": 3637,
+      "sha256": "c8dea306efc17558937f51bbf79f227201ab11aec58d59eba7183acab754bc55"
+    },
+    "ui-running-instance.json": {
+      "bytes": 243,
+      "sha256": "e2f2fc14a8d9de759d4ea3f2cc22a5b9eb9bb11910f5ac3d0c119aea6cd102f4"
+    },
+    "ui-running-instance.png": {
+      "bytes": 159937,
+      "sha256": "9cac5cf6a4fa342ad0d9a349629c6767c7924c4ac26a08b172cf9aa69f30461b"
+    },
+    "ui-stopped-after-two-boots.ax.txt": {
+      "bytes": 3563,
+      "sha256": "0291310bf68eb2b7bdf0d64da5440097809bf9f84a9cca02afa3f588fa09a470"
+    },
+    "ui-stopped-after-two-boots.json": {
+      "bytes": 215,
+      "sha256": "e601852d5c4bd8d41e1b68631dd4c65693a393687bb7891a0f3914e99109068e"
+    },
+    "ui-stopped-after-two-boots.png": {
+      "bytes": 162860,
+      "sha256": "8cefab1f407d2ad4d75969f9bd3cd7957ccd20b99360409d87fb02d5f946070f"
+    }
+  }
+}

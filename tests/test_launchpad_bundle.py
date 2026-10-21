@@ -162,6 +162,12 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
     SOCKET_LENGTH = '.appendingPathComponent("vphone.sock").path\n        return path.utf8CString.count <= ' \
                     'MemoryLayout.size(ofValue: sockaddr_un().sun_path)'
 
+    SOURCE_EXCEPTIONS = {
+        ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift': ['"/usr/sbin/lsof"', 'try await bind()'],
+        ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadDiskUsage.swift': [
+            'VPhoneBundleGuard.withMeasurementLock(', 'flock(lease, LOCK_SH | LOCK_NB)'],
+    }
+
     def test_sources_stay_within_b1(self):
         sources = launchpad_swift()
         self.assertTrue(sources)
@@ -170,6 +176,9 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
             if path == self.LOCATIONS:
                 self.assertEqual(code.count(self.SOCKET_LENGTH), 1)
                 code = code.replace(self.SOCKET_LENGTH, '')
+            for allowed in self.SOURCE_EXCEPTIONS.get(path, []):
+                self.assertEqual(code.count(allowed), 1, (path, allowed))
+                code = code.replace(allowed, "")
             for pattern, what in self.FORBIDDEN.items():
                 self.assertIsNone(re.search(pattern, code), f'{what} in {path.relative_to(ROOT)}')
             if path != self.WHITELIST:

@@ -144,3 +144,25 @@ T47–T60 的原始工作、接受条件和恢复单位见[原始增量卡片](i
 5. 对实际候选完成 restore/boot、VZ 显示、DeviceHub、相机和应用行为验收。T51、T58、模板默认化、ProMotion 和其他默认值继续单独决定。
 
 本次只修订计划和台账，未执行新的 Git 范围审计、构建、固件或 VM 操作。既有验收按其源码和输入范围保留，不因本次计划修订升级为新目标通过。
+
+
+## 2026-10-21：T51 磁盘 rebase 与物理共享计量
+
+实现vm rebase --onto/--dry-run/--recover；持双机目录锁，私有候选逐字节及完整SHA-256校验后journal交换，恢复前阻止Swift/Python其他入口。新增/已有共享按原盘物理extent区分，逻辑字节及身份/SEP/NVRAM/来源元数据保持，实际FirmwareDesiredPlanStore回归确认旧inode资格拒绝。
+
+Launchpad接入物理计量与Allocated/Exclusive/Unknown展示、30秒刷新/15秒预算和按文件缓存。逐文件占用复查及共享目录锁排除合作启动/写入，目录错误、未知映射和过期结果不报告已确认独占量。
+
+扩展Core XCTest93项/Swift Testing498项（跳过1）、Kit244项（跳过11）、CLI4项、来源19项通过；最终Kit245项、相关Core48项、CLI2项、来源19项通过。Python标准958项（跳过4）发现4项历史边界/文案失败，按具体调用修正后受影响38项通过；锁9项通过，无未解决失败。分组存在重复，不相加。
+
+模板基准等待T49，真实外置卷/跨卷/非APFS故障、实际GUI与VM启动、完整进程崩溃矩阵未验收；历史状态和依赖保持，accepted=false。未操作真实VM或冻结.app，未提交或推送。详见T51_disk_rebase_20261021.md与evidence/T51-20261021/manifest.json。后续按计划先推进T50精简基础，再处理T49模板构建。
+
+
+### 2026-10-21 T51/T52真实磁盘与界面验收
+
+真实64GiB副本rebase和原VM摘要/身份复核通过，新增共享64MiB，无pending。实际界面暴露逐文件lsof预算问题；最小回归先失败，修复后完整Kit248项及Python24项通过，r2实际停止/外部读进程/释放恢复回归通过。新签名及冻结VM程序均被AMFI受限权限检查拒绝（--help退出-9），真实启动等待本次具名CDHash临时放行授权；未更改主机安全设置。外置物理卷按用户指示暂缓。报告T51_runtime_acceptance_20261021.md，证据evidence/T51-runtime-20261021/manifest.json。accepted=false，未提交或推送。
+
+
+2026-10-21具名启动续验：用户已批准419d5a6c候选临时AMFI放行。sudo -n需要密码，Computer Use禁止操作Terminal；已提供具体命令供用户终端认证。候选身份复核保持，helper增加900秒上限和停止标记，两次真实启动及35秒GUI检查点脚本已准备。helper尚未启动，未改变主机安全设置，实际启动仍未执行。授权持续有效，不重复请求。
+
+
+2026-10-21 T51真实启动续验完成：仅使用用户批准419d5a6c候选，对已rebase的target执行两次真实启动和生产vm stop。guest连接、26.1/23B85、不同boottime/instanceID、正常关机和磁盘/目录锁释放均通过。实际r2运行实例、Unknown/缓存提示、关机后当前计量回归通过；运行中rebase拒绝。原输入完整摘要/身份复核保持，base未启动，vm-2607仍为原PID；helper8387已停止且PID不存在，无持久允许名单写入。最终证据evidence/T51-runtime-20261021/authorized-boots/manifest.json，范围见T51_runtime_acceptance_20261021.md。外置卷仍暂缓；accepted=false，未提交或推送。

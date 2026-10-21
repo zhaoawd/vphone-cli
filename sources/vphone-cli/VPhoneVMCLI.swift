@@ -16,6 +16,8 @@ struct VPhoneVMCommand: ParsableCommand {
             VPhoneVMRenameCommand.self,
             VPhoneVMDeleteCommand.self,
             VPhoneVMCloneCommand.self,
+            VPhoneVMSnapshotCommand.self,
+            VPhoneVMRebaseCommand.self,
             VPhoneVMExportCommand.self,
             VPhoneVMImportCommand.self,
             VPhoneVMLaunchCommand.self,

@@ -1,0 +1,469 @@
+{
+  "date": "2026-10-21",
+  "recordedAt": "2026-10-21T10:21:53.565143+00:00",
+  "tasks": [
+    "T51",
+    "T52"
+  ],
+  "status": "real_disk_and_signed_gui_validated_vm_boot_awaits_specific_host_authorization",
+  "head": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "upstream": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "realDisk": {
+    "state": "passed",
+    "cliSHA256": "22347003fc5a6045b0c90ca3eff88ea04b7a261b5bd3ed3adac3e38772fdce00",
+    "logicalBytes": 68719476736,
+    "before": {
+      "device": 16777231,
+      "inode": 248260891,
+      "size": 68719476736,
+      "mtimeNS": 1792576860470070235,
+      "ctimeNS": 1792576860470070235,
+      "allocated": 24966512640
+    },
+    "after": {
+      "device": 16777231,
+      "inode": 248276858,
+      "size": 68719476736,
+      "mtimeNS": 1792576860470070235,
+      "ctimeNS": 1792577044538795289,
+      "allocated": 24966512640
+    },
+    "targetPersistentBytesUnchanged": true,
+    "basePersistentBytesUnchanged": true,
+    "journals": [
+      {
+        "version": 1,
+        "original": {
+          "device": 16777231,
+          "inode": 248260891,
+          "size": 68719476736
+        },
+        "disk": "Disk.img",
+        "report": {
+          "logicalSize": 68719476736,
+          "writtenBytes": 0,
+          "newlySharedBytes": 67108864,
+          "punchedBytes": 0,
+          "sharedBytes": 25081413632,
+          "comparedBytes": 25081413632
+        },
+        "candidate": {
+          "device": 16777231,
+          "inode": 248276858,
+          "size": 68719476736
+        },
+        "status": "published",
+        "sha256": "3387f4969389b420feca14b349edbf8b7a2f52000a85fd16cba8d3d22598a84a"
+      }
+    ],
+    "physicalExternalVolumeValidated": false,
+    "guestBootValidated": false
+  },
+  "sourcePreservation": {
+    "state": "passed",
+    "persistentFilesUnchanged": true,
+    "signaturesUnchanged": true
+  },
+  "ui": {
+    "ui-external-reader-r2-after-refresh": {
+      "state": "passed",
+      "hardware": "8 核 8 GB 64 GB 36.9 GB 未知 使用上次磁盘计量结果 NAT",
+      "expectedRunState": "已停止",
+      "expectedCurrent": false,
+      "recordedAt": "2026-10-21T10:16:54.380Z"
+    },
+    "ui-stopped-current-r2": {
+      "state": "passed",
+      "hardware": "8 核 8 GB 64 GB 36.9 GB 8 kB NAT",
+      "expectedRunState": "已停止",
+      "expectedCurrent": true,
+      "recordedAt": "2026-10-21T10:15:17.459Z"
+    },
+    "ui-reader-released-r2": {
+      "state": "passed",
+      "hardware": "8 核 8 GB 64 GB 36.9 GB 8 kB NAT",
+      "expectedRunState": "已停止",
+      "expectedCurrent": true,
+      "recordedAt": "2026-10-21T10:18:22.215Z"
+    }
+  },
+  "validation": {
+    "swiftKitTests": 248,
+    "swiftKitExitCode": 0,
+    "pythonBoundaryTests": 24,
+    "pythonBoundaryExitCode": 0,
+    "smallMeterTests": 9,
+    "smallMeterExitCode": 0
+  },
+  "sourceSHA256": {
+    "Package.swift": "4eafc65c607dc8ad5408a7c7e4648b838446ced258de0b79cb00a005f0e252b4",
+    "research/upstream_integration_2026-10-15/tools/accept_t51_runtime.py": "1d4ae5d42f0967c3882e48f71047158a433be7233d8b8c26293536fe8ea8474e",
+    "research/upstream_integration_2026-10-15/tools/accept_t51_ui.cua.mjs": "fe63b8541addd7ab06c4674c9b1bc66eb92731a31ca406b1ef3b7b79bd96c39c",
+    "scripts/vm_lock.py": "f71165d94289f75a74716f656235f2c22c93f41a363d136f0aeb23969d09ee7d",
+    "sources/VPhoneCore/VPhoneBundleActivity.swift": "47364b956b19026502e22e2f4643c9275dead9905527ab617e85af37982c8bd2",
+    "sources/VPhoneCore/VPhoneBundleGuard.swift": "cd351cb419fa8bd08477f6d12e26f030a29c6e340f6c570a329882bf648bcbf0",
+    "sources/VPhoneCore/VPhoneBundleOps.swift": "1a61d7e480aafe6f8bd97d33516d62006b402979477c2508081e864278a582ca",
+    "sources/VPhoneCore/VPhoneDiskRebase.swift": "edf217ec7e486526c94e716a68dbb95548ff56a5762fee741019544d5e3ef397",
+    "sources/VPhoneCore/VPhoneDiskRebaseTransaction.swift": "243093a31200d2b26da24b0c14465bbc8a89cd777f8e5d13f1f0064ce4da20e5",
+    "sources/VPhoneCore/VPhoneTransferSource.swift": "f9faf74fb5e3ace0bc0527449020ed95be2c4e43ff49e67fcc3ff83a22b7862d",
+    "sources/VPhoneCore/VPhoneVMLock.swift": "d206228551a8ea3a0995b1b6b429c06d86f6d7abde24fdcfdc751a47de280422",
+    "sources/VPhoneCore/VPhoneVMRuntimeState.swift": "b79722b38d98b55fb2daa92f451f0567f198f9f7e7217385cf6e4c5fcdb6e753",
+    "sources/VPhoneLaunchpad/Localizable.xcstrings": "6f2c4d755ccff43ca5031bdb4f8fb1209d185a3ce01db161b8556509ed461619",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift": "a8a8b8d5e30aec4fd47c720fcc31e884e730fc66c95819e96ddfe46a5352b15e",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift": "3329b218cdf56e06903a0a65e1c5ee910c5ce76d884956ddc17cd713d9048e36",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadDiskExtents.swift": "87cf6afc41206b52bdcd54221c1551a41c5ff8868959225e3fefc288babe718d",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadDiskUsage.swift": "e259f8dd240a0ce365e68aa44dfd700d9226aafaab525f2f3e45c857d4fe7f03",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "c08ee5a2373917915aa23c8cfd7732171e2dbbbcbfafcb107aa67559ad5e9332",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadRunState.swift": "409cddba80c051b5dcb9f3ccc6756b06e5b3f4b6248925fb3678575beefe95fb",
+    "sources/vphone-cli/VPhoneVMCLI.swift": "11829aef65623822408449c00179bdf48e0caa7005772efa849e26bafd9a6b4e",
+    "sources/vphone-cli/VPhoneVMRebaseCLI.swift": "e3777ad95c7ef9a6eab525e71e5fa27cf58a73f22a2ee23e0b8a1185fcd44559",
+    "tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift": "0678e7771bce89d756a5b2c9743de6b65a34e3b507b3822fcd1482cccc1d1837",
+    "tests/VPhoneCLITests/VMRebaseCLITests.swift": "a3b5835a6604e03563457350e4744a98bc4b2bbc69a887dbe4835dc746facdca",
+    "tests/VPhoneCoreTests/DiskRebaseTests.swift": "33b46e67bf1ea07c75067dd4db6cda0dde8997ec8a31ea2e006f5481512048f7",
+    "tests/VPhoneCoreTests/VMLockTests.swift": "c46325860a9c2baa8fd58c2a94c3acb20636af74647b82a855b06c9c7cd2fd59",
+    "tests/VPhoneCoreTests/VMOperationTests.swift": "4e1809216fc9dd0b9043a1feef6d20611fd8096c3e5250e15309526d1b6a2930",
+    "tests/VPhoneLaunchpadKitTests/DiskUsageTests.swift": "948cbfc5c1a0bd45d0f0ffde7a771496e77397d287e757aa5e9d07cd570ac131",
+    "tests/test_launchpad_bundle.py": "589305dff27eb6690e399abbc96f1a6777770028697a7bbdf911972c689a1823",
+    "tests/test_launchpad_strings.py": "32ecc4e92c13658c86f3d7a5766b6f906c995017e3e8ff8a5b8e69fbd949109a",
+    "tests/test_vm_lock.py": "1692ab7aaafa368000a5b87821e49f5179803f3a5d5783d06445be16f18cefc4"
+  },
+  "documentsSHA256": {
+    "TASKS.md": "6c3228a8f117103741fbcd309940972bea6feaccef1f81aa277a0c31156f2a6e",
+    "research/0_binary_patch_comparison.md": "97ce514655d2556c5bf8f1638e2dd3aa8c4499a8398d316cd8bd731216593887",
+    "research/upstream_integration_2026-10-15/T51_runtime_acceptance_20261021.md": "a4f8407d7b9052b1101610406a67a755de7ef3a5d09da7686f145406c012014d",
+    "research/upstream_integration_2026-10-15/tasks.json": "32d1682afa714a298c94b0f7182d3f23dd8cb8f3f3bea4c84a19565386dd68a2",
+    "research/upstream_integration_2026-10-15/local_reconciliation.json": "fa9e08db884685cece5ae95c3487d75718cdefe29b29142bd020ba2d6f39a512",
+    "research/upstream_integration_2026-10-15/plan.md": "33d553c99018ef69e37406cb357e4e5203c41f8d0fcc037650606b14129561f0",
+    "research/upstream_integration_2026-10-15/progress.md": "5aa20c3f265cd70e3bc5e94e00b972c8a715abd4b610bf43b8ced568d552115e"
+  },
+  "candidateIdentity": {
+    "launchpad": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/MacOS/vphone-launchpad",
+      "sha256": "ff2d7dbaa5a60fe0fdc1249da5579a2aa33e6ca766cd5a16f9e363d36f2eba57",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/MacOS/vphone-launchpad\nIdentifier=com.vphone.cli.launchpad\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=18481 flags=0x2(adhoc) hashes=571+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=de8723feb06db8336cae0ddaed8f770e9b808bb7\nCandidateCDHashFull sha256=de8723feb06db8336cae0ddaed8f770e9b808bb7028f5f63794bee22a91deff2\nHash choices=sha256\nCMSDigest=de8723feb06db8336cae0ddaed8f770e9b808bb7028f5f63794bee22a91deff2\nCMSDigestType=2\nCDHash=de8723feb06db8336cae0ddaed8f770e9b808bb7\nSignature=adhoc\nInfo.plist entries=21\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=8\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "cli": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "22347003fc5a6045b0c90ca3eff88ea04b7a261b5bd3ed3adac3e38772fdce00",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli\nIdentifier=com.vphone.cli\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=125159 flags=0x2(adhoc) hashes=3905+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=1866ff3ed6638f5950f034d8afbf38e8f742a819\nCandidateCDHashFull sha256=1866ff3ed6638f5950f034d8afbf38e8f742a8196cfc73350e7ac6911ca98f20\nHash choices=sha256\nCMSDigest=1866ff3ed6638f5950f034d8afbf38e8f742a8196cfc73350e7ac6911ca98f20\nCMSDigestType=2\nCDHash=1866ff3ed6638f5950f034d8afbf38e8f742a819\nSignature=adhoc\nInfo.plist entries=15\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=249\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "vm": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "4e0487e69b57f5b77db73b1085e650d87d6f998f8e3ee07c98b2573de6a553c9",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t51-runtime-launchpad-r2-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-55554944522711fbad7f35ca8d1043c75e56aa2c\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=125323 flags=0x2(adhoc) hashes=3905+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=419d5a6c67ab6328589d27246c5d09eb8cc18312\nCandidateCDHashFull sha256=419d5a6c67ab6328589d27246c5d09eb8cc18312b2e9a297395aa106b7b5184d\nHash choices=sha256\nCMSDigest=419d5a6c67ab6328589d27246c5d09eb8cc18312b2e9a297395aa106b7b5184d\nCMSDigestType=2\nCDHash=419d5a6c67ab6328589d27246c5d09eb8cc18312\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "frozenCLI": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "b7a52cd94e96a326ddb1cea0a0ecdb037a815f90b6c694d14a6405604d3f1caa",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli\nIdentifier=com.vphone.cli\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=124039 flags=0x2(adhoc) hashes=3870+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766e\nCandidateCDHashFull sha256=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766ea81e829a10864bbb10ce0566\nHash choices=sha256\nCMSDigest=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766ea81e829a10864bbb10ce0566\nCMSDigestType=2\nCDHash=f59dba5ea9ca4fb3710c59ae75bbec18b5f9766e\nSignature=adhoc\nInfo.plist entries=15\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=249\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    "frozenVM": {
+      "path": "/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+      "codesign": "Executable=/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-55554944a366f5b2877032a088495d3adff812f6\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=124075 flags=0x2(adhoc) hashes=3866+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=89b70a253cad2adea133b3e875519afaf72c5d17\nCandidateCDHashFull sha256=89b70a253cad2adea133b3e875519afaf72c5d172054925a2492857ad1ce59a4\nHash choices=sha256\nCMSDigest=89b70a253cad2adea133b3e875519afaf72c5d172054925a2492857ad1ce59a4\nCMSDigestType=2\nCDHash=89b70a253cad2adea133b3e875519afaf72c5d17\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    }
+  },
+  "limitations": [
+    "No VM boot: AMFI Code -424 at --help; specific temporary CDHash authorization pending",
+    "Physical external volume deferred by user; no external disk connected",
+    "Running-state UI, guest connection, normal shutdown and post-boot disk release unverified",
+    "No complete SIGKILL/power-loss matrix or template-base integration"
+  ],
+  "hostSecurityChanged": false,
+  "acceptanceVMBooted": false,
+  "frozenVMParserProbed": true,
+  "frozenCandidateDigestsPreserved": true,
+  "accepted": false,
+  "committed": false,
+  "pushed": false,
+  "files": {
+    "disk-after-dry-run.json": {
+      "bytes": 295,
+      "sha256": "cada7791141377cfd96ce5301e05cca8e298f54f91b49f09b7c5b000f50c541d"
+    },
+    "disk-after-dry-run.log.gz": {
+      "bytes": 321,
+      "sha256": "418ca9d79270d481ff128bee873f1347f5c0d56065724e67a0874818dee544e5"
+    },
+    "disk-dry-run.json": {
+      "bytes": 295,
+      "sha256": "ed24e8a6217a58b1aae01a6ca6a467ce39338d7a77a0248ec6a185b9a1830c5b"
+    },
+    "disk-dry-run.log.gz": {
+      "bytes": 325,
+      "sha256": "0358c581b7c7fb5468f2376baa585e1bb32fd109a5615b4d20312c7bc88b30fb"
+    },
+    "disk-prepared.json": {
+      "bytes": 2962,
+      "sha256": "9ec3ca88eaa16d38b36dac3b28b38351c8646551829e555a68c982e9a388eba5"
+    },
+    "disk-reader-refusal.json": {
+      "bytes": 296,
+      "sha256": "faffea65c7e05308a53d7c776e16c3c20f14e455c76c3924db8cd15df9caed56"
+    },
+    "disk-reader-refusal.log.gz": {
+      "bytes": 138,
+      "sha256": "d873e9faf4f512434079e0cc92a074d5afc17721141e66aa8a6179f9cb5b7204"
+    },
+    "disk-rebase-result.json": {
+      "bytes": 1326,
+      "sha256": "28bcaa570ec3718a7a3af99e8f2025cce40a84e5a418a9046c4b378cde9014a6"
+    },
+    "disk-rebase.json": {
+      "bytes": 277,
+      "sha256": "cb20c82b624f31bd485dac4f8729100606cdccb81bf83e567c66fb40d7e76720"
+    },
+    "disk-rebase.log.gz": {
+      "bytes": 323,
+      "sha256": "23abc03a619099cd25c0c19eecea737132cf6deee444d403f26e728399871edb"
+    },
+    "disk-source-after.json": {
+      "bytes": 91,
+      "sha256": "7ffc81a9aa7b801cc05d50d63a67d65d279ecd63bc34c5c2cc98669b311cd587"
+    },
+    "disk-source-before.json": {
+      "bytes": 2440,
+      "sha256": "416226d925db44f043c27dc2982ecc5f03706f32a42203129bca97424a2e6aba"
+    },
+    "documents-snapshot.tar.gz": {
+      "bytes": 298430,
+      "sha256": "37064e0005e23a1ba7af63e834ebbf637081c8773d81b9434a99660cb20a9b74"
+    },
+    "host-amfid-probe.log.gz": {
+      "bytes": 527,
+      "sha256": "83a126f11f9514eef69c4f7516d1052a7f5dcbf62602b9b3296ef53446d96583"
+    },
+    "host-build-cli.log.gz": {
+      "bytes": 4645,
+      "sha256": "bce1ea356938aa6cdf8975be1bfcdc3c08c1e1c97c0296b88e217a1db809e849"
+    },
+    "host-build-cli.sh": {
+      "bytes": 6218,
+      "sha256": "3236322f8dc6c22e2da9b26588a4ccad2dc8a924c64b96da499df530f541d8eb"
+    },
+    "host-build-launchpad-r2.log.gz": {
+      "bytes": 2702,
+      "sha256": "ce71aedc2ae76083bbe1d590eefb62627ffc8224c071839b945624f032ca8ffa"
+    },
+    "host-build-launchpad-r2.sh": {
+      "bytes": 5580,
+      "sha256": "75b76f2dcd5dcd81ce4b8a953e4dd0668864b3efe3b5bf2ad9dbc74213b189a6"
+    },
+    "host-build-launchpad.log.gz": {
+      "bytes": 2048,
+      "sha256": "2b6be72828d6856e41ac362b0d2e0222ce2d371accc1a4a56468ca1dbf964a1f"
+    },
+    "host-build-launchpad.sh": {
+      "bytes": 5574,
+      "sha256": "0c1c261afea12ef670269d89f14e0790477a638b8424acfcfdfa7e3b4cabf47a"
+    },
+    "host-candidate-identity.json": {
+      "bytes": 5447,
+      "sha256": "af2bb199f2dbd2227ba9fe70d359124f9ee58e5045126d7bbc1cd04af7f4dc67"
+    },
+    "host-candidate-signature.json": {
+      "bytes": 52,
+      "sha256": "6d620d1c454a90e41ee536109b1fee6ba5177ac2ee9d3aeb3a9f1e108bf3f044"
+    },
+    "host-complete-cli.log.gz": {
+      "bytes": 940,
+      "sha256": "4fcb2f6777b665665d1e82945586b85d0b8614ee0c03ff1472e5b2f4628f67bf"
+    },
+    "host-complete-cli.sh": {
+      "bytes": 2482,
+      "sha256": "7f6e1d790ad2ff1971e30e7b9ad5f5ccf469596f94115b8b6448b097063d76a3"
+    },
+    "host-external-physical.plist": {
+      "bytes": 335,
+      "sha256": "87825f7c9754664f9af15a27946e3f035b14819c8fc345cdf096587d8e9e10c3"
+    },
+    "host-frozen-vm-parser-probe.json": {
+      "bytes": 340,
+      "sha256": "2d7951c383327c0bc034e09b980e75f0448c2fb917a394717d82f37bf8eead4f"
+    },
+    "host-hold-reader.py": {
+      "bytes": 451,
+      "sha256": "c69604d443e3268cf43c01e24a420a0822b8c08fe865fde7ba6a512df42f7d0e"
+    },
+    "host-kit-green-final.log.gz": {
+      "bytes": 14104,
+      "sha256": "a3ef808d13c7d40612e306f12b949168ec935c573f11feb895e309ecff082b31"
+    },
+    "host-meter-green.log.gz": {
+      "bytes": 3924,
+      "sha256": "b89b6366a1e1af1b6b7ae2a7f35b1d296400791e0e5e22b1b005cd03891fce7e"
+    },
+    "host-meter-probe-green.json": {
+      "bytes": 1015,
+      "sha256": "a752f08b37d9b55bb4bf6dda6eeb2fce59b184244e46a08b1b13611f45c40eb5"
+    },
+    "host-meter-probe.json": {
+      "bytes": 998,
+      "sha256": "8f8d5bcba8df5f6c7e3f50996e838c6612970f4c8c2161f4ce56ad361b0df4c0"
+    },
+    "host-meter-red-r2.log.gz": {
+      "bytes": 6492,
+      "sha256": "fb83a5d10179eb435db9eb5606c4cfe702d1ffa986b3dd73563ae6112ba296ee"
+    },
+    "host-meter-red.log.gz": {
+      "bytes": 3197,
+      "sha256": "024ef4984f74ef35d8c32913a171ff0f76fef7b7df4259dfa91cd34665c0b52c"
+    },
+    "host-prepare.log.gz": {
+      "bytes": 223,
+      "sha256": "6fc712330673b5d80609f080e5c97f83ae1f4c5ecc540ff8243793cac0a94102"
+    },
+    "host-process-after.json": {
+      "bytes": 412,
+      "sha256": "f9bc3113c7e348aff3e3836b0e9b97a496ccaddcbfe678b93c6fac4f08323e73"
+    },
+    "host-process-inventory.json": {
+      "bytes": 277,
+      "sha256": "0bfe2fef5abd78e4ce5e61d52bffa63dda6595122200308b2eff204c8264d451"
+    },
+    "host-python-launchpad-green.log.gz": {
+      "bytes": 685,
+      "sha256": "78bd10685b1bb98769286d4ad6522c3f00e95cf63f1029399103fa5d995ba06d"
+    },
+    "host-python-launchpad.log.gz": {
+      "bytes": 969,
+      "sha256": "53356554737e7e136d4484180417809866cebd46fcd43fa0d72bc41ee50beebb"
+    },
+    "host-reader-live.json": {
+      "bytes": 121,
+      "sha256": "0360f7dee034419c48534e73f20e478a16316948b8a10708746143836ffa8a00"
+    },
+    "host-reader-lsof.json": {
+      "bytes": 96,
+      "sha256": "b224be54e92f34eca3639e25b29e74bcd70f954da7b34aa9b42f0930bfb46aec"
+    },
+    "host-reader-released.json": {
+      "bytes": 48,
+      "sha256": "a489a32538ea1a71217fb1b64cf39e607dc4c931845c87eaf8c5273842ae39c0"
+    },
+    "host-reader.log.gz": {
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    "host-rebase-acceptance.log.gz": {
+      "bytes": 283,
+      "sha256": "342f753dc9dd01a194d8f4f3c6ee01800f941b9e2a61c7e4e613515faece9830"
+    },
+    "host-scoped-amfidont.py": {
+      "bytes": 1432,
+      "sha256": "f6bab9597741b165979b8e12597d16822456b250cfbc9220d199d5478c8b5961"
+    },
+    "host-source-after.log.gz": {
+      "bytes": 173,
+      "sha256": "244264c1bb37aaaf1fc4ad1dc7e465744d09d9dba14cb6f63f767a33db9143f5"
+    },
+    "host-stage-guest.log.gz": {
+      "bytes": 98,
+      "sha256": "a3bb7a185c5f69f829037a41b7de930112ef4b7b2be3504a1d844d1776831b0b"
+    },
+    "host-ticket-digests.json": {
+      "bytes": 346,
+      "sha256": "4f201052df6fbe59a3d32ceb9611d9e83f095b688ed59935978219bbf459e89e"
+    },
+    "host-ui-reader-cli-refusal.json": {
+      "bytes": 392,
+      "sha256": "62356e10a8668d0407189b561017120fe493a56e0094580639963537ff3ef0d6"
+    },
+    "host-vm-parser-probe.json": {
+      "bytes": 338,
+      "sha256": "a0b3c450d25211131280e998bfe3bacdb1d7dc399242d91d02c880a3ff265253"
+    },
+    "source-snapshot.tar.gz": {
+      "bytes": 98183,
+      "sha256": "978a71d749422488427835509bd5c8407247db4774d5cfcefbdb606c2d8a0bab"
+    },
+    "ui-external-reader-r2-after-refresh.ax.txt": {
+      "bytes": 3557,
+      "sha256": "8f1c383ae51840e01ce51691c5dc6e0e2a5023db7b026880c6b15a00392cdfa1"
+    },
+    "ui-external-reader-r2-after-refresh.json": {
+      "bytes": 215,
+      "sha256": "cd639f1a38c0a2448a7767f8f93f665a34d92a998ec766084e8807d8ca0d1ad6"
+    },
+    "ui-external-reader-r2-after-refresh.png": {
+      "bytes": 162650,
+      "sha256": "b3a6e9ba71e852488f95bcd0e1b22231e9d4b82b77979727b26ca81da5746a02"
+    },
+    "ui-external-reader-r2.ax.txt": {
+      "bytes": 3524,
+      "sha256": "52561fa97146536b77ec49cf1e4c5d25d5253d7e59a348b52c53b989b88d30c8"
+    },
+    "ui-external-reader-r2.png": {
+      "bytes": 162643,
+      "sha256": "6f798f125dd9d86abe8d2c543ef19c2f7c6ae5875387bd6ba162663c9c524a2f"
+    },
+    "ui-hardware-current-r2.ax.txt": {
+      "bytes": 3558,
+      "sha256": "a530efd71fa4f29a240d71b55b3e7b947ee478012733c4d93923cb303f02b1ea"
+    },
+    "ui-hardware-current-r2.png": {
+      "bytes": 161542,
+      "sha256": "3d395fe6600defd5102c0532d22c9a00d571ab0889724ff02b29bce6867af276"
+    },
+    "ui-hardware-held.ax.txt": {
+      "bytes": 3588,
+      "sha256": "d96e5ef58fe460cf3bc9b75060031113f75d8c6f94538691c4858f5e217beb7e"
+    },
+    "ui-hardware-held.png": {
+      "bytes": 176131,
+      "sha256": "19ef2d29400ee925eca8014b27942e187ec084f3ef480dff795cf705244495ce"
+    },
+    "ui-reader-released-r2.ax.txt": {
+      "bytes": 3524,
+      "sha256": "52561fa97146536b77ec49cf1e4c5d25d5253d7e59a348b52c53b989b88d30c8"
+    },
+    "ui-reader-released-r2.json": {
+      "bytes": 181,
+      "sha256": "eeb6044ef4a6fad4eb087b256ce18038c284566203d48f66c1cc8eafdf63336c"
+    },
+    "ui-reader-released-r2.png": {
+      "bytes": 162647,
+      "sha256": "0d6903425ae70e230995703bcf4a96e6c06ac6b3b9d27351657ca7fc1b400ac7"
+    },
+    "ui-rebase-busy.ax.txt": {
+      "bytes": 2451,
+      "sha256": "230f71536af6992b738634aa0056a0c855408b8ecffd1c0a1241b5fb185c9e6a"
+    },
+    "ui-rebase-busy.png": {
+      "bytes": 161671,
+      "sha256": "08e5a2b46ab581ebe17b4d608358aba310549ce0293765e30683b6a0bb96006f"
+    },
+    "ui-stopped-current-r2.ax.txt": {
+      "bytes": 3524,
+      "sha256": "52561fa97146536b77ec49cf1e4c5d25d5253d7e59a348b52c53b989b88d30c8"
+    },
+    "ui-stopped-current-r2.json": {
+      "bytes": 181,
+      "sha256": "3b0f6802b376211f56658d9de64d008021d37149bf45f2f7a9a92c794d738630"
+    },
+    "ui-stopped-current-r2.png": {
+      "bytes": 162735,
+      "sha256": "421dd52d646586c7328a310daa8ba9f218a64bd6961273ea0ad55d8c9e7e42fc"
+    },
+    "ui-stopped-current-red-2.ax.txt": {
+      "bytes": 3587,
+      "sha256": "63a6eb72797f8bb3b6c0acf30a2f64b0efdbafcd98dc8c61340ba16bf79e00ad"
+    },
+    "ui-stopped-current-red-2.error.txt": {
+      "bytes": 27,
+      "sha256": "4546793d60772d1f4624b3a61c1788abf345e3bb70a492a8ce6ca0bb1ef3dd2b"
+    },
+    "ui-stopped-current-red-2.png": {
+      "bytes": 174219,
+      "sha256": "fa30cf95c89e9e54a7687c44728f0b00c87fc42733e59df1064fbc0143320fc3"
+    },
+    "ui-stopped-held.ax.txt": {
+      "bytes": 3548,
+      "sha256": "47876b1d986ab1975b67bb26fe10365a4fe8c7332f00e6ad30b2f4cf891beb05"
+    },
+    "ui-target-held.ax.txt": {
+      "bytes": 3554,
+      "sha256": "16e020c8f1d44aff77377e78f3aee326f0d5c26e5e504221d50cf38ac5fdc7e4"
+    }
+  }
+}

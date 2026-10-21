@@ -23,6 +23,9 @@ public enum VPhoneVMOperation {
     public static let rename = "rename"
     public static let clone = "clone"
     public static let delete = "delete"
+    public static let snapshot = "snapshot"
+    public static let rebase = "rebase"
+    public static let rebaseRecover = "rebase-recover"
     public static let export = "export"
     public static let importArchive = "import"
     public static let create = "create"
@@ -52,7 +55,7 @@ public enum VPhoneVMOperation {
 
     /// Complete vocabulary, for tests and diagnostics.
     public static let all: [String] = [
-        boot, dfu, stageVphoned, config, rename, clone, delete, export, importArchive, create,
+        boot, dfu, stageVphoned, config, rename, clone, delete, snapshot, rebase, rebaseRecover, export, importArchive, create,
         fwPrepare, fwPatch, fwReceipts, cfw, cfwRecord, restoreDecrypt, cleanupFirmware, createCheckpoint,
         backup, restoreBackup, switchVM, package,
     ]

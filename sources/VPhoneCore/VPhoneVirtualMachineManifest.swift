@@ -240,6 +240,31 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         VZMacMachineIdentifier(dataRepresentation: machineIdentifier)
     }
 
+    // MARK: - File Names & Bundle Files
+
+    /// Whether `name` is one plain entry in a directory: not empty, not `.` or
+    /// `..`, no `/`, no NUL, and within NAME_MAX bytes.
+    public static func isPlainFileName(_ name: String) -> Bool {
+        !name.isEmpty
+            && name != "."
+            && name != ".."
+            && !name.contains("/")
+            && !name.contains("\0")
+            && name.utf8.count <= 255
+    }
+
+    public enum FileKind: Sendable {
+        case missing
+        case regularFile
+        case other
+    }
+
+    public static func fileKind(at url: URL) -> FileKind {
+        var info = stat()
+        guard lstat(url.path, &info) == 0 else { return .missing }
+        return info.st_mode & S_IFMT == S_IFREG ? .regularFile : .other
+    }
+
     // MARK: - Editing
 
     public func updating(

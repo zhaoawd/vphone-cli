@@ -4939,7 +4939,146 @@
         ],
         "next_action": "继续可选延后；纳入时另做完整逻辑字节不变与物理计量验证。"
       },
-      "runtime_validation_this_turn": false
+      "runtime_validation_this_turn": false,
+      "followup_2026_10_21": {
+        "status": "offline_implementation_and_regression_validated_real_vm_acceptance_pending",
+        "evidence": "evidence/T51-20261021/manifest.json",
+        "report": "T51_disk_rebase_20261021.md",
+        "vmBaseRebaseImplemented": true,
+        "templateBaseImplemented": false,
+        "dryRunAndRecoveryRegistered": true,
+        "bothVMExclusiveLocksHeld": true,
+        "verifiedJournalExchangeAndRecoveryImplemented": true,
+        "swiftAndPythonPendingGateImplemented": true,
+        "newlyAndAlreadySharedSeparated": true,
+        "physicalExtentMeterAndInspectorImplemented": true,
+        "sharedMeasurementLeaseAndFreshOccupancyCheckImplemented": true,
+        "unknownAndCachedUsageExplicit": true,
+        "inodeBoundFirmwareQualificationNotReauthorized": true,
+        "validation": {
+          "swiftExpanded": {
+            "coreXCTest": 93,
+            "coreSwiftTesting": 498,
+            "coreSkipped": 1,
+            "kit": 244,
+            "kitSkipped": 11,
+            "cli": 4,
+            "firmwareDesiredPlan": 19,
+            "exitCode": 0
+          },
+          "swiftCloseout": {
+            "kit": 245,
+            "kitSkipped": 11,
+            "relatedCore": 48,
+            "cli": 2,
+            "firmwareDesiredPlan": 19,
+            "exitCode": 0
+          },
+          "dedicatedTests": {
+            "DiskRebaseTests": 22,
+            "DiskUsageTests": 6,
+            "VMRebaseCLITests": 2
+          },
+          "pythonFull": {
+            "tests": 958,
+            "skipped": 4,
+            "failures": 4,
+            "exitCode": 1,
+            "failureScope": "T47/T52 source-boundary assertions and T51/T52 missing localization keys"
+          },
+          "pythonAffectedAfterFix": {
+            "tests": 38,
+            "exitCode": 0,
+            "resolvesAllFullRunFailures": true
+          },
+          "pythonLock": {
+            "tests": 9,
+            "exitCode": 0
+          },
+          "unresolvedFailures": 0,
+          "swiftFinalCLIPaths": {
+            "tests": 2,
+            "exitCode": 0
+          }
+        },
+        "limitations": [
+          "Template identifier/build integration deferred to T49",
+          "No real VM rebase+boot, physical external-volume/cross-device/non-APFS fault acceptance, or signed GUI acceptance",
+          "Fault injection covers verified pre-exchange, post-exchange interruption and retained-byte corruption, not the full SIGKILL/power-loss matrix",
+          "Full digest/recovery I/O on real large disks not benchmarked; snapshots and unmeasured clones can retain old blocks",
+          "Python full run had four check failures; affected modules passed after fixes, other tests not repeated"
+        ],
+        "runtimeValidated": false,
+        "accepted": false,
+        "committed": false,
+        "pushed": false,
+        "cliNamesAndResolvedLibraryScopeValidated": true
+      },
+      "runtime_followup_20261021": {
+        "status": "real_disk_and_signed_gui_validated_vm_boot_awaits_specific_host_authorization",
+        "evidence": "evidence/T51-runtime-20261021/manifest.json",
+        "report": "T51_runtime_acceptance_20261021.md",
+        "real64GiBDiskRebaseValidated": true,
+        "newlySharedBytes": 67108864,
+        "comparedBytes": 25081413632,
+        "targetAndBaseSelectedPersistentBytesPreserved": true,
+        "originalSourceFilesAndIdentityUnchanged": true,
+        "publishedJournalAndNoPendingValidated": true,
+        "signedGUIValidated": true,
+        "guiStoppedCurrentAndExternalReaderRecoveryValidated": true,
+        "meterBudgetAndHolderProbeFixValidated": true,
+        "swiftKitTests": 248,
+        "pythonBoundaryTests": 24,
+        "vmBootValidated": false,
+        "vmBootBlocker": "AMFI Code -424; new and frozen VM parser exits -9; specific temporary hash authorization pending",
+        "allowedCDHashProposal": "419d5a6c67ab6328589d27246c5d09eb8cc18312",
+        "hostSecurityChanged": false,
+        "externalPhysicalVolume": "deferred_by_user_no_disk_connected",
+        "accepted": false,
+        "committed": false,
+        "pushed": false
+      },
+      "authorized_boot_followup_20261021": {
+        "status": "specific_cdhash_authorized_administrator_authentication_pending",
+        "date": "2026-10-21",
+        "cdhash": "419d5a6c67ab6328589d27246c5d09eb8cc18312",
+        "authorizationGranted": true,
+        "sudoNoninteractiveExitCode": 1,
+        "sudoError": "sudo: a password is required",
+        "computerUseTerminalDenied": true,
+        "helperStarted": false,
+        "hostSecurityChanged": false,
+        "bootRunnerPrepared": true,
+        "helperMaximumSeconds": 900,
+        "helperStopMarker": "/Users/kolar/github/vphone-cli/.build/t51-runtime-20261021/stop-authorized-helper",
+        "accepted": false
+      },
+      "authorized_boot_completion_20261021": {
+        "status": "real_rebase_vm_two_boot_and_signed_gui_scope_validated_review_pending",
+        "evidence": "evidence/T51-runtime-20261021/authorized-boots/manifest.json",
+        "report": "T51_runtime_acceptance_20261021.md",
+        "real64GiBDiskRebaseValidated": true,
+        "vmBootValidated": true,
+        "cycles": 2,
+        "guestVersion": "26.1",
+        "guestBuild": "23B85",
+        "normalShutdownBothCycles": true,
+        "forcedFrameworkStop": false,
+        "diskReleasedBothCycles": true,
+        "distinctBootTimesAndInstanceIDs": true,
+        "runningRebaseRefused": true,
+        "signedGUIRunningAndPostShutdownCurrentUsageValidated": true,
+        "originalVMSelectedFilesAndIdentityUnchanged": true,
+        "temporaryHostAuthorizationUsed": true,
+        "authorizedCDHash": "419d5a6c67ab6328589d27246c5d09eb8cc18312",
+        "helperStoppedAndProcessAbsent": true,
+        "persistentAllowlistWritten": false,
+        "guestDaemonUpdated": false,
+        "externalPhysicalVolume": "deferred_by_user_no_disk_connected",
+        "accepted": false,
+        "committed": false,
+        "pushed": false
+      }
     },
     {
       "id": "T52",

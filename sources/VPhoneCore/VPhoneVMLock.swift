@@ -1,19 +1,25 @@
 import Darwin
 import Foundation
 
-public enum VPhoneVMLockError: Error, CustomStringConvertible, LocalizedError {
+public enum VPhoneVMLockError: Error, Equatable, CustomStringConvertible, LocalizedError {
     case unavailable(String, Int32)
     case firmwareRecoveryRequired(String)
     case cfwRecoveryRequired(String)
+    case snapshotRecoveryRequired(String)
+    case rebaseRecoveryRequired(String)
 
     public var errorDescription: String? { description }
 
     public var description: String {
         switch self {
+        case let .rebaseRecoveryRequired(path):
+            return "Pending disk rebase at \(path); run vm rebase --recover before using this VM"
         case let .cfwRecoveryRequired(path):
             return "Pending CFW disk transaction at \(path); inspect/recover it before using this VM"
         case let .firmwareRecoveryRequired(path):
             return "Pending firmware transaction at \(path); run patch-firmware --recover before using this VM"
+        case let .snapshotRecoveryRequired(path):
+            return "Pending snapshot revert at \(path); run vm snapshot revert or recover before starting this VM"
         case let .unavailable(path, code):
             return "VM lock unavailable at \(path): \(String(cString: strerror(code)))"
         }
@@ -67,6 +73,20 @@ public final class VPhoneVMLock {
             if operation != VPhoneVMOperation.cfwRecord, operation != VPhoneVMOperation.fwReceipts,
                let pending = try FileManager.default.contentsOfDirectory(atPath: directory.path).first(where: { $0.hasPrefix(".cfw_disk.") }) {
                 throw VPhoneVMLockError.cfwRecoveryRequired(directory.appendingPathComponent(pending).path)
+            }
+            if operation != VPhoneVMOperation.snapshot,
+               let pending = try FileManager.default.contentsOfDirectory(atPath: directory.path).first(where: { name in
+                   guard name.hasPrefix(".snapshot-revert-") else { return false }
+                   var journal = stat()
+                   let journalPath = directory.appendingPathComponent(name)
+                       .appendingPathComponent(VPhoneMachineSnapshots.revertJournalFileName).path
+                   return lstat(journalPath, &journal) == 0
+               }) {
+                throw VPhoneVMLockError.snapshotRecoveryRequired(directory.appendingPathComponent(pending).path)
+            }
+            if operation != VPhoneVMOperation.rebaseRecover,
+               let pending = try VPhoneDiskRebaseTransaction.pending(in: directory).first {
+                throw VPhoneVMLockError.rebaseRecoveryRequired(pending.path)
             }
             var info = stat()
             guard fstat(fd, &info) == 0 else { throw VPhoneVMLockError.unavailable(directory.path, errno) }

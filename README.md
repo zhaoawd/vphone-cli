@@ -100,6 +100,28 @@ Update to a newer iOS by pointing `fw prepare` at an IPSW: `--iphone-source /pat
 
 Offline bundle operations (`fw prepare`/`fw patch`, `cfw install`, `vm export`/`vm import`, `vm clone`/`vm rename`/`vm delete`) take a per-VM directory lock and refuse a busy VM (a running VM, or another offline operation holding the bundle). There is no separate command for this guard.
 
+To re-share byte-identical disk units between two stopped VMs on one APFS volume:
+
+```sh
+vphone-cli vm rebase myphone --onto myphone-2 --dry-run
+vphone-cli vm rebase myphone --onto myphone-2
+vphone-cli vm rebase myphone --recover  # finish a pending verified disk exchange
+```
+
+Rebase holds both VM directory locks, clones the base disk, writes differing units,
+and verifies the target's logical bytes before an atomic exchange. SEP storage,
+NVRAM, configuration and device identity stay unchanged. Reports distinguish newly
+shared units from units already shared; snapshots or other clones can retain the
+old physical blocks. Templates are not accepted as bases yet. The replaced disk
+has a new inode: existing inode-bound firmware qualification becomes invalid,
+and saved Receipt/generation records do not grant fresh write authority. Pending
+rebase journals block other operations until `--recover` succeeds.
+
+Launchpad's inspector shows allocated and measured exclusive bytes. Running, busy,
+held or unverified machines are not opened for mapping. Unknown ownership stays
+unknown, and cached measurements are marked. Exclusive bytes compare the measured
+VM folders, so they do not predict immediate space recovery from deletion.
+
 ## Firmware Variants
 
 Five patch variants with increasing security bypass — pass one to `--variant`:

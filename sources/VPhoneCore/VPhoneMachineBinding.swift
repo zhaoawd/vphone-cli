@@ -28,6 +28,14 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
         case loaded(VPhoneMachineBinding)
     }
 
+    public static let fileName = "launchpad.json"
+
+    /// True when any recorded guest/kernel/bootChain component origin differs
+    /// from the selected host Core Bundle version.
+    public var hasMixedVersions: Bool {
+        [guestEnvironment, kernel, bootChain].contains { $0.map { $0 != bundle } ?? false }
+    }
+
     public init(bundle: String, guestEnvironment: String? = nil, kernel: String? = nil, bootChain: String? = nil) throws {
         guard [bundle, guestEnvironment, kernel, bootChain].allSatisfy({ $0.map(VPhoneCoreBundleVersion.isStoreName) ?? true }) else {
             throw VPhoneMachineBindingError("Invalid Core Bundle origin in launchpad.json")
@@ -42,6 +50,115 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
     /// executable selection, kernel update or guest environment replacement.
     public func replacingHost(with bundle: String) throws -> Self {
         try replacingOrigin(.host, with: bundle)
+    }
+
+    // MARK: - Snapshots
+
+    /// Path to `Snapshots/<name>/launchpad.json` inside `machine`, or nil when
+    /// `name` is invalid or `machine`, `Snapshots`, or `Snapshots/<name>` is not
+    /// a real directory (never following symbolic links).
+    public static func url(for machine: URL, snapshot name: String) -> URL? {
+        guard (try? VPhoneMachineSnapshots.requireValidName(name)) != nil,
+              !name.contains("..")
+        else {
+            return nil
+        }
+        let snapshots = machine.appendingPathComponent(VPhoneMachineSnapshots.directoryName, isDirectory: true)
+        let folder = snapshots.appendingPathComponent(name, isDirectory: true)
+        for directory in [machine, snapshots, folder] {
+            var info = stat()
+            guard lstat(directory.path, &info) == 0, info.st_mode & S_IFMT == S_IFDIR else {
+                return nil
+            }
+        }
+        return folder.appendingPathComponent(fileName)
+    }
+
+    /// Loads the binding sidecar saved in `Snapshots/<name>/launchpad.json`,
+    /// returning nil when absent, linked, or invalid.
+    public static func load(_ machine: URL, snapshot name: String) -> VPhoneMachineBinding? {
+        guard let sidecar = url(for: machine, snapshot: name) else { return nil }
+        return try? readSidecar(at: sidecar)
+    }
+
+    /// Saves this binding to `Snapshots/<name>/launchpad.json` without following
+    /// symbolic links. Requires the snapshot directory to exist.
+    public func save(to machine: URL, snapshot name: String) throws {
+        guard let sidecar = Self.url(for: machine, snapshot: name) else {
+            throw CocoaError(.fileNoSuchFile, userInfo: [
+                NSFilePathErrorKey: machine
+                    .appendingPathComponent(VPhoneMachineSnapshots.directoryName)
+                    .appendingPathComponent(name).path,
+            ])
+        }
+        try writeAtomically(to: sidecar)
+    }
+
+    /// Reconciles the four-layer binding after reverting a machine to a snapshot.
+    /// The host Core Bundle (`bundle`) remains the currently selected one, while
+    /// `guestEnvironment`, `kernel` and `bootChain` come from the snapshot's
+    /// saved sidecar (or become nil / Unknown when the snapshot has no valid sidecar).
+    public func reverted(to saved: VPhoneMachineBinding?) -> VPhoneMachineBinding {
+        (try? VPhoneMachineBinding(
+            bundle: bundle,
+            guestEnvironment: saved?.guestEnvironment,
+            kernel: saved?.kernel,
+            bootChain: saved?.bootChain
+        )) ?? self
+    }
+
+    static func reconcileAfterSnapshotRevert(machine: URL, snapshot name: String) {
+        guard let current = try? transactionSnapshot(machine)?.binding else { return }
+        let saved = load(machine, snapshot: name)
+        let next = current.reverted(to: saved)
+        try? next.writeAtomically(to: machine.appendingPathComponent(fileName))
+    }
+
+    private static func readSidecar(at url: URL) throws -> VPhoneMachineBinding {
+        let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        guard fd >= 0 else {
+            throw VPhoneMachineBindingError("Cannot open snapshot launchpad.json without following links")
+        }
+        let file = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        defer { try? file.close() }
+        var before = stat(), after = stat(), current = stat()
+        guard fstat(fd, &before) == 0, before.st_mode & S_IFMT == S_IFREG,
+              before.st_size > 0, before.st_size <= 65536 else {
+            throw VPhoneMachineBindingError("snapshot launchpad.json must be a regular file of 1...65536 bytes")
+        }
+        let bytes = try file.read(upToCount: 65537) ?? Data()
+        guard bytes.count == Int(before.st_size), bytes.count <= 65536,
+              fstat(fd, &after) == 0, lstat(url.path, &current) == 0,
+              sameRevision(before, after), sameRevision(after, current) else {
+            throw VPhoneMachineBindingError("snapshot launchpad.json changed while reading")
+        }
+        let decoded = try JSONDecoder().decode(Self.self, from: bytes)
+        return try Self(
+            bundle: decoded.bundle,
+            guestEnvironment: decoded.guestEnvironment,
+            kernel: decoded.kernel,
+            bootChain: decoded.bootChain
+        )
+    }
+
+    private func writeAtomically(to destination: URL) throws {
+        let directory = destination.deletingLastPathComponent()
+        let temporary = directory.appendingPathComponent(".\(Self.fileName)-\(UUID().uuidString)")
+        let fd = open(temporary.path, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
+        guard fd >= 0 else { throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
+        let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        defer {
+            try? output.close()
+            try? FileManager.default.removeItem(at: temporary)
+        }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        try output.write(contentsOf: encoder.encode(self))
+        try output.synchronize()
+        try output.close()
+        guard rename(temporary.path, destination.path) == 0 else {
+            throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno))
+        }
     }
 
     /// One validated file read. Consumers can freeze a selection before work,
