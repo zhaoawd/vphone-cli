@@ -1,0 +1,40 @@
+[
+  {
+    "run": 1,
+    "exitCode": 0,
+    "command": [
+      "swift",
+      "test",
+      "--skip",
+      "FirmwareIntegrationTests",
+      "--filter",
+      "VPhoneAPIKitTests|GuestShutdownTests|APIProxyCLITests|ShutdownPolicyTests|VMWindowCloseTests|HostControlLifecycleTests|GuestWriteCoordinationTests"
+    ]
+  },
+  {
+    "run": 2,
+    "exitCode": 0,
+    "command": [
+      "swift",
+      "test",
+      "--skip-build",
+      "--skip",
+      "FirmwareIntegrationTests",
+      "--filter",
+      "VPhoneAPIKitTests|GuestShutdownTests|APIProxyCLITests|ShutdownPolicyTests|VMWindowCloseTests|HostControlLifecycleTests|GuestWriteCoordinationTests"
+    ]
+  },
+  {
+    "run": 3,
+    "exitCode": 0,
+    "command": [
+      "swift",
+      "test",
+      "--skip-build",
+      "--skip",
+      "FirmwareIntegrationTests",
+      "--filter",
+      "VPhoneAPIKitTests|GuestShutdownTests|APIProxyCLITests|ShutdownPolicyTests|VMWindowCloseTests|HostControlLifecycleTests|GuestWriteCoordinationTests"
+    ]
+  }
+]

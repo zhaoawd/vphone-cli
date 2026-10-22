@@ -1680,3 +1680,5 @@ regular的跳过分支、复制分支与development同类命令改用ln -sfn；g
 ### 2026-10-21：T51具名真实启动续验完成
 
 用户批准仅419d5a6c候选临时AMFI放行后，独立rebase副本两次启动、guest只读查询和生产vm stop正常关机通过，均释放磁盘与目录锁。r2实际运行/停止计量回归通过；helper已停止且PID不存在。未新增固件指令补丁、未更新guest组件，guest图形和应用交互未验证。详见upstream_integration_2026-10-15/T51_runtime_acceptance_20261021.md及authorized-boots/manifest.json。
+
+APIProxy停止竞争已定位并修复：停止准入与容量耗尽不再共用布尔拒绝结果，停止期间直接释放连接，真实容量上限继续返回503。100轮竞争及无探针反证复现；APIProxy13项和原混合110项连续3轮通过。该修改仅涉及宿主代理与本地回归，不新增固件指令补丁，不改已安装Bundle或VM。见[T52 APIProxy记录](upstream_integration_2026-10-15/T52_APIProxy_stop_race_20261022.md)。

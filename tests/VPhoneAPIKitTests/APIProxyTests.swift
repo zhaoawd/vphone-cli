@@ -295,6 +295,22 @@ final class APIProxyTests: XCTestCase {
     }
 
     func testActiveConnectionLimitAndStopDuringConnect() throws {
+        try checkActiveConnectionStop()
+    }
+
+    func testStopDuringAdmissionDoesNotReturnOverloadAcrossRepeatedRuns() throws {
+        for iteration in 0..<100 {
+            try checkActiveConnectionStop(iteration: iteration)
+        }
+    }
+
+    func testStopAfterAllClientsEnterConnectorClosesWithoutReply() throws {
+        for iteration in 0..<10 {
+            try checkActiveConnectionStop(iteration: iteration, waitForConnector: true)
+        }
+    }
+
+    private func checkActiveConnectionStop(iteration: Int = 0, waitForConnector: Bool = false) throws {
         let connector = ProxyConnectorFixture()
         let proxy = try VPhoneAPIProxy(token: token, connector: connector.append)
         let url = try proxy.start(port: 0)
@@ -308,8 +324,19 @@ final class APIProxyTests: XCTestCase {
         let excess = try proxyTCP(url.port!)
         XCTAssertTrue(proxyRead(excess).isEmpty)
         close(excess)
+        if waitForConnector {
+            let deadline = ContinuousClock.now + .seconds(1)
+            while connector.count < 16, ContinuousClock.now < deadline {
+                Thread.sleep(forTimeInterval: 0.001)
+            }
+            XCTAssertEqual(connector.count, 16, "All clients must enter the connector in the control case")
+        }
+        let connectingBeforeStop = connector.count
         proxy.stop()
-        for fd in clients { XCTAssertTrue(proxyRead(fd).isEmpty) }
+        for fd in clients {
+            let reply = proxyRead(fd)
+            XCTAssertTrue(reply.isEmpty, "Unexpected reply while stopping (iteration \(iteration), \(connectingBeforeStop)/16 entered connector): \(String(decoding: reply, as: UTF8.self))")
+        }
     }
 
     func testGuestBackpressureHasBoundedWriteWait() throws {

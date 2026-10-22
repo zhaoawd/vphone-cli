@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "scope": "APIProxy stop/admission race diagnosed and repaired; original mixed tests pass without separation",
+  "sourceRepairVerified": true,
+  "mixedTestsPerRun": 110,
+  "mixedRuns": 3,
+  "accepted": false,
+  "committed": false,
+  "installedBundleChanged": false,
+  "VMStarted": false,
+  "files": [
+    {
+      "path": "T52_APIProxy_stop_race_20261022.md",
+      "bytes": 6131,
+      "sha256": "126a6484335ef0558579af7085deff4efdb8cffe4ea04972429d4a266ef6933b"
+    },
+    {
+      "path": "experiments/baseline-proxy.swift",
+      "bytes": 16788,
+      "sha256": "bc570dfce8feef74a300e8b7ae48ab56671760bdb441f310e3f2ee079c222425"
+    },
+    {
+      "path": "experiments/counterfactual-conflated-source.swift",
+      "bytes": 16953,
+      "sha256": "61f0e107dde7f833b804dedd6cafbbdd580a0ac343281d13606fa1253e0d6855"
+    },
+    {
+      "path": "experiments/counterfactual-fixed-source.swift",
+      "bytes": 17194,
+      "sha256": "f835685ba24d9e452cc3715a04b122d079aeaba9e9c3b9e54c8466d09c832198"
+    },
+    {
+      "path": "experiments/counterfactual-no-instrumentation.log.gz",
+      "bytes": 3869,
+      "sha256": "2671ce8272c030136f5db895f00b5c46d7f7ad6d5c3109a68e9a8f25aea8b0d7"
+    },
+    {
+      "path": "experiments/counterfactual-result.json",
+      "bytes": 124,
+      "sha256": "9515ddd2a35fcf5fb7e29bab8b715f90089be4c7c3e3af233a2418a743979023"
+    },
+    {
+      "path": "experiments/final-change.patch",
+      "bytes": 4100,
+      "sha256": "376afa75bd0104cf67fb7362b3baa4493c8e84cfe3854589564ffe9683f241cc"
+    },
+    {
+      "path": "experiments/isolated-red-00.log.gz",
+      "bytes": 3034,
+      "sha256": "c1760d9f847006302a55bbd973f6e73915c9a2b81df9a95613520f02161f114b"
+    },
+    {
+      "path": "experiments/isolated-red-01.log.gz",
+      "bytes": 2736,
+      "sha256": "b065f7f198fb12420a00d464518be569be069d0ebe968a06b975d72609ce385c"
+    },
+    {
+      "path": "experiments/isolated-red-02.log.gz",
+      "bytes": 2737,
+      "sha256": "24ee8b3893d92af09eea9d7084f373ba9690a7ef88f497ca7810f855e95508ba"
+    },
+    {
+      "path": "experiments/isolated-red-03.log.gz",
+      "bytes": 2716,
+      "sha256": "b5aef185f5c2f27b9a3412dc9db78e2f68c0b0815c07eb13cf3e6b5f07cd0b3c"
+    },
+    {
+      "path": "experiments/isolated-red-04.log.gz",
+      "bytes": 2723,
+      "sha256": "a7b506ff5a4c0719705c378db0ce2e74835a57531faf278075ef51aec60b028c"
+    },
+    {
+      "path": "experiments/isolated-red-05.log.gz",
+      "bytes": 2730,
+      "sha256": "d7a31804ad3154b76b2cc9d2585e8e2912d9c78df1811a1cba2a5cfc2d90da36"
+    },
+    {
+      "path": "experiments/isolated-red-06.log.gz",
+      "bytes": 2726,
+      "sha256": "3541b8d7931ec3e1bf8a43f2e33117b66aa35cf4be37a0f488320e3b697a54ad"
+    },
+    {
+      "path": "experiments/isolated-red-07.log.gz",
+      "bytes": 2764,
+      "sha256": "39cc537bf4644d750625174e0821eff6a6b9a1c163624cfdff34dc6b2ef77def"
+    },
+    {
+      "path": "experiments/isolated-red-08.log.gz",
+      "bytes": 2985,
+      "sha256": "2e66a57360fa5cd36a654e72a8ecbd04a3c119f44c7ac8d9b43bb6348b37ab3f"
+    },
+    {
+      "path": "experiments/isolated-red-09.log.gz",
+      "bytes": 2713,
+      "sha256": "cf171226423d5d568b741bd5d782ce2453f8a438748ac95fb7e7282eb4de8d33"
+    },
+    {
+      "path": "experiments/isolated-red-10.log.gz",
+      "bytes": 2728,
+      "sha256": "90fab743bfc457ce953bcd2a1129f1fe9f2d94ca43c6f29116f183b9c1570d5d"
+    },
+    {
+      "path": "experiments/isolated-red-11.log.gz",
+      "bytes": 2726,
+      "sha256": "c8af1a1d6b42d4f4d75888549d24493b1a925cab3406b38c29ee8cd7a282704e"
+    },
+    {
+      "path": "experiments/isolated-red-results.json",
+      "bytes": 545,
+      "sha256": "624a7f3b88c9195e9e8e719da2343dd3c41baf82ac43469838dface5ad0a9fde"
+    },
+    {
+      "path": "experiments/mixed-diagnostic.log.gz",
+      "bytes": 11639,
+      "sha256": "09a2d358b239072b96baedc384961bd72d373511dd018ae72362230fab3ba4b5"
+    },
+    {
+      "path": "experiments/mixed-green-1.log.gz",
+      "bytes": 8154,
+      "sha256": "ad5aef734b3f0b41dc37b50183be2d07b987c5fd3ff9275829ea2bca19cf6ee7"
+    },
+    {
+      "path": "experiments/mixed-green-2.log.gz",
+      "bytes": 7676,
+      "sha256": "c88814b8d00e9d5c55a61f86c5580d7eb57fcf31c61c148c4bb6747ccd0a7a2d"
+    },
+    {
+      "path": "experiments/mixed-green-3.log.gz",
+      "bytes": 7680,
+      "sha256": "4792a1f6794ec284288dba43c2197b939edd95bdefc1d065f199b2663e7168dd"
+    },
+    {
+      "path": "experiments/mixed-green-results.json",
+      "bytes": 998,
+      "sha256": "970d350b0925fd88ef95a36f1f61c856691f83d0860582ac1896e708820415c0"
+    },
+    {
+      "path": "experiments/mixed-instrumented.log.gz",
+      "bytes": 8114,
+      "sha256": "52afa6390168fcb5444957734165c5a1218ffa721a7be2462fb936ec5a52341a"
+    },
+    {
+      "path": "experiments/proxy-green.log.gz",
+      "bytes": 4144,
+      "sha256": "c84d00c7e45c3a168d40f7f3e5d97bd2f376b81f7d1f6d359d0687df0ce522ce"
+    },
+    {
+      "path": "experiments/stop-race-red.log.gz",
+      "bytes": 3660,
+      "sha256": "d59606f62885ce7b30c34342c296247f8c0872b0781eb023b7094f79817f0b07"
+    },
+    {
+      "path": "experiments/summary.json",
+      "bytes": 2185,
+      "sha256": "00b410cf86167a079b9ac6323f2b825af778f5e7de385a3a606d94f86762ef85"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/archive_t52_api_proxy_evidence.py",
+      "bytes": 1972,
+      "sha256": "6dfb7d8191476f760504aa806c0f0e0735722847a90e276ab1b29f30262e916c"
+    },
+    {
+      "path": "source/sources/VPhoneAPIKit/VPhoneAPIProxy.swift",
+      "bytes": 17194,
+      "sha256": "f835685ba24d9e452cc3715a04b122d079aeaba9e9c3b9e54c8466d09c832198"
+    },
+    {
+      "path": "source/tests/VPhoneAPIKitTests/APIProxyTests.swift",
+      "bytes": 17714,
+      "sha256": "8c9f07859218148609a24dfa3e349b56bf748a48e428976853bd0c4dbc70ec32"
+    }
+  ]
+}

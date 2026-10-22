@@ -89,16 +89,18 @@ public final class VPhoneAPIProxy {
     deinit { state.stop(); listener?.cancel() }
 
     private final class Clients: @unchecked Sendable {
+        enum AttemptAdmission { case reserved, stopped, capacityReached }
         private var attempts = 0
         private let lock = NSLock()
         private var clients: [ObjectIdentifier: Client] = [:]
         private var stopped = false
         var isStopped: Bool { lock.withLock { stopped } }
-        func reserveAttempt() -> Bool {
+        func reserveAttempt() -> AttemptAdmission {
             lock.withLock {
-                guard !stopped, attempts < 16 else { return false }
+                guard !stopped else { return .stopped }
+                guard attempts < 16 else { return .capacityReached }
                 attempts += 1
-                return true
+                return .reserved
             }
         }
         func finishAttempt() { lock.withLock { attempts -= 1 } }
@@ -181,7 +183,13 @@ public final class VPhoneAPIProxy {
         guard let admitted, !client.isStopped else { return }
         // Keep attempts reserved until the framework callback actually returns,
         // even if the host wait times out. Missing callbacks cannot grow without bound.
-        guard state.reserveAttempt() else {
+        switch state.reserveAttempt() {
+        case .reserved: break
+        case .stopped:
+            // Stop closes admission before it closes each individual socket.
+            // A worker in that interval must close, not emit an overload reply.
+            return
+        case .capacityReached:
             sendFailure(503, to: host, timing: timing); return
         }
         connector { result in
