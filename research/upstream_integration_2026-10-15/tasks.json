@@ -5338,7 +5338,119 @@
         "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
         "status": "pending_source_audit",
         "required_delta": "核验新目标是否影响现有合同和接受条件；无等价证据不得提升状态，保留历史实现与验收。",
-        "definition": "revision_2026-10-20.md"
+        "definition": "revision_2026-10-20.md",
+        "api_proxy_stop_race_20261022": {
+          "status": "diagnosed_fixed_and_original_mixed_regression_verified",
+          "report": "T52_APIProxy_stop_race_20261022.md",
+          "evidence": "evidence/T52-APIProxy-stop-race-20261022/manifest.json",
+          "rootCause": "reserveAttempt conflated stopped admission with exhausted attempt capacity; a worker could send HTTP503 before its client socket closed",
+          "productionFix": "Atomically distinguish reserved/stopped/capacityReached; close on stopped; retain HTTP503 on capacityReached",
+          "initialMixedFailureReproduced": true,
+          "isolatedOriginalRuns": 12,
+          "isolatedOriginalFailures": 1,
+          "instrumentedRaceIterations": 100,
+          "instrumentedWrong503Responses": 20,
+          "controlIterations": 10,
+          "controlPassed": true,
+          "counterfactualWithoutInstrumentation": {
+            "counterfactualExitCode": 1,
+            "nonempty503Assertions": 55,
+            "instrumentationAbsent": true,
+            "sourceRestored": true
+          },
+          "proxyTests": 13,
+          "proxyTestsPassed": true,
+          "mixedTestsPerRun": 110,
+          "mixedRuns": [
+            {
+              "run": 1,
+              "XCTest": {
+                "VPhoneAPIKitTests": 37,
+                "VPhoneCLITests": 21
+              },
+              "SwiftTesting": [
+                7,
+                9,
+                36
+              ],
+              "total": 110,
+              "exitCode": 0
+            },
+            {
+              "run": 2,
+              "XCTest": {
+                "VPhoneAPIKitTests": 37,
+                "VPhoneCLITests": 21
+              },
+              "SwiftTesting": [
+                7,
+                9,
+                36
+              ],
+              "total": 110,
+              "exitCode": 0
+            },
+            {
+              "run": 3,
+              "XCTest": {
+                "VPhoneAPIKitTests": 37,
+                "VPhoneCLITests": 21
+              },
+              "SwiftTesting": [
+                7,
+                9,
+                36
+              ],
+              "total": 110,
+              "exitCode": 0
+            }
+          ],
+          "failedTestNotSeparated": true,
+          "temporaryInstrumentationRemoved": true,
+          "sourceSHA256": {
+            "sources/VPhoneAPIKit/VPhoneAPIProxy.swift": "f835685ba24d9e452cc3715a04b122d079aeaba9e9c3b9e54c8466d09c832198",
+            "tests/VPhoneAPIKitTests/APIProxyTests.swift": "8c9f07859218148609a24dfa3e349b56bf748a48e428976853bd0c4dbc70ec32"
+          },
+          "sourceRepairVerified": true,
+          "installedBundleChanged": false,
+          "VMStarted": false,
+          "AMFIChanged": false,
+          "committed": true,
+          "accepted": false,
+          "observedAt": 1792633542.291629,
+          "sourceCommit": "a0119127a5ba7fbbebc1d5d883e4f7eaaae9b78d",
+          "deployment": {
+            "state": "deployed_and_verified",
+            "observedAt": 1792637216.575584,
+            "sourceCommit": "a0119127a5ba7fbbebc1d5d883e4f7eaaae9b78d",
+            "version": "2.6.2-local.266810c8ae29",
+            "archiveSHA256": "00a12bba36b45355ca53bb73065315c78959676dd620e008d4efb0e840bbbb76",
+            "storeDestination": "/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.266810c8ae29",
+            "installed": true,
+            "installedBytesVerified": true,
+            "bindingChanged": true,
+            "binding": {
+              "bundle": "2.6.2-local.266810c8ae29"
+            },
+            "bindingSHA256": "6f33f9c5c95d402dcf93b492f7f30e0910238a8da0a1b128907f93bdf70694f2",
+            "guestDiskMetadataAndConfigurationHashesPreserved": true,
+            "otherVMsPreserved": true,
+            "originalVM": [
+              "33355     1 /Users/kolar/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm --config /Users/kolar/github/autophone/../vphone-cli/vm-2607/config.plist"
+            ],
+            "targetVMRunning": false,
+            "diskReleased": true,
+            "previousBundlePreserved": true,
+            "guestResourcesUnchanged": true,
+            "frameworkLibrariesUnchanged": true,
+            "VMStarted": false,
+            "AMFIChanged": false,
+            "newVersionRuntimeNotTested": true,
+            "pushed": false
+          },
+          "deploymentReport": "T52_APIProxy_deployment_20261022.md",
+          "deploymentEvidence": "evidence/T52-APIProxy-deployment-20261022/manifest.json"
+        }
       }
     },
     {

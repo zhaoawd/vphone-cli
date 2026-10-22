@@ -1682,3 +1682,5 @@ regular的跳过分支、复制分支与development同类命令改用ln -sfn；g
 用户批准仅419d5a6c候选临时AMFI放行后，独立rebase副本两次启动、guest只读查询和生产vm stop正常关机通过，均释放磁盘与目录锁。r2实际运行/停止计量回归通过；helper已停止且PID不存在。未新增固件指令补丁、未更新guest组件，guest图形和应用交互未验证。详见upstream_integration_2026-10-15/T51_runtime_acceptance_20261021.md及authorized-boots/manifest.json。
 
 APIProxy停止竞争已定位并修复：停止准入与容量耗尽不再共用布尔拒绝结果，停止期间直接释放连接，真实容量上限继续返回503。100轮竞争及无探针反证复现；APIProxy13项和原混合110项连续3轮通过。该修改仅涉及宿主代理与本地回归，不新增固件指令补丁，不改已安装Bundle或VM。见[T52 APIProxy记录](upstream_integration_2026-10-15/T52_APIProxy_stop_race_20261022.md)。
+
+APIProxy修复已提交a0119127并部署为2.6.2-local.266810c8ae29，仅重绑停止的t52-v2。新旧收据、安装字节与受保护对象核验通过；客户机资源和Framework库字节保持，未新增固件指令补丁，未启动VM或修改AMFI。新版本真实启动未验证。见[T52 APIProxy部署记录](upstream_integration_2026-10-15/T52_APIProxy_deployment_20261022.md)。

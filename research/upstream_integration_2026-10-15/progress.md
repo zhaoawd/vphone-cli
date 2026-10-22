@@ -341,3 +341,5 @@ Launchpad接入物理计量与Allocated/Exclusive/Unknown展示、30秒刷新/15
 
 
 2026-10-21 T51真实启动续验完成：仅使用用户批准419d5a6c候选，对已rebase的target执行两次真实启动和生产vm stop。guest连接、26.1/23B85、不同boottime/instanceID、正常关机和磁盘/目录锁释放均通过。实际r2运行实例、Unknown/缓存提示、关机后当前计量回归通过；运行中rebase拒绝。原输入完整摘要/身份复核保持，base未启动，vm-2607仍为原PID；helper8387已停止且PID不存在，无持久允许名单写入。最终证据evidence/T51-runtime-20261021/authorized-boots/manifest.json，范围见T51_runtime_acceptance_20261021.md。外置卷仍暂缓；accepted=false，未提交或推送。
+
+APIProxy修复a0119127已部署为2.6.2-local.266810c8ae29，仅切换已停止的t52-v2宿主绑定；新旧收据、安装字节、绑定及磁盘元数据/选定配置摘要核验通过，原VM和受保护副本保持。客户机资源与Framework库字节保持，未重跑环境更新，未启动VM、未修改AMFI、未推送；新版本真实启动未验证，T52整项accepted=false。详见[T52_APIProxy_deployment_20261022.md](T52_APIProxy_deployment_20261022.md)。
