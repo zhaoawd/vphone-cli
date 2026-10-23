@@ -1079,3 +1079,16 @@ cache rebuild.
     rows (chained auth-rebase `sy_call` into __TEXT_EXEC + sane
     `sy_return_type/sy_narg/sy_arg_bytes`). Base @ foff `0x7693B0` (558 rows);
     `sysent[439]` (`SYS_kas_info`) @ foff `0x76BCD8`; cave + 3 entry writes emit.
+
+### BL-056 runtime admission correction (2026-10-23)
+
+The minimal backport also exposes the existing host and owned-location command
+capabilities through the read-only host UDS dispatcher. Disconnected guests do
+not advertise cached capabilities. The boot CLI resolves its default signed
+guest binary from its executable resources, preserving explicit `--vphoned-bin`.
+This corrects the main baseline's VM-directory-relative default, which skipped
+the paired guest when started with only `--config`. Firmware patches are unchanged.
+Socket-pair dispatcher and CLI parsing tests reproduce both admission failures
+without starting a VM. Deployment still requires an observed paired guest hash;
+the legacy guest updater exits after replacing its cache, so a nohup daemon
+without launchd KeepAlive needs a managed restart before acceptance.

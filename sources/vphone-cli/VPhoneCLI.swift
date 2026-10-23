@@ -50,7 +50,7 @@ struct VPhoneBootCLI: ParsableCommand {
     var kernelDebugPort: Int?
 
     @Option(help: "Path to signed vphoned binary for guest auto-update")
-    var vphonedBin: String = ".vphoned.signed"
+    var vphonedBin: String = VPhoneResources.resolve().vphoned.path
 
     @Option(name: [.customShort("V"), .long], help: "Firmware variant to execute.")
     var variant: PatchFirmwareCLI.VariantOption = .regular

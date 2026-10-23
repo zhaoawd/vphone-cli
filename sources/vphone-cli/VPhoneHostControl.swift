@@ -293,7 +293,36 @@ class VPhoneHostControl {
         }
     }
 
-    private nonisolated static func handleClient(_ fd: Int32, controller: VPhoneHostControl?) {
+    /// Current host routes and guest declarations; disconnected guests expose no
+    /// cached capability claims. This read-only query never forwards to vphoned.
+    nonisolated static func capabilitySnapshot(
+        connected: Bool, guestCapabilities: [String], hasLocationProvider: Bool,
+        screenAvailable: Bool
+    ) -> [String: Any] {
+        let caps = connected ? guestCapabilities : []
+        var commands: [String: Bool] = ["capabilities": true, "screenshot": screenAvailable,
+                                      "tap": screenAvailable, "swipe": screenAvailable]
+        for (names, capability) in [
+            (["key"], "hid"), (["type"], "clipboard"), (["shell"], "shell"),
+            (["file_get", "file_put"], "file"),
+            (["app_launch", "app_terminate", "app_list", "app_foreground"], "apps"),
+            (["open_url"], "url"), (["ipa_install"], "ipa_install"),
+        ] {
+            for name in names { commands[name] = caps.contains(capability) }
+        }
+        for name in ["location", "location_stop"] {
+            commands[name] = hasLocationProvider && caps.contains("location")
+        }
+        for name in ["location_source_set", "location_stream_start", "location_stream_push",
+                     "location_source_control", "location_source_stop"] {
+            commands[name] = hasLocationProvider && caps.contains("location_owned")
+        }
+        commands["location_source_status"] = hasLocationProvider
+        return ["protocol_version": 1, "guest_connected": connected,
+                "guest_capabilities": caps, "screen_available": screenAvailable, "commands": commands]
+    }
+
+    nonisolated static func handleClient(_ fd: Int32, controller: VPhoneHostControl?) {
         defer { close(fd) }
 
         guard let line = readLine(from: fd) else { return }
@@ -315,6 +344,23 @@ class VPhoneHostControl {
         let wantColor = json["color"] as? Bool ?? false
 
         switch type {
+        case "capabilities":
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                result.extra = capabilitySnapshot(
+                    connected: controller?.control?.isConnected == true,
+                    guestCapabilities: controller?.control?.guestCaps ?? [],
+                    hasLocationProvider: controller?.locationProvider != nil,
+                    screenAvailable: controller?.captureView?.window != nil)
+            }
+            guard semaphore.wait(timeout: .now() + 5) == .success else {
+                writeResponse(fd, ok: false, error: "capabilities timed out")
+                return
+            }
+            writeResponse(fd, ok: true, extra: result.extra)
+
         case "screenshot":
             let outputPath = json["path"] as? String
             let semaphore = DispatchSemaphore(value: 0)
