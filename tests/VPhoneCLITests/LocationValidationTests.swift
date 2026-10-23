@@ -133,3 +133,29 @@ final class LocationHostControlParsingTests: XCTestCase {
         XCTAssertEqual(message, "stale generation")
     }
 }
+
+final class LocationPersistenceStartupTests: XCTestCase {
+    @MainActor
+    func testCorruptPersistenceDoesNotAutomaticallySelectHostLocation() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let state = directory.appendingPathComponent("system-location.json")
+        try Data("{\"version\":".utf8).write(to: state)
+        let provider = VPhoneLocationProvider(control: VPhoneControl(variant: .exp), locationStateURL: state)
+        // Exercise the headless connection branch with no external command.
+        if !provider.externallyControlled { provider.startForwarding() }
+        let snapshot = provider.systemLocationController.snapshot()
+        XCTAssertTrue(provider.externallyControlled)
+        XCTAssertEqual(snapshot["state"] as? String, "off")
+        let applied = snapshot["applied"] as? [String: Any]
+        let error = applied?["last_error"] as? [String: Any]
+        XCTAssertEqual(error?["code"] as? String, "location_persistence_corrupt")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: state.path))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: directory.path).count, 1)
+        XCTAssertTrue(provider.stopAllLocationSourcesForGUI())
+        XCTAssertFalse(provider.externallyControlled)
+        let cleared = provider.systemLocationController.snapshot()["applied"] as? [String: Any]
+        XCTAssertNil(cleared?["last_error"])
+    }
+}

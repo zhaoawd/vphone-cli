@@ -72,9 +72,13 @@ class VPhoneLocationProvider: NSObject {
         self.locationStateURL = locationStateURL
         super.init()
 
-        if systemLocationController.hasActiveSource {
+        if systemLocationController.requiresExplicitSourceSelection {
             externallyControlled = true
-            print("[location] restored persisted fixed source; waiting for guest")
+            if systemLocationController.hasActiveSource {
+                print("[location] restored persisted fixed source; waiting for guest")
+            } else {
+                print("[location] persisted location restore failed; waiting for explicit source selection")
+            }
         }
 
         let proxy = LocationDelegateProxy { [weak self] location in
