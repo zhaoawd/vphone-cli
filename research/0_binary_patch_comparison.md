@@ -1,5 +1,20 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-23: owned-location runtime backport
+
+The `feat/bl056-owned-location-runtime` branch is based on
+`06370de81c7e9c709b8efb132569402620695f97`. It applies location-only changes
+from `9682b65604c404a5bf9fa524099896aa85eed032`,
+`e2dcd5390961e55adb078593a01fe25a04935dca`,
+`5d1bdaf84f90193659d3c43e597af6319f3fd61c`, and
+`408f3d23b29d16e6e28998d92e20023e897548a3`. The T20 subset covers Host
+validation and its Swift tests; API daemon and Guest Components changes are
+outside this branch. Firmware patch definitions and the variant counts below
+are unchanged. The integration branch's historical runtime acceptance does not
+qualify this backport's binaries; build and deployment evidence must identify
+this branch's frozen commit and paired Host/guest SHA-256 values.
+
+
 > **EXP is a JB superset.** Everything in the baseline tables below that is `Y`
 > for JB is also `Y` for EXP. The columns are kept at three variants to avoid
 > noise — the only place EXP and JB diverge is the **Experimental additions**
