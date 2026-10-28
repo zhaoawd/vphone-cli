@@ -412,3 +412,37 @@ Testable next hypothesis (read-only, in our own app): the status bar view inside
 GeoProbe's own window hierarchy, and the layout class it uses, differ between
 the simulator and the VM. Recording that class name and frame in both answers
 whether the VM picks another status bar layout for this display.
+
+### Status bar view and the 4 pt landscape inset (2026-10-28)
+
+GeoProbe now also walks every window of its scene for views whose class name
+contains `StatusBar` (`statusBarViews`). Simulator and VM, both modes: **none**.
+The status bar is drawn outside the app process (SpringBoard), on both, so its
+layout class cannot be read from the app. SpringBoard's own log around the
+launch (process filter, not truncated: VM 1386 lines / 20 s via `SBLOG=1
+run-vm.sh`, simulator 2805 lines via `simctl spawn log show`) shows the
+`SB-systemAperture` and `SB-systemApertureCurtain` scenes on both and no line
+naming a status bar layout or aperture geometry. The layout choice is not
+visible from the app or the log.
+
+Landscape, same interface orientation (3) on both (`*-inner-land-v3`):
+
+| | GeoBare root view | GeoProbe content view (in UINavigationController) |
+|---|---|---|
+| simulator right inset | 84 | 84 |
+| VM right inset | 84 | **88** |
+
+Window inset is 84 on both and `additionalSafeAreaInsets` is 0 on both, so the
+4 pt is added by the navigation container on the VM only, not by the window or
+the system's safe area. Active occlusion region in landscape: 84x120 at x 867
+(simulator) against **84x124** (VM), also 4 pt; the container probably derives
+its trailing inset from that region, a correlation not verified. The VM again
+reports no inactive division or inactive occlusion.
+
+Summary of the open inner-panel differences, all downstream of SpringBoard's
+description of the inner panel's occluded area: the occlusion region's size
+(portrait 144 vs 134 wide, landscape 124 vs 120 tall), the status bar drawing
+outside it in portrait, and the missing fold regions. Next read-only step: the
+data SpringBoard derives the inner panel's sensor/occlusion area from
+(MobileGestalt display and sensor keys, devicetree `display0`/`display1`), on
+the simulator runtime against the VM.

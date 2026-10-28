@@ -45,6 +45,13 @@ for APP in $APPS; do
   for f in $(rpc files.list "{\"path\":\"$dir/Documents\"}" | jq -r '.result.entries[]?.name | select(startswith("geometry"))'); do
     rpc files.remove "{\"path\":\"$dir/Documents/$f\"}" > /dev/null
   done
+  # SBLOG=1: capture SpringBoard's own log (process filter, so it stays under
+  # the 5000-line cap) for 20 s around the launch, raw reply kept.
+  if [[ -n ${SBLOG:-} ]]; then
+    rpc logs.syslog '{"seconds":20,"process":"SpringBoard","max_lines":5000}' > $OUT/$APP/springboard.raw.json &
+    sblog=$!
+    sleep 1
+  fi
   rpc apps.launch "{\"bundle_id\":\"$BID\"}" | jq -c "{app: \"$APP\", ok, error}"
   sleep 6
   if [[ -n ${ROTATE:-} ]]; then
@@ -56,6 +63,10 @@ for APP in $APPS; do
     send "{\"t\":\"pull\",\"path\":\"$dir/Documents/$f\",\"local\":\"$OUT/$APP/$f\"}" > /dev/null
   done
   print -r -- "$APP: $(ls $OUT/$APP/geometry-*.json 2>/dev/null | wc -l | tr -d ' ') samples"
+  if [[ -n ${SBLOG:-} ]]; then
+    wait $sblog
+    jq -c "{app: \"$APP\", springboard_log: (if .ok then {count: .result.count, truncated: .result.truncated} else {error: .error} end)}" $OUT/$APP/springboard.raw.json
+  fi
   rpc apps.terminate "{\"bundle_id\":\"$BID\"}" > /dev/null
   [[ -n ${ROTATE:-} ]] && { rpc display.rotation '{"orientation":"portrait"}' > /dev/null; sleep 2; }
 done

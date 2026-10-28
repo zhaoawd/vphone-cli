@@ -150,6 +150,33 @@ static NSString *sysctlString(const char *name) {
   [window bringSubviewToFront:self.overlay];
 }
 
+// Status bar views that live in this app's own windows (read only): class,
+// frame in the root view's space, and the layout provider class when the view
+// exposes one. An empty list means the app draws no status bar of its own.
+- (NSArray *)statusBarViewsInScene:(UIWindowScene *)scene {
+  NSMutableArray *found = [NSMutableArray array];
+  __block void (^walk)(UIView *, NSUInteger);
+  __block __weak void (^weakWalk)(UIView *, NSUInteger);
+  walk = ^(UIView *v, NSUInteger depth) {
+    NSString *name = NSStringFromClass(v.class);
+    if ([name rangeOfString:@"StatusBar" options:NSCaseInsensitiveSearch].location != NSNotFound) {
+      NSMutableDictionary *e = [@{@"class": name, @"depth": @(depth), @"hidden": @(v.isHidden), @"alpha": @(v.alpha),
+                                  @"window": NSStringFromClass(v.window.class) ?: @"?",
+                                  @"frameInRootView": rect([v convertRect:v.bounds toView:self.view])} mutableCopy];
+      SEL provider = NSSelectorFromString(@"visualProvider");
+      if ([v respondsToSelector:provider]) {
+        id p = [v valueForKey:@"visualProvider"];
+        e[@"visualProvider"] = p ? NSStringFromClass([p class]) : @"nil";
+      }
+      [found addObject:e];
+    }
+    for (UIView *sub in v.subviews) weakWalk(sub, depth + 1);
+  };
+  weakWalk = walk;
+  for (UIWindow *w in scene.windows) walk(w, 0);
+  return found;
+}
+
 - (void)sample:(NSString *)reason {
   UIWindow *window = self.view.window;
   if (!window) return;
@@ -180,6 +207,7 @@ static NSString *sysctlString(const char *name) {
     } else {
       d[@"statusBar"] = @{@"manager": @NO};
     }
+    d[@"statusBarViews"] = [self statusBarViewsInScene:scene];
   }
   d[@"window"] = @{@"frame": rect(window.frame), @"bounds": rect(window.bounds), @"safeArea": insets(window.safeAreaInsets)};
   d[@"rootView"] = @{@"bounds": rect(self.view.bounds), @"safeArea": insets(self.view.safeAreaInsets),
