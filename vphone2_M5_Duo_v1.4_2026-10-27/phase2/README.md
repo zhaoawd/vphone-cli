@@ -785,7 +785,7 @@ sample; one `ReportSystemMemory` report at the last sample. The run was stopped 
 ### SpringBoard touch diagnostic: the status bar window takes E1 touches (2026-10-28)
 
 `VPhoneGuestComponents/TouchDiag/libtouchdiag.m`, loaded into SpringBoard by
-SystemHook and inert unless `/private/var/tmp/vphone-touchdiag` exists at
+SystemHook and inert unless `/var/mobile/Library/Caches/vphone-touchdiag.flag` exists at
 SpringBoard start, wraps `-[SpringBoard sendEvent:]` to log each touch's
 window, level, frame and hit view, then calls the original. `scripts/sb-trace.sh`
 turns it on, resprings, taps the Home screen 4 times by host view and 4 by
@@ -880,7 +880,7 @@ node on), so the correction is a SpringBoard runtime override, not a devicetree
 change. `VPhoneGuestComponents/InnerCutoutFix/libinnercutoutfix.m`, SystemHook,
 SpringBoard only, separate from the read-only `libtouchdiag`:
 
-- Gate: `/private/var/tmp/vphone-innercutout` present at SpringBoard start with
+- Gate: `/var/mobile/Library/Caches/vphone-innercutout.flag` present at SpringBoard start with
   a rect `x y width height` in points; otherwise it logs "inactive" and changes
   nothing.
 - Match: `-[UIScreen _exclusionArea]` on the main screen, native size exactly
@@ -898,7 +898,8 @@ SpringBoard only, separate from the read-only `libtouchdiag`:
   positions select `AxisAlignableSplit2007` in the probe.
 - Rollback: remove the flag and cold boot. The library stays in `/usr/lib`,
   inert. No root step, no restore, no snapshot needed (the disk change is the
-  environment library and two flag files under `/private/var/tmp`).
+  environment library and two flag files in `/var/mobile/Library/Caches`; `/private/var/tmp`
+  is cleared at every guest boot, so flags there do not reach a cold boot).
 
 `scripts/cutout-run.sh C0|C1|C2`: boot 1 syncs libraries and sets the flags,
 boot 2 is the measured cold boot; records library and bundle hashes, the fix

@@ -14,9 +14,9 @@ CUTOUT="399 30 37 37"
 R=/Users/kolar/vphone-duo-m5/run/phase2
 S=/Users/kolar/.vphone/machines/duo-m5-dd/vphone.sock
 O=$R/cutout/$RUN
-FIX_FLAG=/private/var/tmp/vphone-innercutout
+FIX_FLAG=/var/mobile/Library/Caches/vphone-innercutout.flag
 FIX_LOG=/var/mobile/Library/Caches/vphone-innercutout.log
-DIAG_FLAG=/private/var/tmp/vphone-touchdiag
+DIAG_FLAG=/var/mobile/Library/Caches/vphone-touchdiag.flag
 DIAG_LOG=/var/mobile/Library/Caches/vphone-touchdiag.log
 W=2007; H=2853
 mkdir -p $O
@@ -51,7 +51,8 @@ note "guest boot: $(rpc system.info | jq -c '{uptime: .result.uptime}' 2>/dev/nu
 rpc screen.unlock '{"timeout":30}' > /dev/null
 rpc input.button '{"name":"home"}' > /dev/null; sleep 3
 
-# Home screen: tap, record the foreground app, return home.
+# Home screen: the same 8 grid taps as before (hit windows), then taps on real
+# icons. A first touch makes the diagnostic write the icon centres.
 for src in host guest; do for f in 0.3 0.7; do for g in 0.45 0.65; do
   if [[ $src == host ]]; then
     x=$(( W * f )); y=$(( H * g ))
@@ -64,11 +65,28 @@ for src in host guest; do for f in 0.3 0.7; do for g in 0.45 0.65; do
   note "home tap $src ${f}x${g}: foreground $(rpc apps.foreground | jq -r '.result.bundle_id // "springboard"')"
   rpc input.button '{"name":"home"}' > /dev/null; sleep 2
 done; done; done
+send "{\"t\":\"pull\",\"path\":\"$DIAG_LOG\",\"local\":\"$O/touchdiag-icons.log\"}" > /dev/null
+icons=(${(s: :)$(grep -m1 '^home-icons' $O/touchdiag-icons.log 2>/dev/null | cut -d' ' -f2-)})
+note "home icons (pt): ${icons[1,6]}"
+for src in host guest; do for i in 2 5; do
+  [[ -n ${icons[$i]:-} ]] || continue
+  ix=${icons[$i]%,*}; iy=${icons[$i]#*,}
+  rpc input.button '{"name":"home"}' > /dev/null; sleep 2
+  if [[ $src == host ]]; then
+    x=$(( ix * 3 )); y=$(( iy * 3 ))
+    send "{\"t\":\"tap\",\"x\":${x%.*},\"y\":${y%.*},\"screen\":false}" > /dev/null
+  else
+    rpc input.tap "{\"x\":${ix%.*},\"y\":${iy%.*}}" > /dev/null
+  fi
+  sleep 4
+  note "icon tap $src at ${icons[$i]}: foreground $(rpc apps.foreground | jq -r '.result.bundle_id // "springboard"')"
+done; done
+rpc input.button '{"name":"home"}' > /dev/null; sleep 2
 
 # GeoBare: application, window and view layers.
 zsh $R/touch-trace.sh cutout-$RUN $W $H > /dev/null 2>&1
 note "geobare: $(tail -2 $R/touch-trace/cutout-$RUN/results.txt | head -1)"
-cp $R/touch-trace/cutout-$RUN/*(N) $O/ 2>/dev/null
+for f in $R/touch-trace/cutout-$RUN/*(N); do cp $f $O/geobare-${f:t}; done
 
 send "{\"t\":\"pull\",\"path\":\"$FIX_LOG\",\"local\":\"$O/innercutout.log\"}" > /dev/null
 send "{\"t\":\"pull\",\"path\":\"$DIAG_LOG\",\"local\":\"$O/touchdiag.log\"}" > /dev/null
