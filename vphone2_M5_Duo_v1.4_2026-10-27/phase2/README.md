@@ -668,3 +668,47 @@ SpringBoard changes), the interactive static inner panel is not worth pursuing
 now. The single-display Duo at the outer size, where touch works, stays the
 deliverable; the inner-panel findings (2007x2853, reserved regions, the
 devicetree node, the host turn) remain recorded for later.
+
+### R0/R1/R2: display association for synthetic touches (2026-10-28)
+
+vphoned gained an experimental single-finger path, `input.touch_native`
+(`vp_hid_touch_edge` with no edge, normalized coordinates), and, when
+`/private/var/tmp/vphoned.touch-display` exists, attaches BackBoardServices
+digitizer info (`BKSHIDEventSetDigitizerInfo`) naming a display: the file's
+contents, or `CADisplay.mainDisplay.uniqueId` when empty. The host pushes the
+new vphoned on connect (no root step). `scripts/r-experiment.sh`, E1 size, no
+node, GeoBare's touch log as the criterion:
+
+| group | flag | touches received |
+|---|---|---|
+| R0 | absent | 0/4 |
+| R1 | present, empty (main display UUID) | 0/4, and no attachment logged |
+| R2 | removed | 0/4 |
+
+With an explicit value in the file, `BKSHIDEventSetDigitizerInfo` is found and
+called (`BKSHIDEventDigitizerAttributes` is the attribute class); reading the
+value back through a `displayUUID` getter returned null, so the getter's name is
+not confirmed. With an empty file nothing was attached because the main
+display has no UUID: `CADisplay.displays` in the guest (vphoned `script.eval`)
+lists `LCD` (displayId 1, main, uniqueId null) and five `Wireless` entries.
+The built-in main display's UUID is null by design, so `displayUUID (null)` on
+touches and `setDesignatedMainDisplayUUID: (null)` name the built-in display,
+not a missing one. The hypothesis that E1 touches fail for want of a display
+identity does not hold; why they reach no app at E1 is still open. The flag
+file was removed afterwards.
+
+### T6 at the outer size (2026-10-28, duo-m5-dd, branch bundle)
+
+`scripts/t6o-coldboot.sh` (10 headless cold boots, `results/t6-outer/coldboot.txt`):
+10/10 — vphoned 7–9 s; at 180 s uptime launchd 10 s CPU and kernel_task 45–47 s
+every boot; SpringBoard 37 / backboardd 73 on every boot; unlock ok; a tap on
+Safari through vphoned opens it every time; the only new crash report is
+SiriSearchFeedback (8 of 10 boots), the known one.
+
+`scripts/t6o-interact.sh` (windowed, `results/t6-outer/interact.txt`): GeoProbe,
+Safari open_url, landscape-left and back, keyboard input into the address bar
+(`example.org` shown), food_ordering, Safari back with the same pid (423), no
+crash reports. The interaction round ran with the bundle that carries the
+vphoned experiment (host pushed the new vphoned on connect); the cold boots ran
+before it. Still to run: the 2 h idle (`scripts/t6o-idle.sh`), snapshot and
+export/import regression, and a boot after a host restart (needs the user).

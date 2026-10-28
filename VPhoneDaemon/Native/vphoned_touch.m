@@ -17,6 +17,7 @@
 
 #include <dlfcn.h>
 #include <mach/mach_time.h>
+#include <objc/message.h>
 
 typedef void *IOHIDEventSystemClientRef;
 typedef void *IOHIDEventRef;
@@ -109,6 +110,67 @@ bool vp_hid_keyboard_hold(uint16_t page, uint16_t usage, bool down) {
     return true;
 }
 
+// MARK: - Experimental display association
+//
+// Neither the VZ USB touch screen nor these synthetic events say which display
+// they belong to. On an iPhone Duo guest booted at the inner panel's render
+// size, backboardd resets its designated main display on every touch and the
+// touch reaches no app. As an experiment, when the file below exists, each hand
+// event carries BackBoardServices digitizer info naming a display: the file's
+// contents when non-empty, otherwise the guest's own main display (CADisplay
+// mainDisplay.uniqueId). Without the file nothing changes.
+static NSString *const kVPTouchDisplayFlag = @"/private/var/tmp/vphoned.touch-display";
+
+static void (*pSetDigitizerInfo)(IOHIDEventRef, uint32_t, uint8_t, uint8_t, CFStringRef, CFTimeInterval, float);
+static id (*pGetDigitizerAttributes)(IOHIDEventRef);
+
+static NSString *touch_display_uuid(void) {
+    NSString *contents = [NSString stringWithContentsOfFile:kVPTouchDisplayFlag encoding:NSUTF8StringEncoding error:nil];
+    if (!contents) return nil;
+    NSString *named = [contents stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    if (named.length) return named;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{ dlopen("/System/Library/Frameworks/QuartzCore.framework/QuartzCore", RTLD_NOW); });
+    Class display = NSClassFromString(@"CADisplay");
+    SEL mainDisplay = NSSelectorFromString(@"mainDisplay");
+    SEL uniqueId = NSSelectorFromString(@"uniqueId");
+    if (![display respondsToSelector:mainDisplay]) return nil;
+    id main = ((id (*)(id, SEL))objc_msgSend)(display, mainDisplay);
+    if (![main respondsToSelector:uniqueId]) return nil;
+    id value = ((id (*)(id, SEL))objc_msgSend)(main, uniqueId);
+    return [value isKindOfClass:NSString.class] ? value : nil;
+}
+
+// Attach the display to `hand` when the experiment is on. Logs the value and
+// what BackBoardServices reads back whenever the value changes.
+static void attach_touch_display(IOHIDEventRef hand) {
+    static NSString *lastLogged;
+    NSString *uuid = touch_display_uuid();
+    if (!uuid) return;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        void *bbs = dlopen("/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices", RTLD_NOW);
+        if (!bbs) return;
+        pSetDigitizerInfo = dlsym(bbs, "BKSHIDEventSetDigitizerInfo");
+        pGetDigitizerAttributes = dlsym(bbs, "BKSHIDEventGetDigitizerAttributes");
+    });
+    if (!pSetDigitizerInfo) {
+        if (![lastLogged isEqualToString:@"(no BKSHIDEventSetDigitizerInfo)"]) {
+            lastLogged = @"(no BKSHIDEventSetDigitizerInfo)";
+            NSLog(@"vphoned: touch display: BKSHIDEventSetDigitizerInfo unavailable");
+        }
+        return;
+    }
+    pSetDigitizerInfo(hand, 0, 0, 0, (__bridge CFStringRef)uuid, 0, 0);
+    if (![lastLogged isEqualToString:uuid]) {
+        lastLogged = uuid;
+        id attributes = pGetDigitizerAttributes ? pGetDigitizerAttributes(hand) : nil;
+        id readBack = [attributes respondsToSelector:NSSelectorFromString(@"displayUUID")]
+            ? [attributes valueForKey:@"displayUUID"] : nil;
+        NSLog(@"vphoned: touch display: set %@, read back %@ (%@)", uuid, readBack, [attributes class]);
+    }
+}
+
 // One hand event carrying `count` fingers, dispatched as a single gesture.
 static void dispatch_digitizer_points(const double *xs, const double *ys,
                                       int count, boolean_t range, boolean_t touch,
@@ -133,6 +195,8 @@ static void dispatch_digitizer_points(const double *xs, const double *ys,
         pAppend(hand, finger, 0);
         CFRelease(finger);
     }
+
+    attach_touch_display(hand);
 
     IOHIDEventRef strong = (IOHIDEventRef)CFRetain(hand);
     dispatch_async(gTouchQueue, ^{

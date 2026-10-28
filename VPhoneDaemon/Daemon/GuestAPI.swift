@@ -329,6 +329,16 @@ enum GuestAPI {
                 phase, x: number(params, "x"), y: number(params, "y"),
                 normalized: params["normalized"] as? Bool ?? true,
             )
+        case "input.touch_native":
+            // Experimental: one finger through vphoned's own digitizer path
+            // (`vp_hid_touch_edge` with no edge) instead of icli's, so the
+            // display-association experiment in vphoned_touch.m applies.
+            // Normalized 0..1 coordinates only.
+            guard let phase = (params["phase"] as? String).flatMap(TouchPhase.init(rawValue:)) else {
+                throw GuestAPIError.invalidRequest("phase must be down, move or up")
+            }
+            vp_hid_touch_edge(touchPhaseCode(phase), number(params, "x"), number(params, "y"), 0)
+            return ["phase": phase.rawValue, "path": "vphoned"]
         case "input.touch2":
             // Two fingers in one hand event. icli's `input.touch` carries a
             // single digitizer point, so a pinch has to go through vphoned's own
