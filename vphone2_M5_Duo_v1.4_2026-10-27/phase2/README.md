@@ -640,3 +640,31 @@ geometry and layout only; touch was never exercised there.
 Consequence: the static inner-panel VM (E1) is not interactive. T6 at E1 can
 still cover boot, idle and automation through vphoned's non-touch methods, but
 not touch interaction, until this is found.
+
+### Where E1 touches go (2026-10-28)
+
+backboardd's log around a tap (process filter, not truncated), outer size against
+E1 without the node, message templates compared with addresses removed:
+
+- Outer: the tap moves keyboard focus to the tapped scene
+  (`keyboardFocus … target: …UIHostedScene…`), i.e. it hit a context.
+- E1: no focus change. Instead, on every tap:
+  `setDesignatedMainDisplayUUID: (null)` →
+  `reevaluateDisplayArrangementForReason(designated main display changed)` →
+  a pointer-region rebuild for `<main>` 669x951. Neither line appears at the
+  outer size.
+- Both sizes: hit-test region = full screen, touch stream to SpringBoard's
+  `(external)` destination, digitizer attention events with `displayUUID (null)`.
+
+Reading (from the log text, not traced in code): at the inner size the Duo
+logic that designates the touched panel as the main display is active, and the
+VM's USB touch screen carries no display identity, so each tap designates no
+display and the touch reaches no app. Making it work would mean associating the
+touch screen with a display identity this logic accepts, inside backboardd /
+SpringBoard's dual-panel handling.
+
+Decision point: by the criterion set for this track (stop if it needs deep
+SpringBoard changes), the interactive static inner panel is not worth pursuing
+now. The single-display Duo at the outer size, where touch works, stays the
+deliverable; the inner-panel findings (2007x2853, reserved regions, the
+devicetree node, the host turn) remain recorded for later.
