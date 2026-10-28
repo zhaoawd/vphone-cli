@@ -589,3 +589,31 @@ the inner panel's `BlankableRR` hole, so the system appears to fall back to
 Next hypothesis, one change: drop the device-level island for inner-size boots
 (for example `/product/island-notch-location`) and check `_exclusionArea` and
 the status bar again. Not applied.
+
+### Touch with the inner-panel node: not delivered (2026-10-28)
+
+With the node and the host turn, touch does not reach apps. GeoBare now logs
+every touch it receives (`touchesBegan`, Documents/touches.log);
+`scripts/touch-map.sh` sends four frame-buffer points through the host view
+(`vphone.sock` `tap`) and four through vphoned (`input.tap`). GeoBare was
+frontmost and received none of the eight. Home-screen taps at frame-buffer
+positions did not open the icons under them either.
+
+backboardd's log during taps (process filter, 109 lines, not truncated): the
+digitizer contacts arrive (`contact 0 presence: touching` / `none`), the hit test
+uses `BKSHitTestRegion {{0, 0}, {669, 951}}` (portrait) and the touch goes to an
+`(external)` destination, while the interface is laid out landscape (951x669)
+under `display-rotation` 270. The node turns the display; the VM's USB touch
+screen is not turned with it, so touches are hit-tested in the unturned space
+and miss the app's context.
+
+The frame buffer also shows the status bar drawn unturned (portrait, time and
+battery along the frame buffer's top) while the rest of the interface is turned,
+which is why its split layout lands beside the fold in the turned window.
+
+Consequence: the node as copied (rotation 270) is not usable for interaction.
+Options: a node variant with `display-rotation` 0 and the region frames
+rewritten into the unturned portrait space (no host turn needed, touch stays
+consistent, but the values no longer match the board); find a property that
+turns the touch screen with the panel (not identified); or revert and keep the
+static inner panel without the node.

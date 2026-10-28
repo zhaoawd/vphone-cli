@@ -120,6 +120,32 @@ static NSString *sysctlString(const char *name) {
   [self sampleAfterDelay:@"foreground"];
 }
 
+// Touch log: every touch that begins, as the app's window and screen see it,
+// appended to Documents/touches.log (one JSON object per line). Used to map
+// injected touches to where the guest delivers them.
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+  [super touchesBegan:touches withEvent:event];
+  UIWindow *window = self.view.window;
+  UIWindowScene *scene = window.windowScene;
+  NSURL *docs = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+  NSURL *log = [docs URLByAppendingPathComponent:@"touches.log"];
+  for (UITouch *t in touches) {
+    CGPoint inWindow = [t locationInView:window];
+    CGPoint inScreen = scene ? [window convertPoint:inWindow toCoordinateSpace:scene.screen.fixedCoordinateSpace] : inWindow;
+    NSDictionary *e = @{@"window": @{@"x": @(inWindow.x), @"y": @(inWindow.y)},
+                        @"screenFixed": @{@"x": @(inScreen.x), @"y": @(inScreen.y)},
+                        @"windowBounds": rect(window.bounds),
+                        @"orientation": @(scene.effectiveGeometry.interfaceOrientation),
+                        @"time": @(t.timestamp)};
+    NSMutableData *line = [[NSJSONSerialization dataWithJSONObject:e options:NSJSONWritingSortedKeys error:nil] mutableCopy];
+    [line appendBytes:"\n" length:1];
+    NSFileHandle *h = [NSFileHandle fileHandleForWritingToURL:log error:nil];
+    if (h) { [h seekToEndOfFile]; [h writeData:line]; [h closeFile]; }
+    else { [line writeToURL:log atomically:YES]; }
+    NSLog(@"[geo-probe] touch %@", e);
+  }
+}
+
 - (void)sampleAfterDelay:(NSString *)reason {
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ [self sample:reason]; });
 }
