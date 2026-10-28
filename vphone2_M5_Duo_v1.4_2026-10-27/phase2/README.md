@@ -374,3 +374,41 @@ left buttons end up under the time. The missing division region fits the
 earlier finding that the VM has no hinge (no V68 product-id for CoreMotion, one
 display). Where the occlusion width and the status bar layout come from is not
 traced yet.
+
+### Status bar overlap: localisation from the existing data (2026-10-28)
+
+From `results/geo-{sim,vm}-inner-portrait-v2/` and their screenshots (run host,
+`GeoProbe/screen.png`), unfolded inner portrait, no new runs:
+
+- **Not Safari-specific.** GeoProbe's standard navigation bar collides on the VM
+  too: the clock is drawn over `LeftEdge`, the battery over `RightEdge`. On the
+  simulator both buttons are clear and the status bar sits inside the active
+  occlusion region.
+- **Region reported and honoured on both.** The navigation bar ends its trailing
+  button at the occlusion region's left edge on both (≈525 pt VM, ≈535 pt sim,
+  from the screenshots, approximate). Navigation bar frame (y 24, h 58), root safe
+  area, status bar frame (h 2) and traits are identical. So the first layer that
+  differs for the overlap is **where the status bar draws its content**: on the VM
+  it uses the split layout (left and right ends of the top band), on the simulator
+  a cluster inside the occlusion region. Region data and the app container are
+  not the cause.
+- **144 vs 134 pt** only moves the trailing bar button by 10 pt; it is not what
+  overlaps. Both regions are reported from the root view with
+  `IncludeInactive`, margins 0, y 0, h 82, ending at x 669.
+- **Division:** the query includes inactive regions. The unfolded simulator
+  returns an inactive division (y 455.5, 669x40, margins 20/20) and an inactive
+  37x58 occlusion; the VM returns neither, so the VM has no description of them,
+  not just no active one. Kept as a limit of the single-display VM.
+- **4 pt landscape difference:** measured with the earlier GeoProbe (navigation
+  container, no region query): window right inset 84 on both, content view 88
+  (VM) against 84 (sim). Which layer adds it is not localised; it needs GeoBare
+  in landscape on both.
+- **Comparability:** same iOS 27.1 SDK build, content size L, left-to-right, no
+  camera or Live Activity. Status items differ: VM 12-hour clock and battery,
+  simulator 24-hour clock and Wi-Fi ring. The overlap is about placement, not
+  item width.
+
+Testable next hypothesis (read-only, in our own app): the status bar view inside
+GeoProbe's own window hierarchy, and the layout class it uses, differ between
+the simulator and the VM. Recording that class name and frame in both answers
+whether the VM picks another status bar layout for this display.
