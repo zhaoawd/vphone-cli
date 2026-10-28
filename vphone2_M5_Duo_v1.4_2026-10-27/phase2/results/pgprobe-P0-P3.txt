@@ -1,0 +1,37 @@
+pgprobe P0-P3, run 2026-10-28 13:10 (local), one process per test
+host: macOS 27.0.1 (26A434), Apple M5 Pro
+sdk: 27.0 (26A425), Xcode 27.1
+build: clang -fobjc-arc -Wno-deprecated-declarations -framework Foundation -framework Metal \
+         -framework ParavirtualizedGraphics pgprobe.m -o pgprobe && codesign -s - -f pgprobe
+       (ad hoc, no entitlements; PG logs "Incorrect protected content entitlement" and continues)
+each display: modeList = [1398x2034 @ 60 Hz]; all objects held 2 s before exit
+
+[P0] metal=Apple M5 Pro PGMaxDisplayPortCount=8
+  device ports=1 -> created
+  display a0 port=0 serial=0x12345678 -> created (reports port=0 serial=0x12345678)
+[P0] objects alive: 2
+[P1] metal=Apple M5 Pro PGMaxDisplayPortCount=8
+  device ports=1 -> created
+  device ports=1 -> created
+  display a0 port=0 serial=0x12345678 -> created (reports port=0 serial=0x12345678)
+  display b0 port=0 serial=0x12345678 -> nil
+[P1] objects alive: 3
+[P2] metal=Apple M5 Pro PGMaxDisplayPortCount=8
+  device ports=1 -> created
+  device ports=1 -> created
+  display a0 port=0 serial=0x12345678 -> created (reports port=0 serial=0x12345678)
+  display b0 port=0 serial=0x12345679 -> created (reports port=0 serial=0x12345679)
+[P2] objects alive: 4
+[P3] metal=Apple M5 Pro PGMaxDisplayPortCount=8
+  device ports=2 -> created
+  display a0 port=0 serial=0x12345678 -> created (reports port=0 serial=0x12345678)
+  display a1 port=1 serial=0x12345679 -> created (reports port=1 serial=0x12345679)
+[P3] objects alive: 3
+
+PG log (process pgprobe, subsystem com.apple.gpusw.ParavirtualizedGraphics):
+  every test: E "Incorrect protected content entitlement", then "Starting on metal device"
+  P1: "PGDisplay[0](<private>/0x12345678): Created"
+      E "Display serial numbers must be unique across all devices"
+  P2: "PGDisplay[0](<private>/0x12345678): Created", "PGDisplay[0](<private>/0x12345679): Created"
+  P3: "PGDisplay[0](<private>/0x12345678): Created", "PGDisplay[1](<private>/0x12345679): Created"
+  earlier run without PGMemoryMapDescriptor: every device nil, E "A memory map is required"

@@ -8,13 +8,22 @@ Archived 2026-10-28 from the M5 Pro run. Contents of this folder:
 - `scripts/`: `dd-matrix.sh` (D0–D3 display topology matrix), `screen-probe.sh`
   (boot at a `VPHONE_SCREEN` size, raw syslog/crash capture), `fold-resize.sh`
   (runtime `display` reconfigure attempt).
-- `results/`: the JSON each probe wrote and the matrix table. Screenshots, boot logs
+- `results/`: the JSON each probe wrote, the matrix table and `pgprobe-P0-P3.txt`. Screenshots, boot logs
   and syslog captures stay on the run host under `~/vphone-duo-m5/run/phase2/`.
 
 The scripts hard-code the run host's paths (`/Users/kolar/...`), the test VM
 `duo-m5-dd`, its USB UDID and the experimental bundle `.build/pr728-dd`; the code they
 drive is on this branch (commits 49116af3 and 3b99165c). Paths below that start with
 `~/vphone-duo-m5/` refer to the run host.
+
+## Status (2026-10-28)
+
+| track | state |
+|---|---|
+| Single-display inner panel (static) | **Calibrated.** Boot with `VPHONE_SCREEN=2007x2853@430`; the app-visible geometry matches Xcode 27.1's unfolded iPhone Duo simulator in portrait and landscape. Open: reserved regions (occlusion 144 vs 134 pt, no fold division), status bar drawn outside its occlusion region (Safari's left toolbar buttons under the time), `UIScreen.main` is the inner display. Short stability only (~57 s, pids unchanged, launchd CPU flat); no phase-1-style T6. |
+| Fold switch on one display | **Parked.** Runtime `display` reconfigure is refused because the guest driver never reports mode-list responsiveness; switching panels by reboot is not a fold. |
+| Two real displays | **Blocked at the host, research recorded.** PG accepts one device with two ports (P3) and two devices with distinct serials (P2), with fixed modes connected. The VM service refuses both: ports ≥ 2 need `os_variant_has_internal_content`, two devices get the same serial (`0x12345678 + port`). Route A′ (one GPU, two ports) is the better fit for the one-`gfx` guest devicetree; route B′ (two GPUs) stays a fallback. Both need the VM service changed and an unanalysed guest driver path; neither is pursued here. |
+| Phase 1 baseline | Unchanged: `duo-m5-728`, snapshot `phase1-baseline`. All phase 2 runs used the clone `duo-m5-dd`. |
 
 ---
 
@@ -168,6 +177,9 @@ display is created after registering
 So reconfiguration needs the guest display driver to report that it responds to
 mode-list changes; this iOS guest never does. Making it would mean changing the
 guest's paravirtual display driver and having iOS accept a main-screen mode change.
+This is a separate capability from booting with fixed-size displays: PG connects
+a display when its first `modeList` is set, so two displays of fixed sizes do not
+depend on runtime reconfiguration. Runtime resize is parked, not a precondition.
 
 **Boot-time size: accepted, layout half-adapted.** `VPHONE_SCREEN=1878x2670@430`
 (`phase2/inner-boot.sh`, `phase2/screen-inner/`): vphoned 12 s, guest reports
@@ -182,10 +194,18 @@ metrics this is "a phone with the inner panel's size", not the Duo's unfolded mo
 
 ## Standalone PG probe and guest pre-check (2026-10-28)
 
-`~/vphone-duo-m5/src/phase2/pgprobe.m`: ParavirtualizedGraphics in our own
-process, no Virtualization.framework, no guest. macOS 27 needs
-`PGCreateDeviceWithDescriptor` plus a private `PGMemoryMapDescriptor` (the
-callback memory path is removed); a host allocation stands in for guest RAM.
+`pg-probe/pgprobe.m`: ParavirtualizedGraphics in our own process, no
+Virtualization.framework, no guest. Raw output and host details:
+`results/pgprobe-P0-P3.txt`. On this host (macOS 27.0.1, 26A434) device creation
+needs `PGCreateDeviceWithDescriptor` (`PGNewDeviceWithDescriptor` is unavailable
+in the macOS 27.0 SDK, 26A425) and a private `PGMemoryMapDescriptor` of guest-physical ranges;
+without it PG logs "A memory map is required". That SDK marks the callback
+memory path (`createTask`, `mapMemory`, …) obsoleted in macOS 27.0. When the
+memory-map requirement started is not established here: QEMU's port ties
+`PGMemoryMapDescriptor` to the IOSurface-mapper / process-isolation path of
+macOS 15.4, and the descriptor has `usingIOSurfaceMapper` and
+`enableProcessIsolation` properties, so treat it as a per-version, per-path
+choice, not a macOS 27 switch. A host allocation stands in for guest RAM.
 
 | test | result |
 |---|---|
@@ -194,19 +214,32 @@ callback memory path is removed); a host allocation stands in for guest RAM.
 | P2 2 devices, port 0 each, serials S / S+1 | both created |
 | P3 1 device, displayPortCount 2, ports 0 / 1 | both created |
 
-So PG itself has no internal-content gate on ports and accepts two devices with
+Each created display was given a non-empty `modeList` (1398x2034 @ 60 Hz, which
+is what makes PG hot-plug it) and every device and display was held for 2 s
+before exit. So P2/P3 passed creation and the fixed-mode connect request. PG
+itself has no internal-content gate on ports and accepts two devices with
 distinct serials; both limits seen earlier are the VM service's own choices.
-Display objects only — nothing here shows a guest driving them.
+No guest: nothing here shows memory access, interrupts, a guest driver or frames.
 `PGDeviceDescriptor` also has private `displayPortConnectionTypes` and
 `externalDisplayPortMask` (built-in vs external per port).
 
-Guest side (read-only): `DeviceTree.vphone600ap(.guest).im4p` has exactly one
-`gfx` node (`paravirtualizedgraphics,gpu`, role `APV_GFX`, reg, interrupts). A
-second graphics device (route B) would need a second node with its own MMIO and
-interrupt; one device with two ports (route A) needs no new node. The guest
-driver is `com.apple.driver.AppleParavirtGPUIOGPUFamily`; its
-`AppleParavirtDisplay` is an IOMobileFramebuffer. Whether it creates one display
-per port was not determined.
+Guest side (read-only). What the VM actually boots is the cloudOS 23E5207q
+kernel, not the iPhone Duo IPSW's own: `kernelcache.research.vphone600` in the
+machine's restore folder, Darwin 25.4.0 (`xnu-12377.100.591.502.1~2/RELEASE_ARM64_VRESEARCH1`),
+IM4P file sha256 `697b013c6c53006c78555bfcb961e44da8e2047a303e0b8da609fea263c0cde6`,
+with this machine's JB patches applied. Its devicetree,
+`DeviceTree.vphone600ap(.guest).im4p`, has exactly one `gfx` node
+(`paravirtualizedgraphics,gpu`, role `APV_GFX`, reg, interrupts). A second
+graphics device (route B) would need a second node with its own MMIO and
+interrupt, and how VZ would describe it is unknown. One device with two ports
+(route A) likely needs no second `gfx` node; whether per-port resources fit the
+existing MMIO window was not checked. The guest driver is the fileset entry
+`com.apple.driver.AppleParavirtGPUIOGPUFamily` (source tree
+`ParavirtualizedGraphics/AppleParavirtKext-IOGPUFamily`); its `AppleParavirtDisplay`
+is an IOMobileFramebuffer. Being an IOMobileFramebuffer does not show how many
+instances the driver creates. Whether it discovers ports, creates one display per
+port and routes modes and completions by port was not determined; that driver
+analysis was not continued in this work.
 
 ## Inner-panel render size: 1878x2670 vs 2007x2853 (2026-10-28)
 
@@ -318,7 +351,7 @@ rect and reserved regions). Both record `-[UIView reservedRegionsOfKind:options:
 (iOS 27.1, occlusion and division, inactive included), the status bar rect in the
 root view's space, layout guide/margins, additional safe area, content size,
 system build and SDK. Runs: `geo-sim-inner-portrait-v2/`, `geo-vm-inner-portrait-v2/`
-(sim runtime 24A94401, VM 24A94425, both apps built with the 27.1 SDK, unfolded
+(sim runtime 24A94401, VM 24A94425, both apps built with the iOS 27.1 SDK, unfolded
 inner portrait).
 
 Identical on both, in both modes: window, window and root safe area, safe layout
