@@ -8,7 +8,9 @@
 // SystemHook loads it into SpringBoard. It does nothing unless
 // /private/var/tmp/vphone-touchdiag exists when SpringBoard starts; then it
 // wraps -[UIApplication sendEvent:] to record each touch event (phase,
-// location, window, window level, view) and calls the original unchanged. It
+// location, window, window level, view; for a touch beginning in the status
+// bar window, also the view chain it hit; at the first touch, the status bar
+// windows and their providers) and calls the original unchanged. It
 // never alters an event, a return value or any state. Each event is a line in
 // /var/mobile/Library/Caches/vphone-touchdiag.log, capped at 5000 lines.
 
@@ -16,6 +18,7 @@
 #import <UIKit/UIKit.h>
 #include <dlfcn.h>
 #include <fcntl.h>
+#include <objc/message.h>
 #include <objc/runtime.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -25,6 +28,7 @@
 #define VP_TOUCHDIAG_MAX_LINES 5000
 
 static IMP vpOriginalSendEvent;
+static void vpDumpProviderClasses(void);
 static unsigned vpLines;
 static unsigned long vpOtherEvents;
 
@@ -44,19 +48,101 @@ static NSString *vpClassName(id object) {
     return object ? NSStringFromClass([object class]) : @"nil";
 }
 
+static NSString *vpTransform(CGAffineTransform t) {
+    return CGAffineTransformIsIdentity(t) ? @"identity"
+        : [NSString stringWithFormat:@"[%.3f %.3f %.3f %.3f %.1f %.1f]", t.a, t.b, t.c, t.d, t.tx, t.ty];
+}
+
+// For a touch that began in the status bar window: the hit view and each
+// ancestor up to the window, with geometry, interaction state, the touch point
+// in that view's coordinates and the view's own pointInside answer. Then the
+// window's direct subviews that contain the point. pointInside:withEvent: is
+// the containment test UIKit itself makes during hit-testing.
+static void vpRecordStatusBarChain(UITouch *touch, UIEvent *event) {
+    UIWindow *window = touch.window;
+    NSMutableArray *chain = [NSMutableArray array];
+    for (UIView *view = touch.view; view; view = view.superview) {
+        CGPoint p = [touch locationInView:view];
+        [chain addObject:[NSString stringWithFormat:@"%@<%p> bounds=%@ center=%@ transform=%@ hidden=%d alpha=%.2f interaction=%d clips=%d point=%@ inside=%d subviews=%lu",
+                          vpClassName(view), view, NSStringFromCGRect(view.bounds), NSStringFromCGPoint(view.center),
+                          vpTransform(view.transform), view.hidden, view.alpha, view.userInteractionEnabled,
+                          view.clipsToBounds, NSStringFromCGPoint(p), [view pointInside:p withEvent:event],
+                          (unsigned long)view.subviews.count]];
+        if (view == window)
+            break;
+    }
+    NSMutableArray *containing = [NSMutableArray array];
+    for (UIView *sub in window.subviews) {
+        CGPoint p = [touch locationInView:sub];
+        if ([sub pointInside:p withEvent:event])
+            [containing addObject:[NSString stringWithFormat:@"%@<%p> bounds=%@", vpClassName(sub), sub, NSStringFromCGRect(sub.bounds)]];
+    }
+    vpWriteLine([NSString stringWithFormat:@"chain touch=%p window=%@<%p> scene=%@ root=%@\n  %@\n  window subviews containing point: %@",
+                 touch, vpClassName(window), window, vpClassName(window.windowScene), vpClassName(window.rootViewController.view),
+                 [chain componentsJoinedByString:@"\n  "], [containing componentsJoinedByString:@"; "]]);
+}
+
+static id vpValue(id object, NSString *key) {
+    return [object respondsToSelector:NSSelectorFromString(key)] ? [object valueForKey:key] : nil;
+}
+
+// Once per SpringBoard, at its first touch: every status bar window with its
+// frame and its STUIStatusBar views' bounds, intrinsic size, visual provider
+// class and that class's own height, if it answers one. Tells an oversized
+// status bar at every size from one only at the inner render size, and which
+// provider sized it.
+static void vpDumpStatusBarWindows(void) {
+    static BOOL done;
+    if (done)
+        return;
+    done = YES;
+    vpDumpProviderClasses();
+    NSMutableArray *windows = [NSMutableArray array];
+    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes)
+        if ([scene isKindOfClass:UIWindowScene.class])
+            [windows addObjectsFromArray:((UIWindowScene *)scene).windows];
+    for (UIWindow *window in windows) {
+        if (![vpClassName(window) containsString:@"StatusBar"])
+            continue;
+        NSMutableArray *bars = [NSMutableArray array];
+        NSMutableArray *queue = [NSMutableArray arrayWithObject:window];
+        while (queue.count) {
+            UIView *view = queue.firstObject;
+            [queue removeObjectAtIndex:0];
+            [queue addObjectsFromArray:view.subviews];
+            if (![vpClassName(view) isEqualToString:@"STUIStatusBar"])
+                continue;
+            id provider = vpValue(view, @"visualProvider");
+            Class providerClass = [provider class];
+            NSString *height = [providerClass respondsToSelector:NSSelectorFromString(@"height")]
+                ? [NSString stringWithFormat:@"%@", [(id)providerClass valueForKey:@"height"]] : @"-";
+            [bars addObject:[NSString stringWithFormat:@"STUIStatusBar<%p> bounds=%@ intrinsic=%@ provider=%@ providerHeight=%@ orientation=%@",
+                             view, NSStringFromCGRect(view.bounds), NSStringFromCGSize(view.intrinsicContentSize),
+                             vpClassName(provider), height, vpValue(view, @"orientation") ?: @"-"]];
+        }
+        vpWriteLine([NSString stringWithFormat:@"statusbar-window %@<%p> frame=%@ level=%.0f hidden=%d screen=%@\n  %@",
+                     vpClassName(window), window, NSStringFromCGRect(window.frame), window.windowLevel, window.hidden,
+                     NSStringFromCGRect(window.screen.bounds), [bars componentsJoinedByString:@"\n  "]]);
+    }
+}
+
 static void vpRecordTouches(UIEvent *event) {
+    vpDumpStatusBarWindows();
     NSMutableArray *parts = [NSMutableArray array];
     for (UITouch *touch in event.allTouches) {
         UIWindow *window = touch.window;
         CGPoint inWindow = window ? [touch locationInView:window] : [touch locationInView:nil];
-        [parts addObject:[NSString stringWithFormat:@"{phase=%ld x=%.1f y=%.1f window=%@ level=%.0f windowFrame=%@ view=%@}",
-                          (long)touch.phase, inWindow.x, inWindow.y, vpClassName(window),
+        [parts addObject:[NSString stringWithFormat:@"{touch=%p phase=%ld x=%.1f y=%.1f window=%@ level=%.0f windowFrame=%@ view=%@}",
+                          touch, (long)touch.phase, inWindow.x, inWindow.y, vpClassName(window),
                           window ? window.windowLevel : -1.0,
                           window ? NSStringFromCGRect(window.frame) : @"-", vpClassName(touch.view)]];
     }
     vpWriteLine([NSString stringWithFormat:@"t=%.4f touches=%lu other_events_since_start=%lu %@",
                  event.timestamp, (unsigned long)event.allTouches.count, vpOtherEvents,
                  [parts componentsJoinedByString:@" "]]);
+    for (UITouch *touch in event.allTouches)
+        if (touch.phase == UITouchPhaseBegan && [vpClassName(touch.window) isEqualToString:@"SBStatusBarWindow"])
+            vpRecordStatusBarChain(touch, event);
 }
 
 static void vpSendEvent(id application, SEL selector, UIEvent *event) {
@@ -67,6 +153,146 @@ static void vpSendEvent(id application, SEL selector, UIEvent *event) {
             vpOtherEvents++;
     }
     ((void (*)(id, SEL, UIEvent *))vpOriginalSendEvent)(application, selector, event);
+}
+
+// What provider selection sees: the main screen's native size and scale, each
+// sized subclass's own nativeDisplayWidth / referenceScreenScale / notchSize,
+// and what each family's visualProviderSubclassForScreen: answers for the main
+// screen with no provider info. Class getters and factory methods only.
+static NSString *vpClassGetter(Class cls, NSString *name) {
+    SEL selector = NSSelectorFromString(name);
+    if (!class_getClassMethod(cls, selector))
+        return @"-";
+    @try {
+        return [NSString stringWithFormat:@"%@", [(id)cls valueForKey:name]];
+    } @catch (NSException *exception) {
+        return [NSString stringWithFormat:@"threw %@", exception.name];
+    }
+}
+
+// Forwards every message to the real screen and records the selector and the
+// answer, so a provider selection run against it lists the screen properties it
+// reads. Used only as an argument to a class method; it changes nothing.
+@interface VPTouchDiagLoggingProxy : NSProxy
+@property(nonatomic, strong) id target;
+@property(nonatomic, strong) NSMutableArray<NSString *> *messages;
+@end
+
+@implementation VPTouchDiagLoggingProxy
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector {
+    return [self.target methodSignatureForSelector:selector];
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    [invocation invokeWithTarget:self.target];
+    NSMethodSignature *signature = invocation.methodSignature;
+    const char *type = signature.methodReturnType;
+    NSString *answer = @"void";
+    if (signature.methodReturnLength && type[0] == '@') {
+        __unsafe_unretained id value;
+        [invocation getReturnValue:&value];
+        answer = [[value description] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+        if (answer.length > 160)
+            answer = [answer substringToIndex:160];
+    } else if (signature.methodReturnLength && strchr("cCsSiIlLqQB", type[0])) {
+        long long value = 0;
+        [invocation getReturnValue:&value];
+        answer = [NSString stringWithFormat:@"%lld", value];
+    } else if (signature.methodReturnLength && type[0] == 'd') {
+        double value;
+        [invocation getReturnValue:&value];
+        answer = [NSString stringWithFormat:@"%g", value];
+    } else if (signature.methodReturnLength && type[0] == '{' && signature.methodReturnLength == sizeof(CGRect)) {
+        CGRect value;
+        [invocation getReturnValue:&value];
+        answer = NSStringFromCGRect(value);
+    } else if (signature.methodReturnLength && type[0] == '{' && signature.methodReturnLength == sizeof(CGSize)) {
+        CGSize value;
+        [invocation getReturnValue:&value];
+        answer = NSStringFromCGSize(value);
+    } else if (signature.methodReturnLength) {
+        answer = [NSString stringWithFormat:@"(%s)", type];
+    }
+    [self.messages addObject:[NSString stringWithFormat:@"%@ -> %@", NSStringFromSelector(invocation.selector), answer]];
+}
+@end
+
+static void vpTraceProviderSelection(NSString *className) {
+    Class cls = NSClassFromString(className);
+    SEL choose = NSSelectorFromString(@"visualProviderSubclassForScreen:visualProviderInfo:");
+    if (!class_getClassMethod(cls, choose))
+        return;
+    VPTouchDiagLoggingProxy *proxy = [VPTouchDiagLoggingProxy alloc];
+    proxy.target = UIScreen.mainScreen;
+    proxy.messages = [NSMutableArray array];
+    NSString *chosen;
+    @try {
+        Class result = ((Class (*)(id, SEL, id, id))objc_msgSend)(cls, choose, proxy, nil);
+        chosen = result ? NSStringFromClass(result) : @"nil";
+    } @catch (NSException *exception) {
+        chosen = [NSString stringWithFormat:@"threw %@ %@", exception.name, exception.reason];
+    }
+    vpWriteLine([NSString stringWithFormat:@"provider-trace +[%@ visualProviderSubclassForScreen:proxy info:nil] = %@\n  %@", className,
+                 chosen, [proxy.messages componentsJoinedByString:@"\n  "]]);
+}
+
+static void vpDumpProviderSelection(NSArray<NSString *> *classNames) {
+    UIScreen *screen = UIScreen.mainScreen;
+    vpWriteLine([NSString stringWithFormat:@"provider-screen bounds=%@ nativeBounds=%@ scale=%.2f nativeScale=%.2f",
+                 NSStringFromCGRect(screen.bounds), NSStringFromCGRect(screen.nativeBounds), screen.scale, screen.nativeScale]);
+    for (NSString *name in classNames) {
+        Class cls = NSClassFromString(name);
+        NSString *width = vpClassGetter(cls, @"nativeDisplayWidth");
+        if (![width isEqualToString:@"-"])
+            vpWriteLine([NSString stringWithFormat:@"provider-size %@ nativeDisplayWidth=%@ referenceScreenScale=%@ notchSize=%@",
+                         name, width, vpClassGetter(cls, @"referenceScreenScale"), vpClassGetter(cls, @"notchSize")]);
+        SEL choose = NSSelectorFromString(@"visualProviderSubclassForScreen:visualProviderInfo:");
+        Method own = class_getClassMethod(cls, choose);
+        Method inherited = class_getClassMethod(class_getSuperclass(cls), choose);
+        if (!own || own == inherited)
+            continue;
+        NSString *chosen;
+        @try {
+            Class result = ((Class (*)(id, SEL, id, id))objc_msgSend)(cls, choose, screen, nil);
+            chosen = result ? NSStringFromClass(result) : @"nil";
+        } @catch (NSException *exception) {
+            chosen = [NSString stringWithFormat:@"threw %@", exception.name];
+        }
+        vpWriteLine([NSString stringWithFormat:@"provider-choose +[%@ visualProviderSubclassForScreen:main info:nil] = %@", name, chosen]);
+    }
+}
+
+// Once, when active: the status bar visual provider classes in the runtime and
+// the class methods each declares itself, the metadata from which the provider
+// for a screen is chosen. Read from the runtime, nothing is called.
+static void vpDumpProviderClasses(void) {
+    unsigned int count = 0;
+    Class *classes = objc_copyClassList(&count);
+    NSMutableArray *lines = [NSMutableArray array];
+    for (unsigned int index = 0; index < count; index++) {
+        NSString *name = NSStringFromClass(classes[index]);
+        if (![name hasPrefix:@"STUIStatusBarVisualProvider"] && ![name containsString:@"VisualProviderFactory"])
+            continue;
+        unsigned int methodCount = 0;
+        Method *methods = class_copyMethodList(object_getClass(classes[index]), &methodCount);
+        NSMutableArray *names = [NSMutableArray array];
+        for (unsigned int m = 0; m < methodCount; m++)
+            [names addObject:NSStringFromSelector(method_getName(methods[m]))];
+        free(methods);
+        [names sortUsingSelector:@selector(compare:)];
+        [lines addObject:[NSString stringWithFormat:@"provider-class %@ super=%@ +[%@]", name,
+                          NSStringFromClass(class_getSuperclass(classes[index])), [names componentsJoinedByString:@" "]]];
+    }
+    free(classes);
+    [lines sortUsingSelector:@selector(compare:)];
+    for (NSString *line in lines)
+        vpWriteLine(line);
+    NSMutableArray *names = [NSMutableArray array];
+    for (NSString *line in lines)
+        [names addObject:[line componentsSeparatedByString:@" "][1]];
+    vpDumpProviderSelection(names);
+    vpTraceProviderSelection(@"STUIStatusBarVisualProvider_AxisAlignableSplit");
+    vpTraceProviderSelection(@"STUIStatusBarVisualProvider_Split");
 }
 
 __attribute__((constructor)) static void vpInstallTouchDiag(void) {
@@ -91,4 +317,4 @@ __attribute__((constructor)) static void vpInstallTouchDiag(void) {
     }
 }
 
-int vphone_touchdiag_version(void) { return 1; }
+int vphone_touchdiag_version(void) { return 6; }

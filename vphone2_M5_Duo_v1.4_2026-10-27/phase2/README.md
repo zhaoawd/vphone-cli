@@ -804,3 +804,34 @@ E1 the status bar window's foreground view claims points in the middle of the
 screen, so every touch goes to the status bar and none to the Home screen or
 to the app below it. This is H2, now observed rather than inferred. It fits
 the split, wrong status bar seen at E1 since the first inner-size run.
+
+### Why the status bar claims E1 touches: provider selection (2026-10-28)
+
+libtouchdiag v6 adds, all read-only: the hit view chain for status bar hits,
+the status bar windows and their visual provider at the first touch, the
+provider classes in the runtime with their size getters, and each family's
+`visualProviderSubclassForScreen:visualProviderInfo:` called with a proxy
+that forwards to `UIScreen.mainScreen` and records what it is asked.
+
+- At **both** sizes `SBStatusBarWindow`, `STUIStatusBar_Wrapper`, `STUIStatusBar`
+  and `STUIStatusBarForegroundView` are screen-sized with identity transforms
+  (466x678 outer, 669x951 E1). Screen-sized bounds are normal; at outer the
+  taps still pass through.
+- The provider differs: outer `STUIStatusBarVisualProvider_AxisAlignableSplitV68Cover`
+  (height 77), E1 the generic `STUIStatusBarVisualProvider_DynamicSplitSmallIsland`
+  (height 53.67). StatusBarUI ships inner-panel providers
+  `AxisAlignableSplit1878`, `…2007` (width 2007, scale 3), `…2670`, `…2670_VM`,
+  `…2853_VM`, all with `notchSize` 37x37, like `V68Cover`.
+- `+[AxisAlignableSplit visualProviderSubclassForScreen:]` reads only
+  `_nativeDisplayBounds`, `_exclusionArea` and `_nativeScale` (`_scale` too at
+  outer). Outer: 1398x2034, exclusion `{399, 30, 37, 37}` (a 37 pt hole), scale
+  3 → `V68Cover`. E1: 2007x2853, exclusion `{250.333, 14, 125.333, 36.667}`
+  (an island-shaped pill), scale 3 → **nil**, and the Split family falls back
+  to `DynamicSplitSmallIsland`.
+
+So the native size matches `AxisAlignableSplit2007`; what fails is the screen's
+exclusion area, which at E1 describes a small-island pill instead of the inner
+panel's 37x37 camera hole. The wrong provider then both draws the split status
+bar and claims the screen's touches. The fix target is the exclusion area the
+main display reports at E1 (devicetree special region / display description),
+not hit-testing.
