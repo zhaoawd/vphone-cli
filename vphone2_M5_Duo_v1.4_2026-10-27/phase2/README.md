@@ -781,3 +781,26 @@ over 3601 s (0.14 % average, slowing), kernel_task about 3.5 % of a core steady;
 memorystatus level 55 → 48 then flat; screen reported unlocked and on in every
 sample; one `ReportSystemMemory` report at the last sample. The run was stopped at
 60 of 120 minutes to free the VM; the 2 h idle is still to be done.
+
+### SpringBoard touch diagnostic: the status bar window takes E1 touches (2026-10-28)
+
+`VPhoneGuestComponents/TouchDiag/libtouchdiag.m`, loaded into SpringBoard by
+SystemHook and inert unless `/private/var/tmp/vphone-touchdiag` exists at
+SpringBoard start, wraps `-[SpringBoard sendEvent:]` to log each touch's
+window, level, frame and hit view, then calls the original. `scripts/sb-trace.sh`
+turns it on, resprings, taps the Home screen 4 times by host view and 4 by
+vphoned (Home pressed between), pulls the log, turns it off and resprings.
+Installed hash, load and wrap are logged in each run (`results/sb-trace/`).
+
+| hit window (besides `_UISystemGestureWindow`) | outer | E1 |
+|---|---|---|
+| `SBHomeScreenWindow` level -2 → `SBIconView` / `SBIconListView` | 12 | 0 |
+| `SBStatusBarWindow` level 999 → `STUIStatusBarForegroundView` | 0 | **16** |
+
+Both SpringBoards wrap and log, and both receive every tap, so backboardd
+delivers to SpringBoard at E1 too and the coordinates are right (E1 points
+like 200.7,427.7 sit in a 669x951 window). The difference is hit-testing: at
+E1 the status bar window's foreground view claims points in the middle of the
+screen, so every touch goes to the status bar and none to the Home screen or
+to the app below it. This is H2, now observed rather than inferred. It fits
+the split, wrong status bar seen at E1 since the first inner-size run.

@@ -169,6 +169,9 @@ static int vpExecve(const char *path, char *const argv[], char *const envp[]) {
 // HapticsFix/libhapticsfix.c for what it answers and why SpringBoard is the
 // target.
 #define VP_HAPTICS_FIX "/usr/lib/libhapticsfix.dylib"
+// Read-only touch routing diagnostic, inactive unless its flag file exists. See
+// TouchDiag/libtouchdiag.m.
+#define VP_TOUCH_DIAG "/usr/lib/libtouchdiag.dylib"
 // The Settings follow-up-group hider. Rides the same dlopen route; it swizzles
 // (Preferences' classes are in the shared cache, so interposing would not reach
 // them) and hides the CoreFollowUp suggestion/upsell groups. See
@@ -264,6 +267,7 @@ __attribute__((constructor)) static void vpLogProcess(void) {
     if (vpIsSpringBoard(path)) {
         vpLoadLibrary("haptics-fix", VP_HAPTICS_FIX);
         vpLoadLibrary("accelerometer-hook", VP_ACCELEROMETER_HOOK);
+        vpLoadLibrary("touch-diagnostic", VP_TOUCH_DIAG);
     }
     // Loaded before the app gate too: the swizzle must be in place before
     // Settings builds its follow-up section.
