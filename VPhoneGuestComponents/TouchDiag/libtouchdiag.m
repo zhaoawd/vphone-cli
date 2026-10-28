@@ -170,12 +170,59 @@ static NSString *vpClassGetter(Class cls, NSString *name) {
     }
 }
 
+// The exclusion area's class: its ivars, and its methods that take a CGRect,
+// which is what a substitute in the selection probe below is built with.
+static void vpDescribeExclusionArea(id area) {
+    Class cls = [area class];
+    NSMutableArray *parts = [NSMutableArray array];
+    unsigned int count = 0;
+    Ivar *ivars = class_copyIvarList(cls, &count);
+    for (unsigned int index = 0; index < count; index++)
+        [parts addObject:[NSString stringWithFormat:@"ivar %s %s", ivar_getName(ivars[index]), ivar_getTypeEncoding(ivars[index])]];
+    free(ivars);
+    for (Class target in @[ object_getClass(cls), cls ]) {
+        Method *methods = class_copyMethodList(target, &count);
+        for (unsigned int index = 0; index < count; index++)
+            [parts addObject:[NSString stringWithFormat:@"%c%s %s", class_isMetaClass(target) ? '+' : '-',
+                              sel_getName(method_getName(methods[index])), method_getTypeEncoding(methods[index])]];
+        free(methods);
+    }
+    vpWriteLine([NSString stringWithFormat:@"exclusion-class %@ super=%@\n  %@", NSStringFromClass(cls),
+                 NSStringFromClass(class_getSuperclass(cls)), [parts componentsJoinedByString:@"\n  "]]);
+}
+
+// A substitute exclusion area holding one rect, built through whichever
+// one-rect constructor the class has; nil when it has none.
+static id vpExclusionAreaWithRect(Class cls, CGRect rect) {
+    unsigned int count = 0;
+    Method *methods = class_copyMethodList(object_getClass(cls), &count);
+    id made = nil;
+    for (unsigned int index = 0; index < count && !made; index++) {
+        const char *types = method_getTypeEncoding(methods[index]);
+        if (method_getNumberOfArguments(methods[index]) == 3 && types[0] == '@' && strstr(types, "{CGRect="))
+            made = ((id (*)(id, SEL, CGRect))objc_msgSend)(cls, method_getName(methods[index]), rect);
+    }
+    free(methods);
+    if (made)
+        return made;
+    methods = class_copyMethodList(cls, &count);
+    for (unsigned int index = 0; index < count && !made; index++) {
+        const char *name = sel_getName(method_getName(methods[index]));
+        const char *types = method_getTypeEncoding(methods[index]);
+        if (strncmp(name, "init", 4) == 0 && method_getNumberOfArguments(methods[index]) == 3 && strstr(types, "{CGRect="))
+            made = ((id (*)(id, SEL, CGRect))objc_msgSend)([cls alloc], method_getName(methods[index]), rect);
+    }
+    free(methods);
+    return made;
+}
+
 // Forwards every message to the real screen and records the selector and the
 // answer, so a provider selection run against it lists the screen properties it
 // reads. Used only as an argument to a class method; it changes nothing.
 @interface VPTouchDiagLoggingProxy : NSProxy
 @property(nonatomic, strong) id target;
 @property(nonatomic, strong) NSMutableArray<NSString *> *messages;
+@property(nonatomic, strong) id exclusionArea;
 @end
 
 @implementation VPTouchDiagLoggingProxy
@@ -184,6 +231,12 @@ static NSString *vpClassGetter(Class cls, NSString *name) {
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation {
+    if (self.exclusionArea && invocation.selector == NSSelectorFromString(@"_exclusionArea")) {
+        __unsafe_unretained id value = self.exclusionArea;
+        [invocation setReturnValue:&value];
+        [self.messages addObject:[NSString stringWithFormat:@"_exclusionArea -> substituted %@", value]];
+        return;
+    }
     [invocation invokeWithTarget:self.target];
     NSMethodSignature *signature = invocation.methodSignature;
     const char *type = signature.methodReturnType;
@@ -217,7 +270,7 @@ static NSString *vpClassGetter(Class cls, NSString *name) {
 }
 @end
 
-static void vpTraceProviderSelection(NSString *className) {
+static void vpTraceProviderSelection(NSString *className, id exclusionArea) {
     Class cls = NSClassFromString(className);
     SEL choose = NSSelectorFromString(@"visualProviderSubclassForScreen:visualProviderInfo:");
     if (!class_getClassMethod(cls, choose))
@@ -225,6 +278,7 @@ static void vpTraceProviderSelection(NSString *className) {
     VPTouchDiagLoggingProxy *proxy = [VPTouchDiagLoggingProxy alloc];
     proxy.target = UIScreen.mainScreen;
     proxy.messages = [NSMutableArray array];
+    proxy.exclusionArea = exclusionArea;
     NSString *chosen;
     @try {
         Class result = ((Class (*)(id, SEL, id, id))objc_msgSend)(cls, choose, proxy, nil);
@@ -232,8 +286,8 @@ static void vpTraceProviderSelection(NSString *className) {
     } @catch (NSException *exception) {
         chosen = [NSString stringWithFormat:@"threw %@ %@", exception.name, exception.reason];
     }
-    vpWriteLine([NSString stringWithFormat:@"provider-trace +[%@ visualProviderSubclassForScreen:proxy info:nil] = %@\n  %@", className,
-                 chosen, [proxy.messages componentsJoinedByString:@"\n  "]]);
+    vpWriteLine([NSString stringWithFormat:@"provider-trace +[%@ visualProviderSubclassForScreen:proxy%@ info:nil] = %@\n  %@", className,
+                 exclusionArea ? @" (substituted exclusion)" : @"", chosen, [proxy.messages componentsJoinedByString:@"\n  "]]);
 }
 
 static void vpDumpProviderSelection(NSArray<NSString *> *classNames) {
@@ -291,8 +345,25 @@ static void vpDumpProviderClasses(void) {
     for (NSString *line in lines)
         [names addObject:[line componentsSeparatedByString:@" "][1]];
     vpDumpProviderSelection(names);
-    vpTraceProviderSelection(@"STUIStatusBarVisualProvider_AxisAlignableSplit");
-    vpTraceProviderSelection(@"STUIStatusBarVisualProvider_Split");
+    vpTraceProviderSelection(@"STUIStatusBarVisualProvider_AxisAlignableSplit", nil);
+    vpTraceProviderSelection(@"STUIStatusBarVisualProvider_Split", nil);
+    id area = [UIScreen.mainScreen respondsToSelector:NSSelectorFromString(@"_exclusionArea")]
+        ? [UIScreen.mainScreen valueForKey:@"_exclusionArea"] : nil;
+    if (area) {
+        vpDescribeExclusionArea(area);
+        // The outer panel's 37 pt hole (what the simulator reports for both
+        // panels) and the same hole at the top right of the inner screen.
+        CGFloat width = UIScreen.mainScreen.bounds.size.width;
+        for (NSValue *rect in @[ [NSValue valueWithCGRect:CGRectMake(399, 30, 37, 37)],
+                                  [NSValue valueWithCGRect:CGRectMake(width - 67, 30, 37, 37)] ]) {
+            id substitute = vpExclusionAreaWithRect([area class], rect.CGRectValue);
+            if (!substitute) {
+                vpWriteLine(@"provider-trace substitute: no one-rect constructor");
+                break;
+            }
+            vpTraceProviderSelection(@"STUIStatusBarVisualProvider_AxisAlignableSplit", substitute);
+        }
+    }
 }
 
 __attribute__((constructor)) static void vpInstallTouchDiag(void) {
@@ -317,4 +388,4 @@ __attribute__((constructor)) static void vpInstallTouchDiag(void) {
     }
 }
 
-int vphone_touchdiag_version(void) { return 6; }
+int vphone_touchdiag_version(void) { return 7; }

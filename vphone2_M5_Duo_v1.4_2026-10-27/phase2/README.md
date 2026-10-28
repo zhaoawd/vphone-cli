@@ -835,3 +835,22 @@ panel's 37x37 camera hole. The wrong provider then both draws the split status
 bar and claims the screen's touches. The fix target is the exclusion area the
 main display reports at E1 (devicetree special region / display description),
 not hit-testing.
+
+### The exclusion area alone decides it (2026-10-28)
+
+libtouchdiag v7 repeats the AxisAlignableSplit selection at E1 with the proxy
+answering `_exclusionArea` with a substitute `UISDisplaySingleRectShape`
+(`-initWithRect:`), everything else from the real screen:
+
+| `_exclusionArea` given | result |
+|---|---|
+| real: `{250.333, 14, 125.333, 36.667}` (pill) | nil → `DynamicSplitSmallIsland` |
+| `{399, 30, 37, 37}` (outer Jindo, what the simulator reports for both panels) | **`AxisAlignableSplit2007`** |
+| `{602, 30, 37, 37}` (same hole, top right of the inner screen) | **`AxisAlignableSplit2007`** |
+
+The selection is a probe call; nothing in SpringBoard changed. The shape class
+carries SpringBoard's `+sb_displayShapeForScreenType:` and
+`+sb_thisDeviceDisplayShape`, so the screen's shape is chosen from a screen
+type, which at the inner render size is evidently not the V68 one. Next: find
+where that screen type and shape are decided for the main display, read-only,
+then decide the repair point.
