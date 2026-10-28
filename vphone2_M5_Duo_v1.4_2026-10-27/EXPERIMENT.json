@@ -1,0 +1,118 @@
+{
+  "schema_note": "Project evidence template, not an upstream API. null = not obtained / not tested.",
+  "run_id": "m5pro-duo-2026-10-27",
+  "source_sha": "7d633c9ab373880bf00f6964a29964269e8eb53b",
+  "core_bundle_version": "2.13.8 (local Debug build)",
+  "core_bundle_sha256": null,
+  "core_bundle_vphone_vm_cdhash": "531517b08e0039222a08518e7553925a09473f3c",
+  "experimental_bundle": {
+    "source": "Lakr233/vphone-cli PR #728 (draft, unmerged)",
+    "head_sha": "b03f0b82",
+    "base_version": "2.13.7",
+    "vphone_vm_cdhash": "775ec296e97084bc97c97bc52793761da47b481c",
+    "contains_2_13_8_changes": "yes: #761 (AKS unlock bag) and #762 (BTVC) are ancestors of b03f0b82; only the 2.13.8 version-bump commits are missing"
+  },
+  "launchpad_version": null,
+  "helper_version": null,
+  "xcode": "27.1 (27A9269)",
+  "host": {
+    "chip": "M5 Pro",
+    "macos_build": "27.0.1 (26A434)",
+    "cssc_reported": true,
+    "cssc_execution": "native: ABS/CNT/CTZ/SMAX/UMIN correct, 0.51–0.98 ns per op vs ADD 0.50 ns (2026-10-28, ~/vphone-duo-m5/run/evidence-probe/host-cssc-probe.json)",
+    "feature_sysctl": {
+      "FEAT_CSSC": 1,
+      "FEAT_PAuth2": 1,
+      "FEAT_FPAC": 1,
+      "FEAT_CPA": 0,
+      "FEAT_PAuth_LR": 0
+    },
+    "native_x1_execution": false,
+    "x1_policy_target": "non_native_lowering"
+  },
+  "inputs": {
+    "iphone_ipsw": "iPhone19,4_27.1_24A94425_Restore.ipsw",
+    "iphone_ipsw_bytes": 12724731538,
+    "iphone_ipsw_sha256": "58fbfda85615e90221136d55288f64c9f41386510f8cd77feb8c9d20cc0a782e",
+    "cloudos_build": "23E5207q",
+    "preset": "standard",
+    "vm": "8 CPU / 8 GiB / 64 GB, OpenAVB + OpenSEP, no template, no service profile"
+  },
+  "guest": {
+    "product": "iPhone19,4",
+    "build": "24A94425",
+    "cssc_execution": "native: same probe in a native arm64 UIKit app, all correct, 0.53–1.05 ns per op vs ADD 0.54 ns; kernel-boot-cssc_emulation installed but not entered (a trap would cost microseconds)",
+    "x1_effective_policy": {
+      "stock_2.13.8": "bootstrap lowered ahead of time (launchd, dyld, fsck, mount, 38 cache images / 228,314 rewrites); rest of shared cache via kernel on-demand handler",
+      "pr728": "whole X1 shared cache lowered ahead of time (+4,508 images / 24,606,071 rewrites, 250,449 unvisited candidates still on-demand)"
+    },
+    "kernel_route": "A",
+    "pcc_build": "23E5207q"
+  },
+  "artifact_policy": [
+    "duo-m5-p1: control, stock 2.13.8",
+    "duo-m5-728: APFS clone of duo-m5-p1, then cfw update-environment with PR #728 bundle"
+  ],
+  "packaging": {
+    "seal": "pass",
+    "trustcache": "pass (RestoreTrustCache cdhash 3ee3cd0f… -> 4f9541a0…)",
+    "manifest": "pass",
+    "same_path_fix_reviewed": "not hit on 2.13.8"
+  },
+  "upstream_issue_751": {
+    "full_body_reviewed": true,
+    "applicable_to_this_run": false,
+    "evidence": [
+      "Bugs require a native-X1 host; vp_probe_native_x1 is false on M5, lowering proceeds",
+      "No EXC_ARM_PAC_FAIL on either VM",
+      "installd unchanged pid, no crash for 5 min after an installd (ideviceinstaller) install",
+      "Blocking bootstrap lowering is not viable on M5: unlowered system -> launchd SIGILL panic (panic-full-2026-10-27-173630)"
+    ],
+    "fix_commit": null,
+    "live_state_2026_10_27": "open"
+  },
+  "runtime": {
+    "restore": "pass",
+    "cfw": "pass except 4 VirtualAudio patches on stock 2.13.8 (fixed by PR #728)",
+    "init_dyld": "pass",
+    "gui": "pass (Setup Assistant, Home, Settings)",
+    "vphoned": "pass",
+    "critical_service_observation": {
+      "stock_2.13.8": "fail: launchd 874 s CPU at 2,063 s uptime and rising; scene-create/update watchdogs; widgets blank",
+      "pr728": "pass: launchd 11 s CPU at 1,218 s uptime, flat; no watchdogs over 20 min idle"
+    },
+    "known_crash_loops": [
+      "duetexpertd: Failed to initialize datavault for DuetExpertCenterAsset (known on all iOS 27 guests; trimmed service profile turns it off)"
+    ],
+    "pac_failure_evidence": [],
+    "I0_install": "pass: KFC Prod 6.36.0, install 1 s, launch <1 s (vphoned signer refuses IPAs with armv7 slices)",
+    "I1_install": "pass: KFC Knight 9.1.1 install 6 s; food_ordering ad hoc + application-identifier",
+    "app_food_ordering": "pass after adopting UIScene lifecycle (iOS 27 SDK traps without it)",
+    "cold_boots_passed": "10/10 headless (vphoned 6–10 s, launchd 9–11 s CPU at 180 s; boot 8 slower under host xcodebuild load)",
+    "host_reboot_boot": "pass (2026-10-28): after host restart AMFI refused vphone-vm until vphone-escalator allow was rerun (allowlist is amfid memory); then vphoned 8 s, launchd 10 s CPU at 68 s, Home drawn, 3 user apps",
+    "network": "pass: SSE idle 600 s on one connection, event + ack; link down/up via vm network, address back in 3 s, DNS ok",
+    "rotation": "pass: Safari 90/270/0 applied; portrait-only apps refuse; Home stays portrait",
+    "snapshot_export": "pass: pre-t6 revert boots; export 65 s / 15 GB zstd, import 31 s, imported copy boots with same apps",
+    "audio_playback": "WebKit WAV ×3 and RingtonePreview ×3 played to completion, audiomxd stable, no crashes; audible on the host speakers (user confirmed 2026-10-28)",
+    "folding_behavior": "display.posture accepted for all hinge states, SpringBoard stable, target-sub-type V68VM2025; single display, so no inner/outer layout change (dual display not implemented upstream)",
+    "known_issues": [
+      "display.auto_lock Never not applied: EffectiveUserSettings stays 120 s (UserSettings value 0, rangeMinimum 120)"
+    ],
+    "probe_app": "pass: native arm64 Objective-C UIKit app (UIScene), ad hoc + application-identifier, installed via installd, launches full screen, no crash",
+    "phase1_baseline_snapshot": "duo-m5-728 snapshot phase1-baseline (2026-10-28 08:20), after T0–T6, before Probe install"
+  },
+  "evidence_paths": {
+    "evidence": "~/vphone-duo-m5/evidence/",
+    "logs": "~/vphone-duo-m5/run/",
+    "summaries": [
+      "~/vphone-duo-m5/run/P2-summary.md",
+      "~/vphone-duo-m5/run/P3-summary.md"
+    ]
+  },
+  "no_success_claim_without_runtime_evidence": true,
+  "upstream_version_diff_2_13_2_to_2_13_8": "PLAN §13.6: relevant to this image are #752 CSSC kernel fallback (installed, not entered on M5), #761 AKS unlock bag and #762 BTVC (both applied); the rest is iPhone17,3, tvOS, or terminal-only",
+  "upstream_reports": [
+    "Lakr233/vphone-cli#728 comment 6456703776 (M5 Pro A/B + T6)",
+    "Lakr233/vphone-cli#766 (signer rejects armv7 slices)"
+  ]
+}
