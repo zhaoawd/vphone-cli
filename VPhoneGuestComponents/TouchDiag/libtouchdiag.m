@@ -216,6 +216,32 @@ static id vpExclusionAreaWithRect(Class cls, CGRect rect) {
     return made;
 }
 
+// Where the shape comes from: SpringBoard's own device shape, the screen type
+// SpringBoardHome classifies this device as, and the shape each screen type
+// maps to (only the types whose shape differs from the previous one are
+// written). Pure class methods and lookup functions.
+static void vpDumpScreenTypes(Class shapeClass) {
+    SEL thisDevice = NSSelectorFromString(@"sb_thisDeviceDisplayShape");
+    SEL forType = NSSelectorFromString(@"sb_displayShapeForScreenType:");
+    if (class_getClassMethod(shapeClass, thisDevice))
+        vpWriteLine([NSString stringWithFormat:@"screen-type sb_thisDeviceDisplayShape = %@",
+                     ((id (*)(id, SEL))objc_msgSend)(shapeClass, thisDevice)]);
+    for (NSString *name in @[ @"SBHScreenTypeForCurrentDevice", @"SBHScreenTypeForCurrentDeviceSkippingCache" ]) {
+        unsigned long long (*function)(void) = dlsym(RTLD_DEFAULT, name.UTF8String);
+        vpWriteLine(function ? [NSString stringWithFormat:@"screen-type %@() = %llu", name, function()]
+                             : [NSString stringWithFormat:@"screen-type %@ absent", name]);
+    }
+    if (!class_getClassMethod(shapeClass, forType))
+        return;
+    NSString *previous = nil;
+    for (unsigned long long type = 0; type < 160; type++) {
+        NSString *shape = [((id (*)(id, SEL, unsigned long long))objc_msgSend)(shapeClass, forType, type) description] ?: @"nil";
+        if (![shape isEqualToString:previous])
+            vpWriteLine([NSString stringWithFormat:@"screen-type %llu -> %@", type, shape]);
+        previous = shape;
+    }
+}
+
 // Forwards every message to the real screen and records the selector and the
 // answer, so a provider selection run against it lists the screen properties it
 // reads. Used only as an argument to a class method; it changes nothing.
@@ -351,6 +377,7 @@ static void vpDumpProviderClasses(void) {
         ? [UIScreen.mainScreen valueForKey:@"_exclusionArea"] : nil;
     if (area) {
         vpDescribeExclusionArea(area);
+        vpDumpScreenTypes([area class]);
         // The outer panel's 37 pt hole (what the simulator reports for both
         // panels) and the same hole at the top right of the inner screen.
         CGFloat width = UIScreen.mainScreen.bounds.size.width;
@@ -388,4 +415,4 @@ __attribute__((constructor)) static void vpInstallTouchDiag(void) {
     }
 }
 
-int vphone_touchdiag_version(void) { return 7; }
+int vphone_touchdiag_version(void) { return 8; }

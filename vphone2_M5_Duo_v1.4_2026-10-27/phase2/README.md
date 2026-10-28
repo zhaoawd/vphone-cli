@@ -854,3 +854,21 @@ carries SpringBoard's `+sb_displayShapeForScreenType:` and
 type, which at the inner render size is evidently not the V68 one. Next: find
 where that screen type and shape are decided for the main display, read-only,
 then decide the repair point.
+
+### Screen type: 31 at outer, 32 at E1 (2026-10-28)
+
+libtouchdiag v8, pure class methods and lookups in SpringBoard:
+
+| | outer | E1 |
+|---|---|---|
+| `SBHScreenTypeForCurrentDevice()` | 31 | **32** |
+| `+[UISDisplayShape sb_thisDeviceDisplayShape]` | `{399, 30, 37, 37}` | `{250.333, 14, 125.333, 36.667}` |
+
+`+sb_displayShapeForScreenType:` is the same table at both sizes (types 3–32;
+0 and 33+ nil): type 31 is the V68 cover's 37 pt hole, type 32 the island pill
+E1 reports. The screen type follows the main screen's size: the inner render
+size classifies the device as type 32, whose shape is a pill, so the exclusion
+area is a pill, AxisAlignableSplit finds no match, DynamicSplitSmallIsland is
+chosen and its screen-sized foreground view takes every touch. On the
+simulator the screen type is device-level (its inner screen reports the cover's
+`{399, 30, 37, 37}`), which is why it picks the inner AxisAlignableSplit there.
