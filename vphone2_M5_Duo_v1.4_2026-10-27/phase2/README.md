@@ -986,3 +986,38 @@ Home screen, after Home in landscape, is drawn portrait. Not yet checked: a
 tap on Safari's address field itself (the scripted tap at the bottom hit
 page content, as Safari uses a top toolbar here) and the cancel phase as
 GeoBare sees it (only the absence of a stuck touch afterwards).
+
+### E1 gaps closed: Safari by touch, cancellation phases (2026-10-29)
+
+`scripts/e1-gaps.sh`, correction on, cold boot, vphoned input throughout
+(no host taps in this run).
+
+Safari, touch-driven, not launched by command:
+
+| step | result |
+|---|---|
+| Dock icon tap | Safari frontmost |
+| portrait, tap the top address field | focused: URL selected, Favorites / Suggestions panel |
+| type `neverssl.com` + return | navigates (address and tab title change) |
+| tap page content | Safari stays frontmost |
+| landscape, tap the address field, type `example.com` + return | focused, navigates, page renders |
+
+No software keyboard is shown when the field is focused; the guest appears
+to report a hardware keyboard. Visual: in both orientations the toolbar's
+translucent right-hand button group (share, new tab, tabs) is drawn over the
+end of the address field's text. Recorded as a layout observation, not
+investigated.
+
+Cancellation, GeoBare window log, with no injected cancel:
+
+```
+96.408  began      327,475
+96.920  moved      341,503
+96.920  cancelled  341,503   (Home pressed while the finger was down)
+```
+
+The finger's later release reaches nothing in GeoBare; the next two taps
+arrive as began/ended pairs at their points. Note: `input.touch` takes
+normalized coordinates by default, so the earlier regression's cancel step
+(point values) touched outside the screen; only its "no stuck touch
+afterwards" result stood, and this run replaces it.
