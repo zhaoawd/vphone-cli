@@ -1,0 +1,25 @@
+run C1: fix flag "399 30 37 37", diagnostic flag present
+libraries: [{"name":"SystemHook-vphone.dylib","sha":"3d4e8300db6c"},{"name":"libtouchdiag.dylib","sha":"aa09f086ca34"},{"name":"libinnercutoutfix.dylib","sha":"95c4c58b5225"}]
+bundle vphone-vm: bcb90f73c30f
+guest boot: {"uptime":null}
+home tap host 0.3x0.45: foreground com.apple.springboard
+home tap host 0.3x0.65: foreground com.apple.springboard
+home tap host 0.7x0.45: foreground com.apple.springboard
+home tap host 0.7x0.65: foreground com.apple.springboard
+home tap guest 0.3x0.45: foreground com.apple.springboard
+home tap guest 0.3x0.65: foreground com.apple.springboard
+home tap guest 0.7x0.45: foreground com.apple.springboard
+home tap guest 0.7x0.65: foreground com.apple.springboard
+home icons (pt): 281.7,709.0 175.7,591.0 281.7,591.0 175.7,237.0 493.7,119.0 387.7,591.0
+icon tap host at 175.7,591.0: foreground com.apple.tv
+icon tap host at 493.7,119.0: foreground com.apple.mobilecal
+icon tap guest at 175.7,591.0: foreground com.apple.mobilecal
+icon tap guest at 493.7,119.0: foreground com.apple.mobilecal
+geobare: app touch events: 16, window touch events: 16, touchesBegan: 8 (8 taps sent)
+fix log: pid=37 applied #3 (calls 3, matched 3): single rect: {250.333, 14, 125.333, 36.6667} -> single rect: {399, 30, 37, 37} pid=37 applied #100 (calls 100, matched 100): single rect: {250.333, 14, 125.333, 36.6667} -> single rect: {399, 30, 37, 37} 
+live status bar: bounds={{0, 0}, provider=STUIStatusBarVisualProvider_AxisAlignableSplit2007 
+screen exclusion:   _exclusionArea -> single rect: {399, 30, 37, 37}
+selection: STUIStatusBarVisualProvider_AxisAlignableSplit2007 STUIStatusBarVisualProvider_AxisAlignableSplit2007 
+home hits:  11 window=SBHomeScreenWindow level=-2;
+stopped
+=== C1 done

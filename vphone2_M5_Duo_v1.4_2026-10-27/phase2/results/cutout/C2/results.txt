@@ -1,0 +1,25 @@
+run C2: fix flag absent, diagnostic flag present
+libraries: [{"name":"SystemHook-vphone.dylib","sha":"3d4e8300db6c"},{"name":"libtouchdiag.dylib","sha":"aa09f086ca34"},{"name":"libinnercutoutfix.dylib","sha":"95c4c58b5225"}]
+bundle vphone-vm: bcb90f73c30f
+guest boot: {"uptime":null}
+home tap host 0.3x0.45: foreground com.apple.mobilenotes
+home tap host 0.3x0.65: foreground com.apple.Maps
+home tap host 0.7x0.45: foreground com.apple.reminders
+home tap host 0.7x0.65: foreground com.apple.Maps
+home tap guest 0.3x0.45: foreground com.apple.mobilenotes
+home tap guest 0.3x0.65: foreground com.apple.Maps
+home tap guest 0.7x0.45: foreground com.apple.reminders
+home tap guest 0.7x0.65: foreground com.apple.Maps
+home icons (pt): 493.7,473.0 175.7,591.0 175.7,709.0 387.7,709.0 175.7,473.0 281.7,591.0
+icon tap host at 175.7,591.0: foreground com.apple.springboard
+icon tap host at 175.7,473.0: foreground com.apple.springboard
+icon tap guest at 175.7,591.0: foreground com.apple.springboard
+icon tap guest at 175.7,473.0: foreground com.apple.springboard
+geobare: app touch events: 0, window touch events: 0, touchesBegan: 0 (8 taps sent)
+fix log: pid=37 loaded, flag absent: inactive 
+live status bar: bounds={{0, 0}, provider=STUIStatusBarVisualProvider_DynamicSplitSmallIsland 
+screen exclusion:   _exclusionArea -> single rect: {250.333, 14, 125.333, 36.6667}
+selection: nil STUIStatusBarVisualProvider_DynamicSplitSmallIsland 
+home hits:  8 window=SBMainSwitcherWindow level=5; 12 window=SBStatusBarWindow level=999;
+stopped
+=== C2 done
