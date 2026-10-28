@@ -961,3 +961,28 @@ fixed 32 view point edge threshold the down went to x 0.3 and the up to x 57,
 on empty list space. The vphoned tap on the same icon opened TV in both. This
 is the host's small-window edge handling, not the correction. With the
 correction on, the outer size behaves exactly as with it off.
+
+### E1 regression with the correction on (2026-10-29)
+
+`scripts/e1-regress.sh on|off`, same build, cold boot each, saved window frame
+cleared first; vphoned input; GeoBare's window log counts phases.
+
+| check | on | off |
+|---|---|---|
+| landscape (SpringBoard 90°), 4 taps in GeoBare | began 4 / ended 4, at the sent landscape points | no events |
+| drag, 1 swipe in GeoBare | began 1, moved 20, ended 1 | no events |
+| Home page swipe | page 2 shown | (not compared) |
+| finger down, Home while down, up; then 4 taps | Home went to SpringBoard; 4 / 4, no stuck touch | no events |
+| background, relaunch without terminating, 4 taps | 4 / 4 | no events |
+| lock (power), unlock, 4 taps | GeoBare frontmost again; 4 / 4 | no events |
+| Safari | opens, page loads | opens |
+
+Visual, `results/e1-regress/on/`: in landscape GeoBare reports one active
+occlusion region `{867, 0, 84, 124}` and a right safe area of 84, the
+simulator's unfolded inner layout (84x120 at {867, 0}); time and battery sit
+in that right-hand column. Safari shows its top toolbar with the tab bar, and
+the status bar fits at the right of it without overlapping the buttons. The
+Home screen, after Home in landscape, is drawn portrait. Not yet checked: a
+tap on Safari's address field itself (the scripted tap at the bottom hit
+page content, as Safari uses a top toolbar here) and the cancel phase as
+GeoBare sees it (only the absence of a stuck touch afterwards).
