@@ -17,6 +17,24 @@ extension VPhoneBootCommand {
 
         let vmDir = config.deletingLastPathComponent()
 
+        // Experimental: VPHONE_SCREEN=<width>x<height>@<ppi> boots this run at
+        // another panel size (the iPhone Duo's inner panel is 1878x2670@430)
+        // without changing config.plist.
+        var screen = (
+            width: manifest.screenConfig.width,
+            height: manifest.screenConfig.height,
+            ppi: manifest.screenConfig.pixelsPerInch,
+        )
+        if let spec = ProcessInfo.processInfo.environment["VPHONE_SCREEN"] {
+            let parts = spec.split(whereSeparator: { $0 == "x" || $0 == "@" }).compactMap { Int($0) }
+            if parts.count == 3, parts.allSatisfy({ $0 > 0 }) {
+                screen = (parts[0], parts[1], parts[2])
+                print("[vphone] Screen override from VPHONE_SCREEN: \(spec) (experimental)")
+            } else {
+                print("[vphone] Ignoring VPHONE_SCREEN=\(spec): expected <width>x<height>@<ppi>")
+            }
+        }
+
         return try VPhoneVirtualMachine.Options(
             configURL: config,
             romURL: manifest.romImages.map { try manifest.resolve(path: $0.avpBooter, in: vmDir) },
@@ -26,9 +44,9 @@ extension VPhoneBootCommand {
             memorySize: manifest.memorySize,
             sepStorageURL: manifest.resolve(path: manifest.sepStorage, in: vmDir),
             sepRomURL: manifest.romImages.map { try manifest.resolve(path: $0.avpSEPBooter, in: vmDir) },
-            screenWidth: manifest.screenConfig.width,
-            screenHeight: manifest.screenConfig.height,
-            screenPPI: manifest.screenConfig.pixelsPerInch,
+            screenWidth: screen.width,
+            screenHeight: screen.height,
+            screenPPI: screen.ppi,
             screenScale: manifest.screenConfig.scale,
             kernelDebugPort: kernelDebugPort,
             isPadGuest: manifest.guestDevice.isPad,

@@ -48,8 +48,12 @@ import VPhoneCoreKit
 ///                                                 directory. The file replaces `local` only once complete
 ///   {"t":"network"}                             → the NIC's state, in `"result"`
 ///   {"t":"network","link":"down"}               → unplug (`up` replugs); not saved
+///   {"t":"display"}                             → the first display's size, in `"result"`
+///   {"t":"display","width":1878,"height":2670,"ppi":430}
+///                                               → resize it while the guest runs; not saved
+///                                                 (experimental, iPhone Duo panel sizes)
 ///
-/// All commands except "screenshot", "rpc", "push", "pull" and "network" wait
+/// All commands except "screenshot", "rpc", "push", "pull", "network" and "display" wait
 /// briefly then capture a compact screen image returned as
 /// `"image":"<base64>"` in the response.
 /// Pass `"screen":false` to skip the capture; "rpc" captures only when sent
@@ -315,6 +319,23 @@ class VPhoneHostAutomationServer {
                     try virtualMachine.setNetworkLink(up: link == "up")
                 }
                 return Self.reply(ok: true, result: virtualMachine.networkStatus)
+
+            case "display":
+                guard let virtualMachine else {
+                    return Self.reply(ok: false, error: "the VM is not running")
+                }
+                if json["width"] != nil || json["height"] != nil {
+                    guard let width = json["width"] as? Int, let height = json["height"] as? Int,
+                          width > 0, height > 0
+                    else {
+                        return Self.reply(ok: false, error: "display requires both width and height (pixels)")
+                    }
+                    try virtualMachine.reconfigureDisplay(width: width, height: height, pixelsPerInch: json["ppi"] as? Int ?? 460)
+                    // Taps and swipes are given in pixels of the current display.
+                    screenWidth = width
+                    screenHeight = height
+                }
+                return Self.reply(ok: true, result: virtualMachine.displayStatus)
 
             default:
                 return Self.reply(ok: false, error: "unknown command: \(type)")

@@ -505,6 +505,43 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
         print("[vphone] Network link \(up ? "up" : "down")")
     }
 
+    // MARK: - Display
+
+    enum DisplayControlError: Error, CustomStringConvertible {
+        case noDisplay
+
+        var description: String {
+            "This VM has no graphics display."
+        }
+    }
+
+    /// The first display as it is now, for `vphone.sock`'s `display` command.
+    var displayStatus: [String: Any] {
+        guard let display = virtualMachine.graphicsDevices.first?.displays.first else {
+            return ["display": false]
+        }
+        return [
+            "display": true,
+            "width": Int(display.sizeInPixels.width),
+            "height": Int(display.sizeInPixels.height),
+        ]
+    }
+
+    /// Resize the first display while the guest runs. Experimental: used to
+    /// show the iPhone Duo's outer (1398 x 2034) and inner (1878 x 2670) panel
+    /// sizes on the one display a Mac host can give it.
+    func reconfigureDisplay(width: Int, height: Int, pixelsPerInch: Int) throws {
+        guard let display = virtualMachine.graphicsDevices.first?.displays.first else {
+            throw DisplayControlError.noDisplay
+        }
+        try display.reconfigure(configuration: VZMacGraphicsDisplayConfiguration(
+            widthInPixels: width,
+            heightInPixels: height,
+            pixelsPerInch: pixelsPerInch,
+        ))
+        print("[vphone] Display reconfigured to \(width)x\(height) @ \(pixelsPerInch) ppi")
+    }
+
     static func describe(_ plan: VPhoneNetworkPlan) -> String {
         var parts = switch plan.attachment {
         case .none: ["none"]
