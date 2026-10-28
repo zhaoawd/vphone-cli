@@ -582,6 +582,7 @@ struct VPhoneCustomFirmwareInstaller {
         }
         if !Self.isFoldable(device) {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootFoldableVMSubtype)
+            notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootInnerPanelDisplay)
         }
         if !device.usesTVOS {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.tvTPRO)
@@ -3241,6 +3242,10 @@ struct VPhoneCustomFirmwareInstaller {
         }
         if Self.isFoldable(guestDevice) {
             repairGroup.append((FirmwareGuestSystemPatchSet.prebootFoldableVMSubtype, "patch-dt-foldable-vm-subtype", []))
+            // The inner panel's display node, from the board's own tree.
+            if let boardDeviceTree {
+                repairGroup.append((FirmwareGuestSystemPatchSet.prebootInnerPanelDisplay, "patch-dt-inner-panel-display", [boardDeviceTree.path]))
+            }
         }
         repairGroup.append((FirmwareGuestSystemPatchSet.prebootHaptics, "patch-dt-haptics", []))
         repairGroup.append((FirmwareGuestSystemPatchSet.prebootMicrophoneArray, "patch-dt-microphone-array", []))

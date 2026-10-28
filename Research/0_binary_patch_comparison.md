@@ -463,6 +463,20 @@
 > test-automation override (`com.apple.springboard.testautomation` added to
 > `VPhoneDaemon.entitlements`). See [Duo bring-up](Guest/iphone_duo_bringup.md#fold-posture-2026-10-23).
 
+> **Foldable inner-panel display (2026-10-28):** `preboot-exp-devicetree_inner_panel_display`
+> (guest system set, Preboot device-tree repair, off in `standard`, not applicable
+> to non-foldable boards; verb `cfw patch-dt-inner-panel-display <dt> <board dt>`)
+> adds `/product/display0` to the installed tree, copied from the board's
+> inner-panel node (V68AP `display1`: `special-region-0` BlankableRR camera hole,
+> `special-region-1` Fold, corner radii 55, rotation 270, surface-type 2) with
+> `display-index` 0 and no `AAPL,phandle`. vphone600 has no per-display node, so a
+> guest booted at the inner size (`VPHONE_SCREEN=2007x2853@430`) falls back to the
+> device-level `island-notch-location` and a centred island: split status bar
+> over top bar buttons, a 144 pt occlusion region and no fold region. Values are
+> verbatim (frames in the board panel's 1878x2670 pixels). The Preboot tree
+> serves every boot, so an outer-size boot carries it too. See
+> `vphone2_M5_Duo_v1.4_2026-10-27/phase2/README.md` on the `duo-m5-v1.4` branch.
+
 > **iPhone Duo bring-up (2026-10-23, first boot fails):**
 > `iPhone19,4` / V68AP, iOS 27.1 (24A94425), is registered with one outer
 > display and paired with cloudOS 26.4 (23E5207q). Its device tree reports

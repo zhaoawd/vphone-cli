@@ -525,6 +525,76 @@ public enum CustomFirmwarePostRestoreDeviceTree {
         }
     }
 
+    /// The board node whose properties describe a foldable board's inner
+    /// panel, by the board's `target-sub-type`. iPhone Duo's `display1` is the
+    /// inner panel (surface-type 2, display-index 1); `display0` is the outer one.
+    public static let foldableInnerPanelNodes = ["V68AP": "display1"]
+
+    /// `blob` with a `/product/display0` for the VM's one display, built from the
+    /// board's inner-panel node: corner radii, rotation, surface type and the
+    /// special regions (the camera hole and the fold) SpringBoard and UIKit lay
+    /// the status bar, reserved regions and fold out against. vphone600 has no
+    /// per-display node, so a guest without it falls back to the device-level
+    /// island and a centred Dynamic Island. The copy is the board's node with
+    /// `display-index` 0 and without its `AAPL,phandle`, values verbatim (the
+    /// region frames are in the board panel's pixels). For a VM booted at the
+    /// inner panel's size; the tree serves every boot, outer size included. A
+    /// tree that already has a `display0`, or a board with no inner-panel node,
+    /// comes back unchanged.
+    public static func withInnerPanelDisplay(_ blob: Data, board: Data) throws -> (Data, [Change], Int) {
+        func name(of node: DeviceTreePatcher.DTNode) -> String? {
+            node.properties.first { $0.name == "name" }.map { String(decoding: $0.value.prefix { $0 != 0 }, as: UTF8.self) }
+        }
+        func child(_ node: DeviceTreePatcher.DTNode, _ wanted: String) -> DeviceTreePatcher.DTNode? {
+            node.children.first { name(of: $0) == wanted }
+        }
+        let root = try parseTree(blob, label: "DT")
+        let source = try parseTree(board, label: "board DT")
+        guard
+            let subType = source.properties.first(where: { $0.name == "target-sub-type" }),
+            let innerName = foldableInnerPanelNodes[String(decoding: subType.value.prefix { $0 != 0 }, as: UTF8.self)],
+            let product = child(root, "product"),
+            let inner = child(source, "product").flatMap({ child($0, innerName) }),
+            child(product, "display0") == nil
+        else { return (blob, [], 0) }
+
+        let node = DeviceTreePatcher.DTNode()
+        for property in inner.properties where property.name != "AAPL,phandle" {
+            var value = property.value
+            if property.name == "name" { value = Data("display0".utf8) + [0] }
+            if property.name == "display-index" { value = Data(count: 4) }
+            node.properties.append(DeviceTreePatcher.DTProperty(name: property.name, flags: property.flags, value: value, valueOffset: 0))
+        }
+        product.children.append(node)
+        let added = serializeNode(node).count
+        let record = Change(property: "product/display0", before: "absent",
+                            after: "board \(innerName), \(node.properties.count) properties, display-index 0")
+        return (serializeNode(root), [record], added)
+    }
+
+    /// Give a foldable guest's `devicetree.img4` (or bare `.im4p`) a display node
+    /// for its inner panel from the board's tree at `boardURL`, in place. See
+    /// `withInnerPanelDisplay`.
+    @discardableResult
+    public static func presentInnerPanelDisplay(
+        at url: URL,
+        board boardURL: URL,
+        dryRun: Bool = false,
+        verbose: Bool = true,
+    ) throws -> Outcome {
+        let boardData: Data
+        do {
+            boardData = try Data(contentsOf: boardURL)
+        } catch {
+            throw PatcherError.fileNotFound(boardURL.path)
+        }
+        let board = try openDeviceTree(boardData, path: boardURL.path).blob
+        return try rewrite(at: url, dryRun: dryRun, verbose: verbose) { blob in
+            let (newBlob, changes, delta) = try withInnerPanelDisplay(blob, board: board)
+            return (newBlob, changes, blob.count + delta)
+        }
+    }
+
     /// The root of a flat tree that must fill `blob` exactly.
     private static func parseTree(_ blob: Data, label: String) throws -> DeviceTreePatcher.DTNode {
         let (root, end) = try parseNode(blob, at: 0)

@@ -639,6 +639,39 @@ struct VPhoneCustomFirmwarePatchFoldableVMSubtypeCommand: ParsableCommand {
     }
 }
 
+// MARK: - patch-dt-inner-panel-display
+
+struct VPhoneCustomFirmwarePatchInnerPanelDisplayCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "patch-dt-inner-panel-display",
+        abstract: "Give a foldable guest's one display the board's inner-panel node",
+        discussion: """
+        Adds /product/display0 to the device tree, built from the foldable
+        board's inner-panel node (iPhone Duo's display1) with display-index 0:
+        corner radii, rotation, surface type and the special regions (camera
+        hole, fold) the status bar, reserved regions and fold layout use. For a
+        VM booted at the inner panel's size. A tree that already has a
+        display0, or a board with no inner-panel node, is left as it is.
+
+        Takes a devicetree.img4 (preferred) or a bare .im4p, and the board's
+        DeviceTree .im4p.
+        """,
+    )
+
+    @Argument(help: "Path to devicetree.img4 or devicetree.im4p", transform: URL.init(fileURLWithPath:))
+    var deviceTree: URL
+
+    @Argument(help: "Path to the foldable board's DeviceTree.<board>.im4p", transform: URL.init(fileURLWithPath:))
+    var board: URL
+
+    @Flag(name: .customLong("dry-run"), help: "Report what would change and exit")
+    var dryRun = false
+
+    func run() throws {
+        try CustomFirmwarePostRestoreDeviceTree.presentInnerPanelDisplay(at: deviceTree, board: board, dryRun: dryRun, verbose: true)
+    }
+}
+
 // MARK: - patch-dt-haptics
 
 struct VPhoneCustomFirmwarePatchHapticsCommand: ParsableCommand {

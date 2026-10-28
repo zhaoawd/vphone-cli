@@ -669,6 +669,19 @@ public enum FirmwareGuestSystemPatchSet {
                 target: .prebootDeviceTree,
             ),
             VPhonePatchDeclaration(
+                identifier: prebootInnerPanelDisplay,
+                title: "Foldable inner-panel display",
+                summary: """
+                Adds a display node for the VM's one display, built from the foldable board's \
+                inner-panel node (iPhone Duo's display1): corner radii, rotation and the camera \
+                hole and fold regions the status bar and reserved regions use. For a VM booted \
+                at the inner panel's size (VPHONE_SCREEN=2007x2853@430); the Preboot tree serves \
+                every boot, so an outer-size boot then carries the inner panel's description. \
+                Off in standard.
+                """,
+                target: .prebootDeviceTree,
+            ),
+            VPhonePatchDeclaration(
                 identifier: prebootHaptics,
                 title: "Haptics node",
                 summary: """
@@ -770,6 +783,10 @@ public enum FirmwareGuestSystemPatchSet {
     /// Apple's VM sub-type for a foldable board in the restored Preboot
     /// device tree.
     public static let prebootFoldableVMSubtype = "preboot-cfw-devicetree_foldable_vm_subtype"
+
+    /// A display node for a foldable guest's one display from the board's
+    /// inner-panel node: see `CustomFirmwarePostRestoreDeviceTree.withInnerPanelDisplay`.
+    public static let prebootInnerPanelDisplay = "preboot-exp-devicetree_inner_panel_display"
 
     /// The haptics node removal in the restored Preboot device tree, for any
     /// VM patched before `fw patch` removed it from every guest's tree.
