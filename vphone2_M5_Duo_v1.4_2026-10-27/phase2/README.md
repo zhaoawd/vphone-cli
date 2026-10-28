@@ -500,3 +500,39 @@ process reads it, how the panel-pixel frames map to a 2007x2853 framebuffer, and
 how an inner-only devicetree coexists with outer-size boots of the same VM. It
 would be a devicetree patch, so it goes through a patch set and preset
 (Skills/authoring-patch-sets) and Research/0_binary_patch_comparison.md.
+
+### Inner-panel display node: preparation (2026-10-28, not implemented)
+
+Answers to the three open questions, read-only:
+
+1. **Path.** v68's nodes are `/device-tree/product/display0` (20 props) and
+   `/device-tree/product/display1` (22 props), siblings of `camera`, `iopm`,
+   `audio`. Property list per node (raw bytes dumped on the run host):
+   display-index, display-rotation, display-scale, display-corner-radius (4
+   floats), surface-type, has-prox, chrome-identifier, framebuffer-identifier,
+   special-regions-count, special-region-N-{type,frame,corner-curve},
+   {front,rear}-cam-offset-from-center, side/volume/camera button locations.
+   Which process reads them was not traced.
+2. **Coordinates.** Region frames mix units: inner `Fold` {0, 1335, 1878, 0} is
+   panel pixels (1878x2670, fold at half height = 475.5 pt in the 669x951 layout),
+   the camera hole is 111x111 (= 37 pt at 3x). On the VM the panel is 2007x2853,
+   so a verbatim copy and one scaled by 2007/1878 (≈1.0687, same on both axes)
+   are the two variants to test against the simulator's occlusion {535,0,134,82}
+   and division {0,455.5,669,40}.
+3. **Delivery.** No restore needed: `cfw install` / `cfw update-environment`
+   rewrite the personalized Preboot `devicetree.img4` from its `.bak` (the image4
+   bypass accepts a changed IM4P under the original IM4M), and
+   `CustomFirmwarePostRestoreDeviceTree` already handles size-changing rewrites
+   from the board tree (`withPhoneProduct`, `withBoardAudio`). Existing hooks:
+   `VPhoneCustomFirmwareInstaller.swift` ~3227–3243 (`patch-dt-iphone-product`,
+   `patch-dt-foldable-vm-subtype`), declarations in
+   `FirmwareGuestSystemPatchSet.swift` (target `.prebootDeviceTree`).
+   `presentPhoneProduct` copies `/product` properties only, never its children.
+
+Plan: a new `preboot-exp-devicetree_inner_panel_display` (off in `standard`)
+that adds a `/product/display0` built from v68's `display1` with display-index 0
+for the VM's single display, applied on `duo-m5-dd` only through
+`cfw update-environment`, then GeoBare/GeoProbe against the simulator. Open: the
+Preboot tree serves every boot of the VM, so an inner-panel node also applies
+to outer-size boots until reverted; per-size switching is not designed yet.
+Remember Research/0_binary_patch_comparison.md when it lands.
