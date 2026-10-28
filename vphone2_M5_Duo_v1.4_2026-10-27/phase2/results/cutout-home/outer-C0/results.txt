@@ -1,0 +1,16 @@
+run C0: fix flag absent
+libraries: [{"name":"libtouchdiag.dylib","sha":"885d001976c3"},{"name":"libinnercutoutfix.dylib","sha":"95c4c58b5225"}]
+live provider: provider=STUIStatusBarVisualProvider_AxisAlignableSplitV68Cover
+icons: 145,380=com.apple.mobilenotes 321,380=com.apple.Maps 57,479=com.apple.tv 233,578=com.apple.Preferences
+tap1 host 145,380 want=com.apple.mobilenotes before=com.apple.springboard after=com.apple.mobilenotes: opened
+tap2 host 321,380 want=com.apple.Maps before=com.apple.springboard after=com.apple.Maps: opened
+tap3 host 57,479 want=com.apple.tv before=com.apple.springboard after=com.apple.springboard: not opened
+tap4 host 233,578 want=com.apple.Preferences before=com.apple.springboard after=com.apple.Preferences: opened
+tap5 guest 145,380 want=com.apple.mobilenotes before=com.apple.springboard after=com.apple.mobilenotes: opened
+tap6 guest 321,380 want=com.apple.Maps before=com.apple.springboard after=com.apple.Maps: opened
+tap7 guest 57,479 want=com.apple.tv before=com.apple.springboard after=com.apple.tv: opened
+tap8 guest 233,578 want=com.apple.Preferences before=com.apple.springboard after=com.apple.Preferences: opened
+geobare: app touch events: 16, window touch events: 16, touchesBegan: 8 (8 taps sent)
+fix log: pid=37 loaded, flag absent: inactive
+hits:  1 window=SBHomeScreenWindow	view=SBIconListView; 7 window=SBHomeScreenWindow	view=SBIconView;
+stopped

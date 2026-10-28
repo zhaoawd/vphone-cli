@@ -940,3 +940,24 @@ apps on both input paths, and the status bar uses the inner-panel provider;
 off before and after, they do not. Static inner-size input repair shown; not
 yet covered: landscape, drag and cancel, Safari, foreground/background,
 lock/unlock, outer size unaffected, and the cutout's true inner position.
+
+### Outer size with the cutout correction on: unchanged (2026-10-29)
+
+`scripts/cutout-home.sh C0|C1 outer`, same build, cold boots at 1398x2034,
+outer grid icons measured from a screenshot (Notes, Maps, TV, Settings), then
+GeoBare.
+
+| | outer, fix off | outer, fix on |
+|---|---|---|
+| fix log | loaded, inactive | enabled (wrapped), **no `applied` line**: never matched |
+| live provider | AxisAlignableSplitV68Cover | AxisAlignableSplitV68Cover |
+| intended app opened | 7/8 | 7/8, the same taps |
+| hits | SBIconView 7, SBIconListView 1 | identical |
+| GeoBare app / window / touchesBegan | 16 / 16 / 8 | 16 / 16 / 8 |
+
+The one miss in both is the host tap on TV (x 57 pt, near the left edge): the
+saved window frame for duo-m5-dd had shrunk again (170x247), so within the
+fixed 32 view point edge threshold the down went to x 0.3 and the up to x 57,
+on empty list space. The vphoned tap on the same icon opened TV in both. This
+is the host's small-window edge handling, not the correction. With the
+correction on, the outer size behaves exactly as with it off.
