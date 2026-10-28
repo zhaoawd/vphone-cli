@@ -294,10 +294,23 @@ static NSDictionary *screenPrivateGeometry(UIScreen *screen) {
     d[@"statusBarViews"] = [self statusBarViewsInScene:scene];
     d[@"sceneScreenPrivate"] = screenPrivateGeometry(scene.screen);
     d[@"mainScreenPrivate"] = screenPrivateGeometry(UIScreen.mainScreen);
+    // Which display identity FrontBoard put this scene on (read only).
+    NSMutableDictionary *identity = [NSMutableDictionary dictionary];
+    for (NSString *key in @[@"_displayIdentity", @"displayConfiguration", @"_name"]) {
+      if ([scene.screen respondsToSelector:NSSelectorFromString(key)]) {
+        id v = [scene.screen valueForKey:key];
+        identity[key] = v ? [v description] : @"nil";
+      }
+    }
+    d[@"sceneScreenIdentity"] = identity;
     d[@"sceneScreenIsMain"] = @(scene.screen == UIScreen.mainScreen);
   }
   d[@"gestalt"] = gestaltAnswers();
-  d[@"window"] = @{@"frame": rect(window.frame), @"bounds": rect(window.bounds), @"safeArea": insets(window.safeAreaInsets)};
+  d[@"window"] = @{@"frame": rect(window.frame), @"bounds": rect(window.bounds), @"safeArea": insets(window.safeAreaInsets),
+                   @"class": NSStringFromClass(window.class), @"isKey": @(window.isKeyWindow), @"hidden": @(window.hidden),
+                   @"level": @(window.windowLevel), @"rootInteraction": @(self.view.userInteractionEnabled)};
+  d[@"sceneRole"] = scene.session.role ?: @"nil";
+  d[@"sceneWindows"] = @(scene.windows.count);
   d[@"rootView"] = @{@"bounds": rect(self.view.bounds), @"safeArea": insets(self.view.safeAreaInsets),
                      @"safeLayoutFrame": rect(self.view.safeAreaLayoutGuide.layoutFrame),
                      @"directionalLayoutMargins": dirInsets(self.view.directionalLayoutMargins)};
@@ -340,13 +353,44 @@ static NSDictionary *screenPrivateGeometry(UIScreen *screen) {
 }
 @end
 
+// The window logs every event UIApplication hands it (type, and for touches
+// each touch's phase, location and hit view) to Documents/events.log, then
+// dispatches it as usual. A touch that reaches the app shows up here even when
+// no view's touchesBegan fires; one that never reaches the app does not.
+@interface GeoWindow : UIWindow
+@end
+
+@implementation GeoWindow
+- (void)sendEvent:(UIEvent *)event {
+  NSMutableDictionary *e = [@{@"type": @(event.type), @"subtype": @(event.subtype), @"time": @(event.timestamp)} mutableCopy];
+  if (event.type == UIEventTypeTouches) {
+    NSMutableArray *touches = [NSMutableArray array];
+    for (UITouch *t in event.allTouches) {
+      CGPoint p = [t locationInView:self];
+      [touches addObject:@{@"phase": @(t.phase), @"x": @(p.x), @"y": @(p.y),
+                           @"view": t.view ? NSStringFromClass(t.view.class) : @"nil",
+                           @"window": t.window == self ? @"self" : (t.window ? NSStringFromClass(t.window.class) : @"nil")}];
+    }
+    e[@"touches"] = touches;
+  }
+  NSURL *docs = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+  NSURL *log = [docs URLByAppendingPathComponent:@"events.log"];
+  NSMutableData *line = [[NSJSONSerialization dataWithJSONObject:e options:NSJSONWritingSortedKeys error:nil] mutableCopy];
+  [line appendBytes:"\n" length:1];
+  NSFileHandle *h = [NSFileHandle fileHandleForWritingToURL:log error:nil];
+  if (h) { [h seekToEndOfFile]; [h writeData:line]; [h closeFile]; }
+  else { [line writeToURL:log atomically:YES]; }
+  [super sendEvent:event];
+}
+@end
+
 @interface GeoSceneDelegate : UIResponder <UIWindowSceneDelegate>
 @property(nonatomic, strong) UIWindow *window;
 @end
 
 @implementation GeoSceneDelegate
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)options {
-  self.window = [[UIWindow alloc] initWithWindowScene:(UIWindowScene *)scene];
+  self.window = [[GeoWindow alloc] initWithWindowScene:(UIWindowScene *)scene];
 #ifdef GEO_BARE
   self.window.rootViewController = [GeoViewController new];
 #else
@@ -364,8 +408,36 @@ static NSDictionary *screenPrivateGeometry(UIScreen *screen) {
 @implementation GeoAppDelegate
 @end
 
+// The application logs every touch event it is handed, before any window sees
+// it, to Documents/app-events.log, then dispatches it as usual: tells "no
+// touch entered UIKit's dispatch" from "entered, but missed this window".
+@interface GeoApplication : UIApplication
+@end
+
+@implementation GeoApplication
+- (void)sendEvent:(UIEvent *)event {
+  if (event.type == UIEventTypeTouches) {
+    NSMutableArray *touches = [NSMutableArray array];
+    for (UITouch *t in event.allTouches) {
+      CGPoint p = [t locationInView:nil];
+      [touches addObject:@{@"phase": @(t.phase), @"x": @(p.x), @"y": @(p.y),
+                           @"window": t.window ? NSStringFromClass(t.window.class) : @"nil"}];
+    }
+    NSDictionary *e = @{@"time": @(event.timestamp), @"touches": touches};
+    NSURL *docs = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+    NSURL *log = [docs URLByAppendingPathComponent:@"app-events.log"];
+    NSMutableData *line = [[NSJSONSerialization dataWithJSONObject:e options:NSJSONWritingSortedKeys error:nil] mutableCopy];
+    [line appendBytes:"\n" length:1];
+    NSFileHandle *h = [NSFileHandle fileHandleForWritingToURL:log error:nil];
+    if (h) { [h seekToEndOfFile]; [h writeData:line]; [h closeFile]; }
+    else { [line writeToURL:log atomically:YES]; }
+  }
+  [super sendEvent:event];
+}
+@end
+
 int main(int argc, char *argv[]) {
   @autoreleasepool {
-    return UIApplicationMain(argc, argv, nil, NSStringFromClass(GeoAppDelegate.class));
+    return UIApplicationMain(argc, argv, NSStringFromClass(GeoApplication.class), NSStringFromClass(GeoAppDelegate.class));
   }
 }

@@ -744,3 +744,40 @@ export/import regression, and a boot after a host restart (needs the user).
   in GeoBare (record, then call through) for the same taps at the outer size and
   E1, to find whether touches reach the app's window at all. If locating it
   further needs system processes, stop there.
+
+### Touch trace: where E1 touches stop (2026-10-28)
+
+GeoBare now observes three layers: `UIApplication.sendEvent` (a `GeoApplication`
+subclass, app-events.log), `UIWindow.sendEvent` (`GeoWindow`, events.log) and
+`touchesBegan` (touches.log), each recording then calling through; its sample
+adds the window's class, key/hidden/level, root interaction, scene role and the
+scene screen's FrontBoard display configuration. `scripts/touch-trace.sh`: four
+host-view taps and four vphoned taps, same bundle and GeoBare, flag absent.
+
+| | outer | E1 |
+|---|---|---|
+| app touch events | 16 | **0** |
+| window touch events | 16 | 0 |
+| touchesBegan | 8 | 0 |
+| scene display | `Main` LCD, 466x678@3x | `Main` LCD, 669x951@3x (2007x2853) |
+| scene activationState (all samples) | 0 | 0 |
+
+At E1 touches never enter the app's UIKit dispatch. The scene sits on the same
+`Main` LCD display configuration with the right mode, and is foreground-active,
+so a scene-on-another-display mismatch (H1) and an inactive scene are not what
+the app side shows. The sender-side conversions are right: icli scales points
+by `CADisplay.mainDisplay`'s real bounds (669x951 at E1), the host by the 2007
+pixel width. What remains is between backboardd's receipt of the contacts and
+the app: a system window or input region taking them (H2), a size or transform
+inside backboardd (H3 there), or the app's event channel not registered for
+routing (deeper H4). Locating it needs observation inside system processes
+(SpringBoard / backboardd, through SystemHook), not done.
+
+### Idle, first 60 minutes (2026-10-28, stopped on request)
+
+`results/t6-outer/idle-60min.tsv`, outer size, headless, newer bundle: SpringBoard
+37 / backboardd 73 / vphoned 246 unchanged throughout; launchd CPU 9.68 → 14.76 s
+over 3601 s (0.14 % average, slowing), kernel_task about 3.5 % of a core steady;
+memorystatus level 55 → 48 then flat; screen reported unlocked and on in every
+sample; one `ReportSystemMemory` report at the last sample. The run was stopped at
+60 of 120 minutes to free the VM; the 2 h idle is still to be done.
