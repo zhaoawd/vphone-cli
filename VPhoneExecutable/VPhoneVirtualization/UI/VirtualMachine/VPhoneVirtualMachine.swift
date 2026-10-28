@@ -1,5 +1,6 @@
 import Dynamic
 import Foundation
+import ObjectiveC
 import Virtualization
 import VPhoneCoreKit
 
@@ -173,15 +174,58 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
         )
 
         // Display
-        let gfx = VZMacGraphicsDeviceConfiguration()
-        gfx.displays = [
-            VZMacGraphicsDisplayConfiguration(
-                widthInPixels: options.screenWidth,
-                heightInPixels: options.screenHeight,
+        //
+        // Experimental dual-panel (iPhone Duo) knobs, independent so port
+        // capacity and attached-display count can be separated in testing:
+        //   VPHONE_DISPLAY_COUNT  number of VZMacGraphicsDisplayConfiguration attached (default 1)
+        //   VPHONE_DISPLAY_PORTS  _setDisplayPortCount: on the single device (default = displayCount)
+        //   VPHONE_DISPLAY_LAYOUT "devices" -> one graphics device per display instead
+        //   VPHONE_DISPLAY2_SCALE divide the 2nd+ display pixel size (default 1), e.g. D3 resource probe
+        let env = ProcessInfo.processInfo.environment
+        let displayCount = Self.experimentalDisplayCount()
+        let portCount = env["VPHONE_DISPLAY_PORTS"].flatMap { Int($0) } ?? displayCount
+        let secondScale = env["VPHONE_DISPLAY2_SCALE"].flatMap { Int($0) }.map { max(1, $0) } ?? 1
+        // VPHONE_DISPLAY_IDS: give each display its own identity, since PG refuses
+        // a second device whose display has the same serial ("Display serial numbers
+        // must be unique across all devices"). "ident" = _setDisplayIdentifier:,
+        // "uuid" = _setUUID:, "both". Unset keeps the framework defaults.
+        let displayIDs = env["VPHONE_DISPLAY_IDS"] ?? ""
+        func display(index: Int) -> VZMacGraphicsDisplayConfiguration {
+            let s = index == 0 ? 1 : secondScale
+            let d = VZMacGraphicsDisplayConfiguration(
+                widthInPixels: options.screenWidth / s,
+                heightInPixels: options.screenHeight / s,
                 pixelsPerInch: options.screenPPI,
-            ),
-        ]
-        config.graphicsDevices = [gfx]
+            )
+            if displayCount > 1, displayIDs == "ident" || displayIDs == "both" {
+                Dynamic(d)._setDisplayIdentifier("vphone-display-\(index)" as NSString)
+            }
+            if displayCount > 1, displayIDs == "uuid" || displayIDs == "both" {
+                Dynamic(d)._setUUID(UUID() as NSUUID)
+            }
+            return d
+        }
+        if displayCount > 1, env["VPHONE_DISPLAY_LAYOUT"] == "devices" {
+            // One graphics device per display, each with a single port.
+            config.graphicsDevices = (0..<displayCount).map { i in
+                let gfx = VZMacGraphicsDeviceConfiguration()
+                gfx.displays = [display(index: i)]
+                return gfx
+            }
+            print("[vphone] Display: \(displayCount) graphics devices, 1 port each (experimental)")
+            Self.allowMultipleGraphicsDevices()
+        } else {
+            let gfx = VZMacGraphicsDeviceConfiguration()
+            gfx.displays = (0..<displayCount).map { display(index: $0) }
+            if portCount > 1 || displayCount > 1 {
+                Self.allowDisplayPorts(max(portCount, displayCount), on: gfx)
+            }
+            config.graphicsDevices = [gfx]
+            if portCount != 1 || displayCount != 1 {
+                print("[vphone] Display: 1 device, ports=\(portCount), displays=\(displayCount), 2nd-scale=\(secondScale) (experimental)")
+            }
+        }
+        Self.dumpGraphicsTopology(config.graphicsDevices, label: "built")
 
         // Audio
         let afg = VZVirtioSoundDeviceConfiguration()
@@ -318,6 +362,12 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
         print("[vphone] Configuration validated")
 
         virtualMachine = VZVirtualMachine(configuration: config)
+        // VZVirtualMachine copies the configuration; read the copy back to see
+        // whether the extra port/display survived the copy (not the same object
+        // we set above). Diagnostic only; public `graphicsDevices` key.
+        if let copied = Dynamic(virtualMachine)._configuration.graphicsDevices.asArray as? [Any] {
+            Self.dumpGraphicsTopology(copied, label: "vm-copy")
+        }
         bootAttachment = virtualMachine.networkDevices.first?.attachment
         super.init()
         virtualMachine.delegate = self
@@ -530,7 +580,7 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
 
     nonisolated func virtualMachine(_: VZVirtualMachine, didStopWithError error: Error) {
         finishShaderCache()
-        print("[vphone] Stopped with error: \(error)")
+        print("[vphone] Stopped with error:\n\(Self.describeDeep(error))")
         exit(EXIT_FAILURE)
     }
 
@@ -546,5 +596,101 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
         attachmentWasDisconnectedWithError error: Error,
     ) {
         print("[vphone] Network error: \(error)")
+    }
+}
+
+// MARK: - Experimental Multiple Displays
+
+extension VPhoneVirtualMachine {
+    /// `VPHONE_DISPLAY_COUNT` (1...8) for the iPhone Duo dual-panel experiment; 1 otherwise.
+    static func experimentalDisplayCount() -> Int {
+        guard let value = ProcessInfo.processInfo.environment["VPHONE_DISPLAY_COUNT"],
+              let count = Int(value), (1...8).contains(count)
+        else { return 1 }
+        return count
+    }
+
+    /// Virtualization caps a Mac graphics device at one display unless the host is an
+    /// internal build, where the cap is ParavirtualizedGraphics' port count (8). Lift the
+    /// cap in this process only and give the device one port per display.
+    static func allowDisplayPorts(_ count: Int, on gfx: VZMacGraphicsDeviceConfiguration) {
+        let capSelector = NSSelectorFromString("_maximumAllowedDisplayCount")
+        if let meta = object_getClass(VZMacGraphicsDeviceConfiguration.self),
+           let method = class_getInstanceMethod(meta, capSelector)
+        {
+            let cap: @convention(block) (AnyObject) -> Int = { _ in 8 }
+            method_setImplementation(method, imp_implementationWithBlock(cap))
+        }
+        typealias IntSetter = @convention(c) (AnyObject, Selector, Int) -> Void
+        let portSelector = NSSelectorFromString("_setDisplayPortCount:")
+        if let imp = gfx.method(for: portSelector) {
+            unsafeBitCast(imp, to: IntSetter.self)(gfx, portSelector, count)
+        }
+    }
+
+    /// `-[VZVirtualMachineConfiguration validateWithError:]` rejects more than one
+    /// graphics device with a fixed check (no overridable limit method, unlike
+    /// `_maximumAllowedDisplayCount`). Wrap it in this process only: a config with
+    /// several graphics devices is validated as a copy holding just the first one,
+    /// and every device is validated on its own, so all other checks still run.
+    /// Whether the VM service accepts the extra devices is what the run tests.
+    static func allowMultipleGraphicsDevices() {
+        let sel = NSSelectorFromString("validateWithError:")
+        guard let method = class_getInstanceMethod(VZVirtualMachineConfiguration.self, sel) else { return }
+        typealias Validate = @convention(c) (AnyObject, Selector, AutoreleasingUnsafeMutablePointer<NSError?>?) -> Bool
+        let original = unsafeBitCast(method_getImplementation(method), to: Validate.self)
+        let wrapper: @convention(block) (AnyObject, AutoreleasingUnsafeMutablePointer<NSError?>?) -> Bool = { obj, errorOut in
+            guard let config = obj as? VZVirtualMachineConfiguration, config.graphicsDevices.count > 1,
+                  let single = config.copy() as? VZVirtualMachineConfiguration
+            else { return original(obj, sel, errorOut) }
+            single.graphicsDevices = [config.graphicsDevices[0]]
+            guard original(single, sel, errorOut) else { return false }
+            for device in config.graphicsDevices {
+                let dsel = NSSelectorFromString("validateWithError:")
+                guard let imp = (device as AnyObject).method(for: dsel) else { continue }
+                if !unsafeBitCast(imp, to: Validate.self)(device, dsel, errorOut) { return false }
+            }
+            print("[vphone][diag] validate: \(config.graphicsDevices.count) graphics devices allowed in-process")
+            return true
+        }
+        method_setImplementation(method, imp_implementationWithBlock(wrapper))
+    }
+
+    /// Print the device/port/display shape of a graphics-device array, reading
+    /// the private `_displayPortCount` back so we can tell what actually stuck.
+    nonisolated static func dumpGraphicsTopology(_ devices: [Any], label: String) {
+        guard ProcessInfo.processInfo.environment["VPHONE_DISPLAY_DIAG"] != nil else { return }
+        print("[vphone][diag:\(label)] graphicsDevices=\(devices.count)")
+        for (i, dev) in devices.enumerated() {
+            let obj = dev as AnyObject
+            // Private getter — guard with responds(to:) so an unknown key never
+            // raises NSUnknownKeyException and aborts the VM before it boots.
+            var ports = "?"
+            if obj.responds(to: NSSelectorFromString("_displayPortCount")),
+               let n = obj.value(forKey: "_displayPortCount") as? Int { ports = String(n) }
+            let ds = (obj as? VZMacGraphicsDeviceConfiguration)?.displays ?? []
+            let sizes = ds.map { "\($0.widthInPixels)x\($0.heightInPixels)" }
+            print("[vphone][diag:\(label)]   device[\(i)] ports=\(ports) displays=\(ds.count) sizes=\(sizes.joined(separator: ","))")
+        }
+    }
+
+    /// Expand an NSError's domain/code/userInfo and every nested underlying
+    /// error, so an opaque VZErrorDomain Code=1 shows what it wraps.
+    nonisolated static func describeDeep(_ error: Error, depth: Int = 0) -> String {
+        let ns = error as NSError
+        let pad = String(repeating: "  ", count: depth)
+        var out = "\(pad)\(ns.domain) Code=\(ns.code) \(ns.localizedDescription)"
+        for (k, v) in ns.userInfo where k != NSUnderlyingErrorKey {
+            out += "\n\(pad)  \(k) = \(v)"
+        }
+        if let under = ns.userInfo[NSUnderlyingErrorKey] as? Error {
+            out += "\n\(pad)  underlying:\n" + describeDeep(under, depth: depth + 2)
+        }
+        if #available(macOS 11.3, *), let multi = ns.userInfo[NSMultipleUnderlyingErrorsKey] as? [Error] {
+            for (i, e) in multi.enumerated() {
+                out += "\n\(pad)  underlying[\(i)]:\n" + describeDeep(e, depth: depth + 2)
+            }
+        }
+        return out
     }
 }

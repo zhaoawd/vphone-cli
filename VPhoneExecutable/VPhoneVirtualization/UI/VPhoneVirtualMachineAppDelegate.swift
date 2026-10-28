@@ -73,7 +73,7 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
             do {
                 try await self.startVirtualMachine()
             } catch {
-                print("[vphone] Fatal: \(error)")
+                print("[vphone] Fatal:\n\(VPhoneVirtualMachine.describeDeep(error))")
                 exit(EXIT_FAILURE)
             }
         }
