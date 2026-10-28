@@ -477,6 +477,17 @@
 > serves every boot, so an outer-size boot carries it too. See
 > `vphone2_M5_Duo_v1.4_2026-10-27/phase2/README.md` on the `duo-m5-v1.4` branch.
 
+> **Inner-size cutout correction, experimental (2026-10-28):** not a binary patch
+> but a SpringBoard runtime override, `libinnercutoutfix.dylib`
+> (`VPhoneGuestComponents/InnerCutoutFix`), shipped in the guest environment and
+> loaded by SystemHook. Inert unless `/private/var/tmp/vphone-innercutout` holds a
+> rect when SpringBoard starts. Then `-[UIScreen _exclusionArea]` returns that rect
+> for the main screen at a 2007x2853 native size while the original answer is
+> SpringBoard screen type 32's island pill, so status bar selection can find an
+> AxisAlignableSplit provider. Screen type, provider selection, rotation and
+> hit-testing are unchanged. Removing the flag and restarting restores the
+> original behaviour. See the same phase 2 README.
+
 > **iPhone Duo bring-up (2026-10-23, first boot fails):**
 > `iPhone19,4` / V68AP, iOS 27.1 (24A94425), is registered with one outer
 > display and paired with cloudOS 26.4 (23E5207q). Its device tree reports

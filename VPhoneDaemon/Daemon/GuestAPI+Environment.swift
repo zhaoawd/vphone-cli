@@ -22,6 +22,7 @@ extension GuestAPI {
         "libdevicename.dylib",
         "libprefsfix.dylib",
         "libtouchdiag.dylib",
+        "libinnercutoutfix.dylib",
         "libsigninfix.dylib",
         "libvphonegyro.dylib",
         "libvphoneaccelerometer.dylib",

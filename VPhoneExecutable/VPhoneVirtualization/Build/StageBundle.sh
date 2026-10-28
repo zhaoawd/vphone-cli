@@ -131,6 +131,7 @@ guest_compatibility_library="$(/usr/bin/xcrun swift-stdlib-tool --print \
 /bin/cp "$guest_products/devicename/libdevicename.dylib" "$guest/libdevicename.dylib"
 /bin/cp "$guest_products/prefsfix/libprefsfix.dylib" "$guest/libprefsfix.dylib"
 /bin/cp "$guest_products/touchdiag/libtouchdiag.dylib" "$guest/libtouchdiag.dylib"
+/bin/cp "$guest_products/innercutoutfix/libinnercutoutfix.dylib" "$guest/libinnercutoutfix.dylib"
 /bin/cp "$guest_products/signinfix/libsigninfix.dylib" "$guest/libsigninfix.dylib"
 /bin/cp "$guest_products/gyroscope/libvphonegyro.dylib" "$guest/libvphonegyro.dylib"
 /bin/cp "$guest_products/accelerometer/libvphoneaccelerometer.dylib" "$guest/libvphoneaccelerometer.dylib"

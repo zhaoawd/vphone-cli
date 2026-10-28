@@ -872,3 +872,36 @@ area is a pill, AxisAlignableSplit finds no match, DynamicSplitSmallIsland is
 chosen and its screen-sized foreground view takes every touch. On the
 simulator the screen type is device-level (its inner screen reports the cover's
 `{399, 30, 37, 37}`), which is why it picks the inner AxisAlignableSplit there.
+
+### Cutout-only correction: preparation (2026-10-28)
+
+The devicetree is not the source of E1's pill (it stayed with the inner-panel
+node on), so the correction is a SpringBoard runtime override, not a devicetree
+change. `VPhoneGuestComponents/InnerCutoutFix/libinnercutoutfix.m`, SystemHook,
+SpringBoard only, separate from the read-only `libtouchdiag`:
+
+- Gate: `/private/var/tmp/vphone-innercutout` present at SpringBoard start with
+  a rect `x y width height` in points; otherwise it logs "inactive" and changes
+  nothing.
+- Match: `-[UIScreen _exclusionArea]` on the main screen, native size exactly
+  2007x2853, original answer the type 32 `UISDisplaySingleRectShape`
+  `{250.333, 14, 125.333, 36.667}`. Every other call gets the original.
+- Applied: a `UISDisplaySingleRectShape` built with `-initWithRect:` from the
+  flag's rect. Unchanged: screen type, provider selection, rotation (0),
+  hit-testing.
+- Log: `/var/mobile/Library/Caches/vphone-innercutout.log` (loaded / enabled /
+  applied with calls and matched counts).
+- Rect for C1: `{399, 30, 37, 37}`, what the simulator's inner screen reports
+  (device-level). The inner camera's own position (v68 `display1` BlankableRR
+  `{63, 710, 111, 111}` in 1878x2670 panel pixels, authored for the 270° mount)
+  needs a derived conversion and is left for the visual layout work; both
+  positions select `AxisAlignableSplit2007` in the probe.
+- Rollback: remove the flag and cold boot. The library stays in `/usr/lib`,
+  inert. No root step, no restore, no snapshot needed (the disk change is the
+  environment library and two flag files under `/private/var/tmp`).
+
+`scripts/cutout-run.sh C0|C1|C2`: boot 1 syncs libraries and sets the flags,
+boot 2 is the measured cold boot; records library and bundle hashes, the fix
+log, the live status bar provider and bounds, the screen's exclusion area and
+the selection result, Home screen taps (hit window and foreground app after
+each, host and guest paths) and GeoBare's three event layers.

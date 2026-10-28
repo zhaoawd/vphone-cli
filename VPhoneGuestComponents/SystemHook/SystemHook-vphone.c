@@ -172,6 +172,9 @@ static int vpExecve(const char *path, char *const argv[], char *const envp[]) {
 // Read-only touch routing diagnostic, inactive unless its flag file exists. See
 // TouchDiag/libtouchdiag.m.
 #define VP_TOUCH_DIAG "/usr/lib/libtouchdiag.dylib"
+// Experimental inner-size cutout correction, inactive unless its flag file
+// exists. See InnerCutoutFix/libinnercutoutfix.m.
+#define VP_INNER_CUTOUT_FIX "/usr/lib/libinnercutoutfix.dylib"
 // The Settings follow-up-group hider. Rides the same dlopen route; it swizzles
 // (Preferences' classes are in the shared cache, so interposing would not reach
 // them) and hides the CoreFollowUp suggestion/upsell groups. See
@@ -268,6 +271,7 @@ __attribute__((constructor)) static void vpLogProcess(void) {
         vpLoadLibrary("haptics-fix", VP_HAPTICS_FIX);
         vpLoadLibrary("accelerometer-hook", VP_ACCELEROMETER_HOOK);
         vpLoadLibrary("touch-diagnostic", VP_TOUCH_DIAG);
+        vpLoadLibrary("inner-cutout-fix", VP_INNER_CUTOUT_FIX);
     }
     // Loaded before the app gate too: the swizzle must be in place before
     // Settings builds its follow-up section.
