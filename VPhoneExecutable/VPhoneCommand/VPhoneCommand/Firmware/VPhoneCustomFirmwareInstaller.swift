@@ -583,6 +583,7 @@ struct VPhoneCustomFirmwareInstaller {
         if !Self.isFoldable(device) {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootFoldableVMSubtype)
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootInnerPanelDisplay)
+            notApplicableGuest.insert(FirmwareGuestSystemPatchSet.innerCutout)
         }
         if !device.usesTVOS {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.tvTPRO)
@@ -1608,6 +1609,7 @@ struct VPhoneCustomFirmwareInstaller {
         for (identifier, library) in [
             (FirmwareGuestSystemPatchSet.followUpGroups, "libprefsfix.dylib"),
             (FirmwareGuestSystemPatchSet.signInSheets, "libsigninfix.dylib"),
+            (FirmwareGuestSystemPatchSet.innerCutout, "libinnercutoutfix.dylib"),
             (FirmwareGuestSystemPatchSet.gyroscope, "libvphonegyro.dylib"),
             (FirmwareGuestSystemPatchSet.accelerometer, "libvphoneaccelerometer.dylib"),
             (FirmwareGuestSystemPatchSet.attitude, "libvphoneattitude.dylib"),

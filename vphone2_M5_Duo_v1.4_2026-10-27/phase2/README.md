@@ -1021,3 +1021,39 @@ arrive as began/ended pairs at their points. Note: `input.touch` takes
 normalized coordinates by default, so the earlier regression's cancel step
 (point values) touched outside the screen; only its "no stuck touch
 afterwards" result stood, and this run replaces it.
+
+### Packaged as an opt-in guest patch (2026-10-29)
+
+`system-springboard-exp-inner_cutout`, "Duo inner-screen UI compatibility
+(experimental)", in the guest system set: `.guestFile`
+`/usr/lib/libinnercutoutfix.dylib`, iOS 27.1 only, not applicable to
+non-foldable boards, manual-only and blocked in `standard`, `tvos`,
+`tvos-4k`, `homepod-mini`. Lifecycle as `libprefsfix`: the selection is the
+one source of state; `cfw install` / `cfw update-environment` install the
+library while it is selected and remove it when not, and the host's live
+environment sync (`selectedLibraries`) only replaces an installed copy. The
+library (v2) has no flag file: present is on; the hole is a constant
+`{399, 30, 37, 37}`; the match is unchanged; the first unmatched call is logged
+"not applied: unsupported configuration". Build passes bundle admission;
+`Version requirements`, `Patch selection`, `Patch declarations`,
+`Plan resolution`, `Patch gate`, `Bundled patch set catalogue` pass (the
+rest of FirmwarePatcherTests fails only on absent reference firmware).
+
+Enabled on duo-m5-dd with `fw set-patches duo-m5-dd --allow
+system-springboard-exp-inner_cutout` (selection was bare `standard`) and root
+`cfw update-environment duo-m5-dd`. `scripts/patch-verify.sh`, one cold boot
+each, saved window frame cleared:
+
+| | E1 | outer |
+|---|---|---|
+| selection / receipt Guest | on / recorded | on / recorded |
+| library bundled = installed | `b49ec215ce2e` = `b49ec215ce2e` | same |
+| library log | applied, 200 of 200 calls | loaded; "not applied: unsupported configuration (native {1398, 2034}, cutout {399, 30, 37, 37})" |
+| live provider | AxisAlignableSplit2007 | AxisAlignableSplitV68Cover |
+| Home icons opened (host + vphoned) | 8/8 | 8/8 |
+| GeoBare app / window / touchesBegan | 16 / 16 / 8 | 16 / 16 / 8 |
+
+The touch diagnostic's log accumulates across boots; the script reads its
+last provider entry (the first E1 read took an older boot's line and was
+corrected in its results). The old `vphone-innercutout.flag` was deleted from
+the guest.

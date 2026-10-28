@@ -6,7 +6,7 @@
 // windows and views would they hit?
 //
 // SystemHook loads it into SpringBoard. It does nothing unless
-// /private/var/tmp/vphone-touchdiag exists when SpringBoard starts; then it
+// /var/mobile/Library/Caches/vphone-touchdiag.flag exists when SpringBoard starts; then it
 // wraps -[UIApplication sendEvent:] to record each touch event (phase,
 // location, window, window level, view; for a touch beginning in the status
 // bar window, also the view chain it hit; at the first touch, the status bar
@@ -23,7 +23,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define VP_TOUCHDIAG_FLAG "/private/var/tmp/vphone-touchdiag"
+#define VP_TOUCHDIAG_FLAG "/var/mobile/Library/Caches/vphone-touchdiag.flag"
 #define VP_TOUCHDIAG_LOG "/var/mobile/Library/Caches/vphone-touchdiag.log"
 #define VP_TOUCHDIAG_MAX_LINES 5000
 
@@ -102,6 +102,27 @@ static void vpDumpStatusBarWindows(void) {
         if ([scene isKindOfClass:UIWindowScene.class])
             [windows addObjectsFromArray:((UIWindowScene *)scene).windows];
     for (UIWindow *window in windows) {
+        // The Home screen's visible icons, centres in window points, so a run
+        // can tap real icons rather than guessed positions.
+        if ([vpClassName(window) isEqualToString:@"SBHomeScreenWindow"]) {
+            NSMutableArray *icons = [NSMutableArray array];
+            NSMutableArray *pending = [NSMutableArray arrayWithObject:window];
+            while (pending.count && icons.count < 24) {
+                UIView *view = pending.firstObject;
+                [pending removeObjectAtIndex:0];
+                [pending addObjectsFromArray:view.subviews];
+                if (![vpClassName(view) isEqualToString:@"SBIconView"] || view.hidden || view.window != window)
+                    continue;
+                CGPoint centre = [view convertPoint:CGPointMake(CGRectGetMidX(view.bounds), CGRectGetMidY(view.bounds)) toView:window];
+                if (!CGRectContainsPoint(window.bounds, centre))
+                    continue;
+                id icon = vpValue(view, @"icon");
+                NSString *identifier = vpValue(icon, @"applicationBundleID") ?: vpValue(icon, @"leafIdentifier") ?: @"?";
+                [icons addObject:[NSString stringWithFormat:@"%.1f,%.1f=%@", centre.x, centre.y, identifier]];
+            }
+            vpWriteLine([NSString stringWithFormat:@"home-icons %@", [icons componentsJoinedByString:@" "]]);
+            continue;
+        }
         if (![vpClassName(window) containsString:@"StatusBar"])
             continue;
         NSMutableArray *bars = [NSMutableArray array];
@@ -410,9 +431,15 @@ __attribute__((constructor)) static void vpInstallTouchDiag(void) {
             return;
         }
         vpOriginalSendEvent = method_setImplementation(method, (IMP)vpSendEvent);
+        // Also once without waiting for a touch, after SpringBoard has laid out.
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 45 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            @autoreleasepool {
+                vpDumpStatusBarWindows();
+            }
+        });
         vpWriteLine([NSString stringWithFormat:@"pid=%d active: wrapped -[%@ sendEvent:] (class %@)", getpid(),
                      NSStringFromClass(application), vpClassName(application)]);
     }
 }
 
-int vphone_touchdiag_version(void) { return 8; }
+int vphone_touchdiag_version(void) { return 10; }

@@ -477,16 +477,22 @@
 > serves every boot, so an outer-size boot carries it too. See
 > `vphone2_M5_Duo_v1.4_2026-10-27/phase2/README.md` on the `duo-m5-v1.4` branch.
 
-> **Inner-size cutout correction, experimental (2026-10-28):** not a binary patch
-> but a SpringBoard runtime override, `libinnercutoutfix.dylib`
-> (`VPhoneGuestComponents/InnerCutoutFix`), shipped in the guest environment and
-> loaded by SystemHook. Inert unless `/private/var/tmp/vphone-innercutout` holds a
-> rect when SpringBoard starts. Then `-[UIScreen _exclusionArea]` returns that rect
-> for the main screen at a 2007x2853 native size while the original answer is
-> SpringBoard screen type 32's island pill, so status bar selection can find an
-> AxisAlignableSplit provider. Screen type, provider selection, rotation and
-> hit-testing are unchanged. Removing the flag and restarting restores the
-> original behaviour. See the same phase 2 README.
+> **Duo inner-screen UI compatibility, experimental (2026-10-29):**
+> `system-springboard-exp-inner_cutout` (guest system set, `.guestFile`
+> `/usr/lib/libinnercutoutfix.dylib`, iOS 27.1 only, not applicable to
+> non-foldable boards, off in `standard`) is not a binary patch: like
+> `libprefsfix`, the selection installs or removes a library
+> (`VPhoneGuestComponents/InnerCutoutFix`) that SystemHook loads into SpringBoard,
+> and its presence is the switch (`cfw install` / `cfw update-environment`; the
+> live environment sync only replaces an installed copy). For the main screen at
+> a 2007x2853 native size, while the original answer is SpringBoard screen type
+> 32's island pill, `-[UIScreen _exclusionArea]` returns the device's 37 pt hole
+> `{399, 30, 37, 37}` (the simulator's value, not a calibrated inner camera
+> position), so the status bar selects `AxisAlignableSplit2007` itself and touches
+> reach the Home screen and apps. Other calls keep the original and the first is
+> logged "not applied: unsupported configuration". Screen type, provider
+> selection, rotation, hit-testing and the outer size are unchanged. Single
+> display only; not folding. Evidence: phase 2 README on `duo-m5-v1.4`.
 
 > **iPhone Duo bring-up (2026-10-23, first boot fails):**
 > `iPhone19,4` / V68AP, iOS 27.1 (24A94425), is registered with one outer

@@ -31,6 +31,7 @@ public enum FirmwareGuestSystemPatchSet {
     public static let attitude = "system-apps-cfw-attitude"
     public static let followUpGroups = "system-preferences-cfw-followup_groups"
     public static let signInSheets = "system-apps-cfw-signin_sheets"
+    public static let innerCutout = "system-springboard-exp-inner_cutout"
     public static let arm64eX1DyldBootstrap = "system-dyld-boot-arm64e_x1_bootstrap"
     public static let arm64eX1CacheBootstrap = "dyld-boot-arm64e_x1_bootstrap"
     public static let arm64eX1CacheRemaining = "dyld-cfw-arm64e_x1_cache"
@@ -480,6 +481,26 @@ public enum FirmwareGuestSystemPatchSet {
                 title: "Suppress sign-in sheets",
                 summary: "Installs libsigninfix.dylib, loaded by SystemHook into every app. Drops Apple Account, iCloud, Game Center and Media & Purchases sign-in sheets; account daemons are untouched. Removing the library restores the sheets on the next app launch.",
                 target: .guestFile(path: "/usr/lib/libsigninfix.dylib"),
+            ),
+
+            // MARK: Foldable inner screen
+
+            VPhonePatchDeclaration(
+                identifier: innerCutout,
+                title: "Duo inner-screen UI compatibility (experimental)",
+                summary: """
+                Installs libinnercutoutfix.dylib, loaded by SystemHook into SpringBoard. For an \
+                iPhone Duo VM booted at the inner panel's render size (VPHONE_SCREEN=2007x2853@430) \
+                on one display: SpringBoard classifies that size as a screen type whose cutout is an \
+                island pill, so the status bar finds no inner-panel provider and its fallback takes \
+                every touch. The library reports the device's 37 pt hole instead, and only there, so \
+                the status bar selects its inner-panel provider and touches reach the Home screen \
+                and apps. Not dual display or folding, and the hole is the simulator's value, not a \
+                calibrated inner camera position. Removing the library restores the original \
+                behaviour after SpringBoard restarts. Off in standard.
+                """,
+                target: .guestFile(path: "/usr/lib/libinnercutoutfix.dylib"),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 1)),
             ),
 
             // MARK: Motion

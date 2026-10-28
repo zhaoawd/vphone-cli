@@ -172,8 +172,8 @@ static int vpExecve(const char *path, char *const argv[], char *const envp[]) {
 // Read-only touch routing diagnostic, inactive unless its flag file exists. See
 // TouchDiag/libtouchdiag.m.
 #define VP_TOUCH_DIAG "/usr/lib/libtouchdiag.dylib"
-// Experimental inner-size cutout correction, inactive unless its flag file
-// exists. See InnerCutoutFix/libinnercutoutfix.m.
+// Duo inner-screen cutout correction, present only while its patch is
+// selected. See InnerCutoutFix/libinnercutoutfix.m.
 #define VP_INNER_CUTOUT_FIX "/usr/lib/libinnercutoutfix.dylib"
 // The Settings follow-up-group hider. Rides the same dlopen route; it swizzles
 // (Preferences' classes are in the shared cache, so interposing would not reach

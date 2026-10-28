@@ -30,7 +30,7 @@ extension GuestAPI {
     ]
     /// Must match `VPhoneGuestEnvironment.selectedLibraries`: the VM's patch selection owns these.
     static let environmentSelectedLibraries: Set = [
-        "libprefsfix.dylib", "libsigninfix.dylib",
+        "libprefsfix.dylib", "libsigninfix.dylib", "libinnercutoutfix.dylib",
         "libvphonegyro.dylib", "libvphoneaccelerometer.dylib", "libvphoneattitude.dylib",
     ]
     static let environmentStaging = "/var/root/Library/Caches/vphone-environment"
