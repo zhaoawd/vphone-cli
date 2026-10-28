@@ -13,6 +13,8 @@
 // as "[geo-probe] {...}". All rects are also given in the root view's space.
 #import <UIKit/UIKit.h>
 #include <sys/sysctl.h>
+#include <dlfcn.h>
+#include <objc/runtime.h>
 
 #ifdef GEO_BARE
 static NSString *const kMode = @"A-bare";
@@ -150,6 +152,62 @@ static NSString *sysctlString(const char *name) {
   [window bringSubviewToFront:self.overlay];
 }
 
+// Data sources the inner panel's occluded area may come from, read in this
+// process only. MobileGestalt answers for display/sensor/product keys, and the
+// zero-argument private UIScreen getters whose names suggest sensor or corner
+// geometry, called only when the return type is one we can represent.
+static id jsonSafe(id v) {
+  if (!v) return NSNull.null;
+  if ([NSJSONSerialization isValidJSONObject:@[v]]) return v;
+  return [v description];
+}
+
+static NSDictionary *gestaltAnswers(void) {
+  void *mg = dlopen("/usr/lib/libMobileGestalt.dylib", RTLD_NOW);
+  CFTypeRef (*copyAnswer)(CFStringRef) = mg ? (CFTypeRef (*)(CFStringRef))dlsym(mg, "MGCopyAnswer") : NULL;
+  if (!copyAnswer) return @{@"error": @"MGCopyAnswer unavailable"};
+  NSArray *keys = @[@"ProductType", @"DeviceClass", @"HWModelStr", @"ArtworkDeviceSubType", @"ArtworkTraits",
+                    @"main-screen-width", @"main-screen-height", @"main-screen-scale", @"main-screen-pitch",
+                    @"main-screen-class", @"MainScreenClass", @"ScreenDimensionsCapability", @"DeviceCornerRadius",
+                    @"DeviceSupportsDynamicIsland", @"HasThinBezel", @"DeviceSupportsSingleDisplayEnhancedMultitasking",
+                    @"displayport"];
+  NSMutableDictionary *out = [NSMutableDictionary dictionary];
+  for (NSString *k in keys) {
+    CFTypeRef v = copyAnswer((__bridge CFStringRef)k);
+    out[k] = jsonSafe(CFBridgingRelease(v));
+  }
+  return out;
+}
+
+static NSDictionary *screenPrivateGeometry(UIScreen *screen) {
+  NSMutableDictionary *out = [NSMutableDictionary dictionary];
+  NSRegularExpression *re = [NSRegularExpression regularExpressionWithPattern:@"xclusion|ensor|orner|eriphery|sland|perture|bscur|utout|ousing"
+                                                                     options:0 error:nil];
+  for (Class c = screen.class; c && c != NSObject.class; c = class_getSuperclass(c)) {
+    unsigned n = 0;
+    Method *ms = class_copyMethodList(c, &n);
+    for (unsigned i = 0; i < n; i++) {
+      SEL sel = method_getName(ms[i]);
+      NSString *name = NSStringFromSelector(sel);
+      if ([name containsString:@":"] || out[name]) continue;
+      if (![re firstMatchInString:name options:0 range:NSMakeRange(0, name.length)]) continue;
+      char ret[256] = {0};
+      method_getReturnType(ms[i], ret, sizeof ret);
+      IMP imp = method_getImplementation(ms[i]);
+      if (ret[0] == '@') out[name] = jsonSafe(((id (*)(id, SEL))imp)(screen, sel));
+      else if (ret[0] == 'd') out[name] = @(((double (*)(id, SEL))imp)(screen, sel));
+      else if (ret[0] == 'f') out[name] = @(((float (*)(id, SEL))imp)(screen, sel));
+      else if (ret[0] == 'B' || ret[0] == 'c') out[name] = @(((BOOL (*)(id, SEL))imp)(screen, sel));
+      else if (ret[0] == 'q' || ret[0] == 'Q' || ret[0] == 'i' || ret[0] == 'I') out[name] = @(((long (*)(id, SEL))imp)(screen, sel));
+      else if (!strncmp(ret, "{CGRect=", 8)) out[name] = rect(((CGRect (*)(id, SEL))imp)(screen, sel));
+      else if (!strncmp(ret, "{UIEdgeInsets=", 14)) out[name] = insets(((UIEdgeInsets (*)(id, SEL))imp)(screen, sel));
+      else out[name] = [NSString stringWithFormat:@"<not read: %s>", ret];
+    }
+    free(ms);
+  }
+  return out;
+}
+
 // Status bar views that live in this app's own windows (read only): class,
 // frame in the root view's space, and the layout provider class when the view
 // exposes one. An empty list means the app draws no status bar of its own.
@@ -208,7 +266,11 @@ static NSString *sysctlString(const char *name) {
       d[@"statusBar"] = @{@"manager": @NO};
     }
     d[@"statusBarViews"] = [self statusBarViewsInScene:scene];
+    d[@"sceneScreenPrivate"] = screenPrivateGeometry(scene.screen);
+    d[@"mainScreenPrivate"] = screenPrivateGeometry(UIScreen.mainScreen);
+    d[@"sceneScreenIsMain"] = @(scene.screen == UIScreen.mainScreen);
   }
+  d[@"gestalt"] = gestaltAnswers();
   d[@"window"] = @{@"frame": rect(window.frame), @"bounds": rect(window.bounds), @"safeArea": insets(window.safeAreaInsets)};
   d[@"rootView"] = @{@"bounds": rect(self.view.bounds), @"safeArea": insets(self.view.safeAreaInsets),
                      @"safeLayoutFrame": rect(self.view.safeAreaLayoutGuide.layoutFrame),

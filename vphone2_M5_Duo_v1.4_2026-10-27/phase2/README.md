@@ -446,3 +446,57 @@ outside it in portrait, and the missing fold regions. Next read-only step: the
 data SpringBoard derives the inner panel's sensor/occlusion area from
 (MobileGestalt display and sensor keys, devicetree `display0`/`display1`), on
 the simulator runtime against the VM.
+
+### Data source of the inner panel's occluded area (2026-10-28)
+
+GeoBare now also reads MobileGestalt (`MGCopyAnswer`) for display, sensor and
+product keys, and the zero-argument private `UIScreen` getters whose names
+suggest sensor or corner geometry (`sceneScreenPrivate`, `mainScreenPrivate`),
+in its own process only (`results/geo-*-datasrc*/`).
+
+- MobileGestalt matches on both (ProductType iPhone19,4, ArtworkDeviceSubType
+  2034, DeviceCornerRadius 59, DeviceSupportsDynamicIsland, main screen
+  1398x2034 @ 460); no inner-panel key is involved.
+- Private screen getters: on the simulator the inner screen and the main
+  (outer) screen return the same values, corner radius 59 and `_exclusionArea`
+  `{399, 30, 37, 37}`, so these getters are device-level, not per panel. On the
+  VM: corner radius 55 and `_exclusionArea` `{250.3, 14, 125.3, 36.7}`, a centred
+  Dynamic Island pill.
+- The simulator's Duo capabilities.plist lists two integrated displays with
+  per-display corner radii and framebuffer masks; the masks are rounded
+  rectangles only, no sensor cut-out.
+
+Devicetrees, read with a small property scanner (LZFSE payload decompressed
+with libcompression; tools under the run host's scratch directory):
+
+| | v68ap (iPhone Duo hardware) | vphone600ap.guest (the VM) |
+|---|---|---|
+| `/product` island-notch-location, artwork-device-subtype, display-corner-radius | 144, 2034, 59 | 144, 2034, 59 (same) |
+| per-display nodes | `display0` and `display1` | **none** |
+
+v68's per-display properties, floats decoded:
+
+| node | special regions | frame (panel px) | corner radii |
+|---|---|---|---|
+| `display0` outer, surface-type 1, framebuffer 1C896A2B… | 0: `Jindo`, circular | {1199, 88, 111, 111} = {399.7, 29.3, 37, 37} pt | 5, 5, 59, 59 |
+| `display1` inner, surface-type 2, display-index 1, rotation 270, framebuffer BF0DC480… | 0: `BlankableRR`, circular; 1: `Fold` | {63, 710, 111, 111}; {0, 1335, 1878, 0} | 55 x4 |
+
+The outer `Jindo` region in points is exactly the simulator's `_exclusionArea`.
+The inner `Fold` region is the division the simulator returns and the VM does
+not; the inner region frames are in the physical panel's 1878x2670, not the
+2007x2853 render size. Without per-display nodes the VM falls back to the
+device-level description: `island-notch-location` 144 (the VM's occlusion region
+is 144 pt wide in portrait) and a generic centred island pill, around which the
+status bar uses its split layout.
+
+**Finding:** the inner-panel status bar, occlusion size and fold regions come
+from the devicetree's per-display `special-region-*` properties, which the VM's
+guest devicetree does not carry. Testable fix hypothesis (one change, not
+applied): give the VM's display a node with v68 `display1`'s inner-panel
+properties (corner radii, rotation, surface type, `special-region-0` camera
+hole, `special-region-1` fold) for inner-size boots, then rerun GeoBare/GeoProbe
+against the simulator. Open questions before that: the node path and which
+process reads it, how the panel-pixel frames map to a 2007x2853 framebuffer, and
+how an inner-only devicetree coexists with outer-size boots of the same VM. It
+would be a devicetree patch, so it goes through a patch set and preset
+(Skills/authoring-patch-sets) and Research/0_binary_patch_comparison.md.
