@@ -617,3 +617,26 @@ rewritten into the unturned portrait space (no host turn needed, touch stays
 consistent, but the values no longer match the board); find a property that
 turns the touch screen with the panel (not identified); or revert and keep the
 static inner panel without the node.
+
+### Correction: touch fails at the E1 size itself, not because of the node (2026-10-28)
+
+`duo-m5-dd` reverted to snapshot `pre-inner-panel-display` and its selection
+reset to plain `standard` (the patch shows "not applied", nothing differs).
+
+| boot | host-view tap (`vphone.sock tap`) | guest tap (`input.tap`) | GeoBare touch log |
+|---|---|---|---|
+| outer, configured 1398x2034 | Safari opens | Safari opens | touches logged at pixel/3 (clamped at the 466x678 edge) |
+| E1 `2007x2853@430`, no node | nothing opens | nothing opens | no touch logged |
+| E1 with the node | nothing opens | nothing opens | no touch logged |
+
+So the earlier conclusion "the node breaks touch" is wrong: touch does not reach
+apps at the E1 size with or without the node. backboardd's dispatch mode was
+`ignoring` with the node and `sending` without it (both on the E1 size, and
+`sending` at the outer size), with the hit-test region the full screen in each
+case; posture (closed through open) changed nothing at either size. Where the
+E1 touches end up is not found yet. Everything earlier recorded for E1 was
+geometry and layout only; touch was never exercised there.
+
+Consequence: the static inner-panel VM (E1) is not interactive. T6 at E1 can
+still cover boot, idle and automation through vphoned's non-touch methods, but
+not touch interaction, until this is found.
