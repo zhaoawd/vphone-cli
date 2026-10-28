@@ -1,0 +1,15 @@
+run C1: fix flag "399 30 37 37"
+libraries: [{"name":"libtouchdiag.dylib","sha":"885d001976c3"},{"name":"libinnercutoutfix.dylib","sha":"95c4c58b5225"}]
+live provider: provider=STUIStatusBarVisualProvider_AxisAlignableSplit2007
+icons: 281.5,465.5=com.apple.mobilenotes 493,465.5=com.apple.Maps 175.5,583.5=com.apple.tv 387.5,701.8=com.apple.Preferences
+tap1 host 281.5,465.5 want=com.apple.mobilenotes before=com.apple.springboard after=com.apple.mobilenotes: opened
+tap2 host 493,465.5 want=com.apple.Maps before=com.apple.springboard after=com.apple.Maps: opened
+tap3 host 175.5,583.5 want=com.apple.tv before=com.apple.springboard after=com.apple.tv: opened
+tap4 host 387.5,701.8 want=com.apple.Preferences before=com.apple.springboard after=com.apple.Preferences: opened
+tap5 guest 281.5,465.5 want=com.apple.mobilenotes before=com.apple.springboard after=com.apple.mobilenotes: opened
+tap6 guest 493,465.5 want=com.apple.Maps before=com.apple.springboard after=com.apple.Maps: opened
+tap7 guest 175.5,583.5 want=com.apple.tv before=com.apple.springboard after=com.apple.tv: opened
+tap8 guest 387.5,701.8 want=com.apple.Preferences before=com.apple.springboard after=com.apple.Preferences: opened
+fix log: pid=37 applied #200 (calls 200, matched 200): single rect: {250.333, 14, 125.333, 36.6667} -> single rect: {399, 30, 37, 37}
+hits:  8 window=SBHomeScreenWindow	view=SBIconView;
+stopped

@@ -906,3 +906,37 @@ boot 2 is the measured cold boot; records library and bundle hashes, the fix
 log, the live status bar provider and bounds, the screen's exclusion area and
 the selection result, Home screen taps (hit window and foreground app after
 each, host and guest paths) and GeoBare's three event layers.
+
+### Home screen per tap: 0/8, 8/8, 0/8 (2026-10-29)
+
+`scripts/cutout-home.sh`, same build (libtouchdiag `885d001976c3`,
+libinnercutoutfix `95c4c58b5225`), cold boot per state. Four icons, centres
+measured from the screenshots (page 1 is the same in all states): Notes,
+Maps, TV, Settings, each by host view and by vphoned. Before every tap Home is
+pressed twice and SpringBoard is verified frontmost; after it a screenshot and
+the foreground app are compared with the icon's bundle ID.
+
+| | C0 (off) | C1 (on) | C2 (off) |
+|---|---|---|---|
+| live provider | DynamicSplitSmallIsland | AxisAlignableSplit2007 | DynamicSplitSmallIsland |
+| frontmost before each tap | SpringBoard 8/8 | SpringBoard 8/8 | SpringBoard 8/8 |
+| hit (diagnostic) | SBStatusBarWindow / STUIStatusBarForegroundView 8/8 | SBHomeScreenWindow / SBIconView 8/8 | status bar 8/8 |
+| intended app opened | **0/8** | **8/8** (both paths) | **0/8** |
+
+Visual (`results/cutout-home/C0|C1/home.png`): C0 shows the split status bar
+(time top left, battery top right); C1 stacks time and battery in the top
+right corner, as the simulator's unfolded inner screen does. The Home grid is
+the same in both; only the status bar changes.
+
+Corrections to the earlier notes: the Home grid does not change with the fix
+(it was read wrongly), and the first series' C0 reading of Notes/Maps/Reminders
+as frontmost after status-bar-hit taps is not reproduced here, where the
+before-state is checked; it is left unexplained and superseded. The
+diagnostic's timed icon dump returned views with UUID identifiers that are not
+on page 1, so the icon centres are taken from screenshots.
+
+Status: at E1, with the cutout correction on, touches reach the Home screen and
+apps on both input paths, and the status bar uses the inner-panel provider;
+off before and after, they do not. Static inner-size input repair shown; not
+yet covered: landscape, drag and cancel, Safari, foreground/background,
+lock/unlock, outer size unaffected, and the cutout's true inner position.
