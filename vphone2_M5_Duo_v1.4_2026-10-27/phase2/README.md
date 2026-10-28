@@ -712,3 +712,35 @@ crash reports. The interaction round ran with the bundle that carries the
 vphoned experiment (host pushed the new vphoned on connect); the cold boots ran
 before it. Still to run: the 2 h idle (`scripts/t6o-idle.sh`), snapshot and
 export/import regression, and a boot after a host restart (needs the user).
+
+### Corrections and build attribution (2026-10-28)
+
+- **R1 attached nothing.** With an empty flag file the code looks up the main
+  display's uniqueId, gets null, and returns before calling
+  `BKSHIDEventSetDigitizerInfo`, so R1 ran exactly like R0. The only call that
+  attached a value was the separate check with a placeholder string, which had
+  no GeoBare criterion. So the metadata path is verified to be callable, not
+  tested as a fix. Since a null UUID is the legitimate identity of the built-in
+  display, no non-empty UUID is invented to retry it; the direction is closed.
+  The code stays, off without the flag file, and is not an E1 fix.
+- **Build attribution of the T6 runs.** `vphone-vm` cdhash d606ad52… is the same
+  for both runs (only vphoned changed), but the guest's vphoned differs:
+  | run | host bundle | guest vphoned | result |
+  |---|---|---|---|
+  | 10 cold boots | before the vphoned experiment | previous | 10/10 |
+  | interaction round | with the experiment | pushed on connect (new, flag absent) | passed |
+  | 2 h idle | with the experiment | new, flag absent | running |
+  These are not one build's complete T6. The final candidate is the newer
+  bundle; its cold boots are to be rerun with each binary's hash recorded.
+- **Wording.** No new blocking regression observed; the known SiriSearchFeedback
+  crash appeared on 8 of 10 boots and is listed separately, not "no crashes".
+  The PIDs were read once per boot at 180 s uptime (SpringBoard 37, backboardd 73,
+  the boot-time values, so no restart up to that point); the rerun records
+  start and end PIDs. The idle run is a locked-screen idle (Auto-Lock 120 s),
+  not continuous on-screen operation.
+- **E1 status.** Render size and base geometry calibrated; status bar and
+  reserved regions still differ; touch reaches no app. Not an interactive inner
+  panel test environment. Remaining step, one round only: log `UIWindow.sendEvent`
+  in GeoBare (record, then call through) for the same taps at the outer size and
+  E1, to find whether touches reach the app's window at all. If locating it
+  further needs system processes, stop there.
