@@ -536,3 +536,33 @@ for the VM's single display, applied on `duo-m5-dd` only through
 Preboot tree serves every boot of the VM, so an inner-panel node also applies
 to outer-size boots until reverted; per-size switching is not designed yet.
 Remember Research/0_binary_patch_comparison.md when it lands.
+
+### First run of the inner-panel display node (2026-10-28)
+
+`preboot-exp-devicetree_inner_panel_display` applied to `duo-m5-dd` only (snapshot
+`pre-inner-panel-display` before it; `fw set-patches --allow`, then root
+`cfw update-environment`; receipt records it in Guest). Boot at
+`VPHONE_SCREEN=2007x2853@430`, `results/geo-vm-inner-portrait-dt/`.
+
+Reserved regions now carry the inner panel (landscape, VM o 4 vs simulator o 3,
+so the camera region is mirrored):
+
+| region | simulator | VM before | VM with the node |
+|---|---|---|---|
+| division, inactive | {455.5, 0, 40, 669} | absent | {455.5, 0, 40, 669} |
+| occlusion, inactive (camera) | 58x37 at {215.7, 611} | absent | 58x37 at {677.3, 21} |
+| occlusion, active (status bar) | 84x120 at {867, 0} | portrait 144x82 | 84x124 at {867, 0} |
+
+`_displayCornerRadius` 55; `_exclusionArea` is still the device-level pill.
+
+New: the node's `display-rotation` 270 makes the system treat the framebuffer as
+a panel mounted at 270°, as the real inner panel is. The UI now starts in
+landscape (o 4, 951x669), like the simulator's unfolded default, and is drawn
+rotated into the 2007x2853 portrait framebuffer, so the host window shows it
+sideways (`GeoProbe/screen.png` on the run host). The devicetree values are
+right; what is left is presentation. Options: (1) rotate the host view and its
+touch mapping by 90° for this display (keeps hardware semantics); (2) a node
+variant with `display-rotation` 0 and the region frames rewritten into
+portrait coordinates, calibrated against the simulator's portrait values
+(diverges from hardware); (3) revert (snapshot, or block the patch and rerun
+`update-environment`).
