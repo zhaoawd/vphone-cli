@@ -225,6 +225,19 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
 
     // MARK: - Orientation
 
+    /// Experimental: VPHONE_PANEL_ROTATION=<degrees, clockwise> for a panel the
+    /// guest's device tree describes as mounted turned, such as the iPhone Duo's
+    /// inner panel (`display-rotation` 270 in `preboot-exp-devicetree_inner_panel_display`).
+    /// The guest then draws its interface turned into the portrait frame buffer
+    /// while SpringBoard still reports the interface as portrait; the window adds
+    /// the mounting so the interface reads upright. 0 otherwise.
+    private static let panelMountDegrees: Int = {
+        guard let value = ProcessInfo.processInfo.environment["VPHONE_PANEL_ROTATION"],
+              let degrees = Int(value), degrees % 90 == 0
+        else { return 0 }
+        return ((degrees % 360) + 360) % 360
+    }()
+
     private weak var displayContainer: VPhoneDisplayContainerView?
     private var panelSize: NSSize = .zero
     private var orientationPollInFlight = false
@@ -252,7 +265,12 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
     /// Turns the VM view and gives the window the turned panel's aspect
     /// ratio, in one animation. A windowed VM reshapes around its center; a
     /// full-screen one keeps the screen and letterboxes the turned panel.
-    private func applyOrientation(_ orientation: VPhoneDisplayOrientation, to window: NSWindow, force: Bool = false) {
+    ///
+    /// `orientation` is the guest interface's, as SpringBoard reports it. The
+    /// panel's mounting (`panelMountDegrees`) is added for the window only, so
+    /// the menu's rotation still works from the interface's own orientation.
+    private func applyOrientation(_ interface: VPhoneDisplayOrientation, to window: NSWindow, force: Bool = false) {
+        let orientation = VPhoneDisplayOrientation(degrees: interface.rawValue + Self.panelMountDegrees) ?? interface
         guard let container = displayContainer, force || container.orientation != orientation else { return }
         window.contentAspectRatio = orientation.displayedSize(panel: panelSize)
         var frame: NSRect?

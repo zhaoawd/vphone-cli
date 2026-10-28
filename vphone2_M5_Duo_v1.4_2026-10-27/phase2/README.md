@@ -566,3 +566,26 @@ variant with `display-rotation` 0 and the region frames rewritten into
 portrait coordinates, calibrated against the simulator's portrait values
 (diverges from hardware); (3) revert (snapshot, or block the patch and rerun
 `update-environment`).
+
+### Host rotation for the turned inner panel (2026-10-28)
+
+`VPHONE_PANEL_ROTATION=<degrees clockwise>` (window controller,
+`panelMountDegrees`) adds the panel's mounting to the window's turn only; the
+menu's rotation still works from SpringBoard's own orientation, which stays 0°
+with the inner-panel node. Touch keeps working through the turned view
+(AppKit's conversion undoes the rotation). With the node,
+`VPHONE_PANEL_ROTATION=90` shows the interface upright: the window becomes
+landscape, the fold division is a vertical band in the middle and the active
+occlusion region is the 84 pt column at the top right, as on the unfolded
+simulator. Touch mapping in the turned window still to be checked by hand.
+
+Still different: the status bar keeps its split layout (time left of the fold,
+battery at the top right over the trailing bar button), while the simulator
+stacks time and Wi-Fi in the 84 pt right-hand column. The device-level
+`_exclusionArea` is still the centred island pill. On the simulator it is the
+outer panel's `Jindo` region (`display0`); the VM's only `display0` now carries
+the inner panel's `BlankableRR` hole, so the system appears to fall back to
+`/product` `island-notch-location` 144 with `DeviceSupportsDynamicIsland`.
+Next hypothesis, one change: drop the device-level island for inner-size boots
+(for example `/product/island-notch-location`) and check `_exclusionArea` and
+the status bar again. Not applied.
