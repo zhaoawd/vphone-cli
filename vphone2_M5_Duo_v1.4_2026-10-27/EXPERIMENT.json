@@ -195,6 +195,18 @@
         "dock": "both displays respond via both paths",
         "rotation_needs_open_flat": "hinge open(4) refuses display.rotation; open-flat(3) rotates 0/90/180/270",
         "script": "run/fold214/f3.sh"
+      },
+      "f6_partial": {
+        "cold_boots": "cold1 5/5: vphoned ready 8-9 s; at 180 s launchd 8 s, kernel_task 3 s CPU; unlock, vphoned Settings tap, host Dock tap pass; open 2034x1398 inner shown, closed 1398x2034, holds 2/2; SpringBoard pid stable",
+        "cold_boot_new_crashes": "duetexpertd 0-2, SiriSearchFeedback 0-1 per boot; no SpringBoard/backboardd",
+        "locked_idle_120min": "13 samples: SpringBoard/backboardd/vphoned pids unchanged; launchd 0.12%, kernel_task 0.43% CPU; memorystatus_level 58->53, pressure level 1; no crashes after the first 10 min",
+        "after_idle": "open while locked shows inner lock screen; unlock ok; vphoned and host taps reach Settings and Safari; SpringBoard pid unchanged",
+        "springboard_crash_in_list": "SpringBoard-2026-10-27-174016.ips predates the VM, inherited from duo-m5-p1",
+        "not_done": "host restart, export/import (29 GiB free)",
+        "scripts": [
+          "run/fold214/f6-coldboot.sh",
+          "run/fold214/f6-idle.sh"
+        ]
       }
     }
   }

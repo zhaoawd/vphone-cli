@@ -598,7 +598,18 @@ PR #728 head `b03f0b82` 已包含 #761 和 #762，与 2.13.8 只差版本号提�
 
 **发现：`display.posture hinge:open`（4）下 `display.rotation` 失败。** 上游文档说明 hinge 4 时两块面板方向都是 ambiguous，只有 `open-flat`（3，`position: open`）能旋转；本轮用 `open-flat` 后内屏 0／90／180／270 全部生效。F4／F5 脚本使用的 `hinge:open` 不影响其结论，F5 中 “rotate-inner-portrait” 失败即此原因。
 
-未做原因分析：v1.6 与 v1.5 的差异主要是外屏以原生尺寸开机（v1.5 外屏是在内屏尺寸面板上裁出），推测 v1.5 的 “cover-size reduction” 路径与此有关，未验证。记录：`~/vphone-duo-m5/run/fold214/`（`f0/`、`f5/run1/`、`kb/`）。仍未做：F2 购物车与导航、F6；模拟器对照的意义降低，可作为可选。
+**F6 部分：冷启动与锁屏空闲（`run/fold214/f6-coldboot.sh`、`f6-idle.sh`，无窗口启动，bundle cdhash `39c2349e…`）。** 宿主重启与导出导入未做（前者要机主重启 Mac，后者磁盘只剩约 29 GiB）。
+
+| 项目 | 结果 |
+|---|---|
+| 冷启动 5 次（`f6/cold1`） | 5／5：vphoned 就绪 8–9 s；180 s 时 launchd CPU 8 s、kernel_task 3 s；解锁成功；vphoned 点设置、宿主点 Dock Safari 都进到对应 App；展开截图 2034×1398、内屏 shown=1，合拢回 1398×2034；hold 2／2；SpringBoard pid 37 开合前后不变 |
+| 冷启动新增崩溃 | 仅 duetexpertd（每次 0–2 份）、SiriSearchFeedback（0–1 份），均为已知后台进程；无 SpringBoard／backboardd |
+| 锁屏空闲 120 min（`f6/idle`） | 合拢、按电源黑屏后每 10 min 采样 13 次：SpringBoard 37、backboardd 73、vphoned 114 全程不变；launchd 占用 0.12%、kernel_task 0.43%，均为线性增长、无突增；memorystatus_level 58→53，压力级别 1；崩溃只有开机最初 10 min 内的 duetexpertd 2、SiriSearchFeedback 1，此后无新增 |
+| 空闲后操作 | 锁屏中展开为内屏锁屏（678×466 pt，截图正常）；解锁成功；合拢后 vphoned 点设置、宿主点 Dock Safari 都成功；SpringBoard 仍为 37 |
+
+此前 `logs.crashes` 中的 SpringBoard 报告（`SpringBoard-2026-10-27-174016.ips`）早于 `duo-m5-fold214` 创建，是从 `duo-m5-p1` 克隆带来的，不计入 v1.6。
+
+未做原因分析：v1.6 与 v1.5 的差异主要是外屏以原生尺寸开机（v1.5 外屏是在内屏尺寸面板上裁出），推测 v1.5 的 “cover-size reduction” 路径与此有关，未验证。记录：`~/vphone-duo-m5/run/fold214/`（`f0/`、`f5/run1/`、`kb/`）。仍未做：F2 购物车与导航、F6 宿主重启与导出导入；模拟器对照的意义降低，可作为可选。
 
 ## 来源与读取渠道
 
