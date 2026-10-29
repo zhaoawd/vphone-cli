@@ -177,7 +177,15 @@
         "software_keyboard": "3/3 normal",
         "touch_after_close": "reaches app"
       },
-      "evidence": "~/vphone-duo-m5/run/fold214/"
+      "evidence": "~/vphone-duo-m5/run/fold214/",
+      "f4_run1": {
+        "dark_fold_wakes_to_lock_screen": "s1/s2 pass",
+        "tap_to_wake": "s3/s4 pass",
+        "power_inside_hold": "s5/s6 lock screen shown, no stale frame; screen relights ~250 ms later, stays locked",
+        "rapid_fold_while_dark": "s7 holds 9/9 released",
+        "auto_lock_300s_then_fold": "s8/s9 pass",
+        "script": "run/fold214/f4.sh"
+      }
     }
   }
 }
