@@ -17,14 +17,21 @@ extension VPhoneBootCommand {
 
         let vmDir = config.deletingLastPathComponent()
 
-        // Experimental: VPHONE_SCREEN=<width>x<height>@<ppi> boots this run at
-        // another panel size (the iPhone Duo's inner panel is 1878x2670@430)
-        // without changing config.plist.
         var screen = (
             width: manifest.screenConfig.width,
             height: manifest.screenConfig.height,
             ppi: manifest.screenConfig.pixelsPerInch,
         )
+        // One immutable physical Main backs both logical Duo panels. Keep
+        // enough native pixels for inner mode even when booting closed. A
+        // static display choice (vm config --display) boots config.plist's
+        // screen instead.
+        if manifest.guestDevice == .iPhone19_4, VPhoneFoldableDisplayChoice.read(in: vmDir) == nil {
+            let inner = VPhoneGuestDevice.iPhone19_4InnerScreen
+            screen = (inner.width, inner.height, inner.pixelsPerInch)
+        }
+        // Experimental: VPHONE_SCREEN=<width>x<height>@<ppi> boots this run at
+        // another panel size without changing config.plist.
         if let spec = ProcessInfo.processInfo.environment["VPHONE_SCREEN"] {
             let parts = spec.split(whereSeparator: { $0 == "x" || $0 == "@" }).compactMap { Int($0) }
             if parts.count == 3, parts.allSatisfy({ $0 > 0 }) {
@@ -53,6 +60,7 @@ extension VPhoneBootCommand {
             isTVGuest: manifest.guestDevice.family == .appleTV,
             isHomePodGuest: manifest.guestDevice.family == .homePod,
             isWatchGuest: manifest.guestDevice.family == .watch,
+            isFoldableGuest: manifest.guestDevice == .iPhone19_4
         )
     }
 }

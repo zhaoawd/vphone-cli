@@ -584,6 +584,9 @@ struct VPhoneCustomFirmwareInstaller {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootFoldableVMSubtype)
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootInnerPanelDisplay)
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.innerCutout)
+            notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootFoldableProductId)
+            notApplicableGuest.insert(FirmwareGuestSystemPatchSet.hinge)
+            notApplicableGuest.insert(FirmwareGuestSystemPatchSet.foldGuard)
         }
         if !device.usesTVOS {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.tvTPRO)
@@ -1299,6 +1302,8 @@ struct VPhoneCustomFirmwareInstaller {
                     && identifier != FirmwareGuestSystemPatchSet.gyroscope
                     && identifier != FirmwareGuestSystemPatchSet.accelerometer
                     && identifier != FirmwareGuestSystemPatchSet.attitude
+                    && identifier != FirmwareGuestSystemPatchSet.hinge
+                    && identifier != FirmwareGuestSystemPatchSet.foldGuard
             }
             guard plan.isEnabled(identifier) else {
                 print("  [·] \(identifier): off in preset \(plan.presetIdentifier)")
@@ -1460,7 +1465,10 @@ struct VPhoneCustomFirmwareInstaller {
         } catch let overflow as DyldSharedCacheMaxSlidePatcher.RegionOverflow {
             throw overflow
         } catch {
-            print("  [!] shared region check skipped: \(error)")
+            // Expected: the preflight looks for the plain arm64e cache file,
+            // and every iOS 27 guest ships a chunked X1 cache the later cache
+            // stage measures directly. Nothing to report.
+            print("  [·] shared region check skipped: the cache is not a plain \(cacheArchitecture) file")
         }
 
         if guestDevice.hasPlainArm64Userland {
@@ -1613,10 +1621,23 @@ struct VPhoneCustomFirmwareInstaller {
             (FirmwareGuestSystemPatchSet.gyroscope, "libvphonegyro.dylib"),
             (FirmwareGuestSystemPatchSet.accelerometer, "libvphoneaccelerometer.dylib"),
             (FirmwareGuestSystemPatchSet.attitude, "libvphoneattitude.dylib"),
+            (FirmwareGuestSystemPatchSet.hinge, "libvphonehinge.dylib"),
+            (FirmwareGuestSystemPatchSet.foldGuard, "libvphonefoldguard.dylib"),
+            (FirmwareGuestSystemPatchSet.foldDisplay, "libvphonefolddisplay.dylib"),
         ] {
             isolate([identifier]) {
                 let path = "usr/lib/" + library
-                if on(identifier) {
+                // The hinge serves a foldable guest's CoreMotion, the guard
+                // exists only beside the foldable identity, and the display
+                // pad answers the fold layouts' two-display gate; on any other
+                // guest they would publish hooks nobody reads or a no-op that
+                // is not installed at all.
+                let foldOnly = identifier == FirmwareGuestSystemPatchSet.hinge
+                    || identifier == FirmwareGuestSystemPatchSet.foldGuard
+                    || identifier == FirmwareGuestSystemPatchSet.foldDisplay
+                let wanted = on(identifier)
+                    && (!foldOnly || Self.isFoldable(guestDevice))
+                if wanted {
                     try system.replaceFile(path, fromFileAt: VPhoneGuestBinaries.resolve(library),
                                            mode: 0o755, owner: Self.guestOwner)
                     live.insert(identifier)
@@ -3243,11 +3264,18 @@ struct VPhoneCustomFirmwareInstaller {
                                 boardDeviceTree.map { [$0.path] } ?? []))
         }
         if Self.isFoldable(guestDevice) {
+            // Keep the repair in the inverse composition even with no donor
+            // when it is off: restoring the clean backup needs no source tree.
+            if enabled(FirmwareGuestSystemPatchSet.prebootFoldableProductId), boardDeviceTree == nil {
+                throw ValidationError("Foldable product identity needs the board's own device tree.")
+            }
             repairGroup.append((FirmwareGuestSystemPatchSet.prebootFoldableVMSubtype, "patch-dt-foldable-vm-subtype", []))
             // The inner panel's display node, from the board's own tree.
             if let boardDeviceTree {
                 repairGroup.append((FirmwareGuestSystemPatchSet.prebootInnerPanelDisplay, "patch-dt-inner-panel-display", [boardDeviceTree.path]))
             }
+            repairGroup.append((FirmwareGuestSystemPatchSet.prebootFoldableProductId, "patch-dt-foldable-product-id",
+                                boardDeviceTree.map { [$0.path] } ?? []))
         }
         repairGroup.append((FirmwareGuestSystemPatchSet.prebootHaptics, "patch-dt-haptics", []))
         repairGroup.append((FirmwareGuestSystemPatchSet.prebootMicrophoneArray, "patch-dt-microphone-array", []))

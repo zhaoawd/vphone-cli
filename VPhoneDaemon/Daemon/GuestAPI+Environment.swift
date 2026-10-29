@@ -24,6 +24,9 @@ extension GuestAPI {
         "libtouchdiag.dylib",
         "libinnercutoutfix.dylib",
         "libsigninfix.dylib",
+        "libvphonefolddisplay.dylib",
+        "libvphonefoldguard.dylib",
+        "libvphonehinge.dylib",
         "libvphonegyro.dylib",
         "libvphoneaccelerometer.dylib",
         "libvphoneattitude.dylib",
@@ -32,6 +35,7 @@ extension GuestAPI {
     static let environmentSelectedLibraries: Set = [
         "libprefsfix.dylib", "libsigninfix.dylib", "libinnercutoutfix.dylib",
         "libvphonegyro.dylib", "libvphoneaccelerometer.dylib", "libvphoneattitude.dylib",
+        "libvphonehinge.dylib", "libvphonefoldguard.dylib", "libvphonefolddisplay.dylib",
     ]
     static let environmentStaging = "/var/root/Library/Caches/vphone-environment"
 

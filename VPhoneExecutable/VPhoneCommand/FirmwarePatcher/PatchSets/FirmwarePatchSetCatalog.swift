@@ -70,6 +70,7 @@ public enum FirmwarePatchSetCatalog {
             .union(experimentalIdentityPatches)
             .union([FirmwareGuestSystemPatchSet.otaUserland, FirmwareGuestSystemPatchSet.homePodTopCap, FirmwareGuestSystemPatchSet.homePodSetupBypass, FirmwareGuestSystemPatchSet.homePodAudioProduct, FirmwareGuestSystemPatchSet.homePodWelcome, FirmwareGuestSystemPatchSet.homePodSiriSpeech, FirmwareGuestSystemPatchSet.homePodOTAUserland, FirmwareGuestSystemPatchSet.homePodSoundGlow, FirmwareGuestSystemPatchSet.homePodCryptexStaging, FirmwareGuestSystemPatchSet.homePodCryptexClass, FirmwareGuestSystemPatchSet.homePodAdHocInstall, FirmwareGuestSystemPatchSet.prebootInnerPanelDisplay, FirmwareGuestSystemPatchSet.innerCutout])
             .union([FirmwareKernelCustomFirmwarePatchSet.tvTPROPagers, misTrustAuthPatch, FirmwareGuestSystemPatchSet.settingsRootRows, FirmwareGuestSystemPatchSet.settingsSoftwareUpdate, FirmwareGuestSystemPatchSet.tvTPRO, FirmwareGuestSystemPatchSet.tvOTAUserland, FirmwareGuestSystemPatchSet.tvSetupDisplayLookup, FirmwareGuestSystemPatchSet.tvSetupFocus, FirmwareGuestSystemPatchSet.tvLocalActivation, FirmwareGuestSystemPatchSet.tvLegacySetup])
+            .union([FirmwareGuestSystemPatchSet.prebootFoldableProductId])
 
     /// ProMotion: the 120 Hz timing for the paravirtual display.
     ///
@@ -250,6 +251,7 @@ public enum FirmwarePatchSetCatalog {
         "preboot-cfw-devicetree_haptics",
         "preboot-cfw-devicetree_iphone_product",
         "preboot-cfw-devicetree_foldable_vm_subtype",
+        "preboot-exp-devicetree_foldable_product_id",
         "preboot-cfw-devicetree_microphone_array",
         RestoreRamDiskSealPatcher.patchIdentifier,
         "system-apps-cfw-attitude",
@@ -257,6 +259,9 @@ public enum FirmwarePatchSetCatalog {
         FirmwareGuestSystemPatchSet.followUpGroups,
         "system-backboardd-cfw-gyroscope",
         "system-backboardd-cfw-accelerometer",
+        "system-backboardd-cfw-hinge",
+        "system-springboard-cfw-fold_guard",
+        "system-springboard-cfw-fold_display",
         "system-campo-cfw-entitlements",
         "system-debugserver-cfw-install",
         FirmwareGuestSystemPatchSet.arm64eX1DyldBootstrap,

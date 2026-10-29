@@ -20,6 +20,9 @@ public enum VPhoneGuestEnvironment {
         "libtouchdiag.dylib",
         "libinnercutoutfix.dylib",
         "libsigninfix.dylib",
+        "libvphonefolddisplay.dylib",
+        "libvphonefoldguard.dylib",
+        "libvphonehinge.dylib",
         "libvphonegyro.dylib",
         "libvphoneaccelerometer.dylib",
         "libvphoneattitude.dylib",
@@ -37,5 +40,6 @@ public enum VPhoneGuestEnvironment {
     public static let selectedLibraries: Set<String> = [
         "libprefsfix.dylib", "libsigninfix.dylib", "libinnercutoutfix.dylib",
         "libvphonegyro.dylib", "libvphoneaccelerometer.dylib", "libvphoneattitude.dylib",
+        "libvphonehinge.dylib", "libvphonefoldguard.dylib", "libvphonefolddisplay.dylib",
     ]
 }
