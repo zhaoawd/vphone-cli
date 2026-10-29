@@ -25,6 +25,16 @@ drive is on this branch (commits 49116af3 and 3b99165c). Paths below that start 
 | Two real displays | **Blocked at the host, research recorded.** PG accepts one device with two ports (P3) and two devices with distinct serials (P2), with fixed modes connected. The VM service refuses both: ports ≥ 2 need `os_variant_has_internal_content`, two devices get the same serial (`0x12345678 + port`). Route A′ (one GPU, two ports) is the better fit for the one-`gfx` guest devicetree; route B′ (two GPUs) stays a fallback. Both need the VM service changed and an unanalysed guest driver path; neither is pursued here. |
 | Phase 1 baseline | Unchanged: `duo-m5-728`, snapshot `phase1-baseline`. All phase 2 runs used the clone `duo-m5-dd`. |
 
+Update 2026-10-29: the static inner panel went on to T6 at E1 and a persistent
+`vm config --display` (sections below). The fold itself now runs on a different
+route, PR #728's two logical displays on one output, on branch `duo-m5-v1.5` and VM
+`duo-m5-fold728`: see the last section, "Two logical displays on one output".
+
+| track (2026-10-29) | state |
+|---|---|
+| Two logical displays, one output (#728) | **Working, partly verified.** Merged as `297add30` (PR head `3da02943`). F0 display model passes; open and close in one session with SpringBoard unchanged; fold black frames fixed in `fb41cd6b` (0 dark frames on 26 transitions). Not done: app continuity, full touch and rotation, auto-lock and sleep, long-run stability. |
+| Static inner panel (E1) | Kept on `duo-m5-v1.4` as the fixed-size baseline. On v1.5 it needs `--display inner` plus `fold_display` blocked and `inner_cutout` allowed. |
+
 ---
 
 # Phase 2: dual display on our own (findings 2026-10-28)
@@ -1246,3 +1256,40 @@ one, so new VPhoneCoreKit API was missing to vphone-cli. Removing
 `.build/XcodeCommand/Build/Products/Debug/{VPhoneCoreKit.swiftmodule,
 libVPhoneCoreKit.a}` fixed it. The T6 candidate was not affected: no
 VPhoneCoreKit change landed between that test build and the freeze.
+
+## Two logical displays on one output (2026-10-29, branch `duo-m5-v1.5`)
+
+PR #728 moved on after this record started: backboardd publishes the inner
+panel as a software render display (`VPhone Duo Inner`, 2853x2007, built-in,
+not Main) before SpringBoard connects, SpringBoard resolves FoldingDual and
+FullyClosed natively, and composites the inner display onto the one PG output.
+The VM service gate above still stands; this route no longer needs it.
+
+- Branch `duo-m5-v1.5` (worktree `~/vphone-duo-m5/src/fold728`) = `duo-m5-v1.4` +
+  PR head `3da02943`, merge `297add30`. Boot rule: an iPhone19,4 boots the fold at
+  2007x2853 @460 unless `vm config --display outer|inner` wrote `display-choice`
+  beside config.plist. SystemHook loads `inner-cutout-fix` only without the fold
+  display. `fold_display`, `fold_guard` and `hinge` are on in `standard`, so the
+  v1.5 bundle must not update `duo-m5-728` or an E1 machine.
+- VM `duo-m5-fold728`: APFS clone of `duo-m5-p1` with a new identity, then
+  `cfw update-environment` with the v1.5 bundle (vphone-vm cdhash `2fb0bec7…`).
+- F0: `CADisplay.mainDisplay` is `LCD primary` (id 1); `VPhone Duo Inner` is id 7,
+  not external. SpringBoard loads `fold-guard` and `fold-display`, backboardd
+  `hinge` and `fold-display`.
+- Fold: over 100 `display.posture` changes with SpringBoard's pid unchanged; the
+  fold does not lock the guest (Home, Safari in front, unlock on the inner
+  display then close, replay after reboot). Safari keeps its page across folds.
+- Black frames, measured with the window's own recorder (Capture > Start
+  Recording, the PG output itself) over a fixed sequence, 30 fps
+  (`~/vphone-duo-m5/run/fold728/f5-record.sh`, `f5-analyze.sh`, `f5-align.sh`):
+  as merged, 23 of 25 fold transitions had fully black frames (open 100–433 ms,
+  close 33–133 ms). Millisecond logs showed the content handed over in steps
+  (cover scenes leave Main 130–190 ms before the compositor's first inner frame;
+  an app in front draws black on the inner display for up to a second) and the
+  scanout powered off in 4 of 27 transitions. `fb41cd6b` holds Main's last frame
+  until the other side has drawn: 0 dark frames on 26 transitions, holds of
+  260–420 ms (0.9–1.4 s with Safari in front). See
+  `Research/0_binary_patch_comparison.md`.
+- Open: black launch cards for Settings and Photos on the inner display
+  (pre-existing); Safari's status-bar time over its address bar on the cover;
+  the cover fills the whole panel instead of 466x678.

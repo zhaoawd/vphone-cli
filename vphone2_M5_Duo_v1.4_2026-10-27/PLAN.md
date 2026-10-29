@@ -4,7 +4,8 @@
 **目标：实体 M5 Mac，iPhone19,4，iOS 27.1 / 24A94425。**  
 **承接：v1.3；原始固件、旧 Bundle、旧 VM 和实验记录均保留。**  
 **交付：更新后的实施方案及证据分级，不包含制作成功的虚拟机或已实现补丁。**  
-**实测增补（2026-10-27 晚）：已在 M5 Pro 上完成 P1–P3（A 级系统来源 VM、X1 性能对照、I0/I1 安装与 food_ordering），结果见 §0.1 与 §13；C 级折叠仍未做。**
+**实测增补（2026-10-27 晚）：已在 M5 Pro 上完成 P1–P3（A 级系统来源 VM、X1 性能对照、I0/I1 安装与 food_ordering），结果见 §0.1 与 §13；C 级折叠仍未做。**  
+**实测增补三（2026-10-29）：第二阶段改走 PR #728 的 guest 逻辑双显示（一个宿主输出），合入为本地分支 `duo-m5-v1.5`，新建 `duo-m5-fold728`；F0（显示模型）通过，同会话开合可用，开合黑帧已修复（26 次切换 0 黑帧）；F2–F4、F6 未做。见 §13.8。**
 
 ## 0. 本版结论
 
@@ -498,8 +499,49 @@ PR #728 head `b03f0b82` 已包含 #761 和 #762，与 2.13.8 只差版本号提�
 
    **第一阶段（单显示 Duo 开发测试 VM）完成**，基线快照 `phase1-baseline`；附带条件是依赖未合并的 #728。#728 合并发版后，用正式 Bundle 执行 `cfw update-environment`（或重做），并复跑 T3 与 §13.6 探针，即可去掉该条件。方案原列的证据项（逐版差异、CSSC 探针、原生 Probe App）已在 §13.6 补齐。
 3. 已结论：duetexpertd datavault 循环是所有 iOS 27 guest 的已知现象（上游 `Research/Host/machine_templates.md`），精简服务配置可关闭；收据设备 `iPhone99,11` 是 vphone600ap 平台身份，属预期；TXM `selector: 38 | 15` 噪声随 #728 从 2,981 条降到 1 条，是 X1 按需处理的副作用。
-4. 已报上游：签名器 armv7 slice（#766）。待查：Auto-Lock Never 不生效；双显示／折叠（C 级，依赖上游）。
+4. 已报上游：签名器 armv7 slice（#766）。待查：Auto-Lock Never 不生效；双显示／折叠（C 级，依赖上游）。（2026-10-29 更新：折叠改走 #728 的 guest 逻辑双显示，已可在同一会话内开合，见 §13.8；两个独立宿主输出仍受 VM 服务门禁限制。）
 5. 原始日志：`~/vphone-duo-m5/run/`（prepare、patch、restore、cfw、728-update-env、first-boot、728-boot、`p2/`、`p2-728/`、`p3/`、`crash/`、P2-summary.md、P3-summary.md）；证据：`~/vphone-duo-m5/evidence/`。
+
+### 13.8 第二阶段：#728 逻辑双显示（`duo-m5-v1.5`／`duo-m5-fold728`，2026-10-29）
+
+**路线。** 两个独立宿主输出仍被 VM 服务门禁挡住（phase2/README.md）。PR #728 后续提交（`spike/duo-virtual-inner`，经 `4410ed73` 并入）改走另一条路：backboardd 在 guest 内发布一个软件内屏（`VPhone Duo Inner`，2853×2007，内置、非 Main），SpringBoard 用原生内容模式解析 FoldingDual／FullyClosed，并把内屏画面合成到唯一的 PG 输出上。它不解除门禁，只是不再依赖第二个端口。
+
+**合入。** 本地分支 `duo-m5-v1.5`（worktree `~/vphone-duo-m5/src/fold728`）＝ `duo-m5-v1.4` ＋ PR head `3da02943`（比分析所用 PDF 的 `f680c8c` 新一个提交），合并提交 `297add30`，未推送。X1、VirtualAudio、服务保留与旧 PR head `b03f0b82` 是同一批提交，无需去重；新增的是 spike 分支的 23 个提交。12 个冲突文件，规则由机主确认：
+
+| 规则 | 内容 |
+|---|---|
+| 启动尺寸 | iPhone19,4 默认按折叠模式启动，单个 PG 输出 2007×2853；`vm config --display outer\|inner` 在 VM 目录写 `display-choice`，改为静态单屏；`--display fold` 删除该文件。不改 config.plist 格式（Launchpad 读取） |
+| ppi | 内屏统一为 2007×2853 @460（v1.4 为 430） |
+| 互斥 | SpringBoard 中 SystemHook 仅在 `libvphonefolddisplay.dylib` 不存在时加载 `inner-cutout-fix`（cutout 修正把 Main 当内屏，折叠路线 Main 是外屏）；静态内屏须 `fw set-patches --block system-springboard-cfw-fold_display --allow system-springboard-exp-inner_cutout` |
+| 设备树 | 本地 `preboot-exp-devicetree_inner_panel_display` 与 #728 `preboot-exp-devicetree_foldable_product_id` 并存，均在 standard 中关闭 |
+| 默认开启 | `fold_display`、`fold_guard`、`hinge` 是 cfw 补丁，standard 下对 iPhone19,4 默认开启：**不得用 v1.5 Bundle 更新 `duo-m5-728` 或静态 E1 VM** |
+
+构建：`VPhone` 通过（含 ValidateBundle），`vphone-vm` cdhash `2fb0bec7…`（已加入 allowlist）。VPhoneCoreKitTests 663/663，vphoned 逻辑检查 394/0 失败，FoldGuard 7/7；FirmwarePatcherTests 134 项失败，均为本机缺参考固件（`pristine` fixture、`ibss.bin` 等），与 Duo 无关。
+
+**VM。** `duo-m5-fold728` ＝ `duo-m5-p1` 的 APFS 克隆（`--new-identity`，已信任宿主）＋ v1.5 的 `cfw update-environment`（X1 缓存 24,606,071 处改写，与 `duo-m5-728` 相同；`target-sub-type` V68AP → V68VM2025）。首次 update-environment 被 Ctrl-C 中断于 X1 全缓存阶段，清理挂载后重跑成功（`UPD_EXIT=0`）。
+
+| 关卡 | 结果 |
+|---|---|
+| F0 显示模型 | **通过。** `CADisplay.mainDisplay` = `LCD primary`（id 1，type 0，外屏）；`VPhone Duo Inner`（id 7，非外接，独立 UUID）；SystemHook：SpringBoard 加载 `fold-guard`、`fold-display`，backboardd 加载 `hinge`、`fold-display`，无 `inner-cutout-fix`。vphoned 8–10 s，launchd CPU 10 s |
+| F1 同会话开合 | **冒烟通过。** `display.posture` open／closed 逾百次（F0、锁屏测试与 4 轮 F5 录制），SpringBoard pid 不变、无新崩溃；合拢为竖屏外屏主屏，展开为横屏内屏主屏（侧边 Dock）；Safari 跨开合保持同一页面 |
+| 锁屏 | 开合不锁屏（主屏、Safari 前台、内屏解锁后合拢、重启后按 F0 顺序重放，均以 0.5／2／5 s 采样）。F0 首次启动时见过一次展开后锁屏，未能复现（当时 pose `hinge: 0` 且有“信任此电脑”弹窗） |
+| 旋转 | 外屏主屏拒绝横屏、内屏主屏拒绝竖屏（与 iPhone 主屏语义一致）；其余旋转请求生效 |
+| F5 输出一致性 | **开合黑帧已修复**，见下 |
+
+**F5 黑帧。** 用 VM 窗口自带录制（截取 ▸ 开始录制，⇧⌘R，录的是 PG 输出本身）在固定序列下逐帧统计（`~/vphone-duo-m5/run/fold728/f5-*.sh`，30 fps）：
+
+| | run1（合入原样） | run3（第一版修复） | run4（最终） |
+|---|---|---|---|
+| 含黑像素帧 | 121 | 100 | 27（全部为 App 启动） |
+| 主屏展开／合拢 | 6–7 帧／1–2 帧 | 2–3／0 | **0／0** |
+| Safari 前台展开 | 11–30 帧 | 26–29 | **0** |
+| 快速开合（1 s 间隔） | 6–7／1–2 | 1–2／0 | **0／0** |
+
+原因（毫秒日志对齐）：一是交接分步，SpringBoard 先把外屏场景撤离 Main，约 130–190 ms 后合成器第一帧才到；App 在前台时内屏本身还会先黑约 1 s。二是 `vpApplyPanelStates` 在内屏已持有面板、但尚未收到内屏供电请求时关闭了唯一输出（27 次中 4 次）。修复提交 `fb41cd6b`：内容模式切换开始时由 render server 把 Main 当前帧画进 IOSurface，置于 Main 根场景窗口最上层，展开时等内屏画出非黑内容、合拢时外屏取回主场景后 150 ms 再撤下，最长 2 s；内屏未请求供电前输出保持点亮。代价是切换时静止 260–420 ms（Safari 前台 0.9–1.4 s），不再黑屏。
+
+**新发现（未处理）。** 内屏启动“设置”“照片”时启动卡片为黑色（16／8 帧，修复前即有，与折叠无关）；外屏 Safari 状态栏时间压住地址栏（作者已记录横屏，竖屏同样）；合拢时外屏占满整块面板，不裁到 466×678（作者已记录）。
+
+**未做。** F2（food_ordering 跨开合保持购物车、导航、输入）、F3（两面板触摸与各方向完整回归）、F4（自动锁屏、睡眠中开合）、F6（冷启动、长时间、导出导入、宿主重启）。测量与修复是否回报 #728 由机主决定。
 
 ## 来源与读取渠道
 

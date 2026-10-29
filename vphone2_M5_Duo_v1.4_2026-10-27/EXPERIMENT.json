@@ -94,7 +94,7 @@
     "rotation": "pass: Safari 90/270/0 applied; portrait-only apps refuse; Home stays portrait",
     "snapshot_export": "pass: pre-t6 revert boots; export 65 s / 15 GB zstd, import 31 s, imported copy boots with same apps",
     "audio_playback": "WebKit WAV ×3 and RingtonePreview ×3 played to completion, audiomxd stable, no crashes; audible on the host speakers (user confirmed 2026-10-28)",
-    "folding_behavior": "display.posture accepted for all hinge states, SpringBoard stable, target-sub-type V68VM2025; single display, so no inner/outer layout change (dual display not implemented upstream)",
+    "folding_behavior": "2026-10-29 (duo-m5-fold728, branch duo-m5-v1.5): PR #728 two logical displays on one PG output; Main = cover (CADisplay LCD, id 1), inner = software display VPhone Duo Inner (id 7); display.posture opens and closes in the same session, SpringBoard pid unchanged, no lock on fold. Earlier single-display result (2026-10-28): posture accepted, no layout change.",
     "known_issues": [
       "display.auto_lock Never not applied: EffectiveUserSettings stays 120 s (UserSettings value 0, rangeMinimum 120)"
     ],
@@ -114,5 +114,36 @@
   "upstream_reports": [
     "Lakr233/vphone-cli#728 comment 6456703776 (M5 Pro A/B + T6)",
     "Lakr233/vphone-cli#766 (signer rejects armv7 slices)"
-  ]
+  ],
+  "phase2_logical_dual_display": {
+    "branch": "duo-m5-v1.5 (local, not pushed)",
+    "merge_commit": "297add30",
+    "pr_728_head": "3da02943",
+    "fix_commit": "fb41cd6b",
+    "vphone_vm_cdhash": "2fb0bec7d0a5c90ded8ef49a4d8ba7515c691556",
+    "vm": "duo-m5-fold728 (APFS clone of duo-m5-p1, --new-identity, cfw update-environment with the v1.5 bundle)",
+    "rules": {
+      "boot_size": "fold at 2007x2853@460 unless vm config --display outer|inner wrote display-choice",
+      "inner_ppi": 460,
+      "cutout_vs_fold_display": "SystemHook loads inner-cutout-fix only without libvphonefolddisplay.dylib"
+    },
+    "tests": {
+      "VPhoneCoreKitTests": "663/663",
+      "vphoned_logic": "394 checks, 0 failures",
+      "FoldGuard": "7/7",
+      "FirmwarePatcherTests": "134 issues, all missing reference firmware fixtures"
+    },
+    "F0_display_model": "pass",
+    "F1_same_session_fold": "smoke pass (100+ posture changes, SpringBoard pid constant)",
+    "F2_app_continuity": null,
+    "F3_touch_rotation": "partial: Home rotation refusals as stock iPhone; full touch regression not done",
+    "F4_lock_power": "partial: fold does not lock (4 scenarios); auto-lock and sleep not done",
+    "F5_output": {
+      "before_fix": "23 of 25 fold transitions with fully black frames (open 100-433 ms, close 33-133 ms)",
+      "after_fix": "0 dark frames on 26 transitions; holds 260-420 ms, 0.9-1.4 s with Safari in front",
+      "remaining": "black launch cards for Settings/Photos on the inner display (pre-existing, not fold)"
+    },
+    "F6_stability": null,
+    "evidence": "~/vphone-duo-m5/run/fold728/ (f0, lock, lock-boot, f5/run1-run4, f5-*.sh, redeploy.sh)"
+  }
 }
