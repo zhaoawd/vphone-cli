@@ -48,6 +48,10 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
     public let productName: String
     /// The guest display: a device panel, or a provisional virtual canvas.
     public let screen: VPhoneVirtualMachineManifest.ScreenConfig
+    /// A foldable's inner display, which `vm config --display inner` boots
+    /// instead of `screen` (the outer one). The VM has one display either way:
+    /// this is a static inner-screen machine, not a fold.
+    public let innerScreen: VPhoneVirtualMachineManifest.ScreenConfig?
 
     public init(
         family: Family,
@@ -55,12 +59,14 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
         deviceClass: String,
         productName: String,
         screen: VPhoneVirtualMachineManifest.ScreenConfig,
+        innerScreen: VPhoneVirtualMachineManifest.ScreenConfig? = nil,
     ) {
         self.family = family
         self.productType = productType
         self.deviceClass = deviceClass
         self.productName = productName
         self.screen = screen
+        self.innerScreen = innerScreen
     }
 
     public var isPad: Bool {
@@ -136,9 +142,18 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
     /// iPhone 18 Pro (V63AP): 1206x2622, 402x874 points.
     public static let iPhone19_2 = iPhone("iPhone19,2", "v63ap", "iPhone 18 Pro", width: 1206, height: 2622)
 
-    /// iPhone Duo (V68AP), using only its outer display for initial bring-up.
-    /// The inner display and hinge are not represented by the VM's single panel.
-    public static let iPhone19_4 = iPhone("iPhone19,4", "v68ap", "iPhone Duo", width: 1398, height: 2034)
+    /// iPhone Duo (V68AP): outer display 1398x2034, 466x678 points. The inner
+    /// display is the render size App Store Connect gives for it, 2007x2853 at
+    /// 430 ppi (669x951 points); its 1878x2670 panel size clips the dock. The VM
+    /// has one display, so it boots one or the other; the hinge is not modelled.
+    public static let iPhone19_4 = VPhoneGuestDevice(
+        family: .iPhone,
+        productType: "iPhone19,4",
+        deviceClass: "v68ap",
+        productName: "iPhone Duo",
+        screen: .init(width: 1398, height: 2034, pixelsPerInch: 460, scale: 3.0),
+        innerScreen: .init(width: 2007, height: 2853, pixelsPerInch: 430, scale: 3.0),
+    )
 
     /// iPhone XS Max: 1242x2688 at 458 ppi, 414x896 points. Its IPSW carries the
     /// iOS 18 releases after 18.6, which the iPhone 16 never got; the research

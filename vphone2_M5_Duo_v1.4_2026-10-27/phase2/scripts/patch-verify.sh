@@ -3,7 +3,7 @@
 # boot: selection and receipt (host), installed library hash, the library's
 # log, the live status bar provider, four Home icon taps per input path and
 # GeoBare's three layers. Expects the VM stopped; ends stopped.
-#   patch-verify.sh <tag> [inner|outer]
+#   patch-verify.sh <tag> [inner|outer|config]   (config: no VPHONE_SCREEN, inner icons)|outer]
 set -uo pipefail
 TAG=${1:?tag}; SIZE=${2:-inner}
 R=/Users/kolar/vphone-duo-m5/run/phase2
@@ -31,7 +31,11 @@ note "selection: $($CLI fw patches duo-m5-dd 2>&1 | grep -E '\] system-springboa
 note "receipt guest has it: $(plutil -p ~/.vphone/machines/duo-m5-dd/PatchReceipt.plist | grep -c system-springboard-exp-inner_cutout)"
 note "bundled library: $(shasum -a 256 $BUNDLED | cut -c1-12)"
 
-if [[ $SIZE == outer ]]; then
+if [[ $SIZE == config ]]; then
+  # The display the VM's config.plist names, no VPHONE_SCREEN: an inner config.
+  W=2007; H=2853; zsh $R/window-launch-any.sh 0 verify-$TAG > /dev/null 2>&1
+  icons=(281.5,465.5=com.apple.mobilenotes 493,465.5=com.apple.Maps 175.5,583.5=com.apple.tv 387.5,701.8=com.apple.Preferences)
+elif [[ $SIZE == outer ]]; then
   W=1398; H=2034; zsh $R/window-launch-any.sh 0 verify-$TAG > /dev/null 2>&1
   icons=(145,380=com.apple.mobilenotes 321,380=com.apple.Maps 57,479=com.apple.tv 233,578=com.apple.Preferences)
 else
@@ -40,6 +44,8 @@ else
 fi
 rpc screen.unlock '{"timeout":30}' > /dev/null; home; home
 rpc files.remove '{"path":"/var/mobile/Library/Caches/vphone-innercutout.flag"}' > /dev/null
+send "{\"t\":\"screenshot\",\"path\":\"$O/screen.png\"}" > /dev/null
+note "framebuffer: $(sips -g pixelWidth -g pixelHeight $O/screen.png 2>/dev/null | awk '/pixel/{printf "%s ", $2}')(config screenConfig $(plutil -extract screenConfig.width raw ~/.vphone/machines/duo-m5-dd/config.plist)x$(plutil -extract screenConfig.height raw ~/.vphone/machines/duo-m5-dd/config.plist))"
 note "installed library: $(rpc environment.status | jq -r '.result.libraries[] | select(.name == "libinnercutoutfix.dylib") | (.sha256 // "absent") | .[0:12]')"
 sleep 30
 send "{\"t\":\"pull\",\"path\":\"$DIAG_LOG\",\"local\":\"$O/touchdiag.log\"}" > /dev/null

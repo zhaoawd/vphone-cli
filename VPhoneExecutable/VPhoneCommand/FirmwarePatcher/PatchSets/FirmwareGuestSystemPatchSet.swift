@@ -490,7 +490,7 @@ public enum FirmwareGuestSystemPatchSet {
                 title: "Duo inner-screen UI compatibility (experimental)",
                 summary: """
                 Installs libinnercutoutfix.dylib, loaded by SystemHook into SpringBoard. For an \
-                iPhone Duo VM booted at the inner panel's render size (VPHONE_SCREEN=2007x2853@430) \
+                iPhone Duo VM booted on its inner display (vm config --display inner, 2007x2853@430) \
                 on one display: SpringBoard classifies that size as a screen type whose cutout is an \
                 island pill, so the status bar finds no inner-panel provider and its fallback takes \
                 every touch. The library reports the device's 37 pt hole instead, and only there, so \

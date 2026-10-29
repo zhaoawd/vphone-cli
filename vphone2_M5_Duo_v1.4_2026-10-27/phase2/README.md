@@ -1210,3 +1210,39 @@ interval); kernel_task about 2.8 % of a core, steady; one `ReportSystemMemory`
 report from the 100-minute sample on (a memory report, not a crash). The
 script stops the VM at the end, so the post-idle interaction check (unlock,
 tap, input after the long idle) was not part of this run.
+
+## W1: the inner display as a persistent VM setting (2026-10-29)
+
+The VM already keeps its display in `config.plist` (`screenConfig`);
+`VPHONE_SCREEN` only overrode it for one launch. Now:
+
+- `VPhoneGuestDevice.innerScreen`: a foldable's inner display. iPhone Duo:
+  2007x2853 @430 ppi, scale 3 (669x951 pt); its `screen` stays the outer
+  1398x2034 @460. Other devices: none.
+- `vphone-cli vm config <vm> --display outer|inner` writes that screen into
+  `screenConfig`, from the next start (`VPhoneBundleOperations.setScreen`,
+  `VPhoneVirtualMachineManifest.updating(screenConfig:)`). A device without
+  an inner display, or another value, is refused. Choosing `inner` while
+  `system-springboard-exp-inner_cutout` is not in the receipt's Guest part
+  prints a warning and the commands that make it live.
+- `vm info` prints `display: outer|inner|custom <w>x<h> @<ppi> ppi`.
+- `VPHONE_SCREEN` stays, as a one-launch experimental override.
+
+The VM still has one display; switching needs a stop and a start and is not
+a fold. Checked on duo-m5-dd: `--display outer` → 1398x2034 @460, `--display
+inner` → 2007x2853 @430, `--display middle` refused with the config
+unchanged. Booted from the config alone (no `VPHONE_SCREEN` in the
+environment, saved window frame kept, `KEEP_FRAME=1 scripts/patch-verify.sh
+w1-config config`): framebuffer 2007x2853, cutout patch applied 200 of 200
+calls, Home icons 8/8 by host view and vphoned, GeoBare 16 / 16 / 8. The touch
+diagnostic is off since the T6 freeze, so this run has no fresh provider line
+(the one printed is an older boot's). VPhoneCoreKitTests: 659 tests pass,
+including the new "Foldable guest display" suite.
+
+Build note: a FirmwarePatcherTests run earlier with `-derivedDataPath
+.build/XcodeCommand` left a VPhoneCoreKit module and library in that folder,
+which the bundle build's nested command build then preferred over the fresh
+one, so new VPhoneCoreKit API was missing to vphone-cli. Removing
+`.build/XcodeCommand/Build/Products/Debug/{VPhoneCoreKit.swiftmodule,
+libVPhoneCoreKit.a}` fixed it. The T6 candidate was not affected: no
+VPhoneCoreKit change landed between that test build and the freeze.

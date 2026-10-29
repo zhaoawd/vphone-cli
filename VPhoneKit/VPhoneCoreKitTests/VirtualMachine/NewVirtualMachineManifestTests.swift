@@ -166,3 +166,28 @@ struct NewVirtualMachineManifestTests {
         #expect(parsed["machineIdentifier"] is Data)
     }
 }
+
+/// A foldable guest boots one of its two displays; `vm config --display`
+/// writes the chosen one into the manifest.
+@Suite("Foldable guest display")
+struct FoldableGuestDisplayTests {
+    @Test
+    func `iPhone Duo has an inner display and other phones none`() {
+        let duo = VPhoneGuestDevice.iPhone19_4
+        #expect(duo.screen == .init(width: 1398, height: 2034, pixelsPerInch: 460, scale: 3.0))
+        #expect(duo.innerScreen == .init(width: 2007, height: 2853, pixelsPerInch: 430, scale: 3.0))
+        #expect(VPhoneGuestDevice.iPhone17_3.innerScreen == nil)
+        #expect(VPhoneGuestDevice.named("iPhone19,4")?.innerScreen == duo.innerScreen)
+    }
+
+    @Test
+    func `changing the display keeps every other field`() throws {
+        let original = VPhoneVirtualMachineManifest.newVM().updating(guestDevice: .iPhone19_4)
+        let inner = try #require(VPhoneGuestDevice.iPhone19_4.innerScreen)
+        let updated = original.updating(screenConfig: inner)
+        #expect(updated.screenConfig == inner)
+        let encoder = PropertyListEncoder()
+        let restored = updated.updating(screenConfig: original.screenConfig)
+        #expect(try encoder.encode(restored) == encoder.encode(original))
+    }
+}

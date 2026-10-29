@@ -190,6 +190,14 @@ public enum VPhoneBundleOperations {
         try VPhoneHostFilePermissions.makeAccessible(at: destination)
     }
 
+    /// Writes `screen` as the display the VM boots from its next start.
+    public static func setScreen(_ screen: VPhoneVirtualMachineManifest.ScreenConfig, in bundle: VPhoneBundle) throws -> VPhoneBundle {
+        let updated = bundle.manifest.updating(screenConfig: screen)
+        try updated.write(to: bundle.configURL)
+        try VPhoneHostFilePermissions.makeAccessible(at: bundle.configURL)
+        return VPhoneBundle(url: bundle.url, manifest: updated)
+    }
+
     private static func write(romImages: VPhoneVirtualMachineManifest.ROMImages, to bundle: VPhoneBundle) throws -> VPhoneBundle {
         let updated = bundle.manifest.updating(romImages: romImages)
         try updated.write(to: bundle.configURL)
