@@ -5530,3 +5530,21 @@ The host VM view now derives its input geometry from the active Duo viewport (`a
 > not match the choice. `preboot-exp-devicetree_inner_panel_display` (our display0 node) and
 > `preboot-exp-devicetree_foldable_product_id` (#728) both remain, off in `standard`; the
 > former describes Main as the inner panel and is for the static inner screen only.
+
+> **Duo display: fold hand-over without black frames (2026-10-29, `duo-m5-v1.5`):** in
+> `system-springboard-cfw-fold_display`, measured with the VM window's recorder over a fixed
+> sequence (`f5` runs on duo-m5-fold728, 30 fps): 23 of 25 fold transitions showed fully
+> black frames (open 100–433 ms, close 33–133 ms). Two causes: the panel's content changed
+> hands in steps (SpringBoard took the cover's scenes off Main some 130–190 ms before the
+> compositor's first inner frame, and the inner display drew black for up to a second
+> while an app in front moved over), and `vpApplyPanelStates` powered the primary scanout
+> off when the inner display owned the panel before SpringBoard had asked for the inner
+> display's power. Now `-[SBDisplayContentModeCoordinator performDisplayContentModeTransitionWithCoordinator:]`
+> first has the render server draw Main (`CARenderServerRenderDisplay`) into an IOSurface
+> shown on a layer at the top of Main's `UIRootSceneWindow`; the hold goes in the commit
+> whose inner frame has content (an 8x8 sample grid not all black), or 150 ms after the
+> primary scene returns to the cover, at most after 2 s. Ownership is noted in
+> `vpApplyPanelStates`. The scanout stays lit while the inner display owns the panel and
+> has not been asked about. Result: 0 dark frames on all 26 transitions; holds 260–420 ms,
+> 0.9–1.4 s with Safari in front. The log (`vphone-folddisplay.log`) stamps lines with
+> epoch seconds to the millisecond and records each applied panel state.
