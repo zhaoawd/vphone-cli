@@ -1,0 +1,21 @@
+candidate 2026-10-29 08:56:31
+  source: 78b79d0f Restore the VM window frame after its toolbar is installed (worktree clean: yes)
+  vphone-cli 35978b7e05ce  vphone-vm b0acd6912114  bundled vphoned 9bab82f7d642  bundled libinnercutoutfix b49ec215ce2e
+  selection: { "AllowedPatches" => [ 0 => "system-springboard-exp-inner_cutout" ] "BlockedPatches" => [ ] "Preset" => "standard" } 
+  receipt Guest has inner_cutout: 1
+  display: VPHONE_SCREEN=2007x2853@430, headless, rotation 0
+  guest libraries: {"SystemHook-vphone.dylib":"3d4e8300db6c","libtouchdiag.dylib":"885d001976c3","libinnercutoutfix.dylib":"b49ec215ce2e"}
+  guest vphoned: 9bab82f7d642
+  diagnostic flag removed: yes
+start 08:57:10
+boot 1: vphoned_ready=7s up=184s launchd_cpu=9s kernel_task=3s SB=37 BB=73 vphoned=116 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 2: vphoned_ready=7s up=184s launchd_cpu=9s kernel_task=4s SB=37 BB=73 vphoned=116 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 3: vphoned_ready=6s up=184s launchd_cpu=9s kernel_task=4s SB=37 BB=73 vphoned=115 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 4: vphoned_ready=6s up=184s launchd_cpu=9s kernel_task=3s SB=37 BB=73 vphoned=117 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 5: vphoned_ready=9s up=184s launchd_cpu=9s kernel_task=4s SB=37 BB=73 vphoned=116 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 6: vphoned_ready=7s up=184s launchd_cpu=9s kernel_task=4s SB=37 BB=73 vphoned=116 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 7: vphoned_ready=6s up=184s launchd_cpu=8s kernel_task=3s SB=37 BB=73 vphoned=117 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 8: vphoned_ready=7s up=184s launchd_cpu=8s kernel_task=3s SB=37 BB=73 vphoned=115 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 9: vphoned_ready=7s up=184s launchd_cpu=8s kernel_task=3s SB=37 BB=73 vphoned=117 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+boot 10: vphoned_ready=6s up=184s launchd_cpu=8s kernel_task=3s SB=37 BB=73 vphoned=116 unlock=ok fix_applied_lines=+1 guest_notes=com.apple.mobilenotes host_maps=com.apple.reminders new_crashes: none
+done 09:33:45

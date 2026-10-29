@@ -1108,3 +1108,30 @@ whether a following E1 launch keeps it is not yet checked.
 The edge threshold itself is unchanged: 32 view points is a host-window zone
 for starting guest edge swipes, about 31 guest points at this window size.
 It misjudged taps only because the window had shrunk.
+
+## T6 at E1 on the frozen candidate (2026-10-29)
+
+Candidate (`results/t6-e1/coldboot.txt` header): source `78b79d0f` (clean),
+vphone-cli `35978b7e05ce`, vphone-vm `b0acd6912114`, vphoned bundled = guest
+`9bab82f7d642`, libinnercutoutfix bundled = guest `b49ec215ce2e`, SystemHook
+`3d4e8300db6c`; selection `standard` + `system-springboard-exp-inner_cutout`,
+recorded in the receipt; `VPHONE_SCREEN=2007x2853@430`, rotation 0; touch
+diagnostic flag off (libtouchdiag installed, inert).
+
+### Cold boots: 10/10
+
+`scripts/t6e1-coldboot.sh`, headless: vphoned ready 6–9 s; at 180 s launchd
+8–9 s and kernel_task 3–4 s CPU; SpringBoard 37 / backboardd 73 / vphoned
+115–117 every boot; unlock ok; the cutout patch logged a new `applied` line
+every boot; vphoned tap 10/10 opened `com.apple.mobilenotes`; no new crash
+reports.
+
+The host tap opened `com.apple.reminders` in all 10, not Maps.
+`scripts/t6e1-hostcheck.sh` reproduces it only with the cold-boot order (Notes
+by vphoned, one Home, host tap): the screen after that Home is the widgets
+page (`results/t6-e1/hostcheck-widgets-page.png`), where the tapped point lies
+on the Reminders widget, and the host tap opened what was under it; with the
+Home screen's first page showing, the same host tap opens Maps, as does the
+vphoned tap. So the host path delivered every touch; the script did not
+verify which page was showing. The first C0 series' unexplained
+Notes/Maps/Reminders readings fit the same widgets page.
