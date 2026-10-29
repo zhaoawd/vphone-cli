@@ -1135,3 +1135,15 @@ Home screen's first page showing, the same host tap opens Maps, as does the
 vphoned tap. So the host path delivered every touch; the script did not
 verify which page was showing. The first C0 series' unexplained
 Notes/Maps/Reminders readings fit the same widgets page.
+
+### Interaction round: all pass
+
+`scripts/t6e1-interact.sh`, windowed, saved frame kept (676 x 961, the size
+after the outer → inner refit; still 676 x 961 at the end, so the refit was
+one-time). GeoBare began/ended 4/4 in portrait, landscape-left (90°) and
+landscape-right (270°), after a respring (SpringBoard 37 → 530), after
+lock/unlock (locked and screen off confirmed) and after a guest restart.
+Home icons Notes and Maps opened by host view and by vphoned (4/4). Safari by
+touch: Dock tap, address field, `example.org`; food_ordering
+(`com.autophone.foodorderingdemo.v2`) launched and tapped; Safari kept pid 486
+across background and foreground. No crash reports in the round.
