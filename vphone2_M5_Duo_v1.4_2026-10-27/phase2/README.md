@@ -1074,3 +1074,37 @@ owner, one E1 cold boot with `scripts/patch-verify.sh`.
 The off run's library log lines are the previous boot's (the library was not
 loaded, so it wrote none). The selection is the single source of state; no
 leftover marker keeps the correction on or off.
+
+### Host window: the saved frame shrank on every launch (2026-10-29)
+
+`scripts/window-frame-cycles.sh`: from no saved frame, five E1 launch/stop
+cycles with no resize, the last two with a landscape and back rotation.
+
+| cycle | before the fix | after |
+|---|---|---|
+| 1 | 669 x 951 | 692 x 983 |
+| 2 | 646 x 918 | 692 x 983 |
+| 3 | 623 x 886 | 692 x 983 |
+| 4 (+ rotation) | 601 x 854 | 692 x 983 |
+| 5 (+ rotation) | 578 x 822 | 692 x 983 |
+
+Cause, from one launch with the frame logged at each step: the window
+restored its autosaved frame (`setFrameUsingName`) before the unified toolbar
+and the Home accessory were added. The saved frame is written with them, so
+applied to the bare title bar the content lost the toolbar's 32 points on
+every launch, and the content aspect ratio narrowed the width to match. After
+enough launches the window was about 150 x 150, where the fixed 32 view point
+edge zone covered a third of the width, so host taps at 0.3 and 0.7 began as
+edge touches. Fix: restore and autosave after the toolbar and accessory are
+installed (`VPhoneVirtualMachineWindowController`). A rotation round trip
+keeps the size; the origin moves by 1 point (centre rounding).
+
+With the saved frame kept (no clearing, `KEEP_FRAME=1 scripts/patch-verify.sh`),
+patch on: outer 8/8 icons including the host tap on TV beside the left edge,
+GeoBare 16 / 16 / 8; then E1 8/8, 16 / 16 / 8. Switching between the outer and
+inner sizes refits the frame once to the other aspect (692 x 983 → 676 x 961);
+whether a following E1 launch keeps it is not yet checked.
+
+The edge threshold itself is unchanged: 32 view points is a host-window zone
+for starting guest edge swipes, about 31 guest points at this window size.
+It misjudged taps only because the window had shrunk.

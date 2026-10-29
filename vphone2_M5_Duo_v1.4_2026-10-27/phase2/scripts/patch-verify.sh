@@ -20,7 +20,12 @@ note() { print -r -- "$1" | tee -a $O/results.txt }
 front() { rpc apps.foreground | jq -r '.result.bundle_id // "none"' }
 home() { rpc input.button '{"name":"home"}' > /dev/null; sleep 3 }
 : > $O/results.txt
-defaults delete com.vphone.bundle "NSWindow Frame vphone-scene-/Users/kolar/.vphone/machines/duo-m5-dd" 2> /dev/null
+# KEEP_FRAME=1 keeps the saved window frame (the delivered behaviour).
+if [[ ${KEEP_FRAME:-0} == 1 ]]; then
+  note "window frame kept: $(defaults read com.vphone.bundle "NSWindow Frame vphone-scene-/Users/kolar/.vphone/machines/duo-m5-dd" 2>/dev/null)"
+else
+  defaults delete com.vphone.bundle "NSWindow Frame vphone-scene-/Users/kolar/.vphone/machines/duo-m5-dd" 2> /dev/null
+fi
 
 note "selection: $($CLI fw patches duo-m5-dd 2>&1 | grep -E '\] system-springboard-exp-inner_cutout' | tr -s ' ')"
 note "receipt guest has it: $(plutil -p ~/.vphone/machines/duo-m5-dd/PatchReceipt.plist | grep -c system-springboard-exp-inner_cutout)"
