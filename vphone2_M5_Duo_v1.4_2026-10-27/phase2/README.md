@@ -1057,3 +1057,20 @@ The touch diagnostic's log accumulates across boots; the script reads its
 last provider entry (the first E1 read took an older boot's line and was
 corrected in its results). The old `vphone-innercutout.flag` was deleted from
 the guest.
+
+### Patch lifecycle on → off → on (2026-10-29)
+
+Each step: `fw set-patches`, root `cfw update-environment duo-m5-dd` by the
+owner, one E1 cold boot with `scripts/patch-verify.sh`.
+
+| | on | off | on again |
+|---|---|---|---|
+| selection / receipt Guest | on / recorded | off / not recorded | on / recorded |
+| installed library | `b49ec215ce2e` | **absent** (the host's sync on connect did not reinstall it) | `b49ec215ce2e` |
+| live provider | AxisAlignableSplit2007 | DynamicSplitSmallIsland | AxisAlignableSplit2007 |
+| Home icons opened | 8/8 | 0/8 | 8/8 |
+| GeoBare | 16 / 16 / 8 | 0 / 0 / 0 | 16 / 16 / 8 |
+
+The off run's library log lines are the previous boot's (the library was not
+loaded, so it wrote none). The selection is the single source of state; no
+leftover marker keeps the correction on or off.
