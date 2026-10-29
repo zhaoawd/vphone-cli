@@ -53,6 +53,7 @@ T6（冷启动、宿主重启、长连接、旋转、快照／导出）与 C 级
 | D30 | — | 发现：food_ordering（RN）＋ `UIRequiresFullScreen=false` ＋ 合拢时输入框有焦点 → 外屏空白或只画上方约 669 pt；原生探针、设置、`true` 变体均正常；规避为 `requireFullScreen` 或合拢前结束编辑；iPhone Duo 模拟器对照待机主在 Device Hub 操作 | PLAN §13.8，run/fold728/f2/F2-notes.md |
 | D31 | — | v1.6：合并 main 2.14.0（`a1ec2f75`），fold 改为外屏原生尺寸开机，保留 `fb41cd6b`；新 VM `duo-m5-fold214` 上 F0 通过、F5 交接黑帧 0／26、F2 焦点合拢空白未复现（硬件键盘 3/3、软键盘 3/3） | PLAN §13.9，run/fold214/ |
 | D32 | F4 未做 | 完成：黑屏中开合唤醒到对应屏锁屏、点按唤醒、交接期间按电源无旧帧（之后约 250 ms 再亮，停在锁屏）、黑屏快速开合 8 次 hold 9／9 撤下、300 s 自动锁屏后开合正常 | PLAN §13.9，run/fold214/f4/run1 |
+| D33 | F3 未做 | 完成：合拢／展开各 4 方向、两条输入路径触摸映射正确（展开为面板到内屏的铺满缩放）；Dock 两屏响应；宿主上滑回主屏幕两屏成功。发现：vphoned 边缘手势在内屏不达、`input.swipe` 不带边缘标志在外屏不回主屏；`hinge:open`（4）下不能旋转，需 `open-flat` | PLAN §13.9，run/fold214/f3 |
 
 ## 保留不变
 
