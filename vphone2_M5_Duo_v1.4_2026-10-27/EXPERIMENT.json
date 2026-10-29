@@ -135,7 +135,7 @@
     },
     "F0_display_model": "pass",
     "F1_same_session_fold": "smoke pass (100+ posture changes, SpringBoard pid constant)",
-    "F2_app_continuity": null,
+    "F2_app_continuity": "partial: food_ordering keeps typed input and its process across folds; cart and navigation not tested (account or verification build needed)",
     "F3_touch_rotation": "partial: Home rotation refusals as stock iPhone; full touch regression not done",
     "F4_lock_power": "partial: fold does not lock (4 scenarios); auto-lock and sleep not done",
     "F5_output": {
@@ -144,6 +144,19 @@
       "remaining": "black launch cards for Settings/Photos on the inner display (pre-existing, not fold)"
     },
     "F6_stability": null,
-    "evidence": "~/vphone-duo-m5/run/fold728/ (f0, lock, lock-boot, f5/run1-run4, f5-*.sh, redeploy.sh)"
+    "evidence": "~/vphone-duo-m5/run/fold728/ (f0, lock, lock-boot, f5/run1-run4, f5-*.sh, redeploy.sh)",
+    "F2_keyboard_blank": {
+      "trigger": "food_ordering (React Native/Expo) + UIRequiresFullScreen=false + focused text field while the fold closes",
+      "effect": "cover blank or only the top ~669 pt drawn, AX empty, touches lost, for the life of the process",
+      "passes": [
+        "UIRequiresFullScreen=true re-sign",
+        "keyboard dismissed before closing",
+        "Settings search field",
+        "native KBProbe with UIRequiresFullScreen=false"
+      ],
+      "workaround": "ios.requireFullScreen true, or end editing before the fold closes",
+      "simulator_check": "pending: simulator build installed on the iPhone Duo simulator, fold needs Device Hub by hand",
+      "notes": "~/vphone-duo-m5/run/fold728/f2/F2-notes.md"
+    }
   }
 }

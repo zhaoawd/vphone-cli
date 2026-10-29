@@ -5,7 +5,7 @@
 **承接：v1.3；原始固件、旧 Bundle、旧 VM 和实验记录均保留。**  
 **交付：更新后的实施方案及证据分级，不包含制作成功的虚拟机或已实现补丁。**  
 **实测增补（2026-10-27 晚）：已在 M5 Pro 上完成 P1–P3（A 级系统来源 VM、X1 性能对照、I0/I1 安装与 food_ordering），结果见 §0.1 与 §13；C 级折叠仍未做。**  
-**实测增补三（2026-10-29）：第二阶段改走 PR #728 的 guest 逻辑双显示（一个宿主输出），合入为本地分支 `duo-m5-v1.5`，新建 `duo-m5-fold728`；F0（显示模型）通过，同会话开合可用，开合黑帧已修复（26 次切换 0 黑帧）；F2–F4、F6 未做。见 §13.8。**
+**实测增补三（2026-10-29）：第二阶段改走 PR #728 的 guest 逻辑双显示（一个宿主输出），合入为本地分支 `duo-m5-v1.5`，新建 `duo-m5-fold728`；F0（显示模型）通过，同会话开合可用，开合黑帧已修复（26 次切换 0 黑帧）；F2 部分完成（输入跨开合保留；发现“带焦点输入框合拢后外屏空白”，模拟器对照待做）；F3、F4、F6 未做。见 §13.8。**
 
 ## 0. 本版结论
 
@@ -541,7 +541,22 @@ PR #728 head `b03f0b82` 已包含 #761 和 #762，与 2.13.8 只差版本号提�
 
 **新发现（未处理）。** 内屏启动“设置”“照片”时启动卡片为黑色（16／8 帧，修复前即有，与折叠无关）；外屏 Safari 状态栏时间压住地址栏（作者已记录横屏，竖屏同样）；合拢时外屏占满整块面板，不裁到 466×678（作者已记录）。
 
-**未做。** F2（food_ordering 跨开合保持购物车、导航、输入）、F3（两面板触摸与各方向完整回归）、F4（自动锁屏、睡眠中开合）、F6（冷启动、长时间、导出导入、宿主重启）。测量与修复是否回报 #728 由机主决定。
+**F2 应用连续性（部分完成，2026-10-29）。** food_ordering 生产包（`food_ordering.ipa`，Appwrite 登录，仅竖屏，单场景，`UIRequiresFullScreen=false`）经 installd 装入 `duo-m5-fold728`（UDID `0000FE01-0931B54BFFF5E54B`）。登录页输入跨开合：进程不重启，输入的邮箱、密码在内屏保留。购物车与应用内导航未测：生产包需要账号（不在机主后端建号），verification 包需 fixture 选择文件并在 `food_ordering-testchannel` 做 `expo prebuild`。
+
+**F2 发现：带焦点输入框合拢后外屏空白。** 输入框有焦点（硬件键盘模式，屏上无软键盘）时合拢，food_ordering 在外屏只剩状态栏或只画出上方约 669 pt（＝内屏高度），可访问性树为空、触摸不达，同一进程内一直如此；再展开内容恢复，输入仍在。用同一脚本（`~/vphone-duo-m5/run/fold728/tools/kb-cycle.sh`，以 AX 树中出现键盘按键确认焦点）逐项排除：
+
+| 变体（合拢时输入框有焦点） | 合拢后外屏 |
+|---|---|
+| 原包 `UIRequiresFullScreen=false` | 空白，或只画上方约 669 pt |
+| 加横屏方向／改通用设备族（键仍为 false） | 空白 |
+| 重签为 `UIRequiresFullScreen=true` | 正常 |
+| 合拢前在内屏收起键盘／无焦点 | 正常 |
+| 设置（未声明该键）搜索框有焦点 | 正常 |
+| 原生 UIKit 最小探针 KBProbe（`UIRequiresFullScreen=false`，有焦点） | 正常 |
+
+触发条件是 food_ordering（React Native／Expo）＋ `UIRequiresFullScreen=false` ＋ 合拢时输入框有焦点三者同时成立；单独的键或单独的焦点都不触发。仅失败时 SpringBoard 记录 `Keyboard can't be hosted inside app scene - app is not full screen` 与 `Cover-display … cover-size reduction`；应用端 UIKit 记录场景已移回外屏（几何 669×951）。规避：应用设 `ios.requireFullScreen: true`，或测试流程中合拢前结束编辑。是否属于 iOS／应用自身行为，正用 Xcode 27.1 的 iPhone Duo 模拟器对照（已装模拟器版 food_ordering，外屏为 `--display=1`、内屏 `--display=3`；开合需机主在 Device Hub 中操作），结果未出。记录：`~/vphone-duo-m5/run/fold728/f2/F2-notes.md`、`kb/`。
+
+**未做。** F2 的购物车与导航、F3（两面板触摸与各方向完整回归）、F4（自动锁屏、睡眠中开合）、F6（冷启动、长时间、导出导入、宿主重启）。测量与修复是否回报 #728 由机主决定。
 
 ## 来源与读取渠道
 

@@ -32,7 +32,7 @@ route, PR #728's two logical displays on one output, on branch `duo-m5-v1.5` and
 
 | track (2026-10-29) | state |
 |---|---|
-| Two logical displays, one output (#728) | **Working, partly verified.** Merged as `297add30` (PR head `3da02943`). F0 display model passes; open and close in one session with SpringBoard unchanged; fold black frames fixed in `fb41cd6b` (0 dark frames on 26 transitions). Not done: app continuity, full touch and rotation, auto-lock and sleep, long-run stability. |
+| Two logical displays, one output (#728) | **Working, partly verified.** Merged as `297add30` (PR head `3da02943`). F0 display model passes; open and close in one session with SpringBoard unchanged; fold black frames fixed in `fb41cd6b` (0 dark frames on 26 transitions). App continuity partly checked: typed input survives folds; a React Native app with `UIRequiresFullScreen=false` goes blank on the cover when the fold closes with a field focused (simulator comparison pending). Not done: cart and navigation, full touch and rotation, auto-lock and sleep, long-run stability. |
 | Static inner panel (E1) | Kept on `duo-m5-v1.4` as the fixed-size baseline. On v1.5 it needs `--display inner` plus `fold_display` blocked and `inner_cutout` allowed. |
 
 ---
@@ -1293,3 +1293,14 @@ The VM service gate above still stands; this route no longer needs it.
 - Open: black launch cards for Settings and Photos on the inner display
   (pre-existing); Safari's status-bar time over its address bar on the cover;
   the cover fills the whole panel instead of 466x678.
+- App continuity (F2, partial): food_ordering (production build, React Native/Expo,
+  portrait-only, `UIRequiresFullScreen=false`) keeps its process and the typed sign-in
+  input across folds. Closing with a text field focused leaves the cover blank or drawn
+  only in its top ~669 pt (the inner display's height), with an empty AX tree and no
+  touches, for the rest of the process. Same-script checks (`tools/kb-cycle.sh`): re-signed
+  with `UIRequiresFullScreen=true`, keyboard dismissed first, Settings' search field, and a
+  native UIKit probe with `UIRequiresFullScreen=false` all pass. Only the failing case logs
+  `Keyboard can't be hosted inside app scene - app is not full screen` and `Cover-display …
+  cover-size reduction`. Comparison on Xcode 27.1's iPhone Duo simulator is set up (simulator
+  build installed; the fold is switched by hand in Device Hub) and pending. Notes:
+  `~/vphone-duo-m5/run/fold728/f2/F2-notes.md`.

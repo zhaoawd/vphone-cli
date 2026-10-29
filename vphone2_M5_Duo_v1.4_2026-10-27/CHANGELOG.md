@@ -49,6 +49,8 @@ T6（冷启动、宿主重启、长连接、旋转、快照／导出）与 C 级
 | D26 | C 级折叠：单显示下 posture 被接受但画面不变 | 同会话开合可用，SpringBoard 不重启，开合不锁屏，Safari 跨开合保持页面 | PLAN §13.8 |
 | D27 | — | 开合黑帧：合入原样 23/25 次切换有全黑帧；修复 `fb41cd6b`（交接期间保持上一帧、不提前关输出）后 26 次切换 0 黑帧 | PLAN §13.8，Research/0_binary_patch_comparison.md |
 | D28 | — | 未做：F2 应用连续性、F3 触摸与旋转完整回归、F4 锁屏与电源、F6 长期稳定；App 启动黑卡片、外屏状态栏遮挡地址栏未处理 | PLAN §13.8 |
+| D29 | F2 未做 | 部分：food_ordering 输入跨开合保留、进程不重启；购物车与导航因账号／verification 包未测 | PLAN §13.8 |
+| D30 | — | 发现：food_ordering（RN）＋ `UIRequiresFullScreen=false` ＋ 合拢时输入框有焦点 → 外屏空白或只画上方约 669 pt；原生探针、设置、`true` 变体均正常；规避为 `requireFullScreen` 或合拢前结束编辑；iPhone Duo 模拟器对照待机主在 Device Hub 操作 | PLAN §13.8，run/fold728/f2/F2-notes.md |
 
 ## 保留不变
 
