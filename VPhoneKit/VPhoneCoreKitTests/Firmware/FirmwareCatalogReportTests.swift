@@ -265,6 +265,17 @@ struct FirmwareCatalogReportTests {
         }
     }
 
+    @Test func `a resolved release gets its pairing's cloud OS, else its version's`() {
+        for p in VPhoneFirmwareCatalog.pairings {
+            let version = String(p.iosName.dropFirst("iOS ".count))
+            #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "iPhone17,3", version: version, url: p.iosURL).url == p.cloudosURL)
+        }
+        // A curated pairing wins over the version rule, by URL or by name.
+        #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "iPhone17,3", version: "18.6.2", url: "").url == VPhoneFirmwareCatalog.cloud261)
+        #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "iPhone17,3", version: "26.2.9", url: "").url == VPhoneFirmwareCatalog.cloud262)
+        #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "AppleTV5,3", version: "26.1", url: "").url == VPhoneFirmwareCatalog.cloud264)
+    }
+
     @Test func `round trips JSON`() throws {
         let report = VPhoneFirmwareCatalog.report
         let back = try JSONDecoder().decode(VPhoneFirmwareCatalogReport.self, from: JSONEncoder().encode(report))

@@ -143,10 +143,11 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
     public static let iPhone19_2 = iPhone("iPhone19,2", "v63ap", "iPhone 18 Pro", width: 1206, height: 2622)
 
     /// iPhone Duo (V68AP): outer display 1398x2034, 466x678 points, and the
-    /// inner display below. The VM has one paravirtual display: by default it
-    /// boots at the inner size and the fold display composites the cover and
-    /// the inner panel onto it; `vm config --display outer|inner` boots one
-    /// of them statically instead (`VPhoneFoldableDisplayChoice`).
+    /// inner display below. The VM's panel is its outer display (the cover);
+    /// the guest publishes the inner display as a second, virtual display and
+    /// shows it on that panel while the device is open (libvphonefolddisplay).
+    /// `vm config --display outer|inner` boots one of them statically instead
+    /// (`VPhoneFoldableDisplayChoice`).
     public static let iPhone19_4 = VPhoneGuestDevice(
         family: .iPhone,
         productType: "iPhone19,4",
@@ -156,12 +157,10 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
         innerScreen: iPhone19_4InnerScreen,
     )
 
-    /// The Duo's inner display, the panel the fold opens onto. The host
-    /// refuses runtime display resizing (measured 2026-10-25, see
-    /// Research/Guest/iphone_duo_bringup.md), so the one panel is sized at
-    /// boot. Apple's iPhone Duo device profile declares 2007×2853 at 3x
-    /// (669×951 points); its 1878x2670 panel size clips the dock, and 2034
-    /// was a custom bring-up width.
+    /// The Duo's inner display, booted only as a static choice (`vm config
+    /// --display inner`); the fold shows it as a virtual display instead.
+    /// Apple's iPhone Duo device profile declares 2007×2853 at 3x (669×951
+    /// points); its 1878x2670 panel size clips the dock.
     public static let iPhone19_4InnerScreen = VPhoneVirtualMachineManifest.ScreenConfig(
         width: 2007, height: 2853, pixelsPerInch: 460, scale: 3.0
     )
@@ -259,7 +258,7 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
         screen: .init(width: 320, height: 320, pixelsPerInch: 72, scale: 1.0),
     )
 
-    /// Apple Watch Series 11 (GPS), 46 mm: 416x496 at 330 ppi, 208x248 points.
+    /// Apple Watch Series 11 (GPS), 46 mm: 416x496 at 326 ppi, 208x248 points.
     /// The research board's kernel boots it with the watchOS kexts of its IPSW
     /// (the `watch` kernelcache recipe); N227b's device tree supplies the watch
     /// idiom and 2x identity.
@@ -268,7 +267,7 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
         productType: "Watch7,18",
         deviceClass: "n227bap",
         productName: "Apple Watch Series 11 (GPS)",
-        screen: .init(width: 416, height: 496, pixelsPerInch: 330, scale: 2.0),
+        screen: .init(width: 416, height: 496, pixelsPerInch: 326, scale: 2.0),
     )
 
     /// Whether the guest's userland is plain arm64 rather than arm64e: only
@@ -395,9 +394,9 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
 
 /// A foldable VM's static display, written by `vm config --display
 /// outer|inner` as `display-choice` beside config.plist. Without it a
-/// foldable guest boots the fold: one panel at the inner size, onto which the
-/// fold display composites the cover and the inner display. With it the VM
-/// boots config.plist's screen as the guest's only display.
+/// foldable guest boots the fold: the cover's panel, onto which the fold
+/// display shows the inner display while open. With it the VM boots
+/// config.plist's screen as the guest's only display.
 public enum VPhoneFoldableDisplayChoice: String, Sendable {
     case outer
     case inner

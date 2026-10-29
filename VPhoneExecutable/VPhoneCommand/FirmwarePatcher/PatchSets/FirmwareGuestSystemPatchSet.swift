@@ -41,6 +41,9 @@ public enum FirmwareGuestSystemPatchSet {
     public static let arm64eX1LaunchdBootstrap = "system-launchd-boot-arm64e_x1_bootstrap"
     public static let arm64eX1FsckBootstrap = "system-fsck-boot-arm64e_x1_bootstrap"
     public static let arm64eX1MountBootstrap = "system-mount-boot-arm64e_x1_bootstrap"
+    public static let arm64eX1CIBarcode = "system-cibarcode-cfw-arm64e_x1"
+    public static let ciBarcodeBundlePath = "System/Library/CoreImage/CIBarcode.cifilter"
+    public static let ciBarcodeExecutablePath = ciBarcodeBundlePath + "/CIBarcode"
 
     public static let paravirtGPUIndexOffset = "system-paravirt_gpu-cfw-heap_index_offset"
     public static let paravirtGPUDriverPath =
@@ -313,6 +316,17 @@ public enum FirmwareGuestSystemPatchSet {
                 target: .guestExecutable(path: "/sbin/mount"),
                 applicability: ios27,
                 bootEssential: true,
+            ),
+            VPhonePatchDeclaration(
+                identifier: arm64eX1CIBarcode,
+                title: "ARM64E_X1 barcode filters",
+                summary: """
+                Lowers the standalone CIBarcode plug-in before apps load its barcode filters. \
+                This image is outside the shared cache, so whole-cache lowering cannot prevent \
+                its remaining X1 instruction faults.
+                """,
+                target: .guestExecutable(path: "/" + ciBarcodeExecutablePath),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 1)),
             ),
 
             VPhonePatchDeclaration(

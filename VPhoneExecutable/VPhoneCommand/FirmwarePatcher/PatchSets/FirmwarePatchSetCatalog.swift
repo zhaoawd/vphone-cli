@@ -238,6 +238,7 @@ public enum FirmwarePatchSetCatalog {
         paravirtTask3Patch,
         FirmwareGuestSystemPatchSet.arm64eX1CacheBootstrap,
         FirmwareGuestSystemPatchSet.arm64eX1CacheRemaining,
+        FirmwareGuestSystemPatchSet.arm64eX1CIBarcode,
         "dyld-boot-iomfb_force_kern",
         "dyld-boot-iomfb_swapend",
         "dyld-boot-lockdown_mode",

@@ -17,19 +17,13 @@ extension VPhoneBootCommand {
 
         let vmDir = config.deletingLastPathComponent()
 
+        // A foldable guest boots config.plist's screen: the cover for the
+        // fold, or the display `vm config --display` chose.
         var screen = (
             width: manifest.screenConfig.width,
             height: manifest.screenConfig.height,
             ppi: manifest.screenConfig.pixelsPerInch,
         )
-        // One immutable physical Main backs both logical Duo panels. Keep
-        // enough native pixels for inner mode even when booting closed. A
-        // static display choice (vm config --display) boots config.plist's
-        // screen instead.
-        if manifest.guestDevice == .iPhone19_4, VPhoneFoldableDisplayChoice.read(in: vmDir) == nil {
-            let inner = VPhoneGuestDevice.iPhone19_4InnerScreen
-            screen = (inner.width, inner.height, inner.pixelsPerInch)
-        }
         // Experimental: VPHONE_SCREEN=<width>x<height>@<ppi> boots this run at
         // another panel size without changing config.plist.
         if let spec = ProcessInfo.processInfo.environment["VPHONE_SCREEN"] {

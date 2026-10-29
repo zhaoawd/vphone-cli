@@ -4758,3 +4758,81 @@ within 32 points of an edge: swipe home, Control Center, Notification Center,
 and the Dock at the usual window size) no longer reach SpringBoard until the
 guest reboots; the host's VZ taps keep working. Seen with the bundle's own
 build as well. Not yet explained.
+
+## 2026-10-29 evening: the panel is the cover's
+
+Main (the paravirtual panel) had been sized for the inner display,
+2007×2853 (669×951 points), since the single-display design, where SpringBoard
+laid the inner content out on Main itself (`VPhoneBootCommand` replaced the
+machine's 1398×2034 screen with `iPhone19_4InnerScreen` on every boot). With
+the two-display path that reason is gone: the inner display is its own
+2853×2007 virtual display, and Main is the cover. A cover laid out on
+669×951 points looked like a second inner display, not the Duo's outer one.
+
+vphone-vm now boots the machine's own screen, 1398×2034 at 3x: the cover is
+466×678 points with its native layout (the right-side Dock and status column
+are the Duo's outer-display design). Open, the compositor turns the inner
+display upright and fills the panel with it: 0.697 across and 0.713 along,
+about 2% tighter across than along. A first version kept the proportions and
+left 23 px black bars along the long sides, which the user did not want; with
+the fill, the digitizer (which spans the panel) maps onto the whole inner
+display, so backboardd's touch turn needs no rectangle of its own.
+
+Measured on the test VM (bundle built from this change):
+
+- Taps logged in SpringBoard land at the expected points: inner, panel pixel
+  (X, Y) of the landscape screenshot at (X × 951 / 2034, Y × 669 / 1398) points
+  for the centre and four corners (no bars); cover, at (X / 3, Y / 3).
+- Guest screenshots match the VM window at offset (0, 0) in all four inner and
+  three cover orientations (cover tested with Safari, which rotates on iPhone).
+- Three launch-sequence captures: no black frames, 2-5 transient tiles.
+
+## 2026-10-29 night: the inner display at 120 Hz
+
+Open, the VM window counted 60 fps while the cover (the paravirtual panel,
+with the ProMotion patch) runs at 120. Two caps, one in each process:
+
+- **backboardd.** A `CAWindowServerVirtualDisplay` gets one 60 Hz mode whatever
+  `kCAVirtualDisplayUpdateRate` says. `VirtualDisplay::refresh_rate()` uses the
+  update rate only while the display has no current mode; with one, it takes
+  the mode's 16.16 rate. `heartbeat_rate()` is that mode's period divided by
+  the integer `kCAVirtualDisplayMinimumFrameDuration` (default 1). Clients read
+  `CADisplay.refreshRate` (the mode), and `UIScreen.maximumFramesPerSecond`
+  is its inverse, so every app on the inner display was capped at 60
+  (UpdateRate 120: the display ticked faster, apps still saw 60; UpdateRate
+  60 + MinimumFrameDuration 2: heartbeat 1/120, refresh still 1/60).
+  The display's modes can be replaced with `-[CAWindowServerDisplay
+  setDigitalModes:withTimings:]` (`VirtualDisplay::set_digital_modes`), which
+  takes the framebuffer timing format: timings with `HorizontalAttributes` /
+  `VerticalAttributes` `{Active}` and `VerticalAttributes.PreciseSyncRate`
+  (16.16, default `0x3c0000` = 60), optional `Score`, and color modes
+  (`PixelEncoding` 0, `Depth` ≤ 8, `Colorimetry` 1/10/16, `EOTF` 0,
+  `DynamicRange` 0). A mode is preferred only when its score is above 0
+  (Colorimetry 16 adds 2, plain RGB nothing); with no preferred mode the
+  display comes up 0×0 and SpringBoard aborts in
+  `-[SBMainDisplayConfigurationTransformer transformDisplayConfiguration:]`.
+  FoldDisplay now sets one timing, 2853×2007 at 120, with Colorimetry 1 and
+  Score 1: the inner mode reads `RGB_8bit` like the panel's.
+- **SpringBoard.** The compositor's display link asks for the panel's
+  `maximumFramesPerSecond` (120 with the ProMotion patch, else 60).
+
+backboardd cannot read the panel's rate while it adds the inner display: the
+primary's rate is not set yet during display detection, and asking
+`CADisplay` there blocks backboardd (the inner display never appeared).
+
+Measured on duospike-inner (iOS 27.1, Settings open, 3 s windows):
+
+| | panel (LCD) | inner |
+|---|---|---|
+| `UIScreen.maximumFramesPerSecond` | 120 | 120 (was 60) |
+| `CADisplay.refreshRate` / heartbeat | 1/120 / 1/120 | 1/120 / 1/120 (was 1/60) |
+| default `CADisplayLink`, ticks in 3 s | 377 | 377 |
+| compositor renders in 3 s | | 375-378 |
+
+Idle CPU on the home screen, three 10 s samples each: 60 Hz build SpringBoard
+6.9-7.9%, backboardd 37.8-45.6%; 120 Hz build 9.3-10.4% and 50.3-51.3%.
+
+Window captures (ScreenCaptureKit) cannot judge 120 Hz here: the cover, which
+is natively 120, measures the same 40-55 changes per second as the inner
+display, because the host composites the window at its own rate. Use guest
+display links, or the host's `lastSubmittedTime` poller from the vGPU notes.

@@ -26,6 +26,7 @@ struct VPhoneVirtualMachineCommand: ParsableCommand {
             VPhoneVirtualMachineLaunchCommand.self,
             VPhoneVirtualMachineStopCommand.self,
             VPhoneVirtualMachineCreateCommand.self,
+            VPhoneVirtualMachineCreateBulkCommand.self,
             VPhoneVirtualMachineTemplateCommand.self,
             VPhoneVirtualMachineWriteManifestCommand.self,
         ],
@@ -266,10 +267,10 @@ struct VPhoneVirtualMachineConfigCommand: ParsableCommand {
         AVPSEPBooter, --seprom <file> any other SEP ROM. Applies from the next start, without a \
         restore: both load the SEP firmware the restore installed.
 
-        --display fold (the default) boots a foldable guest (iPhone Duo) at its inner size, 2007x2853 \
-        at 460 ppi, for system-springboard-cfw-fold_display to show the cover and the inner display on \
-        it and switch between them with display.posture. --display outer and --display inner boot that \
-        one display statically instead, from the next start. At the static inner size touches reach \
+        --display fold (the default) boots a foldable guest (iPhone Duo) on its cover, 1398x2034 at \
+        460 ppi, for system-springboard-cfw-fold_display to show the inner display on it while \
+        open and switch between them with display.posture. --display outer and --display inner boot \
+        that one display statically instead, from the next start. At the static inner size touches reach \
         apps only with system-springboard-exp-inner_cutout live and the fold display off.
         """,
     )
@@ -508,9 +509,9 @@ struct VPhoneVirtualMachineDeleteCommand: ParsableCommand {
 // MARK: - --display
 
 /// `--display` of `vm config`: how a foldable guest's one paravirtual display
-/// boots. `fold` (the default) boots it at the inner size for the fold display
-/// to composite the cover and the inner panel onto; `outer` and `inner` boot
-/// that one display statically, recorded as `VPhoneFoldableDisplayChoice`.
+/// boots. `fold` (the default) boots it as the cover, onto which the fold
+/// display shows the inner display while open; `outer` and `inner` boot that
+/// one display statically, recorded as `VPhoneFoldableDisplayChoice`.
 enum VPhoneDisplayOption {
     static let help: ArgumentHelp = "Display a foldable guest boots: fold | outer | inner (from the next start)"
 
@@ -534,16 +535,14 @@ enum VPhoneDisplayOption {
         return updated
     }
 
-    /// `fold 2007x2853 @460 ppi` or `inner …`, for listings; `custom` for a
+    /// `fold 1398x2034 @460 ppi` or `inner …`, for listings; `custom` for a
     /// static choice whose screen matches neither display.
     static func describe(_ bundle: VPhoneBundle) -> String {
         let screen = bundle.manifest.screenConfig
         let size = "\(screen.width)x\(screen.height) @\(screen.pixelsPerInch) ppi"
         let device = VPhoneGuestDevice.named(bundle.manifest.guestProductType) ?? .default
         guard let inner = device.innerScreen else { return size }
-        guard VPhoneFoldableDisplayChoice.read(in: bundle.url) != nil else {
-            return "fold \(inner.width)x\(inner.height) @\(inner.pixelsPerInch) ppi"
-        }
+        guard VPhoneFoldableDisplayChoice.read(in: bundle.url) != nil else { return "fold \(size)" }
         let name = screen == inner ? "inner" : screen == device.screen ? "outer" : "custom"
         return "\(name) \(size)"
     }

@@ -430,6 +430,29 @@
 > reached, because the manager's construction needs haptics hardware a
 > VM does not have). See the full section below.
 
+> **CIBarcode standalone X1 lowering (2026-10-29, local validation):**
+> `system-cibarcode-cfw-arm64e_x1` applies the existing static X1 planner to
+> `/System/Library/CoreImage/CIBarcode.cifilter/CIBarcode`, outside the shared
+> cache. It is gated to iOS 27.1, enabled in `standard`, and blocked in the TV
+> and HomePod presets. The measured 24A94425 image UUID is
+> `807AC7DC-7FE2-3E60-BA1B-0E879FF70012`. After whole-cache lowering, an app
+> reached its normal main run loop but faulted on a utility queue in this
+> image at relative address 5960 with `EXC_BAD_INSTRUCTION` / `0xDAC1A7FE`,
+> called by `+[CIFilter(CIFilterRegistryPrivate) filterWithName:setDefaults:]`.
+> This offset is evidence only; the patch discovers reachable instructions
+> through the existing planner, not a fixed offset. The installer stages from
+> `.bak`, re-attests/signs and seals the filter bundle, and restores the backup
+> when deselected. On the pulled stock image, the planner lowered 425
+> instructions, re-attested 19 slots, and left zero unvisited candidates;
+> the recorded fault site was lowered and a second pass was byte-identical.
+> The X1 and catalogue suites passed (39 tests). An environment update on an
+> existing M3 Max Duo preserved a byte-identical original `.bak` and recorded
+> the new patch in its Guest receipt. The previously crashing app reached its
+> home screen in both open and closed postures without a new CIBarcode crash.
+> App-specific environment-risk checks remain active; login and transactions
+> were not tested. The build used local Xcode 26 compatibility adjustments
+> outside this patch. A full multi-firmware golden corpus was not available.
+
 > **ARM64E_X1 whole-cache lowering (2026-10-23):** `dyld-cfw-arm64e_x1_cache`
 > (guest system set, iOS 27, on in `standard`, blocked in `tvos` and
 > `tvos-4k`; verb `cfw patch-arm64e-x1-cache`) lowers the X1 instructions of

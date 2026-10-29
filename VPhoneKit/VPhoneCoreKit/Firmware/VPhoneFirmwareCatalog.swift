@@ -666,11 +666,7 @@ public enum VPhoneFirmwareCatalog {
             }
         }
         return releases.map { release in
-            let cloudOS = switch guest.family {
-            case .appleTV, .homePod: VPhoneCloudOSOption(name: "cloudOS 26.4", url: cloud264)
-            case .watch: researchBoardCloudOS(forVersion: release.version) ?? recommendedCloudOS(forVersion: release.version)
-            case .iPhone, .iPad: recommendedCloudOS(forVersion: release.version)
-            }
+            let cloudOS = recommendedCloudOS(for: guest.family, version: release.version)
             return VPhoneFirmwarePairing(
                 device: guest.productType,
                 iosName: "\(guest.family.osName) \(release.version)",
@@ -678,6 +674,26 @@ public enum VPhoneFirmwareCatalog {
                 cloudosName: cloudOS.name,
                 cloudosURL: cloudOS.url,
             )
+        }
+    }
+
+    /// The cloudOS for `device`'s release at `url`, of `version`: its pairing's,
+    /// else the one the pairings give that version on its family.
+    public static func recommendedCloudOS(forDevice device: String, version: String, url: String) -> VPhoneCloudOSOption {
+        let guest = VPhoneGuestDevice.named(device)
+        let pairings = pairings(for: device)
+        let name = "\((guest?.family ?? .iPhone).osName) \(version)"
+        if let pairing = pairings.first(where: { $0.iosURL == url }) ?? pairings.first(where: { $0.iosName == name }) {
+            return VPhoneCloudOSOption(name: pairing.cloudosName, url: pairing.cloudosURL)
+        }
+        return recommendedCloudOS(for: guest?.family ?? .iPhone, version: version)
+    }
+
+    static func recommendedCloudOS(for family: VPhoneGuestDevice.Family, version: String) -> VPhoneCloudOSOption {
+        switch family {
+        case .appleTV, .homePod: VPhoneCloudOSOption(name: "cloudOS 26.4", url: cloud264)
+        case .watch: researchBoardCloudOS(forVersion: version) ?? recommendedCloudOS(forVersion: version)
+        case .iPhone, .iPad: recommendedCloudOS(forVersion: version)
         }
     }
 

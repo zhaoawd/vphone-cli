@@ -878,7 +878,10 @@ struct VPhoneCustomFirmwareInstaller {
             ?? VPhoneVirtualMachinePatchSelection()
         let plan = readPatchPlan(in: bundleDirectory)
         if let pristine = try firmwareOriginalsKernelcache(in: bundleDirectory),
-           let preset = VPhonePatchPresetStore.preset(named: selection.presetIdentifier),
+           let preset = VPhonePatchPresetStore.preset(
+               named: selection.presetIdentifier,
+               vmCopy: try? bundleDirectory.readData(VPhonePatchPresetStore.vmPresetFileName),
+           ),
            !preset.patchSets.contains(where: {
                if case .external = $0 {
                    true
@@ -1431,6 +1434,23 @@ struct VPhoneCustomFirmwareInstaller {
             machO(FirmwareGuestSystemPatchSet.arm64eX1MountBootstrap, path: "sbin/mount",
                   verbs: ["patch-arm64e-x1"], preserveEntitlements: true)
             try requireX1Bootstrap()
+        }
+
+        // CIBarcode is a standalone Core Image plug-in, outside the shared cache.
+        // Lower it ahead of time rather than relying on an application's inherited
+        // exception handler to translate these instructions at runtime.
+        // The normal Mach-O path keeps a pristine backup and re-seals the bundle;
+        // deselecting the declaration restores it on the next environment update.
+        if version.hasPrefix("27.1.") || version == "27.1"
+            || priorGuest.contains(FirmwareGuestSystemPatchSet.arm64eX1CIBarcode)
+        {
+            machO(
+                FirmwareGuestSystemPatchSet.arm64eX1CIBarcode,
+                path: FirmwareGuestSystemPatchSet.ciBarcodeExecutablePath,
+                verbs: ["patch-arm64e-x1"],
+                preserveEntitlements: true,
+                bundle: FirmwareGuestSystemPatchSet.ciBarcodeBundlePath,
+            )
         }
 
         // 0. A cache whose span alone overruns the guest kernel's shared region
@@ -2356,7 +2376,10 @@ struct VPhoneCustomFirmwareInstaller {
             .flatMap { try? PropertyListDecoder().decode(VPhoneVirtualMachinePatchSelection.self, from: $0) }
             ?? VPhoneVirtualMachinePatchSelection()
         guard
-            let preset = VPhonePatchPresetStore.preset(named: plan.presetIdentifier),
+            let preset = VPhonePatchPresetStore.preset(
+                named: plan.presetIdentifier,
+                vmCopy: try? bundleDirectory.readData(VPhonePatchPresetStore.vmPresetFileName),
+            ),
             let resolved = try? VPhonePatchPlan.resolve(
                 preset: preset,
                 patchSets: FirmwarePatchSetCatalog.bundled,
