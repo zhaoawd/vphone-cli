@@ -51,6 +51,7 @@ T6（冷启动、宿主重启、长连接、旋转、快照／导出）与 C 级
 | D28 | — | 未做：F2 应用连续性、F3 触摸与旋转完整回归、F4 锁屏与电源、F6 长期稳定；App 启动黑卡片、外屏状态栏遮挡地址栏未处理 | PLAN §13.8 |
 | D29 | F2 未做 | 部分：food_ordering 输入跨开合保留、进程不重启；购物车与导航因账号／verification 包未测 | PLAN §13.8 |
 | D30 | — | 发现：food_ordering（RN）＋ `UIRequiresFullScreen=false` ＋ 合拢时输入框有焦点 → 外屏空白或只画上方约 669 pt；原生探针、设置、`true` 变体均正常；规避为 `requireFullScreen` 或合拢前结束编辑；iPhone Duo 模拟器对照待机主在 Device Hub 操作 | PLAN §13.8，run/fold728/f2/F2-notes.md |
+| D31 | — | v1.6：合并 main 2.14.0（`a1ec2f75`），fold 改为外屏原生尺寸开机，保留 `fb41cd6b`；新 VM `duo-m5-fold214` 上 F0 通过、F5 交接黑帧 0／26、F2 焦点合拢空白未复现（硬件键盘 3/3、软键盘 3/3） | PLAN §13.9，run/fold214/ |
 
 ## 保留不变
 

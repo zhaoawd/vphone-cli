@@ -558,6 +558,22 @@ PR #728 head `b03f0b82` 已包含 #761 和 #762，与 2.13.8 只差版本号提�
 
 **未做。** F2 的购物车与导航、F3（两面板触摸与各方向完整回归）、F4（自动锁屏、睡眠中开合）、F6（冷启动、长时间、导出导入、宿主重启）。测量与修复是否回报 #728 由机主决定。
 
+### 13.9 v1.6：合并 main 2.14.0（`duo-m5-v1.6`／`duo-m5-fold214`，2026-10-29）
+
+**上游。** main `2a8ee8b0`（2.14.0）已合入 #728，合并时 head 即 v1.5 所取的 `3da02943`；其后 Duo 相关提交：外屏原生尺寸开机 1398×2034（`5713cc40`）、内屏铺满外屏面板（`737591ff`）、内屏 120 Hz（`16795479`）、注入触摸只路由到存在的显示（`e60c2a56`）、点按唤醒黑屏（`10a71f4f`）。上游没有与 `fb41cd6b` 等价的交接保持。
+
+**合并（`a1ec2f75`，worktree `~/vphone-duo-m5/src/fold214`）。** 按机主决定采用上游模型：fold 按 config.plist 的外屏尺寸开机，不再强制内屏尺寸面板；`display-choice` 与 `iPhone19_4InnerScreen` 只用于 `vm config --display inner`；`VPHONE_SCREEN` 保留为实验开关；`fb41cd6b` 的保持层叠在上游铺满＋120 Hz 面板之上（按 Main 自身尺寸截帧，与面板尺寸无关）。冲突 3 个文件。构建：独立 DerivedData `.build/fold214`，`vphone-vm` cdhash `39c2349e…`。测试：CoreKit 664 通过，FoldGuard 7 通过，FirmwarePatcher 失败集与 v1.5 相同（134 项，依赖本机缺少的固件样本），无新增。
+
+**新 VM `duo-m5-fold214`。** 由 `duo-m5-p1` 克隆（`--new-identity`），`--display fold`，`cfw update-environment` 后回执含 fold_display／fold_guard／devicetree_foldable_vm_subtype，`libinnercutoutfix` 未装；guest `libvphonefolddisplay` 与构建一致（`79f01d877a8f`）。
+
+| 项 | 结果 |
+|---|---|
+| F0 | 通过：外屏原生 466×678 pt 布局；展开内屏 951×669 pt 铺满（缩放 0.697／0.713），120 Hz；开合 SpringBoard 不重启；vphoned 8 s |
+| F5（run1，30 fps 录制，26 次开合） | 交接黑帧 0；hold 26 次全部撤下（展开 215–250 ms，Safari 前台 820–932 ms；合拢约 310 ms）。唯一暗段 14 帧为 Safari 在外屏启动的深色启动卡，非交接；v1.5 中内屏“设置”“照片”的黑启动卡本轮未出现 |
+| F2 焦点合拢 | 未复现：food_ordering 原包（`UIRequiresFullScreen=false`）、Email 有焦点合拢，硬件键盘模式 3/3、软键盘模式（`GSEventHardwareKeyboardAttached` bit 0 清零）3/3 均正常：外屏内容完整、AX 36 元素、合拢后点外屏键盘字符进入输入框（展开后为 `kbtestq`） |
+
+未做原因分析：v1.6 与 v1.5 的差异主要是外屏以原生尺寸开机（v1.5 外屏是在内屏尺寸面板上裁出），推测 v1.5 的 “cover-size reduction” 路径与此有关，未验证。记录：`~/vphone-duo-m5/run/fold214/`（`f0/`、`f5/run1/`、`kb/`）。仍未做：F2 购物车与导航、F3、F4、F6；模拟器对照的意义降低，可作为可选。
+
 ## 来源与读取渠道
 
 [S1] Apple：Preparing your app to work with pointer authentication。当前检索正文包含 arm64e.x1、PAuth_LR 和 M6+ 的支持说明；检索日 2026-10-27。  
