@@ -1147,3 +1147,55 @@ Home icons Notes and Maps opened by host view and by vphoned (4/4). Safari by
 touch: Dock tap, address field, `example.org`; food_ordering
 (`com.autophone.foodorderingdemo.v2`) launched and tapped; Safari kept pid 486
 across background and foreground. No crash reports in the round.
+
+## D3 G0: the guest display driver is multi-port (2026-10-29, read-only)
+
+Kernel: `kernelcache.research.vphone600` from duo-m5-dd's restore folder (IM4P
+sha256 `697b013c…`, the cloudOS 23E5207q kernel the VM boots), payload
+extracted with `ipsw img4 im4p extract`; fileset entry
+`com.apple.driver.AppleParavirtGPUIOGPUFamily` 15.0.0 extracted with
+`ipsw kernel extract` and disassembled (`ipsw macho disass`); classes from
+`ipsw kernel cpp`; personalities from `__PRELINK_INFO`. Nothing patched. All
+addresses are in that kernelcache.
+
+Facts (from the disassembly):
+
+- `setupMMIO` (`sub_fffffe0007ebe9a8` region): the register block used below is
+  MMIO BAR + 0x1000 (`this+0x398`).
+- `setupVersion` (`sub_fffffe0007ebea84`): writes protocol version **0xfc (252)**
+  to block + 0x34 (MMIO 0x1034), reads the host's answer; 0 / −1 → "host doesn't
+  appear to be configured with GPU"; otherwise walks down a version table to a
+  common version, which must be > 9 ("Version doesn't support mapper").
+- `configureDevice` (`sub_fffffe0007ebf6cc`): port count = block + 0x22c
+  (**MMIO 0x122c**), stored at `this+0x2e8`; 0 → 1; ≥ 9 → 8 with "DisplayPortCount
+  configuration (%u) exceeds max (%u)"; published as the `DisplayPortCount`
+  property. With flag `this+0x559`, block + 0x234 (MMIO 0x1234) is read into
+  `this+0x2ec`: 2 bits per port, a per-port connection type.
+- Channels (`sub_fffffe0007ebd3b4`): for each port an `AppleParavirtVirtualChannel`
+  named `Display[%u]`, channel id port + 4, 0x4000 bytes, stored at
+  `this+0x3d8 + 8·port` (8 slots).
+- `AppleParavirtGPU::start` (`sub_fffffe0007ebcf00`, loop at `0xfffffe0007ebd060`):
+  for port 0 ..< portCount: `AppleParavirtDisplay` allocated through its
+  metaclass, `init(gpu, port)` (`sub_fffffe0007eb4024`, fails unless
+  port < portCount), stored at `this+0x350 + 8·port`, attached, its
+  connection-type bits examined, started.
+- The only IOKit personality is `AppleParavirtGPUARM` (IOClass
+  `AppleParavirtGPU`, IONameMatch `paravirtualizedgraphics,gpu`); displays are
+  created by the GPU, one per port, not by matching. `AppleParavirtDisplay`
+  (0x2ae8 bytes) is an IOMobileFramebuffer; strings `PGDisplay[%u]` and the
+  assertion `fSharedState->port == fPort` show per-port state.
+
+Inference: the guest driver needs no change to drive two ports on one GPU
+(route A′): it creates one framebuffer per port the host reports, up to 8,
+each with its own channel, and it proposes protocol 252, above the 245
+threshold another PG implementation (reims-vgpu) documents for multi-port
+reporting. The register offsets (0x1034 version, 0x122c port count) match that
+documentation. Not shown statically: what the host's PG answers to 252, whether
+the existing MMIO window covers port 1's registers (same device, so likely),
+and how the iOS userland (IOMobileFramebuffer clients, backboardd,
+SpringBoard) treats a second built-in framebuffer and assigns inner / cover
+roles.
+
+So for D3 the blocker is the host alone: the VM service refuses a port count
+of 2 unless `os_variant_has_internal_content` (recorded above). Guest-side
+work starts only once a host gives the guest two ports.
