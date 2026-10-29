@@ -1199,3 +1199,14 @@ roles.
 So for D3 the blocker is the host alone: the VM service refuses a port count
 of 2 unless `os_variant_has_internal_content` (recorded above). Guest-side
 work starts only once a host gives the guest two ports.
+
+### Locked-screen idle, 120 minutes: pass
+
+`scripts/t6e1-idle.sh 120`, headless, frozen candidate, screen locked with the
+power button after boot. All 13 samples report `locked true, screen_off true`.
+SpringBoard 37 / backboardd 73 / vphoned 117 unchanged throughout; launchd CPU
+8.82 → 18.60 s over 7202 s (ΔCPU/Δwall 0.00136, i.e. 0.14 %, falling per
+interval); kernel_task about 2.8 % of a core, steady; one `ReportSystemMemory`
+report from the 100-minute sample on (a memory report, not a crash). The
+script stops the VM at the end, so the post-idle interaction check (unlock,
+tap, input after the long idle) was not part of this run.
