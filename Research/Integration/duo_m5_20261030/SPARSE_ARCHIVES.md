@@ -75,9 +75,39 @@ The final full archive suite passed 103 tests in seven suites. Temporary
 `DEBUG-duo-sparse` instrumentation has been removed. Full logs and `.xcresult`
 are under `.build/validation/sparse/full-regression-final2.*`.
 
+## Full VM transfer, 2026-10-30
+
+Candidate bundle (`a71f2360` build), stopped clone `duo-candidate-20261030`,
+default export mode (zstd, no IPSW directory). Evidence:
+`.build/acceptance/cases/transfer-1/`, `imported-boot-1/`, `imported-boot-2/`.
+
+| Step | Result |
+| --- | --- |
+| Source `Disk.img` | 64,000,000,000 logical, 29,027,905,536 allocated bytes |
+| `vm export` | 69.4 s, exit 0; archive 16 GB, SHA-256 `760875d3873736ae…` |
+| `vm import --name duo-imported-20261030` | 72.1 s, exit 0 |
+| Imported `Disk.img` | 64,000,000,000 logical, 28,601,794,560 allocated bytes |
+| Small state | `nvram.bin`, `config.plist`, `PatchReceipt.plist`, `SEPStorage` hashes equal the source |
+| Imported boots (`imported-boot-2`) | 2/2: vphoned 9 s, unlock, vphoned tap opens Settings, host tap opens Dock Safari, open-flat 2034 × 1398 with the inner display shown, closed 1398 × 2034, SpringBoard PID 37 unchanged, no new reports |
+
+The v1.6 import of the same disk would have written all 64 GB; this one
+keeps it sparse, about 1.5% below the source's allocation. Allocation was
+sampled every 15 s during the import. One sample, taken at 27.95 GB of
+logical length, reported 46.0 GB allocated by `du`. Free space fell from
+about 95 to 62 GiB over the import, consistent with the final allocation.
+That transient sample is not explained. Plan for more headroom than the
+final allocation when importing on a nearly full volume. `imported-boot-1`
+used an Accessibility lookup for the Home-screen taps that does not work
+there; the boot checks themselves passed, and `imported-boot-2` repeats them
+with fixed, screenshot-checked points.
+
 ## Limits
 
-- No full 64 GB VM import or constrained-free-space VM transfer has run yet.
+- A constrained-free-space transfer and a `--max` (xz) full transfer have
+  not run. Byte identity of the full 64 GB disk was not compared; the
+  imported boot and state hashes are the acceptance evidence.
+- The baseline was not transferred in full; its dense expansion is the v1.6
+  record plus the small reproduction above.
 - Filesystem implementations without usable `F_PUNCHHOLE` may remain dense.
 - GNU tar output still has no sparse map in the measured case. Export reads
   logical zero regions and compresses them; this repair addresses imported
