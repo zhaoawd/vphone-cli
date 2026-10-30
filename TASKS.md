@@ -25,6 +25,8 @@ modification is authorized.
 - [x] Triage new diagnostic reports against baseline, source history and repeats.
 - [x] Windowed A/B: F3 touch and edge gestures, F5 transition frames, F4 power during close (`WINDOWED.md`).
 - [x] Windowed A/B: keyboard modes across folds and window frame restore (`WINDOWED.md`).
+- [x] F6 on the candidate: 5 cold boots, full 64 GB export/import with imported boots, snapshot round trip, 120-minute locked idle (`F6.md`).
+- [ ] Static outer/inner and cutout on/off/on (`Regression/display-matrix.zsh`, needs the user's sudo run).
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
 
 ## Constraints and approval gates
