@@ -1,4 +1,4 @@
-# Pending VM acceptance
+# VM acceptance record and remaining checks
 
 ## Current state and approval scope
 
@@ -10,38 +10,43 @@ After shutdown, its disk was 64,000,000,000 logical bytes and 27,766,452,224
 allocated bytes. An APFS copy-on-write seed and two new-identity clones now
 exist below `.build/acceptance/machines`. The source's inode/size/mtime/ctime
 and small-state hashes did not change during copying. Clone disk inodes are
-distinct; SEP/NVRAM hashes match and clone identities are reset. No clone has
-been updated or booted. Details: `runtime-preparation.json`.
+distinct; SEP/NVRAM hashes matched and clone identities were reset before
+their first boots. Details: `runtime-preparation.json`.
 
 Runtime preparation status:
 
 1. Gracefully stopping the existing `duo-m5-fold214` VM: approved and complete.
 2. Copying that stopped source into an isolated seed and creating baseline
    and candidate clones with new identities, entirely inside `.build`: complete.
-3. Applying the matching bundle's offline CFW environment update to each clone.
-   This requires root and temporary mounts/directories managed by CFW.
-4. Allowlisting the two built `vphone-vm` binaries through `vphone-escalator`.
-   This changes host AMFI admission. Non-root `status` could not read amfid.
+3. Applying the matching bundle's offline CFW environment update to each clone:
+   complete, through the user's Terminal execution of `prepare-root.zsh`.
+4. Allowlisting the two built `vphone-vm` binaries through `vphone-escalator`:
+   complete in that same run. The marker is dated 2026-10-30T07:29:53Z.
+
+Both update logs ended with successful environment-update messages. Both
+receipts contain the same 54 Guest patches, including fold display/guard;
+the optional inner cutout patch is absent. The allowlist output contains
+both expected VM CDHashes from `validation.json`.
 
 These actions do not include deleting a source VM, rebuilding/restoring its
 disk, pushing branches, or merging into `main`. The user's repository-external
 modification approval gate remains in effect.
 
-## Concrete setup after approval
+## Completed setup commands
 
 Use absolute paths from `validation.json` for the final candidate, and the
 preserved baseline at `.build/validation/baseline/artifacts/VPhone.bundle`.
 The stop/copy/clone commands below are retained as an execution record and
-must not be repeated against the existing directories. Root commands have
-not run. Their reviewed wrapper verifies outer bundle CDHashes, CLI/VM binary
+must not be repeated against the existing directories. The user has run
+the root commands. Their reviewed wrapper verifies outer bundle CDHashes, CLI/VM binary
 hashes, signatures and stopped state before invoking sudo:
 
 ```zsh
 zsh /Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/Research/Integration/duo_m5_20261030/Regression/prepare-root.zsh
 ```
 
-Run it in the user's Terminal so sudo can authenticate there. `--check` runs
-read-only checks without invoking sudo; that mode passed. The default run
+The user ran it in Terminal so sudo could authenticate there. `--check` runs
+read-only checks without invoking sudo; that mode passed before execution. The default run
 updates only the two isolated clones and allowlists the two recorded VM
 binaries. It saves logs and patch receipts and writes
 `.build/acceptance/root-steps-complete.json` only if all three steps succeed.
@@ -68,8 +73,8 @@ sudo "$candidate/Contents/MacOS/vphone-escalator" allow \
   "$baseline/Contents/MacOS/vphone-vm" "$candidate/Contents/MacOS/vphone-vm"
 ```
 
-The copies are already made. Recheck available storage and clone state before
-root actions; the wrapper rechecks signatures, hashes and open file handles.
+The copies and root steps are complete. Any later root action still needs
+concrete preparation and authorization for its particular scope.
 
 ## Runtime checks
 
@@ -83,9 +88,15 @@ zsh Research/Integration/duo_m5_20261030/Regression/vm-smoke.zsh \
 ```
 
 Repeat with the candidate socket and a new candidate evidence directory.
-The script asserts RPC success, stable SpringBoard/backboardd processes, and
-locked state after a fold in the dark. Geometry and screenshots are recorded
-for assessment; syntax validation alone is not runtime evidence.
+The script asserts RPC success, six supported hinge/rotation combinations,
+two upstream-defined unsupported physical poses, stable SpringBoard/backboardd
+processes, and locked state after a fold in the dark. Unsupported pose checks
+require the exact structured error and unchanged orientation. Geometry and
+screenshots are recorded for assessment; syntax validation alone is not
+runtime evidence. `Regression/probe-run.zsh` adds installd installation,
+app-owned geometry, CSSC correctness, and focused-field continuity checks.
+
+New execution results and limits are recorded in [RUNTIME.md](RUNTIME.md).
 
 The remaining acceptance matrix includes:
 

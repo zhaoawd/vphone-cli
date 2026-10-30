@@ -3,6 +3,7 @@
 # posture, foreground app and lock state; captures evidence without deleting it.
 set -euo pipefail
 source "${0:a:h}/rpc-request.zsh"
+source "${0:a:h}/host-request.zsh"
 
 repo_root="$(cd "${0:a:h}/../../../.." && pwd)"
 socket_path="${1:?usage: vm-smoke.zsh <acceptance-socket> <new-output-directory> [fold-cycles]}"
@@ -14,17 +15,13 @@ fold_cycles="${3:-6}"
     print -u2 'Expected a running acceptance VM socket below this worktree/.build'
     exit 2
 }
-[[ ! -e "$output_root" ]] || { print -u2 'Evidence directory must be new'; exit 2; }
+[[ "$output_root" == "$repo_root/.build/"* && ! -e "$output_root" ]] || { print -u2 'Evidence directory must be new and below this worktree/.build'; exit 2; }
 mkdir -p "$output_root"
+cp "${0:a}" "$output_root/driver.zsh"
+shasum -a 256 "${0:a}" > "$output_root/driver-sha256.txt"
 
 host_request() {
-    local response
-    response=$(print -r -- "$1" | nc -U -w 40 "$socket_path")
-    print -r -- "$response" | jq -e '.ok == true' >/dev/null || {
-        print -u2 -- "$response"
-        return 1
-    }
-    print -r -- "$response"
+    vphone_host_request "$socket_path" "$1"
 }
 rpc() {
     local request
@@ -32,13 +29,14 @@ rpc() {
     host_request "$request"
 }
 capture() {
-    local label="$1" image_path
+    local label="$1"
     rpc device.screen > "$output_root/$label-screen.json"
+    if (( $# >= 2 )); then
+        jq -e --argjson orientation "$2" '.result.orientation == $orientation' "$output_root/$label-screen.json" >/dev/null
+    fi
     host_request '{"t":"display.geometry"}' > "$output_root/$label-geometry.json"
-    host_request '{"t":"screenshot"}' > "$output_root/$label-shot.json"
-    image_path=$(jq -er '.path' "$output_root/$label-shot.json")
-    [[ -f "$image_path" ]]
-    cp "$image_path" "$output_root/$label.jpg"
+    host_request "$(jq -nc --arg path "$output_root/$label.jpg" '{t:"screenshot",path:$path}')" > "$output_root/$label-shot.json"
+    [[ -f "$output_root/$label.jpg" ]]
 }
 process_ids() {
     rpc processes.list | jq -ce '[.result.processes[] | select(.name == "SpringBoard" or .name == "backboardd") | {name,pid}] | sort_by(.name) | select(length == 2)'
@@ -59,10 +57,32 @@ for hinge in closed open-flat; do
     posture "$hinge" "$hinge"
     sleep 3
     for orientation in portrait landscape-left landscape-right upside-down; do
+        # Current relay controls have no UIDevice upside-down pose. The
+        # cover maps that to interface 180; the inner panel maps it to 270.
+        if [[ "$hinge/$orientation" == closed/upside-down || "$hinge/$orientation" == open-flat/landscape-right ]]; then
+            rpc device.screen > "$output_root/$hinge-$orientation-before.json"
+            if rpc display.rotation "$(jq -nc --arg orientation "$orientation" '{orientation:$orientation}')" \
+                > "$output_root/$hinge-$orientation-reply.json" 2> "$output_root/$hinge-$orientation-error.json"; then
+                print -u2 "Unsupported relay pose unexpectedly succeeded: $hinge/$orientation"
+                exit 1
+            fi
+            jq -se 'length == 1 and .[0].ok == false and .[0].guest_error.code == "invalid_operation" and .[0].error == "the host controls have no upside-down orientation"' \
+                "$output_root/$hinge-$orientation-error.json" >/dev/null
+            rpc device.screen > "$output_root/$hinge-$orientation-after.json"
+            jq -se '.[0].result.orientation == .[1].result.orientation' \
+                "$output_root/$hinge-$orientation-before.json" "$output_root/$hinge-$orientation-after.json" >/dev/null
+            continue
+        fi
+        case "$orientation" in
+            portrait) degrees=0 ;;
+            landscape-left) degrees=90 ;;
+            landscape-right) degrees=270 ;;
+            upside-down) degrees=180 ;;
+        esac
         rpc display.rotation "$(jq -nc --arg orientation "$orientation" '{orientation:$orientation}')" \
             > "$output_root/$hinge-$orientation-rotation.json"
         sleep 2
-        capture "$hinge-$orientation"
+        capture "$hinge-$orientation" "$degrees"
     done
 done
 

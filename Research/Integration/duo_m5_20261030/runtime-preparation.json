@@ -93,8 +93,8 @@
       "snapshots_absent": true
     }
   },
-  "root_steps_executed": false,
-  "machines_booted": false,
+  "root_steps_executed": true,
+  "machines_booted": true,
   "recorded_at": "2026-10-30T15:24:09.183348+08:00",
   "bundles": {
     "baseline": {
@@ -108,6 +108,14 @@
   },
   "root_preflight": "passed; signature, binary hashes and no open clone state files",
   "root_script": "Regression/prepare-root.zsh",
-  "root_execution": "not_run; requires manual Terminal execution by the user",
-  "source_shutdown_log": ".build/acceptance/logs/source-shutdown.log"
+  "root_execution": {
+    "completed_at": "2026-10-30T07:29:53Z",
+    "logs": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/acceptance/logs/root-20261030T072841Z-44707",
+    "baseline_update": true,
+    "candidate_update": true,
+    "allowlist": true
+  },
+  "source_shutdown_log": ".build/acceptance/logs/source-shutdown.log",
+  "followup_runtime_record": "runtime-validation.json",
+  "followup_checked_at": "2026-10-30T08:02:36.499503+00:00"
 }

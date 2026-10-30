@@ -104,17 +104,21 @@ source SHA, bundle hash, guest patch receipt, commands, and tested machine.
   103 passed. See [sparse archive investigation](SPARSE_ARCHIVES.md).
 - FoldGuard: seven passed. CLI display regression and five RPC request
   encoding checks passed. Device/simulator probe builds passed; the host CSSC
-  probe returned six correct results. No guest probe or simulator was run.
+  probe returned six correct results. Guest probe results are recorded below;
+  no simulator was launched.
 - Historical scripts retain their original paths and behavior; they are
   evidence, not maintained execution entrypoints. Maintained helpers are in
   `Regression/` and `Probes/build.zsh`. Detailed F3/F4/F5/F6 harness adaptation
   remains part of runtime acceptance.
-- No VM acceptance has run. After the user approved shutdown, the original
-  `duo-m5-fold214` was stopped normally and the isolated seed/baseline/candidate
-  copies were created and verified. No clone has been booted or updated.
-  Root CFW and AMFI preparation awaits manual Terminal execution; see
-  [the execution record and commands](ACCEPTANCE.md) and
-  `runtime-preparation.json`.
+- After authorized source shutdown and isolated cloning, the user ran the
+  prepared root CFW/AMFI steps successfully. Baseline and candidate headless
+  fold/rotation/lock regressions passed. Both installed all five native probes
+  through installd and passed six CSSC correctness checks, eight geometry
+  samples and four focused-field checks. The app-owned geometry/focus results
+  match exactly. Both clones are stopped. New diagnostic reports remain
+  untriaged; full windowed, transition-frame, keyboard-mode and transfer
+  acceptance remains incomplete. See [new runtime evidence](RUNTIME.md),
+  `runtime-validation.json`, and [the setup record](ACCEPTANCE.md).
 
 The imported source history is reachable from the integration branch through
 a history-only merge after selective implementation. Its tree was checked

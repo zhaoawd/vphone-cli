@@ -1,0 +1,822 @@
+{
+  "checked_at": "2026-10-30T08:02:36.499503+00:00",
+  "code_commit": "a71f2360",
+  "driver_parent_commit": "fe9dd3c4a1272936217b99dadf0c2df84b6f4108",
+  "branch": "duo-integration-20261030",
+  "main": "39324ee7fcbb1d909bfa293f6188a8ef752ba734",
+  "origin_main": "39324ee7fcbb1d909bfa293f6188a8ef752ba734",
+  "original_worktree_status_sha256": "a682f06db218e0b57ba5b736214437620f7b533a82d9597472a32cab8b33a999",
+  "root_execution": {
+    "completed_at": "2026-10-30T07:29:53Z",
+    "logs": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/acceptance/logs/root-20261030T072841Z-44707",
+    "baseline_update": true,
+    "candidate_update": true,
+    "allowlist": true
+  },
+  "results": {
+    "baseline": {
+      "machine": ".build/acceptance/machines/duo-baseline-20261030",
+      "boot_case": ".build/acceptance/cases/baseline-boot-1",
+      "smoke_case": ".build/acceptance/cases/baseline-smoke-2",
+      "probe_case": ".build/acceptance/cases/baseline-probes-2",
+      "boot_mode": "headless",
+      "stopped_normally": true,
+      "agent_sha256": "7ae1cfe90a73e4408ef1b8c68514a270ab066f812f1a447203de91d4e4b84b14",
+      "fold_library_sha256": "a764b380db72e77a1d3c9f93fe84baafaa60666cf9d63b73db99211465f3295b",
+      "guest_patches": [
+        "dyld-boot-arm64e_x1_bootstrap",
+        "dyld-boot-iomfb_force_kern",
+        "dyld-boot-lockdown_mode",
+        "dyld-boot-lsd_embedded_reg",
+        "dyld-boot-maxslide",
+        "dyld-boot-xpc_lwcr",
+        "dyld-cfw-arm64e_x1_cache",
+        "dyld-cfw-camera",
+        "preboot-cfw-devicetree_board_audio",
+        "preboot-cfw-devicetree_foldable_displays",
+        "preboot-cfw-devicetree_foldable_product_id",
+        "preboot-cfw-devicetree_foldable_vm_subtype",
+        "preboot-cfw-devicetree_haptics",
+        "preboot-cfw-devicetree_iphone_product",
+        "preboot-cfw-devicetree_microphone_array",
+        "system-apps-cfw-attitude",
+        "system-apps-cfw-signin_sheets",
+        "system-backboardd-cfw-accelerometer",
+        "system-backboardd-cfw-gyroscope",
+        "system-backboardd-cfw-hinge",
+        "system-bluetoothd-cfw-btvc_le_connection",
+        "system-campo-cfw-entitlements",
+        "system-cibarcode-cfw-arm64e_x1",
+        "system-debugserver-cfw-install",
+        "system-diskimagesiod-cfw-is_mount_complete",
+        "system-dyld-boot-arm64e_x1_bootstrap",
+        "system-extensions-boot-gpu_bundle",
+        "system-fsck-boot-arm64e_x1_bootstrap",
+        "system-gigalocker-boot-rename",
+        "system-installcoordination_proxy-cfw-persona_lookup",
+        "system-jetsamproperties-cfw-disable_allowed",
+        "system-launchd-boot-arm64e_x1_bootstrap",
+        "system-launchd-boot-jetsam_panic_guard_bypass",
+        "system-launchd_cache_loader-boot-unsecure_cache_gate",
+        "system-launchdaemons-boot-environment",
+        "system-locationd-cfw-disable_auto_cohort",
+        "system-mobileactivationd-boot-should_hactivate",
+        "system-mount-boot-arm64e_x1_bootstrap",
+        "system-paravirt_gpu-cfw-heap_index_offset",
+        "system-preferences-cfw-followup_groups",
+        "system-seputil-boot-gigalocker_uuid",
+        "system-springboard-cfw-fold_display",
+        "system-springboard-cfw-fold_guard",
+        "system-systemhook-cfw-metal_cache_reuse",
+        "system-virtiosound-cfw-hal_plugin",
+        "system-virtualaudio-cfw-device_state_null_gate",
+        "system-virtualaudio-cfw-microphone_graph_chains",
+        "system-virtualaudio-cfw-mute_set_throw",
+        "system-virtualaudio-cfw-speaker_graph_chains",
+        "system-virtualaudio-cfw-speaker_protection_gate",
+        "system-virtualaudio-cfw-speaker_raw_chains",
+        "system-virtualaudio-cfw-speaker_route_throws",
+        "system-virtualaudio-cfw-volume_mode_precondition",
+        "system-vphoned-boot-install"
+      ],
+      "process_ids": [
+        {
+          "name": "SpringBoard",
+          "pid": 37
+        },
+        {
+          "name": "backboardd",
+          "pid": 73
+        }
+      ],
+      "fold_cycles": 6,
+      "supported_rotation_cases": 6,
+      "unsupported_rotation_cases": 2,
+      "cssc": {
+        "checks": {
+          "abs": true,
+          "cnt": true,
+          "ctz": true,
+          "smax": true,
+          "umin": true,
+          "umin_imm": true
+        },
+        "iterations": 2000000,
+        "ns_per_op": {
+          "add": 0.495,
+          "abs": 0.517,
+          "cnt": 1.038,
+          "ctz": 0.73,
+          "smax": 0.769,
+          "umin_imm": 0.739
+        },
+        "worst_over_add": 2.1,
+        "correct": true,
+        "native": true
+      },
+      "geometry": [
+        {
+          "case": "geoprobe-closed-portrait",
+          "scene": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geoprobe-closed-landscape-left",
+          "scene": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        },
+        {
+          "case": "geoprobe-open-flat-portrait",
+          "scene": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geoprobe-open-flat-landscape-left",
+          "scene": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        },
+        {
+          "case": "geobare-closed-portrait",
+          "scene": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geobare-closed-landscape-left",
+          "scene": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        },
+        {
+          "case": "geobare-open-flat-portrait",
+          "scene": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geobare-open-flat-landscape-left",
+          "scene": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        }
+      ],
+      "focused_field": [
+        {
+          "case": "kbprobe-open-flat",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            951,
+            669
+          ],
+          "scene": [
+            951,
+            669
+          ],
+          "screen": [
+            951,
+            669
+          ],
+          "orientation": 4
+        },
+        {
+          "case": "kbprobe-closed",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            466,
+            678
+          ],
+          "scene": [
+            466,
+            678
+          ],
+          "screen": [
+            466,
+            678
+          ],
+          "orientation": 1
+        },
+        {
+          "case": "kbprobe.fs-open-flat",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            951,
+            669
+          ],
+          "scene": [
+            951,
+            669
+          ],
+          "screen": [
+            951,
+            669
+          ],
+          "orientation": 4
+        },
+        {
+          "case": "kbprobe.fs-closed",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            466,
+            678
+          ],
+          "scene": [
+            466,
+            678
+          ],
+          "screen": [
+            466,
+            678
+          ],
+          "orientation": 1
+        }
+      ],
+      "new_smoke_diagnostics": [
+        {
+          "name": "SiriSearchFeedback-2026-10-30-154207.ips",
+          "process": "SiriSearchFeedback",
+          "mtime": 1793346127.6491435,
+          "path": "/var/mobile/Library/Logs/CrashReporter/SiriSearchFeedback-2026-10-30-154207.ips"
+        }
+      ],
+      "new_probe_diagnostics": [],
+      "diagnostic_causes": "not investigated; reports remain on the retained clone disks",
+      "evidence_sha256": {
+        ".build/acceptance/cases/baseline-boot-1/device.info-final.json": "1e105b1d3cc1aba2642cf8e37174b153d45755a757f5dc861316d68b5d41ccc5",
+        ".build/acceptance/cases/baseline-boot-1/environment.status-final.json": "4ab701a2df3dc71bbed9d0135d12b1ceb5173e770df8c712c1bd615eb3583d6d",
+        ".build/acceptance/cases/baseline-boot-1/PatchReceipt-before-boot.plist": "cf6ae21e25cda93170cf73b5e38e53ae85d66e1b8dcf9b93ed82de41cb7bd337",
+        ".build/acceptance/cases/baseline-boot-1/signature.txt": "ca69511a34f048244f4a1db62c4e47900cbef144cb97ca6c9f3d20a629feebea",
+        ".build/acceptance/cases/baseline-boot-1/stop.log": "1d5230180f83bda6d9637371095ea38bf916bab57e43c1f86cdcf160a567d431",
+        ".build/acceptance/cases/baseline-smoke-2/crashes-before.json": "ef4a2fb198227d10d07cd3ad740b07e14c274f00fe07a58c1d1f3ab6cc3e0c03",
+        ".build/acceptance/cases/baseline-smoke-2/crashes-after.json": "5661aa02bd5fae3294f026eea221c319156c223803a17e830606af97d11cbede",
+        ".build/acceptance/cases/baseline-probes-2/crashes-before.json": "813d7e1a8758cd64f294bf50f41946dbc9166cf092f8a5e29579060e2d459816",
+        ".build/acceptance/cases/baseline-probes-2/crashes-after.json": "90a11222ef5060db7a0819e226b6dd2d8e4eec99888b7be9344151217bcc2861",
+        ".build/acceptance/cases/baseline-probes-2/ipa-sha256.txt": "5c41bfd6197cc7d29fdf3df8c42b6038be4711e0afeee6e1c9dab8c4e7a0d9d1",
+        ".build/acceptance/cases/baseline-probes-2/driver-sha256.txt": "ef7021ca9ddf314d11e58125b64ecad35660b51592701675165eea1d8be58f87",
+        ".build/acceptance/cases/baseline-probes-2/install-GeoBare.log": "eb861592fee8f1ebdb78980784c17b24b20a421034c189ca35014312373bc3da",
+        ".build/acceptance/cases/baseline-probes-2/install-GeoProbe.log": "9e2c27d12ca0d7b1ffd0607e752d3539f3ffd1d617f156a41e2fc9749e9fc1b9",
+        ".build/acceptance/cases/baseline-probes-2/install-KBProbe.log": "e60154dd4ede266b09f050892d2e32f4fa204493e807935e337804d01ff1e651",
+        ".build/acceptance/cases/baseline-probes-2/install-KBProbeFS.log": "378bf59a9fbebb316a0696f706be549a25736043d0489cb60323dd4836b89716",
+        ".build/acceptance/cases/baseline-probes-2/install-Probe.log": "9ec99d25d5348b15323d390852c0f107a27b6d1c742c5174dec0dddb82a93626",
+        ".build/acceptance/cases/baseline-probes-2/driver-reconstructed.zsh": "897daeec02e53e7ea29c053df7ac5290a4b5040ee26149ac6b29acb413e7ece6"
+      },
+      "uptime_seconds_at_final_sample": 1461.7965530000001
+    },
+    "candidate": {
+      "machine": ".build/acceptance/machines/duo-candidate-20261030",
+      "boot_case": ".build/acceptance/cases/candidate-boot-1",
+      "smoke_case": ".build/acceptance/cases/candidate-smoke-1",
+      "probe_case": ".build/acceptance/cases/candidate-probes-1",
+      "boot_mode": "headless",
+      "stopped_normally": true,
+      "agent_sha256": "8014b18b0139407119541da7ccdb2a2983f60947fb7608a999fa642303e51182",
+      "fold_library_sha256": "a764b380db72e77a1d3c9f93fe84baafaa60666cf9d63b73db99211465f3295b",
+      "guest_patches": [
+        "dyld-boot-arm64e_x1_bootstrap",
+        "dyld-boot-iomfb_force_kern",
+        "dyld-boot-lockdown_mode",
+        "dyld-boot-lsd_embedded_reg",
+        "dyld-boot-maxslide",
+        "dyld-boot-xpc_lwcr",
+        "dyld-cfw-arm64e_x1_cache",
+        "dyld-cfw-camera",
+        "preboot-cfw-devicetree_board_audio",
+        "preboot-cfw-devicetree_foldable_displays",
+        "preboot-cfw-devicetree_foldable_product_id",
+        "preboot-cfw-devicetree_foldable_vm_subtype",
+        "preboot-cfw-devicetree_haptics",
+        "preboot-cfw-devicetree_iphone_product",
+        "preboot-cfw-devicetree_microphone_array",
+        "system-apps-cfw-attitude",
+        "system-apps-cfw-signin_sheets",
+        "system-backboardd-cfw-accelerometer",
+        "system-backboardd-cfw-gyroscope",
+        "system-backboardd-cfw-hinge",
+        "system-bluetoothd-cfw-btvc_le_connection",
+        "system-campo-cfw-entitlements",
+        "system-cibarcode-cfw-arm64e_x1",
+        "system-debugserver-cfw-install",
+        "system-diskimagesiod-cfw-is_mount_complete",
+        "system-dyld-boot-arm64e_x1_bootstrap",
+        "system-extensions-boot-gpu_bundle",
+        "system-fsck-boot-arm64e_x1_bootstrap",
+        "system-gigalocker-boot-rename",
+        "system-installcoordination_proxy-cfw-persona_lookup",
+        "system-jetsamproperties-cfw-disable_allowed",
+        "system-launchd-boot-arm64e_x1_bootstrap",
+        "system-launchd-boot-jetsam_panic_guard_bypass",
+        "system-launchd_cache_loader-boot-unsecure_cache_gate",
+        "system-launchdaemons-boot-environment",
+        "system-locationd-cfw-disable_auto_cohort",
+        "system-mobileactivationd-boot-should_hactivate",
+        "system-mount-boot-arm64e_x1_bootstrap",
+        "system-paravirt_gpu-cfw-heap_index_offset",
+        "system-preferences-cfw-followup_groups",
+        "system-seputil-boot-gigalocker_uuid",
+        "system-springboard-cfw-fold_display",
+        "system-springboard-cfw-fold_guard",
+        "system-systemhook-cfw-metal_cache_reuse",
+        "system-virtiosound-cfw-hal_plugin",
+        "system-virtualaudio-cfw-device_state_null_gate",
+        "system-virtualaudio-cfw-microphone_graph_chains",
+        "system-virtualaudio-cfw-mute_set_throw",
+        "system-virtualaudio-cfw-speaker_graph_chains",
+        "system-virtualaudio-cfw-speaker_protection_gate",
+        "system-virtualaudio-cfw-speaker_raw_chains",
+        "system-virtualaudio-cfw-speaker_route_throws",
+        "system-virtualaudio-cfw-volume_mode_precondition",
+        "system-vphoned-boot-install"
+      ],
+      "process_ids": [
+        {
+          "name": "SpringBoard",
+          "pid": 37
+        },
+        {
+          "name": "backboardd",
+          "pid": 73
+        }
+      ],
+      "fold_cycles": 6,
+      "supported_rotation_cases": 6,
+      "unsupported_rotation_cases": 2,
+      "cssc": {
+        "checks": {
+          "abs": true,
+          "cnt": true,
+          "ctz": true,
+          "smax": true,
+          "umin": true,
+          "umin_imm": true
+        },
+        "iterations": 2000000,
+        "ns_per_op": {
+          "add": 0.492,
+          "abs": 0.516,
+          "cnt": 0.976,
+          "ctz": 0.717,
+          "smax": 0.715,
+          "umin_imm": 0.72
+        },
+        "worst_over_add": 1.98,
+        "correct": true,
+        "native": true
+      },
+      "geometry": [
+        {
+          "case": "geoprobe-closed-portrait",
+          "scene": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geoprobe-closed-landscape-left",
+          "scene": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        },
+        {
+          "case": "geoprobe-open-flat-portrait",
+          "scene": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geoprobe-open-flat-landscape-left",
+          "scene": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        },
+        {
+          "case": "geobare-closed-portrait",
+          "scene": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 678,
+            "w": 466,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geobare-closed-landscape-left",
+          "scene": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 466,
+            "w": 678,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        },
+        {
+          "case": "geobare-open-flat-portrait",
+          "scene": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 951,
+            "w": 669,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 1
+        },
+        {
+          "case": "geobare-open-flat-landscape-left",
+          "scene": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "window": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "scene_screen": {
+            "h": 669,
+            "w": 951,
+            "x": 0,
+            "y": 0
+          },
+          "orientation": 4
+        }
+      ],
+      "focused_field": [
+        {
+          "case": "kbprobe-open-flat",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            951,
+            669
+          ],
+          "scene": [
+            951,
+            669
+          ],
+          "screen": [
+            951,
+            669
+          ],
+          "orientation": 4
+        },
+        {
+          "case": "kbprobe-closed",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            466,
+            678
+          ],
+          "scene": [
+            466,
+            678
+          ],
+          "screen": [
+            466,
+            678
+          ],
+          "orientation": 1
+        },
+        {
+          "case": "kbprobe.fs-open-flat",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            951,
+            669
+          ],
+          "scene": [
+            951,
+            669
+          ],
+          "screen": [
+            951,
+            669
+          ],
+          "orientation": 4
+        },
+        {
+          "case": "kbprobe.fs-closed",
+          "first_responder": true,
+          "text": "duo-focus-20261030",
+          "window": [
+            466,
+            678
+          ],
+          "scene": [
+            466,
+            678
+          ],
+          "screen": [
+            466,
+            678
+          ],
+          "orientation": 1
+        }
+      ],
+      "new_smoke_diagnostics": [
+        {
+          "name": "ReportSystemMemory-2026-10-30-155840.ips",
+          "process": "ReportSystemMemory",
+          "mtime": 1793347120.1850061,
+          "path": "/var/mobile/Library/Logs/CrashReporter/ReportSystemMemory-2026-10-30-155840.ips"
+        },
+        {
+          "name": "SiriSearchFeedback-2026-10-30-155830.ips",
+          "process": "SiriSearchFeedback",
+          "mtime": 1793347110.5254564,
+          "path": "/var/mobile/Library/Logs/CrashReporter/SiriSearchFeedback-2026-10-30-155830.ips"
+        }
+      ],
+      "new_probe_diagnostics": [
+        {
+          "name": "ReportSystemMemory-2026-10-30-160015.ips",
+          "process": "ReportSystemMemory",
+          "mtime": 1793347215.1857944,
+          "path": "/var/mobile/Library/Logs/CrashReporter/ReportSystemMemory-2026-10-30-160015.ips"
+        },
+        {
+          "name": "ExcUserFault_lsd-2026-10-30-160014.000.ips",
+          "process": "ExcUserFault_lsd",
+          "mtime": 1793347214.6549783,
+          "path": "/var/mobile/Library/Logs/CrashReporter/ExcUserFault_lsd-2026-10-30-160014.000.ips"
+        }
+      ],
+      "diagnostic_causes": "not investigated; reports remain on the retained clone disks",
+      "evidence_sha256": {
+        ".build/acceptance/cases/candidate-boot-1/device.info-final.json": "cd1314fc8559ac35dd307ac3b58e21326ee2d837fa5baf0f26646d345f70eaf0",
+        ".build/acceptance/cases/candidate-boot-1/environment.status-final.json": "aded01079ad21736ed3238f2496df4348d174da3b381effeca5623cb5708dfe3",
+        ".build/acceptance/cases/candidate-boot-1/PatchReceipt-before-boot.plist": "31ae57852097058d68e643dcce8c54ac7a241ad6c8534aae73235bfad0f7e7d9",
+        ".build/acceptance/cases/candidate-boot-1/signature.txt": "96994aa196ff7329bc5264dc474f9d2292780468b10cb526c6c200208b1188bf",
+        ".build/acceptance/cases/candidate-boot-1/stop.log": "aae3ca849f83f550746dc9f7ff09cf45cc7aa87a5b58971c089f8633da52d150",
+        ".build/acceptance/cases/candidate-smoke-1/crashes-before.json": "562326cc3c4dfb001c939b6891a0a64084caadbbfece173786fd5e1682779cb8",
+        ".build/acceptance/cases/candidate-smoke-1/crashes-after.json": "65f2db62ceab440c5888605608650420172ef682bb6ff93e4179ec986a364653",
+        ".build/acceptance/cases/candidate-probes-1/crashes-before.json": "dca8fb421277fbfa67443392e3aededf2e2a24f190b1b8ed68814b8d408cbc85",
+        ".build/acceptance/cases/candidate-probes-1/crashes-after.json": "0aaebf69e7d275af46b0f890ba8c47f98ad9a1ad77bd7b5bb4a0cc6bd8d1e006",
+        ".build/acceptance/cases/candidate-probes-1/ipa-sha256.txt": "5c41bfd6197cc7d29fdf3df8c42b6038be4711e0afeee6e1c9dab8c4e7a0d9d1",
+        ".build/acceptance/cases/candidate-probes-1/driver-sha256.txt": "0e5cb618125e653afb3bba7782f00c6b2aae6e78635c50aa7987bd54ddee5f81",
+        ".build/acceptance/cases/candidate-probes-1/install-GeoBare.log": "88f0780ed76aa0fa2a405afbff2010065b9470abb8031da981403fcb7c1a55c6",
+        ".build/acceptance/cases/candidate-probes-1/install-GeoProbe.log": "447e20edaeca910bd92cf724636ae111bd7490af0e5abcd4e4b1156551af8c7e",
+        ".build/acceptance/cases/candidate-probes-1/install-KBProbe.log": "c6cd4a7c3e3d81bf1be21789e954101db206fda269050bd4c557bc3ee7eaa93e",
+        ".build/acceptance/cases/candidate-probes-1/install-KBProbeFS.log": "bbca211c69eeec6af2b1fc405021a3dd68ce4b1dacf6c43cfe3be989c7f2a894",
+        ".build/acceptance/cases/candidate-probes-1/install-Probe.log": "e455c7df8b59651010048c541ffecbf04cb11acc965d2fb5a4b68ee4712f3e61",
+        ".build/acceptance/cases/candidate-probes-1/driver.zsh": "0d6c63e952b303462b99837269593ba8fbc26f19b8fa3cb90c5ece84d9dbd02d"
+      },
+      "uptime_seconds_at_final_sample": 223.851159125
+    }
+  },
+  "matched_app_geometry": true,
+  "matched_focus_measurements": true,
+  "transport_contract": "5 cases passed; .build/acceptance/logs/transport-final.log",
+  "rpc_contract": "5 checks passed",
+  "baseline_driver_note": "Hash-verified reconstruction retained with the case; current driver adds normal termination of running test probes before installd updates. Measurement steps unchanged.",
+  "remaining": [
+    "windowed host touch and physical frames",
+    "fold transition black/stale frames",
+    "safe area and navigation bar assessment",
+    "software/hardware keyboard modes",
+    "repeated cold boot and 120-minute idle",
+    "full 64GB export/import and imported boot",
+    "snapshot restore",
+    "audio",
+    "static display patch on/off/on",
+    "new diagnostic report triage"
+  ],
+  "final_helper_preflight": "baseline and candidate --check passed; root marker, pinned CLI/VM hashes, signatures; no VM launched",
+  "final_helper_scope": "Later script edits add preflight/output restrictions/driver snapshots; no product binary changed"
+}
