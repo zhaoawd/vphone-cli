@@ -109,9 +109,12 @@ source SHA, bundle hash, guest patch receipt, commands, and tested machine.
   evidence, not maintained execution entrypoints. Maintained helpers are in
   `Regression/` and `Probes/build.zsh`. Detailed F3/F4/F5/F6 harness adaptation
   remains part of runtime acceptance.
-- No VM acceptance has run. The existing `duo-m5-fold214` is still running;
-  it has not been stopped or modified. See [the prepared approval scope and
-  commands](ACCEPTANCE.md).
+- No VM acceptance has run. After the user approved shutdown, the original
+  `duo-m5-fold214` was stopped normally and the isolated seed/baseline/candidate
+  copies were created and verified. No clone has been booted or updated.
+  Root CFW and AMFI preparation awaits manual Terminal execution; see
+  [the execution record and commands](ACCEPTANCE.md) and
+  `runtime-preparation.json`.
 
 The imported source history is reachable from the integration branch through
 a history-only merge after selective implementation. Its tree was checked

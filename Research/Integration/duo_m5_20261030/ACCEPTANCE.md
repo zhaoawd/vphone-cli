@@ -2,19 +2,22 @@
 
 ## Current state and approval scope
 
-Read-only process inspection found `duo-m5-fold214` still running from the
-original `vphone-cli-up/.build/fold214` bundle (VM PID 7944 at inspection).
-It has not been stopped, modified, cloned, or updated by this integration.
+The user approved closing `duo-m5-fold214` on 2026-10-30. Its original CLI
+performed a normal stop (SIGINT), returned success, and both launch/VM processes
+exited. lsof then found no open Disk.img/SEPStorage/nvram.bin handles.
 
-Its source disk is 64,000,000,000 logical bytes and 27,747,278,848 allocated
-bytes at inspection. An offline copy is required for consistent acceptance
-inputs. New machine libraries and logs will be below this worktree's `.build`.
+After shutdown, its disk was 64,000,000,000 logical bytes and 27,766,452,224
+allocated bytes. An APFS copy-on-write seed and two new-identity clones now
+exist below `.build/acceptance/machines`. The source's inode/size/mtime/ctime
+and small-state hashes did not change during copying. Clone disk inodes are
+distinct; SEP/NVRAM hashes match and clone identities are reset. No clone has
+been updated or booted. Details: `runtime-preparation.json`.
 
-Before runtime acceptance, request approval for:
+Runtime preparation status:
 
-1. Gracefully stopping the existing `duo-m5-fold214` VM.
+1. Gracefully stopping the existing `duo-m5-fold214` VM: approved and complete.
 2. Copying that stopped source into an isolated seed and creating baseline
-   and candidate clones with new identities, entirely inside `.build`.
+   and candidate clones with new identities, entirely inside `.build`: complete.
 3. Applying the matching bundle's offline CFW environment update to each clone.
    This requires root and temporary mounts/directories managed by CFW.
 4. Allowlisting the two built `vphone-vm` binaries through `vphone-escalator`.
@@ -28,7 +31,20 @@ modification approval gate remains in effect.
 
 Use absolute paths from `validation.json` for the final candidate, and the
 preserved baseline at `.build/validation/baseline/artifacts/VPhone.bundle`.
-The commands below have been prepared, not executed.
+The stop/copy/clone commands below are retained as an execution record and
+must not be repeated against the existing directories. Root commands have
+not run. Their reviewed wrapper verifies outer bundle CDHashes, CLI/VM binary
+hashes, signatures and stopped state before invoking sudo:
+
+```zsh
+zsh /Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/Research/Integration/duo_m5_20261030/Regression/prepare-root.zsh
+```
+
+Run it in the user's Terminal so sudo can authenticate there. `--check` runs
+read-only checks without invoking sudo; that mode passed. The default run
+updates only the two isolated clones and allowlists the two recorded VM
+binaries. It saves logs and patch receipts and writes
+`.build/acceptance/root-steps-complete.json` only if all three steps succeed.
 
 ```zsh
 repo=/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030
@@ -52,9 +68,8 @@ sudo "$candidate/Contents/MacOS/vphone-escalator" allow \
   "$baseline/Contents/MacOS/vphone-vm" "$candidate/Contents/MacOS/vphone-vm"
 ```
 
-Recheck source process state before copying: the process inspection above is
-a snapshot, not a lock. Recheck available storage and the final binary hashes
-before root actions. Capture each CFW log, exit status, and patch receipt.
+The copies are already made. Recheck available storage and clone state before
+root actions; the wrapper rechecks signatures, hashes and open file handles.
 
 ## Runtime checks
 

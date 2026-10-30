@@ -1,0 +1,113 @@
+{
+  "checked_at": "2026-10-30T15:21:20.381469+08:00",
+  "source": "/Users/kolar/.vphone/machines/duo-m5-fold214",
+  "source_shutdown": "normal CLI stop, exit 0",
+  "source_processes_exited": true,
+  "source_state_files_no_open_readers": true,
+  "source_metadata_unchanged_during_copy": true,
+  "source_small_state_hashes_match": true,
+  "copies": {
+    "seed": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/acceptance/machines/seed",
+      "files": {
+        "Disk.img": {
+          "inode": 267592354,
+          "logical_bytes": 64000000000,
+          "allocated_bytes": 27766452224
+        },
+        "SEPStorage": {
+          "inode": 267592426,
+          "logical_bytes": 524288,
+          "allocated_bytes": 524288
+        },
+        "nvram.bin": {
+          "inode": 267592443,
+          "logical_bytes": 33570816,
+          "allocated_bytes": 28327936
+        }
+      },
+      "guest_product": "iPhone19,4",
+      "screen": {
+        "height": 2034,
+        "pixelsPerInch": 460,
+        "scale": 3.0,
+        "width": 1398
+      }
+    },
+    "duo-baseline-20261030": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/acceptance/machines/duo-baseline-20261030",
+      "files": {
+        "Disk.img": {
+          "inode": 267592451,
+          "logical_bytes": 64000000000,
+          "allocated_bytes": 27766452224
+        },
+        "SEPStorage": {
+          "inode": 267592458,
+          "logical_bytes": 524288,
+          "allocated_bytes": 524288
+        },
+        "nvram.bin": {
+          "inode": 267592461,
+          "logical_bytes": 33570816,
+          "allocated_bytes": 28327936
+        }
+      },
+      "guest_product": "iPhone19,4",
+      "screen": {
+        "height": 2034,
+        "pixelsPerInch": 460,
+        "scale": 3.0,
+        "width": 1398
+      },
+      "new_identity_on_first_boot": true,
+      "snapshots_absent": true
+    },
+    "duo-candidate-20261030": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/acceptance/machines/duo-candidate-20261030",
+      "files": {
+        "Disk.img": {
+          "inode": 267592821,
+          "logical_bytes": 64000000000,
+          "allocated_bytes": 27766452224
+        },
+        "SEPStorage": {
+          "inode": 267592828,
+          "logical_bytes": 524288,
+          "allocated_bytes": 524288
+        },
+        "nvram.bin": {
+          "inode": 267592831,
+          "logical_bytes": 33570816,
+          "allocated_bytes": 28327936
+        }
+      },
+      "guest_product": "iPhone19,4",
+      "screen": {
+        "height": 2034,
+        "pixelsPerInch": 460,
+        "scale": 3.0,
+        "width": 1398
+      },
+      "new_identity_on_first_boot": true,
+      "snapshots_absent": true
+    }
+  },
+  "root_steps_executed": false,
+  "machines_booted": false,
+  "recorded_at": "2026-10-30T15:24:09.183348+08:00",
+  "bundles": {
+    "baseline": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/validation/baseline/artifacts/VPhone.bundle",
+      "bundle_cdhash": "e4ef988a213326e77b5a1774b3bd755bc8f503a8"
+    },
+    "candidate": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/XcodeDuo/Build/Products/Debug/VPhone.bundle",
+      "bundle_cdhash": "0aa6e05855defd0228373e4c82e20866f15dee89"
+    }
+  },
+  "root_preflight": "passed; signature, binary hashes and no open clone state files",
+  "root_script": "Regression/prepare-root.zsh",
+  "root_execution": "not_run; requires manual Terminal execution by the user",
+  "source_shutdown_log": ".build/acceptance/logs/source-shutdown.log"
+}

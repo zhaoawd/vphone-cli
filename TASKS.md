@@ -2,7 +2,9 @@
 
 Scope: integrate the iPhone Duo work from `vphone-cli-up` and
 `vphone-duo-m5` onto upstream-based `main`, without changing the original
-worktrees or existing machines. Source directories are read-only inputs.
+worktrees. Source directories are read-only inputs. On 2026-10-30 the user
+approved normal shutdown of the existing source VM; no other original-VM
+modification is authorized.
 
 - [x] Import `duo-m5-v1.4`, `duo-m5-v1.5`, and `duo-m5-v1.6` with their history.
 - [x] Create isolated branch/worktree `duo-integration-20261030` at `39324ee7`.
@@ -15,14 +17,14 @@ worktrees or existing machines. Source directories are read-only inputs.
 - [x] Preserve research, probes, historical scripts/results, and maintained regression scripts with provenance.
 - [x] Reproduce and repair sparse archive round-trip behavior using isolated test data; 103 archive tests pass.
 - [x] Build the integrated bundle and run affected firmware-free tests; existing firmware-fixture failures match baseline.
-- [x] Prepare VM A/B commands and the isolated-library layout; actual copies await permission to stop the source VM.
+- [x] Prepare VM A/B commands and create/verify isolated seed, baseline, and candidate copies after authorized shutdown.
 - [ ] Run authorized VM acceptance; distinguish historic evidence from new runs.
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
 
 ## Constraints and approval gates
 
 - No remote push, merge into `main`, data deletion, modification of source
-  repositories, modification of existing machines, or host privilege changes.
+  repositories, additional original-machine modification, or host privilege changes.
   Present concrete commands and results before requesting any needed approval.
 - Use Xcode targets and native components from the new upstream layout.
 - Do not read or modify the repository-root `TODO.md`.
@@ -50,9 +52,14 @@ The source history is now reachable from the integration branch through a
 history-only merge whose tree was checked unchanged. No merge into `main` or
 remote push has been performed.
 
-Runtime gate: the original `duo-m5-fold214` is running. It has not been stopped
-or modified. Concrete approval scope and commands are in
-`Research/Integration/duo_m5_20261030/ACCEPTANCE.md`.
+Runtime preparation: the user approved closing `duo-m5-fold214`. The normal
+CLI stop returned success; both old processes exited and lsof found no state
+file readers. The seed and two isolated clones are created and verified.
+Source metadata/small-state hashes were unchanged during copying; clones have
+distinct disk inodes, identical SEP/NVRAM data and reset identities. No clone
+has been booted or updated. Root CFW/AMFI steps await manual Terminal execution.
+See `Research/Integration/duo_m5_20261030/runtime-preparation.json` and
+`Regression/prepare-root.zsh` there.
 
 Detailed evidence and change decisions:
 `Research/Integration/duo_m5_20261030/README.md`.
