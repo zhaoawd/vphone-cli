@@ -1,0 +1,145 @@
+== s1: closed, power off, open while dark
+  [dark] locked=true off=true 466x678
+  [opened] locked=true off=false 678x466
+    1793286648.102 inner display: display 1 wants state 0
+    1793286649.996 inner display: hold on (LCD rendered in 1 ms, window 0xada5e3200)
+    1793286650.064 inner display: panel owned by the inner display
+    1793286650.199 inner display: display 7 wants state 1
+    1793286650.203 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286650.231 inner display: hold off (inner display drawn) after 235 ms
+  holds on=1 off=1
+== s2: open, power off, close while dark
+  [dark] locked=true off=true 678x466
+  [closed] locked=true off=false 466x678
+    1793286658.241 inner display: display 7 wants state 0
+    1793286658.241 inner display: shown=0
+    1793286660.155 inner display: hold on (LCD rendered in 1 ms, window 0xada5e3200)
+    1793286660.374 inner display: display 1 wants state 1
+    1793286660.374 inner display: panel owned by the cover
+    1793286660.374 inner display: display 7 wants state 1
+    1793286660.527 inner display: hold off (cover redrawn) after 372 ms
+    1793286663.375 inner display: display 7 wants state 0
+  holds on=1 off=1
+== s3: open, power off, tap to wake on the inner display
+  [dark] locked=true off=true 678x466
+  [tapped] locked=true off=false 678x466
+    1793286676.196 inner display: display 7 wants state 0
+    1793286676.199 inner display: shown=0
+    1793286678.064 inner display: display 7 wants state 1
+    1793286678.070 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+  holds on=0 off=0
+== s4: closed, power off, tap to wake on the cover
+  [dark] locked=true off=true 466x678
+  [tapped] locked=true off=false 466x678
+    1793286686.044 inner display: display 7 wants state 0
+    1793286686.286 inner display: display 1 wants state 0
+    1793286688.228 inner display: display 1 wants state 1
+  holds on=0 off=0
+== s5: Safari on the cover, open and power off inside the hold
+  [after] locked=true off=false 678x466
+  [woken] locked=true off=true 678x466
+    1793286700.284 inner display: hold on (LCD rendered in 4 ms, window 0xada5e3200)
+    1793286700.516 inner display: display 1 wants state 0
+    1793286700.517 inner display: panel owned by the inner display
+    1793286700.517 inner display: display 7 wants state 1
+    1793286700.539 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286700.943 inner display: display 7 wants state 0
+    1793286700.944 inner display: shown=0
+    1793286701.083 inner display: display 7 wants state 1
+    1793286701.091 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286701.114 inner display: hold off (inner display drawn) after 830 ms
+    1793286704.134 inner display: display 7 wants state 0
+    1793286704.135 inner display: shown=0
+  holds on=1 off=1
+== s6: Safari on the inner display, close and power off inside the hold
+  [after] locked=true off=false 466x678
+  [woken] locked=true off=true 466x678
+    1793286715.274 inner display: hold on (LCD rendered in 1 ms, window 0xada5e3200)
+    1793286715.539 inner display: display 1 wants state 1
+    1793286715.539 inner display: panel owned by the cover
+    1793286715.540 inner display: shown=0
+    1793286715.691 inner display: hold off (cover redrawn) after 418 ms
+    1793286715.749 inner display: display 1 wants state 0
+    1793286715.749 inner display: display 7 wants state 0
+    1793286715.994 inner display: display 7 wants state 1
+    1793286715.994 inner display: display 1 wants state 1
+    1793286719.009 inner display: display 1 wants state 0
+    1793286719.010 inner display: display 7 wants state 0
+  holds on=1 off=1
+== s7: power off, fold 8 times at 0.5 s while dark, end open, wake
+  [dark-open] locked=true off=false 678x466
+  [woken] locked=true off=true 678x466
+  [unlocked] locked=false off=false 678x466
+    1793286726.402 inner display: display 1 wants state 0
+    1793286728.153 inner display: hold on (LCD rendered in 2 ms, window 0xada5e3200)
+    1793286728.232 inner display: panel owned by the inner display
+    1793286728.312 inner display: display 7 wants state 1
+    1793286728.327 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286728.382 inner display: hold off (inner display drawn) after 229 ms
+    1793286728.764 inner display: hold on (LCD rendered in 11 ms, window 0xada5e3200)
+    1793286728.931 inner display: display 1 wants state 1
+    1793286728.931 inner display: panel owned by the cover
+    1793286728.940 inner display: shown=0
+    1793286729.083 inner display: hold off (cover redrawn) after 319 ms
+    1793286729.347 inner display: hold on (LCD rendered in 5 ms, window 0xada5e3200)
+    1793286729.392 inner display: panel owned by the inner display
+    1793286729.446 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286729.460 inner display: display 1 wants state 0
+    1793286729.616 inner display: hold off (inner display drawn) after 269 ms
+    1793286729.976 inner display: hold on (LCD rendered in 1 ms, window 0xada5e3200)
+    1793286730.146 inner display: display 1 wants state 1
+    1793286730.146 inner display: panel owned by the cover
+    1793286730.152 inner display: shown=0
+    1793286730.303 inner display: hold off (cover redrawn) after 327 ms
+    1793286730.461 inner display: hold on (LCD rendered in 3 ms, window 0xada5e3200)
+    1793286730.500 inner display: panel owned by the inner display
+    1793286730.525 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286730.541 inner display: display 1 wants state 0
+    1793286730.689 inner display: hold off (inner display drawn) after 229 ms
+    1793286731.068 inner display: hold on (LCD rendered in 2 ms, window 0xada5e3200)
+    1793286731.241 inner display: display 1 wants state 1
+    1793286731.241 inner display: panel owned by the cover
+    1793286731.249 inner display: shown=0
+    1793286731.395 inner display: hold off (cover redrawn) after 326 ms
+    1793286731.565 inner display: hold on (LCD rendered in 6 ms, window 0xada5e3200)
+    1793286731.607 inner display: panel owned by the inner display
+    1793286731.674 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286731.683 inner display: display 1 wants state 0
+    1793286731.894 inner display: hold off (inner display drawn) after 330 ms
+    1793286732.268 inner display: hold on (LCD rendered in 2 ms, window 0xada5e3200)
+    1793286732.459 inner display: display 1 wants state 1
+    1793286732.459 inner display: panel owned by the cover
+    1793286732.467 inner display: shown=0
+    1793286732.612 inner display: hold off (cover redrawn) after 343 ms
+    1793286732.675 inner display: hold on (LCD rendered in 4 ms, window 0xada5e3200)
+    1793286732.717 inner display: panel owned by the inner display
+    1793286732.780 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793286732.793 inner display: display 1 wants state 0
+    1793286732.941 inner display: hold off (inner display drawn) after 267 ms
+    1793286736.244 inner display: display 7 wants state 0
+    1793286736.244 inner display: shown=0
+    1793286738.129 inner display: display 7 wants state 1
+    1793286738.131 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+  holds on=9 off=9
+== s8: Safari on the inner display, idle past auto-lock, close while auto-locked
+  [idle] locked=true off=true 678x466
+  [closed] locked=true off=false 466x678
+    1793287075.911 inner display: display 7 wants state 0
+    1793287075.912 inner display: shown=0
+    1793287105.876 inner display: hold on (LCD rendered in 1 ms, window 0xada5e3200)
+    1793287106.108 inner display: display 1 wants state 1
+    1793287106.108 inner display: panel owned by the cover
+    1793287106.142 inner display: display 7 wants state 1
+    1793287106.261 inner display: hold off (cover redrawn) after 386 ms
+  holds on=1 off=1
+== s9: Home on the cover, idle past auto-lock, open while auto-locked
+  [idle] locked=true off=true 466x678
+  [opened] locked=true off=false 678x466
+  [unlocked] locked=false off=false 678x466
+    1793287410.800 inner display: display 1 wants state 0
+    1793287443.956 inner display: hold on (LCD rendered in 1 ms, window 0xada5e3200)
+    1793287444.022 inner display: panel owned by the inner display
+    1793287444.104 inner display: display 7 wants state 1
+    1793287444.111 inner display: shown=1 panel={466, 678} inner={951, 669} turned=1 scale={0.697, 0.713} fps=120 window 0xada5e3200 hidden=0
+    1793287444.154 inner display: hold off (inner display drawn) after 198 ms
+  holds on=1 off=1

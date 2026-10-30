@@ -1,0 +1,9 @@
+candidate 2026-10-30 09:50:26 vm=duo-m5-fold214
+  source: ec96e3df Plan v1.4: record F6 export/import on v1.6
+  vphone-vm cdhash: 39c2349e0a83c687f85a8f1e08cb0df5e8d9c9b9
+  display-choice: absent (fold)
+  crash reports before: 0
+boot 1: vphoned_ready=8s up=182s launchd_cpu=9s kernel_task=3s SB=37 BB=73 vphoned=115 unlock=ok guest_settings=com.apple.Preferences host_dock=com.apple.mobilesafari open=2034x1398 inner_shown=1 closed=1398x2034 holds=2/2 SB_after_fold=37 new_crashes: DockFolderViewService=1 duetexpertd=34 ExcUserFault_DockFolderViewService=1 geod=1 MercuryPosterExtension=1 NANDTaskScheduler=1 panic-full=1 ReportSystemMemory=21 searchd=3 Setup=6 SiriSearchFeedback=18 Spotlight=1 SpringBoard=1 stacks+com.apple.datamigrator=1 
+boot 2: vphoned_ready=9s up=184s launchd_cpu=8s kernel_task=3s SB=37 BB=73 vphoned=114 unlock=ok guest_settings=com.apple.Preferences host_dock=com.apple.mobilesafari open=2034x1398 inner_shown=1 closed=1398x2034 holds=2/2 SB_after_fold=37 new_crashes: duetexpertd=1 SiriSearchFeedback=1 
+done 09:57:51
+note: boot 1 'new_crashes' is the whole guest list (baseline empty: taken while the VM was stopped). Against cold1/crashes-5.txt the only new reports are duetexpertd and SiriSearchFeedback; the rest are 2026-10-27, inherited from duo-m5-p1. Script fixed to take the baseline at ready.

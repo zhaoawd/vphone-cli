@@ -6,16 +6,16 @@ worktrees or existing machines. Source directories are read-only inputs.
 
 - [x] Import `duo-m5-v1.4`, `duo-m5-v1.5`, and `duo-m5-v1.6` with their history.
 - [x] Create isolated branch/worktree `duo-integration-20261030` at `39324ee7`.
-- [ ] Record source inventory and decisions for every code change.
-- [ ] Build and test the unmodified upstream code baseline.
-- [ ] Integrate display configuration and its regression tests.
-- [ ] Integrate any required optional guest patches through the patch catalog.
+- [x] Record source inventory and decisions for every code change.
+- [x] Build and test the unmodified upstream code baseline (134 known fixture failures recorded).
+- [x] Integrate display configuration and its regression tests.
+- [x] Integrate the optional static-inner guest patch through the patch catalog, off in standard.
 - [ ] Compare upstream fold transitions with the local previous-frame hold;
       retain upstream fixes and establish whether a local adaptation is needed.
-- [ ] Preserve research, probes, and reusable regression scripts with provenance.
-- [ ] Reproduce sparse archive round-trip behavior using isolated test data.
+- [x] Preserve research, probes, historical scripts/results, and maintained regression scripts with provenance.
+- [x] Reproduce and repair sparse archive round-trip behavior using isolated test data; 103 archive tests pass.
 - [ ] Build the integrated bundle and run affected firmware-free tests.
-- [ ] Prepare VM A/B commands and isolated acceptance inputs.
+- [x] Prepare VM A/B commands and the isolated-library layout; actual copies await permission to stop the source VM.
 - [ ] Run authorized VM acceptance; distinguish historic evidence from new runs.
 - [ ] Review the final diff, record results and remaining approval gates.
 
@@ -36,6 +36,16 @@ Source `main`: `39324ee7fcbb1d909bfa293f6188a8ef752ba734` (2.14.1).
 Latest local Duo branch: `3f9a15624b438e132e81093ec8b5740cbe4facf8`.
 Source code worktrees were clean at inspection. The original `vphone-cli`
 worktree remains on its previous integration branch with its uncommitted files.
+
+Current checks: CoreKit 668 passed; patch catalogue 25 passed; ArchiveKit 103
+passed; FoldGuard seven passed; saved CLI display regression passed; RPC request
+contract five checks passed. Native device/simulator probe builds passed and
+the host CSSC probe returned six correct results. Full candidate bundle and
+firmware comparison are being finalized.
+
+Runtime gate: the original `duo-m5-fold214` is running. It has not been stopped
+or modified. Concrete approval scope and commands are in
+`Research/Integration/duo_m5_20261030/ACCEPTANCE.md`.
 
 Detailed evidence and change decisions:
 `Research/Integration/duo_m5_20261030/README.md`.

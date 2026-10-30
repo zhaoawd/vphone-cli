@@ -22,17 +22,17 @@ These counts describe path overlap, not confirmed merge conflicts.
 
 ## Integration decisions
 
-| Change | Source | Initial decision / verification needed |
+| Change | Source | Decision / verification needed |
 | --- | --- | --- |
 | M5 X1 compatibility and guest dual displays | Upstream and earlier local merges | Keep current upstream implementation; do not reintroduce older versions. |
-| Static outer/inner display selection and configuration persistence | 5899d882 | Port as an explicit option; test config, copy/export behavior, and guest patch requirements. |
+| Static outer/inner display selection and configuration persistence | 5899d882 | Ported with persistence/clone tests and a CLI regression; invalid options are checked before unrelated config writes. |
 | Experimental inner display node and host multi-display knobs | a103f424, 49116af3, 3b99165c | Preserve source history and reveal notes; evaluate separately from the default fold model. |
-| Experimental panel mounting and window-frame correction | c5629f5b, 78b79d0f | Compare with upstream window behavior before porting. |
+| Experimental panel mounting and window-frame correction | c5629f5b, 78b79d0f | Retained upstream orientation behavior; ported the independent frame restoration after toolbar installation. New window acceptance is pending. |
 | Experimental vphoned display-association injection | bf02a819 | Keep inactive unless a new reproduction establishes a requirement. |
 | SpringBoard touch diagnostics | b4680ceb and subsequent trace commits | Preserve diagnostic sources and evidence without enabling them by default. |
-| Optional inner cutout correction | b18c8f48, 9c8f2873 | Evaluate together with static-inner mode; catalog, gate, and test any retained patch. |
+| Optional inner cutout correction | b18c8f48, 9c8f2873 | Ported as a reversible, Duo-only, iOS 27.1 guest-library patch; off in standard, skipped while the fold library is installed. Catalog and resource paths tested; VM acceptance pending. |
 | Previous-frame hold across fold transitions | fb41cd6b | Upstream now changes panel ownership, rendering, and wake behavior. Establish an A/B reproduction before adopting a runtime change. |
-| Plans, probes, and regression scripts | source plan folder and run/fold214 | Preserve provenance; parameterize machine and bundle paths for new runs. |
+| Plans, probes, and regression scripts | source plan folder and run/fold214 | Eight historical plan documents plus 29 current historical scripts/small results preserved; 602 run files indexed by hash. Ten native probe inputs preserved; maintained builds and regressions use explicit/new paths. |
 
 The latest upstream already changes the same fold transition hooks used by the
 local hold, and changes how the inner display's own pages are composited.
@@ -86,4 +86,25 @@ source SHA, bundle hash, guest patch receipt, commands, and tested machine.
 
 - Imported the three source branches and created isolated worktree.
 - Read upstream `AGENTS.md` and `Skills/authoring-patch-sets/SKILL.md`.
-- Implementation and new build/runtime validation have not started.
+- Ported the display choices and the independent toolbar/frame correction.
+- Kept current upstream fold ownership/rendering/wake logic intact. The source
+  hold and earlier topology/touch experiments remain in imported history.
+- Built the upstream baseline and the first integrated bundle, including
+  bundle admission and signing. Final build validation is being recorded.
+- CoreKit: baseline 663 passed; retained display behavior 668 passed.
+- Patch catalogue: 25 passed, including opt-in/version gates and preset parity.
+- Firmware baseline: 779 tests, 134 fixture-related issues. All 128 failed
+  names match the historical v1.6 log; details are in
+  `baseline-firmware-failures.json`. Full candidate comparison is pending.
+- ArchiveKit: baseline 102 passed; repaired transfer regression and full suite
+  103 passed. See [sparse archive investigation](SPARSE_ARCHIVES.md).
+- FoldGuard: seven passed. CLI display regression and five RPC request
+  encoding checks passed. Device/simulator probe builds passed; the host CSSC
+  probe returned six correct results. No guest probe or simulator was run.
+- Historical scripts retain their original paths and behavior; they are
+  evidence, not maintained execution entrypoints. Maintained helpers are in
+  `Regression/` and `Probes/build.zsh`. Detailed F3/F4/F5/F6 harness adaptation
+  remains part of runtime acceptance.
+- No VM acceptance has run. The existing `duo-m5-fold214` is still running;
+  it has not been stopped or modified. See [the prepared approval scope and
+  commands](ACCEPTANCE.md).

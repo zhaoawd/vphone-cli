@@ -1,0 +1,161 @@
+{
+  "plan_version": "1.4",
+  "date_local": "2026-10-27",
+  "timezone": "Asia/Tokyo",
+  "generated_at_utc": "2026-10-27T06:45:25.815636+00:00",
+  "target": {
+    "host": "M5 Mac",
+    "product": "iPhone19,4",
+    "version": "27.1",
+    "build": "24A94425"
+  },
+  "baseline_document": {
+    "original_path": "/mnt/data/vphone2_M5_Duo_制作方案_v1.3_2026-10-25.md",
+    "path_note": "Path from the environment that generated v1.4; the file does not exist on the M5 Pro host. Hash kept as recorded, not re-verified.",
+    "exists_on_run_host": false,
+    "sha256": "ae96269b013d2a5572c8575e7c61929040458af6a6448da85d6adeeef24ee88e",
+    "read_via_files": true
+  },
+  "remote_head": "7d633c9ab373880bf00f6964a29964269e8eb53b",
+  "official_latest_release": {
+    "version": "2.13.8",
+    "published_utc": "2026-10-26T18:57:02Z",
+    "via": "gh release list"
+  },
+  "latest_indexed_candidate": "2.13.5",
+  "obtained_actual_checkout": true,
+  "obtained_complete_issue_751": true,
+  "sources": [
+    {
+      "id": "S1",
+      "type": "primary_documentation",
+      "publisher": "Apple",
+      "url": "https://developer.apple.com/documentation/security/preparing-your-app-to-work-with-pointer-authentication",
+      "observed": "Indexed official text includes arm64e.x1 PAuth_LR and M6-or-newer Mac support range.",
+      "limit": "Not a hardware probe or VM execution result."
+    },
+    {
+      "id": "S2",
+      "type": "primary_code_review",
+      "publisher": "LLVM",
+      "url": "https://github.com/llvm/llvm-project/pull/171187",
+      "observed": "M5 processor feature definition includes CSSC.",
+      "limit": "No local compiler or M5 execution test."
+    },
+    {
+      "id": "S3",
+      "type": "primary_author_document_mirror",
+      "origin": "https://github.com/Lakr233/vphone-cli/blob/main/Documents/Guides/iphone-models.md",
+      "read_channel": "https://upd.dev/Lakr233/vphone-cli/src/branch/main/Documents/Guides/iphone-models.md",
+      "observed": "Non-native X1 lowering described for recorded iPhone19,2 support.",
+      "limit": "Not real-time main, not Duo success proof."
+    },
+    {
+      "id": "S4",
+      "type": "primary_author_release_reproduced",
+      "origin": "https://github.com/Lakr233/vphone-cli/releases",
+      "read_channel": "https://reporadar.spreix.com/repos/Lakr233/vphone-cli",
+      "section": "Releases and announcements / 2.13.1",
+      "observed": "Sealed-image trustcache self-move fix and isolated macOS27 reproduction / Debug build evidence.",
+      "limit": "Surrounding AI summary and latest label were not adopted; complete release validation paragraph truncated."
+    },
+    {
+      "id": "S5",
+      "type": "primary_documentation",
+      "publisher": "Apple",
+      "url": "https://developer.apple.com/documentation/Apple-Silicon/improving-control-flow-integrity-with-pointer-authentication",
+      "observed": "Signing keys and address-dependent discriminators; relocation context is relevant to audit.",
+      "limit": "Does not diagnose issue751."
+    },
+    {
+      "id": "S6",
+      "type": "primary_upstream_documentation",
+      "url": "https://github.com/Lakr233/vphone-cli",
+      "observed": "Runtime, notarized GUI entry and same-series bundle setup; not interpreted as Duo test."
+    },
+    {
+      "id": "S7",
+      "type": "primary_upstream_documentation_snapshot",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/main/Documents/Guides/host-setup.md",
+      "observed": "Full bundle workspace and host preflight; commands need pinned-tree confirmation."
+    },
+    {
+      "id": "S8",
+      "type": "primary_upstream_documentation_snapshot",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/main/Documents/Guides/create-and-run.md",
+      "observed": "Manual pipeline / artifact and permission boundaries; not run."
+    },
+    {
+      "id": "S9",
+      "type": "inherited_primary_documentation_contract",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/main/Documents/Guides/launchpad-cli.md",
+      "observed": "Update/provenance rules inherited from v1.3; current help must be checked."
+    },
+    {
+      "id": "L1",
+      "type": "third_party_release_metadata_only",
+      "url": "https://git.hiwiki.org/en/repo/lakr233/vphone-cli",
+      "observed_version": "2.13.5",
+      "displayed_date": "2026-10-26",
+      "displayed_time_zone": null,
+      "official_latest_verified": false,
+      "limit": "Not used for installation instructions or technical implementation claims."
+    },
+    {
+      "id": "L2",
+      "type": "original_issue_title_reproduced_in_indexes",
+      "origin": "https://github.com/Lakr233/vphone-cli/issues/751",
+      "read_channels": [
+        "https://githubhelp.com/Lakr233/vphone-cli",
+        "https://www.goodfirstissue.org/Lakr233"
+      ],
+      "title": "iPhone Duo on a native-X1 host: two EXC_ARM_PAC_FAIL bugs (bootstrap lowering + libmisfix trampoline)",
+      "displayed_opened_date": "2026-10-25",
+      "indexed_state": "open",
+      "live_state": null,
+      "body_obtained": false,
+      "fix_commit": null,
+      "limit": "Does not identify target host as M5 or prove fix inclusion."
+    },
+    {
+      "id": "U1",
+      "type": "user_provided_historical_evidence",
+      "url": "https://ipsw.me/download/iPhone19,4/24A94425/",
+      "observed": "Filename/build/hash retained from earlier user screenshots.",
+      "downloaded_this_turn": false
+    },
+    {
+      "id": "G1",
+      "type": "live_upstream",
+      "url": "https://github.com/Lakr233/vphone-cli/releases",
+      "observed": "2.13.8 Latest (2026-10-26T18:57:02Z); local main 7d633c9a = tag 2.13.8."
+    },
+    {
+      "id": "G2",
+      "type": "live_upstream_pr",
+      "url": "https://github.com/Lakr233/vphone-cli/pull/728",
+      "observed": "Draft, head b03f0b82: whole X1 shared-cache lowering, VirtualAudio fix, foldable devicetree subtype.",
+      "limit": "Unmerged; built locally after diff review."
+    },
+    {
+      "id": "G3",
+      "type": "live_upstream_issue",
+      "url": "https://github.com/Lakr233/vphone-cli/issues/751",
+      "observed": "Open; both PAC bugs need a native-X1 host; masked on M5 because vp_probe_native_x1 is false."
+    },
+    {
+      "id": "R1",
+      "type": "local_runtime_evidence",
+      "path": "~/vphone-duo-m5/",
+      "observed": "Build, restore, cfw, boot, P2 sampling and P3 install logs, screenshots, crash reports."
+    }
+  ],
+  "executed_mac_build": true,
+  "executed_restore": true,
+  "executed_guest_boot": true,
+  "executed_guest_probe": "partial: vphoned RPC sampling and app installs; no CSSC instruction probe",
+  "old_tools_modified": false,
+  "scope": "Document revision and evidence assessment, plus the 2026-10-27 M5 Pro runtime addendum (P1-P3). No firmware patch implemented in this repo.",
+  "run_addendum_at_utc": "2026-10-27T15:15:15Z",
+  "latest_indexed_candidate_superseded": true
+}

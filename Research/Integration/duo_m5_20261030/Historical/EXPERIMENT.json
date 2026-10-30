@@ -1,0 +1,221 @@
+{
+  "schema_note": "Project evidence template, not an upstream API. null = not obtained / not tested.",
+  "run_id": "m5pro-duo-2026-10-27",
+  "source_sha": "7d633c9ab373880bf00f6964a29964269e8eb53b",
+  "core_bundle_version": "2.13.8 (local Debug build)",
+  "core_bundle_sha256": null,
+  "core_bundle_vphone_vm_cdhash": "531517b08e0039222a08518e7553925a09473f3c",
+  "experimental_bundle": {
+    "source": "Lakr233/vphone-cli PR #728 (draft, unmerged)",
+    "head_sha": "b03f0b82",
+    "base_version": "2.13.7",
+    "vphone_vm_cdhash": "775ec296e97084bc97c97bc52793761da47b481c",
+    "contains_2_13_8_changes": "yes: #761 (AKS unlock bag) and #762 (BTVC) are ancestors of b03f0b82; only the 2.13.8 version-bump commits are missing"
+  },
+  "launchpad_version": null,
+  "helper_version": null,
+  "xcode": "27.1 (27A9269)",
+  "host": {
+    "chip": "M5 Pro",
+    "macos_build": "27.0.1 (26A434)",
+    "cssc_reported": true,
+    "cssc_execution": "native: ABS/CNT/CTZ/SMAX/UMIN correct, 0.51–0.98 ns per op vs ADD 0.50 ns (2026-10-28, ~/vphone-duo-m5/run/evidence-probe/host-cssc-probe.json)",
+    "feature_sysctl": {
+      "FEAT_CSSC": 1,
+      "FEAT_PAuth2": 1,
+      "FEAT_FPAC": 1,
+      "FEAT_CPA": 0,
+      "FEAT_PAuth_LR": 0
+    },
+    "native_x1_execution": false,
+    "x1_policy_target": "non_native_lowering"
+  },
+  "inputs": {
+    "iphone_ipsw": "iPhone19,4_27.1_24A94425_Restore.ipsw",
+    "iphone_ipsw_bytes": 12724731538,
+    "iphone_ipsw_sha256": "58fbfda85615e90221136d55288f64c9f41386510f8cd77feb8c9d20cc0a782e",
+    "cloudos_build": "23E5207q",
+    "preset": "standard",
+    "vm": "8 CPU / 8 GiB / 64 GB, OpenAVB + OpenSEP, no template, no service profile"
+  },
+  "guest": {
+    "product": "iPhone19,4",
+    "build": "24A94425",
+    "cssc_execution": "native: same probe in a native arm64 UIKit app, all correct, 0.53–1.05 ns per op vs ADD 0.54 ns; kernel-boot-cssc_emulation installed but not entered (a trap would cost microseconds)",
+    "x1_effective_policy": {
+      "stock_2.13.8": "bootstrap lowered ahead of time (launchd, dyld, fsck, mount, 38 cache images / 228,314 rewrites); rest of shared cache via kernel on-demand handler",
+      "pr728": "whole X1 shared cache lowered ahead of time (+4,508 images / 24,606,071 rewrites, 250,449 unvisited candidates still on-demand)"
+    },
+    "kernel_route": "A",
+    "pcc_build": "23E5207q"
+  },
+  "artifact_policy": [
+    "duo-m5-p1: control, stock 2.13.8",
+    "duo-m5-728: APFS clone of duo-m5-p1, then cfw update-environment with PR #728 bundle"
+  ],
+  "packaging": {
+    "seal": "pass",
+    "trustcache": "pass (RestoreTrustCache cdhash 3ee3cd0f… -> 4f9541a0…)",
+    "manifest": "pass",
+    "same_path_fix_reviewed": "not hit on 2.13.8"
+  },
+  "upstream_issue_751": {
+    "full_body_reviewed": true,
+    "applicable_to_this_run": false,
+    "evidence": [
+      "Bugs require a native-X1 host; vp_probe_native_x1 is false on M5, lowering proceeds",
+      "No EXC_ARM_PAC_FAIL on either VM",
+      "installd unchanged pid, no crash for 5 min after an installd (ideviceinstaller) install",
+      "Blocking bootstrap lowering is not viable on M5: unlowered system -> launchd SIGILL panic (panic-full-2026-10-27-173630)"
+    ],
+    "fix_commit": null,
+    "live_state_2026_10_27": "open"
+  },
+  "runtime": {
+    "restore": "pass",
+    "cfw": "pass except 4 VirtualAudio patches on stock 2.13.8 (fixed by PR #728)",
+    "init_dyld": "pass",
+    "gui": "pass (Setup Assistant, Home, Settings)",
+    "vphoned": "pass",
+    "critical_service_observation": {
+      "stock_2.13.8": "fail: launchd 874 s CPU at 2,063 s uptime and rising; scene-create/update watchdogs; widgets blank",
+      "pr728": "pass: launchd 11 s CPU at 1,218 s uptime, flat; no watchdogs over 20 min idle"
+    },
+    "known_crash_loops": [
+      "duetexpertd: Failed to initialize datavault for DuetExpertCenterAsset (known on all iOS 27 guests; trimmed service profile turns it off)"
+    ],
+    "pac_failure_evidence": [],
+    "I0_install": "pass: KFC Prod 6.36.0, install 1 s, launch <1 s (vphoned signer refuses IPAs with armv7 slices)",
+    "I1_install": "pass: KFC Knight 9.1.1 install 6 s; food_ordering ad hoc + application-identifier",
+    "app_food_ordering": "pass after adopting UIScene lifecycle (iOS 27 SDK traps without it)",
+    "cold_boots_passed": "10/10 headless (vphoned 6–10 s, launchd 9–11 s CPU at 180 s; boot 8 slower under host xcodebuild load)",
+    "host_reboot_boot": "pass (2026-10-28): after host restart AMFI refused vphone-vm until vphone-escalator allow was rerun (allowlist is amfid memory); then vphoned 8 s, launchd 10 s CPU at 68 s, Home drawn, 3 user apps",
+    "network": "pass: SSE idle 600 s on one connection, event + ack; link down/up via vm network, address back in 3 s, DNS ok",
+    "rotation": "pass: Safari 90/270/0 applied; portrait-only apps refuse; Home stays portrait",
+    "snapshot_export": "pass: pre-t6 revert boots; export 65 s / 15 GB zstd, import 31 s, imported copy boots with same apps",
+    "audio_playback": "WebKit WAV ×3 and RingtonePreview ×3 played to completion, audiomxd stable, no crashes; audible on the host speakers (user confirmed 2026-10-28)",
+    "folding_behavior": "2026-10-29 (duo-m5-fold728, branch duo-m5-v1.5): PR #728 two logical displays on one PG output; Main = cover (CADisplay LCD, id 1), inner = software display VPhone Duo Inner (id 7); display.posture opens and closes in the same session, SpringBoard pid unchanged, no lock on fold. Earlier single-display result (2026-10-28): posture accepted, no layout change.",
+    "known_issues": [
+      "display.auto_lock Never not applied: EffectiveUserSettings stays 120 s (UserSettings value 0, rangeMinimum 120)"
+    ],
+    "probe_app": "pass: native arm64 Objective-C UIKit app (UIScene), ad hoc + application-identifier, installed via installd, launches full screen, no crash",
+    "phase1_baseline_snapshot": "duo-m5-728 snapshot phase1-baseline (2026-10-28 08:20), after T0–T6, before Probe install"
+  },
+  "evidence_paths": {
+    "evidence": "~/vphone-duo-m5/evidence/",
+    "logs": "~/vphone-duo-m5/run/",
+    "summaries": [
+      "~/vphone-duo-m5/run/P2-summary.md",
+      "~/vphone-duo-m5/run/P3-summary.md"
+    ]
+  },
+  "no_success_claim_without_runtime_evidence": true,
+  "upstream_version_diff_2_13_2_to_2_13_8": "PLAN §13.6: relevant to this image are #752 CSSC kernel fallback (installed, not entered on M5), #761 AKS unlock bag and #762 BTVC (both applied); the rest is iPhone17,3, tvOS, or terminal-only",
+  "upstream_reports": [
+    "Lakr233/vphone-cli#728 comment 6456703776 (M5 Pro A/B + T6)",
+    "Lakr233/vphone-cli#766 (signer rejects armv7 slices)"
+  ],
+  "phase2_logical_dual_display": {
+    "branch": "duo-m5-v1.5 (local, not pushed)",
+    "merge_commit": "297add30",
+    "pr_728_head": "3da02943",
+    "fix_commit": "fb41cd6b",
+    "vphone_vm_cdhash": "2fb0bec7d0a5c90ded8ef49a4d8ba7515c691556",
+    "vm": "duo-m5-fold728 (APFS clone of duo-m5-p1, --new-identity, cfw update-environment with the v1.5 bundle)",
+    "rules": {
+      "boot_size": "fold at 2007x2853@460 unless vm config --display outer|inner wrote display-choice",
+      "inner_ppi": 460,
+      "cutout_vs_fold_display": "SystemHook loads inner-cutout-fix only without libvphonefolddisplay.dylib"
+    },
+    "tests": {
+      "VPhoneCoreKitTests": "663/663",
+      "vphoned_logic": "394 checks, 0 failures",
+      "FoldGuard": "7/7",
+      "FirmwarePatcherTests": "134 issues, all missing reference firmware fixtures"
+    },
+    "F0_display_model": "pass",
+    "F1_same_session_fold": "smoke pass (100+ posture changes, SpringBoard pid constant)",
+    "F2_app_continuity": "partial: food_ordering keeps typed input and its process across folds; cart and navigation not tested (account or verification build needed)",
+    "F3_touch_rotation": "partial: Home rotation refusals as stock iPhone; full touch regression not done",
+    "F4_lock_power": "partial: fold does not lock (4 scenarios); auto-lock and sleep not done",
+    "F5_output": {
+      "before_fix": "23 of 25 fold transitions with fully black frames (open 100-433 ms, close 33-133 ms)",
+      "after_fix": "0 dark frames on 26 transitions; holds 260-420 ms, 0.9-1.4 s with Safari in front",
+      "remaining": "black launch cards for Settings/Photos on the inner display (pre-existing, not fold)"
+    },
+    "F6_stability": null,
+    "evidence": "~/vphone-duo-m5/run/fold728/ (f0, lock, lock-boot, f5/run1-run4, f5-*.sh, redeploy.sh)",
+    "F2_keyboard_blank": {
+      "trigger": "food_ordering (React Native/Expo) + UIRequiresFullScreen=false + focused text field while the fold closes",
+      "effect": "cover blank or only the top ~669 pt drawn, AX empty, touches lost, for the life of the process",
+      "passes": [
+        "UIRequiresFullScreen=true re-sign",
+        "keyboard dismissed before closing",
+        "Settings search field",
+        "native KBProbe with UIRequiresFullScreen=false"
+      ],
+      "workaround": "ios.requireFullScreen true, or end editing before the fold closes",
+      "simulator_check": "pending: simulator build installed on the iPhone Duo simulator, fold needs Device Hub by hand",
+      "notes": "~/vphone-duo-m5/run/fold728/f2/F2-notes.md"
+    },
+    "v1_6_main_2_14_0": {
+      "branch": "duo-m5-v1.6",
+      "merge_commit": "a1ec2f75",
+      "upstream_main": "2a8ee8b0 (2.14.0)",
+      "bundle": ".build/fold214/Build/Products/Debug/VPhone.bundle",
+      "vphone_vm_cdhash": "39c2349e0a83c687f85a8f1e08cb0df5e8d9c9b9",
+      "vm": "duo-m5-fold214",
+      "boot_screen": "1398x2034@460 (cover)",
+      "f0": "pass",
+      "f5_run1": {
+        "fold_transitions": 26,
+        "handover_black_frames": 0,
+        "other_dark": "Safari cover launch card, 14 frames"
+      },
+      "f2_focused_close": {
+        "hardware_keyboard": "3/3 normal",
+        "software_keyboard": "3/3 normal",
+        "touch_after_close": "reaches app"
+      },
+      "evidence": "~/vphone-duo-m5/run/fold214/",
+      "f4_run1": {
+        "dark_fold_wakes_to_lock_screen": "s1/s2 pass",
+        "tap_to_wake": "s3/s4 pass",
+        "power_inside_hold": "s5/s6 lock screen shown, no stale frame; screen relights ~250 ms later, stays locked",
+        "rapid_fold_while_dark": "s7 holds 9/9 released",
+        "auto_lock_300s_then_fold": "s8/s9 pass",
+        "script": "run/fold214/f4.sh"
+      },
+      "f3": {
+        "touch_mapping": "closed and open-flat x portrait/landscape-left/landscape-right/upside-down, 10/10 each, both paths agree",
+        "open_scale": "panel pt -> inner pt 1.435 x 1.403 (swapped in landscape), residual <= 0.4 pt",
+        "home_swipe_host": "pass both displays",
+        "vphoned_edge_touch": "cover 3/3, inner 0/3",
+        "vphoned_swipe_no_edge_flags": "cover 0/6, inner pass",
+        "dock": "both displays respond via both paths",
+        "rotation_needs_open_flat": "hinge open(4) refuses display.rotation; open-flat(3) rotates 0/90/180/270",
+        "script": "run/fold214/f3.sh"
+      },
+      "f6_partial": {
+        "cold_boots": "cold1 5/5: vphoned ready 8-9 s; at 180 s launchd 8 s, kernel_task 3 s CPU; unlock, vphoned Settings tap, host Dock tap pass; open 2034x1398 inner shown, closed 1398x2034, holds 2/2; SpringBoard pid stable",
+        "cold_boot_new_crashes": "duetexpertd 0-2, SiriSearchFeedback 0-1 per boot; no SpringBoard/backboardd",
+        "locked_idle_120min": "13 samples: SpringBoard/backboardd/vphoned pids unchanged; launchd 0.12%, kernel_task 0.43% CPU; memorystatus_level 58->53, pressure level 1; no crashes after the first 10 min",
+        "after_idle": "open while locked shows inner lock screen; unlock ok; vphoned and host taps reach Settings and Safari; SpringBoard pid unchanged",
+        "springboard_crash_in_list": "SpringBoard-2026-10-27-174016.ips predates the VM, inherited from duo-m5-p1",
+        "not_done": "import (export drops Disk.img sparseness)",
+        "scripts": [
+          "run/fold214/f6-coldboot.sh",
+          "run/fold214/f6-idle.sh"
+        ],
+        "export_import": {
+          "export": "vm export --max: 912 s, 13.7 GB .txz, ok",
+          "import": "not completed: aborted three times by a free-space guard",
+          "cause": "archive has no sparse map for Disk.img (64 GB logical, 27.7 GB allocated); import writes it fully allocated (37.4 GB written = 37.4 GB allocated at abort)",
+          "root_cause": "not investigated (VPhoneArchiveWriter read-disk setup or libarchive hole detection on APFS)",
+          "space_freed": "deleted duo-m5-728, duo-m5-dd and stale build caches at user request; archive deleted"
+        },
+        "host_restart": "2026-10-30 09:42 restart + escalator allow: 2/2 cold boots pass, same as cold1; new crashes only duetexpertd, SiriSearchFeedback (boot 1 list was the whole history, baseline taken while stopped; script fixed)"
+      }
+    }
+  }
+}
