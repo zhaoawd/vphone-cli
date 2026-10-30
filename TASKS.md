@@ -12,8 +12,9 @@ modification is authorized.
 - [x] Build and test the unmodified upstream code baseline (134 known fixture failures recorded).
 - [x] Integrate display configuration and its regression tests.
 - [x] Integrate the optional static-inner guest patch through the patch catalog, off in standard.
-- [ ] Compare upstream fold transitions with the local previous-frame hold;
-      retain upstream fixes and establish whether a local adaptation is needed.
+- [x] Compare upstream fold transitions with the local previous-frame hold;
+      upstream still shows 1–12 black hand-over frames. User decision
+      (2026-10-30): do not adapt `fb41cd6b`; keep upstream behaviour.
 - [x] Preserve research, probes, historical scripts/results, and maintained regression scripts with provenance.
 - [x] Reproduce and repair sparse archive round-trip behavior using isolated test data; 103 archive tests pass.
 - [x] Build the integrated bundle and run affected firmware-free tests; existing firmware-fixture failures match baseline.
@@ -23,6 +24,7 @@ modification is authorized.
       preserve new diagnostic reports and remaining windowed/transfer checks.
 - [x] Triage new diagnostic reports against baseline, source history and repeats.
 - [x] Windowed A/B: F3 touch and edge gestures, F5 transition frames, F4 power during close (`WINDOWED.md`).
+- [x] Windowed A/B: keyboard modes across folds and window frame restore (`WINDOWED.md`).
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
 
 ## Constraints and approval gates
@@ -92,10 +94,12 @@ Windowed A/B (`WINDOWED.md`): F3 tap tables are identical between builds
 (80/80; inner scale 1.435/1.404, residual ≤ 0.17 pt); edge gestures match
 (host and `edge: 2` 3/3 on both displays). F5: both builds show 1–12 fully
 black hand-over frames (72 vs 66 total), so the `fb41cd6b` gap persists
-upstream; adapting the hold is a pending user decision. F4: 10/10 power-during-
-close trials end on the lock screen without cover Safari frames. Next steps
-are keyboard modes and window restore, full transfer and imported boot, then
-longer idle/cold-boot checks. Static-inner on/off requires separately
+upstream; the user chose not to adapt the hold. F4: 10/10 power-during-
+close trials end on the lock screen without cover Safari frames. Keyboard
+modes: 8/8 focus/text continuity in hardware and software modes on both
+builds; window restore: baseline loses ~32 pt per relaunch, candidate stable.
+Next steps are full transfer and imported boot, then longer idle/cold-boot
+checks. Static-inner on/off requires separately
 prepared root actions. See `RUNTIME.md` and `runtime-validation.json`.
 
 Detailed evidence and change decisions:
