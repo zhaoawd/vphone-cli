@@ -67,18 +67,24 @@ public struct VPhoneArchiveExtractOptions: Sendable {
     /// Restore ACLs and BSD file flags as well as mode bits.
     public var extendedMetadata: Bool
 
+    /// Recreate zero-filled blocks as holes even when the archive has no
+    /// sparse map. Host VM imports need this for existing GNU tar exports.
+    public var sparseFiles: Bool
+
     public init(
         ownership: VPhoneArchiveOwnership,
         exactPermissions: Bool = false,
         noOverwriteDir: Bool = false,
         macMetadata: Bool = false,
         extendedMetadata: Bool = false,
+        sparseFiles: Bool = false,
     ) {
         self.ownership = ownership
         self.exactPermissions = exactPermissions
         self.noOverwriteDir = noOverwriteDir
         self.macMetadata = macMetadata
         self.extendedMetadata = extendedMetadata
+        self.sparseFiles = sparseFiles
     }
 
     /// Unpacking onto a mounted guest volume, as root.
@@ -107,7 +113,7 @@ public struct VPhoneArchiveExtractOptions: Sendable {
     /// home directory. So `exactPermissions` stays off, the process umask
     /// applies, and setuid/setgid/sticky are dropped.
     ///
-    /// This is exactly what `/usr/bin/tar -xf` (no `-p`) gave, which is what
+    /// These permissions match `/usr/bin/tar -xf` (no `-p`), which is what
     /// `vm import` used to shell out to. It is a deliberate contract, not a
     /// default nobody looked at: `hostPresetNeverRestoresSetuid` fails if the
     /// flag ever comes back.
@@ -117,6 +123,7 @@ public struct VPhoneArchiveExtractOptions: Sendable {
         noOverwriteDir: false,
         macMetadata: false,
         extendedMetadata: false,
+        sparseFiles: true,
     )
 
     /// The libarchive `archive_write_disk` flags for these options.
@@ -145,6 +152,10 @@ public struct VPhoneArchiveExtractOptions: Sendable {
         var flags = ARCHIVE_EXTRACT_SECURE_SYMLINKS
             | ARCHIVE_EXTRACT_SECURE_NODOTDOT
             | ARCHIVE_EXTRACT_TIME
+
+        if sparseFiles {
+            flags |= ARCHIVE_EXTRACT_SPARSE
+        }
 
         // ARCHIVE_EXTRACT_PERM is `tar -p`, and it is a decision, not a
         // fidelity dial. With it, archive_write_disk restores the stored mode

@@ -58,6 +58,72 @@ struct BundleTransferTests {
 
     // MARK: - Round trip
 
+    @Test(arguments: [VPhoneBundleTransfer.ExportCompression.fast, .max], [false, true])
+    func `export and import keep a sparse VM disk sparse`(
+        compression: VPhoneBundleTransfer.ExportCompression, endsWithData: Bool,
+    ) throws {
+        let root = try makeRoot()
+        let importedRoot = try makeRoot()
+        defer {
+            try? FileManager.default.removeItem(at: root)
+            try? FileManager.default.removeItem(at: importedRoot)
+        }
+        let library = VPhoneLibrary(root: root)
+        let bundle = try makeBundle("sparse", in: library)
+        let disk = bundle.url.appendingPathComponent("Disk.img")
+        let marker = Data(repeating: 0xA5, count: 4096)
+        try marker.write(to: disk)
+        let file = try FileHandle(forWritingTo: disk)
+        try file.seek(toOffset: 8 * 1024 * 1024)
+        try file.write(contentsOf: marker)
+        try file.truncate(atOffset: 16 * 1024 * 1024)
+        if endsWithData {
+            try file.seek(toOffset: 16 * 1024 * 1024 - UInt64(marker.count))
+            try file.write(contentsOf: marker)
+        }
+        // Extending a file can allocate zero-filled blocks on this host.
+        // Punch aligned holes explicitly, as disk rebase does, so the
+        // precondition measures an actual sparse input rather than zeros.
+        let halfSize: Int64 = 8 * 1024 * 1024
+        let tailReservation: Int64 = endsWithData ? 16_384 : 0
+        let holes: [(Int64, Int64)] = [
+            (16_384, halfSize - 16_384),
+            (halfSize + 16_384, halfSize - 16_384 - tailReservation),
+        ]
+        for (start, length) in holes {
+            var hole = fpunchhole_t()
+            hole.fp_offset = off_t(start)
+            hole.fp_length = off_t(length)
+            try #require(fcntl(file.fileDescriptor, F_PUNCHHOLE, &hole) == 0)
+        }
+        try file.close()
+        try FileManager.default.setAttributes(
+            [.modificationDate: Date(timeIntervalSince1970: 1_700_000_000)], ofItemAtPath: disk.path,
+        )
+        var before = stat()
+        #expect(lstat(disk.path, &before) == 0)
+        try #require(Int64(before.st_blocks) * 512 < before.st_size / 4)
+
+        let archive = root.appendingPathComponent("sparse.\(compression.fileExtension)")
+        try VPhoneBundleTransfer.export(
+            bundleNamed: "sparse", to: archive, includeIPSW: false, compression: compression, in: library,
+        )
+        let imported = try VPhoneBundleTransfer.importArchive(
+            from: archive, name: "copy", in: VPhoneLibrary(root: importedRoot),
+        )
+        let restored = imported.url.appendingPathComponent("Disk.img")
+        var after = stat()
+        #expect(lstat(restored.path, &after) == 0)
+        #expect(after.st_size == before.st_size)
+        #expect(after.st_mtimespec.tv_sec == before.st_mtimespec.tv_sec)
+        #expect(after.st_mtimespec.tv_nsec == before.st_mtimespec.tv_nsec)
+        print("Sparse transfer \(compression), tail data=\(endsWithData): logical=\(before.st_size), source=\(before.st_blocks * 512), restored=\(after.st_blocks * 512) bytes")
+        #expect(try Data(contentsOf: restored) == Data(contentsOf: disk))
+        // Compare against the logical size, allowing filesystem allocation
+        // granularity to differ while detecting a fully materialized disk.
+        #expect(Int64(after.st_blocks) * 512 < before.st_size / 4)
+    }
+
     @Test func `export then import round trips`() throws {
         let root = try makeRoot()
         defer { try? FileManager.default.removeItem(at: root) }
