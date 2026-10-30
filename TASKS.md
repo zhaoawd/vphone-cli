@@ -100,9 +100,11 @@ upstream; the user chose not to adapt the hold. F4: 10/10 power-during-
 close trials end on the lock screen without cover Safari frames. Keyboard
 modes: 8/8 focus/text continuity in hardware and software modes on both
 builds; window restore: baseline loses ~32 pt per relaunch, candidate stable.
-Next steps are full transfer and imported boot, then longer idle/cold-boot
-checks. Static-inner on/off requires separately
-prepared root actions. See `RUNTIME.md` and `runtime-validation.json`.
+F6 (`F6.md`): 5/5 cold boots, sparse 64 GB transfer (28.6 GB imported)
+with 2/2 imported boots, snapshot round trip, and a 120-minute locked idle
+with stable PIDs and no new reports. Next is the user-run
+`Regression/display-matrix.zsh` (static displays and cutout on/off/on).
+See `RUNTIME.md`, `WINDOWED.md`, `F6.md` and `runtime-validation.json`.
 
 Detailed evidence and change decisions:
 `Research/Integration/duo_m5_20261030/README.md`.
