@@ -609,7 +609,9 @@ PR #728 head `b03f0b82` 已包含 #761 和 #762，与 2.13.8 只差版本号提�
 
 此前 `logs.crashes` 中的 SpringBoard 报告（`SpringBoard-2026-10-27-174016.ips`）早于 `duo-m5-fold214` 创建，是从 `duo-m5-p1` 克隆带来的，不计入 v1.6。
 
-未做原因分析：v1.6 与 v1.5 的差异主要是外屏以原生尺寸开机（v1.5 外屏是在内屏尺寸面板上裁出），推测 v1.5 的 “cover-size reduction” 路径与此有关，未验证。记录：`~/vphone-duo-m5/run/fold214/`（`f0/`、`f5/run1/`、`kb/`）。仍未做：F2 购物车与导航、F6 宿主重启与导出导入；模拟器对照的意义降低，可作为可选。
+**F6 导出导入（`run/fold214/f6/export`）。** 为腾空间删除了 `duo-m5-728`、`duo-m5-dd`（含其快照）及旧构建缓存。`vm export duo-m5-fold214 --max`：912 s，归档 13.7 GB（.txz），成功。`vm import` 三次均在剩余空间低于阈值时由守护中止，未完成。原因：归档中 `Disk.img` 没有稀疏记录（pax／GNU sparse 头不存在），导出时空洞被当作零数据打包；原机 `Disk.img` 逻辑 64 GB、实占 27.7 GB，导入已解压的 37.4 GB 全部实占，完整导入需写满 64 GB。即导出→导入会让 VM 磁盘占用从 27.7 GB 胀到 64 GB；`VPhoneTreeFingerprint` 把稀疏占用列为应保持的差异，说明这不是预期行为。原因在 `VPhoneArchiveWriter` 读盘设置还是 libarchive 在 APFS 上的空洞识别，未查。v1.5 期 `duo-m5-728` 导入成功只因当时空间足够，未检查占用。归档已删除。
+
+未做原因分析：v1.6 与 v1.5 的差异主要是外屏以原生尺寸开机（v1.5 外屏是在内屏尺寸面板上裁出），推测 v1.5 的 “cover-size reduction” 路径与此有关，未验证。记录：`~/vphone-duo-m5/run/fold214/`（`f0/`、`f5/run1/`、`kb/`）。仍未做：F2 购物车与导航、F6 宿主重启；模拟器对照的意义降低，可作为可选。
 
 ## 来源与读取渠道
 

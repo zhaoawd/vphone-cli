@@ -202,11 +202,18 @@
         "locked_idle_120min": "13 samples: SpringBoard/backboardd/vphoned pids unchanged; launchd 0.12%, kernel_task 0.43% CPU; memorystatus_level 58->53, pressure level 1; no crashes after the first 10 min",
         "after_idle": "open while locked shows inner lock screen; unlock ok; vphoned and host taps reach Settings and Safari; SpringBoard pid unchanged",
         "springboard_crash_in_list": "SpringBoard-2026-10-27-174016.ips predates the VM, inherited from duo-m5-p1",
-        "not_done": "host restart, export/import (29 GiB free)",
+        "not_done": "host restart",
         "scripts": [
           "run/fold214/f6-coldboot.sh",
           "run/fold214/f6-idle.sh"
-        ]
+        ],
+        "export_import": {
+          "export": "vm export --max: 912 s, 13.7 GB .txz, ok",
+          "import": "not completed: aborted three times by a free-space guard",
+          "cause": "archive has no sparse map for Disk.img (64 GB logical, 27.7 GB allocated); import writes it fully allocated (37.4 GB written = 37.4 GB allocated at abort)",
+          "root_cause": "not investigated (VPhoneArchiveWriter read-disk setup or libarchive hole detection on APFS)",
+          "space_freed": "deleted duo-m5-728, duo-m5-dd and stale build caches at user request; archive deleted"
+        }
       }
     }
   }
