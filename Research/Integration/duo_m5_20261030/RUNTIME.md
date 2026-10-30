@@ -104,8 +104,12 @@ October 27 panic. Comparisons use before/after report names, rather than
 treating every listed report as new. New SiriSearchFeedback reports occurred
 on the baseline. Candidate smoke also added SiriSearchFeedback and
 ReportSystemMemory reports; its probe run added ReportSystemMemory and
-ExcUserFault_lsd reports. Their causes are not established by these runs;
-they prevent a claim of an entirely crash-free guest. No claim of application
+ExcUserFault_lsd reports. Triage in [DIAGNOSTICS.md](DIAGNOSTICS.md) found
+none attributable to the candidate: SiriSearchFeedback is a parsecd session
+log; the ReportSystemMemory crash has one signature on both builds and on the
+source VM since Oct 27, near boot; the lsd fault is a simulated iconservices
+fault that two candidate repeats did not reproduce. The recurring reporter
+crash still prevents a claim of an entirely crash-free guest. No claim of application
 stability outside the measured SpringBoard/backboardd PID checks is made.
 
 Baseline and candidate app-owned scene/window/screen geometry and focused-field

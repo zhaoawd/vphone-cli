@@ -21,6 +21,7 @@ modification is authorized.
 - [ ] Run authorized VM acceptance; distinguish historic evidence from new runs.
 - [x] Complete isolated baseline/candidate headless smoke and native probe checks;
       preserve new diagnostic reports and remaining windowed/transfer checks.
+- [x] Triage new diagnostic reports against baseline, source history and repeats.
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
 
 ## Constraints and approval gates
@@ -79,11 +80,12 @@ original worktree status digest still matches the recorded digest. Transport
 and RPC contract checks each passed five cases. No product binary changed
 after build `a71f2360`.
 
-Runtime remains partial: new SiriSearchFeedback reports occurred on the
-baseline; candidate runs also added ReportSystemMemory and ExcUserFault_lsd
-reports. Their causes are uninvestigated; raw report lists and retained clone
-disks are the checked evidence locations. Next steps are diagnostic triage,
-windowed touch/frame/keyboard validation, full transfer and imported boot,
+Diagnostic triage (`DIAGNOSTICS.md`): SiriSearchFeedback is a session log;
+ReportSystemMemory's libdispatch `KERN_DENIED` crash recurs near boot on both
+builds and on the source VM since Oct 27; the one ExcUserFault_lsd is a
+non-fatal iconservices fault not reproduced in two candidate repeats. None is
+attributed to the candidate. Rotation is refused about 30 s after boot on the
+baseline too; runners must wait for a settled boot. Next steps are windowed touch/frame/keyboard validation, full transfer and imported boot,
 then longer idle/cold-boot checks. Static-inner on/off requires separately
 prepared root actions. See `RUNTIME.md` and `runtime-validation.json`.
 
