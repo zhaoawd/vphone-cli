@@ -22,6 +22,7 @@ modification is authorized.
 - [x] Complete isolated baseline/candidate headless smoke and native probe checks;
       preserve new diagnostic reports and remaining windowed/transfer checks.
 - [x] Triage new diagnostic reports against baseline, source history and repeats.
+- [x] Windowed A/B: F3 touch and edge gestures, F5 transition frames, F4 power during close (`WINDOWED.md`).
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
 
 ## Constraints and approval gates
@@ -85,8 +86,16 @@ ReportSystemMemory's libdispatch `KERN_DENIED` crash recurs near boot on both
 builds and on the source VM since Oct 27; the one ExcUserFault_lsd is a
 non-fatal iconservices fault not reproduced in two candidate repeats. None is
 attributed to the candidate. Rotation is refused about 30 s after boot on the
-baseline too; runners must wait for a settled boot. Next steps are windowed touch/frame/keyboard validation, full transfer and imported boot,
-then longer idle/cold-boot checks. Static-inner on/off requires separately
+baseline too; runners must wait for a settled boot.
+
+Windowed A/B (`WINDOWED.md`): F3 tap tables are identical between builds
+(80/80; inner scale 1.435/1.404, residual ≤ 0.17 pt); edge gestures match
+(host and `edge: 2` 3/3 on both displays). F5: both builds show 1–12 fully
+black hand-over frames (72 vs 66 total), so the `fb41cd6b` gap persists
+upstream; adapting the hold is a pending user decision. F4: 10/10 power-during-
+close trials end on the lock screen without cover Safari frames. Next steps
+are keyboard modes and window restore, full transfer and imported boot, then
+longer idle/cold-boot checks. Static-inner on/off requires separately
 prepared root actions. See `RUNTIME.md` and `runtime-validation.json`.
 
 Detailed evidence and change decisions:

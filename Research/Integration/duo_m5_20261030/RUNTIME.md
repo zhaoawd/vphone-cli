@@ -121,8 +121,8 @@ not compare diagnostic-report rates or establish long-idle stability. Final
 process checks found none of the recorded source/baseline/candidate VM PIDs,
 and lsof found no open handles on their three disk images.
 
-Remaining acceptance includes windowed F3/F5 input and video measurements,
-safe-area assessment, keyboard modes, account-dependent application continuity,
+Windowed F3/F4/F5 results are in [WINDOWED.md](WINDOWED.md). Remaining
+acceptance includes safe-area assessment, keyboard modes, account-dependent application continuity,
 audio, repeated cold boots, 120-minute idle, snapshot restoration, and a full
 64 GB export/import followed by imported boot. Static outer/inner changes and
 cutout patch on/off/on require separately prepared copies and root steps.

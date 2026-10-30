@@ -3,10 +3,10 @@
 set -euo pipefail
 
 repo_root="$(cd "${0:a:h}/../../../.." && pwd)"
-variant="${1:?usage: vm-run.zsh <baseline|candidate> <new-case-name> [--check]}"
+variant="${1:?usage: vm-run.zsh <baseline|candidate> <new-case-name> [--check|--windowed]}"
 case_name="${2:?a new case name is required}"
-check_only="${3:-}"
-[[ -z "$check_only" || "$check_only" == --check ]] || exit 2
+mode="${3:-}"
+[[ -z "$mode" || "$mode" == --check || "$mode" == --windowed ]] || exit 2
 [[ "$case_name" == [a-zA-Z0-9]* && "$case_name" != *[^a-zA-Z0-9_-]* ]] || exit 2
 case "$variant" in
     baseline) bundle="$repo_root/.build/validation/baseline/artifacts/VPhone.bundle" ;;
@@ -26,7 +26,7 @@ for executable in vphone-cli vphone-vm; do
     [[ "${actual%% *}" == "$expected" ]] || { print -u2 "Unexpected binary: $executable"; exit 1; }
 done
 codesign --verify --deep --strict "$bundle"
-if [[ "$check_only" == --check ]]; then
+if [[ "$mode" == --check ]]; then
     print "Validated $variant root marker, pinned CLI/VM hashes and signature; no VM launched."
     exit 0
 fi
@@ -40,6 +40,10 @@ print -r -- "$machine" > "$case_root/machine.txt"
 print -r -- "$bundle" > "$case_root/bundle.txt"
 cp "$library/$machine/PatchReceipt.plist" "$case_root/PatchReceipt-before-boot.plist"
 codesign -dvvv "$bundle/Contents/MacOS/vphone-vm" > "$case_root/signature.txt" 2>&1
+# Windowed runs exercise the VM view's touch path and its recorder.
+launch_mode=(--headless)
+[[ "$mode" == --windowed ]] && launch_mode=()
+print -r -- "${mode:-headless}" > "$case_root/launch-mode.txt"
 print "Booting $machine; evidence: $case_root"
-exec "$bundle/Contents/MacOS/vphone-cli" vm launch "$machine" -l "$library" --headless -v \
+exec "$bundle/Contents/MacOS/vphone-cli" vm launch "$machine" -l "$library" $launch_mode -v \
     > "$case_root/boot.log" 2>&1
