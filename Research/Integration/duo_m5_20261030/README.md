@@ -89,13 +89,17 @@ source SHA, bundle hash, guest patch receipt, commands, and tested machine.
 - Ported the display choices and the independent toolbar/frame correction.
 - Kept current upstream fold ownership/rendering/wake logic intact. The source
   hold and earlier topology/touch experiments remain in imported history.
-- Built the upstream baseline and the first integrated bundle, including
-  bundle admission and signing. Final build validation is being recorded.
+- Built the upstream baseline and final integrated bundle; admission,
+  deep/strict signature verification, and the final CLI regression passed.
+  Exact hashes, commands and evidence paths are in `validation.json`.
 - CoreKit: baseline 663 passed; retained display behavior 668 passed.
 - Patch catalogue: 25 passed, including opt-in/version gates and preset parity.
 - Firmware baseline: 779 tests, 134 fixture-related issues. All 128 failed
   names match the historical v1.6 log; details are in
-  `baseline-firmware-failures.json`. Full candidate comparison is pending.
+  `baseline-firmware-failures.json`. Candidate: 780 tests, the same 134 issue
+  records and no new/removed failing names, recorded in
+  `candidate-firmware-comparison.json`. The full suite remains failed until
+  its required firmware inputs are available.
 - ArchiveKit: baseline 102 passed; repaired transfer regression and full suite
   103 passed. See [sparse archive investigation](SPARSE_ARCHIVES.md).
 - FoldGuard: seven passed. CLI display regression and five RPC request
@@ -108,3 +112,20 @@ source SHA, bundle hash, guest patch receipt, commands, and tested machine.
 - No VM acceptance has run. The existing `duo-m5-fold214` is still running;
   it has not been stopped or modified. See [the prepared approval scope and
   commands](ACCEPTANCE.md).
+
+The imported source history is reachable from the integration branch through
+a history-only merge after selective implementation. Its tree was checked
+byte-identical to the preceding integration tree. This retains old experiments
+without replacing current upstream implementations. `main` is unchanged and
+no remote push has been made.
+
+The final candidate was built clean at `a71f2360`; later validation-record
+commits change documentation only. The baseline build at `d3af6081` differs
+from upstream `39324ee7` only by this integration's initial planning documents.
+The baseline and candidate fold-display guest libraries have identical SHA-256
+hashes. The original worktree status digest still matches the pre-operation
+digest, and all four source worktrees remain clean.
+
+Historical documents/results are preserved byte for byte, including Markdown
+hard line breaks and trailing spaces in original log lines. Whitespace checks
+exclude `Historical/**`; managed source and new documentation pass them.

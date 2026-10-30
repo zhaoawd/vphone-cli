@@ -14,10 +14,10 @@ worktrees or existing machines. Source directories are read-only inputs.
       retain upstream fixes and establish whether a local adaptation is needed.
 - [x] Preserve research, probes, historical scripts/results, and maintained regression scripts with provenance.
 - [x] Reproduce and repair sparse archive round-trip behavior using isolated test data; 103 archive tests pass.
-- [ ] Build the integrated bundle and run affected firmware-free tests.
+- [x] Build the integrated bundle and run affected firmware-free tests; existing firmware-fixture failures match baseline.
 - [x] Prepare VM A/B commands and the isolated-library layout; actual copies await permission to stop the source VM.
 - [ ] Run authorized VM acceptance; distinguish historic evidence from new runs.
-- [ ] Review the final diff, record results and remaining approval gates.
+- [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
 
 ## Constraints and approval gates
 
@@ -40,8 +40,15 @@ worktree remains on its previous integration branch with its uncommitted files.
 Current checks: CoreKit 668 passed; patch catalogue 25 passed; ArchiveKit 103
 passed; FoldGuard seven passed; saved CLI display regression passed; RPC request
 contract five checks passed. Native device/simulator probe builds passed and
-the host CSSC probe returned six correct results. Full candidate bundle and
-firmware comparison are being finalized.
+the host CSSC probe returned six correct results. Final candidate build,
+bundle admission, deep/strict signature verification, and final CLI regression
+passed. Full FirmwarePatcher: 780 tests with the same 134 issue records as the
+baseline, no added or removed failing names. See `validation.json` for hashes
+and evidence paths.
+
+The source history is now reachable from the integration branch through a
+history-only merge whose tree was checked unchanged. No merge into `main` or
+remote push has been performed.
 
 Runtime gate: the original `duo-m5-fold214` is running. It has not been stopped
 or modified. Concrete approval scope and commands are in
