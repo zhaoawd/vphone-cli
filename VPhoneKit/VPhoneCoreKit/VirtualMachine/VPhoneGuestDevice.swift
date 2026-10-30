@@ -48,6 +48,10 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
     public let productName: String
     /// The guest display: a device panel, or a provisional virtual canvas.
     public let screen: VPhoneVirtualMachineManifest.ScreenConfig
+    /// A foldable's inner display, which `vm config --display inner` boots
+    /// instead of `screen` (the outer one). The VM has one display either way:
+    /// this is a static inner-screen machine, not a fold.
+    public let innerScreen: VPhoneVirtualMachineManifest.ScreenConfig?
 
     public init(
         family: Family,
@@ -55,12 +59,14 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
         deviceClass: String,
         productName: String,
         screen: VPhoneVirtualMachineManifest.ScreenConfig,
+        innerScreen: VPhoneVirtualMachineManifest.ScreenConfig? = nil,
     ) {
         self.family = family
         self.productType = productType
         self.deviceClass = deviceClass
         self.productName = productName
         self.screen = screen
+        self.innerScreen = innerScreen
     }
 
     public var isPad: Bool {
@@ -136,10 +142,28 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
     /// iPhone 18 Pro (V63AP): 1206x2622, 402x874 points.
     public static let iPhone19_2 = iPhone("iPhone19,2", "v63ap", "iPhone 18 Pro", width: 1206, height: 2622)
 
-    /// iPhone Duo (V68AP). The VM's panel is its outer display (the cover); the
-    /// guest publishes the inner display as a second, virtual display and shows
-    /// it on that panel while the device is open (libvphonefolddisplay).
-    public static let iPhone19_4 = iPhone("iPhone19,4", "v68ap", "iPhone Duo", width: 1398, height: 2034)
+    /// iPhone Duo (V68AP): outer display 1398x2034, 466x678 points, and the
+    /// inner display below. The VM's panel is its outer display (the cover);
+    /// the guest publishes the inner display as a second, virtual display and
+    /// shows it on that panel while the device is open (libvphonefolddisplay).
+    /// `vm config --display outer|inner` boots one of them statically instead
+    /// (`VPhoneFoldableDisplayChoice`).
+    public static let iPhone19_4 = VPhoneGuestDevice(
+        family: .iPhone,
+        productType: "iPhone19,4",
+        deviceClass: "v68ap",
+        productName: "iPhone Duo",
+        screen: .init(width: 1398, height: 2034, pixelsPerInch: 460, scale: 3.0),
+        innerScreen: iPhone19_4InnerScreen,
+    )
+
+    /// The Duo's inner display, booted only as a static choice (`vm config
+    /// --display inner`); the fold shows it as a virtual display instead.
+    /// Apple's iPhone Duo device profile declares 2007×2853 at 3x (669×951
+    /// points); its 1878x2670 panel size clips the dock.
+    public static let iPhone19_4InnerScreen = VPhoneVirtualMachineManifest.ScreenConfig(
+        width: 2007, height: 2853, pixelsPerInch: 460, scale: 3.0
+    )
 
     /// iPhone XS Max: 1242x2688 at 458 ppi, 414x896 points. Its IPSW carries the
     /// iOS 18 releases after 18.6, which the iPhone 16 never got; the research
@@ -363,5 +387,39 @@ public struct VPhoneGuestDevice: Sendable, Equatable {
     public static func isPadManifest(_ buildManifest: [String: Any]) -> Bool {
         let types = buildManifest["SupportedProductTypes"] as? [String] ?? []
         return types.contains { $0.hasPrefix("iPad") }
+    }
+}
+
+// MARK: - Foldable Display Choice
+
+/// A foldable VM's static display, written by `vm config --display
+/// outer|inner` as `display-choice` beside config.plist. Without it a
+/// foldable guest boots the fold: the cover's panel, onto which the fold
+/// display shows the inner display while open. With it the VM boots
+/// config.plist's screen as the guest's only display.
+public enum VPhoneFoldableDisplayChoice: String, Sendable {
+    case outer
+    case inner
+
+    public static let fileName = "display-choice"
+
+    /// The choice recorded in `vmDirectory`, or nil for the fold.
+    public static func read(in vmDirectory: URL) -> VPhoneFoldableDisplayChoice? {
+        let url = vmDirectory.appendingPathComponent(fileName)
+        guard let text = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        return VPhoneFoldableDisplayChoice(rawValue: text.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+
+    /// Record `choice` in `vmDirectory`; nil removes it, so the VM boots the fold.
+    public static func write(_ choice: VPhoneFoldableDisplayChoice?, in vmDirectory: URL) throws {
+        let url = vmDirectory.appendingPathComponent(fileName)
+        guard let choice else {
+            if FileManager.default.fileExists(atPath: url.path) {
+                try FileManager.default.removeItem(at: url)
+            }
+            return
+        }
+        try Data((choice.rawValue + "\n").utf8).write(to: url, options: .atomic)
+        try VPhoneHostFilePermissions.makeAccessible(at: url)
     }
 }

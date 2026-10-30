@@ -174,6 +174,9 @@ static int vpExecve(const char *path, char *const argv[], char *const envp[]) {
 // HapticsFix/libhapticsfix.c for what it answers and why SpringBoard is the
 // target.
 #define VP_HAPTICS_FIX "/usr/lib/libhapticsfix.dylib"
+// Selected only for a static inner-screen boot; skipped while the fold
+// display is installed, whose main display is the cover.
+#define VP_INNER_CUTOUT_FIX "/usr/lib/libinnercutoutfix.dylib"
 // The Settings follow-up-group hider. Rides the same dlopen route; it swizzles
 // (Preferences' classes are in the shared cache, so interposing would not reach
 // them) and hides the CoreFollowUp suggestion/upsell groups. See
@@ -274,7 +277,10 @@ __attribute__((constructor)) static void vpLogProcess(void) {
         // Inert without the foldable product identity; with it, the guard
         // keeps the secure-indicator raise from crash-looping SpringBoard.
         vpLoadLibrary("fold-guard", VP_FOLD_GUARD);
-        vpLoadLibrary("fold-display", VP_FOLD_DISPLAY);
+        if (access(VP_FOLD_DISPLAY, F_OK) == 0)
+            vpLoadLibrary("fold-display", VP_FOLD_DISPLAY);
+        else
+            vpLoadLibrary("inner-cutout-fix", VP_INNER_CUTOUT_FIX);
     }
     // Loaded before the app gate too: the swizzle must be in place before
     // Settings builds its follow-up section.

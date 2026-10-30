@@ -1,5 +1,18 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Duo M5 integration (2026-10-30, pending runtime acceptance).** Adds the
+> opt-in `system-springboard-exp-inner_cutout` guest-library declaration from
+> the local `duo-m5-v1.6` work. It is limited to iOS 27.1, blocked in `standard`
+> and the TV/HomePod presets, and loaded into SpringBoard only when the fold
+> display library is absent. The library matches the measured static-inner
+> main-screen geometry and island shape before reporting the simulator's
+> 37 pt cutout. Selection owns installation/removal and live sync cannot
+> reinstall a deselected copy. No kernel/boot-chain patch, display-node
+> experiment, or previous-frame hold is added by this integration. Existing
+> fold rendering remains upstream's. Historical static-inner on/off evidence
+> is retained in the integration research folder; new integrated VM
+> acceptance is pending. See [integration record](Integration/duo_m5_20261030/README.md).
+
 > **Camera session teardown (2026-10-29).** Source-only change in libcamfix.
 > Session tracking uses `objc_storeWeakOrNil` and a strong weak-load before
 > weak-table insertion. It skips sessions already in deallocation.

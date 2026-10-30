@@ -128,11 +128,6 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
         // of inheriting the last frame another VM saved.
         let sceneName = "vphone-scene-\(sceneIdentifier)"
         window.identifier = NSUserInterfaceItemIdentifier(sceneName)
-        if !window.setFrameUsingName(sceneName) {
-            window.center()
-        }
-        window.setFrameAutosaveName(sceneName)
-        setMinimumContentSize(for: .portrait, on: window)
         observeKeyState(of: window)
 
         // An empty unified toolbar gives the title bar its full height. The Home
@@ -152,6 +147,15 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
         }
         pinWindowButtons(in: window)
         installTitle(name, in: window, trailingInset: trailingInset)
+
+        // The saved frame includes the toolbar and titlebar accessory.
+        // Restore it after those are installed so their height is accounted
+        // for once, rather than being lost from the content on each launch.
+        if !window.setFrameUsingName(sceneName) {
+            window.center()
+        }
+        window.setFrameAutosaveName(sceneName)
+        setMinimumContentSize(for: .portrait, on: window)
 
         let controller = NSWindowController(window: window)
         controller.showWindow(nil)

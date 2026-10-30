@@ -462,6 +462,25 @@ struct BundleOperationsTests {
 
     // MARK: - Clone state and identity
 
+    @Test func `clone preserves a static inner display with either identity policy`() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let library = VPhoneLibrary(root: root)
+        let source = try makeBootedSource(named: "source", in: library)
+        let manifest = source.manifest.updating(guestDevice: .iPhone19_4)
+        let inner = try #require(VPhoneGuestDevice.iPhone19_4.innerScreen)
+        try manifest.updating(screenConfig: inner).write(to: source.configURL)
+        try VPhoneFoldableDisplayChoice.write(.inner, in: source.url)
+        for newIdentity in [false, true] {
+            let clone = try VPhoneBundleOperations.clone(
+                bundleNamed: "source", to: "copy-\(newIdentity)", in: library, newIdentity: newIdentity,
+            )
+            #expect(clone.manifest.screenConfig == inner)
+            #expect(clone.manifest.guestProductType == "iPhone19,4")
+            #expect(VPhoneFoldableDisplayChoice.read(in: clone.url) == .inner)
+        }
+    }
+
     /// A stopped machine with the files a booted one has: state files with
     /// distinct bytes, an identity, fixed network settings, a stale control
     /// socket and a snapshot.

@@ -1,4 +1,5 @@
 import ArgumentParser
+import FirmwarePatcher
 import Foundation
 import VPhoneCoreKit
 
@@ -166,6 +167,7 @@ struct VPhoneVirtualMachineInfoCommand: ParsableCommand {
             print("location: \(report.syncsHostLocation ? "on" : "off")")
             print("rom:   \(VPhoneBootROMOption.describe(bundle))")
             print("seprom: \(VPhoneSEPROMOption.describe(bundle))")
+            print("display: \(VPhoneDisplayOption.describe(bundle))")
             if let snapshots = try? VPhoneMachineSnapshots.list(of: bundle), !snapshots.isEmpty {
                 print("snapshots: \(snapshots.count)")
             }
@@ -221,7 +223,7 @@ struct VPhoneVirtualMachineNewCommand: ParsableCommand {
 struct VPhoneVirtualMachineConfigCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "config",
-        abstract: "Edit VM manifest fields (cpu/memory/network/startup/rom/seprom)",
+        abstract: "Edit VM manifest fields (cpu/memory/network/startup/rom/seprom/display)",
         discussion: """
         Network settings are read when the VM starts, so a change applies from the next launch.
 
@@ -264,6 +266,12 @@ struct VPhoneVirtualMachineConfigCommand: ParsableCommand {
         --seprom opensep makes the bundle's OpenSEP the SEP ROM, --seprom apple Virtualization.framework's \
         AVPSEPBooter, --seprom <file> any other SEP ROM. Applies from the next start, without a \
         restore: both load the SEP firmware the restore installed.
+
+        --display fold (the default) boots a foldable guest (iPhone Duo) on its cover, 1398x2034 at \
+        460 ppi, for system-springboard-cfw-fold_display to show the inner display on it while \
+        open and switch between them with display.posture. --display outer and --display inner boot \
+        that one display statically instead, from the next start. At the static inner size touches reach \
+        apps only with system-springboard-exp-inner_cutout live and the fold display off.
         """,
     )
 
@@ -302,10 +310,16 @@ struct VPhoneVirtualMachineConfigCommand: ParsableCommand {
     var rom: String?
     @Option(name: .long, help: VPhoneSEPROMOption.help)
     var seprom: String?
+    @Option(name: .long, help: VPhoneDisplayOption.help)
+    var display: String?
 
     func run() throws {
         let name = try VPhoneVirtualMachineSelection.resolveExisting(name, in: lib.library)
         let edit = try networkEdit(vmName: name)
+        // Validate display arguments before updateConfig writes any other edit.
+        if let display {
+            _ = try VPhoneDisplayOption.selection(display, for: lib.library.bundle(named: name).manifest.guestDevice)
+        }
         let unlocks = try unlockAtStartup.map { try Self.parseSwitch($0, option: "--unlock-at-startup") }
         let syncsLocation = try syncHostLocation.map { try Self.parseSwitch($0, option: "--sync-host-location") }
         let updated = try VPhoneBundleOperations.updateConfig(
@@ -325,6 +339,13 @@ struct VPhoneVirtualMachineConfigCommand: ParsableCommand {
         if let seprom {
             current = try VPhoneSEPROMOption.install(seprom, in: current)
             print("SEP ROM: \(VPhoneSEPROMOption.describe(current)), from the next start")
+        }
+        if let display {
+            current = try VPhoneDisplayOption.apply(display, to: current)
+            print("display: \(VPhoneDisplayOption.describe(current)), from the next start")
+            if let warning = VPhoneDisplayOption.warning(for: display, bundle: current) {
+                print(warning)
+            }
         }
         let m = updated.manifest
         print(
@@ -485,6 +506,82 @@ struct VPhoneVirtualMachineDeleteCommand: ParsableCommand {
             let size = VPhoneSystemTrim.formatBytes(VPhoneMachineTemplates.allocatedBytes(of: template.url))
             print("note: template \(template.identifier) (~\(size)) is no longer used by any machine; "
                 + "remove it with `vphone-cli vm template delete \(template.identifier)`")
+        }
+    }
+}
+
+// MARK: - --display
+
+/// `--display` of `vm config`: how a foldable guest's one paravirtual display
+/// boots. `fold` (the default) boots it as the cover, onto which the fold
+/// display shows the inner display while open; `outer` and `inner` boot that
+/// one display statically, recorded as `VPhoneFoldableDisplayChoice`.
+enum VPhoneDisplayOption {
+    static let help: ArgumentHelp = "Display a foldable guest boots: fold | outer | inner (from the next start)"
+
+    /// Apply `argument` to this VM: its screen in config.plist and the static
+    /// choice beside it.
+    static func apply(_ argument: String, to bundle: VPhoneBundle) throws -> VPhoneBundle {
+        let (choice, screen) = try selection(argument, for: bundle.manifest.guestDevice)
+        let updated = try VPhoneBundleOperations.setScreen(screen, in: bundle)
+        try VPhoneFoldableDisplayChoice.write(choice, in: bundle.url)
+        return updated
+    }
+
+    static func selection(
+        _ argument: String,
+        for device: VPhoneGuestDevice,
+    ) throws -> (VPhoneFoldableDisplayChoice?, VPhoneVirtualMachineManifest.ScreenConfig) {
+        guard let inner = device.innerScreen else {
+            throw ValidationError("--display: \(device.productName) has one display")
+        }
+        let choice: VPhoneFoldableDisplayChoice?
+        let screen: VPhoneVirtualMachineManifest.ScreenConfig
+        switch argument.lowercased() {
+        case "fold": (choice, screen) = (nil, device.screen)
+        case "outer": (choice, screen) = (.outer, device.screen)
+        case "inner": (choice, screen) = (.inner, inner)
+        default: throw ValidationError("--display must be fold, outer or inner")
+        }
+        return (choice, screen)
+    }
+
+    /// `fold 1398x2034 @460 ppi` or `inner …`, for listings; `custom` for a
+    /// static choice whose screen matches neither display.
+    static func describe(_ bundle: VPhoneBundle) -> String {
+        let screen = bundle.manifest.screenConfig
+        let size = "\(screen.width)x\(screen.height) @\(screen.pixelsPerInch) ppi"
+        let device = VPhoneGuestDevice.named(bundle.manifest.guestProductType) ?? .default
+        guard let inner = device.innerScreen else { return size }
+        guard VPhoneFoldableDisplayChoice.read(in: bundle.url) != nil else { return "fold \(size)" }
+        let name = screen == inner ? "inner" : screen == device.screen ? "outer" : "custom"
+        return "\(name) \(size)"
+    }
+
+    /// What the guest's live patches lack for `argument`, or nil. The fold
+    /// needs the fold display; a static inner screen needs the inner cutout
+    /// patch, and SystemHook skips that patch while the fold display is
+    /// installed.
+    static func warning(for argument: String, bundle: VPhoneBundle) -> String? {
+        let live = VPhonePatchPresetStore.receipt(forVM: bundle.url)?.parts["Guest"]?.patches ?? []
+        let fold = FirmwareGuestSystemPatchSet.foldDisplay
+        let cutout = FirmwareGuestSystemPatchSet.innerCutout
+        let update = "then run `sudo vphone-cli cfw update-environment` with the machine off."
+        switch argument.lowercased() {
+        case "fold" where !live.contains(fold):
+            return "[!] \(fold) is not live in this guest: the inner display is not composited. " +
+                "Select it with `fw set-patches --allow \(fold)`, " + update
+        case "outer" where live.contains(fold):
+            return "[!] \(fold) is live in this guest, so the guest can still fold to its inner display. " +
+                "For a static outer display, turn it off with `fw set-patches --block \(fold)`, " + update
+        case "inner" where live.contains(fold):
+            return "[!] \(fold) is live in this guest, so SystemHook does not load \(cutout). " +
+                "Turn it off with `fw set-patches --block \(fold) --allow \(cutout)`, " + update
+        case "inner" where !live.contains(cutout):
+            return "[!] \(cutout) is not live in this guest: at the inner size touches do not reach " +
+                "the Home screen or apps. Select it with `fw set-patches --allow \(cutout)`, " + update
+        default:
+            return nil
         }
     }
 }

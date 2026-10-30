@@ -585,6 +585,7 @@ struct VPhoneCustomFirmwareInstaller {
         }
         if !Self.isFoldable(device) {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootFoldableVMSubtype)
+            notApplicableGuest.insert(FirmwareGuestSystemPatchSet.innerCutout)
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootFoldableProductId)
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootFoldableDisplays)
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.hinge)
@@ -1654,6 +1655,7 @@ struct VPhoneCustomFirmwareInstaller {
         for (identifier, library) in [
             (FirmwareGuestSystemPatchSet.followUpGroups, "libprefsfix.dylib"),
             (FirmwareGuestSystemPatchSet.signInSheets, "libsigninfix.dylib"),
+            (FirmwareGuestSystemPatchSet.innerCutout, "libinnercutoutfix.dylib"),
             (FirmwareGuestSystemPatchSet.gyroscope, "libvphonegyro.dylib"),
             (FirmwareGuestSystemPatchSet.accelerometer, "libvphoneaccelerometer.dylib"),
             (FirmwareGuestSystemPatchSet.attitude, "libvphoneattitude.dylib"),
@@ -1671,6 +1673,7 @@ struct VPhoneCustomFirmwareInstaller {
                 let foldOnly = identifier == FirmwareGuestSystemPatchSet.hinge
                     || identifier == FirmwareGuestSystemPatchSet.foldGuard
                     || identifier == FirmwareGuestSystemPatchSet.foldDisplay
+                    || identifier == FirmwareGuestSystemPatchSet.innerCutout
                 let wanted = on(identifier)
                     && (!foldOnly || Self.isFoldable(guestDevice))
                 if wanted {

@@ -166,3 +166,62 @@ struct NewVirtualMachineManifestTests {
         #expect(parsed["machineIdentifier"] is Data)
     }
 }
+
+/// A foldable guest boots one of its two displays; `vm config --display`
+/// writes the chosen one into the manifest.
+@Suite("Foldable guest display")
+struct FoldableGuestDisplayTests {
+    @Test
+    func `static display choice persists and fold restores an absent choice`() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        #expect(VPhoneFoldableDisplayChoice.read(in: root) == nil)
+        for choice in [VPhoneFoldableDisplayChoice.outer, .inner] {
+            try VPhoneFoldableDisplayChoice.write(choice, in: root)
+            #expect(VPhoneFoldableDisplayChoice.read(in: root) == choice)
+        }
+        try VPhoneFoldableDisplayChoice.write(nil, in: root)
+        #expect(!FileManager.default.fileExists(atPath: root.appendingPathComponent("display-choice").path))
+        #expect(VPhoneFoldableDisplayChoice.read(in: root) == nil)
+        // Clearing the default twice is valid too.
+        try VPhoneFoldableDisplayChoice.write(nil, in: root)
+    }
+
+    @Test
+    func `screen edit persists without changing the guest or its other settings`() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let original = VPhoneVirtualMachineManifest.newVM().updating(guestDevice: .iPhone19_4)
+            .updating(hardwareKeyboardEnabled: false)
+        try original.write(to: root.appendingPathComponent("config.plist"))
+        let bundle = try VPhoneBundle.load(at: root)
+        let inner = try #require(original.guestDevice.innerScreen)
+        _ = try VPhoneBundleOperations.setScreen(inner, in: bundle)
+        let saved = try VPhoneBundle.load(at: root).manifest
+        #expect(saved.screenConfig == inner)
+        let restored = saved.updating(screenConfig: original.screenConfig)
+        #expect(try PropertyListEncoder().encode(restored) == PropertyListEncoder().encode(original))
+    }
+
+    @Test
+    func `iPhone Duo has an inner display and other phones none`() {
+        let duo = VPhoneGuestDevice.iPhone19_4
+        #expect(duo.screen == .init(width: 1398, height: 2034, pixelsPerInch: 460, scale: 3.0))
+        #expect(duo.innerScreen == .init(width: 2007, height: 2853, pixelsPerInch: 460, scale: 3.0))
+        #expect(VPhoneGuestDevice.iPhone17_3.innerScreen == nil)
+        #expect(VPhoneGuestDevice.named("iPhone19,4")?.innerScreen == duo.innerScreen)
+    }
+
+    @Test
+    func `changing the display keeps every other field`() throws {
+        let original = VPhoneVirtualMachineManifest.newVM().updating(guestDevice: .iPhone19_4)
+        let inner = try #require(VPhoneGuestDevice.iPhone19_4.innerScreen)
+        let updated = original.updating(screenConfig: inner)
+        #expect(updated.screenConfig == inner)
+        let encoder = PropertyListEncoder()
+        let restored = updated.updating(screenConfig: original.screenConfig)
+        #expect(try encoder.encode(restored) == encoder.encode(original))
+    }
+}
