@@ -1,0 +1,51 @@
+{
+  "state": "prepared_not_installed",
+  "version": "2.6.2-local.56be1ce20ded",
+  "bundle": "/Users/kolar/github/vphone-cli/.build/t52-camera-diagnostics-20261022/package/VPhone.bundle",
+  "archive": "/Users/kolar/github/vphone-cli/.build/t52-camera-diagnostics-20261022/2.6.2-local.56be1ce20ded.tar",
+  "archiveSHA256": "59822dd34e15f7c9734fa69e5f4ceca9dcf1efa442c7d64bf5bac549f8ad05f4",
+  "archiveBytes": 185229824,
+  "hostVMUnchanged": true,
+  "hostVMCDHash": "89cb8ee4c9f47b15a1c63bd73c99b53a0d43a541",
+  "APIUnchanged": true,
+  "frameworkLibrariesUnchanged": true,
+  "v2Publisher": "/Users/kolar/github/vphone-cli/.build/t52-camera-diagnostics-20261022/vphoned-v2",
+  "v2PublisherSHA256": "0c3c906aabd670968fe4947bbf68c1130f9af0c5c93216dad8ec8c80ed9332b8",
+  "changedPaths": [
+    "Contents/MacOS/vphone-cli",
+    "Contents/Resources/.build/guest-components-v2/stage/camfix/libcamfix.dylib",
+    "Contents/Resources/.build/guest-components-v2/stage/manifest.json",
+    "Contents/Resources/.build/guest-components-v2/stage/vcamcaptured/libvcamcaptured.dylib",
+    "Contents/Resources/build-dependencies.json",
+    "Contents/Resources/camera-interface-provenance.json",
+    "Contents/Resources/dependencies/guest-components-pins.json",
+    "Contents/_CodeSignature/CodeResources"
+  ],
+  "provenance": {
+    "baseVersion": "2.6.2-local.93805a71796d",
+    "sourceSHA256": {
+      "scripts/vphoned/vphoned_vcam.h": "9b882e4e8c7ecfef3a91d562705e6b35e5d70b2d3af844f373dfe18440c9f27a",
+      "scripts/vphoned/vphoned_vcam.m": "205541522d09d913404b6bfc533f7ec9ff07541955d1e7b7deb394867340bef5",
+      "sources/VPhoneGuestComponents/Shared/VPhoneCameraFrame.h": "481377f61b41f1319855aa67f3cb57d70d468e6dbe91844d4110c227f7f6ea6d",
+      "sources/VPhoneGuestComponents/VCamCaptured/VCamFrameProtocol.h": "41a8d9b8bbd2adece3253ebbc9cc50260d19c6650631449528be4b2dfd7dc428",
+      "sources/VPhoneGuestComponents/VCamCaptured/VCamFrameReceiver.inc": "96a5ca9b32df70238d4a2b92a4dd903e782cfd8d9675355d717df6f9c4b6cc44",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.m": "dcc140a3f5c5e4e9c77a949eac7f66babacf7ca2fb0526b93ff85a67b5f51dfe",
+      "sources/VPhoneGuestComponents/CamFix/libcamfix.m": "edce208bc74790b5730af1b28048a567616271f3797e497ab44eea81ed3e8afa",
+      "sources/VPhoneGuestComponents/CamFix/CameraMetadataOutput.inc": "fbea32cf7a727655991dc534492b8468ee008999ef5498e16f22c0b15983b1f4",
+      "scripts/patchers/cfw.py": "8c388bd0fad73186d242854039ba41725dd078e7254c5521b48ef3f512a14aed",
+      "scripts/patchers/cfw_daemons.py": "744a775f8e06a9259fb5cebbe079bbe2655ad193fc4ec937dc846424b4be9ace"
+    },
+    "changedGuestLibraries": [
+      "libcamfix.dylib",
+      "libvcamcaptured.dylib"
+    ],
+    "classicDefault": "classic",
+    "v2LaunchdEnvironment": {
+      "VPHONED_CAMERA_LAYOUT": "v2"
+    },
+    "acceptancePublisherDefault": "v2",
+    "acceptancePublisherSHA256": "0c3c906aabd670968fe4947bbf68c1130f9af0c5c93216dad8ec8c80ed9332b8",
+    "installed": false,
+    "runtimeValidated": false
+  }
+}

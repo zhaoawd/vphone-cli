@@ -1,0 +1,41 @@
+[
+  {
+    "argv": [
+      ".venv/bin/python3",
+      "-B",
+      "scripts/check_guest_components.py",
+      "--stage",
+      ".build/t52-real-20261021/baseline-components/stage"
+    ],
+    "exitCode": 0
+  },
+  {
+    "argv": [
+      ".venv/bin/python3",
+      "-B",
+      "scripts/check_guest_components.py",
+      "--stage",
+      ".build/t52-real-20261021/package/VPhone.bundle/Contents/Resources/.build/guest-components-v2/stage"
+    ],
+    "exitCode": 0
+  },
+  {
+    "argv": [
+      ".venv/bin/python3",
+      "-B",
+      "scripts/check_guest_api.py",
+      ".build/t52-real-20261021/package/VPhone.bundle/Contents/Resources/guest-resources"
+    ],
+    "exitCode": 0
+  },
+  {
+    "argv": [
+      ".venv/bin/python3",
+      "-B",
+      "scripts/check_daemon_api.py",
+      "--candidate",
+      ".build/t52-real-20261021/v2-api"
+    ],
+    "exitCode": 0
+  }
+]

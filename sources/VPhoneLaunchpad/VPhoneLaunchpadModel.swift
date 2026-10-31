@@ -27,6 +27,14 @@ final class VPhoneLaunchpadModel {
     private(set) var coreBundle: VPhoneLaunchpadCoreBundle?
     /// The embedded `vphone-cli`, once verified (New Machine's catalog).
     private(set) var commandLine: VPhoneLaunchpadCommandLine?
+    private var archiveOpens: VPhoneLaunchpadArchiveOpenQueue?
+
+    func connectArchiveOpens(_ queue: VPhoneLaunchpadArchiveOpenQueue) {
+        archiveOpens = queue
+        if let error = queue.error { machines.actionError = error }
+        guard commandLine != nil else { return }
+        queue.attach { [weak self] urls in await self?.machines.importArchives(urls) }
+    }
 
     /// Checks the embedded toolchain, then lists machines. Nothing is listed
     /// and no command runs when the check fails.
@@ -46,6 +54,7 @@ final class VPhoneLaunchpadModel {
             host = VPhoneLaunchpadHostSetup(commandLine: commandLine, libraryRoot: machines.libraryRoot)
             coreBundle = VPhoneLaunchpadCoreBundle(commandLine: commandLine)
             machines.startMonitoring(with: commandLine)
+            if let archiveOpens { connectArchiveOpens(archiveOpens) }
             openRequestedPanel()
         case let .failure(failure):
             toolchain = .failed(failure)

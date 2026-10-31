@@ -189,6 +189,28 @@ struct BundleOpsTests {
         }
     }
 
+    @Test func renameCarriesDerivedMDNSNameAndKeepsHandChosenOne() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let rom = try fakeROM(); let seprom = try fakeROM()
+        defer { try? FileManager.default.removeItem(at: rom); try? FileManager.default.removeItem(at: seprom) }
+        let lib = VPhoneLibrary(root: root)
+        for name in ["lab_a", "lab_b"] {
+            let created = try VPhoneBundleOps.create(
+                .init(name: name, cpuCount: 2, memoryMB: 2048, diskSizeGB: 1,
+                      romSource: rom, sepromSource: seprom), in: lib)
+            let hostName = name == "lab_a" ? VPhoneNetworking.localHostName(forVMName: "lab_a") : "bench"
+            let updated = created.manifest.updating(
+                networkConfig: created.manifest.networkConfig.with(localHostName: .some(hostName)))
+            try updated.write(to: created.configURL)
+        }
+        #expect(try VPhoneBundleOps.rename(bundleNamed: "lab_a", to: "phone_a", in: lib)
+            .manifest.networkConfig.localHostName == "phone-a")
+        #expect(try VPhoneBundleOps.rename(bundleNamed: "lab_b", to: "phone_b", in: lib)
+            .manifest.networkConfig.localHostName == "bench")
+        #expect(try lib.bundle(named: "phone_a").manifest.networkConfig.localHostName == "phone-a")
+    }
+
     @Test func cloneCopiesBundleAndPreservesIdentity() throws {
         let root = try makeRoot()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -243,6 +265,170 @@ struct BundleOpsTests {
         #expect(throws: VPhoneLibraryError.alreadyExists(name: "b")) {
             _ = try VPhoneBundleOps.clone(bundleNamed: "a", to: "b", in: lib)
         }
+    }
+
+    // MARK: - Clone state and identity
+
+    private func makeBootedSource(named name: String, in lib: VPhoneLibrary) throws -> VPhoneBundle {
+        let rom = try fakeROM()
+        defer { try? FileManager.default.removeItem(at: rom) }
+        let created = try VPhoneBundleOps.create(
+            .init(name: name, cpuCount: 8, memoryMB: 4096, diskSizeGB: 1,
+                  romSource: rom, sepromSource: rom), in: lib)
+        let url = created.url
+        try Data([0xD1, 0x5C, 0x00, 0x01]).write(to: url.appendingPathComponent("Disk.img"))
+        try Data([0x5E, 0x90]).write(to: url.appendingPathComponent("SEPStorage"))
+        try Data([1, 2, 3]).write(to: url.appendingPathComponent("nvram.bin"))
+        try Data([4]).write(to: url.appendingPathComponent("udid-prediction.txt"))
+        try Data(#"{"bundle":"2.7.0"}"#.utf8).write(to: url.appendingPathComponent("launchpad.json"))
+        try Data().write(to: url.appendingPathComponent("vphone.sock"))
+        try Data("host-local-plan".utf8).write(to: url.appendingPathComponent(".firmware-desired-plan.json"))
+        let snapshot = url.appendingPathComponent("Snapshots/before-update")
+        try FileManager.default.createDirectory(at: snapshot, withIntermediateDirectories: true)
+        try Data([0xD1]).write(to: snapshot.appendingPathComponent("Disk.img"))
+
+        typealias Network = VPhoneVirtualMachineManifest.NetworkConfig
+        let network = Network(
+            mode: .nat,
+            macAddress: "aa:bb:cc:dd:ee:ff",
+            ipv4: .init(address: "192.168.64.20", prefixLength: 24),
+            portForwards: [.init(hostPort: 8022, guestPort: 22)],
+            localHostName: "src-phone",
+            resolvesMacName: false
+        )
+        let manifest = created.manifest.updating(
+            machineIdentifier: Data([9, 9]),
+            networkConfig: network,
+            hardwareKeyboardEnabled: false,
+            unlockAtStartup: true
+        )
+        try manifest.write(to: created.configURL)
+        return VPhoneBundle(url: url, manifest: manifest)
+    }
+
+    @Test func cloneWithNewIdentityClearsIdentityAndCollidingNetworkSettings() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let lib = VPhoneLibrary(root: root)
+        let src = try makeBootedSource(named: "src", in: lib)
+        let sourceConfig = try Data(contentsOf: src.configURL)
+
+        let clone = try VPhoneBundleOps.clone(bundleNamed: "src", to: "dst", in: lib, newIdentity: true)
+
+        let manifest = try lib.bundle(named: "dst").manifest
+        #expect(manifest.machineIdentifier.isEmpty)
+        #expect(manifest.networkConfig.macAddress.isEmpty)
+        #expect(manifest.networkConfig.ipv4 == nil)
+        #expect(manifest.networkConfig.portForwards == nil)
+        #expect(manifest.networkConfig.localHostName == nil)
+        #expect(manifest.networkConfig.mode == .nat)
+        #expect(manifest.networkConfig.resolvesMacName == false)
+        #expect(manifest.cpuCount == 8)
+        #expect(manifest.memorySize == 4096 * 1024 * 1024)
+        #expect(manifest.unlockAtStartup == true)
+        #expect(manifest.usesHardwareKeyboard == false)
+
+        let fm = FileManager.default
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("udid-prediction.txt").path))
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("vphone.sock").path))
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("Snapshots").path))
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent(".firmware-desired-plan.json").path))
+        for name in ["Disk.img", "SEPStorage", "nvram.bin", "launchpad.json", "AVPBooter.vresearch1.bin"] {
+            #expect(try Data(contentsOf: clone.url.appendingPathComponent(name))
+                == Data(contentsOf: src.url.appendingPathComponent(name)))
+        }
+
+        #expect(try Data(contentsOf: src.configURL) == sourceConfig)
+        #expect(fm.fileExists(atPath: src.url.appendingPathComponent("udid-prediction.txt").path))
+        #expect(fm.fileExists(atPath: src.url.appendingPathComponent("Snapshots/before-update/Disk.img").path))
+    }
+
+    @Test func cloneRefusesWhileSourceHoldsAStateFileOpenAndWaitsOutBriefReaders() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let lib = VPhoneLibrary(root: root)
+        let src = try makeBootedSource(named: "src", in: lib)
+        let disk = src.url.appendingPathComponent("Disk.img")
+
+        let fd = open(disk.path, O_RDONLY)
+        #expect(fd >= 0)
+        for newIdentity in [false, true] {
+            #expect(throws: VPhoneBundleActivityError.running(name: "src", pids: [getpid()])) {
+                try VPhoneBundleOps.clone(
+                    bundleNamed: "src", to: "dst", in: lib, newIdentity: newIdentity, readerWait: 0.2
+                ) {}
+            }
+            #expect(!FileManager.default.fileExists(atPath: lib.url(forName: "dst").path))
+        }
+        close(fd)
+
+        let brief = open(disk.path, O_RDONLY | O_EVTONLY)
+        try #require(brief >= 0)
+        let closer = Thread {
+            Thread.sleep(forTimeInterval: 0.25)
+            close(brief)
+        }
+        closer.start()
+        let clone = try VPhoneBundleOps.clone(bundleNamed: "src", to: "dst", in: lib)
+        #expect(FileManager.default.fileExists(atPath: clone.url.appendingPathComponent("Disk.img").path))
+    }
+
+    @Test func cloneRefusesSourceThatStartsOrMutatesDuringCopy() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let lib = VPhoneLibrary(root: root)
+        let src = try makeBootedSource(named: "src", in: lib)
+
+        for name in ["Disk.img", "SEPStorage", "nvram.bin"] {
+            var fd: Int32 = -1
+            defer { if fd >= 0 { close(fd) } }
+            #expect(throws: VPhoneBundleActivityError.running(name: "src", pids: [getpid()])) {
+                try VPhoneBundleOps.clone(
+                    bundleNamed: "src", to: "dst", in: lib, newIdentity: false, readerWait: 0.2
+                ) {
+                    fd = open(src.url.appendingPathComponent(name).path, O_RDONLY)
+                }
+            }
+            #expect(!FileManager.default.fileExists(atPath: lib.url(forName: "dst").path))
+        }
+
+        #expect(throws: VPhoneBundleActivityError.stateChanged(name: "src")) {
+            try VPhoneBundleOps.clone(
+                bundleNamed: "src", to: "dst", in: lib, newIdentity: false, readerWait: 0.1
+            ) {
+                try Data([0xFF, 0xEE]).write(to: src.url.appendingPathComponent("nvram.bin"))
+            }
+        }
+        #expect(!FileManager.default.fileExists(atPath: lib.url(forName: "dst").path))
+    }
+
+    @Test func listsNetworkSettingsClearedByNewIdentityAndFollowsDerivedMDNS() throws {
+        typealias Network = VPhoneVirtualMachineManifest.NetworkConfig
+        #expect(VPhoneBundleOps.networkSettingsClearedByNewIdentity(.default, sourceName: "src").isEmpty)
+        let network = Network(
+            mode: .tunnel,
+            macAddress: "aa:bb:cc:dd:ee:ff",
+            ipv4: .init(address: "10.0.0.5", prefixLength: 24),
+            portForwards: [.init(hostPort: 8022, guestPort: 22)],
+            localHostName: "phone"
+        )
+        #expect(VPhoneBundleOps.networkSettingsClearedByNewIdentity(network, sourceName: "src") == [
+            "fixed IPv4 address 10.0.0.5/24",
+            "port forwards tcp:127.0.0.1:8022:22",
+            "mDNS name phone",
+        ])
+        let derived = network.with(localHostName: .some(VPhoneNetworking.localHostName(forVMName: "lab_a")))
+        #expect(!VPhoneBundleOps.networkSettingsClearedByNewIdentity(derived, sourceName: "lab_a")
+            .contains { $0.hasPrefix("mDNS name") })
+
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let lib = VPhoneLibrary(root: root)
+        let src = try makeBootedSource(named: "lab_a", in: lib)
+        try src.manifest.updating(networkConfig: derived).write(to: src.configURL)
+        let clone = try VPhoneBundleOps.clone(bundleNamed: "lab_a", to: "lab_b", in: lib, newIdentity: true)
+        #expect(clone.manifest.networkConfig.localHostName == "lab-b")
+        #expect(try lib.bundle(named: "lab_a").manifest.networkConfig.localHostName == "lab-a")
     }
 
     @Test func exportThenImportRoundTrips() throws {

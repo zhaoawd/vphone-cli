@@ -30,7 +30,7 @@ faults = set(filter(None, os.environ.get('CFW_TXN_FAULTS', '').split(',')))
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from patchers import undo_provenance
 def synthetic_provenance(work, record):
-    if record.get('version') not in (2, 3, 4) or record.get('provenanceMode') != 'required':
+    if record.get('version') not in (2, 3, 4, 5) or record.get('provenanceMode') != 'required':
         raise ValueError('old records permit recovery only')
 undo_provenance.verify_publication = synthetic_provenance
 
@@ -45,6 +45,8 @@ if 'clone' in faults:
     txn.clone_file = failing(errno.ENOTSUP)
 if 'copy' in faults:
     txn.copy_file = failing(errno.EIO)
+if 'bind-mount' in faults:
+    txn.bind_mount = failing(errno.EIO)
 if 'corrupt' in faults:
     real_copy = txn.copy_file
 

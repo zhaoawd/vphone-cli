@@ -1,5 +1,6 @@
 """Exercise shared installer operations with temporary files and command doubles."""
 import os
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -107,3 +108,64 @@ exit 37
     def test_missing_restore_reports_error(self):
         result = self.run_shell('find_restore_dir')
         self.assertNotEqual(result.returncode, 0)
+
+
+class JournalBoundMountTests(unittest.TestCase):
+    def setUp(self):
+        from tests.test_patch_plan_gate import FrozenGateTests
+        from cfw_disk_txn import mount_identity
+        self.f = FrozenGateTests()
+        self.f.setUp()
+        self.addCleanup(self.f.doCleanups)
+        self.mount = self.f.root.resolve() / '.cfw_mount.external'
+        self.mount.mkdir(mode=0o700)
+        self.target = self.mount / 'mnt_sysos'
+        self.target.mkdir()
+        self.work = self.f.evidence.parent
+        self.work.mkdir(mode=0o700)
+        self.record = dict(version=5, provenanceMode='required', guestEvidenceRequired=True,
+                           runtimeImageEvidenceRequired=True, vm=str(self.f.vm),
+                           mountRoot=mount_identity(self.mount))
+        self.journal = self.work / 'transaction.json'
+        self.journal.write_text(json.dumps(self.record))
+
+    def check(self, target):
+        return subprocess.run(['/bin/zsh', '-c', '''
+SCRIPT_DIR="$CFW_TEST_SCRIPTS"
+VM_DIR="$CFW_TEST_VM"
+PYTHON3="$VPHONE_PYTHON"
+source "$CFW_TEST_COMMON"
+assert_mount_under_vm "$CFW_TEST_TARGET" "SystemOS mountpoint"
+'''], env=dict(os.environ, CFW_TEST_SCRIPTS=str(ROOT / 'scripts'),
+              CFW_TEST_VM=str(self.f.vm), VPHONE_PYTHON=sys.executable,
+              CFW_TEST_COMMON=str(COMMON), CFW_TEST_TARGET=str(target),
+              CFW_HOST_MNT=str(self.mount)), capture_output=True, text=True,
+              pass_fds=(self.f.lock_fd,), timeout=20)
+
+    def test_external_mount_bound_to_live_plan_lock_and_journal_is_accepted(self):
+        result = self.check(self.target)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_unbound_sibling_link_and_replaced_root_are_rejected(self):
+        sibling = self.mount.parent / 'unbound-mount'
+        sibling.mkdir()
+        link = self.mount / 'linked'
+        link.symlink_to(sibling, target_is_directory=True)
+        for target in (sibling, link):
+            with self.subTest(target=str(target)):
+                self.assertNotEqual(self.check(target).returncode, 0)
+        self.mount.rename(self.mount.with_name(self.mount.name + '-retained'))
+        self.target.mkdir(parents=True)
+        self.mount.chmod(0o700)
+        self.assertNotEqual(self.check(self.target).returncode, 0)
+
+    def test_wrong_vm_missing_journal_and_changed_plan_are_rejected(self):
+        self.record['vm'] = str(self.mount.parent / 'another-vm')
+        self.journal.write_text(json.dumps(self.record))
+        self.assertNotEqual(self.check(self.target).returncode, 0)
+        self.journal.unlink()
+        self.assertNotEqual(self.check(self.target).returncode, 0)
+        self.record['vm'] = str(self.f.vm)
+        self.journal.write_text(json.dumps(self.record))
+        self.f.path.write_bytes(b'changed-plan')
+        self.assertNotEqual(self.check(self.target).returncode, 0)

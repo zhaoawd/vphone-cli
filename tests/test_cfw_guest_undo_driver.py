@@ -8,6 +8,10 @@ import sys
 import unittest
 
 from tests import test_guest_undo_transaction as fixtures
+if __package__:
+    from .cfw_fixture_capacity import model_capacity
+else:
+    from cfw_fixture_capacity import model_capacity
 
 
 class GuestUndoDriverTests(unittest.TestCase):
@@ -15,7 +19,9 @@ class GuestUndoDriverTests(unittest.TestCase):
         f = fixtures.GuestUndoTransactionTests(); f.setUp(); self.addCleanup(f.doCleanups)
         root = f.vm.parent/'driver'; (root/'scripts').mkdir(parents=True)
         source = fixtures.fixtures.fixtures.plan_tests.ROOT
-        shutil.copyfile(source/'scripts/vm_lock.py', root/'scripts/vm_lock.py')
+        for name in ('vm_lock.py', 'cfw_disk_txn.py', 'cfw_guest_evidence.py', 'sparse_file.py'):
+            shutil.copyfile(source/'scripts'/name, root/'scripts'/name)
+        model_capacity(root/'scripts/cfw_disk_txn.py')
         driver = (source/'scripts/cfw_install_host.sh').read_text()
         guard = 'if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then'
         self.assertIn(guard,driver)
@@ -49,7 +55,7 @@ exit 1
             '--generation',f.fixture.generation,'--undo-declaration','dyld-boot-maxslide',str(f.vm)],
             env=env,pass_fds=(f.fixture.fixture.f.lock_fd,),capture_output=True,timeout=30)
         self.assertEqual(result.returncode,0,result.stdout.decode()+result.stderr.decode())
-        self.assertIn(b'guest DSC Undo published',result.stdout)
+        self.assertIn(b'guest component Undo published',result.stdout)
         expected = fixtures.fixtures.fixtures.cache(b'changed')
         self.assertEqual((f.vm/'Disk.img').read_bytes(),expected)
         self.assertEqual((inputs/'keep').read_bytes(),b'original input')

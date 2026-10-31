@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <notify.h>
 #include <pthread.h>
+#include <pwd.h>
 #include <stdatomic.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -58,11 +59,55 @@ static int            s_notify_token = -1;
 static uint64_t       s_publisher_started_at_ns = 0;
 
 #define VVC_LOG_PATH "/var/jb/var/mobile/Library/vphone-vcam.log"
+#ifndef VPHONED_DEFAULT_CAMERA_LAYOUT
+#define VPHONED_DEFAULT_CAMERA_LAYOUT "classic"
+#endif
+
+static const char *vvc_layout(void) {
+  const char *layout = getenv("VPHONED_CAMERA_LAYOUT");
+  return layout ? layout : VPHONED_DEFAULT_CAMERA_LAYOUT;
+}
+
+static BOOL vvc_uses_v2_layout(void) {
+  return strcmp(vvc_layout(), "v2") == 0;
+}
+
+static const char *vvc_frame_path(void) {
+  return vvc_uses_v2_layout() ? VPHONE_VCAM_V2_SHM_PATH : VPHONED_VCAM_SHM_PATH;
+}
+
+static const char *vvc_observe_path(void) {
+  return vvc_uses_v2_layout() ? VPHONE_VCAM_V2_OBSERVE_SHM_PATH : VPHONED_VCAM_OBSERVE_SHM_PATH;
+}
+
+// v2 uses the same explicit mobile media directory as its camera hooks.
+// Refuse links or preexisting non-root frame files rather than replacing them.
+static int vvc_open_v2_directory(void) {
+  struct passwd *mobile = getpwnam("mobile");
+  if (!mobile) { errno = ENOENT; return -1; }
+  int parent = open("/var/mobile/Media", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+  if (parent < 0) return -1;
+  if (mkdirat(parent, "SimulatedCamera", 0755) < 0 && errno != EEXIST) { close(parent); return -1; }
+  int directory = openat(parent, "SimulatedCamera", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+  close(parent);
+  if (directory < 0) return -1;
+  if (fchown(directory, mobile->pw_uid, mobile->pw_gid) < 0 || fchmod(directory, 0755) < 0) {
+    close(directory); return -1;
+  }
+  return directory;
+}
 
 __attribute__((format(printf, 1, 2)))
 static void vvc_logf(const char *fmt, ...) {
-  FILE *fp = fopen(VVC_LOG_PATH, "a");
-  if (!fp) return;
+  const char *path = vvc_uses_v2_layout() ? VPHONE_VCAM_V2_LOG_PATH : VVC_LOG_PATH;
+  int fd = open(path, O_WRONLY | O_CREAT | O_APPEND | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC, 0644);
+  if (fd < 0) return;
+  struct stat st;
+  if (fstat(fd, &st) < 0 || !S_ISREG(st.st_mode) || st.st_nlink != 1 || st.st_uid != geteuid()) {
+    close(fd); return;
+  }
+  FILE *fp = fdopen(fd, "a");
+  if (!fp) { close(fd); return; }
   va_list ap;
   va_start(ap, fmt);
   vfprintf(fp, fmt, ap);
@@ -72,13 +117,29 @@ static void vvc_logf(const char *fmt, ...) {
 }
 
 static int open_shm(void) {
+  const char *layout = vvc_layout();
+  if (strcmp(layout, "classic") != 0 && strcmp(layout, "v2") != 0) {
+    errno = EINVAL; return -1;
+  }
   /* Truncate to total size each fresh open so a stale half-written file
    * from a previous boot doesn't confuse readers. */
-  int fd = open(VPHONED_VCAM_SHM_PATH, O_RDWR | O_CREAT, 0644);
+  int fd;
+  if (vvc_uses_v2_layout()) {
+    int directory = vvc_open_v2_directory();
+    if (directory < 0) return -1;
+    fd = openat(directory, "vphone-vcam-frame.shm", O_RDWR | O_CREAT | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC, 0644);
+    close(directory);
+  } else {
+    fd = open(VPHONED_VCAM_SHM_PATH, O_RDWR | O_CREAT, 0644);
+  }
   if (fd < 0) {
     vvc_logf("vphoned_vcam: open(%s) failed: %s",
-          VPHONED_VCAM_SHM_PATH, strerror(errno));
+          vvc_frame_path(), strerror(errno));
     return -1;
+  }
+  struct stat st;
+  if (fstat(fd, &st) < 0 || !S_ISREG(st.st_mode) || st.st_nlink != 1 || st.st_uid != geteuid()) {
+    close(fd); errno = EPERM; return -1;
   }
   if (ftruncate(fd, VPHONED_VCAM_SHM_TOTAL_SIZE) < 0) {
     vvc_logf("vphoned_vcam: ftruncate failed: %s", strerror(errno));
@@ -275,7 +336,7 @@ static void *listener_thread(__unused void *unused) {
     return NULL;
   }
   vvc_logf("vphoned_vcam: listening on vsock %d, shm=%s",
-        VPHONED_VCAM_VSOCK_PORT, VPHONED_VCAM_SHM_PATH);
+        VPHONED_VCAM_VSOCK_PORT, vvc_frame_path());
 
   for (;;) {
     int fd = accept(srv, NULL, NULL);
@@ -317,10 +378,10 @@ void vp_vcam_start(void) {
 static BOOL read_observe_snapshot(uint64_t *out_index, uint64_t *out_at_ns,
                                   uint64_t *out_count, char *out_gen,
                                   size_t out_gen_cap, uint8_t out_presentation_id[16]) {
-  int fd = open(VPHONED_VCAM_OBSERVE_SHM_PATH, O_RDONLY);
+  int fd = open(vvc_observe_path(), O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC);
   if (fd < 0) return NO;
   struct stat st;
-  if (fstat(fd, &st) < 0 || st.st_size < VPHONED_VCAM_OBSERVE_SHM_SIZE) {
+  if (fstat(fd, &st) < 0 || !S_ISREG(st.st_mode) || st.st_nlink != 1 || st.st_size < VPHONED_VCAM_OBSERVE_SHM_SIZE) {
     close(fd);
     return NO;
   }

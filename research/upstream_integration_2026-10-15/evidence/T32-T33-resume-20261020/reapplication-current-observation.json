@@ -1,0 +1,110 @@
+{
+  "observation": {
+    "recordedAt": "2026-10-21T00:03:31.001972+00:00",
+    "stage": "reapply-cfw",
+    "runnerPID": 93069,
+    "runnerAlive": true,
+    "rootInstallerPIDs": [
+      17578
+    ],
+    "processes": [
+      {
+        "user": "kolar",
+        "pid": 15708,
+        "ppid": 93069,
+        "elapsed": "09:33:15",
+        "cpuTime": "4:13.49",
+        "cpuPercent": "0.0",
+        "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw install vm-t32-t33-dsc-20261018 --library-root /Users/kolar/github/vphone-cli --variant regular --guest-environment classic --keep-artifacts --reinstall-cryptex --root-popup"
+      },
+      {
+        "user": "root",
+        "pid": 17578,
+        "ppid": 94401,
+        "elapsed": "09:29:02",
+        "cpuTime": "0:00.09",
+        "cpuPercent": "0.0",
+        "command": "/bin/zsh .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/cfw_install_host.sh --variant regular --reinstall-cryptex vm-t32-t33-dsc-20261018"
+      },
+      {
+        "user": "root",
+        "pid": 64818,
+        "ppid": 17578,
+        "elapsed": "01:17",
+        "cpuTime": "0:00.11",
+        "cpuPercent": "0.0",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/patchers/plan_gate.py verify-final"
+      },
+      {
+        "user": "root",
+        "pid": 64819,
+        "ppid": 64818,
+        "elapsed": "01:17",
+        "cpuTime": "1:13.71",
+        "cpuPercent": "95.4",
+        "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw verify-plan vm-t32-t33-dsc-20261018 --expected-sha256 bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c"
+      },
+      {
+        "user": "kolar",
+        "pid": 93069,
+        "ppid": 1,
+        "elapsed": "17:16:14",
+        "cpuTime": "0:20.18",
+        "cpuPercent": "0.0",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -u .build/t32-resume-acceptance-20261020/run-acceptance.py"
+      }
+    ]
+  },
+  "acceptanceState": {
+    "previousFailedTransaction": "20261020T000756Z-iTDO2qSV",
+    "state": "reapply-cfw",
+    "vm": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018",
+    "runtimeEffectsValidated": false,
+    "graphicsValidated": false,
+    "recordedAt": "2026-10-20T14:30:15.676803+00:00",
+    "runnerPID": 93069,
+    "argv": [
+      "/Users/kolar/github/vphone-cli/.build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli",
+      "cfw",
+      "install",
+      "vm-t32-t33-dsc-20261018",
+      "--library-root",
+      "/Users/kolar/github/vphone-cli",
+      "--variant",
+      "regular",
+      "--guest-environment",
+      "classic",
+      "--keep-artifacts",
+      "--reinstall-cryptex",
+      "--root-popup"
+    ],
+    "childPID": 15708,
+    "stages": [
+      {
+        "stage": "install-cfw",
+        "exitCode": 0
+      },
+      {
+        "stage": "installed-proof",
+        "exitCode": 0
+      },
+      {
+        "stage": "undo-preboot",
+        "exitCode": 0
+      },
+      {
+        "stage": "restored-proof",
+        "exitCode": 0
+      },
+      {
+        "stage": "restored-api",
+        "exitCode": 0
+      },
+      {
+        "stage": "restored-postboot",
+        "exitCode": 0
+      }
+    ]
+  },
+  "note": "Read-only process observation; reapplication completion is not established."
+}

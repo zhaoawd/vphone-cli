@@ -1,0 +1,42 @@
+{
+  "reason": "Irisin CLI v5.1.4 does not set bootstrapInstall; debianutils.postinst requires bootstrap sh and cp before normal transaction stages place dash/coreutils.",
+  "files": [
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/dash.seed",
+      "target": "/var/jb/usr/bin/dash",
+      "sha256": "c98ea31bb64a7f6fe4b7729cb490d95814af96ed562d980d803dc13f678c0bf9"
+    },
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/cp.seed",
+      "target": "/var/jb/usr/bin/cp",
+      "sha256": "4914302ec3497270b90bed4872ef2fec6a72f4a4ff13e93dadd8c4046c44b586"
+    }
+  ],
+  "links": [
+    {
+      "result": {
+        "link": "/var/jb/bin/sh",
+        "resolved": "/var/jb/usr/bin/dash",
+        "target": "/var/jb/usr/bin/dash"
+      },
+      "ok": true
+    },
+    {
+      "result": {
+        "resolved": "/var/jb/usr/bin/dash",
+        "target": "/var/jb/usr/bin/dash",
+        "link": "/var/jb/usr/bin/sh"
+      },
+      "ok": true
+    }
+  ],
+  "probe": {
+    "result": {
+      "crashed": false,
+      "ok": true,
+      "output": "",
+      "result": "{\"status\":0,\"stderr\":\"\",\"signal\":null,\"stdout\":\"shell-seed-okcp (GNU coreutils) 9.5\\nCopyright (C) 2024 Free Software Foundation, Inc.\\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\\nThis is free software: you are free to change and redistribute it.\\nThere is NO WARRANTY, to the extent permitted by law.\\n\\nWritten by Torbj\u00f6rn Granlund, David MacKenzie, and Jim Meyering.\\n\"}"
+    },
+    "ok": true
+  }
+}

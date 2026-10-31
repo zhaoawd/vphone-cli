@@ -133,6 +133,28 @@ class ComponentSignatureTests(unittest.TestCase):
             new.write_bytes(binary(1<<40))
             with self.assertRaises(ValueError): signatures.verify_signing(old,new)
 
+    def test_existing_linkedit_reservation_is_preserved_but_cannot_be_expanded(self):
+        def binary(vmsize):
+            data=bytearray(signed_macho())
+            command=bytearray(72)
+            struct.pack_into('<II16sQQQQIIII',command,0,0x19,72,b'__LINKEDIT',0x100000000,vmsize,4096,len(data)-4096,1,1,0,0)
+            signature=data[32:48]
+            data[32:104]=command;data[104:120]=signature
+            struct.pack_into('<II',data,16,2,88)
+            data[4168:4200]=hashlib.sha256(data[:4096]).digest()
+            return data
+        with tempfile.TemporaryDirectory() as tmp:
+            old,new=Path(tmp)/'old',Path(tmp)/'new'
+            old.write_bytes(binary(32768));new.write_bytes(binary(32768))
+            signatures.verify_signing(old,new)
+            new.write_bytes(binary(65536))
+            with self.assertRaisesRegex(ValueError,'linkedit'):
+                signatures.verify_signing(old,new)
+            for invalid in (0,4097):
+                old.write_bytes(binary(invalid));new.write_bytes(binary(4096))
+                with self.assertRaisesRegex(ValueError,'linkedit'):
+                    signatures.verify_signing(old,new)
+
     def test_signer_cannot_promote_an_unknown_input_signature_structure(self):
         with tempfile.TemporaryDirectory() as tmp:
             old,new=Path(tmp)/'old',Path(tmp)/'new'
@@ -157,3 +179,80 @@ class ComponentSignatureTests(unittest.TestCase):
             path.write_bytes(data)
             with self.assertRaisesRegex(ValueError,'scatter'):
                 signatures.directories(path)
+
+
+class SigningCommandSpaceTests(unittest.TestCase):
+    @staticmethod
+    def injected(source_version=True, padding=0):
+        segment=bytearray(152)
+        struct.pack_into('<II16sQQQQIIII',segment,0,0x19,152,b'__TEXT',0x100000000,4096,0,4096,5,5,1,0)
+        uuid=struct.pack('<II16s',0x1b,24,b'uuid-preserved!!')
+        version=struct.pack('<IIQ',0x2a,16,0x10203) if source_version else b''
+        dylib=struct.pack('<IIIIII',0x80000018,32,24,0,0,0)+b'/vh\0'+b'\0'*4
+        commands=segment+uuid+version+dylib
+        start=32+len(commands)+padding
+        struct.pack_into('<16s16sQQIIIIIIII',commands,72,b'__text',b'__TEXT',0x100000000+start,64,start,2,0,0,0,0,0,0)
+        body=bytearray(4096)
+        struct.pack_into('<IIIIIIII',body,0,0xfeedfacf,0x100000c,0,2,3+bool(source_version),len(commands),0,0)
+        body[32:32+len(commands)]=commands
+        body[start:start+64]=bytes(range(1,65))
+        return bytes(body),start
+
+    @classmethod
+    def signed_injection_input(cls):
+        data, text = cls.injected()
+        body = bytearray(data)
+        count, size = struct.unpack_from('<II', body, 16)
+        # Replace the fixture's final /vh command with the old signature.
+        size -= 32
+        tail = signed_macho()[4096:]
+        struct.pack_into('<IIII', body, 32 + size, 0x1d, 16, 4096, len(tail))
+        body[32 + size + 16:text] = bytes(text - (32 + size + 16))
+        struct.pack_into('<II', body, 16, count, size + 16)
+        body.extend(tail)
+        body[4168:4200] = hashlib.sha256(body[:4096]).digest()
+        return bytes(body), text
+
+    @staticmethod
+    def sign(data):
+        body=bytearray(data);count,size=struct.unpack_from('<II',body,16)
+        tail=signed_macho()[4096:]
+        struct.pack_into('<II',body,16,count+1,size+16)
+        struct.pack_into('<IIII',body,32+size,0x1d,16,4096,len(tail))
+        body.extend(tail);body[4168:4200]=hashlib.sha256(body[:4096]).digest()
+        return body
+
+    def test_source_version_space_preserves_text_uuid_and_signature_checks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            old,new=Path(tmp)/'old',Path(tmp)/'new'
+            data,text=self.injected();old.write_bytes(data);new.write_bytes(self.sign(data))
+            with self.assertRaisesRegex(ValueError,'non-padding'):
+                signatures.verify_signing(old,new)
+            self.assertTrue(signatures.reserve_signature_command(old))
+            prepared=old.read_bytes()
+            self.assertEqual(prepared[text:],data[text:])
+            self.assertIn(b'uuid-preserved!!',prepared)
+            new.write_bytes(self.sign(prepared));signatures.verify_signing(old,new)
+
+    def test_room_keeps_source_version_and_no_room_without_it_refuses(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'image';data,_=self.injected(padding=16);path.write_bytes(data)
+            self.assertFalse(signatures.reserve_signature_command(path));self.assertEqual(path.read_bytes(),data)
+            data,_=self.injected(source_version=False);path.write_bytes(data)
+            with self.assertRaisesRegex(ValueError,'space'):
+                signatures.reserve_signature_command(path)
+            self.assertEqual(path.read_bytes(),data)
+
+    def test_overlap_and_nonzero_reserved_space_refuse_without_writes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'image'
+            for kind in ('overlap','nonzero-padding'):
+                with self.subTest(kind=kind):
+                    data,text=self.injected(padding=16);data=bytearray(data)
+                    if kind=='overlap':
+                        struct.pack_into('<I',data,32+72+48,text-20)
+                    else:
+                        data[text-16]=1
+                    path.write_bytes(data)
+                    with self.assertRaises(ValueError): signatures.reserve_signature_command(path)
+                    self.assertEqual(path.read_bytes(),data)

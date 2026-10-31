@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "scope": "additional assertion on installed Undo eligibility after tree-copy and staged build-version change",
+  "passed": true,
+  "tests": 1,
+  "seconds": 3.138,
+  "requiredDeclarations": [
+    "system-systemversion-cfw-build_version"
+  ],
+  "state": "qualified_file_restore",
+  "unsupportedTargets": [],
+  "productionChanged": false,
+  "frozenInputsChanged": false,
+  "VMStarts": 0,
+  "CFWWrites": 0,
+  "securityWindows": 0,
+  "files": [
+    {
+      "path": "test_patch_plan_gate.py",
+      "source": "/Users/kolar/github/vphone-cli/tests/test_patch_plan_gate.py",
+      "bytes": 81148,
+      "sha256": "e01b0d46193b1a24d23c8e8f0e501c488bdb3c5230dc4830fa746e6ef1afeee5"
+    },
+    {
+      "path": "combined-target-undo-eligibility.log",
+      "source": "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/exp-bounded-preflight-20261024/combined-target-undo-eligibility.log",
+      "bytes": 440,
+      "sha256": "9a01e9b016d0a3c2e59da6e12cf68d171882c342c0396795a29015152b9ddc52"
+    }
+  ]
+}

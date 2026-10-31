@@ -1,0 +1,694 @@
+{
+  "accepted": false,
+  "target": {
+    "host_id": "migration-local",
+    "rig_id": "migration-stage3-fresh",
+    "rig_generation": 6,
+    "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+    "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer",
+    "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer/vphone.sock",
+    "expected_usb_udid": "0000FE01-32F7B33D02134DC5",
+    "ssh_host": "127.0.0.1",
+    "ssh_port": 22243,
+    "frida_host": "127.0.0.1",
+    "frida_port": 37043,
+    "frida_guest_port": 27042,
+    "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/logs",
+    "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/tmp",
+    "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/packages",
+    "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/runtime",
+    "protocol": "upstream_v1",
+    "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+  },
+  "build_id": "bld-91bb43c065eb8f469d32f2a244943c40982cff44b7685675d33448609addfe8c",
+  "checks": [
+    {
+      "name": "provisioning_readback",
+      "passed": true,
+      "value": {
+        "status": "passed",
+        "changed": false,
+        "installed_build": {
+          "slot": "001",
+          "label": "food-coupons-ios27-scene-r6",
+          "file": "blobs/e8f0d787a2eb058cacbd48447ef850545ad1a08a04de78a35217a6bc7c392757.ipa",
+          "bundle_id": "com.autophone.foodorderingdemo.v2",
+          "version": "1.0.0",
+          "release_like": true,
+          "release_evidence": "embedded_js_bundle:Payload/FoodAIVerification.app/main.jsbundle",
+          "sha256": "e8f0d787a2eb058cacbd48447ef850545ad1a08a04de78a35217a6bc7c392757",
+          "size": 9717565,
+          "added_at": "2026-10-31T14:50:58+08:00",
+          "app": "food_ordering_v2",
+          "short_version": "1.0.0",
+          "build_id": "bld-91bb43c065eb8f469d32f2a244943c40982cff44b7685675d33448609addfe8c",
+          "build_version": "1",
+          "source_revision": {
+            "kind": "source_tree",
+            "state": "generated",
+            "tree_sha256": "4f1df96099acbbc799e7bbd0127715dd7296f8e1cfe1ef7972fe5a5e5ffd4bd4",
+            "base_commit_sha": "f6a72613482ec50b639829d39884868828798e76"
+          },
+          "artifact_sha256": "e8f0d787a2eb058cacbd48447ef850545ad1a08a04de78a35217a6bc7c392757",
+          "resolution_source": "slot_build_id",
+          "verified": true,
+          "installed_at": "2026-10-31T14:51:10+08:00",
+          "installer": "vphone_native"
+        },
+        "detail": "desired build already observed",
+        "build_ref": {
+          "app": "food_ordering_v2",
+          "slot": "001",
+          "short_version": "1.0.0",
+          "build_id": "bld-91bb43c065eb8f469d32f2a244943c40982cff44b7685675d33448609addfe8c",
+          "build_version": "1",
+          "source_revision": {
+            "kind": "source_tree",
+            "state": "generated",
+            "tree_sha256": "4f1df96099acbbc799e7bbd0127715dd7296f8e1cfe1ef7972fe5a5e5ffd4bd4",
+            "base_commit_sha": "f6a72613482ec50b639829d39884868828798e76"
+          },
+          "artifact_sha256": "e8f0d787a2eb058cacbd48447ef850545ad1a08a04de78a35217a6bc7c392757",
+          "resolution_source": "build_id"
+        },
+        "install_receipt": null,
+        "readback": {
+          "app": "food_ordering_v2",
+          "bundle_id": "com.autophone.foodorderingdemo.v2",
+          "short_version": "1.0.0",
+          "build_version": "1",
+          "slot": null,
+          "sha256": null,
+          "build_id": null
+        },
+        "build_marker": {
+          "state": "present",
+          "expected_sha256": "39ef1c22e8a6570dad5456183b3180a5fa057deb656d0965f0eb2c9b10557ced",
+          "readback_sha256": "39ef1c22e8a6570dad5456183b3180a5fa057deb656d0965f0eb2c9b10557ced",
+          "readback_error": null
+        }
+      }
+    },
+    {
+      "name": "fixture_home_ready",
+      "passed": true,
+      "value": {
+        "nonce": "e5d75f04074d8c3bec6f073657f01f20",
+        "receipt": {
+          "schema_version": "ui-eval-selection-receipt/v1",
+          "mutation_id": "baseline",
+          "mutation_epoch": 0,
+          "nonce": "e5d75f04074d8c3bec6f073657f01f20",
+          "registry_sha256": "7c9af7b50fc8255101a17abb87e4614d07016b2638c925ab7ba1c1dc1c3a1fd5"
+        },
+        "bag_count": 2,
+        "snapshot_hash": "fnv1a32:a49acdde"
+      }
+    },
+    {
+      "name": "foreground_home_ready",
+      "passed": true,
+      "value": {
+        "pid": 857
+      }
+    }
+  ],
+  "ui_events": [
+    {
+      "kind": "assert",
+      "identifier": "home.recommendation.title",
+      "label": "炙烤牛肉拌饭",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "assert",
+      "identifier": "home.header.cart",
+      "label": "袋 2",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "assert",
+      "identifier": "home.header.cart",
+      "label": null,
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "tap",
+      "identifier": "home.header.cart"
+    },
+    {
+      "kind": "assert",
+      "identifier": "cart.summary.quantity",
+      "label": "2",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "assert",
+      "identifier": "cart.line.beef-bowl-001.portion-standard.remove",
+      "label": null,
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "tap",
+      "identifier": "cart.line.beef-bowl-001.portion-standard.remove"
+    },
+    {
+      "kind": "assert",
+      "identifier": "cart.empty.message",
+      "label": "购物车还是空的",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "assert",
+      "identifier": "cart.empty.primary_action",
+      "label": null,
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "tap",
+      "identifier": "cart.empty.primary_action"
+    },
+    {
+      "kind": "assert",
+      "identifier": "home.header.cart",
+      "label": "袋 0",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "assert",
+      "identifier": "home.recommendation.details",
+      "label": null,
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "tap",
+      "identifier": "home.recommendation.details"
+    },
+    {
+      "kind": "assert",
+      "identifier": "dish.title",
+      "label": "菜品规格与数量",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "assert",
+      "identifier": "dish.total",
+      "label": "¥32",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    },
+    {
+      "kind": "assert",
+      "identifier": "dish.quantity.value",
+      "label": "1",
+      "selected": null,
+      "enabled": null,
+      "pid": 857
+    }
+  ],
+  "failed_observations": [
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    },
+    {
+      "identifier": "dish.portion.standard",
+      "matches": [
+        {
+          "traits": 8589934600,
+          "x": 116.5,
+          "enabled": true,
+          "frame": {
+            "y": 369,
+            "height": 52,
+            "width": 189,
+            "x": 22
+          },
+          "role": "element",
+          "visible": 1,
+          "y": 395,
+          "identifier": "dish.portion.standard",
+          "clickable": true,
+          "label": "标准份",
+          "value": "checked"
+        }
+      ]
+    }
+  ],
+  "error": "RuntimeError: UI assertion deadline: dish.portion.standard",
+  "screen_lock_released": true
+}

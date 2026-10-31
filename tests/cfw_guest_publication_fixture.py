@@ -71,8 +71,10 @@ def readback(work):
     final = dict(schemaVersion=1, transactionID=record['id'], generationID=plan.context['generationID'],
         planDigest=plan.record['planSHA256'], desiredSHA256=plan.raw_sha256,
         operationsSHA256=hashlib.sha256(raw).hexdigest(), stagedImage=str(image),
-        stagedIdentity=evidence.image_identity(image.stat()), outputs=[{'target': target}])
+        stagedIdentity=evidence.image_identity(image.stat()), outputs=[])
     rows = [json.loads(line) for line in raw.splitlines()]
+    final['outputs']=[dict(target=target, state=rows[-1]['effect']['after'],
+                           effects=[hashlib.sha256(evidence.canonical(row)).hexdigest() for row in rows])]
     final['undoProvenanceSHA256'] = undo_provenance.persist(plan, rows, final['outputs'], work)
     evidence.write_final(work / evidence.FINAL, evidence.canonical(final))
     undo_provenance.seal(work, final)

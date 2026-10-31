@@ -1,0 +1,29 @@
+
+
+2026-10-23 T32/T33隔离验收进度校正：原计划cdb74f7a…首阶段在写盘前被身份门拒绝，三项Mach-O应用、撤销、重应用均未完成；12项持久文件及335项冻结输入保持。两份早期v4祖先记录缺少盘、postimage和effect-blobs，缺失时点及原因未查明。Swift身份读取器另已补齐v5/schema3兼容并通过v4/v5、完整文件Undo和真实只读回放。新候选a88440c704e4及新隔离计划f3eabf4a…已获用户批准，340项冻结输入复核通过，当前等待macOS系统认证，尚未创建新副本。两批准备/失败证据共119及40项分别归档并逐项核验。未启动VM或开启新窗口；受信guest来源、GUI/补丁运行效果与整项验收仍未完成，accepted=false。详见T32_T33_completion_20261023.md。
+
+2026-10-23 用户已完成新隔离计划f3eabf4a…的系统认证，原生root执行器已启动，fresh-offline-acceptance目录及根执行日志已生成。执行器先检查具名缓存及磁盘空间，再完整复核原VM的12项启动文件；尚无任何on/off/on通过结论，不启动VM或辅助窗口。
+
+
+2026-10-23 新隔离计划f3eabf4a…实际结束：generation=34abf58b3c5166e0b393f8e9c53b14deee5835efc4ec561f6629ef0c79c89664，语义计划与批准相同；首次CFW已采集generation文件原件，但旧assert_mount_under_vm在SystemOS挂载前拒绝批准的外部工作目录。没有新磁盘发布，三阶段均未计通过；按失败即停止，未重试。两盘均无附件，失败暂存正常卸载并清理，失败journal保留。独立完整摘要确认原VM12项身份/元数据/内容保持，新副本10项启动文件仍与备份相同且inode独立，340项冻结输入保持；两个受保护VM仍运行。正在建立该路径检查的复现及修复；新候选续验需具体方案，原批准不自动重试。accepted=false。
+
+
+2026-10-23 外部挂载路径修复：实际shell复现3项仅合格外部路径失败，拒绝分支保持。assert_mount_under_vm对外部路径改用现有private_path门：重读冻结计划、继承VM锁、核对journal中mountRoot的dev/inode/uid及无符号链接路径；真实mount-cryptex仍单独核验固定挂载目标、源镜像和generation。16项挂载/工作目录及121项相关shell、计划门、宿主事务和文件Undo回归通过，续验执行门2项通过，语法和空白检查通过。未增加固件、内核或DSC指令补丁。
+
+修复候选2.6.2-local.887b0069c62a封装及签名/依赖闭包/Bundle核验通过，归档SHA-256为55b37cf5f02ed228e4dfda0b423161b7bf7747995db29dc985259eb083777c9a，194647552字节；VM及guest载荷相对基底保持，未安装到Store。新resumed-file-acceptance-plan.json（SHA-256 ba1279954c64ab30712e0e92eb4428c2b222f91d0cf9e621a39ad358f6d7fd95）冻结342项输入，仅拟在同一新副本和新generation上执行一次on/off/on，原12项和新10项完整摘要/身份先复核，每阶段严格独立只读审计；root重新读取实际desired和manifest，正式CLI重新验证完整generation/磁盘身份。允许正式CFW正常清理该新副本的.cfw_temp（含此前失败生成的可重建源缓存）及新暂存，保留原VM、旧盘、generation、失败journal和证据。新候选及失败后的再次执行尚未获准，未重试；不启动VM或窗口，不重建generation、不安装或重绑。受信Guest来源和运行效果仍未通过，accepted=false。
+
+2026-10-23 用户明确批准续验计划ba1279954c64ab30712e0e92eb4428c2b222f91d0cf9e621a39ad358f6d7fd95；342项冻结输入再次复核通过，独立批准标记及用户原文已保存。已排除旧执行/认证进程，发起本次具名系统认证，等待认证后执行。此次只在保留的新副本上验三项Mach-O，无VM启动、窗口、Store安装或重绑；原计划的失败记录和已归档证据保持。
+
+续验认证已确认；原VM12项和新副本10项完整内容/身份复核通过，实际root重新读取同generation/同语义计划及归档关联后进入on阶段，候选887b0069c62a在.cfw_disk.xoAlcrnT采集新原件。尚未发布或完成任何一个验收阶段。
+
+2026-10-23 续验进展：on事务20261023T074423Z-xoAlcrnT通过独立只读审计，4681项目标及5项代码页记录核验通过，磁盘摘要与发布记录相同；三项撤销事务20261023T082509Z-gml5bJzX已发布并保留前盘，正在进行独立只读审计及完整原件/签名页复核。尚未执行重应用，整项accepted=false；本轮未启动VM或辅助窗口。
+
+2026-10-23 续验off独立审计及三项完整原件/签名页复核通过，on与off均完成。执行器已进入reapplied阶段的已有发布链核验，尚未完成最终发布/审计和原VM最终完整复核。三阶段全部通过前不计完整文件on/off/on通过；本轮无VM启动或辅助窗口，accepted=false。
+
+2026-10-23 运行观察器独立复验：原4项回归通过。代码核查GuestAPI.apps.foreground总是提供verified字段，旧观察器仅比较bundle_id；新增失败复现中verified=false、缺失、1及字符串true均被错误计为显示通过。修复为要求verified is True并保存原始前台返回，5项回归通过，AA.gl拒绝仍保留失败并继续显示检查。该观察器不属于当前离线冻结输入，未用于本轮VM运行，也未开启新窗口。日志runtime-foreground-red.log/runtime-foreground-green.log。
+
+2026-10-23 续验计划ba127995…已结束，结果为失败；保留已通过阶段和原始失败记录，没有自动重试、回滚、VM启动或辅助窗口。错误：Reapplied target differs from the first on state: system:/usr/libexec/seputil。T32/T33整项accepted=false。
+
+2026-10-23 签名差异已定位并独立核验：相同签名前输入和参数经ldid产生不同CMS signingTime及其签名值。三项文件的CMS以外全部字节、证书、算法、其他签名属性和安装元数据一致；六份CMS密码学校验及全部代码页通过。原始完整文件字节相等验收继续失败，不改写旧记录。新增独立CMS核验6项回归通过，包含有效/无效时间篡改、签名损坏、证书/字段修改及代码改变的拒绝。独立保存证据核验同时确认原VM12项完整内容/身份、342项冻结输入及66项旧归档保持。无新挂载或VM写入。
+
+同一隔离副本10项启动文件的完整备份已核验；completed-runtime/runtime-plan.json已准备，SHA-256 8f47f172215467fc7f9aef31c464ae71b1709acdd0b59e32ff9587e3462e5621，冻结365项工具/证明，资格明确为原件精确恢复+CMS签名时间差异的密码学校验，原完整字节验收仍失败。计划仅拟一次GUI/Settings显示与AA.gl摘要观察，原窗口已消耗，新计划尚未批准、未启动VM或辅助窗口。AA.gl既有EPERM继续保留为失败，不能由显示通过覆盖。可信Guest来源桥接、真实Preboot数据撤销及运行效果仍未完成，accepted=false。

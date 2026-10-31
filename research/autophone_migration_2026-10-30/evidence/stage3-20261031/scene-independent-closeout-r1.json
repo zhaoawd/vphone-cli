@@ -1,0 +1,102 @@
+{
+  "accepted": true,
+  "targets": [
+    {
+      "target": {
+        "host_id": "migration-local",
+        "rig_id": "migration-stage3",
+        "rig_generation": 4,
+        "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+        "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline",
+        "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+        "expected_usb_udid": "0000FE01-2119AAF5C1E70D2F",
+        "ssh_host": "127.0.0.1",
+        "ssh_port": 22242,
+        "frida_host": "127.0.0.1",
+        "frida_port": 37042,
+        "frida_guest_port": 27042,
+        "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/logs",
+        "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/tmp",
+        "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage3/packages",
+        "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/runtime",
+        "protocol": "upstream_v1",
+        "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+      },
+      "status": {
+        "action": "status",
+        "status": "stopped",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage3",
+        "rig_generation": 4,
+        "affected_pids": [],
+        "detail": ""
+      },
+      "disk_holders": [],
+      "launch_lock_held": false,
+      "probe": {
+        "state": "unreachable",
+        "available": false,
+        "evidence": "uds=/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock guest/transport unavailable: ConnectionRefusedError: [Errno 61] Connection refused"
+      },
+      "screen_lock": {
+        "device": "migration-stage3",
+        "locked": false,
+        "run_id": null,
+        "acquired_at": null,
+        "pid": null,
+        "owner_kind": null,
+        "owner_id": null
+      }
+    },
+    {
+      "target": {
+        "host_id": "migration-local",
+        "rig_id": "migration-stage3-fresh",
+        "rig_generation": 6,
+        "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+        "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer",
+        "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer/vphone.sock",
+        "expected_usb_udid": "0000FE01-32F7B33D02134DC5",
+        "ssh_host": "127.0.0.1",
+        "ssh_port": 22243,
+        "frida_host": "127.0.0.1",
+        "frida_port": 37043,
+        "frida_guest_port": 27042,
+        "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/logs",
+        "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/tmp",
+        "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/packages",
+        "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/runtime",
+        "protocol": "upstream_v1",
+        "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+      },
+      "status": {
+        "action": "status",
+        "status": "stopped",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage3-fresh",
+        "rig_generation": 6,
+        "affected_pids": [],
+        "detail": ""
+      },
+      "disk_holders": [],
+      "launch_lock_held": false,
+      "probe": {
+        "state": "unreachable",
+        "available": false,
+        "evidence": "uds=/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer/vphone.sock guest/transport unavailable: ConnectionRefusedError: [Errno 61] Connection refused"
+      },
+      "screen_lock": {
+        "device": "migration-stage3-fresh",
+        "locked": false,
+        "run_id": null,
+        "acquired_at": null,
+        "pid": null,
+        "owner_kind": null,
+        "owner_id": null
+      }
+    }
+  ],
+  "vm_sha256": "0f86660fa63f85614fdb5bb81cbf76d4193d7b4fc3a3e4c82fd7b48e3eac8a88",
+  "codesign": 0,
+  "original_ipa_sha256": "e0942c400684af47d5d8e67c79d996adae42e8a5f3024c36522d5b780cb0c642"
+}

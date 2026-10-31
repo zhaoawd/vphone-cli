@@ -1,0 +1,707 @@
+/*
+ * vphoned — VM guest agent for vphone-cli.
+ *
+ * Runs inside the iOS VM as a LaunchDaemon. Communicates with the host
+ * over vsock using length-prefixed JSON (vphone-control protocol).
+ *
+ * Auto-update: on each handshake the host sends its binary hash. If it
+ * differs from our own, the host pushes a signed replacement. We write
+ * it to CACHE_PATH and exit — launchd restarts us, and the bootstrap
+ * code in main() exec's the cached binary.
+ *
+ * Build:
+ *   make vphoned
+ */
+
+#include <CommonCrypto/CommonDigest.h>
+#import <Foundation/Foundation.h>
+#include <arpa/inet.h>
+#include <stdatomic.h>
+#include <ifaddrs.h>
+#include <mach-o/dyld.h>
+#include <math.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#import "vphoned_accessibility.h"
+#import "vphoned_apps.h"
+#import "vphoned_clipboard.h"
+#import "vphoned_devmode.h"
+#import "vphoned_files.h"
+#import "vphoned_hid.h"
+#import "vphoned_install.h"
+#import "vphoned_keychain.h"
+#import "vphoned_location.h"
+#import "vphoned_notify.h"
+#import "vphoned_protocol.h"
+#import "vphoned_settings.h"
+#import "vphoned_shell.h"
+#import "vphoned_url.h"
+#import "vphoned_vcam.h"
+
+#ifndef AF_VSOCK
+#define AF_VSOCK 40
+#endif
+
+static BOOL vp_parse_safe_json_integer(id value, NSInteger *parsed) {
+  if (![value isKindOfClass:[NSNumber class]] ||
+      CFGetTypeID((__bridge CFTypeRef)value) == CFBooleanGetTypeID()) {
+    return NO;
+  }
+  double number = [value doubleValue];
+  if (!isfinite(number) || trunc(number) != number ||
+      fabs(number) > 9007199254740991.0) {
+    return NO;
+  }
+  if (parsed) *parsed = (NSInteger)number;
+  return YES;
+}
+
+#define VMADDR_CID_ANY 0xFFFFFFFF
+#define VPHONED_PORT 1337
+
+#ifndef VPHONED_BUILD_HASH
+#define VPHONED_BUILD_HASH "unknown"
+#endif
+
+static BOOL gClipboardAvailable = NO;
+static BOOL gAppsAvailable = NO;
+
+/// Concurrent worker pool for slow commands without inline payload.
+/// Each handle_client invocation owns a private dispatch_group + a unique
+/// monotonic session id. Workers capture that id and refuse to write if
+/// the session has been invalidated (set when the reader loop exits),
+/// preventing a stale async write from landing on a recycled fd.
+static dispatch_queue_t gWorkerQueue;
+static _Atomic uint64_t gCurrentSession = 0;
+
+#define INSTALL_PATH "/usr/bin/vphoned"
+#define CACHE_PATH "/var/root/Library/Caches/vphoned"
+#define CACHE_DIR "/var/root/Library/Caches"
+
+struct sockaddr_vm {
+  __uint8_t svm_len;
+  sa_family_t svm_family;
+  __uint16_t svm_reserved1;
+  __uint32_t svm_port;
+  __uint32_t svm_cid;
+};
+
+// MARK: - Self-hash
+
+static NSString *sha256_of_file(const char *path) {
+  int fd = open(path, O_RDONLY);
+  if (fd < 0)
+    return nil;
+
+  CC_SHA256_CTX ctx;
+  CC_SHA256_Init(&ctx);
+
+  uint8_t buf[32768];
+  ssize_t n;
+  while ((n = read(fd, buf, sizeof(buf))) > 0)
+    CC_SHA256_Update(&ctx, buf, (CC_LONG)n);
+  close(fd);
+
+  unsigned char digest[CC_SHA256_DIGEST_LENGTH];
+  CC_SHA256_Final(digest, &ctx);
+
+  NSMutableString *hex =
+      [NSMutableString stringWithCapacity:CC_SHA256_DIGEST_LENGTH * 2];
+  for (int i = 0; i < CC_SHA256_DIGEST_LENGTH; i++)
+    [hex appendFormat:@"%02x", digest[i]];
+  return hex;
+}
+
+static const char *self_executable_path(void) {
+  static char path[4096];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) != 0)
+    return NULL;
+  return path;
+}
+
+// MARK: - Network
+
+/// Returns the first non-loopback IPv4 address, preferring en* interfaces
+/// (Wi-Fi/cellular over virtual). Returns nil if no usable address is found.
+static NSString *primary_ipv4_address(void) {
+  struct ifaddrs *ifap = NULL;
+  if (getifaddrs(&ifap) != 0 || ifap == NULL)
+    return nil;
+
+  NSString *preferred = nil;
+  NSString *fallback = nil;
+
+  for (struct ifaddrs *cur = ifap; cur != NULL; cur = cur->ifa_next) {
+    if (cur->ifa_addr == NULL || cur->ifa_addr->sa_family != AF_INET)
+      continue;
+    if ((cur->ifa_flags & IFF_UP) == 0 ||
+        (cur->ifa_flags & IFF_LOOPBACK) != 0)
+      continue;
+
+    char buf[INET_ADDRSTRLEN] = {0};
+    struct sockaddr_in *sin = (struct sockaddr_in *)cur->ifa_addr;
+    if (!inet_ntop(AF_INET, &sin->sin_addr, buf, sizeof(buf)))
+      continue;
+
+    NSString *addr = [NSString stringWithUTF8String:buf];
+    NSString *name = [NSString stringWithUTF8String:cur->ifa_name];
+    if ([name hasPrefix:@"en"] || [name hasPrefix:@"pdp_ip"]) {
+      preferred = addr;
+      break;
+    }
+    if (!fallback)
+      fallback = addr;
+  }
+
+  freeifaddrs(ifap);
+  return preferred ?: fallback;
+}
+
+// MARK: - Auto-update
+
+/// Receive raw binary from host, write to CACHE_PATH, chmod +x.
+static BOOL receive_update(int fd, NSUInteger size) {
+  mkdir(CACHE_DIR, 0755);
+
+  char tmp_path[] = CACHE_DIR "/vphoned.XXXXXX";
+  int tmp_fd = mkstemp(tmp_path);
+  if (tmp_fd < 0) {
+    NSLog(@"vphoned: mkstemp failed: %s", strerror(errno));
+    return NO;
+  }
+
+  uint8_t buf[32768];
+  NSUInteger remaining = size;
+  while (remaining > 0) {
+    size_t chunk = remaining < sizeof(buf) ? remaining : sizeof(buf);
+    if (!vp_read_fully(fd, buf, chunk)) {
+      NSLog(@"vphoned: update read failed at %lu/%lu",
+            (unsigned long)(size - remaining), (unsigned long)size);
+      close(tmp_fd);
+      unlink(tmp_path);
+      return NO;
+    }
+    if (write(tmp_fd, buf, chunk) != (ssize_t)chunk) {
+      NSLog(@"vphoned: update write failed: %s", strerror(errno));
+      close(tmp_fd);
+      unlink(tmp_path);
+      return NO;
+    }
+    remaining -= chunk;
+  }
+  close(tmp_fd);
+  chmod(tmp_path, 0755);
+
+  if (rename(tmp_path, CACHE_PATH) != 0) {
+    NSLog(@"vphoned: rename to cache failed: %s", strerror(errno));
+    unlink(tmp_path);
+    return NO;
+  }
+
+  NSLog(@"vphoned: update written to %s (%lu bytes)", CACHE_PATH,
+        (unsigned long)size);
+  return YES;
+}
+
+// MARK: - Command Dispatch
+
+static NSString *location_protocol_code(VPLocationProtocolResult result) {
+  switch (result) {
+  case VPLocationProtocolInvalid:
+    return @"invalid_location_source";
+  case VPLocationProtocolGenerationConflict:
+    return @"location_generation_conflict";
+  case VPLocationProtocolSequenceConflict:
+    return @"location_sequence_conflict";
+  case VPLocationProtocolUnavailable:
+    return @"location_guest_unavailable";
+  case VPLocationProtocolOK:
+    return nil;
+  }
+}
+
+static NSMutableDictionary *location_protocol_response(
+    VPLocationProtocolResult result, id reqId, NSString *message) {
+  NSMutableDictionary *response =
+      vp_make_response(result == VPLocationProtocolOK ? @"ok" : @"err", reqId);
+  if (result != VPLocationProtocolOK) {
+    response[@"code"] = location_protocol_code(result);
+    response[@"msg"] = message;
+  }
+  return response;
+}
+
+static NSDictionary *handle_command(NSDictionary *msg) {
+  NSString *type = msg[@"t"];
+  id reqId = msg[@"id"];
+
+  if ([type isEqualToString:@"hid"]) {
+    uint32_t page = [msg[@"page"] unsignedIntValue];
+    uint32_t usage = [msg[@"usage"] unsignedIntValue];
+    NSNumber *downVal = msg[@"down"];
+    if (downVal != nil) {
+      vp_hid_key(page, usage, [downVal boolValue]);
+    } else {
+      vp_hid_press(page, usage);
+    }
+    return vp_make_response(@"ok", reqId);
+  }
+
+  if ([type isEqualToString:@"touch"]) {
+    int phase = [msg[@"phase"] intValue];
+    double x = [msg[@"x"] doubleValue];
+    double y = [msg[@"y"] doubleValue];
+    vp_hid_touch_from_edge(phase, x, y, [msg[@"edge"] boolValue]);
+    return vp_make_response(@"ok", reqId);
+  }
+
+  if ([type isEqualToString:@"devmode"]) {
+    if (!vp_devmode_available()) {
+      NSMutableDictionary *r = vp_make_response(@"err", reqId);
+      r[@"msg"] = @"XPC not available";
+      return r;
+    }
+    NSString *action = msg[@"action"];
+    if ([action isEqualToString:@"status"]) {
+      BOOL enabled = vp_devmode_status();
+      NSMutableDictionary *r = vp_make_response(@"ok", reqId);
+      r[@"enabled"] = @(enabled);
+      return r;
+    }
+    if ([action isEqualToString:@"enable"]) {
+      BOOL alreadyEnabled = NO;
+      BOOL ok = vp_devmode_arm(&alreadyEnabled);
+      NSMutableDictionary *r = vp_make_response(ok ? @"ok" : @"err", reqId);
+      if (ok) {
+        r[@"already_enabled"] = @(alreadyEnabled);
+        r[@"msg"] = alreadyEnabled
+                        ? @"developer mode already enabled"
+                        : @"developer mode armed, reboot to activate";
+      } else {
+        r[@"msg"] = @"failed to arm developer mode";
+      }
+      return r;
+    }
+    NSMutableDictionary *r = vp_make_response(@"err", reqId);
+    r[@"msg"] =
+        [NSString stringWithFormat:@"unknown devmode action: %@", action];
+    return r;
+  }
+
+  if ([type isEqualToString:@"ping"]) {
+    return vp_make_response(@"pong", reqId);
+  }
+
+  if ([type isEqualToString:@"location_source_begin"]) {
+    NSString *generation = msg[@"generation"];
+    VPLocationProtocolResult result = vp_location_begin(generation);
+    NSMutableDictionary *response = location_protocol_response(
+        result, reqId, @"invalid or unavailable location generation");
+    if (result == VPLocationProtocolOK) response[@"generation"] = generation;
+    return response;
+  }
+
+  if ([type isEqualToString:@"location"]) {
+    double lat = [msg[@"lat"] doubleValue];
+    double lon = [msg[@"lon"] doubleValue];
+    double alt = [msg[@"alt"] doubleValue];
+    double hacc = [msg[@"hacc"] doubleValue];
+    double vacc = [msg[@"vacc"] doubleValue];
+    double speed = [msg[@"speed"] doubleValue];
+    double course = [msg[@"course"] doubleValue];
+    NSString *generation = msg[@"generation"];
+    if (generation != nil) {
+      NSNumber *sequence = msg[@"delivery_sequence"];
+      NSInteger deliverySequence = 0;
+      if (!vp_parse_safe_json_integer(sequence, &deliverySequence) ||
+          deliverySequence < 0) {
+        return location_protocol_response(
+            VPLocationProtocolInvalid, reqId,
+            @"delivery_sequence must be a non-negative safe integer");
+      }
+      BOOL idempotent = NO;
+      VPLocationProtocolResult result = vp_location_simulate_owned(
+          generation, deliverySequence,
+          lat, lon, alt, hacc, vacc, speed, course,
+          [msg[@"ts"] doubleValue], &idempotent);
+      NSMutableDictionary *response = location_protocol_response(
+          result, reqId, @"owned location delivery rejected");
+      if (result == VPLocationProtocolOK) {
+        response[@"generation"] = generation;
+        response[@"delivery_sequence"] = @(deliverySequence);
+        response[@"idempotent"] = @(idempotent);
+      }
+      return response;
+    }
+    if (vp_location_simulate(lat, lon, alt, hacc, vacc, speed, course)) {
+      return vp_make_response(@"ok", reqId);
+    }
+    NSMutableDictionary *r = vp_make_response(@"err", reqId);
+    r[@"msg"] = @"location simulation unavailable or failed";
+    return r;
+  }
+
+  if ([type isEqualToString:@"location_stop"]) {
+    NSString *generation = msg[@"generation"];
+    if (generation != nil) {
+      BOOL idempotent = NO;
+      VPLocationProtocolResult result =
+          vp_location_clear_owned(generation, &idempotent);
+      NSMutableDictionary *response = location_protocol_response(
+          result, reqId, @"owned location clear rejected");
+      if (result == VPLocationProtocolOK) {
+        response[@"generation"] = generation;
+        response[@"idempotent"] = @(idempotent);
+      }
+      return response;
+    }
+    if (vp_location_clear()) {
+      return vp_make_response(@"ok", reqId);
+    }
+    NSMutableDictionary *r = vp_make_response(@"err", reqId);
+    r[@"msg"] = @"clear simulated location unavailable or failed";
+    return r;
+  }
+
+  if ([type isEqualToString:@"version"]) {
+    NSMutableDictionary *r = vp_make_response(@"version", reqId);
+    r[@"hash"] = @VPHONED_BUILD_HASH;
+    return r;
+  }
+
+  if ([type isEqualToString:@"ipa_install"]) {
+    return vp_handle_custom_install(msg);
+  }
+
+  NSMutableDictionary *r = vp_make_response(@"err", reqId);
+  r[@"msg"] = [NSString stringWithFormat:@"unknown type: %@", type];
+  return r;
+}
+
+// MARK: - Dispatch Routing
+
+/// Allowlist of slow commands without inline request/response payload that
+/// are safe to dispatch to the worker pool. ANY unrecognized command must
+/// stay synchronous, because a new payload-carrying command added later
+/// would otherwise leak raw bytes onto the reader thread and corrupt the
+/// stream. Add new entries here only after auditing them.
+///
+/// Deliberately excluded (sync only):
+///   - update / file_put / clipboard_set image — request inline payload.
+///   - file_get / clipboard_get image — streamed response payload.
+///   - hid / ping / version / location* — fast, no dispatch benefit.
+static BOOL is_async_eligible(NSString *t) {
+  if (!t) return NO;
+  if ([t hasPrefix:@"app_"]) return YES;
+  if ([t hasPrefix:@"settings_"]) return YES;
+  if ([t hasPrefix:@"keychain_"]) return YES;
+  if ([t isEqualToString:@"open_url"]) return YES;
+  if ([t isEqualToString:@"shell"]) return YES;
+  if ([t isEqualToString:@"accessibility_tree"]) return YES;
+  if ([t isEqualToString:@"low_power_mode"]) return YES;
+  if ([t isEqualToString:@"devmode"]) return YES;
+  if ([t isEqualToString:@"ipa_install"]) return YES;
+  return NO;
+}
+
+/// Route one message to the right handler and write its response (if any).
+/// `mySession` is the session id this work belongs to. When the worker
+/// finally reaches the write step we recheck against `gCurrentSession`
+/// under the writer lock — if it has advanced, the original client is
+/// gone, the fd may be recycled, and we MUST skip the write.
+static void process_message(int fd, NSDictionary *msg, uint64_t mySession) {
+  NSString *t = msg[@"t"];
+  NSDictionary *resp = nil;
+
+  if ([t hasPrefix:@"file_"]) {
+    resp = vp_handle_file_command(fd, msg);
+  } else if ([t hasPrefix:@"keychain_"]) {
+    resp = vp_handle_keychain_command(msg);
+  } else if ([t hasPrefix:@"clipboard_"]) {
+    resp = vp_handle_clipboard_command(fd, msg);
+  } else if ([t hasPrefix:@"app_"]) {
+    resp = vp_handle_apps_command(msg);
+  } else if ([t isEqualToString:@"open_url"]) {
+    resp = vp_handle_url_command(msg);
+  } else if ([t isEqualToString:@"shell"]) {
+    resp = vp_handle_shell_command(msg);
+  } else if ([t hasPrefix:@"settings_"]) {
+    resp = vp_handle_settings_command(msg);
+  } else if ([t isEqualToString:@"accessibility_tree"]) {
+    resp = vp_handle_accessibility_command(msg);
+  } else if ([t isEqualToString:@"low_power_mode"]) {
+    resp = vp_handle_notify_command(msg);
+  } else if ([t isEqualToString:@"vcam_status"]) {
+    resp = vp_vcam_status(msg);
+  } else {
+    resp = handle_command(msg);
+  }
+
+  if (!resp) return;
+
+  // Session-gated write: holding the writer lock pairs with the bump in
+  // handle_client's teardown so a stale worker cannot slip a write in
+  // between session invalidation and close(fd).
+  vp_writer_lock();
+  if (atomic_load(&gCurrentSession) == mySession) {
+    vp_write_message_locked(fd, resp);
+  }
+  vp_writer_unlock();
+}
+
+// MARK: - Client Session
+
+/// Returns YES if daemon should exit for restart (after update).
+static BOOL handle_client(int fd) {
+  BOOL should_restart = NO;
+  // Claim a unique id for this session. Workers spawned below capture it
+  // and re-check before writing, so they self-cancel after teardown.
+  uint64_t mySession = atomic_fetch_add(&gCurrentSession, 1) + 1;
+  dispatch_group_t group = dispatch_group_create();
+  @autoreleasepool {
+    NSDictionary *hello = vp_read_message(fd);
+    if (!hello) {
+      close(fd);
+      return NO;
+    }
+
+    NSInteger version = [hello[@"v"] integerValue];
+    NSString *type = hello[@"t"];
+
+    if (![type isEqualToString:@"hello"]) {
+      NSLog(@"vphoned: expected hello, got %@", type);
+      close(fd);
+      return NO;
+    }
+
+    if (version != PROTOCOL_VERSION) {
+      NSLog(@"vphoned: version mismatch (client v%ld, daemon v%d)",
+            (long)version, PROTOCOL_VERSION);
+      vp_write_message(
+          fd, @{
+            @"v" : @PROTOCOL_VERSION,
+            @"t" : @"err",
+            @"msg" : @"version mismatch"
+          });
+      close(fd);
+      return NO;
+    }
+
+    // Hash comparison for auto-update
+    NSString *hostHash = hello[@"bin_hash"];
+    BOOL needUpdate = NO;
+    if (hostHash.length > 0) {
+      const char *selfPath = self_executable_path();
+      NSString *selfHash = selfPath ? sha256_of_file(selfPath) : nil;
+      if (selfHash && ![selfHash isEqualToString:hostHash]) {
+        NSLog(@"vphoned: hash mismatch (self=%@ host=%@)", selfHash, hostHash);
+        needUpdate = YES;
+      } else if (selfHash) {
+        NSLog(@"vphoned: hash OK");
+      }
+    }
+
+    // Build capabilities list
+    NSMutableArray *caps = [NSMutableArray
+        arrayWithObjects:@"hid", @"devmode", @"file", @"keychain", nil];
+    if (vp_location_available())
+      [caps addObject:@"location"];
+    if (vp_location_owned_available())
+      [caps addObject:@"location_owned"];
+    if (vp_custom_installer_available())
+      [caps addObject:@"ipa_install"];
+    if (gClipboardAvailable)
+      [caps addObject:@"clipboard"];
+    // `apps` covers app_list / app_terminate / app_foreground (private
+    // frameworks only). app_launch and open_url shell out to uiopen, so they
+    // get their own capabilities, declared only when uiopen is executable.
+    // `apps_v2` marks a guest that uses this split; hosts treat `apps` without
+    // `apps_v2` as the legacy meaning (apps implied app_launch).
+    BOOL uiopenAvailable = vp_uiopen_available();
+    [caps addObject:@"apps_v2"];
+    if (gAppsAvailable)
+      [caps addObject:@"apps"];
+    if (gAppsAvailable && uiopenAvailable)
+      [caps addObject:@"app_launch"];
+    if (uiopenAvailable)
+      [caps addObject:@"url"];
+    [caps addObject:@"settings"];
+    if (vp_shell_path() != NULL)
+      [caps addObject:@"shell"];
+    [caps addObject:@"touch"];
+    [caps addObject:@"touch_edge"];
+    [caps addObject:@"vcam_status"];
+    [caps addObject:@"vcam_receipt_v3"];
+
+    NSMutableDictionary *helloResp = [@{
+      @"v" : @PROTOCOL_VERSION,
+      @"t" : @"hello",
+      @"name" : @"vphoned",
+      @"caps" : caps,
+    } mutableCopy];
+    NSOperatingSystemVersion osv =
+        [[NSProcessInfo processInfo] operatingSystemVersion];
+    helloResp[@"ios"] =
+        [NSString stringWithFormat:@"%ld.%ld.%ld", (long)osv.majorVersion,
+                                   (long)osv.minorVersion, (long)osv.patchVersion];
+    NSString *ip = primary_ipv4_address();
+    if (ip)
+      helloResp[@"ip"] = ip;
+    if (needUpdate)
+      helloResp[@"need_update"] = @YES;
+
+    if (!vp_write_message(fd, helloResp)) {
+      close(fd);
+      return NO;
+    }
+    NSLog(@"vphoned: client connected (v%d)%s", PROTOCOL_VERSION,
+          needUpdate ? " [update pending]" : "");
+
+    NSDictionary *msg;
+    while ((msg = vp_read_message(fd)) != nil) {
+      @autoreleasepool {
+        NSString *t = msg[@"t"];
+        NSLog(@"vphoned: recv cmd: %@", t);
+
+        if ([t isEqualToString:@"update"]) {
+          NSUInteger size = [msg[@"size"] unsignedIntegerValue];
+          id reqId = msg[@"id"];
+          NSLog(@"vphoned: receiving update (%lu bytes)", (unsigned long)size);
+          if (size > 0 && size < 10 * 1024 * 1024 && receive_update(fd, size)) {
+            NSMutableDictionary *r = vp_make_response(@"ok", reqId);
+            r[@"msg"] = @"updated, restarting";
+            vp_write_message(fd, r);
+            should_restart = YES;
+            break;
+          } else {
+            NSMutableDictionary *r = vp_make_response(@"err", reqId);
+            r[@"msg"] = @"update failed";
+            vp_write_message(fd, r);
+          }
+          continue;
+        }
+
+        // Slow commands with no inline request payload run on the worker
+        // pool. The reader thread keeps reading, so independent requests
+        // (e.g. ping) aren't blocked behind a long-running app_launch or
+        // ipa_install. Writes are mutex-serialized via vp_write_message.
+        if (is_async_eligible(t)) {
+          NSDictionary *msgCapture = msg;
+          dispatch_group_async(group, gWorkerQueue, ^{
+            @autoreleasepool {
+              process_message(fd, msgCapture, mySession);
+            }
+          });
+          continue;
+        }
+
+        // Sync path: reader-bound commands (payload reads, streamed
+        // responses) and fast commands not worth dispatch overhead.
+        process_message(fd, msg, mySession);
+      }
+    }
+
+    vp_hid_touch_reset();
+
+    // Teardown:
+    //   1. Under the writer lock, invalidate this session and close fd.
+    //      Workers already holding the lock finish cleanly on the still-
+    //      open fd; later workers see the session mismatch and skip.
+    //   2. Best-effort drain so most workers complete naturally. Bounded
+    //      timeout prevents a hung handler (XPC, ipa_install) from
+    //      blocking accept(2) of the next client.
+    vp_writer_lock();
+    atomic_fetch_add(&gCurrentSession, 1);
+    close(fd);
+    vp_writer_unlock();
+    dispatch_group_wait(group,
+                        dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+
+    NSLog(@"vphoned: client disconnected%s",
+          should_restart ? " (restarting for update)" : "");
+  }
+  return should_restart;
+}
+
+// MARK: - Main
+
+int main(int argc, char *argv[]) {
+  @autoreleasepool {
+    // Bootstrap: if running from install path and a cached update exists, exec
+    // it
+    const char *selfPath = self_executable_path();
+    NSLog(@"vphoned: starting (pid=%d, path=%s)", getpid(), selfPath ?: "?");
+
+#if !LESS
+    if (selfPath && strcmp(selfPath, INSTALL_PATH) == 0 &&
+        access(CACHE_PATH, X_OK) == 0) {
+      NSLog(@"vphoned: found cached binary at %s, exec'ing", CACHE_PATH);
+      execv(CACHE_PATH, argv);
+      NSLog(@"vphoned: execv failed: %s — continuing with installed binary",
+            strerror(errno));
+      unlink(CACHE_PATH);
+    }
+#endif
+
+    gWorkerQueue = dispatch_queue_create("com.vphone.vphoned.workers",
+                                         DISPATCH_QUEUE_CONCURRENT);
+
+    if (!vp_hid_load())
+      return 1;
+    if (!vp_devmode_load())
+      NSLog(@"vphoned: XPC unavailable, devmode disabled");
+    vp_location_load();
+
+    gClipboardAvailable = vp_clipboard_load();
+    gAppsAvailable = vp_apps_load();
+    vp_vcam_start();
+
+    int sock = socket(AF_VSOCK, SOCK_STREAM, 0);
+    if (sock < 0) {
+      perror("vphoned: socket(AF_VSOCK)");
+      return 1;
+    }
+
+    int one = 1;
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+
+    struct sockaddr_vm addr = {
+        .svm_len = sizeof(struct sockaddr_vm),
+        .svm_family = AF_VSOCK,
+        .svm_port = VPHONED_PORT,
+        .svm_cid = VMADDR_CID_ANY,
+    };
+
+    if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+      perror("vphoned: bind");
+      close(sock);
+      return 1;
+    }
+    if (listen(sock, 2) < 0) {
+      perror("vphoned: listen");
+      close(sock);
+      return 1;
+    }
+
+    NSLog(@"vphoned: listening on vsock port %d", VPHONED_PORT);
+
+    for (;;) {
+      int client = accept(sock, NULL, NULL);
+      if (client < 0) {
+        perror("vphoned: accept");
+        sleep(1);
+        continue;
+      }
+      if (handle_client(client)) {
+        NSLog(@"vphoned: exiting for update restart");
+        close(sock);
+        return 0;
+      }
+    }
+  }
+}

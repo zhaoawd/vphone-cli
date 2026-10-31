@@ -1,0 +1,502 @@
+{
+  "recorded_at": "2026-10-31T00:57:54.376481+08:00",
+  "stage": 1,
+  "stage_accepted": true,
+  "scope": "fixed upstream build and new VM through independent autophone lifecycle entry point",
+  "upstream_head": "39324ee7fcbb1d909bfa293f6188a8ef752ba734",
+  "autophone_branch": "feat/autophone-upstream-migration",
+  "autophone_worktree": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration",
+  "vm": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline",
+  "vm_running": false,
+  "allowlist_approved": true,
+  "allowlist_exit_code": 0,
+  "host_preflight_exit_code": 0,
+  "prepare_exit_code": 0,
+  "firmware_patch_exit_code": 0,
+  "firmware_patch_components": 11,
+  "firmware_patch_operations": 252,
+  "restore_exit_code": 0,
+  "dfu_stop_exit_code": 0,
+  "cfw_install_exit_code": 0,
+  "restore_info": {
+    "cloudOS": {
+      "build": "23E5207q",
+      "version": "26.4"
+    },
+    "device": "iPhone99,11",
+    "ios": {
+      "build": "24A446",
+      "version": "27.0.1"
+    },
+    "variant": "jb"
+  },
+  "autophone_regression": {
+    "passed": 156,
+    "skipped": 8,
+    "seconds": 8.91,
+    "skipped_reason": "AUTOPHONE_TEST_POSTGRES_DSN is not configured",
+    "ruff": "pass"
+  },
+  "acceptance_regression": {
+    "passed": 6,
+    "ruff": "pass"
+  },
+  "boot_acceptance": {
+    "accepted": true,
+    "vm": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline",
+    "cycles": [
+      {
+        "index": 1,
+        "ready": true,
+        "stopped": true,
+        "launcher_pid": 51050,
+        "ping": {
+          "ok": true
+        },
+        "boot_seconds": 10.046707917004824,
+        "device_info": {
+          "ok": true,
+          "result": {
+            "host": "iphone.local",
+            "sysname": "Darwin",
+            "lock": {
+              "passcode_enabled": false,
+              "screen_off": false,
+              "locked": false
+            },
+            "uptime_seconds": 9.388339166666666,
+            "model": "iPhone17,3",
+            "boot_session_uuid": "1245F829-2847-4598-A53F-A316C488F1A2",
+            "screen": {
+              "scale": 3,
+              "locked": false,
+              "screen_off": false,
+              "height": 932,
+              "width": 430,
+              "orientation": 0
+            },
+            "boot_time": 1793379220,
+            "kernel": "25.4.0",
+            "volume": 0.5,
+            "agent": {
+              "pid": 117,
+              "binary_hash": "65e94b380a952fd770ae2bd9ab5769bfa4f4472897a20291490a91b3941ba6d1"
+            },
+            "rotation": {
+              "degrees": 0,
+              "locked": false,
+              "device_orientation": 0,
+              "name": "portrait"
+            },
+            "low_power_mode": {
+              "enabled": false,
+              "method": "powerd"
+            },
+            "storage": {
+              "total_bytes": 63983181824,
+              "available_bytes": 46488739840
+            },
+            "processor_count": 8,
+            "jailbreak": {
+              "jbroot": null,
+              "layout": null,
+              "source": "not detected"
+            },
+            "developer_mode": {
+              "armed": false,
+              "enabled": true,
+              "writable": true
+            },
+            "ios_version": "27.0.1",
+            "brightness": {
+              "auto": null,
+              "value": 0.5
+            },
+            "battery": {
+              "state": 2,
+              "fraction": 1
+            },
+            "memory_bytes": 8565800960,
+            "device_name": {
+              "name": "baseline",
+              "own_name": "iPhone"
+            },
+            "network": {
+              "addresses": [
+                "lo0 127.0.0.1",
+                "lo0 ::1",
+                "lo0 fe80::1%lo0",
+                "en0 fe80::408:adc7:be:3c59%en0",
+                "en0 192.168.64.2",
+                "en0 fd5c:d8f7:3ae8:24d7:4c3:1ee8:9f3c:7a69",
+                "utun0 fe80::ee10:ba56:4951:f996%utun0",
+                "anpi0 fe80::4c9b:a9ff:fe15:ed53%anpi0",
+                "en1 fe80::10d2:63c9:aa7a:e63f%en1",
+                "utun1 fe80::7d6c:1e35:132f:b6cd%utun1",
+                "utun2 fe80::dfd4:9150:9340:c729%utun2",
+                "utun3 fe80::ce81:b1c:bd2c:69e%utun3"
+              ]
+            }
+          }
+        },
+        "device_info_seconds": 16.396155333000934,
+        "process_identity": {
+          "exit_code": 0,
+          "stdout": "target\n",
+          "stderr": ""
+        },
+        "disk_holders_running": [
+          51098
+        ],
+        "launch_lock_held_running": true,
+        "stop_exit_code": 0,
+        "launcher_exit_code": 0,
+        "disk_holders_after_stop": [],
+        "launch_lock_held_after_stop": false
+      },
+      {
+        "index": 2,
+        "ready": true,
+        "stopped": true,
+        "launcher_pid": 52656,
+        "ping": {
+          "ok": true
+        },
+        "boot_seconds": 4.068538667001121,
+        "device_info": {
+          "ok": true,
+          "result": {
+            "host": "iPhone",
+            "battery": {
+              "state": 2,
+              "fraction": 1
+            },
+            "uptime_seconds": 3.3682674583333334,
+            "storage": {
+              "total_bytes": 63983181824,
+              "available_bytes": 46373343232
+            },
+            "low_power_mode": {
+              "enabled": false,
+              "method": "powerd"
+            },
+            "boot_time": 1793379251,
+            "model": "iPhone17,3",
+            "lock": {
+              "passcode_enabled": false,
+              "screen_off": false,
+              "locked": false
+            },
+            "boot_session_uuid": "7599CF04-18B2-479C-971C-1D503361AA85",
+            "processor_count": 8,
+            "rotation": {
+              "degrees": 0,
+              "locked": false,
+              "device_orientation": 0,
+              "name": "portrait"
+            },
+            "device_name": {
+              "name": "baseline",
+              "own_name": "iPhone"
+            },
+            "volume": 0.5,
+            "brightness": {
+              "auto": null,
+              "value": 0.5
+            },
+            "developer_mode": {
+              "armed": false,
+              "enabled": true,
+              "writable": true
+            },
+            "kernel": "25.4.0",
+            "jailbreak": {
+              "jbroot": null,
+              "layout": null,
+              "source": "not detected"
+            },
+            "ios_version": "27.0.1",
+            "network": {
+              "addresses": [
+                "lo0 127.0.0.1",
+                "lo0 ::1",
+                "lo0 fe80::1%lo0",
+                "en0 fe80::408:adc7:be:3c59%en0",
+                "en0 192.168.64.2",
+                "utun0 fe80::f4e3:f343:2e36:f48e%utun0",
+                "utun1 fe80::ae71:5ee1:9b6d:179a%utun1",
+                "utun2 fe80::8c8c:7096:5355:e66d%utun2",
+                "utun3 fe80::ce81:b1c:bd2c:69e%utun3"
+              ]
+            },
+            "memory_bytes": 8565800960,
+            "agent": {
+              "pid": 113,
+              "binary_hash": "65e94b380a952fd770ae2bd9ab5769bfa4f4472897a20291490a91b3941ba6d1"
+            },
+            "sysname": "Darwin",
+            "screen": {
+              "scale": 3,
+              "locked": false,
+              "screen_off": false,
+              "height": 932,
+              "width": 430,
+              "orientation": 0
+            }
+          }
+        },
+        "device_info_seconds": 0.056417250001686625,
+        "process_identity": {
+          "exit_code": 0,
+          "stdout": "target\n",
+          "stderr": ""
+        },
+        "disk_holders_running": [
+          52666
+        ],
+        "launch_lock_held_running": true,
+        "stop_exit_code": 0,
+        "launcher_exit_code": 0,
+        "disk_holders_after_stop": [],
+        "launch_lock_held_after_stop": false
+      }
+    ],
+    "restore_info": {
+      "cloudOS": {
+        "build": "23E5207q",
+        "version": "26.4"
+      },
+      "device": "iPhone99,11",
+      "ios": {
+        "build": "24A446",
+        "version": "27.0.1"
+      },
+      "variant": "jb"
+    },
+    "boot_sessions": [
+      "1245F829-2847-4598-A53F-A316C488F1A2",
+      "7599CF04-18B2-479C-971C-1D503361AA85"
+    ]
+  },
+  "independent_closeout": "independent-closeout.json",
+  "prior_failed_acceptance": "boot-acceptance/result.json",
+  "file_hashes": [
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/accept_stage1.py",
+      "size": 9816,
+      "sha256": "ad1d0b758a67b01407c29d87c612ead44ad6ae728a64b2fd3058f58834da1b5a"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/test_accept_stage1.py",
+      "size": 2673,
+      "sha256": "76399583b39fadbc4e37c45d0222b899c20fdfff53f6382e7153e25824a511a7"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/probe_disk_attachment.swift",
+      "size": 482,
+      "sha256": "b06d23599d5466de92b08c9b15139b3afa0d9539bf2756fa683f518860940cf5"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/install_stage1_cfw.zsh",
+      "size": 1433,
+      "sha256": "7f306c69392a1f071e7eeb67c684edb6990a5d661905fa44b0f430a6fe2d7386"
+    },
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/autophone/rig/upstream.py",
+      "size": 4990,
+      "sha256": "3a5a93ded607092bc2b8a768bdfdc7509681f1ef39e1375b21507d19180aab9f"
+    },
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/tests/test_upstream_vphone_lifecycle.py",
+      "size": 7060,
+      "sha256": "8a26e01222a80b4c473a9dfd22d5717fdbd2e706d80f0bc61553abad3373cb2d"
+    },
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/CHANGELOG.md",
+      "size": 232438,
+      "sha256": "0b65461b1ca06def173d83e71afdda9d331aa414a46e04374067b8cbd64df97b"
+    },
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/TASKS.md",
+      "size": 48704,
+      "sha256": "6ce546074010550f2f8f3afcc746ab22346e1720b500159d1ef22883621a4155"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/config.plist",
+      "size": 1190,
+      "sha256": "afdfaa1d80cb377992e5a22e884520e626330d3cf5d0bd11b105a6eadfd936f7"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/PatchPlan.plist",
+      "size": 9249,
+      "sha256": "bd0223e6a0d96d15762351017e15fd6549c3c07db72a15a1065709dc3a0febca"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/PatchSelection.plist",
+      "size": 308,
+      "sha256": "20bf79f4b5158dc825bae53c79ec1cf85cbeecb11287be9e48b1fe15afba1f28"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/PatchReceipt.plist",
+      "size": 10641,
+      "sha256": "445b89cf3c0380ca1df785bb8fcb409bd8c5e7ccdac79843e47f0a34bce78d62"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/restore-info.json",
+      "size": 186,
+      "sha256": "943950e8f490b55b9f5cb9cfb499c3e15d1b2ac1ebcd5f647eca6ffd4519ff44"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/udid-prediction.txt",
+      "size": 102,
+      "sha256": "2b923bd88ced1fc6635c02c813c7219a338c460da674d24d601dcfe245a55e47"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/.vphoned.signed",
+      "size": 12894016,
+      "sha256": "65e94b380a952fd770ae2bd9ab5769bfa4f4472897a20291490a91b3941ba6d1"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-tests.log",
+      "size": 604,
+      "sha256": "eac81ffa4fd86340c20968d2e0ac48dc187019ce8339b5c382432e5098782ed0"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/cfw-install.log",
+      "size": 16411,
+      "sha256": "cb5af4084080787aa0cbe32a75c2966bfa599017deb92bdc7b29eb95bd10e2f7"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/dfu-stop.log",
+      "size": 52,
+      "sha256": "4fc1b3a7b6d11e52817a8a455e59b5b8d2ecf0ab908dc40b701a65b541dc7b96"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/restore.log",
+      "size": 9801,
+      "sha256": "7e4db247ec35b73e080656ca693156b73d379864f8d715f8375adbd577598b3b"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/iphone-source-head.log",
+      "size": 1473,
+      "sha256": "354b3ad817f69578839a3644b8b62879e72c72be16c4a3ed4e9e187804ba4117"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/dfu-launch.log",
+      "size": 474777,
+      "sha256": "a6fd9ee0a712102cbf17f8b3d4bf730b93749dd7d9c58de8a6e5635ebb33c4fa"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance-r2-driver.log",
+      "size": 170,
+      "sha256": "3d1218bde9ba19730fa03eee0a5f914cde0664fe18d15aa143daac73db2e8591"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance-driver.log",
+      "size": 189,
+      "sha256": "09296567c38194570ed4f9105ae72b523c6288223f8fa201904d91b0e6cb90c2"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-tests-v4.log",
+      "size": 870,
+      "sha256": "5249db987e66caa39ae56f6bea1063552ddd9278f31f4c17f5d334c862ff1576"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-tests-final-v3.log",
+      "size": 720,
+      "sha256": "7d23512a0e76eedfbce821fe49e79b6d930a1c5808806fb78c28cc843d5a650c"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-tests-current.log",
+      "size": 720,
+      "sha256": "7d23512a0e76eedfbce821fe49e79b6d930a1c5808806fb78c28cc843d5a650c"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-ruff-v2.log",
+      "size": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/ruff.log",
+      "size": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-ruff-final.log",
+      "size": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/fw-patch.log",
+      "size": 36772,
+      "sha256": "f752f5b35c8eed69419488e61227014bcfefd735e888a663fc516bd5c7681544"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/autophone-lock-tests.log",
+      "size": 271,
+      "sha256": "05f1054ea747a4bb387a2d09d334cdd5484adf577239f7f12b5188bff09ac320"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-tests-v2.log",
+      "size": 720,
+      "sha256": "7d23512a0e76eedfbce821fe49e79b6d930a1c5808806fb78c28cc843d5a650c"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-ruff.log",
+      "size": 4220,
+      "sha256": "78807718b39f104ab33bb83fcb9e2306d74cc1cbee30c8a398245559ee3c7b59"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/fw-prepare.log",
+      "size": 870,
+      "sha256": "144e4311120e9a7ca7da877477e9dcf8c31d0d50dcf076eb110ee84dc4c0b318"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/acceptance-tests-final.log",
+      "size": 720,
+      "sha256": "7d23512a0e76eedfbce821fe49e79b6d930a1c5808806fb78c28cc843d5a650c"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/vm-new.log",
+      "size": 69,
+      "sha256": "0f68544aa3ea12d496a2cfff0d1412ac958b78531d9814fabebd981355e20ad8"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance-r2/stop-2.log",
+      "size": 52,
+      "sha256": "51ce3f5725646ea9f714846d86b3384406a85877d7c01ac8959a4ef262240885"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance-r2/stop-1.log",
+      "size": 52,
+      "sha256": "8a815f9d724e003b074500e9691f00e4cdd60fe6c2ed614d37ee13fea13e81bf"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance-r2/boot-2.log",
+      "size": 90831,
+      "sha256": "27fab37835dc7e167b95ee12c01daa3f6913f5ae8e765e606191b8a27c68074b"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance-r2/boot-1.log",
+      "size": 103155,
+      "sha256": "509e7ca46871ffaa53d9612062b929836c0dcf021d86afb8f1181a6cb2a02f81"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance/stop-1.log",
+      "size": 52,
+      "sha256": "2aba51beb5479e7a77085a58e93f16d412bcc04254a2aa6dcd8afde97dd6d4d5"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage1-20261031/runtime/boot-acceptance/boot-1.log",
+      "size": 106428,
+      "sha256": "5e3cfced3f92c9383dc27781dc624baf09aaff08baf0f816b13b59765a91b95e"
+    }
+  ],
+  "limitations": [
+    "Launch lock covers the autophone entry point only; raw upstream CLI is not covered",
+    "Full-stack Rig entry points have not been adapted",
+    "Stages 2 and 3 are not accepted",
+    "No PostgreSQL multi-rig integration, build-id IPA, SSH/Frida, location or camera business acceptance",
+    "Not committed, merged, or published"
+  ]
+}

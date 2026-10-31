@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "python3",
+    "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/scan_inventory.py",
+    "--check",
+    "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/source_inventory.json"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/scan_inventory.py\", line 225, in <module>\n    check(args.check)\n    ~~~~~^^^^^^^^^^^^\n  File \"/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/scan_inventory.py\", line 197, in check\n    assert digest(HERE / item[\"path\"]) == item[\"sha256\"], f\"changed inventory document: {item['path']}\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: changed inventory document: README.md\n",
+  "expected_current_state_difference": "Original 2026-10-30 snapshot is retained; current TASKS.md changed during authorized implementation. New snapshot is checked separately."
+}

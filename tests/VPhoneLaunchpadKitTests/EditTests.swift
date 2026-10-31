@@ -166,7 +166,12 @@ struct LaunchpadEditStandIn {
         fi
         case "$2" in
         import)
-          trap 'echo "import got SIGINT"; exit 130' INT
+          if [ -e "$root/.import-ignore-int" ]; then
+            trap '' INT
+          else
+            trap 'echo "import got SIGINT"; exit 130' INT
+          fi
+          : > "$root/.import-started"
           while [ -e "$root/.import-block" ]; do sleep 0.03; done
           echo "import ok" ;;
         export)
@@ -302,6 +307,17 @@ struct EditLibraryTests {
         #expect(FileManager.default.fileExists(atPath: standIn.path("b").url.path))
     }
 
+    @Test func deletionDoesNotRequireTheBoundCoreBundle() async throws {
+        let standIn = try LaunchpadEditStandIn()
+        try standIn.makeMachines(["a"])
+        // This version is not installed. Removal still uses the embedded CLI.
+        try JSONEncoder().encode(VPhoneMachineBinding(bundle: "999.0.0")).write(to: standIn.path("a").url.appendingPathComponent("launchpad.json"))
+        let library = await standIn.library()
+        await library.delete([standIn.path("a")])
+        #expect(standIn.edits == ["vm delete a --force --library-root \(standIn.root)"])
+        #expect(library.actionError == nil)
+    }
+
     @Test func importGoesIntoTheDefaultLibrary() async throws {
         let standIn = try LaunchpadEditStandIn()
         let library = await standIn.library()
@@ -352,8 +368,9 @@ struct EditLibraryTests {
         try FileManager.default.removeItem(at: blocker)
         await first.value
         await second.value
-        #expect(standIn.edits.count == 1)
+        #expect(standIn.edits.count == 2)
         #expect(standIn.edits.first?.contains("first.tzst") == true)
+        #expect(standIn.edits.last?.contains("second.tzst") == true)
         #expect(library.globalActivity == nil)
     }
 

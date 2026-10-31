@@ -4,6 +4,18 @@ import VPhoneCore
 @testable import VPhoneLaunchpadKit
 
 struct LaunchRouteTests {
+    @Test func environmentUpdateUsesTheNewBoundProducer() throws {
+        let temp = try LaunchpadTemporaryDirectory()
+        try JSONEncoder().encode(VPhoneMachineBinding(bundle: "2.6.2"))
+            .write(to: temp.url.appendingPathComponent("launchpad.json"))
+        let arguments = ["cfw", "update-environment", "machine", "--library-root", temp.url.path, "--root-popup"]
+        let route = try VPhoneLaunchpadLaunchRoute.resolve(embedded: embedded, launcher: launcher,
+            machine: temp.url, arguments: arguments)
+        #expect(route.executable == launcher)
+        #expect(route.arguments.first?.contains("/2.6.2/VPhone.bundle/") == true)
+        #expect(Array(route.arguments.dropFirst()) == arguments + ["--expected-binding-sha256", route.snapshot!.sha256])
+    }
+
     let embedded = URL(fileURLWithPath: "/tmp/embedded-cli")
     let launcher = URL(fileURLWithPath: "/tmp/launcher")
     @Test func missingBindingKeepsEmbeddedDevelopmentToolchain() throws {

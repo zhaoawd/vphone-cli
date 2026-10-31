@@ -1,0 +1,117 @@
+{
+  "scope": "T52 actual Core Bundle binding and environment replacement on an independent VM",
+  "systemInstallation": {
+    "version": "2.6.2-local.cd529f26a150",
+    "archive": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/2.6.2-local.cd529f26a150.tar",
+    "archiveSHA256": "f61ce4e0f1c6437fa55b7e488a9c888dd5b5e2bd92b2741fa8a4a2134964660c",
+    "archiveBytes": 184731136,
+    "bundle": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/package/VPhone.bundle",
+    "storeDestination": "/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.cd529f26a150",
+    "cliSHA256": "82f940ed219c41f928e7631989589f550d3c38e20360471a821881b062a42244",
+    "vmSHA256": "e29cc792d83850bd81fd28b5f5d65dc08e0e7ed053ca37556d2e363a4e2cdd1a",
+    "signatures": {
+      "vphone-cli": "2a2e9553700ce98c9bb2dd69dd39b84d88c14537",
+      "vphone-vm": "2d9b99f3a41e6f7ba7bb3d5558f15524b409b3b5"
+    }
+  },
+  "newVMCandidate": {
+    "path": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-v2",
+    "configuration": "regular/v2, iOS 26.1/23B85 and cloudOS 26.1/23B85, 64 GiB logical disk",
+    "argv": [
+      "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/package/VPhone.bundle/Contents/MacOS/vphone-cli",
+      "vm",
+      "create",
+      "t52-v2",
+      "--library-root",
+      "/Users/kolar/github/vphone-cli/.build/t51rt/lib",
+      "--variant",
+      "regular",
+      "--guest-environment",
+      "v2",
+      "--prepare-backend",
+      "native",
+      "--restore-backend",
+      "native",
+      "--iphone-source",
+      "/Users/kolar/.vphone/ipsws/iPhone17,3_26.1_23B85_Restore.ipsw",
+      "--cloudos-source",
+      "/Users/kolar/.vphone/ipsws/399b664dd623358c3de118ffc114e42dcd51c9309e751d43-727c4f5e2432.ipsw",
+      "--disk-size",
+      "64",
+      "--keep-artifacts",
+      "--root-popup",
+      "--project-root",
+      "/Users/kolar/github/vphone-cli"
+    ],
+    "environment": {
+      "VPHONE_ROOT": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/user-root",
+      "VPHONE_PYTHON": "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+      "VPHONE_GUEST_COMPONENTS": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/baseline-components/stage",
+      "VPHONE_API_DAEMON": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/v2-api",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "baseline": "Same pinned guest component sources compiled with -O0; final Bundle uses -Os. Real signed compiler outputs, no manufactured guest metadata or byte mutation.",
+    "apiStage": "Reuse the verified signed 0.8.6 daemon binary with the source v2 launchd plist, matching build_daemon_api.sh profile staging; validated by check_daemon_api.py.",
+    "effectiveResume": {
+      "argv": [
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.cd529f26a150/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "vm",
+        "create",
+        "t52-v2",
+        "--resume",
+        "--library-root",
+        "/Users/kolar/github/vphone-cli/.build/t51rt/lib",
+        "--root-popup",
+        "--keep-artifacts",
+        "--accept-tool-change",
+        "-v"
+      ],
+      "environment": {
+        "VPHONE_ROOT": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/user-root",
+        "VPHONE_PYTHON": "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "VPHONE_GUEST_COMPONENTS": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/baseline-components/stage",
+        "VPHONE_API_DAEMON": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/v2-api",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "startedAt": 1792594769.266201,
+      "reason": "Remove mistaken repository resource override; use approved sealed Bundle classic/API cohort. Baseline v2 components and standalone v2 daemon remain explicitly frozen. CLI/VM bytes unchanged; checkpoint verifies prior stages; accept resource-fingerprint change.",
+      "snapshotRemovalApprovedAndVerified": true
+    }
+  },
+  "temporaryAMFI": {
+    "cdhash": "2d9b99f3a41e6f7ba7bb3d5558f15524b409b3b5",
+    "maxSeconds": 1800,
+    "persistentAllowlistModified": false,
+    "stopWhenFinished": true,
+    "authorization": "approved_only_this_hash_1800_seconds",
+    "status": "stopped_early_after_retry_1_not_reused"
+  },
+  "steps": [
+    "Install exact archive into a new root-owned store version; verify receipt/signatures",
+    "Create/restore an independent regular/v2 VM via production pipeline with explicit local sources and -O0 component baseline",
+    "Read-only classify the baseline against final sealed -Os Bundle libraries",
+    "Verify complete backup outside VM and publish host binding via vm bind-core-bundle",
+    "Invoke selected Bundle environment-update protocol with frozen binding and native administrator authentication",
+    "Read-only verify already_current, library hashes, unchanged configuration/identity and retained disk history",
+    "Where pipeline succeeds, check real guest boot/normal shutdown and stop temporary helper"
+  ],
+  "prohibited": [
+    "No writes to existing user VMs",
+    "No overwritten existing Bundle versions",
+    "No bypass of classification, desired-plan, original-source or transaction checks",
+    "No physical external disk acceptance",
+    "No persistent AMFI policy changes"
+  ],
+  "status": "approved_sealed_resource_cfw_resume_running",
+  "authorization": {
+    "rootBundleInstall": "\u6279\u51c6\u5b89\u88c5\u6b64\u7248\u672c",
+    "newV2VMAndScopedAMFI": "\u6279\u51c6\u672c\u6b21\u72ec\u7acb VM \u9a8c\u6536\u53ca\u5177\u540d\u4e34\u65f6\u653e\u884c",
+    "scopeUnchanged": true
+  },
+  "resourceSelectionCorrection": "Initial project-root override selected stale repository guest 0.8.5 cohort; removed to use approved sealed Bundle 0.8.6. Production snapshot candidate preflight passed.",
+  "snapshotRemoval": {
+    "authorization": "\u5141\u8bb8\uff0c\u4ec5\u5220\u9664\u8fd9\u4efd\u5df2\u5907\u4efd\u5feb\u7167",
+    "record": "snapshot-retention-backup.json",
+    "completed": true
+  }
+}

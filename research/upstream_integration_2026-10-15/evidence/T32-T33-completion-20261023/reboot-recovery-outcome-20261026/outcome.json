@@ -1,0 +1,35 @@
+{
+  "state": "finalized",
+  "planSHA256": "2e48952320c7b10206b3ff8e3eecdf891d0c194f984979d8a2f7d44b01c324cb",
+  "accepted": false,
+  "runtimeValidated": false,
+  "nativeState": "failed",
+  "offlineAcceptancePassed": false,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "phaseTransactions": {
+    "on": "20261025T132920Z-adMN63qO"
+  },
+  "originalFirstOnProducer": "2.6.2-local.f43043c4c559",
+  "reapplicationProducer": "2.6.2-local.73b536cbb70c",
+  "repeatedFirstOn": 0,
+  "repeatedUndoWrites": 0,
+  "preservedSourceTransaction": "20261025T144138Z-W7aZSh3x",
+  "preservation": {
+    "sourceBackup": {
+      "files": 10,
+      "fullReadbackPassed": true
+    },
+    "frozenInputs": 1878,
+    "executionInputs": 112,
+    "rootBackupEvidence": {
+      "fullReadbackPassed": true,
+      "bootFiles": 12,
+      "protectedHostInputs": 1,
+      "cacheTrees": 2,
+      "failedHistories": 4
+    },
+    "limitation": "private complete backup and preserved partial transaction were reread by root; finalizer verifies public evidence"
+  },
+  "error": "Command '['/Users/kolar/github/vphone-cli/.build/t32-qualified-cache-20261024/venv/bin/python3', '/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.73b536cbb70c/VPhone.bundle/Contents/Resources/scripts/vm_lock.py', '/Users/kolar/github/vphone-cli/.build/t33t-20261025', 'cfw-record', '--', '/Users/kolar/github/vphone-cli/.build/t32-qualified-cache-20261024/venv/bin/python3', '-B', '/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/tools/run_t33_recovered_undo.py', '--plan', '/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/exp-reboot-recovery-acceptance-20261026/offline-plan.json', '--sha256', '2e48952320c7b10206b3ff8e3eecdf891d0c194f984979d8a2f7d44b01c324cb']' returned non-zero exit status 1."
+}

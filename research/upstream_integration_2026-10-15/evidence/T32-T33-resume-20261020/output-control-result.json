@@ -1,0 +1,33 @@
+{
+  "state": "passed",
+  "scope": "disposable host-driver output consumer control; not real VM acceptance",
+  "cases": [
+    {
+      "output": "closed-pipe",
+      "producerExit": 0,
+      "exitCode": 141,
+      "journalStatus": "failed",
+      "journalExit": 141,
+      "originalUnchanged": true,
+      "stagingRemains": false
+    },
+    {
+      "output": "regular-file",
+      "producerExit": 0,
+      "exitCode": 0,
+      "journalStatus": "published",
+      "journalExit": 0,
+      "originalUnchanged": true,
+      "stagingRemains": false
+    },
+    {
+      "output": "regular-file",
+      "producerExit": 37,
+      "exitCode": 37,
+      "journalStatus": "failed",
+      "journalExit": 37,
+      "originalUnchanged": true,
+      "stagingRemains": false
+    }
+  ]
+}

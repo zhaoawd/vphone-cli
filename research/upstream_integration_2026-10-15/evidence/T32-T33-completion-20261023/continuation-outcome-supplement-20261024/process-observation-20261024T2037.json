@@ -1,0 +1,43 @@
+{
+  "observedAt": "2026-10-24T20:36:58.916747+08:00",
+  "scope": "read-only snapshot of original native execution tree",
+  "rootPID": 11603,
+  "processes": [
+    {
+      "pid": 11603,
+      "ppid": 11602,
+      "user": "root",
+      "elapsed": "08:04:53",
+      "cpu": "0.0",
+      "state": "S",
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/tools/execute_t32_origin_identity_acceptance.py --execute-approved-plan b98e0a565583ebd57380c5984be62ff0ed491fe499e7357c4d111c8fe5f87230"
+    },
+    {
+      "pid": 13053,
+      "ppid": 11603,
+      "user": "root",
+      "elapsed": "04:30:56",
+      "cpu": "0.0",
+      "state": "S",
+      "command": "/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.a84f5889b159/VPhone.bundle/Contents/MacOS/vphone-cli cfw install t32q-20261024 --library-root /Users/kolar/github/vphone-cli/.build --variant regular --qualify-origin --keep-artifacts --work-parent /private/tmp --reinstall-cryptex"
+    },
+    {
+      "pid": 14404,
+      "ppid": 13053,
+      "user": "root",
+      "elapsed": "04:28:16",
+      "cpu": "0.0",
+      "state": "S",
+      "command": "/bin/zsh /Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.a84f5889b159/VPhone.bundle/Contents/Resources/scripts/cfw_install_host.sh --variant regular --reinstall-cryptex --work-parent /private/tmp /Users/kolar/github/vphone-cli/.build/t32q-20261024"
+    },
+    {
+      "pid": 44232,
+      "ppid": 14404,
+      "user": "root",
+      "elapsed": "03:09",
+      "cpu": "90.4",
+      "state": "R",
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.a84f5889b159/VPhone.bundle/Contents/Resources/scripts/cfw_disk_txn.py seal --fd 11 --owner-pid 14404 /Users/kolar/github/vphone-cli/.build/t32q-20261024 /Users/kolar/github/vphone-cli/.build/t32q-20261024/.cfw_disk.kbuBz8Io"
+    }
+  ]
+}

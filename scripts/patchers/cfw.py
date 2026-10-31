@@ -151,7 +151,7 @@ else:
     from .cfw_daemons import parse_cryptex_paths, inject_daemons, inject_daemon, patch_dropbear_plist
 
 
-def _dispatch(*, dry_run=False):
+def _dispatch(*, dry_run=False, guest_environment="classic"):
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
@@ -289,7 +289,8 @@ def _dispatch(*, dry_run=False):
         if len(sys.argv) < 4:
             print("Usage: patch_cfw.py inject-daemons <launchd.plist> <daemon_dir>")
             sys.exit(1)
-        inject_daemons(sys.argv[2], sys.argv[3])
+        inject_daemons(sys.argv[2], sys.argv[3], include_api=guest_environment != "v2",
+                       guest_environment=guest_environment)
 
     elif cmd in ("inject-daemon", "inject-jb-daemon"):
         if len(sys.argv) != 5:
@@ -461,6 +462,9 @@ def main():
         else:
             if command not in mapping: raise ValueError("unknown guest patch command: " + command)
             declaration, target = mapping[command]
+        if command == 'patch-build-version':
+            from patchers.guest_write import staged_target
+            target = logical(path) or staged_target(plan, path, declaration)
         if os.environ.get('VPHONE_DECLARATION_ID', declaration) != declaration: raise ValueError("guest declaration override refused")
         gate.authorize(plan, declaration, target)
         staging = Path(plan.context['vmDirectory']) / '.cfw_temp'
@@ -471,12 +475,14 @@ def main():
         if path.is_symlink(): raise ValueError("linked guest patch target")
         observations.append((path, target, gate.snapshot(path), component_effects.capture_input(path, effect_store)))
     gate.recheck(plan)
-    implementation = None
-    if command in dsc:
-        from patchers.undo_provenance import implementation as producer_implementation
-        implementation = producer_implementation()
+    from patchers.undo_provenance import implementation as producer_implementation
+    implementation = producer_implementation()
     try:
-        return _dispatch()
+        result = _dispatch(guest_environment=plan.context['guestEnvironment'])
+        if command == 'inject-dylib':
+            from patchers.component_signatures import reserve_signature_command
+            reserve_signature_command(path)
+        return result
     finally:
         if readonly_dsc_inputs is not None and _readonly_dsc_inputs(path) != readonly_dsc_inputs:
             raise ValueError('DSC readonly input changed during patching')
@@ -484,7 +490,7 @@ def main():
             effect = component_effects.capture_change(effect_input, item, effect_store)
             if implementation is not None:
                 if producer_implementation() != implementation:
-                    raise ValueError('DSC producer source changed during execution')
+                    raise ValueError('Patch producer source changed during execution')
                 effect['implementation'] = implementation
             gate.append_evidence(plan, declaration, target, item, before, gate.snapshot(item), source_image=source_image, effect=effect, source_binding=source_binding)
 

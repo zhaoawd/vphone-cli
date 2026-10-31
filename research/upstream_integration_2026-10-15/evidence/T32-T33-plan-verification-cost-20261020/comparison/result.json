@@ -1,0 +1,73 @@
+{
+  "state": "passed",
+  "scope": "isolated fixture with two 64MiB CFW postimages and a synthetic Undo image; not real VM installation elapsed time",
+  "cliSHA256": {
+    "before": "4b4462290673f7bae7eb04d5820b4de70914fc1663ebadcf9da29174247a132f",
+    "after": "7474952f13e94a8b335237cdad25a48ed1170c71fdae587cf1dac707257d79ae"
+  },
+  "trials": [
+    {
+      "label": "before",
+      "warmup": true,
+      "elapsedSeconds": 0.17327412497252226,
+      "generationLoads": 2,
+      "hashedFileBytes": 268509688
+    },
+    {
+      "label": "after",
+      "warmup": true,
+      "elapsedSeconds": 3.417313249781728,
+      "generationLoads": 1,
+      "hashedFileBytes": 134254844
+    },
+    {
+      "label": "after",
+      "warmup": false,
+      "elapsedSeconds": 0.08521904237568378,
+      "generationLoads": 1,
+      "hashedFileBytes": 134254844
+    },
+    {
+      "label": "before",
+      "warmup": false,
+      "elapsedSeconds": 0.14321116730570793,
+      "generationLoads": 2,
+      "hashedFileBytes": 268509688
+    },
+    {
+      "label": "before",
+      "warmup": false,
+      "elapsedSeconds": 0.14331345818936825,
+      "generationLoads": 2,
+      "hashedFileBytes": 268509688
+    },
+    {
+      "label": "after",
+      "warmup": false,
+      "elapsedSeconds": 0.08458095788955688,
+      "generationLoads": 1,
+      "hashedFileBytes": 134254844
+    },
+    {
+      "label": "after",
+      "warmup": false,
+      "elapsedSeconds": 0.08729104232043028,
+      "generationLoads": 1,
+      "hashedFileBytes": 134254844
+    },
+    {
+      "label": "before",
+      "warmup": false,
+      "elapsedSeconds": 0.15785125037655234,
+      "generationLoads": 2,
+      "hashedFileBytes": 268509688
+    }
+  ],
+  "medianSeconds": {
+    "before": 0.14331345818936825,
+    "after": 0.08521904237568378
+  },
+  "speedup": 1.6817069776210134,
+  "identicalVerifiedExports": true,
+  "unchangedFixture": true
+}

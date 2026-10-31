@@ -4,9 +4,13 @@ Uses the producer's LC_CODE_SIGNATURE / dyld header and SuperBlob /
 CodeDirectory format. Evidence proves byte relationships, not signer trust.
 """
 import hashlib
+import os
+import stat
 from pathlib import Path
 import plistlib
 import struct
+import subprocess
+import tempfile
 
 
 def read(stream, offset, count, limit):
@@ -185,7 +189,17 @@ def verify_signing(before, after):
                 if row.get('linkedit') is not None:
                     vmsize,fileoff,filesize=row['linkedit']
                     end=row['size'] if row['signature'] is None else sum(row['signature'])-row['base']
-                    if fileoff+filesize!=end or vmsize not in {((filesize+page-1)//page)*page for page in (4096,16384)}:
+                    # Mach-O permits an existing segment to reserve more virtual
+                    # space than its file mapping needs. Preserve that exact
+                    # reservation or accept only the signer's minimal page size.
+                    allowed={((filesize+page-1)//page)*page for page in (4096,16384)}
+                    if row is left:
+                        valid_vm=vmsize>=filesize and vmsize%4096==0
+                    else:
+                        if left.get('linkedit') is not None:
+                            allowed.add(left['linkedit'][0])
+                        valid_vm=vmsize>=filesize and vmsize in allowed
+                    if fileoff+filesize!=end or not valid_vm:
                         raise ValueError('linkedit sizes do not describe actual signature layout')
                 if row['signature'] is not None:
                     position=sum(row['signature']);end=row['base']+row['size']
@@ -215,3 +229,109 @@ def verify_signing(before, after):
     if {cd['identity'] for cd in cds if cd['slot']==0}!={row['identity'] for row in new}:
         raise ValueError('signer produced no primary CodeDirectory for a slice')
     verify_slots(after,[dict(identity=cd['identity'],slot=cd['slot'],pages=list(range(cd['count']))) for cd in cds])
+
+
+def verify_artifact(path, *, require_cms=False):
+    """Verify all code pages and CMS integrity; do not assert publisher trust."""
+    from .component_effects import regular
+    cds=directories(path)
+    verify_slots(path,[dict(identity=cd['identity'],slot=cd['slot'],pages=range(cd['count'])) for cd in cds])
+    size=Path(path).stat().st_size
+    with regular(path) as stream:
+        for layout in layouts(path):
+            if layout['identity']=='dsc' or layout['signature'] is None:
+                raise ValueError('Signing artifact has no Mach-O signature')
+            start,span=layout['signature'];count=struct.unpack('>I',read(stream,start+8,4,size))[0]
+            primary=None;cms=None
+            for index in range(count):
+                slot,offset=struct.unpack('>II',read(stream,start+12+index*8,8,size))
+                magic,length=struct.unpack('>II',read(stream,start+offset,8,size))
+                if slot==0:
+                    if length>16<<20:raise ValueError('Signing CodeDirectory exceeds bound')
+                    primary=read(stream,start+offset,length,size)
+                if slot==0x10000:
+                    if magic!=0xfade0b01 or not 8<length<=1<<20:
+                        raise ValueError('Invalid signing CMS wrapper')
+                    cms=read(stream,start+offset+8,length-8,size)
+            if primary is None:raise ValueError('Signing artifact lacks primary CodeDirectory')
+            if cms is None:
+                if require_cms or not struct.unpack_from('>I',primary,12)[0]&2:
+                    raise ValueError('Non-ad-hoc signing artifact lacks CMS')
+                continue
+            with tempfile.TemporaryDirectory(prefix='vphone-signing-cms-') as raw:
+                content=Path(raw)/'CodeDirectory';content.write_bytes(primary)
+                result=subprocess.run(['/usr/bin/openssl','cms','-verify','-binary','-inform','DER',
+                    '-content',str(content),'-noverify','-out','/dev/null'],input=cms,capture_output=True,timeout=20)
+                if result.returncode:raise ValueError('Signing artifact CMS integrity verification failed')
+
+
+def reserve_signature_command(path):
+    """Reserve LC_CODE_SIGNATURE before signing an injected thin image.
+
+    Match VPhoneMachOImage.signed: drop only LC_SOURCE_VERSION when needed.
+    This is a recorded loader edit, never an exception in verify_signing.
+    """
+    layout = layouts(path)
+    if len(layout) != 1 or layout[0]['identity'] != 'thin':
+        raise ValueError('signature space reservation requires a thin Mach-O')
+    if layout[0]['signature'] is not None:
+        return False
+    fd = os.open(path, os.O_RDWR | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
+    with os.fdopen(fd, 'r+b') as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise ValueError('signature space input must be a private regular file')
+        header = stream.read(32)
+        count, size = struct.unpack_from('<II', header, 16)
+        if 32 + size != layout[0]['end']:
+            raise ValueError('signature space input changed')
+        area = stream.read(size)
+        commands, content, position = [], [], 0
+        for _ in range(count):
+            cmd, length = struct.unpack_from('<II', area, position)
+            raw = area[position:position + length]
+            if len(raw) != length or length < 8:
+                raise ValueError('invalid signature space load command')
+            if cmd == 0x19:
+                if length < 72:
+                    raise ValueError('invalid segment command')
+                sections = struct.unpack_from('<I', raw, 64)[0]
+                if length != 72 + sections * 80:
+                    raise ValueError('invalid section command bounds')
+                for index in range(sections):
+                    section = 72 + index * 80
+                    offset = struct.unpack_from('<I', raw, section + 48)[0]
+                    if offset:
+                        content.append(offset)
+                if not sections:
+                    offset, span = struct.unpack_from('<QQ', raw, 40)
+                    if offset and span:
+                        content.append(offset)
+            commands.append((cmd, raw))
+            position += length
+        if position != size:
+            raise ValueError('signature space command size differs')
+        # No section boundary means no additional edit is authorized. The
+        # unchanged signer verifier still rejects overwritten nonzero bytes.
+        if not content:
+            return False
+        first = min(content)
+        if not 32 + size <= first <= info.st_size:
+            raise ValueError('load commands overlap file content')
+        if 32 + size + 16 <= first:
+            if any(stream.read(16)):
+                raise ValueError('signature space contains non-padding bytes')
+            return False
+        versions = [raw for cmd, raw in commands if cmd == 0x2a]
+        if len(versions) != 1 or len(versions[0]) != 16:
+            raise ValueError('no signature command space without LC_SOURCE_VERSION')
+        kept = b''.join(raw for cmd, raw in commands if cmd != 0x2a)
+        if 32 + len(kept) + 16 > first:
+            raise ValueError('insufficient signature command space')
+        stream.seek(16)
+        stream.write(struct.pack('<II', count - 1, len(kept)))
+        stream.seek(32)
+        stream.write(kept + bytes(size - len(kept)))
+        stream.flush()
+        os.fsync(stream.fileno())
+    return True

@@ -1,0 +1,30 @@
+{
+  "variable": "remove platform-application entitlement only; same project signer and identifier",
+  "beforeSHA256": "860055c04fc0f85029213694052a889b2604ca99c5179db5d6ba4ef4b0dfaf74",
+  "afterSHA256": "f0e682d117bba16f501372d1c94f63845aaa05c3ee84762eec9e5a97e2e407ed",
+  "textSectionUnchanged": true,
+  "originalEntitlements": {
+    "com.apple.private.security.container-required": "org.vphone.acceptance.t52.20261022",
+    "com.apple.private.tcc.allow": [
+      "kTCCServiceCamera"
+    ],
+    "com.apple.security.iokit-user-client-class": [
+      "IOSurfaceRootUserClient",
+      "IOGPUDeviceUserClient"
+    ],
+    "jb.pmap_cs_custom_trust": "PMAP_CS_APP_STORE",
+    "platform-application": true
+  },
+  "candidateEntitlements": {
+    "com.apple.private.security.container-required": "org.vphone.acceptance.t52.20261022",
+    "com.apple.private.tcc.allow": [
+      "kTCCServiceCamera"
+    ],
+    "com.apple.security.iokit-user-client-class": [
+      "IOSurfaceRootUserClient",
+      "IOGPUDeviceUserClient"
+    ],
+    "jb.pmap_cs_custom_trust": "PMAP_CS_APP_STORE"
+  },
+  "path": "/var/containers/Bundle/Application/FE3CFC90-BF86-41D6-8123-31520D687DEA/T52Acceptance.app/T52Acceptance"
+}

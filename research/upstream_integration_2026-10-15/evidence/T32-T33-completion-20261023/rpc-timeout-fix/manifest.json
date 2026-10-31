@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "scope": "Offline separate health/RPC deadlines; no candidate deployment",
+  "accepted": false,
+  "runtimeValidated": false,
+  "patchCausalityValidated": false,
+  "actualRuntimeResultChanged": false,
+  "redBehavioralFailures": 2,
+  "newRegressionTests": 5,
+  "XCTestPassed": 37,
+  "SwiftTestingPassed": 41,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "priorArchivesVerified": [
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/cms-qualified/manifest.json",
+      "sha256": "21e549fc50a0e3bf45ed23e9c837b80368d8deb94030faa5d0baaa19a16dd5a4",
+      "files": 28
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/display-runtime-outcome/manifest.json",
+      "sha256": "3ea02a61a8d0a7deb6deb34dfc8be959304afcf3ec5708820f9a6fb9c44be93e",
+      "files": 62
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/external-mount-fix-prepared/manifest.json",
+      "sha256": "47ef8289da8bac0b455e6524b29382ced520c1de813d17b6b1d93a5b1d036593",
+      "files": 21
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/fresh-offline/manifest.json",
+      "sha256": "78773c155edf1a94e6833b2c431afcfc4bf511c6fc946f99ddf16b36b771a96d",
+      "files": 27
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/gui-socket-failure/manifest.json",
+      "sha256": "e0cb6aa1aa5d777911ac99e5be7fcf97199e22172ea1371511bf0a0334709150",
+      "files": 34
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/offline-refusal/manifest.json",
+      "sha256": "308bdb205b0b53de8fedac47e682686df48721fb78aa57cda42ca14a9bcf5bc7",
+      "files": 40
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/prepared/manifest.json",
+      "sha256": "73e212fe983b42bb50614b348c492b40467041f595b2cd6abb3c6ed127e97725",
+      "files": 119
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/resumed-offline/manifest.json",
+      "sha256": "9dd8de00fad24fe36c4cd8d9db82ba228dc008de0fa74794bc9eec664010a589",
+      "files": 66
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/short-runtime-outcome/manifest.json",
+      "sha256": "ccb1bc0aadad1ed8dbe47022c699731ea6f9471ed827ad734cceebb7bc3a6df7",
+      "files": 54
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/short-runtime-prepared/manifest.json",
+      "sha256": "1f9bac1b164d46c9995c23cadb27b4fd677156a08889a843485328bec84d2d18",
+      "files": 24
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/unlock-isolation-prepared/manifest.json",
+      "sha256": "320b6271aa70ad76c7b58fab0b5d8d8b5e64017d4c315632352ff0a020d31786",
+      "files": 31
+    }
+  ],
+  "files": [
+    {
+      "path": "files/.build/t32-t33-completion-20261023/rpc-deadline-analysis.json",
+      "origin": ".build/t32-t33-completion-20261023/rpc-deadline-analysis.json",
+      "sha256": "0dc54d6ac7bad77ba2142cd19a996eceb32878750f96e12d5d620f339f884b66",
+      "bytes": 909
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/rpc-timeout-green.log",
+      "origin": ".build/t32-t33-completion-20261023/rpc-timeout-green.log",
+      "sha256": "c3995b06037e04a07c1070beffaa717f706f206b149e42b52e7086bb70a574ab",
+      "bytes": 112378
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/rpc-timeout-red.log",
+      "origin": ".build/t32-t33-completion-20261023/rpc-timeout-red.log",
+      "sha256": "64b929eb2f5af47d916efe709b93d65346fa7aea494c5dcb032ff1c4aa2f8a3b",
+      "bytes": 90434
+    },
+    {
+      "path": "files/TASKS.md",
+      "origin": "TASKS.md",
+      "sha256": "97e10a73447f51c9f34aa080c1537f99a9df35e05bb7dbb9782b2644a43d1fc6",
+      "bytes": 115062
+    },
+    {
+      "path": "files/research/0_binary_patch_comparison.md",
+      "origin": "research/0_binary_patch_comparison.md",
+      "sha256": "d777847517ed52d9c9c2616ec06023657cc2ce2b5a7da6cad4bef384c4794249",
+      "bytes": 268458
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/T32_T33_completion_20261023.md",
+      "origin": "research/upstream_integration_2026-10-15/T32_T33_completion_20261023.md",
+      "sha256": "eccb4682b325dbeab545724fca572bc1bcce6855b2b55e0d601c196883633d46",
+      "bytes": 27314
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "origin": "research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "sha256": "1e8ebbd455767aaa6078f00f039a0c8a3cca5f662783793c8a08612cf1b7a5b5",
+      "bytes": 313997
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/local_reconciliation.md",
+      "origin": "research/upstream_integration_2026-10-15/local_reconciliation.md",
+      "sha256": "6cd7d54a9332ea0681a6127e8eeadb58d3f4dd3e68de90a6fbcc98c7339a353b",
+      "bytes": 13606
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/progress.md",
+      "origin": "research/upstream_integration_2026-10-15/progress.md",
+      "sha256": "e424bf11676b821d9e8805c9e717c1a82412f9613c8cc90795bd33f31ec98d83",
+      "bytes": 108299
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tasks.json",
+      "origin": "research/upstream_integration_2026-10-15/tasks.json",
+      "sha256": "008222c4e01fa035fb249ed40d3ef4fa23f3dfcf2450a00371f40ed36957b5aa",
+      "bytes": 369846
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/archive_t32_rpc_timeout_fix.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/archive_t32_rpc_timeout_fix.py",
+      "sha256": "5cb18397b7b5deb43d4c0f2e5f9a6425866e59763ba8142235753a06e1ad4a01",
+      "bytes": 3382
+    },
+    {
+      "path": "files/sources/VPhoneAPIKit/VPhoneAPIClient.swift",
+      "origin": "sources/VPhoneAPIKit/VPhoneAPIClient.swift",
+      "sha256": "00503f1b51cae729402f39029f88e33e0d56f6cce7fed6293c82427209af7293",
+      "bytes": 9204
+    },
+    {
+      "path": "files/sources/VPhoneAPIKit/VPhoneAPIHTTPExchange.swift",
+      "origin": "sources/VPhoneAPIKit/VPhoneAPIHTTPExchange.swift",
+      "sha256": "bf7ea29873fe1316ae1241170379986db4c1c6f347ce24e85d1c026870848cec",
+      "bytes": 4884
+    },
+    {
+      "path": "files/sources/VPhoneAPIKit/VPhoneAPIWebSocket.swift",
+      "origin": "sources/VPhoneAPIKit/VPhoneAPIWebSocket.swift",
+      "sha256": "45245323095f482c3e5acce6ca5d5093ec89119a2ba0d73b1c02f64d2cd59c4b",
+      "bytes": 6614
+    },
+    {
+      "path": "files/sources/VPhoneAPIKit/VPhoneStartupUnlock.swift",
+      "origin": "sources/VPhoneAPIKit/VPhoneStartupUnlock.swift",
+      "sha256": "4a608b5c155d0de1ea9198bfa1efe1d4c4b841a97366540fe904dd581ee8b429",
+      "bytes": 5119
+    },
+    {
+      "path": "files/sources/VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "origin": "sources/VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "sha256": "9eab426ddecf366b72b67891da922677bfd2abe019c2275facb8856e33bedd4d",
+      "bytes": 1022
+    },
+    {
+      "path": "files/sources/VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "origin": "sources/VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "sha256": "198f5006f2630adc68c0a9e9c4c9be85f13ee417732e1b4c344cc06b52ddf995",
+      "bytes": 6812
+    },
+    {
+      "path": "files/sources/vphone-cli/VPhoneAppDelegate.swift",
+      "origin": "sources/vphone-cli/VPhoneAppDelegate.swift",
+      "sha256": "165230111cec67f19fa826de363417897bed49ddfefdce91743172eee6e11f61",
+      "bytes": 25927
+    },
+    {
+      "path": "files/tests/VPhoneAPIKitTests/APIRPCTimeoutTests.swift",
+      "origin": "tests/VPhoneAPIKitTests/APIRPCTimeoutTests.swift",
+      "sha256": "eda48517409719475c5e48f67792ca8c0a81464df887a45ddb922136983bdb65",
+      "bytes": 2908
+    },
+    {
+      "path": "files/tests/fixtures/host_api/server.py",
+      "origin": "tests/fixtures/host_api/server.py",
+      "sha256": "5d1d1b05caadc8dc153c426e611d1d215371eb37d15e1351dcffbdec79d78b2e",
+      "bytes": 13599
+    }
+  ],
+  "count": 20
+}

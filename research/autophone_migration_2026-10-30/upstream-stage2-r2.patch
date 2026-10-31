@@ -1,0 +1,819 @@
+diff --git a/VPhoneDaemon/Daemon/GuestAPI.swift b/VPhoneDaemon/Daemon/GuestAPI.swift
+index 6cf93a0..22de7d1 100644
+--- a/VPhoneDaemon/Daemon/GuestAPI.swift
++++ b/VPhoneDaemon/Daemon/GuestAPI.swift
+@@ -153,6 +153,7 @@ enum GuestAPI {
+                 "motion_gyroscope_toggle",
+                 "motion_attitude",
+             ] + pointerCapabilities() + scriptCapabilities() + GuestHomePodDisplay.capabilities
++                + (GuestShellCommands.program == nil ? [] : ["shell_exec"])
+                 + GuestHomePodDebug.capabilities,
+         ]
+     }
+@@ -165,6 +166,16 @@ enum GuestAPI {
+ 
+     static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
+         switch method {
++        case "shell.exec":
++            return try GuestShellCommands.shared.execute(params)
++        case "shell.cancel":
++            let identifier = try string(params, "request_id")
++            guard UUID(uuidString: identifier) != nil else { throw GuestAPIError.invalidRequest("request_id must be a UUID") }
++            return ["cancelled": GuestShellCommands.shared.cancel(identifier)]
++        case "agent.health":
++            var result = health()
++            result["shell_exec_available"] = GuestShellCommands.program != nil
++            return result
+         case "device.snapshot":
+             var snapshot = try collectDeviceSnapshot()
+             snapshot["jailbreak"] = jailbreakInfo()
+diff --git a/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift b/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
+index 7c40437..291177e 100644
+--- a/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
++++ b/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
+@@ -310,6 +310,11 @@ private final class HTTPJob: @unchecked Sendable {
+         self.channel = channel
+         self.request = request
+         self.hub = hub
++        if request.method == "shell.exec", let identifier = request.params["request_id"] as? String {
++            channel.closeFuture.whenComplete { _ in
++                GuestShellCommands.shared.cancel(identifier)
++            }
++        }
+     }
+ 
+     func run() {
+diff --git a/VPhoneDaemon/Daemon/GuestShellCommand.swift b/VPhoneDaemon/Daemon/GuestShellCommand.swift
+new file mode 100644
+index 0000000..af0e447
+--- /dev/null
++++ b/VPhoneDaemon/Daemon/GuestShellCommand.swift
+@@ -0,0 +1,106 @@
++import Darwin
++import Foundation
++import VphonedNative
++
++private final class GuestShellCancellation: @unchecked Sendable {
++    private let lock = NSLock()
++    private var value = false
++    func cancel() { lock.lock(); value = true; lock.unlock() }
++    func isCancelled() -> Bool { lock.lock(); defer { lock.unlock() }; return value }
++}
++
++/// One-shot POSIX commands, independent of the interactive terminal route.
++final class GuestShellCommands: @unchecked Sendable {
++    static let shared = GuestShellCommands()
++    private let lock = NSLock()
++    private var jobs: [String: GuestShellCancellation] = [:]
++    private var cancelledBeforeStart: [String: Date] = [:]
++    private var completed: [String: Date] = [:]
++
++    private func trimHistory() {
++        completed = completed.filter { $0.value.timeIntervalSinceNow > -180 }
++        cancelledBeforeStart = cancelledBeforeStart.filter { $0.value.timeIntervalSinceNow > -180 }
++        for history in [true, false] {
++            let values = history ? completed : cancelledBeforeStart
++            if values.count >= 128, let oldest = values.min(by: { $0.value < $1.value })?.key {
++                if history { completed.removeValue(forKey: oldest) }
++                else { cancelledBeforeStart.removeValue(forKey: oldest) }
++            }
++        }
++    }
++
++    static var program: String? {
++        (try? GuestShellSessionHandler.resolveProgram("sh")) ?? nil
++    }
++
++    @discardableResult
++    func cancel(_ identifier: String) -> Bool {
++        lock.lock()
++        defer { lock.unlock() }
++        if let job = jobs[identifier] { job.cancel(); return true }
++        trimHistory()
++        if completed[identifier] != nil { return false }
++        cancelledBeforeStart[identifier] = Date()
++        return false
++    }
++
++    func execute(_ params: [String: Any]) throws -> [String: Any] {
++        let identifier = try GuestAPI.string(params, "request_id")
++        guard UUID(uuidString: identifier) != nil else {
++            throw GuestAPIError.invalidRequest("request_id must be a UUID")
++        }
++        let command = try GuestAPI.string(params, "cmd")
++        guard params["cwd"] == nil || params["cwd"] is String else {
++            throw GuestAPIError.invalidRequest("cwd must be a string")
++        }
++        let cwd = params["cwd"] as? String
++        guard !command.utf8.contains(0), command.utf8.count <= 128 * 1024,
++              cwd == nil || (cwd!.hasPrefix("/") && !cwd!.utf8.contains(0)) else {
++            throw GuestAPIError.invalidRequest("cmd/cwd contains an invalid value")
++        }
++        if let value = params["timeout_ms"] {
++            guard let number = value as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID() else {
++                throw GuestAPIError.invalidRequest("timeout_ms must be an integer")
++            }
++        }
++        let timeout = (params["timeout_ms"] as? NSNumber)?.doubleValue ?? 30000
++        guard timeout.isFinite, timeout.rounded() == timeout, timeout >= 1, timeout <= 120000 else {
++            throw GuestAPIError.invalidRequest("timeout_ms must be 1...120000")
++        }
++        guard let program = Self.program else {
++            throw GuestAPIError.operationFailed("POSIX shell is unavailable; install a bootstrap before shell.exec")
++        }
++        let job = GuestShellCancellation()
++        lock.lock()
++        trimHistory()
++        guard jobs.count < 8, jobs[identifier] == nil, completed[identifier] == nil else {
++            lock.unlock()
++            throw GuestAPIError.operationFailed("shell.exec is busy or request_id is already active")
++        }
++        if cancelledBeforeStart.removeValue(forKey: identifier) != nil { job.cancel() }
++        jobs[identifier] = job
++        lock.unlock()
++        defer {
++            lock.lock()
++            jobs.removeValue(forKey: identifier)
++            trimHistory()
++            completed[identifier] = Date()
++            lock.unlock()
++        }
++        var result = vp_shell_result()
++        let context = Unmanaged.passUnretained(job).toOpaque()
++        let check: @convention(c) (UnsafeMutableRawPointer?) -> Bool = { pointer in
++            guard let pointer else { return true }
++            return Unmanaged<GuestShellCancellation>.fromOpaque(pointer).takeUnretainedValue().isCancelled()
++        }
++        let code = vp_shell_execute(program, command, cwd, Int32(timeout), check, context, &result)
++        guard code == 0 else { throw GuestAPIError.operationFailed("shell.exec: \(String(cString: strerror(code)))") }
++        defer { vp_shell_result_free(&result) }
++        let stdout = String(decoding: UnsafeBufferPointer(start: result.out_bytes, count: result.out_length), as: UTF8.self)
++        let stderr = String(decoding: UnsafeBufferPointer(start: result.err_bytes, count: result.err_length), as: UTF8.self)
++        return ["stdout": stdout, "stderr": stderr, "exit_code": Int(result.exit_code),
++                "timed_out": result.timed_out, "cancelled": result.cancelled,
++                "stdout_truncated": result.stdout_truncated, "stderr_truncated": result.stderr_truncated,
++                "request_id": identifier]
++    }
++}
+diff --git a/VPhoneDaemon/Native/Include/VPhoneShellExec.h b/VPhoneDaemon/Native/Include/VPhoneShellExec.h
+new file mode 100644
+index 0000000..c24f6c5
+--- /dev/null
++++ b/VPhoneDaemon/Native/Include/VPhoneShellExec.h
+@@ -0,0 +1,22 @@
++#pragma once
++#include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
++
++#define VP_SHELL_OUTPUT_LIMIT (64 * 1024)
++typedef struct {
++    uint8_t *out_bytes;
++    size_t out_length;
++    uint8_t *err_bytes;
++    size_t err_length;
++    int exit_code;
++    bool timed_out;
++    bool cancelled;
++    bool stdout_truncated;
++    bool stderr_truncated;
++} vp_shell_result;
++
++int vp_shell_execute(const char *shell, const char *command, const char *cwd,
++                     int timeout_ms, bool (*cancelled)(void *), void *context,
++                     vp_shell_result *result);
++void vp_shell_result_free(vp_shell_result *result);
+diff --git a/VPhoneDaemon/Native/Include/VphonedNative.h b/VPhoneDaemon/Native/Include/VphonedNative.h
+index d24b221..1cd29d9 100644
+--- a/VPhoneDaemon/Native/Include/VphonedNative.h
++++ b/VPhoneDaemon/Native/Include/VphonedNative.h
+@@ -4,6 +4,7 @@
+ #include <stdint.h>
+ #include <spawn.h>
+ #include <sys/types.h>
++#include "VPhoneShellExec.h"
+ #ifdef __OBJC__
+ #import <Foundation/Foundation.h>
+ #endif
+diff --git a/VPhoneDaemon/Native/vphoned_shell_exec.c b/VPhoneDaemon/Native/vphoned_shell_exec.c
+new file mode 100644
+index 0000000..88e569d
+--- /dev/null
++++ b/VPhoneDaemon/Native/vphoned_shell_exec.c
+@@ -0,0 +1,175 @@
++#include "Include/VphonedNative.h"
++#include <errno.h>
++#include <fcntl.h>
++#include <poll.h>
++#include <signal.h>
++#include <spawn.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/wait.h>
++#include <time.h>
++#include <unistd.h>
++
++extern char **environ;
++// The Darwin symbol is present in iOS; use the same native bridging convention
++// as vphoned's other posix_spawn file actions.
++extern int vp_shell_addchdir(posix_spawn_file_actions_t *, const char *)
++    __asm__("_posix_spawn_file_actions_addchdir_np");
++extern int vp_shell_setpgroup(posix_spawnattr_t *, pid_t) __asm__("_posix_spawnattr_setpgroup");
++#define posix_spawn vp_spawn
++#define posix_spawn_file_actions_init vp_spawn_file_actions_init
++#define posix_spawn_file_actions_destroy vp_spawn_file_actions_destroy
++#define posix_spawn_file_actions_addopen vp_spawn_file_actions_addopen
++#define posix_spawn_file_actions_adddup2 vp_spawn_file_actions_adddup2
++#define posix_spawn_file_actions_addclose vp_spawn_file_actions_addclose
++#define posix_spawnattr_init vp_spawnattr_init
++#define posix_spawnattr_destroy vp_spawnattr_destroy
++#define posix_spawnattr_setflags vp_spawnattr_setflags
++#define posix_spawnattr_setpgroup vp_shell_setpgroup
++
++static double monotonic_seconds(void) {
++    struct timespec value;
++    clock_gettime(CLOCK_MONOTONIC, &value);
++    return value.tv_sec + value.tv_nsec / 1e9;
++}
++
++static int make_pipe(int pipefd[2]) {
++    if (pipe(pipefd) != 0) return errno;
++    for (int i = 0; i < 2; i++) {
++        if (pipefd[i] < 3) {
++            int replacement = fcntl(pipefd[i], F_DUPFD_CLOEXEC, 3);
++            if (replacement < 0) {
++                int error = errno; close(pipefd[0]); close(pipefd[1]); return error;
++            }
++            close(pipefd[i]); pipefd[i] = replacement;
++        }
++    }
++    if (fcntl(pipefd[0], F_SETFD, FD_CLOEXEC) < 0 ||
++        fcntl(pipefd[1], F_SETFD, FD_CLOEXEC) < 0 ||
++        fcntl(pipefd[0], F_SETFL, O_NONBLOCK) < 0) {
++        int error = errno;
++        close(pipefd[0]); close(pipefd[1]);
++        return error;
++    }
++    return 0;
++}
++
++// Bound each drain as well as stored output so a continuously writing child
++// cannot prevent timeout or cancellation checks.
++static void drain(int fd, uint8_t *output, size_t *length, bool *truncated, bool *eof) {
++    uint8_t buffer[8192];
++    for (int turn = 0; turn < 8 && !*eof; turn++) {
++        ssize_t count = read(fd, buffer, sizeof(buffer));
++        if (count == 0) { *eof = true; break; }
++        if (count < 0) {
++            if (errno == EINTR) continue;
++            if (errno != EAGAIN && errno != EWOULDBLOCK) { *eof = true; *truncated = true; }
++            break;
++        }
++        size_t available = VP_SHELL_OUTPUT_LIMIT - *length;
++        size_t keep = (size_t)count < available ? (size_t)count : available;
++        memcpy(output + *length, buffer, keep);
++        *length += keep;
++        if (keep != (size_t)count) *truncated = true;
++    }
++}
++
++void vp_shell_result_free(vp_shell_result *result) {
++    free(result->out_bytes); free(result->err_bytes);
++    result->out_bytes = NULL; result->err_bytes = NULL;
++}
++
++int vp_shell_execute(const char *shell, const char *command, const char *cwd,
++                     int timeout_ms, bool (*cancelled)(void *), void *context,
++                     vp_shell_result *result) {
++    memset(result, 0, sizeof(*result));
++    if (!shell || !command || timeout_ms < 1 || timeout_ms > 120000) return EINVAL;
++    result->out_bytes = malloc(VP_SHELL_OUTPUT_LIMIT);
++    result->err_bytes = malloc(VP_SHELL_OUTPUT_LIMIT);
++    if (!result->out_bytes || !result->err_bytes) {
++        vp_shell_result_free(result); return ENOMEM;
++    }
++    if (cancelled && cancelled(context)) {
++        result->cancelled = true; result->exit_code = 137; return 0;
++    }
++    int output[2], errors[2];
++    int error = make_pipe(output);
++    if (error) { vp_shell_result_free(result); return error; }
++    error = make_pipe(errors);
++    if (error) { close(output[0]); close(output[1]); vp_shell_result_free(result); return error; }
++    posix_spawn_file_actions_t actions;
++    posix_spawnattr_t attributes;
++    error = posix_spawn_file_actions_init(&actions);
++    if (error) goto close_pipes;
++    error = posix_spawnattr_init(&attributes);
++    if (error) { posix_spawn_file_actions_destroy(&actions); goto close_pipes; }
++    #define ACTION(call) do { if (!error) error = (call); } while (0)
++    ACTION(posix_spawn_file_actions_addopen(&actions, STDIN_FILENO, "/dev/null", O_RDONLY, 0));
++    ACTION(posix_spawn_file_actions_adddup2(&actions, output[1], STDOUT_FILENO));
++    ACTION(posix_spawn_file_actions_adddup2(&actions, errors[1], STDERR_FILENO));
++    ACTION(posix_spawn_file_actions_addclose(&actions, output[0]));
++    ACTION(posix_spawn_file_actions_addclose(&actions, output[1]));
++    ACTION(posix_spawn_file_actions_addclose(&actions, errors[0]));
++    ACTION(posix_spawn_file_actions_addclose(&actions, errors[1]));
++    if (cwd) ACTION(vp_shell_addchdir(&actions, cwd));
++    ACTION(posix_spawnattr_setpgroup(&attributes, 0));
++    ACTION(posix_spawnattr_setflags(&attributes, POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_CLOEXEC_DEFAULT));
++    pid_t pid = -1;
++    char *argv[] = {(char *)shell, "-c", (char *)command, NULL};
++    if (!error) error = posix_spawn(&pid, shell, &actions, &attributes, argv, environ);
++    posix_spawn_file_actions_destroy(&actions);
++    posix_spawnattr_destroy(&attributes);
++    #undef ACTION
++    if (error) goto close_pipes;
++    close(output[1]); close(errors[1]);
++
++    double deadline = monotonic_seconds() + timeout_ms / 1000.0;
++    bool out_eof = false, err_eof = false, exited = false;
++    while (!(out_eof && err_eof && exited)) {
++        result->cancelled = cancelled && cancelled(context);
++        result->timed_out = !result->cancelled && monotonic_seconds() >= deadline;
++        if (result->cancelled || result->timed_out) {
++            // Keep the leader unreaped until this signal: its PID cannot be
++            // reused while a delayed cancellation is targeting its group.
++            kill(-pid, SIGKILL);
++            break;
++        }
++        drain(output[0], result->out_bytes, &result->out_length, &result->stdout_truncated, &out_eof);
++        drain(errors[0], result->err_bytes, &result->err_length, &result->stderr_truncated, &err_eof);
++        siginfo_t observed = {0};
++        if (waitid(P_PID, (id_t)pid, &observed, WEXITED | WNOHANG | WNOWAIT) == 0) {
++            exited = observed.si_pid == pid;
++        } else if (errno != EINTR) {
++            error = errno;
++            kill(-pid, SIGKILL);
++            break;
++        }
++        if (!(out_eof && err_eof && exited)) {
++            struct pollfd channels[] = {{out_eof ? -1 : output[0], POLLIN, 0},
++                                        {err_eof ? -1 : errors[0], POLLIN, 0}};
++            poll(channels, 2, 10);
++        }
++    }
++    int status = 0;
++    while (waitpid(pid, &status, 0) < 0) {
++        if (errno != EINTR) { if (!error) error = errno; break; }
++    }
++    // Drain queued bytes after the leader was reaped. This loop is finite
++    // even if a command deliberately detached into a different process group.
++    for (int turn = 0; turn < 50 && !(out_eof && err_eof); turn++) {
++        drain(output[0], result->out_bytes, &result->out_length, &result->stdout_truncated, &out_eof);
++        drain(errors[0], result->err_bytes, &result->err_length, &result->stderr_truncated, &err_eof);
++        if (!(out_eof && err_eof)) usleep(10000);
++    }
++    result->stdout_truncated |= !out_eof;
++    result->stderr_truncated |= !err_eof;
++    result->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 128 + WTERMSIG(status);
++    close(output[0]); close(errors[0]);
++    if (error) vp_shell_result_free(result);
++    return error;
++
++close_pipes:
++    close(output[0]); close(output[1]); close(errors[0]); close(errors[1]);
++    vp_shell_result_free(result);
++    return error;
++}
+diff --git a/VPhoneDaemon/Tests/ShellCommandTests.swift b/VPhoneDaemon/Tests/ShellCommandTests.swift
+new file mode 100644
+index 0000000..5b9187a
+--- /dev/null
++++ b/VPhoneDaemon/Tests/ShellCommandTests.swift
+@@ -0,0 +1,62 @@
++import Darwin
++import Foundation
++
++// Only platform routing is stubbed; the production Swift command controller
++// and production C executor are compiled unchanged into this harness.
++enum GuestAPIError: Error { case invalidRequest(String), operationFailed(String) }
++enum GuestAPI {
++    static func string(_ params: [String: Any], _ key: String) throws -> String {
++        guard let value = params[key] as? String, !value.isEmpty else {
++            throw GuestAPIError.invalidRequest(key)
++        }
++        return value
++    }
++}
++enum GuestShellSessionHandler {
++    static func resolveProgram(_: String) throws -> String? { "/bin/sh" }
++}
++
++@main
++struct ShellCommandTests {
++    static func main() throws {
++        let commands = GuestShellCommands.shared
++        var count = 0
++        for override: [String: Any] in [
++            ["cwd": 123], ["timeout_ms": "100"], ["timeout_ms": true],
++            ["timeout_ms": 1.5], ["timeout_ms": 0], ["timeout_ms": 120001],
++            ["cmd": "prefix\0suffix"], ["cwd": "/tmp\0suffix"],
++        ] {
++            var params: [String: Any] = ["request_id": UUID().uuidString, "cmd": "printf executed"]
++            params.merge(override) { _, new in new }
++            do {
++                _ = try commands.execute(params)
++                fatalError("invalid parameters reached execution: \(override)")
++            } catch GuestAPIError.invalidRequest { count += 1 }
++        }
++        let identifier = UUID().uuidString
++        let params: [String: Any] = ["request_id": identifier, "cmd": "printf '%s' \"$PPID\""]
++        let result = try commands.execute(params)
++        precondition(result["stdout"] as? String == String(getpid()))
++        precondition(result["exit_code"] as? Int == 0)
++        count += 1
++        do {
++            _ = try commands.execute(params)
++            fatalError("finished request was replayed")
++        } catch GuestAPIError.operationFailed { count += 1 }
++
++        // A completed request's HTTP close must not consume an early-cancel
++        // entry and eventually prevent cancellation of a queued command.
++        for _ in 0 ..< 140 {
++            let id = UUID().uuidString
++            _ = try commands.execute(["request_id": id, "cmd": "exit 0"])
++            precondition(!commands.cancel(id))
++        }
++        let cancelled = UUID().uuidString
++        precondition(!commands.cancel(cancelled))
++        let stopped = try commands.execute(["request_id": cancelled, "cmd": "printf must-not-run"])
++        precondition(stopped["cancelled"] as? Bool == true)
++        precondition(stopped["stdout"] as? String == "")
++        count += 1
++        print("\(count) Swift shell controller tests passed")
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Tests/HostAutomationIOTests.swift b/VPhoneExecutable/VPhoneVirtualization/Tests/HostAutomationIOTests.swift
+new file mode 100644
+index 0000000..5470d10
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/Tests/HostAutomationIOTests.swift
+@@ -0,0 +1,85 @@
++import Darwin
++import Foundation
++
++@main
++struct HostAutomationIOTests {
++    static func pair() -> [Int32] {
++        var fds: [Int32] = [0, 0]
++        precondition(socketpair(AF_UNIX, SOCK_STREAM, 0, &fds) == 0)
++        var value: Int32 = 1
++        for fd in fds { precondition(setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &value, 4) == 0) }
++        return fds
++    }
++
++    static func main() {
++        var count = 0
++        do {
++            let fds = pair(); defer { fds.forEach { close($0) } }
++            let data = Data("{\"t\":\"中文\"}\n".utf8)
++            DispatchQueue.global().async {
++                for byte in data { var byte = byte; _ = Darwin.write(fds[1], &byte, 1) }
++            }
++            precondition(VPhoneHostAutomationIO.readCommand(from: fds[0])?.line == "{\"t\":\"中文\"}")
++            count += 1
++        }
++        do {
++            let fds = pair(); defer { fds.forEach { close($0) } }
++            let data = Data("{\"t\":\"tap\"}".utf8)
++            _ = data.withUnsafeBytes { Darwin.write(fds[1], $0.baseAddress, $0.count) }
++            shutdown(fds[1], SHUT_WR)
++            precondition(VPhoneHostAutomationIO.readCommand(from: fds[0]) == nil)
++            count += 1
++        }
++        do {
++            let fds = pair(); defer { fds.forEach { close($0) } }
++            DispatchQueue.global().async {
++                let data = Data(repeating: 0x61, count: (1 << 20) + 1) + [0x0A]
++                _ = VPhoneHostAutomationIO.write(data, to: fds[1], timeout: 1)
++                shutdown(fds[1], SHUT_WR)
++            }
++            // The writer itself substitutes a bounded JSON error for an
++            // oversized response rather than transmitting invalid JSON.
++            let line = VPhoneHostAutomationIO.readCommand(from: fds[0])!.line
++            precondition(line.contains("response exceeds"))
++            count += 1
++        }
++        do {
++            let fds = pair(); defer { fds.forEach { close($0) } }
++            let writer = DispatchGroup()
++            writer.enter()
++            DispatchQueue.global().async {
++                defer { writer.leave() }
++                let data = Data(repeating: 0x61, count: (1 << 20) + 1) + [0x0A]
++                data.withUnsafeBytes { raw in
++                    var offset = 0
++                    while offset < raw.count {
++                        let written = Darwin.write(fds[1], raw.baseAddress! + offset, raw.count - offset)
++                        guard written > 0 else { return }
++                        offset += written
++                    }
++                }
++            }
++            precondition(VPhoneHostAutomationIO.readCommand(from: fds[0], timeout: 1) == nil)
++            shutdown(fds[0], SHUT_RDWR)
++            precondition(writer.wait(timeout: .now() + 1) == .success)
++            count += 1
++        }
++        do {
++            let fds = pair(); defer { fds.forEach { close($0) } }
++            let start = ProcessInfo.processInfo.systemUptime
++            precondition(VPhoneHostAutomationIO.readCommand(from: fds[0], timeout: 0.05) == nil)
++            precondition(ProcessInfo.processInfo.systemUptime - start < 0.5)
++            count += 1
++        }
++        do {
++            let fds = pair(); defer { fds.forEach { close($0) } }
++            var size: Int32 = 4096
++            precondition(setsockopt(fds[0], SOL_SOCKET, SO_SNDBUF, &size, 4) == 0)
++            let start = ProcessInfo.processInfo.systemUptime
++            precondition(!VPhoneHostAutomationIO.write(Data(repeating: 0x61, count: 1 << 20), to: fds[0], timeout: 0.05))
++            precondition(ProcessInfo.processInfo.systemUptime - start < 0.5)
++            count += 1
++        }
++        print("\(count) host I/O tests passed")
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationIO.swift b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationIO.swift
+new file mode 100644
+index 0000000..b58e926
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationIO.swift
+@@ -0,0 +1,54 @@
++import Darwin
++import Foundation
++
++/// Bounded line I/O independent of the VM and its MainActor operations.
++enum VPhoneHostAutomationIO {
++    static let maximumLength = 1 << 20
++
++    private static func timeout(_ descriptor: Int32, _ option: Int32, until deadline: TimeInterval) -> Bool {
++        let remaining = deadline - ProcessInfo.processInfo.systemUptime
++        guard remaining > 0 else { return false }
++        let micros = max(1, Int(remaining * 1_000_000))
++        var value = timeval(tv_sec: micros / 1_000_000, tv_usec: Int32(micros % 1_000_000))
++        return setsockopt(descriptor, SOL_SOCKET, option, &value, socklen_t(MemoryLayout<timeval>.size)) == 0
++    }
++
++    static func readCommand(from descriptor: Int32, timeout seconds: TimeInterval = 15) -> (line: String, rest: Data)? {
++        guard seconds.isFinite, seconds > 0 else { return nil }
++        let deadline = ProcessInfo.processInfo.systemUptime + seconds
++        var accumulated = Data()
++        var buffer = [UInt8](repeating: 0, count: 4096)
++        while accumulated.count < maximumLength {
++            guard timeout(descriptor, SO_RCVTIMEO, until: deadline) else { return nil }
++            let count = read(descriptor, &buffer, buffer.count)
++            if count < 0, errno == EINTR { continue }
++            guard count > 0, accumulated.count + count <= maximumLength else { return nil }
++            accumulated.append(contentsOf: buffer[..<count])
++            if let newline = accumulated.firstIndex(of: 0x0A) {
++                guard let line = String(data: accumulated[..<newline], encoding: .utf8) else { return nil }
++                return (line, Data(accumulated[accumulated.index(after: newline)...]))
++            }
++        }
++        return nil
++    }
++
++    @discardableResult
++    static func write(_ response: Data, to descriptor: Int32, timeout seconds: TimeInterval = 15) -> Bool {
++        guard seconds.isFinite, seconds > 0 else { return false }
++        let data = response.count <= maximumLength ? response
++            : Data("{\"ok\":false,\"error\":\"response exceeds 1 MiB\"}\n".utf8)
++        let deadline = ProcessInfo.processInfo.systemUptime + seconds
++        return data.withUnsafeBytes { raw in
++            guard let base = raw.baseAddress else { return true }
++            var offset = 0
++            while offset < raw.count {
++                guard timeout(descriptor, SO_SNDTIMEO, until: deadline) else { return false }
++                let count = Darwin.write(descriptor, base.advanced(by: offset), raw.count - offset)
++                if count < 0, errno == EINTR { continue }
++                guard count > 0 else { return false }
++                offset += count
++            }
++            return true
++        }
++    }
++}
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift
+index 49be92f..7a68d4c 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift
+@@ -88,6 +88,7 @@ class VPhoneHostAutomationServer {
+     /// Matches vphoned's JSON body limit, so an `rpc` line is never refused
+     /// here that the guest would accept.
+     private nonisolated static let maximumRequestLength = 1 << 20
++    private nonisolated static let connections = DispatchSemaphore(value: 64)
+ 
+     /// Screen pixel dimensions for coordinate mapping.
+     private var screenWidth: Int = 1290
+@@ -154,6 +155,10 @@ class VPhoneHostAutomationServer {
+             return
+         }
+ 
++        guard chmod(socketPath, 0o600) == 0 else {
++            close(fd)
++            return
++        }
+         guard listen(fd, SOMAXCONN) == 0 else {
+             print("[hostctl] listen failed: \(String(cString: strerror(errno)))")
+             close(fd)
+@@ -196,22 +201,51 @@ class VPhoneHostAutomationServer {
+ 
+         do {
+             switch type {
++            case "capabilities":
++                let connected = control?.isConnected == true
++                let guest = Set(connected ? (control?.guestCapabilities ?? []) : [])
++                let screen = connected && (windowedView != nil || guest.contains("screenshot"))
++                let touch = connected && (windowedView != nil || guest.contains("touch"))
++                let commands: [String: Bool] = [
++                    "capabilities": true, "ping": connected, "rpc": connected, "screenshot": screen,
++                    "tap": touch, "swipe": touch, "key": connected && guest.contains("hid"),
++                    "type": connected && guest.contains("clipboard"),
++                    "app_list": connected && guest.contains("apps"),
++                    "app_foreground": connected && guest.contains("apps"),
++                    "app_launch": connected && guest.contains("apps"),
++                    "app_terminate": connected && guest.contains("apps"),
++                    "file_get": connected && guest.contains("files"),
++                    "file_put": connected && guest.contains("files"),
++                    "shell": connected && guest.contains("shell_exec"),
++                ]
++                let object: [String: Any] = ["ok": true, "protocol": "upstream_v1",
++                    "guest_connected": connected, "commands": commands,
++                    "guest_capabilities": Array(guest).sorted(),
++                    "headless": windowedView == nil,
++                    "screen": ["width": screenWidth, "height": screenHeight, "scale": Self.compactScale],
++                    "shell": ["single_stream_limit": 65536, "timeout_ms_max": 120000,
++                              "available": commands["shell"] == true]]
++                return try JSONSerialization.data(withJSONObject: object) + [0x0A]
+             case "ping":
+                 try await connectedControl().sendPing()
+                 return Self.reply(ok: true)
+ 
+             case "screenshot":
+                 let image = try await automationScreenshot()
+-                let url = if let outputPath = json["path"] as? String {
+-                    try screenRecorder.saveScreenshot(jpegData: image, to: URL(fileURLWithPath: outputPath))
+-                } else {
+-                    try screenRecorder.saveScreenshot(jpegData: image)
++                var outputPath: String?
++                if json["save"] as? Bool != false {
++                    let url = if let path = json["path"] as? String {
++                        try screenRecorder.saveScreenshot(jpegData: image, to: URL(fileURLWithPath: path))
++                    } else {
++                        try screenRecorder.saveScreenshot(jpegData: image)
++                    }
++                    outputPath = url.path
+                 }
+                 // Always include compact image for screenshot command, from the same capture
+                 let compact = CGImageSourceCreateWithData(image as CFData, nil)
+                     .flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) }
+                     .flatMap(compactJPEG)
+-                return Self.reply(ok: true, path: url.path, image: compact)
++                return Self.reply(ok: true, path: outputPath, image: compact)
+ 
+             case "display.geometry":
+                 var result: [String: Any] = [
+@@ -557,6 +591,13 @@ class VPhoneHostAutomationServer {
+                 close(clientFD)
+                 continue
+             }
++            var uid: uid_t = 0
++            var gid: gid_t = 0
++            guard getpeereid(clientFD, &uid, &gid) == 0, uid == geteuid(),
++                  connections.wait(timeout: .now()) == .success else {
++                close(clientFD)
++                continue
++            }
+             clientQueue.async {
+                 serveClient(clientFD, controller: controller)
+             }
+@@ -566,23 +607,75 @@ class VPhoneHostAutomationServer {
+     /// Socket reads and writes block, so they stay on `clientQueue`; only the
+     /// command itself runs on the main actor, where it awaits without
+     /// holding a thread.
++    private final class ClientState: @unchecked Sendable {
++        private let lock = NSLock()
++        private var finished = false
++        let descriptor: Int32
++        init(_ descriptor: Int32) { self.descriptor = descriptor }
++        func finish() { lock.lock(); finished = true; lock.unlock() }
++        func disconnected() -> Bool? {
++            lock.lock()
++            defer { lock.unlock() }
++            if finished { return nil }
++            var byte: UInt8 = 0
++            let count = recv(descriptor, &byte, 1, MSG_PEEK | MSG_DONTWAIT)
++            if count == 0 || count > 0 { return true }
++            return errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR
++        }
++    }
++
+     private nonisolated static func serveClient(_ fd: Int32, controller: VPhoneHostAutomationServer?) {
+         guard let (line, typedAhead) = readCommand(from: fd) else {
+-            close(fd)
+-            return
++            close(fd); connections.signal(); return
+         }
+-        // A shell has no reply: the connection becomes the terminal, so it
+-        // leaves the one-line protocol here and never comes back to it.
+         if let request = shellRequest(in: line) {
+             relayShell(fd, request: request, typedAhead: typedAhead, controller: controller)
++            connections.signal()
+             return
+         }
++        guard typedAhead.isEmpty else {
++            write(reply(ok: false, error: "one request per connection"), to: fd)
++            close(fd); connections.signal(); return
++        }
++        var command = line
++        var shellID: String?
++        if let data = line.data(using: .utf8),
++           var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
++           object["t"] as? String == "rpc", object["method"] as? String == "shell.exec" {
++            shellID = UUID().uuidString
++            var params = object["params"] as? [String: Any] ?? [:]
++            params["request_id"] = shellID
++            object["params"] = params
++            if let wire = try? JSONSerialization.data(withJSONObject: object), wire.count < maximumRequestLength {
++                command = String(decoding: wire, as: UTF8.self)
++            } else {
++                write(reply(ok: false, error: "shell.exec request exceeds 1 MiB"), to: fd)
++                close(fd); connections.signal(); return
++            }
++        }
++        let state = ClientState(fd)
++        if let shellID {
++            clientQueue.async {
++                while let disconnected = state.disconnected() {
++                    if disconnected {
++                        Task { @MainActor in
++                            _ = try? await controller?.control?.rpcAfterQueuedInput("shell.cancel", params: ["request_id": shellID])
++                        }
++                        break
++                    }
++                    usleep(25000)
++                }
++            }
++        }
++        let admittedCommand = command
+         Task { @MainActor in
+-            let response = await controller?.respond(to: line)
++            let response = await controller?.respond(to: admittedCommand)
+                 ?? reply(ok: false, error: "host control stopped")
+             clientQueue.async {
++                state.finish()
+                 write(response, to: fd)
+                 close(fd)
++                connections.signal()
+             }
+         }
+     }
+@@ -593,24 +686,7 @@ class VPhoneHostAutomationServer {
+     /// anything behind it: its client starts typing without waiting for a
+     /// reply, and those keystrokes are already the session's input.
+     private nonisolated static func readCommand(from fd: Int32) -> (line: String, rest: Data)? {
+-        var buffer = [UInt8](repeating: 0, count: 4096)
+-        var accumulated = Data()
+-
+-        while accumulated.count < maximumRequestLength {
+-            let n = read(fd, &buffer, buffer.count)
+-            guard n > 0 else { break }
+-            accumulated.append(contentsOf: buffer[..<n])
+-            if buffer[..<n].contains(0x0A) {
+-                break
+-            }
+-        }
+-
+-        if let nlRange = accumulated.firstIndex(of: 0x0A) {
+-            guard let line = String(data: accumulated[..<nlRange], encoding: .utf8) else { return nil }
+-            return (line, Data(accumulated[accumulated.index(after: nlRange)...]))
+-        }
+-        guard !accumulated.isEmpty, let line = String(data: accumulated, encoding: .utf8) else { return nil }
+-        return (line, Data())
++        VPhoneHostAutomationIO.readCommand(from: fd)
+     }
+ 
+     // MARK: - Interactive Shell
+@@ -705,19 +781,6 @@ class VPhoneHostAutomationServer {
+     }
+ 
+     private nonisolated static func write(_ data: Data, to fd: Int32) {
+-        data.withUnsafeBytes { raw in
+-            guard let base = raw.baseAddress else { return }
+-            var offset = 0
+-            while offset < raw.count {
+-                let written = Darwin.write(fd, base.advanced(by: offset), raw.count - offset)
+-                if written < 0, errno == EINTR {
+-                    continue
+-                }
+-                if written <= 0 {
+-                    break
+-                }
+-                offset += written
+-            }
+-        }
++        VPhoneHostAutomationIO.write(data, to: fd)
+     }
+ }

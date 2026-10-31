@@ -206,6 +206,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self.authorized():
             return self.reply(401, {'error': 'unauthorized'})
         request = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+        if self.path.startswith('/slow-rpc/'):
+            time.sleep(0.35)
         result = {'type': 'response', 'id': request['id'], 'result': request['params']}
         status = 200
         if self.path.startswith('/wrong/'):
@@ -256,6 +258,8 @@ class Handler(BaseHTTPRequestHandler):
         self.frame({'type': 'event', 'event': 'connected', 'data': health if managed else {'api_version': 1}})
         if managed:
             while value := self.read_frame():
+                if self.path.startswith('/slow-rpc/'):
+                    time.sleep(0.35)
                 result = health if value['method'] == 'agent.health' else value['method']
                 if host_commands and value['method'] == 'apps.list':
                     if value['params'] != {'filter': 'user'}:

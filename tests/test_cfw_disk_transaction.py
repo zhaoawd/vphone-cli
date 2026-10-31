@@ -117,6 +117,49 @@ class DiskTransactionTests(HostDriverFixture):
             self.assertIn(needle, json.dumps(records[0]))
         return records[0]
 
+    def test_unusable_work_parent_refuses_before_staging(self):
+        vm, digest, inode = self.make_disk()
+        parent = self.root / 'shared scratch'
+        parent.mkdir(mode=0o755)
+        _, process = self.start(work_parent=parent)
+        rc, output = self.finish(process)
+        self.assertNotEqual(rc, 0, output)
+        self.assertIn('CFW work parent', output)
+        self.assertEqual(list(vm.glob('.cfw_disk.*')), [])
+        self.assertEqual(list(parent.iterdir()), [])
+        self.assert_original_intact(vm, digest, inode)
+        self.assertNotIn('hdiutil attach', self.calls())
+
+    def test_external_mount_workspace_preserves_same_volume_staging_and_history(self):
+        vm, digest, inode = self.make_disk()
+        vm = vm.resolve()
+        parent = (self.root / 'external scratch').resolve()
+        parent.mkdir(mode=0o700)
+        _, process = self.start(work_parent=parent, REAL_LSOF='1')
+        rc, output = self.finish(process)
+        self.assertEqual(rc, 0, output)
+        self.assertIn('mounts=' + str(parent), output)
+        attached = Path((vm / 'mount-table.attached').read_text().strip())
+        self.assertEqual(attached.parent.parent, vm)
+        self.assertEqual(list(parent.iterdir()), [])
+        record = self.records(vm)[0]
+        self.assertEqual(Path(record['mountRoot']['path']).parent, parent)
+        original = Path(record['location']) / 'Disk.img'
+        self.assertEqual((sha256(original), original.stat().st_ino), (digest, inode))
+
+    def test_final_mount_binding_failure_cleans_external_root_without_publishing(self):
+        vm, digest, inode = self.make_disk()
+        parent = self.root / 'external scratch'
+        parent.mkdir(mode=0o700)
+        _, process = self.start(work_parent=parent, CFW_TXN_FAULTS='bind-mount')
+        rc, output = self.finish(process)
+        self.assertNotEqual(rc, 0, output)
+        self.assertIn('CFW disk bind-mount:', output)
+        self.assertEqual(list(parent.iterdir()), [])
+        self.assertNotIn(' publish ', self.calls())
+        self.assert_original_intact(vm, digest, inode)
+        self.assert_failed_record(vm)
+
     # MARK: - Success
 
     def test_success_publishes_patched_clone_and_keeps_original_for_each_variant(self):
@@ -140,7 +183,7 @@ class DiskTransactionTests(HostDriverFixture):
                 self.assertEqual(list(vm.glob('.cfw_disk.*')), [])
                 record = self.records(vm)[0]
                 self.assertEqual(record['status'], 'published')
-                self.assertEqual(record['version'],4)
+                self.assertEqual(record['version'],5)
                 self.assertIs(record['runtimeImageEvidenceRequired'], True)
                 self.assertEqual(record['provenanceMode'],'required')
                 self.assertIs(record['guestEvidenceRequired'], True)

@@ -1,0 +1,130 @@
+{
+  "ipa": "/Users/kolar/github/vphone-cli/.build/autophone-stage3/scene-r4/build/food-ordering-v5-full-visual-release.ipa",
+  "receipt": {
+    "schema_version": "ui-eval-release-build-receipt/v2",
+    "status": "built",
+    "target_id": "ui-eval-target-b-food-ordering",
+    "bundle_id": "com.autophone.foodorderingdemo.v2",
+    "scheme": "FoodAIVerification",
+    "configuration": "Release",
+    "js_engine": "jsc",
+    "expo_template": {
+      "version": "53.0.34",
+      "archive_sha256": "eb47b0d4b052cb05f826f9033b776206ee7f8216775dd78392adaab6cc2d07fb"
+    },
+    "source_tree_sha256": "5f150d49a91f8eb334f7a8ad4b973b2886471167c068bce3aff912d36e2a4153",
+    "cache_mode": "clean",
+    "clean_acceptance_eligible": true,
+    "installed_build_marker": {
+      "file": "autophone-ui-eval-build-marker.json",
+      "sha256": "ba76a4313ad4d285fb0fcf3721777843d856b6b287177bba0d5af584bd159427",
+      "app_tree_sha256": "40b1e7e221b5a7fa5e7637e9f35699ef4da26c80b3aa7cc32194abb7a9361f6a"
+    },
+    "ipa": {
+      "file": "food-ordering-v5-full-visual-release.ipa",
+      "sha256": "c7fe737a16f3da3267c07b2824e50bcc7f6bc84e7b4fe6154faa747ef480dc19",
+      "size_bytes": 9960415
+    },
+    "build_environment": {
+      "CI": "1",
+      "EXPO_NO_DOTENV": "1",
+      "EXPO_NO_TELEMETRY": "1",
+      "EXPO_PUBLIC_AUTOPHONE_VERIFICATION": "1",
+      "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+    },
+    "stage_timings_seconds": {
+      "npm_ci": 20.37057108299632,
+      "expo_template": 0.22512695800105575,
+      "expo_prebuild": 1.1117986669996753,
+      "pod_install": 8.04517895799654,
+      "xcodebuild": 100.24116479199438
+    },
+    "toolchain": {
+      "tools": {
+        "node": {
+          "path": "/Users/kolar/.local/bin/node",
+          "version": "v22.22.3"
+        },
+        "npm": {
+          "path": "/Users/kolar/.local/bin/npm",
+          "version": "10.9.8"
+        },
+        "npx": {
+          "path": "/Users/kolar/.local/bin/npx",
+          "version": "10.9.8"
+        },
+        "pod": {
+          "path": "/opt/homebrew/bin/pod",
+          "version": "1.17.0"
+        },
+        "xcodebuild": {
+          "path": "/usr/bin/xcodebuild",
+          "version": "Xcode 27.1\nBuild version 27A9269"
+        }
+      },
+      "xcode_select": {
+        "path": "/usr/bin/xcode-select",
+        "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+      },
+      "sdk": {
+        "name": "iphoneos",
+        "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk",
+        "version": "27.1"
+      }
+    },
+    "dependency_resolution": {
+      "reproducibility": "non-reproducible",
+      "replayable": false,
+      "npm": {
+        "network_access": "allowed",
+        "lockfile_enforced": true,
+        "lockfile": {
+          "file": "package-lock.json",
+          "sha256": "99327607a715edfe51863a15f5e475f18dec3d00e9816dac096984b9fc677e5c"
+        }
+      },
+      "cocoapods": {
+        "network_access": "allowed",
+        "lockfile_enforced": false,
+        "lockfile_present_before_install": false,
+        "podfile": {
+          "file": "ios/Podfile",
+          "sha256": "89cd2927ba41287a8ad0f1c5c31db37d157153c47e766dd96d59a4bd21eb8e93"
+        },
+        "lockfile": {
+          "file": "ios/Podfile.lock",
+          "sha256": "38b22b4f88ce93a82c2772993e2a76715694ce5175e04636106230f9b113a1ed"
+        }
+      }
+    },
+    "dependency_cache": {
+      "cocoapods_seed_tree_sha256": "08fe45141456164cf91bfefd088af9cdc2be88ea395bcd522d674cdb0de8cdd5",
+      "cocoapods_home_seed_tree_sha256": "a4aa2cb424d27ca090eee0d5dc619e72aa16d4cf52f6a35156c85063919a3aa4",
+      "npm_seed_tree_sha256": "8d2691a1aa74327b7fbe3ef8343ee75c5e9c08da7f87191402aeaa83be5020b0"
+    },
+    "workspace_policy": {
+      "minimum_free_bytes": 16106127360,
+      "intermediates_retained": true
+    }
+  },
+  "scene_manifest": {
+    "UIApplicationSupportsMultipleScenes": false,
+    "UISceneConfigurations": {
+      "UIWindowSceneSessionRoleApplication": [
+        {
+          "UISceneClassName": "UIWindowScene",
+          "UISceneConfigurationName": "Autophone",
+          "UISceneDelegateClassName": "AutophoneSceneDelegate"
+        }
+      ]
+    }
+  },
+  "marker": {
+    "schema_version": "ui-eval-installed-build-marker/v1",
+    "target_id": "ui-eval-target-b-food-ordering",
+    "bundle_id": "com.autophone.foodorderingdemo.v2",
+    "source_tree_sha256": "5f150d49a91f8eb334f7a8ad4b973b2886471167c068bce3aff912d36e2a4153",
+    "app_tree_sha256": "40b1e7e221b5a7fa5e7637e9f35699ef4da26c80b3aa7cc32194abb7a9361f6a"
+  },
+  "marker_sha256": "ba76a4313ad4d285fb0fcf3721777843d856b6b287177bba0d5af584bd159427"
+}

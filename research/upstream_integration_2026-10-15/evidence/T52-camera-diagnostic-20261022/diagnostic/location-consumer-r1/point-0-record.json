@@ -1,0 +1,58 @@
+{
+  "startedAt": 1792660204.067972,
+  "schemaVersion": 1,
+  "applicationState": 1,
+  "mode": "location",
+  "pid": 479,
+  "runID": "t52-location-ad8a0952a54b48a69ed5af5e6346c2a1",
+  "events": [
+    {
+      "type": "started",
+      "time": 1792660204.067988
+    },
+    {
+      "implementationOwners": {
+        "startUpdatingLocation": "/usr/lib/libvlocation.dylib",
+        "availableMetadataObjectTypes": "/usr/lib/libcamfix.dylib"
+      },
+      "type": "runtime_diagnostic",
+      "time": 1792660204.0705209,
+      "fileAccess": [
+        {
+          "path": "/var/mobile/Media/SimulatedCamera/vphone-vcam-frame.shm",
+          "openErrno": 1
+        },
+        {
+          "path": "/var/mobile/Library/Caches/vphone-location.json",
+          "openErrno": 2
+        }
+      ]
+    },
+    {
+      "status": 0,
+      "type": "location_authorization",
+      "time": 1792660204.096554
+    },
+    {
+      "status": 4,
+      "type": "location_authorization",
+      "time": 1792660232.18216
+    },
+    {
+      "verticalAccuracy": 6,
+      "speed": 2,
+      "longitude": 121.5,
+      "horizontalAccuracy": 5,
+      "course": 90,
+      "time": 1792660232.184097,
+      "latitude": 31.2,
+      "type": "location_callback",
+      "timestamp": 1792660232.001405,
+      "altitude": 20
+    }
+  ],
+  "locationServicesEnabled": true,
+  "updatedAt": 1792660232.184099,
+  "authorization": 4,
+  "bundleID": "org.vphone.acceptance.t52.20261022"
+}

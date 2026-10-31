@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-10-20T10:11:09.695467+00:00",
+  "sourceBase": "d968d02f5c69615b9f2f3bd45805b60e10540bfc",
+  "scope": "real signed CLI import queue and library/command termination coordination with isolated new fixtures; no AppKit Quit interaction or VM boot",
+  "tests": 2,
+  "seconds": 9.065,
+  "exitCode": 0,
+  "results": {
+    "concurrentImports": "two archives published; complete source and destination disk SHA256 and archive SHA256 unchanged; output drained",
+    "termination": "private .import- extraction observed before termination; one CLI child status130; pending archive not started; output drained; no final publication or remaining staging/child; source disk/archive/waiting archive and pre-existing config SHA256 unchanged"
+  },
+  "initialFailure": "test observed nonexistent .vphone-import- prefix; actual implementation uses .import-; corrected both active-stage observation and existing cleanup assertions; no production changes",
+  "frozenProgramsSHA256": {
+    ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli": "4b4462290673f7bae7eb04d5820b4de70914fc1663ebadcf9da29174247a132f",
+    ".build/t32-dsc-companions-final.app/Contents/MacOS/vphone-vm": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125"
+  },
+  "acceptedT60": false,
+  "pending": [
+    "actual signed AppKit UI interactions",
+    "full VM and mixed-version creation/transfer/quit matrix",
+    "byte progress protocol"
+  ],
+  "files": {
+    "RealCLIImportQueueTests.swift": {
+      "bytes": 7795,
+      "sha256": "87841ee35fc3fa56b57104460ad9461cb28d3996f218aeafd2ed1acf93543172"
+    },
+    "command.txt": {
+      "bytes": 382,
+      "sha256": "3d92f3f647340a0280c0fd0dba15a23e2191a863ec0044eb18e78850af4fdab1"
+    },
+    "real-cli-tests-retry.log.gz": {
+      "bytes": 3448,
+      "sha256": "495da3ec76f5523dba8caebb362525bcec327c295a06ea41c3f78924e91a6807"
+    },
+    "real-cli-tests.log.gz": {
+      "bytes": 3731,
+      "sha256": "4b0accae1f4b40c0c1820f17b3b6673275aaebb0aca98daa7bfd80940911ad4a"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "method": "services.print",
+  "result": {
+    "label": "com.vphone.vphoned",
+    "domain": "user",
+    "description": "user/501/com.vphone.vphoned = {\n\tactive count = 1\n\tpath = /System/Library/LaunchDaemons/vphoned.plist\n\ttype = LaunchDaemon\n\tstate = running\n\n\tprogram = /usr/bin/vphoned\n\targuments = {\n\t\t/usr/bin/vphoned\n\t}\n\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tXPC_SERVICE_NAME => com.vphone.vphoned\n\t}\n\n\tdomain = user/501\n\tminimum runtime = 10\n\tbase minimum runtime = 10\n\texit timeout = 3\n\truns = 1\n\tpid = 65\n\timmediate reason = speculative\n\tforks = 0\n\texecs = 1\n\tinitialized = 1\n\ttrampolined = 1\n\tstarted suspended = 0\n\tproxy started suspended = 0\n\tuses proxy = 1\n\tchecked allocations = 0 (queried = 1)\n\tchecked allocations reason = no host\n\tchecked allocations flags = 0x0\n\tlast exit code = (never exited)\n\tretain only = 0\n\n\tresource coalition = {\n\t\tID = 73\n\t\ttype = resource\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.vphoned\n\t}\n\n\tjetsam coalition = {\n\t\tID = 74\n\t\ttype = jetsam\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.vphoned\n\t}\n\n\tspawn type = adaptive (6)\n\tjetsam priority = 30\n\tjetsam memory limit (active) = (unlimited)\n\tjetsam memory limit (inactive) = (unlimited)\n\tjetsamproperties category = daemon\n\tcpumon = default\n\texponential throttling grace limit = 10\n\n\tproperties = keepalive | runatload | supports transactions | inferred program | platform binary | exponential throttling | needs proxy | tle system\n}\n"
+  },
+  "ok": true
+}

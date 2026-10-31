@@ -191,8 +191,24 @@ public enum VPhoneBundleOps {
             // this operation is over, so drop it rather than leave a stale path.
             try? FileManager.default.removeItem(
                 at: dst.appendingPathComponent(VPhoneVMRuntimeState.filename))
-            return try VPhoneBundle.load(at: dst)
+            let renamed = try VPhoneBundle.load(at: dst)
+            let network = renamed.manifest.networkConfig
+            guard let followed = localHostName(following: network.localHostName, from: name, to: newName) else {
+                return renamed
+            }
+            let updated = renamed.manifest.updating(networkConfig: network.with(localHostName: .some(followed)))
+            try updated.write(to: renamed.configURL)
+            return VPhoneBundle(url: renamed.url, manifest: updated)
         }
+    }
+
+    /// The mDNS name for a machine renamed or cloned from `oldName` to
+    /// `newName`, when `name` is the one `--mdns on` derived from `oldName`.
+    /// Nil for a name chosen by hand, or none.
+    static func localHostName(following name: String?, from oldName: String, to newName: String) -> String? {
+        name == VPhoneNetworking.localHostName(forVMName: oldName)
+            ? VPhoneNetworking.localHostName(forVMName: newName)
+            : nil
     }
 
     public static func delete(bundleNamed name: String, in library: VPhoneLibrary) throws {
@@ -209,23 +225,87 @@ public enum VPhoneBundleOps {
     /// identity (NVRAM, machine identifier, SEP storage and tickets stay together).
     /// This is not a new independent device: use create/restore for that purpose.
     /// Prefer APFS CoW; omit host runtime state, the control socket and CFW rollback history.
+    ///
+    /// With `newIdentity: true`, the copy gets a fresh `machineIdentifier` and MAC
+    /// address on its first start and drops colliding network settings, while
+    /// `SEPStorage`, `Disk.img` and `nvram.bin` remain byte-for-byte copies.
+    @discardableResult
     public static func clone(
-        bundleNamed name: String, to newName: String, in library: VPhoneLibrary
+        bundleNamed name: String, to newName: String, in library: VPhoneLibrary,
+        newIdentity: Bool = false
     ) throws -> VPhoneBundle {
-        try clone(bundleNamed: name, to: newName, in: library, copyDirectory: {
-            try VPhoneCloneCopy.copy(from: $0, to: $1, excludingRootNames: $2)
-        })
+        try clone(
+            bundleNamed: name, to: newName, in: library, newIdentity: newIdentity,
+            copyDirectory: {
+                try VPhoneCloneCopy.copy(from: $0, to: $1, excludingRootNames: $2)
+            })
+    }
+
+    /// Clones a machine folder that need not be in `library`, such as a
+    /// template in `.templates`, into `library` as `newName`. `sourceName` is
+    /// the name a derived mDNS name follows from.
+    @discardableResult
+    public static func clone(
+        _ source: VPhoneBundle, sourceName name: String, to newName: String,
+        in library: VPhoneLibrary, newIdentity: Bool = false
+    ) throws -> VPhoneBundle {
+        try clone(
+            source, sourceName: name, to: newName, in: library, newIdentity: newIdentity,
+            copyDirectory: {
+                try VPhoneCloneCopy.copy(from: $0, to: $1, excludingRootNames: $2)
+            })
     }
 
     /// Test seams for forced non-APFS copying, failed copies and a destination
     /// collision immediately before publication. No global mutable test hooks.
+    @discardableResult
     static func clone(
         bundleNamed name: String, to newName: String, in library: VPhoneLibrary,
+        newIdentity: Bool = false,
+        readerWait: TimeInterval = VPhoneBundleActivity.readerWait,
         copyDirectory: (URL, URL, Set<String>) throws -> Void,
+        afterCopy: (() throws -> Void)? = nil,
         afterNameCheck: (() throws -> Void)? = nil
     ) throws -> VPhoneBundle {
         try requireValidName(newName)
-        let src = try library.bundle(named: name).url
+        let source = try library.bundle(named: name)
+        return try clone(
+            source, sourceName: name, to: newName, in: library, newIdentity: newIdentity,
+            readerWait: readerWait, copyDirectory: copyDirectory,
+            afterCopy: afterCopy, afterNameCheck: afterNameCheck)
+    }
+
+    @discardableResult
+    static func clone(
+        bundleNamed name: String, to newName: String, in library: VPhoneLibrary,
+        newIdentity: Bool,
+        readerWait: TimeInterval = VPhoneBundleActivity.readerWait,
+        afterCopy: () throws -> Void
+    ) throws -> VPhoneBundle {
+        try withoutActuallyEscaping(afterCopy) { escaped in
+            try clone(
+                bundleNamed: name, to: newName, in: library, newIdentity: newIdentity,
+                readerWait: readerWait,
+                copyDirectory: {
+                    try VPhoneCloneCopy.copy(from: $0, to: $1, excludingRootNames: $2)
+                },
+                afterCopy: escaped)
+        }
+    }
+
+    @discardableResult
+    static func clone(
+        _ source: VPhoneBundle, sourceName name: String, to newName: String, in library: VPhoneLibrary,
+        newIdentity: Bool = false,
+        readerWait: TimeInterval = VPhoneBundleActivity.readerWait,
+        copyDirectory: (URL, URL, Set<String>) throws -> Void = {
+            try VPhoneCloneCopy.copy(from: $0, to: $1, excludingRootNames: $2)
+        },
+        afterCopy: (() throws -> Void)? = nil,
+        afterNameCheck: (() throws -> Void)? = nil
+    ) throws -> VPhoneBundle {
+        try requireValidName(newName)
+        let src = source.url
         // Keep the existing source lock for the full snapshot and publication.
         // Running VMs remain refused; there is no live-snapshot opt-out.
         return try VPhoneBundleGuard.withBundleLock(
@@ -236,6 +316,11 @@ public enum VPhoneBundleOps {
             if try VPhoneCloneCopy.exists(at: dst) {
                 throw VPhoneLibraryError.alreadyExists(name: newName)
             }
+            let fresh = try VPhoneBundle.load(at: src)
+            let checked = VPhoneBundle(url: src, manifest: fresh.manifest)
+            try VPhoneBundleActivity.requireStopped(
+                checked, name: name, waitingForReaders: readerWait)
+            let stateBefore = try VPhoneBundleActivity.stateSignature(of: checked)
             // Only an exclusively created private directory may be rolled back.
             // Never clean up the final name after a failed clone or EEXIST.
             let staging = library.root.appendingPathComponent(".clone-\(UUID().uuidString)")
@@ -244,7 +329,16 @@ public enum VPhoneBundleOps {
             defer { try? fm.removeItem(at: staging) }
             let payload = staging.appendingPathComponent("payload")
             try copyDirectory(src, payload, cloneRootExclusions(in: src))
-            let staged = try VPhoneBundle.load(at: payload)
+            try afterCopy?()
+            try VPhoneBundleActivity.requireStopped(
+                checked, name: name, waitingForReaders: readerWait)
+            guard try VPhoneBundleActivity.stateSignature(of: checked) == stateBefore else {
+                throw VPhoneBundleActivityError.stateChanged(name: name)
+            }
+            var staged = try VPhoneBundle.load(at: payload)
+            if newIdentity {
+                staged = try resetIdentity(of: staged, clonedFrom: name, targetName: newName)
+            }
             // As in importArchive, copying happens privately, then name checking
             // and publication use the library lock. Slow copies do not monopolize it.
             return try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
@@ -284,6 +378,62 @@ public enum VPhoneBundleOps {
             }
         }
         return excluded
+    }
+
+    /// The network settings a new-identity clone drops, described for display.
+    public static func networkSettingsClearedByNewIdentity(
+        _ network: VPhoneVirtualMachineManifest.NetworkConfig,
+        sourceName: String
+    ) -> [String] {
+        newIdentityNetwork(network, from: sourceName, to: sourceName).cleared
+    }
+
+    private static func newIdentityNetwork(
+        _ network: VPhoneVirtualMachineManifest.NetworkConfig,
+        from sourceName: String,
+        to newName: String
+    ) -> (network: VPhoneVirtualMachineManifest.NetworkConfig, cleared: [String]) {
+        var cleared: [String] = []
+        if let ipv4 = network.ipv4 {
+            cleared.append("fixed IPv4 address \(ipv4.address)/\(ipv4.prefixLength)")
+        }
+        if let forwards = network.portForwards, !forwards.isEmpty {
+            cleared.append("port forwards \(forwards.map(\.description).joined(separator: ", "))")
+        }
+        let followed = localHostName(following: network.localHostName, from: sourceName, to: newName)
+        if followed == nil, let name = network.localHostName, !name.isEmpty {
+            cleared.append("mDNS name \(name)")
+        }
+        let updated = network.with(
+            macAddress: "",
+            ipv4: .some(nil),
+            portForwards: .some(nil),
+            localHostName: .some(followed)
+        )
+        return (updated, cleared)
+    }
+
+    static func resetIdentity(
+        of bundle: VPhoneBundle,
+        clonedFrom sourceName: String,
+        targetName: String? = nil
+    ) throws -> VPhoneBundle {
+        let resolvedTarget = targetName ?? bundle.name
+        let network = newIdentityNetwork(
+            bundle.manifest.networkConfig, from: sourceName, to: resolvedTarget
+        ).network
+        let updated = bundle.manifest.updating(machineIdentifier: Data(), networkConfig: network)
+        try updated.write(to: bundle.configURL)
+        try removeIfPresent(bundle.url.appendingPathComponent("udid-prediction.txt"))
+        return VPhoneBundle(url: bundle.url, manifest: updated)
+    }
+
+    private static func removeIfPresent(_ url: URL) throws {
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch CocoaError.fileNoSuchFile {
+            return
+        }
     }
 
     // MARK: - Export / Import
@@ -327,7 +477,6 @@ public enum VPhoneBundleOps {
         VPhoneMachineSnapshots.directoryName, "*.snapshot-revert-*", ".snapshot-revert-*",
         ".rebase-*", "*.rebase-*", ".disk-rebase-history", "*.disk-rebase-history*",
     ]
-
 
     /// When `to` is an existing directory, the archive is written inside it as
     /// `<name>.<compression.fileExtension>`. Returns the resolved output URL.
@@ -400,10 +549,17 @@ public enum VPhoneBundleOps {
                                                attributes: [.posixPermissions: 0o700])
         defer { try? FileManager.default.removeItem(at: staging) }
         let temporary = staging.appendingPathComponent("output")
+        var excludes = exportExcludePatterns
+        if !includeIPSW { excludes.append("*_Restore*") }
+        excludes += try VPhoneNativeTransfer.socketExclusions(in: bundle.url, excluding: excludes)
+        let sourceState = try VPhoneTransferSource.tree(bundle.url, excluding: excludes, isCancelled: isCancelled)
         try writeExport(bundle: bundle, name: name, to: temporary, includeIPSW: includeIPSW,
-                        compression: compression, in: library, backend: backend,
+                        compression: compression, in: library, backend: backend, excluding: excludes,
                         isCancelled: isCancelled, progress: progress)
         if isCancelled?() == true { throw CancellationError() }
+        guard try VPhoneTransferSource.tree(bundle.url, excluding: excludes, isCancelled: isCancelled) == sourceState else {
+            throw VPhoneBundleOpsError.badArchive("export source changed during transfer")
+        }
         // Publication is the commit point. Never replace a concurrently created
         // destination, and never roll back a completed publication on a late signal.
         guard renamex_np(temporary.path, output.path, UInt32(RENAME_EXCL)) == 0 else {
@@ -415,11 +571,9 @@ public enum VPhoneBundleOps {
     private static func writeExport(
         bundle: VPhoneBundle, name: String, to outFile: URL, includeIPSW: Bool,
         compression: ExportCompression, in library: VPhoneLibrary, backend: ArchiveBackend,
-        isCancelled: (() -> Bool)?, progress: ((Int64, Int64) -> Void)?
+        excluding excludes: [String], isCancelled: (() -> Bool)?, progress: ((Int64, Int64) -> Void)?
     ) throws {
         if backend == .native {
-            var excludes = exportExcludePatterns
-            if !includeIPSW { excludes.append("*_Restore*") }
             let total = progress == nil ? 0 : VPhoneNativeTransfer.logicalSize(of: bundle.url, excluding: excludes)
             try VPhoneArchiveWriter.create(
                 archive: outFile, from: bundle.url, topLevel: name, format: .gnutar,
@@ -433,8 +587,7 @@ public enum VPhoneBundleOps {
         // consumer's `@-` reader misbid the stream as mtree ("Line too long")
         // on large members; gnutar also carries files >8 GB (ustar cannot).
         var producer = ["--format", "gnutar", "-cf", "-"]
-        if !includeIPSW { producer += ["--exclude", "*_Restore*"] }
-        for pattern in exportExcludePatterns { producer += ["--exclude", pattern] }
+        for pattern in excludes { producer += ["--exclude", pattern] }
         producer += ["-C", library.root.path, name]
         let consumer = ["-cf", outFile.path] + compression.tarArgs + ["@-"]
 
@@ -517,6 +670,8 @@ public enum VPhoneBundleOps {
         guard stat(inFile.path, &archiveInfo) == 0, archiveInfo.st_mode & S_IFMT == S_IFREG else {
             throw VPhoneBundleOpsError.badArchive("archive source must be a regular file")
         }
+        let archiveState = try VPhoneTransferSource.file(inFile)
+        let archiveTargetState = try VPhoneTransferSource.file(inFile, followLinks: true)
         // Fail fast when the destination name is already known (explicit rename).
         if let name {
             try requireValidName(name)
@@ -577,6 +732,10 @@ public enum VPhoneBundleOps {
             if try VPhoneCloneCopy.exists(at: dst) { throw VPhoneLibraryError.alreadyExists(name: finalName) }
             try afterNameCheck?()
             try checkCancellation()
+            guard try VPhoneTransferSource.file(inFile) == archiveState,
+                  try VPhoneTransferSource.file(inFile, followLinks: true) == archiveTargetState else {
+                throw VPhoneBundleOpsError.badArchive("import archive changed during transfer")
+            }
             // The exclusive rename commits publication. Cancellation observed
             // after this point does not undo an already imported bundle.
             guard renamex_np(extracted.path, dst.path, UInt32(RENAME_EXCL)) == 0 else {

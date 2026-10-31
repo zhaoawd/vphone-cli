@@ -1,0 +1,145 @@
+{
+  "status": "fixed_git_graph_and_first_pass_routing_complete_semantic_review_pending",
+  "base": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+  "target": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "counts": {
+    "total_commits": 57,
+    "merge_commits": 20,
+    "non_merge_commits": 37,
+    "first_parent_commits": 19,
+    "endpoint_changed_paths": 215
+  },
+  "validation": {
+    "git_graph_exact_set": true,
+    "disposition_reproduced_against_original_objects": true,
+    "wrong_target_rejected": true,
+    "missing_commit_rejected": true,
+    "task_count": 66,
+    "task_dependency_dag": true,
+    "historical_status_target_review_dependencies_unchanged": true,
+    "existing_dirty_files_unchanged": [
+      "README.md",
+      "research/0_binary_patch_comparison.md",
+      "research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md",
+      "research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "scripts/build.sh",
+      "scripts/build_native_dependencies.py",
+      "scripts/check_bundle.py",
+      "scripts/record_build_dependencies.py",
+      "scripts/run_launchpad_cli_tests.sh",
+      "scripts/setup_tools.sh",
+      "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift",
+      "sources/Info.plist",
+      "sources/VPhoneCore/VPhoneBundleOps.swift",
+      "sources/VPhoneCore/VPhoneNativeTransfer.swift",
+      "sources/VPhoneCore/VPhoneProcessRunner.swift",
+      "sources/VPhoneLaunchpad-Info.plist",
+      "sources/VPhoneLaunchpad/Localizable.xcstrings",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift",
+      "sources/vphone-cli/VPhoneVMTransferCLI.swift",
+      "tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift",
+      "tests/VPhoneCLITests/CFWFrozenPlanTests.swift",
+      "tests/VPhoneCoreTests/NativeTransferTests.swift",
+      "tests/VPhoneLaunchpadKitTests/EditTests.swift",
+      "tests/VPhoneLaunchpadKitTests/LibraryTests.swift",
+      "tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift",
+      "tests/test_bundle_validation.py",
+      "tests/test_launchpad_bundle.py",
+      "tests/test_progress_pipe.py",
+      "research/upstream_integration_2026-10-15/T32_T33_plan_verification_performance.md",
+      "research/upstream_integration_2026-10-15/T60_archive_allocation_20261021.md",
+      "research/upstream_integration_2026-10-15/T60_import_queue.md",
+      "research/upstream_integration_2026-10-15/tools/accept_t60_real_vm_archive.py",
+      "research/upstream_integration_2026-10-15/tools/benchmark_desired_plan.py",
+      "research/upstream_integration_2026-10-15/tools/check_desired_plan_cost.py",
+      "research/upstream_integration_2026-10-15/tools/pause_t60_import.py",
+      "scripts/licenses/LZ4.txt",
+      "scripts/licenses/xz-0BSD.txt",
+      "scripts/licenses/xz-GPLv2.txt",
+      "scripts/licenses/xz-LGPLv2.1.txt",
+      "scripts/licenses/xz.txt",
+      "scripts/licenses/zstd.txt",
+      "sources/VPhoneCore/VPhoneTransferProgress.swift",
+      "sources/VPhoneCore/VPhoneTransferSource.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadArchiveOpenQueue.swift",
+      "tests/VPhoneCoreTests/TransferProgressTests.swift",
+      "tests/VPhoneLaunchpadKitTests/ArchiveOpenQueueTests.swift",
+      "tests/VPhoneLaunchpadKitTests/CreateTerminationTests.swift",
+      "tests/VPhoneLaunchpadKitTests/ExportQueueTests.swift",
+      "tests/VPhoneLaunchpadKitTests/ImportQueueTests.swift",
+      "tests/VPhoneLaunchpadKitTests/RealCLIImportQueueTests.swift",
+      "tests/VPhoneLaunchpadKitTests/RealCLISparseTests.swift"
+    ],
+    "runtime_tests_run": false
+  },
+  "tools": {
+    "research/upstream_integration_2026-10-15/tools/audit_upstream_scoped.py": "ee5df06548a7a71654409d2766e99dca9fa543f9523218907b3d943c33cbd975",
+    "research/upstream_integration_2026-10-15/tools/reconcile_oct20_range.py": "6ebdf79a1f6e84c84896914e5dfe19abdf7c7050a0c040947da8ac491c27d9e1"
+  },
+  "files": {
+    "validation-recipe.py.txt": {
+      "bytes": 7991,
+      "sha256": "b260fbc68676a0ef1d52ae673ee910479d2c48d15480f7e988a9a1a61514bb0b"
+    },
+    "wip.json": {
+      "bytes": 15628,
+      "sha256": "70a82cb8534615c9d052273933ce2c0d3c9c7d33ca63f746bafae54fe164f261"
+    },
+    "audit.json": {
+      "bytes": 994,
+      "sha256": "b1cf0a76db3a47625656b55368e4457ca94fd846045d5cc37bf49c728d3afd81"
+    },
+    "commit_dispositions.json": {
+      "bytes": 117548,
+      "sha256": "89ff60c834ef5eb6fee72b8653b962c03d18d42a4af98137894c07bd5b0a786e"
+    },
+    "wip.patch": {
+      "bytes": 180014,
+      "sha256": "3b7c196df1e9e14c5c4a99aa59792ffd34b08a2e54b44061d722714343e3dfbb"
+    },
+    "observed_ledger_reconciliation.json": {
+      "bytes": 62,
+      "sha256": "c6f2b5d6da7e733e57d59874eaefcc94670b31faa67617f11952aa806e488b26"
+    },
+    "source_observations.json": {
+      "bytes": 11075,
+      "sha256": "e73f0d57202e35bd2d66136ae5b6bb93744db3a1c52736e4f02caf2a8c9c5bc1"
+    },
+    "validation.json": {
+      "bytes": 3804,
+      "sha256": "a0e11ddd1c31df0e4523e2610ed098754f8c3c57de08c2d3599428d2dfe04eb0"
+    },
+    "git-audit.tar.gz": {
+      "bytes": 1613787,
+      "sha256": "a258bef0a1c03983b2f19952c98497345d74eb5bd1fc2e3e5676ec210a0bce78"
+    }
+  },
+  "limits": [
+    "Original attachment enumeration unavailable; no independent attachment set comparison.",
+    "Merge parent diffs archived; empty remerge output does not prove semantic equivalence.",
+    "First-pass routing only. No functionality, ROM rebuild, firmware or VM acceptance.",
+    "Root TODO.md content excluded.",
+    "No Python dependency suite, Swift build, firmware or VM acceptance in this batch.",
+    "Broken project .venv was observed and not changed.",
+    "WIP snapshot is not a full backup."
+  ],
+  "accepted": false,
+  "documents": {
+    "research/upstream_integration_2026-10-15/U0_source_audit_20261021.md": "1c78a57ca1ead38be334db0ff86d050bdb35a5c66fcff50b92067a88e3895696",
+    "research/upstream_integration_2026-10-15/plan.md": "c9c48165b737e37d5f4f99e24dcc031c6af52ab7dbe5e2dd7c7e8c2bb454bcd4",
+    "research/upstream_integration_2026-10-15/tasks.json": "7364653b96c2987102c4c0b43830f83ebf926da1fca98521c9c28e0849b4dd47",
+    "TASKS.md": "9e07b4ad9173c23137202c14d9862c493c7c8c6119bf1e53308cd49f00941d8a",
+    "research/upstream_integration_2026-10-15/progress.md": "974777ac898262f4ad8fe81f66e5d69e48b06ff538a14c7188e3c6b2cdafa339"
+  }
+}

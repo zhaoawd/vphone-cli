@@ -1,0 +1,86 @@
+{
+  "observedAt": 1792638891.39438,
+  "upstreamTarget": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "localSourceSHA256": {
+    "sources/VPhoneGuestComponents/Makefile": "36b897536ba377d7d3fd08cc82a71b74be89e510c58b67bd3b6d189a355e5287",
+    "sources/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c": "c98900cda655bf784b1dba66b60b1908edc6e7424bc787d7dd1f6a6ef478af03",
+    "sources/VPhoneGuestComponents/Shared/InjectionEnvironment.h": "97175d707f52424e9fe8e076a3e41dbdae4e29391f4ed510eec190ca955fefd8",
+    "dependencies/guest-components-pins.json": "d709e766bd4395966ff71da5a79b70a0c4e7200a2124b034c689c20dcfe1fea0",
+    "scripts/check_guest_components.py": "b4668f11853ec2f21c64a6747f5c332434314605d39ec7c37f0733110ba1cd7b",
+    "scripts/patchers/cfw_daemons.py": "a8cc63a8271e488f351c40e4cc9caf4c1a6bc9c5b4b0c7553084eb323e99d620",
+    "scripts/patchers/plan_gate.py": "413e01b55530d36a7755ca9cf5030b223f09a826268ac1ae5d19fbdfae2f4195",
+    "sources/FirmwarePatcher/PatchSet/PatchDeclarationCatalogData.swift": "55923e173e16dddee8c496fe863ee2b3246d64925abb29643b1aa63d2050266d",
+    "sources/FirmwarePatcher/Core/VPhonePatchUndoLog.swift": "668620357290678b12254f07288fbb9b8fda54019e49d1035aa8ac24e97eba1a",
+    "tests/test_undo_provenance.py": "a200f9a22db1cf19f965c13b9a0650287539182be6373a59d67d69251e53bd39"
+  },
+  "queries": {
+    "upstream-flutter-references": {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "libflutterremapfix\\|flutterremapfix",
+        "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "--",
+        ":!Research",
+        ":!*.lock",
+        ":!*.json"
+      ],
+      "exitCode": 0
+    },
+    "upstream-persona-devicehub-wiring": {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "devicehub\\|persona_lookup",
+        "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+        "--",
+        "*.sh",
+        "*.py",
+        "VPhoneGuestComponents/Shared/InjectionEnvironment.h"
+      ],
+      "exitCode": 0
+    },
+    "xcode": {
+      "command": [
+        "/usr/bin/xcodebuild",
+        "-version"
+      ],
+      "exitCode": 0
+    },
+    "sdk": {
+      "command": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "iphoneos",
+        "--show-sdk-version"
+      ],
+      "exitCode": 0
+    }
+  },
+  "dependencies": {
+    "T08": "icli086_adaptation_and_isolated_candidates_validated_guest_acceptance_pending",
+    "T18": "pending_source_audit",
+    "T24": "pending_source_audit",
+    "T32": "pending_source_audit",
+    "T33": "pending_source_audit",
+    "T35": "pending_source_audit",
+    "T43": "pending_source_audit",
+    "T44": "pending_source_audit"
+  },
+  "missingLocalComponents": [
+    "sources/VPhoneGuestComponents/DeviceHubFix/libdevicehubfix.c",
+    "sources/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c",
+    "sources/VPhoneGuestComponents/LaunchHook/InstallCoordinationPersona.h"
+  ],
+  "personaDeclarationNotImplemented": true,
+  "conditionalForceKernProductionRefusalPreserved": true,
+  "productIntegrated": false,
+  "runtimeValidated": false,
+  "accepted": false,
+  "upstreamFlutterProductionWiring": "Compiled directly into SystemHook-vphone.dylib via SYSTEMHOOK_SOURCES, Makefile line 44",
+  "standaloneFlutterBuildRole": "experiment_only",
+  "systemHookSourceCombinationBuildPassed": true,
+  "auditCorrection": "Initial filename search did not identify the wildcard FlutterRemapFix source input; Makefile line 44 confirms production linkage in upstream only"
+}

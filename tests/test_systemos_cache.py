@@ -75,6 +75,14 @@ elif name == 'python-stub':
             if args[2]=='systemos': os.execv(sys.executable,[sys.executable,str(pathlib.Path(args[0]).parents[1]/'cache_systemos.py')]+args[3:])
             if args[2]=='appos': shutil.copyfile(args[3],args[4])
     elif args and args[0].endswith('check_python_runtime.py'): pass
+    elif args and args[0].endswith('dev_overlay.py'):
+        # This suite models the unrelated archive producer and still exercises
+        # the real cache helper. Dev overlay has separate archive/transport tests.
+        assert len(args) == 3
+        assert args[1] == os.environ['A2_OVERLAY_ARCHIVE']
+        assert args[2] == os.environ['A2_OVERLAY_PAYLOAD']
+        assert pathlib.Path(args[1]).read_bytes() == b'archive fixture'
+        assert pathlib.Path(args[2]).read_bytes() == b'overlay'
     elif args and args[0] in ('-c', '--version'): pass
     else: os.execv(sys.executable, [sys.executable] + args)
 ''')
@@ -230,9 +238,14 @@ function mount() { return 0; }
                     (restore / "SystemOS.dmg.aea").write_bytes(b"AEA1encrypted" if encrypted else DMG)
                     (restore / "AppOS.dmg").write_bytes(DMG)
                     (vm / "cfw_input").mkdir()
+                    overlay_archive = vm / 'cfw_input/jb/iosbinpack64.tar'
+                    overlay_archive.parent.mkdir()
+                    overlay_archive.write_bytes(b'archive fixture')
                     (vm / ".iosbinpack_tmp/iosbinpack64/usr/local/bin").mkdir(parents=True)
                     env = dict(self.env, ZDOTDIR=str(zdot), _VPHONE_PATH=self.env["PATH"],
                                VPHONE_PYTHON=str(self.bin / "python-stub"),
+                               A2_OVERLAY_ARCHIVE=str(overlay_archive),
+                               A2_OVERLAY_PAYLOAD=str(overlay / 'rpcserver_ios'),
                                CFW_HOST_CONTAINER="test-only", CFW_HOST_MNT=str(vm / "mounts"))
                     result = subprocess.run([sys.executable, str(scripts / "vm_lock.py"), str(vm), "test", "--", "/bin/zsh", str(scripts / f"cfw_install{variant}.sh"), str(vm)],
                                             env=env, capture_output=True, text=True)

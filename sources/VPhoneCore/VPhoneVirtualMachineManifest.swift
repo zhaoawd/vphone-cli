@@ -91,7 +91,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         case dev
     }
 
-    public struct ScreenConfig: Codable, Sendable {
+    public struct ScreenConfig: Codable, Equatable, Sendable {
         public let width: Int
         public let height: Int
         public let pixelsPerInch: Int
@@ -113,15 +113,40 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
     }
 
     public struct NetworkConfig: Codable, Equatable, Sendable {
+        public typealias PortForward = VPhonePortForwardPlan
+
+        public struct IPv4Config: Codable, Equatable, Hashable, Sendable {
+            public let address: String
+            public let prefixLength: Int
+            public let router: String?
+            public let dns: [String]?
+
+            public init(address: String, prefixLength: Int, router: String? = nil, dns: [String]? = nil) {
+                self.address = address
+                self.prefixLength = prefixLength
+                self.router = router
+                self.dns = dns
+            }
+        }
+
         public let mode: NetworkMode
         public let macAddress: String
         /// Host interface identifier to bridge (bridged mode only); nil otherwise.
         public let bridgeInterface: String?
+        /// A fixed guest IPv4 address; nil leaves the address to DHCP.
+        public let ipv4: IPv4Config?
+        /// Host ports carried into the guest. Nil and empty both forward nothing.
+        public let portForwards: [PortForward]?
+        /// The name the guest answers to as `<name>.local` over mDNS.
+        public let localHostName: String?
+        /// Whether the guest resolves this Mac's `.local` name locally.
+        public let resolvesMacName: Bool?
 
         public enum NetworkMode: String, Codable, Sendable {
             case nat
             case bridged
             case hostOnly
+            case tunnel
             /// No network device. Named `off` (not `none`) so a `NetworkMode?`
             /// literal `.none` can't silently bind to `Optional.none`.
             case off = "none"
@@ -129,10 +154,42 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
 
         public static let `default` = NetworkConfig(mode: .nat, macAddress: "")
 
-        public init(mode: NetworkMode, macAddress: String, bridgeInterface: String? = nil) {
+        public init(
+            mode: NetworkMode,
+            macAddress: String,
+            bridgeInterface: String? = nil,
+            ipv4: IPv4Config? = nil,
+            portForwards: [PortForward]? = nil,
+            localHostName: String? = nil,
+            resolvesMacName: Bool? = nil
+        ) {
             self.mode = mode
             self.macAddress = macAddress
             self.bridgeInterface = bridgeInterface
+            self.ipv4 = ipv4
+            self.portForwards = portForwards
+            self.localHostName = localHostName
+            self.resolvesMacName = resolvesMacName
+        }
+
+        public func with(
+            mode: NetworkMode? = nil,
+            macAddress: String? = nil,
+            bridgeInterface: String?? = nil,
+            ipv4: IPv4Config?? = nil,
+            portForwards: [PortForward]?? = nil,
+            localHostName: String?? = nil,
+            resolvesMacName: Bool?? = nil
+        ) -> NetworkConfig {
+            NetworkConfig(
+                mode: mode ?? self.mode,
+                macAddress: macAddress ?? self.macAddress,
+                bridgeInterface: bridgeInterface ?? self.bridgeInterface,
+                ipv4: ipv4 ?? self.ipv4,
+                portForwards: portForwards ?? self.portForwards,
+                localHostName: localHostName ?? self.localHostName,
+                resolvesMacName: resolvesMacName ?? self.resolvesMacName
+            )
         }
     }
 

@@ -1,0 +1,94 @@
+# -*- coding: utf-8 -*-
+from pathlib import Path
+import sys,json,hashlib,tarfile,subprocess,importlib.util,copy
+root=Path.cwd();base=root/'research/upstream_integration_2026-10-15';out=base/'evidence/U0-20261021';audit=root/'.build/u0-20261021/git-audit'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def dump(p,x):p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+# Keep full audit output including every merge parent diff; source text is fixed-target evidence.
+with tarfile.open(out/'git-audit.tar.gz','w:gz') as tar:
+ tar.add(audit,arcname='git-audit')
+ tar.add(root/'.build/u0-20261021/source',arcname='selected-sources')
+for name in ['audit.json','observed_ledger_reconciliation.json']:(out/name).write_bytes((audit/name).read_bytes())
+observations=[]
+queries=[
+ ('T08','upstream','VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved',['651ce0','0.8.6']),
+ ('T08','local','sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved',['815ef','0.8.5']),
+ ('T15/T52','local','scripts/cfw_disk_txn.py',['def stage_copy','os.statvfs','f_bavail']),
+ ('T15/T52','upstream','VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift',['volumeAvailableCapacityForImportantUsage','statfs(path']),
+ ('T61','local','sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift',['ROMs/AVPBooter','ROMs/AVPSEPBooter']),
+ ('T62','local','sources/vphone-cli/VPhoneHostScreenAdapter.swift',['captureCompactScreenshot','saveScreenshot']),
+ ('T62','upstream','VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneHostScreenService.swift',['VPhoneHostScreenService']),
+ ('T63','local','sources/VPhoneAPIKit/VPhoneAPIClient.swift',['64 * 1024 * 1024','instanceID: String, binaryHash: String']),
+ ('T63','local','sources/VPhoneAPIKit/VPhoneAPISession.swift',['stale_session','file_upload_identity','downloads.count < 4']),
+ ('T63','local','sources/vphone-cli/VPhoneHostAPICommands.swift',['file.publish','session.downloadFile','session.uploadFile']),
+ ('T63','local','sources/vphone-cli/VPhoneFileBrowserModel.swift',['Data(contentsOf: url)','let data = try await control.downloadFile']),
+ ('T63','upstream','VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift',['func pushFile','func pullFile','1 << 20','rename(temporary.path']),
+ ('T24','upstream','VPhoneExecutable/VPhoneEscalator/VPhoneEscalator/Commands.c',['holds_requirement','CFDataRef wanted']),
+ ('T64','local','sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift',['contentsOfDirectory(atPath: parent)']),
+ ('T65','upstream','.github/workflows/build.yml',['xcode-27']),
+ ('T09/T10','upstream','VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipeline.swift',['systemVolumeHashType','guard variant != .less, sealSelected']),
+ ('T49/T50','upstream','VPhoneKit/VPhoneCoreKit/Bundle/VPhoneTemplateSetupBoot.swift',['outcome.settleReboots','rebooting the guest once']),
+]
+for task,source,path,terms in queries:
+ p=root/path if source=='local' else root/'.build/u0-20261021/source'/path
+ lines=p.read_text().splitlines();matches=[]
+ for term in terms:
+  found=[{'line':i,'text':line.strip()} for i,line in enumerate(lines,1) if term in line]
+  assert found,(path,term)
+  matches.extend(found)
+ observations.append({'tasks':task.split('/'),'source':source,'path':path,'sha256':sha(p),'matches':matches})
+dump(out/'source_observations.json',observations)
+# Reproduce from original repository objects, independent from bare clone refs.
+spec=importlib.util.spec_from_file_location('reconcile',base/'tools/reconcile_oct20_range.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+original=json.loads((out/'commit_dispositions.json').read_text());again=m.build(root,audit);assert original==again
+# Negative checks exercise captured audit mutation in isolated evidence copies.
+negative=root/'.build/u0-20261021/negative';negative.mkdir()
+summary=json.loads((audit/'audit.json').read_text());changed=dict(summary,target=m.BASE)
+(negative/'audit.json').write_text(json.dumps(changed))
+try:m.build(root,negative)
+except AssertionError:pass
+else:raise AssertionError('wrong range accepted')
+(negative/'audit.json').write_text(json.dumps(summary))
+commits=json.loads((audit/'git_commits.json').read_text());(negative/'git_commits.json').write_text(json.dumps(commits[:-1]))
+try:m.build(root,negative)
+except AssertionError:pass
+else:raise AssertionError('missing commit accepted')
+# Preserve all historical status/target_review fields; add dated execution evidence.
+p=base/'tasks.json';tasks=json.loads(p.read_text());before=copy.deepcopy(tasks)
+e='evidence/U0-20261021/manifest.json'
+for t in tasks['tasks']:
+ r=t.setdefault('planning_review',{})
+ if t['id'] in ['T00','T01','T02']:
+  r['status']={'T00':'fixed_target_graph_verified','T01':'current_wip_evidence_captured','T02':'first_pass_commit_routing_complete_semantic_review_pending'}[t['id']]
+  r['execution_20261021']={'evidence':e,'semantic_equivalence_verified':False,'accepted':False}
+ elif t['id'] in ['T08','T15','T23','T24','T49','T50','T52','T61','T62','T63','T64','T65']:
+  r['source_audit_20261021']={'evidence':e,'status':'fixed_target_source_observations_recorded','implementation_applied':False,'accepted':False}
+pr=tasks['planning_revision'];pr.update(git_range_verified=True,commit_count=57,merge_count=20,non_merge_count=37,first_parent_count=19,endpoint_changed_paths=215)
+pr['execution_20261021']={'evidence':e,'authorization':'用户在当前聊天要求继续推进TODO；本轮执行固定Git范围与首轮源码对账。','attachment_set_match':None,'semantic_review_complete':False,'defaults_changed':False}
+for a,b in zip(before['tasks'],tasks['tasks']):
+ for k in ['status','target_review','dependencies']:
+  assert a.get(k)==b.get(k),(a['id'],k)
+# Unique IDs and dependency DAG.
+byid={t['id']:t for t in tasks['tasks']};assert len(byid)==len(tasks['tasks'])==66
+seen=set();active=set()
+def visit(k):
+ if k in seen:return
+ assert k not in active,k
+ active.add(k)
+ for dep in byid[k].get('dependencies',[]):
+  assert dep in byid,(k,dep)
+  visit(dep)
+ active.remove(k);seen.add(k)
+for k in byid:visit(k)
+dump(p,tasks)
+# Existing dirty code must stay byte-identical to the WIP snapshot.
+wip=json.loads((out/'wip.json').read_text());unchanged=[]
+for f in wip['files']:
+ if 'sha256' in f and f['path'] not in ['TASKS.md',str((base/'tasks.json').relative_to(root)),str((base/'plan.md').relative_to(root)),str((base/'progress.md').relative_to(root))]:
+  assert sha(root/f['path'])==f['sha256'],f['path'];unchanged.append(f['path'])
+validation={'git_graph_exact_set':True,'disposition_reproduced_against_original_objects':True,'wrong_target_rejected':True,'missing_commit_rejected':True,'task_count':66,'task_dependency_dag':True,'historical_status_target_review_dependencies_unchanged':True,'existing_dirty_files_unchanged':unchanged,'runtime_tests_run':False}
+dump(out/'validation.json',validation)
+index={str(p.relative_to(out)):{'bytes':p.stat().st_size,'sha256':sha(p)} for p in out.iterdir() if p.is_file() and p.name!='manifest.json'}
+manifest={'status':'fixed_git_graph_and_first_pass_routing_complete_semantic_review_pending','base':m.BASE,'target':m.TARGET,'counts':{k:summary[k] for k in ['total_commits','merge_commits','non_merge_commits','first_parent_commits','endpoint_changed_paths']},'validation':validation,'tools':{str(p.relative_to(root)):sha(p) for p in [base/'tools/audit_upstream_scoped.py',base/'tools/reconcile_oct20_range.py']},'files':index,'limits':original['limitations']+['No Python dependency suite, Swift build, firmware or VM acceptance in this batch.','Broken project .venv was observed and not changed.','WIP snapshot is not a full backup.'],'accepted':False}
+dump(out/'manifest.json',manifest)
+print(json.dumps({'validation':validation,'evidenceFiles':len(index),'archiveBytes':(out/'git-audit.tar.gz').stat().st_size},ensure_ascii=False,indent=2))

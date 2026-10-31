@@ -1,0 +1,136 @@
+@testable import VPhoneCore
+import Foundation
+import Testing
+
+struct ResourcesTests {
+    @Test func bundledLayoutResolvesToContentsResources() {
+        let exe = "/Applications/vphone-cli.app/Contents/MacOS/vphone-cli"
+        let r = VPhoneResources.resolve(executablePath: exe)
+        #expect(r.base.path == "/Applications/vphone-cli.app/Contents/Resources")
+        #expect(r.fwPrepareScript.path == "/Applications/vphone-cli.app/Contents/Resources/scripts/fw_prepare.sh")
+        #expect(r.cfwPy.path == "/Applications/vphone-cli.app/Contents/Resources/scripts/patchers/cfw.py")
+    }
+
+    @Test func symlinkLaunchResolvesBundleAndCertificate() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let executable = root.appendingPathComponent("App.app/Contents/MacOS/vphone-cli")
+        try FileManager.default.createDirectory(at: executable.deletingLastPathComponent(),
+                                                withIntermediateDirectories: true)
+        try Data("fixture".utf8).write(to: executable)
+        let link = root.appendingPathComponent("launcher")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: executable)
+        let resources = VPhoneResources.resolve(executablePath: link.path)
+        let expected = root.resolvingSymlinksInPath().appendingPathComponent("App.app/Contents/Resources")
+        #expect(resources.base == expected)
+        #expect(resources.signcert == expected.appendingPathComponent("scripts/vphoned/signcert.p12"))
+    }
+
+    @Test func devLayoutWalksUpToProjectRoot() throws {
+        // Fake a dev tree: <root>/.build/release/vphone-cli with a <root>/scripts dir.
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(
+            at: root.appendingPathComponent(".build/release"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: root.appendingPathComponent("scripts"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let exe = root.appendingPathComponent(".build/release/vphone-cli").path
+        let r = VPhoneResources.resolve(executablePath: exe)
+        #expect(r.base.path == root.resolvingSymlinksInPath().path)
+        #expect(r.resourceArchivesDir.path == root.resolvingSymlinksInPath()
+            .appendingPathComponent("scripts/resources").path)
+    }
+
+    @Test func cacheDirsAreHomeRelativeAndToolsBinIsBaseRelative() {
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/Applications/vphone-cli.app/Contents/Resources"), environment: [:])
+        #expect(r.userCacheDir.path.hasSuffix("/.vphone"))
+        #expect(r.toolsBinDir.path == r.base.appendingPathComponent(".tools/bin").path)
+    }
+
+    /// These all shell out; a missing interpreter must return false, not throw.
+    @Test func venvProbesAreTotalForAMissingInterpreter() {
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"), environment: [:])
+        let missing = URL(fileURLWithPath: "/nonexistent/bin/python3")
+        #expect(r.pythonIsUsable(missing) == false)
+    }
+
+    @Test func explicitPythonMustPassFullLockedProbe() {
+        let resources = VPhoneResources(base: URL(fileURLWithPath: "/missing-resources"),
+                                        environment: ["VPHONE_PYTHON": "/usr/bin/false"])
+        #expect(throws: VPhoneResourcesError.self) {
+            try resources.pythonExecutable()
+        }
+    }
+
+    @Test func managedVenvDefaultsUnderDotVphone() {
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"), environment: [:])
+        #expect(r.managedVenvDir.path.hasSuffix("/.vphone/venv"))
+    }
+
+    @Test func existingRuntimeSelectionNeverBootstraps() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let resources = VPhoneResources(base: root.appendingPathComponent("missing-resources"),
+            environment: ["VPHONE_ROOT": root.path, "VPHONE_HOST_PYTHON": "/usr/bin/false"])
+        #expect(throws: VPhoneResourcesError.self) { try resources.pythonExecutable(allowBootstrap: false) }
+        #expect(!FileManager.default.fileExists(atPath: root.path))
+    }
+
+    @Test func userCacheDirHonorsVPHONERoot() {
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"),
+                                environment: ["VPHONE_ROOT": "/tmp/vphone-test-root"])
+        #expect(r.userCacheDir.path == "/tmp/vphone-test-root")
+        #expect(r.ipswCacheDir.path == "/tmp/vphone-test-root/ipsws")
+        #expect(r.sealVolumeCacheDir.path == "/tmp/vphone-test-root/tools")
+        #expect(r.debsCacheDir.path == "/tmp/vphone-test-root/debs")
+        #expect(r.managedVenvDir.path == "/tmp/vphone-test-root/venv")
+    }
+
+    @Test func managedVenvOverrideBeatsVPHONERoot() {
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"), environment: [
+            "VPHONE_ROOT": "/tmp/vphone-test-root", "VPHONE_VENV_DIR": "/tmp/custom-venv",
+        ])
+        #expect(r.managedVenvDir.path == "/tmp/custom-venv")
+    }
+
+    @Test func pythonUsabilityProbeRejectsMissingAcceptsDevVenv() {
+        let cwd = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        let r = VPhoneResources(base: cwd)
+        // A non-existent interpreter is never usable.
+        #expect(r.pythonIsUsable(URL(fileURLWithPath: "/does/not/exist/python3")) == false)
+        // The dev .venv (when present) carries a modern ipsw_parser and must pass.
+        let devVenv = cwd.appendingPathComponent(".venv/bin/python3")
+        if FileManager.default.isExecutableFile(atPath: devVenv.path) {
+            #expect(r.pythonIsUsable(devVenv) == true)
+        }
+    }
+    @Test func guestPathsDoNotFallBackFromInstalledBundle() {
+        let app = VPhoneResources(base: URL(fileURLWithPath: "/tmp/Test.app/Contents/Resources"))
+        #expect(app.vphoned.path == "/tmp/Test.app/Contents/Resources/guest-resources/vphoned")
+        #expect(app.vphonedLess.lastPathComponent == "vphoned-less")
+        #expect(app.vphonedLaunchdPlist.lastPathComponent == "vphoned.plist")
+        let dev = VPhoneResources(base: URL(fileURLWithPath: "/tmp/repo"))
+        #expect(dev.vphoned.path == "/tmp/repo/.build/guest/vphoned")
+    }
+
+    @Test func createRebaseRetainsTheSelectedVenvGenerationAndUserRoot() throws {
+        let fm = FileManager.default
+        let root = fm.temporaryDirectory.appendingPathComponent("create-rebase-" + UUID().uuidString)
+        defer { try? fm.removeItem(at: root) }
+        let source = root.appendingPathComponent("source")
+        let first = root.appendingPathComponent("generation-one")
+        let second = root.appendingPathComponent("generation-two")
+        for directory in [source, first.appendingPathComponent("bin"), second.appendingPathComponent("bin")] {
+            try fm.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        try fm.createSymbolicLink(at: source.appendingPathComponent(".venv"), withDestinationURL: first)
+        let original = VPhoneResources(base: source, environment: ["VPHONE_ROOT": root.appendingPathComponent("user").path])
+        let rebased = original.rebasedForCreate(at: root.appendingPathComponent("copy"))
+        try fm.removeItem(at: source.appendingPathComponent(".venv"))
+        try fm.createSymbolicLink(at: source.appendingPathComponent(".venv"), withDestinationURL: second)
+        #expect(rebased.pythonCandidates.first?.url == first.resolvingSymlinksInPath().appendingPathComponent("bin/python3"))
+        #expect(rebased.userCacheDir.path == root.appendingPathComponent("user").path)
+        #expect(rebased.processEnvironment["PYTHONDONTWRITEBYTECODE"] == "1")
+    }
+
+}

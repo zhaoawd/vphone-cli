@@ -1,0 +1,54 @@
+{
+  "candidate": ".build/t60-remaining-r3-20261021.app",
+  "cliCDHash": "f59dba5ea9ca4fb3710c59ae75bbec18b5f9766e",
+  "library": ".build/t60-remaining-20261021/ui-library",
+  "faultInjection": "pause_t60_import.py pauses only the owned CLI after real staging appears, resumes on release or a 90-second bound; AppKit is not paused",
+  "actualImportCancel": {
+    "selection": ["ui-first.tzst", "ui-second.tzst"],
+    "activeObserved": "ui-first.tzst 1 MB 正在导入…",
+    "fractionObserved": 0.5755445596181976,
+    "waitingObserved": "ui-second.tzst 等待导入…",
+    "waitingCancel": "clicked second Cancel; waiting row removed",
+    "activeCancel": "clicked first Cancel; row displayed 正在取消… and disabled Cancel until release",
+    "afterRelease": "rows removed, empty library, no import staging",
+    "stateDirectory": "pause-cancel-resume"
+  },
+  "actualTransferQuitTimeout": {
+    "action": "Command-Q while first import paused and second waiting",
+    "waitingRemoved": true,
+    "activeCancelling": true,
+    "alert": "命令输出尚未结束，应用已取消退出。日志读取和写入继续运行。请等待命令结束后再次退出。",
+    "afterRelease": "child finished; dismissing alert returned to empty library; app remained usable",
+    "stateDirectory": "pause-quit-resume",
+    "additionalTimeout": "pause-quit-drain also reached timeout because the process-check approval delayed release; not counted as successful drain"
+  },
+  "actualTransferQuitDrain": {
+    "appPID": 89079,
+    "action": "Command-Q then immediate unprivileged release-file write",
+    "appExited": true,
+    "cliExited": true,
+    "checkBeforeAnyNewAXRead": true,
+    "libraryEmpty": true,
+    "stateDirectory": "pause-quit-drain-2"
+  },
+  "actualFinderOpen": {
+    "cold": "Finder selected ui-first.tzst -> Open With -> t60-remaining-r3-20261021; application began embedded-toolchain verification then published ui-first",
+    "warm": "Finder selected ui-second.tzst -> Open With -> same running application; actual progress row then published ui-second",
+    "bothStoppedRowsObserved": true,
+    "didNotChangeDefaultAssociation": true,
+    "digestProof": "gui-resume-digests.json"
+  },
+  "actualExportCancel": {
+    "selectedMachines": ["ui-first", "ui-second"],
+    "outputDirectory": "ui-exports",
+    "activeObserved": "ui-first 正在导出… 1 MB",
+    "waitingObserved": "ui-second 等待导出…",
+    "waitingCancel": "selected ui-second, More -> Cancel Export; state returned to 已停止 while ui-first remained active",
+    "activeCancel": "selected ui-first, More -> Cancel Export; state returned to 已停止",
+    "outputsAndStagingAfterCancel": [],
+    "sourcePreservation": "gui-resume-digests.json",
+    "stateDirectory": "pause-export",
+    "note": "the bounded pause resumed automatically near the active-cancel action; final output remained unpublished"
+  },
+  "limitations": ["actual create/restore Quit not exercised; controlled create group/drain regressions remain the evidence", "no VM boot in this acceptance"]
+}

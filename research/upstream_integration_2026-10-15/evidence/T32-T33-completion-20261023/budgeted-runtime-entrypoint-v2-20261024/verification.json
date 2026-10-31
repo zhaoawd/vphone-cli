@@ -1,0 +1,20 @@
+{
+  "observedAt": "2026-10-24T17:11:50.811776+08:00",
+  "command": "/Users/kolar/github/vphone-cli/.venv/bin/python3 -B -m unittest -v test_t32_budgeted_runtime test_t32_runtime_rpc_transport",
+  "tests": 10,
+  "seconds": 1.615,
+  "exitCode": 0,
+  "originalRed": {
+    "command": "test_t32_budgeted_runtime.BudgetedRuntimeEntrypointTests.test_existing_wrapper_import_pattern_from_an_unrelated_directory",
+    "tests": 1,
+    "failed": 1,
+    "seconds": 0.033,
+    "exitCode": 1,
+    "error": "ModuleNotFoundError: No module named 't32_runtime_rpc_transport'"
+  },
+  "unfixedArchiveControlExit": 1,
+  "priorArchiveManifestSHA256": "bca5cb18ac759b6c2e192aec0e8f6e36ddd03b73ab5b1052d71c5b8d8a51ea64",
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "scope": "entrypoint and isolated Unix socket fixture; no actual guest runtime"
+}

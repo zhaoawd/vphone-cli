@@ -7,8 +7,8 @@
 # modifications (launchd jetsam patch, dylib injection, procursus bootstrap,
 # BaseBin hook deployment, JB-1..JB-5), and additionally the experimental
 # phases — labeled `EXP-JB-N` to make their EXP-only scope obvious:
-#   - Pre-step      : byte-5 mangle of kern.hv_vmm_present in DSC dylibs
-#                     (paired with KernelEXPPatcher's kernel-side rename).
+#   - Base DSC step : byte-5 mangle of kern.hv_vmm_present in the staged guest
+#                     DSC, paired with KernelEXPPatcher's kernel-side rename.
 #   - EXP-JB-3.5    : surgical 2-insn patch of watchdogd's hv_vmm cache +
 #                     slot re-attest of the standalone Mach-O.
 #   - EXP-JB-6      : post-restore DT identity rewrite (root model /
@@ -40,91 +40,35 @@ SCRIPT_DIR="${0:a:h}"
 source "$SCRIPT_DIR/lib/cfw_common.sh"
 cfw_require_runtime_and_lock
 
+# Prepare the dev payload before the base installer records the archive's
+# effects. Installing a different archive later would overwrite those effects.
+apply_dev_overlay() {
+    local dev_bin
+    for search_dir in "$SCRIPT_DIR/resources/cfw_dev" "$SCRIPT_DIR/cfw_dev"; do
+        dev_bin="$search_dir/rpcserver_ios"
+        if [[ -f "$dev_bin" ]]; then
+            echo "  Applying dev overlay (rpcserver_ios)..."
+            local iosbinpack="$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar"
+            "$PYTHON3" "$SCRIPT_DIR/patchers/dev_overlay.py" "$iosbinpack" "$dev_bin"
+            return
+        fi
+    done
+    die "Dev overlay not found (cfw_dev/rpcserver_ios)"
+}
+
+CFW_INPUT="cfw_input"
+TAR="$(command -v gtar 2>/dev/null || echo /opt/homebrew/bin/gtar)"
+cfw_extract_input "$CFW_INPUT" "cfw_input.tar.zst" "CFW input resources not found" "$TAR"
+apply_dev_overlay
+
 # ════════════════════════════════════════════════════════════════
 # Step 1: Run base CFW install (skip halt — we continue with JB phases)
 # ════════════════════════════════════════════════════════════════
 echo "[*] cfw_install_exp.sh — Installing CFW + JB extensions + EXP experimental patches..."
 echo ""
 
-# ────────────────────────────────────────────────────────────────────
-# Pre-step: patch hv_vmm_present user-mode consumers in the SystemOS
-# Cryptex's DSC chunks BEFORE running cfw_install.sh.
-#
-# cfw_install.sh decrypts the SystemOS Cryptex AEA into
-# $TEMP_DIR/CryptexSystemOS.dmg and reuses it on subsequent runs. We
-# pre-create that decrypted DMG here, mount it, patch the DSC chunks
-# in place, unmount, and let cfw_install.sh pick up the cached
-# (already-patched) DMG. cfw_install.sh itself is unmodified — this
-# is the EXP variant's device-like user-mode patching, kept out of
-# the JB install path so JB remains unaffected.
-# ────────────────────────────────────────────────────────────────────
-VM_DIR_ABS="$(cd "${VM_DIR:-.}" && pwd)"
-JB_TEMP_DIR="$VM_DIR_ABS/.cfw_temp"
-JB_SYSOS_DMG="$JB_TEMP_DIR/CryptexSystemOS.dmg"
-JB_MNT_SYSOS="${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}/mnt_sysos_hv_vmm"
-cfw_guest_write mkdir -p "$JB_TEMP_DIR"
-
-# Find the restore directory (same logic as cfw_install.sh)
-JB_RESTORE_DIR=""
-for d in "$VM_DIR_ABS"/iPhone*_Restore; do
-    [[ -d "$d" ]] && { JB_RESTORE_DIR="$d"; break; }
-done
-
-if [[ -z "$JB_RESTORE_DIR" ]]; then
-    echo "[!] hv_vmm DSC patch: no restore directory found, skipping"
-else
-    JB_CRYPTEX_SYSOS=$("$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" cryptex-paths "$JB_RESTORE_DIR/iPhone-BuildManifest.plist" | head -1)
-    cfw_cache_systemos "$JB_RESTORE_DIR/$JB_CRYPTEX_SYSOS" "$JB_SYSOS_DMG"
-fi
-
-if [[ -f "$JB_SYSOS_DMG" ]]; then
-    # Mount, patch chunks (hv_vmm + camera, same cryptex), unmount.
-    # Idempotent: re-running on an already-patched DMG is a no-op
-    # (hv_vmm patcher detects already-patched cstrings; camera patcher
-    # accepts matching patched entries and verifies their page hashes).
-    echo "[*] DSC patches: mounting cached SystemOS DMG..."
-    cfw_guest_write mkdir -p "$JB_MNT_SYSOS"
-    "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" mount-cryptex "$JB_SYSOS_DMG" "$JB_MNT_SYSOS"
-
-    JB_DSC_CHUNKS_DIR="$JB_MNT_SYSOS/System/Library/Caches/com.apple.dyld"
-    JB_DSC_HEADER="$JB_DSC_CHUNKS_DIR/dyld_shared_cache_arm64e"
-    if [[ -d "$JB_DSC_CHUNKS_DIR" ]]; then
-        echo "[*] hv_vmm DSC patch: patching chunks under $JB_DSC_CHUNKS_DIR..."
-        "$SCRIPT_DIR/patch_hv_vmm_userland.sh" dsc "$JB_DSC_CHUNKS_DIR"
-        echo "[+] hv_vmm DSC patch: chunks patched"
-
-        # Camera DSC patches: (1) short-circuit the NeutrinoCore
-        # _NUStyleTransfer*Processor methods so Camera.app's style-
-        # thumbnail pipeline doesn't crash on this VM build, and (2)
-        # force +[AVCaptureDevice authorizationStatusForMediaType:] =
-        # Authorized so apps don't bail at the TCC gate. Both are
-        # resolved per-build via `ipsw dyld symaddr` and verified by
-        # pacibsp prologue match — version-portable as long as the
-        # named ObjC symbols continue to exist. Combined with the
-        # /product/camera DT node added at fw_patch time, this lets
-        # Camera.app's icon show on Home Screen and the app launch
-        # without immediately bailing.
-        if [[ -f "$JB_DSC_HEADER" ]]; then
-            echo "[*] camera DSC patch: patching chunks under $JB_DSC_CHUNKS_DIR..."
-            if "$SCRIPT_DIR/patch_camera_userland.sh" dsc "$JB_DSC_CHUNKS_DIR" "$JB_DSC_HEADER"; then
-                echo "[+] camera DSC patch: chunks patched"
-            else
-                echo "[!] camera DSC patch: failed (likely build-version mismatch); continuing"
-            fi
-        else
-            echo "[-] camera DSC patch: $JB_DSC_HEADER not found, skipping"
-        fi
-    else
-        echo "[-] DSC patches: $JB_DSC_CHUNKS_DIR not found, skipping"
-    fi
-
-    sudo ${SUDO_ASKPASS:+-A} hdiutil detach "$JB_MNT_SYSOS" -force
-    "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" cache-detached "$JB_SYSOS_DMG"
-fi
-
-# Now run the regular CFW install. It will see the cached (patched)
-# CryptexSystemOS.dmg and use it as-is, so the patched DSC chunks land
-# in $MNT1/System/Cryptexes/OS.
+# The base installer copies readonly Cryptex sources, then applies the EXP
+# DSC patches to the staged guest before IOMFB and the remaining base stages.
 zsh "$SCRIPT_DIR/cfw_install.sh" "$VM_DIR"
 
 # ════════════════════════════════════════════════════════════════
@@ -135,7 +79,6 @@ zsh "$SCRIPT_DIR/cfw_install.sh" "$VM_DIR"
 VM_DIR="$(cd "${VM_DIR}" && pwd)"
 
 # ── Configuration ───────────────────────────────────────────────
-CFW_INPUT="cfw_input"
 CFW_JB_INPUT="cfw_jb_input"
 CFW_JB_ARCHIVE="cfw_jb_input.tar.zst"
 TEMP_DIR="$VM_DIR/.cfw_temp"
@@ -288,26 +231,6 @@ setup_cfw_jb_input() {
     cfw_extract_input "$CFW_JB_INPUT" "$CFW_JB_ARCHIVE" "JB mode: neither $CFW_JB_INPUT/ nor $CFW_JB_ARCHIVE found" tar --zstd
 }
 
-# ── Apply dev overlay (replace rpcserver_ios in iosbinpack64) ──
-apply_dev_overlay() {
-    local dev_bin
-    for search_dir in "$SCRIPT_DIR/resources/cfw_dev" "$SCRIPT_DIR/cfw_dev"; do
-        dev_bin="$search_dir/rpcserver_ios"
-        if [[ -f "$dev_bin" ]]; then
-            echo "  Applying dev overlay (rpcserver_ios)..."
-            local iosbinpack="$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar"
-            local tmpdir="$VM_DIR/.iosbinpack_tmp"
-            cfw_guest_write mkdir -p "$tmpdir"
-            tar -xf "$iosbinpack" -C "$tmpdir"
-            cfw_guest_write cp "$dev_bin" "$tmpdir/iosbinpack64/usr/local/bin/rpcserver_ios"
-            (cd "$tmpdir" && tar -cf "$iosbinpack" iosbinpack64)
-            cfw_guest_write rm -rf "$tmpdir"
-            return
-        fi
-    done
-    die "Dev overlay not found (cfw_dev/rpcserver_ios)"
-}
-
 # The VM's Disk.img is attached on the host by cfw_install_host.sh; its APFS
 # volumes are mounted here and every file is placed with plain cp/chmod/etc.
 # (the VM is off — nothing runs "on the device").
@@ -374,15 +297,7 @@ echo "  [+] launchd patched"
 
 # ═══════════ JB-2 INSTALL IOSBINPACK64 ════════════════════════
 echo ""
-echo "[JB-2] Installing iosbinpack64..."
-
-apply_dev_overlay
-cfw_guest_write cp -R "$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar" "$MNT1"
-cfw_guest_write "$TAR" --preserve-permissions --no-overwrite-dir \
-    -xf $MNT1/iosbinpack64.tar -C $MNT1
-cfw_guest_write /bin/rm -f $MNT1/iosbinpack64.tar
-
-echo "  [+] iosbinpack64 installed"
+echo "[JB-2] iosbinpack64 dev overlay installed by base CFW"
 
 # ═══════════ JB-3 PATCH debugserver entitlements ════
 echo ""
@@ -512,7 +427,8 @@ cfw_guest_write /usr/sbin/chown 0:0 $MNT5/$BOOT_HASH/$JB_DIR_NAME
 cfw_guest_write "$TAR" --preserve-permissions -xf $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar \
     -C $MNT5/$BOOT_HASH/$JB_DIR_NAME/
 cfw_guest_write /bin/mv $MNT5/$BOOT_HASH/$JB_DIR_NAME/var $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus
-cfw_guest_write mv "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb"/*(N) "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus" 2>/dev/null || true
+# Preserve declared dotfiles and stop before container removal if a move fails.
+cfw_guest_write mv "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb"/*(DN) "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus"
 cfw_guest_write /bin/rm -rf $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb
 cfw_guest_write /bin/rm -f $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar
 cfw_guest_write rm -f "$BOOTSTRAP_TAR"
@@ -617,6 +533,9 @@ echo ""
 echo "[JB-5] Deploying first-boot setup..."
 
 # Deploy first-boot JB setup script + LaunchDaemon
+# The base installer cleans its temporary files before EXP starts. Use an
+# EXP-specific path so the two observed staging lifetimes remain distinct.
+JB_LAUNCHD_PLIST="$TEMP_DIR/jb_launchd.plist"
 SETUP_SCRIPT="$SCRIPT_DIR/vphone_jb_setup.sh"
 SETUP_PLIST="$SCRIPT_DIR/vphone_jb_setup.plist"
 if [[ -f "$SETUP_SCRIPT" ]]; then
@@ -651,10 +570,10 @@ if [[ -f "$SETUP_PLIST" ]]; then
 
     # Inject into launchd.plist so launchd starts it at boot
     echo "  Injecting com.vphone.jb-setup into launchd.plist..."
-    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
-    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$TEMP_DIR/launchd.plist" "$SETUP_PLIST" \
+    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$JB_LAUNCHD_PLIST"
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$JB_LAUNCHD_PLIST" "$SETUP_PLIST" \
         "/System/Library/LaunchDaemons/com.vphone.jb-setup.plist"
-    cfw_guest_write cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
+    cfw_guest_write cp -R "$JB_LAUNCHD_PLIST" "$MNT1/System/Library/xpc/launchd.plist"
     cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
     echo "  [+] com.vphone.jb-setup.plist injected into launchd.plist"
 fi
@@ -675,10 +594,10 @@ if [[ -f "$SSHD_PLIST" ]]; then
 
     # Inject into launchd.plist so launchd starts it at boot
     echo "  Injecting com.vphone.sshd into launchd.plist..."
-    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
-    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$TEMP_DIR/launchd.plist" "$SSHD_PLIST" \
+    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$JB_LAUNCHD_PLIST"
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$JB_LAUNCHD_PLIST" "$SSHD_PLIST" \
         "/System/Library/LaunchDaemons/com.vphone.sshd.plist"
-    cfw_guest_write cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
+    cfw_guest_write cp -R "$JB_LAUNCHD_PLIST" "$MNT1/System/Library/xpc/launchd.plist"
     cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
     echo "  [+] com.vphone.sshd.plist injected into launchd.plist"
 
@@ -739,11 +658,11 @@ fi
 # skipped entirely and the build identifier stays at whatever the IPSW
 # shipped.
 #
-# What it does (when enabled): flips ProductBuildVersion in the two
-# SystemVersion.plist files iOS reads for "Build" display and
-# MGCopyAnswer("BuildVersion"):
-#   /System/Library/CoreServices/SystemVersion.plist                       (rootfs)
-#   /private/preboot/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist (Cryptex)
+# Update existing SystemVersion.plist inputs on System and, when present,
+# Preboot. Match the upstream System/Cryptexes copy as well as the rootfs copy:
+#   /System/Library/CoreServices/SystemVersion.plist
+#   /System/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist
+#   /private/preboot/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist
 #
 # Both are plain plist files (no Apple signature on individual plists),
 # so no image4 / cdHash / TXM concerns. Both volumes are writable at
@@ -751,8 +670,7 @@ fi
 #   $MNT1 (rootfs)  — writable before the install-time seal is established
 #   $MNT5 (preboot) — apfs writable
 #
-# After this, Settings -> About -> Build, MG BuildVersion key, and every
-# framework that reads SystemVersion.plist see the new identifier.
+# Settings and MGCopyAnswer consumption require separate runtime validation.
 # `sysctl kern.osversion` still reports the kernel image's own build
 # (e.g. 23B78 from the PCC vphone600/vresearch101 kernel) — that comes
 # from a kernel global populated at boot from boot args, not from this
@@ -763,6 +681,7 @@ if [[ -n "${SPOOF_BUILD:-}" ]]; then
 
     for jb7_remote in \
         "$MNT1/System/Library/CoreServices/SystemVersion.plist" \
+        "$MNT1/System/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist" \
         "$MNT5/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist"
     do
         if [[ -e "$jb7_remote" ]]; then

@@ -1,0 +1,242 @@
+{
+  "recordedAt": "2026-10-20T23:52:24.090057+00:00",
+  "sourceBase": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "scope": "single-request complete desired-plan verification deduplication; no cross-request/process cache",
+  "status": "related_regressions_and_4GiB_release_comparison_passed",
+  "relatedSwift": {
+    "executedFunctions": 47,
+    "suites": 5,
+    "optionalFixtureSkipped": 1,
+    "exitCode": 0,
+    "reportedTests": 48
+  },
+  "fixturePreparation": {
+    "tests": 1,
+    "postimageMiB": 4096,
+    "seconds": 102.64,
+    "exitCode": 0
+  },
+  "comparison": {
+    "state": "passed",
+    "scope": "isolated fixture with two 4096MiB CFW postimages and a synthetic Undo image; not real VM installation elapsed time",
+    "postimageMiB": 4096,
+    "cliSHA256": {
+      "before": "4b4462290673f7bae7eb04d5820b4de70914fc1663ebadcf9da29174247a132f",
+      "after": "fffd79938d34ab97bc62aa1d38e0aa6235db2305e7f54dfafa3acbaff8357930"
+    },
+    "trials": [
+      {
+        "label": "before",
+        "warmup": true,
+        "elapsedSeconds": 7.134692375082523,
+        "generationLoads": 2,
+        "hashedFileBytes": 17179943362
+      },
+      {
+        "label": "after",
+        "warmup": true,
+        "elapsedSeconds": 3.760095334146172,
+        "generationLoads": 1,
+        "hashedFileBytes": 8589971681
+      },
+      {
+        "label": "after",
+        "warmup": false,
+        "elapsedSeconds": 3.5320674581453204,
+        "generationLoads": 1,
+        "hashedFileBytes": 8589971681
+      },
+      {
+        "label": "before",
+        "warmup": false,
+        "elapsedSeconds": 7.155970458872616,
+        "generationLoads": 2,
+        "hashedFileBytes": 17179943362
+      },
+      {
+        "label": "before",
+        "warmup": false,
+        "elapsedSeconds": 7.4889811663888395,
+        "generationLoads": 2,
+        "hashedFileBytes": 17179943362
+      },
+      {
+        "label": "after",
+        "warmup": false,
+        "elapsedSeconds": 3.657978749834001,
+        "generationLoads": 1,
+        "hashedFileBytes": 8589971681
+      },
+      {
+        "label": "after",
+        "warmup": false,
+        "elapsedSeconds": 3.9743710421025753,
+        "generationLoads": 1,
+        "hashedFileBytes": 8589971681
+      },
+      {
+        "label": "before",
+        "warmup": false,
+        "elapsedSeconds": 7.117958333808929,
+        "generationLoads": 2,
+        "hashedFileBytes": 17179943362
+      }
+    ],
+    "medianSeconds": {
+      "before": 7.155970458872616,
+      "after": 3.657978749834001
+    },
+    "speedup": 1.9562635401305581,
+    "identicalVerifiedExports": true,
+    "unchangedFixture": true
+  },
+  "timingConditions": "Final comparison ran after related regression processes ended; existing real VM acceptance and other host activity were not stopped. First comparison overlapped some regression work and is retained separately. Medians use three measurements after one warmup per verifier, alternating order.",
+  "review": {
+    "originalPathMapping": "same validated generation manifest/names and .firmware-generations/<id>/originals layout as originalURLs",
+    "checksPreserved": [
+      "per-request full manifest/identity/ancestry/original verification",
+      "canonical desired/catalog/plan/version gates",
+      "complete hash and read-stability checks",
+      "public originalURLs still performs full verification"
+    ],
+    "remainingCost": [
+      "every guarded write/sign still starts its own verifier",
+      "repeated content across historical publication nodes is still re-read"
+    ],
+    "runtimeAcceptance": "No optimized-candidate real VM install/Undo/boot performed; frozen running acceptance CLI/VM hashes unchanged"
+  },
+  "sourceSHA256": {
+    "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift": "40b3e503c99beac1472585425d9933138201b1bf886827c3cb7c9c8eb10eb08d",
+    "tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift": "f7e3b2e3cc264cbe99fd2326bfd400e6807270abbe9c4c0d946520acb8106e86",
+    "tests/VPhoneCLITests/CFWFrozenPlanTests.swift": "bb8b0b63836c13c83f3a2c89c2d7dc2ffaf6f08ac3f5065835dbb2cfcbe12028",
+    "research/upstream_integration_2026-10-15/tools/benchmark_desired_plan.py": "5f22166d22c882754de7719ff836470846f636e272f6b3bf68985250ebf2087f",
+    "research/upstream_integration_2026-10-15/tools/check_desired_plan_cost.py": "54a8ea78264a20804c752c8c8770a2dd773b62455b7997ed47d6290f8c874920"
+  },
+  "committedOrPushed": false,
+  "files": {
+    "commands.txt": {
+      "bytes": 1329,
+      "sha256": "003c4c45827f2378066552835600856bb399a235d68869612c0b9c964e58d8f9"
+    },
+    "comparison-4096/after-0.57281.jsonl.gz": {
+      "bytes": 2676,
+      "sha256": "76296e4707a1f60577697a8faa62bf8dd2ddb6214d2347bf82f11b4d3f5a6d86"
+    },
+    "comparison-4096/after-1.57620.jsonl.gz": {
+      "bytes": 2689,
+      "sha256": "3e44598f5fe25d078fc58010e9ea132cf88438092a7e3f03deafa85b7006510e"
+    },
+    "comparison-4096/after-2.57949.jsonl.gz": {
+      "bytes": 2679,
+      "sha256": "501d687bb9fcba7e6217e91499e11bdce793c33291f618d3b0ae0d31b67d5c5f"
+    },
+    "comparison-4096/after-3.57985.jsonl.gz": {
+      "bytes": 2667,
+      "sha256": "9473b0aae1d757a3411a41d2796dd42b3aa6bef54190ad16c050b7d78df4ebf9"
+    },
+    "comparison-4096/before-0.57182.jsonl.gz": {
+      "bytes": 4453,
+      "sha256": "6e0eb28cac57ec51554076a1df837224e32f3686b4b87ee83c53f7830ddf7796"
+    },
+    "comparison-4096/before-1.57826.jsonl.gz": {
+      "bytes": 4449,
+      "sha256": "210a926490f970546fdee8ac92bdb2c32705da191c48446ba74c748c3009c941"
+    },
+    "comparison-4096/before-2.57894.jsonl.gz": {
+      "bytes": 4430,
+      "sha256": "315cf4905162cea40cf1f7a42b52651c29eaf3d4b20ee9bf4f1ff7d74e2e26c5"
+    },
+    "comparison-4096/before-3.58006.jsonl.gz": {
+      "bytes": 4439,
+      "sha256": "19911338946e0cb6fd10d1a020091a4f3e5009b95e3a386ad00ed3bcfcb40026"
+    },
+    "comparison-4096/result.json.gz": {
+      "bytes": 584,
+      "sha256": "e3f6a2f556a2501eff47148087ab55fb638618f7397c3cb1364d45b7773527fd"
+    },
+    "comparison-4096/verified-export.json.gz": {
+      "bytes": 9020,
+      "sha256": "610b9aed346f597fdcf8d64dfada33872e402d3667f10ffd63c1a1de0571203c"
+    },
+    "comparison-4096-final/after-0.58425.jsonl.gz": {
+      "bytes": 2682,
+      "sha256": "5432cb04084e6922c09b16e06e51bcce5000fe4327bcfb61083e0bd547705998"
+    },
+    "comparison-4096-final/after-1.58454.jsonl.gz": {
+      "bytes": 2673,
+      "sha256": "9be8389555d525ecd222f331ee86a63f5bd99554f350cbcc4c20c3e81fa28097"
+    },
+    "comparison-4096-final/after-2.58636.jsonl.gz": {
+      "bytes": 2676,
+      "sha256": "d5906a8018558615e4e821874dfccde2828886e1a9dea0167ff5fd5899f95282"
+    },
+    "comparison-4096-final/after-3.58664.jsonl.gz": {
+      "bytes": 2681,
+      "sha256": "42189c4a600661becbc78f80c860bcd9668ce3a03bb026e36e5ede9b0b0fe337"
+    },
+    "comparison-4096-final/before-0.58376.jsonl.gz": {
+      "bytes": 4450,
+      "sha256": "9cea2c7ef90315170246fcb24843340f327d0a3bbf70f86b1eec854f7defb9ae"
+    },
+    "comparison-4096-final/before-1.58506.jsonl.gz": {
+      "bytes": 4456,
+      "sha256": "e1f43a7bb770247b890952e9084f3cf1e870b0a582c30512abba6de0c1bfcd87"
+    },
+    "comparison-4096-final/before-2.58571.jsonl.gz": {
+      "bytes": 4425,
+      "sha256": "4123134a0030bd6c13bb5ffc566d15f7539e3d5874ba0e843593bca895cb06f3"
+    },
+    "comparison-4096-final/before-3.58698.jsonl.gz": {
+      "bytes": 4445,
+      "sha256": "2cef7b42f89ec581ea2848794ec1d4080c6629e0dc2efe1e8c3a9689bb68a104"
+    },
+    "comparison-4096-final/result.json.gz": {
+      "bytes": 584,
+      "sha256": "032ba7d32ed44c63e72970f508eb044b47c0694f7ba879f07a9e1cf278fbe139"
+    },
+    "comparison-4096-final/verified-export.json.gz": {
+      "bytes": 9020,
+      "sha256": "610b9aed346f597fdcf8d64dfada33872e402d3667f10ffd63c1a1de0571203c"
+    },
+    "comparison-4096-final.log.gz": {
+      "bytes": 584,
+      "sha256": "032ba7d32ed44c63e72970f508eb044b47c0694f7ba879f07a9e1cf278fbe139"
+    },
+    "comparison-4096.log.gz": {
+      "bytes": 584,
+      "sha256": "e3f6a2f556a2501eff47148087ab55fb638618f7397c3cb1364d45b7773527fd"
+    },
+    "fixture-marker.json": {
+      "bytes": 144,
+      "sha256": "8b1beea0584c61cf82966bd810bf12ead8faab1bc23468ca7eab7f3cebf4620a"
+    },
+    "frozen-inputs-after.json": {
+      "bytes": 317,
+      "sha256": "683b98d2fc59ad9c93b64ac3f71d3c0c634747570cb2e6be77809298cdbe120e"
+    },
+    "frozen-plan-final.log.gz": {
+      "bytes": 3341,
+      "sha256": "402f013e72d035d3a50c7bc2ca23049ea1a0b5477e751eb75477547cf2714417"
+    },
+    "prepare-4096.log.gz": {
+      "bytes": 3048,
+      "sha256": "84d66c394a2a88656bc4c9e7c2a647df518a0fc7f79494b8c1efd88ffc3235cd"
+    },
+    "related-final.log.gz": {
+      "bytes": 6094,
+      "sha256": "05765d9e75a20c0faa903cc646c4705b282d8d0f5e413ad38140ad103fab1cd1"
+    },
+    "trace-counts-final.json": {
+      "bytes": 334,
+      "sha256": "9588e49e49f1428e8d41a9fc418e7f92ee0e37f76be0ef82dc505a4a29673f49"
+    }
+  },
+  "finalFrozenPlanRegression": {
+    "reportedTests": 4,
+    "executedFunctions": 3,
+    "optionalFixtureSkipped": 1,
+    "exitCode": 0,
+    "seconds": 3.449,
+    "scope": "exact identityMismatch assertion through desired-plan reader; eight identity/evidence settings and five write settings retained"
+  }
+}

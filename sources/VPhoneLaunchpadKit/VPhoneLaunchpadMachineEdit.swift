@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import VPhoneCore
 
 // MARK: - Machine names
 
@@ -127,11 +128,15 @@ public struct VPhoneLaunchpadEditCommand: Equatable, Sendable {
 
     /// `vm clone <name> <new name> --library-root <root>`, into the same
     /// library.
-    public static func clone(_ machine: VPhoneLaunchpadMachinePath, as newName: String) -> Self? {
+    public static func clone(
+        _ machine: VPhoneLaunchpadMachinePath,
+        as newName: String,
+        newIdentity: Bool = false
+    ) -> Self? {
         guard isPassable(machine), isAcceptedNewName(newName, for: machine) else {
             return nil
         }
-        return Self(.clone, ["vm", "clone", machine.name, newName] + machine.libraryArguments)
+        return Self(.clone, machine.cloneArguments(as: newName, newIdentity: newIdentity))
     }
 
     /// `vm delete <name> --force --library-root <root>`. `--force` only skips
@@ -201,8 +206,14 @@ public struct VPhoneLaunchpadEditCommand: Equatable, Sendable {
 public extension VPhoneLaunchpadCommandLine {
     /// Runs one edit command, recorded in the history. Cancelling the
     /// calling task sends SIGINT to this child only.
-    func run(_ command: VPhoneLaunchpadEditCommand) async throws -> VPhoneLaunchpadCommandResult {
-        try await run(command.arguments)
+    func run(_ command: VPhoneLaunchpadEditCommand,
+             onProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil) async throws -> VPhoneLaunchpadCommandResult {
+        let direction: VPhoneTransferProgress.Direction? = switch command.kind {
+        case .importArchive: .importArchive
+        case .export: .exportArchive
+        default: nil
+        }
+        return try await run(command.arguments, transferDirection: direction, onTransferProgress: onProgress)
     }
 }
 
@@ -214,5 +225,80 @@ public enum VPhoneLaunchpadExportOutput {
     public static func exists(_ url: URL) -> Bool {
         var info = stat()
         return lstat(url.path, &info) == 0
+    }
+}
+
+// MARK: - vm snapshot list
+
+/// One entry of `vphone-cli vm snapshot list <vm> --json`: a copy of the
+/// machine's disk, SEP storage and NVRAM taken while it was stopped. The list
+/// comes oldest first.
+public struct VPhoneLaunchpadMachineSnapshot: Decodable, Hashable, Identifiable, Sendable {
+    public let name: String
+    public let created: Date
+    public let note: String?
+
+    public var id: String {
+        name
+    }
+
+    /// Decodes the array `vm snapshot list --json` prints, whose `created`
+    /// is written with JSONEncoder's `.iso8601`.
+    public static func list(from data: Data) throws -> [Self] {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode([Self].self, from: data)
+    }
+
+    /// The name Take Snapshot offers: the local date and time to the minute,
+    /// `2026-10-06-2230`, with `-2`, `-3`… when that is taken. It follows the
+    /// machine name rules, which snapshot names share.
+    public static func defaultName(at date: Date, taken: Set<String>, calendar: Calendar = .current) -> String {
+        let parts = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        let base = String(
+            format: "%04d-%02d-%02d-%02d%02d",
+            parts.year ?? 0, parts.month ?? 0, parts.day ?? 0, parts.hour ?? 0, parts.minute ?? 0
+        )
+        var name = base
+        var counter = 2
+        while taken.contains(name) {
+            name = "\(base)-\(counter)"
+            counter += 1
+        }
+        return name
+    }
+}
+
+// MARK: - Arguments
+
+/// The `vphone-cli` arguments for clone and snapshots, kept apart from the
+/// library so they can be checked without running anything.
+public extension VPhoneLaunchpadMachinePath {
+    /// `--new-identity` gives the clone its own ECID, UDID and MAC, so it can
+    /// run beside this machine.
+    func cloneArguments(as newName: String, newIdentity: Bool) -> [String] {
+        ["vm", "clone", name, newName] + (newIdentity ? ["--new-identity"] : []) + libraryArguments
+    }
+
+    var snapshotListArguments: [String] {
+        ["vm", "snapshot", "list", name, "--json"] + libraryArguments
+    }
+
+    /// A blank note is left out. The note is joined to its option, so one
+    /// that starts with a hyphen is not read as another option.
+    func snapshotCreateArguments(_ snapshot: String, note: String?) -> [String] {
+        var arguments = ["vm", "snapshot", "create", name, snapshot]
+        if let note = note?.trimmingCharacters(in: .whitespacesAndNewlines), !note.isEmpty {
+            arguments.append("--note=\(note)")
+        }
+        return arguments + libraryArguments
+    }
+
+    func snapshotRevertArguments(_ snapshot: String) -> [String] {
+        ["vm", "snapshot", "revert", name, snapshot, "--force"] + libraryArguments
+    }
+
+    func snapshotDeleteArguments(_ snapshot: String) -> [String] {
+        ["vm", "snapshot", "delete", name, snapshot, "--force"] + libraryArguments
     }
 }

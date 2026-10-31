@@ -1,0 +1,28 @@
+{
+  "observedAt": "2026-10-24T19:11:20.883241+08:00",
+  "scope": "response-recorder fixtures; no guest access",
+  "initialPassThrough": {
+    "tests": 6,
+    "failures": 6,
+    "exitCode": 1
+  },
+  "targeted": {
+    "tests": 6,
+    "seconds": 0.001,
+    "exitCode": 0
+  },
+  "combined": {
+    "tests": 16,
+    "seconds": 1.645,
+    "exitCode": 0,
+    "command": "/Users/kolar/github/vphone-cli/.venv/bin/python3 -B -m unittest -v test_t32_budgeted_runtime test_t32_runtime_rpc_transport test_t32_runtime_hash_only_transport"
+  },
+  "callerResponsePreserved": true,
+  "errorAndTruncationPreserved": true,
+  "integratedIntoRuntimePlan": false,
+  "integratedIntoObserverEntrypoint": false,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "runtimeValidated": false,
+  "accepted": false
+}

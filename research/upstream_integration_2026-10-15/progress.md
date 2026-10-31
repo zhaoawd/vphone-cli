@@ -1,6 +1,6 @@
 # 8a75092 范围核验与本地对账（2026-10-15）
 
-2026-10-20 当前状态：21ae78d3已push。显式Cryptex重装事务20261019T124601Z-vZh3Hh4C最终核验拒绝，原盘身份/mtime与66样本保持，两个顺序验收脚本停止，未执行Undo或启动。已用真实删除记录与实际安装脚本复现已有目录符号链接的ln -sf额外写入，改用ln -sfn，并在写入入口拒绝跟随目录或尾斜杠；最终严格比较保持并新增目标/字段诊断。相关43项及最终完整Python948项（跳过2项）通过，签名应用和原VM程序保持核验通过。修复后重试CLI4097/session59096已发起，Undo及on→off→on尚待验收，T32/T33未accepted。
+2026-10-20 当前状态：当前项固定为T32/T33独立DSC真实顺序验收。持久runner93069/CLI94446/root97562在staged .cfw_disk.tjhO0rSZ继续，最新进入GPU归档提取入口，尚未最终核验/发布。冻结VM程序字节/inode/CDHash保持，但参数探测被信号9终止；amfid44463日志确认restricted entitlements拒绝。按本任务既有精确CDHash授权发起临时helper恢复，系统原生验证待完成。安装不受此验证等待影响；后续启动依赖其完成。Undo、重新应用及on→off→on仍未验收，整项未accepted。
 
 ## 2026-10-16 roothide journal 实际核对
 
@@ -320,6 +320,162 @@ regular的跳过分支、复制分支与development同类命令改用ln -sfn；g
 
 最终完整Python命令make test_python，948项、跳过2项、259.925秒退出0。相关43项、12.775秒退出0；沙箱fclone EPERM原日志保留，宿主原断言重跑通过。此次未修改Swift和二进制补丁；host CLI仅因资源封签改变签名字节，可执行内容保持；原获批VM程序字节、inode和CDHash保持。证据：`evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json`。
 
+## 2026-10-20：续跑只读核验
+
+已取得 VM 目录锁，按正式 cfw_disk_txn.sample_digest 计算 66 段采样，SHA-256 为 6715076b65c9b03b5313ab5f62c0a5e69dd352072cb63e5f8fe5e56543b35108，与安装前记录一致。完整磁盘摘要未重算，未启动或写入 VM。指定 root 历史事务等待原生验证读取；尚不能确认退出原因。旧验收/归档进程不存在，未重启安装或自动归档。证据：`evidence/T32-T33-resume-20261020/manifest.json`。
+
+## 2026-10-20：141 退出复现及持久日志重试准备
+
+已只读取得事务与最后 14 条操作摘要。真实退出为 141，109 条操作止于 GPU 归档删除；无最终效果报告或发布证据。原事务明确记录原盘身份及 66 段采样保持。
+
+隔离正式 host-driver 对照命令：`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python3 .build/t32-resume-20261020/compare-output.py`。三个场景通过：关闭 stdout 消费者得到 141/failed，普通日志得到 0/published，普通日志加安装错误得到 37/failed；三个场景原盘均保持且无残留 staged。该结果证明可复现路径，不能确认真实输出消费者退出原因。
+
+持久进程 PID93069 使用普通日志，先等待指定失败事务及 .cfw_temp 的原有 invoker handback，再检查签名/输入/磁盘身份，执行同 generation 的安装、启动前撤销、重新应用及各两次 API 启停和读回。所有生产核验保持；未改动 VM 程序、宿主放行或 Git。重试安装前仍须系统原生管理员验证。证据：`evidence/T32-T33-resume-20261020/manifest.json`。
+
+## 2026-10-20：T60 导入 FIFO 与批量选择
+
+当前源码实现 FIFO 等待、批量选择、等待项取消和退出门关闭后不启动下一项。原实现 2 项回归记录 4 个失败；实现后相关 26 项及完整 LaunchpadKit 210 项通过，6 项真实 CLI/烟测按配置跳过。首次沙箱运行的 4 个权限失败保留，同一已构建测试在沙箱外通过。逐项队列行/进度/取消 UI、签名交互和完整退出矩阵未完成；T60 整体未 accepted。详情：`T60_import_queue.md`。DSC 冻结安装继续在独立持久进程中运行，未由本轮源码构建替换。
+
+## 2026-10-20：T60 状态/取消/退出后续验证
+
+逐项导入状态和取消入口、等待选择取消、活动项排空、退出时混合转移取消及超时保留状态已实施。31项定向、216项完整LaunchpadKit通过；独立Release签名候选及嵌套工具链/依赖/资源检查通过。真实签名CLI的隔离并发导入复验通过：两个归档发布、源盘/目标盘/归档完整摘要保持、输出排空；具体摘要已归档。真实UI操作、字节进度、真实VM迁移及完整混合版本退出矩阵仍未验收，T60整体未accepted。证据：`evidence/T60-import-state-20261020/manifest.json`。
+
+## 2026-10-20：完成当前DSC项的执行条件
+
+用户要求继续完成当前项，本轮仅继续已有T32/T33验收。安装已从seputil推进到GPU归档提取入口，持久进程存活，未发布；未启动重复安装。后续VM程序的参数探测返回-9，程序字节、inode和已批准CDHash保持；16:33:10宿主日志确认amfid的restricted entitlements拒绝。仅按既有同哈希授权恢复临时helper，等待系统管理员验证，不扩展允许范围、不改SIP/启动参数或持久列表。准备了最终归档脚本，只有七组真实证明、三份journal、同generation、6885代码页和两组正常启停/读回全部匹配才会通过；脚本目前仅做语法检查，未执行最终归档。
+
+## 2026-10-20：管理员验证后附加失败
+
+用户确认已完成原生验证并在终端执行 sudo -v。第二次调用实际返回 helper60603，但日志记录附加失败；当前 amfid60692 存在。冻结 VM 参数探测再次返回 -9，程序摘要与 inode 保持。工具进程 sudo -n 返回需要密码，用户终端凭据在该进程不可用。当前安装已推进到 GPU 文件 chmod 的冻结计划核验，未发布。已保存探测脚本及诊断辅助脚本；后者沿用唯一获批 CDHash 和现有断点处理，只增加 euid、LLDB 附加错误和目标 PID 记录。其原生验证待完成，尚不能判定附加失败原因。
+
+## 2026-10-20：同 CDHash 放行复验通过
+
+用户完成诊断调用原生验证。09:01:23 UTC 的日志记录 euid0、按名称附加成功、目标 amfid60692 和两个各有一处位置的既有断点；helper62985 仅载入获批 CDHash。保存的 probe-boot-readiness.py 在恢复前返回 -9，09:01:40 UTC 复验进入参数解析并按预期返回64，冻结 VM 摘要和 inode 保持。此前附加失败原因未查明；成功重试未改变目标查找方法或断点处理，不能据此确认进程重启、名称匹配或权限中的具体原因。只验证了程序执行条件，未启动 VM。CFW 继续至 GPU CodeResources chmod 的冻结计划核验，未发布；当前项的后续 Undo/重新应用/正常启停仍由既有顺序 runner 执行。证据：evidence/T32-T33-resume-20261020/manifest.json。
+
+## 2026-10-20 17:52 CST：DSC 安装第6/7步
+
+本轮只读观察确认第4/7步 iosbinpack64 已推进至第6/7步 mobileactivationd 签名前核验，verify-plan CPU97.3%，持久 runner93069/CLI94446/root97562继续。安装 CLI约3小时，尚未最终核验、封存或交换，on-off-on-result.json不存在；未把子步骤序号换算为全体验收百分比。诊断 helper因目标state10退出，但冻结 VM参数检查仍退出64，程序摘要/inode保持，未重复请求系统验证。保存 current-progress-20261020.json 和观察记录；当前剩余顺序为安装发布、未启动Undo、原件/6885代码页证明、两次正常启停、同generation显式重新应用、重复证明/两次启停/读回。T60代码已有31定向、216完整LaunchpadKit及1真实CLI检查通过，真实UI和完整VM退出矩阵待验收；本轮无新源码修改、提交或推送。
+
+## 2026-10-20：在DSC安装期间推进T60
+
+DSC独立VM和冻结程序继续执行安装，第7/7步vphoned安装入口已观察到，尚未发布。并行在独立临时库中补充真实CLI导入中的退出协调回归，2项9.065秒退出0；等待项不启动、活动CLI退出130、输出排空、无残留和指定摘要保持均通过。强化了真实 `.import-` 目录断言，首次测试观察路径错误和成功复验均保存；生产源码未修改。实际AppKit交互与完整VM/混合版本退出矩阵仍未验收，T60整项未accepted。证据：evidence/T60-real-import-termination-20261020/manifest.json。
+
+## 2026-10-20 19:34 CST：状态复核
+
+DSC仍在首次安装，已从vphoned推进到第7/7步末段launchd.plist的chmod前核验；verifier CPU94.2%，持久runner存活，CLI累计4小时44分钟。未最终核验或发布，未进入本轮Undo/重新应用/启停；最终on-off-on结果不存在。T60最近结果仍为18:11归档的2项真实CLI回归通过，之后没有新增UI或完整矩阵验证，不提升accepted。源码及证据未新增提交或推送。实际观察见 evidence/T32-T33-resume-20261020/progress-20261020-1934.json。
+
+## 2026-10-20：安装计划核验的重复完整读取
+
+源码确认 plan_gate 每次 write/sign 先经 from_environment/load_plan 调 Swift verify-plan；后者的 DesiredPlanStore.validate 先调用 loadVerified，再经 originalURLs 第二次调用 loadVerified。该路径核验generation原件；在CFW已交换inode后，还沿发布记录检查完整postimage和全部effect blob摘要。实际观察小型chmod/sign阶段分别等待数分钟，核验进程CPU持续90%以上。重复完整核验是当前主要已定位性能问题，各类摘要/读取的时间占比尚未测量；一次1秒sample因普通用户无权采样root进程退出255，未额外请求系统验证。未改变校验门或中断安装；安装当前已从launchd.plist chmod进入临时目录清理前核验，未发布。优化应先建立明确性能基线和篡改/身份变化回归，再决定如何复用已验证结果；不能直接以永久缓存替代当前读取要求。证据：evidence/T32-T33-resume-20261020/plan-verification-cost-20261020.json。
+
+## 2026-10-20：单次计划读取完整校验去重
+
+已将DesiredPlanStore.validate中第二次loadVerified改为从本次刚核验的manifest解析原件路径；每次新请求仍完整核验，无跨请求缓存。trace回归优化前捕获2次并退出1，优化后1次退出0；修改原件并恢复mtime仍拒绝。47项相关Swift及实际Release CLI的5种写入/8类变更拒绝回归通过。独立证据链夹具交替对照中位143.313ms→85.219ms，完整fileSHA256字节减半，输出与夹具摘要保持；不能外推真实64GiB安装时间。真实DSC安装发布/installed证明已通过，冻结程序继续执行启动前Undo，尚未整体验收。见T32_T33_plan_verification_performance.md及对应manifest。本轮未提交/推送。
+
+## 2026-10-20 21:07 CST：继续真实DSC验收
+
+用户要求继续完成真实VM验收。确认首次安装及installed-proof均退出0，事务20261020T070734Z-tjhO0rSZ、同generation、6885代码页及原件/补丁指令通过；当前root66219执行prepare-undo，尚无撤销发布。冻结CLI/VM/runner/postboot工具摘要均保持。参数预检查再次返回-9，已按既有唯一CDHash授权请求诊断helper恢复，原生验证待完成；有期限参数检查只执行非法选项，终态或12小时自动退出，不写VM或改宿主配置。Undo继续，不因启动前置条件等待停止。
+
+## 2026-10-20 22:21 CST：真实启动前Undo发布
+
+事务20261020T130129Z-EauDALvj（guest-dsc-undo-v1）于14:20:42 UTC完成，version4、status published、exit0，使用RENAME_SWAP。实际日志确认两个最终效果核验、挂载清理、发布及ownership handback通过；组件Receipt已共同发布，guest来源仍unknown。当前restored-proof正在核对恢复原件；尚未报告恢复证明、撤销后启停或重新应用通过。真实事务metadata和日志已保存至evidence/T32-T33-resume-20261020/undo-published-20261020，不包含镜像或blob原件；原件继续保留于VM journal。
+
+## 2026-10-20 22:24 CST：恢复证明及两次正常启停通过
+
+restored-proof退出0：实际原件SHA256为e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5，w3恢复0x548，6885代码页核验通过；parent为本轮installed事务，guestOrigin unknown。撤销后两次API启动均读回26.0/23A341，bootSeconds和bootSessionUUID不同，stop/vm退出0、guestStopped true、forcedFrameworkStop false、diskReleased true；config/staged daemon摘要保持。当前运行后Receipt/generation读取正在执行；未将history读取或显示/运行时效果提前记为通过。实际证明已保存至evidence/T32-T33-resume-20261020/restored-20261020和api-restored-20261020。
+
+## 2026-10-20 22:30 CST：撤销后运行读回通过并开始重新应用
+
+Receipt和verify-plan均退出0，关联Undo事务20261020T130129Z-EauDALvj。状态committed-publication、runtimeImageChanged true、runtimeValidated false；发布SHA79e94266…与当前运行SHA6458b911…分开，磁盘物理身份保持。显式同generation重新应用CLI15708已开始普通用户预检；尚未观察到新root安装器或新磁盘事务。此前恢复原件、6885页及两次API正常启停证据均已封存到本轮续跑证据目录。重新应用及最终重复证明/启停/读回尚待执行。
+
+2026-10-20 23:03 CST：重新应用的 root installer17578 已完成 host 入口检查并启动 regular 安装器入口校验。进程观察已保存为 `evidence/T32-T33-resume-20261020/reapplication-current-observation.json`；验收 runner、原始 CLI 和 VM 程序保持，当前无新发布结果。
+
+2026-10-21 00:04 CST：重新应用已完成 SystemOS/AppOS 挂载，当前 staged Cryptex 替换操作仍在执行；新磁盘尚未发布。只读观察与 TASKS.md 已更新。
+
+2026-10-21 00:54 CST：重新应用已完成两份 Cryptex 复制和 dyld 链接设置，DSC SwapEnd producer 按目标0x560启动，目前执行完整计划校验；无新发布结果。可用空间只读检查约46GiB。
+
+2026-10-21 01:51 CST：重新应用已结束 Cryptex/DSC、seputil 和 gigalocker 步骤，进入第3/7项 GPU 驱动安装；尚未发布，完整 DSC 字节/代码页仍待独立证明。
+
+2026-10-21 03:07 CST：重新应用已结束第3/7项 GPU 驱动安装，进入第4/7项 iosbinpack64 安装。恢复阶段的完整证明、两次正常启停和读回已通过；重新应用发布及后续证明仍待完成。resume manifest 顶层状态已更正为当前进度，原退出141诊断字段保存于 initialDiagnosis。
+
+2026-10-21 04:09 CST：重新应用已结束第4/7项 iosbinpack64、第5/7项 launchd_cache_loader，当前进入第6/7项 mobileactivationd。安装器仍未报告失败；发布、独立证明和后续运行验证未完成。
+
+2026-10-21 04:44 CST：重新应用已结束第6/7项 mobileactivationd，进入第7/7项 LaunchDaemons。冻结 cfw_common.sh 与 cfw_install.sh 中该项约有27个写入/补丁调用；按近期单次约7分钟估算，本项仍需约3小时，最终校验和发布另计。该数值为执行时间估算，未完成范围保持。
+
+2026-10-21 05:46 CST：重新应用第7/7项中 classic vphoned、独立 API 的执行文件和 plist 安装步骤已结束，进入 bash plist 写入。当前仍未发布。冻结 CLI/VM 保持，前一性能优化候选不属于本轮运行输入。
+
+2026-10-21 06:44 CST：重新应用第7/7项中 bash、dropbear、trollvnc plist 写入与权限步骤已结束，进入 rpcserver_ios plist 写入。安装器未报告失败，发布与后续验证未完成。
+
+2026-10-21 07:09 CST：用户询问是否卡住。最新进程观察显示 runner 存活、verify-plan CPU约92%，已完成 rpcserver_ios 配置与 classic vphoned plist 写入，当前执行权限设置前校验。总状态 reapply-cfw 在完整安装结束前保持；按近期单次约7分钟和剩余步骤估计约1–2小时，未作为完成时限。
+
+
+## 2026-10-21：T60 独立收尾及性能验证续跑（当前聊天）
+
+修复跨选择导出并发和调用方取消未传播，保存原始失败回归；两后端导入/导出接入最终发布前源变化复查。完整LaunchpadKit221项、Core436项和Python37项通过。正式CLI入口对上一和本轮签名候选各6项通过。实际NSOpenPanel多选两个16GiB稀疏夹具，两个源/目标完整磁盘摘要均相等，无staging；随后UI工具的AX/截图/重绑定/重置连续timeoutReached。1秒sample显示主线程处于正常事件循环，超时原因未查明；实际UI取消和AppKit Quit不提升通过。T60保持未accepted，详见T60_import_queue.md和evidence/T60-closeout-20261021/manifest.json。
+
+按用户顺序继续计划读取性能优化收尾。已构造含两个4GiB历史postimage的独立合成夹具，并通过正式Swift/Python验证链发布及Undo。新增通过Store.read直接核验身份/历史证据拒绝的断言，相关48项通过、可选fixture按配置跳过；完整trace确认两个独立读取各一次loadVerified和verifyOriginals。首轮对照输出及夹具摘要保持；该轮部分时间与回归并行，正在独立重测作为最终时间证据。不替换正在真实验收的冻结程序，不操作其VM。
+
+
+2026-10-21 当前聊天最终复核：4GiB历史证据链独立Release对照中位7.155970秒→3.657979秒，完整摘要读取17179943362→8589971681字节；每请求generation核验2→1，输出/夹具摘要保持。48项相关回归包含1项配置性跳过，执行47个函数通过；具体identityMismatch断言的3个实际verifier函数再次通过。两份新证据索引的全部文件和源码SHA256复核通过，66个任务ID唯一、JSON有效、git diff --check通过。真实冻结CLI/VM摘要保持。T60实际UI取消/Quit仍因工具超时未验证；T60与T32/T33整体状态不提升，源码/证据仍未提交或推送。
+
+2026-10-21 08:03 CST：重新应用全部7项组件安装与清理步骤已结束，进入第一轮最终效果核验。快照处理、第二轮核验、封存/交换及重新应用后的独立证明与运行验证仍未完成。
+
+2026-10-21 08:13 CST：按当前 root17578 的两次直接 verify-final 调用及冻结脚本顺序核对，第一轮最终效果核验、cleanup 与启动快照处理已结束，进入第二轮只读核验。已保存调用PID/观察时间及host脚本SHA；封存、发布和后续独立/运行证明仍未完成。
+
+2026-10-21 08:36 CST：两轮最终效果核验和启动快照处理已进入后续 seal。封存进程74327先后执行两个直接 verify-plan 子进程74344/83091；两者均已结束，seal仍在运行。进程观察和研究清单已更新；未确认封存、发布或重新应用后的运行验证通过。
+
+
+### 2026-10-21：T60剩余实现和离线矩阵
+
+完成创建退出等待、Finder归档排队/UTI、版本化JSONL进度、socket排除；实际GUI缺zstd已复现并打包zstd/xz和依赖/许可证。最终r3候选签名/资源/依赖通过，Kit227（跳过10）/Core441（跳过1）/ArchiveCLI2函数/Python62+7通过；新旧具名签名CLI各8项、真实信号导入4+导出4场景通过。旧VM克隆导出15,564,157,664字节归档通过。实际GUI因Mac锁定待手动解锁；真实VM导入需30,044,004,352字节空闲且当前差约2.2GiB，待释放至少3GiB后复核。未删数据，未启动旧VM，不更改DSC冻结输入；T60未accepted。证据：evidence/T60-remaining-20261021/manifest.json。未提交或推送。
+
+2026-10-21 09:12 CST：独立 DSC 启动前 Undo→同generation显式重新应用真实VM序列已通过。10阶段退出0，7组证明通过；恢复与重新应用状态各2次真实API启动/正常关机、26.0/23A341、磁盘释放和运行后Receipt/generation读取通过。最终归档118个索引文件/26,257,055字节的大小与SHA-256独立核对通过；指定后台PID均已不在进程表。源构建冻结基线d968d02f，优化候选未纳入本轮；不推进运行效果、图形、Mach-O/Preboot或受信来源的接受状态。证据：`evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json`。本轮未执行Git提交或推送。
+
+
+### 2026-10-21：T60用户解锁后实际矩阵
+
+最终r3实际导入/导出等待和活动Cancel、传输Quit超时保留及排空退出、Finder冷/热打开通过；两个16GiB完整摘要保持。真实64GiB默认system-tar导入完成，8个持久文件及源VM/归档完整摘要保持，无staging、未启动VM。新增正式native稀疏/硬链接回归，新旧签名CLI各9项通过；Kit228项（跳过11）通过。native真实大盘两次触及保留空间并取消，分配差异原因未查明，未修改生产归档代码。待批准清理本次约62GiB的system-tar/restored测试副本后复验，原盘/归档/结果保留。实际create/restore与更广历史组合仍未验收，T60未accepted。证据：evidence/T60-resume-20261021/manifest.json。
+
+
+### 2026-10-21：T60具名矩阵完成
+
+用户批准后仅删除本次system-tar/restored测试副本，空闲恢复77.824GB。相同r3候选/归档的native64GiB真实导入通过，8个持久文件完整摘要一致，原VM/归档保持，无staging、未启动VM；native目标分配约27.5GiB。GUI、两个签名CLI各9项及两个真实导入后端的具名矩阵完成，可提交评审。分配差异原因未查明，不声称修复；实际restore退出、导入后启动和全部历史组合仍未覆盖，不代替人审accepted。最终证据：evidence/T60-final-20261021/manifest.json。未提交、推送或发布。
+
+
+## 2026-10-21：新目标 U0 Git 核验与首轮源码对账
+
+按当前用户继续推进待办的请求，取得固定目标2a0d3ac；8a75092..2a0d3ac完整Git图确认57条提交（20 merge、37条其他提交）、first-parent19条、端点215路径。全部merge父差异和排除根TODO.md的端点内容已归档。附件原枚举当前不可读，未冒充独立集合比对；旧194条统计不与本轮相加。
+
+保存当前HEAD+WIP摘要和tracked diff，57条记录逐条路由，原仓库对象重建结果一致；错误范围/遗漏提交拒绝通过。核对全部7份锁文件及两份ROM二进制与固定记录摘要；确认上游IcliKit0.8.6与本地0.8.5差异。本地API文件传输已有身份/临时发布能力，classic和GUI大文件仍须分别适配；ROM、tvOS/X1和默认值不自动扩大。完整语义评审、依赖升级及新目标运行验收未完成。
+
+66项唯一ID/依赖无环、历史status/target_review/dependencies保持及既有脏源码摘要核对通过。本轮未改生产实现、未运行VM、未提交或推送。项目.venv指向已不存在的生成目录，仅使用系统Python标准库；下一项为恢复受锁文件约束的项目环境，再审阅T08依赖与guest RPC兼容。详见U0_source_audit_20261021.md和evidence/U0-20261021/manifest.json。
+
+
+## 2026-10-21：T08 IcliKit 0.8.6 适配与独立候选
+
+承接U0后续任务，按项目3.14平台锁恢复.venv；locked probe、包版本及pip check通过。核对0.8.5→0.8.6四条提交/七个端点文件：主要修复为前台用户lookup的sessions guard；Swift调用和JPEG源文件未变。同步本地exact requirement、resolved/expected pins和overlay revision，原JPEG补丁及内容摘要保持，其余六项pin不变。
+
+独立.build/daemon-api-icli086-20261021的iOS Release编译链接和classic/v2候选签名、依赖、marker、来源检查通过；候选未安装或激活。16项pin/overlay和3项实际固定依赖宿主回归通过，新增foreground guard已接入正式测试。正式make test_python全量运行中，终态见后续记录与manifest；不以宿主替身或构建结果证明真实tvOS/iOS运行。初始网络沙箱失败和最终成功日志分别保留；冻结应用两份执行文件摘要保持。详见T08_icli086_20261021.md及evidence/T08-icli086-20261021。未提交或推送。
+
+
+2026-10-21 T08终态：正式make test_python运行949项、250.597秒，退出0，跳过1个默认NIO目录缺失的测试类。夹具新增隔离SourcePackages入口并核对实际NIO revision后，该类2项补验通过（15.725秒）。没有重复全量，也未弱化原断言。16项pin/overlay、3项固定依赖宿主回归和classic/v2独立iOS候选检查均通过。证据清单、原始失败/成功日志和源摘要见evidence/T08-icli086-20261021/manifest.json。实际guest服务、应用与截图内存仍未验收；候选未安装或激活，旧accepted和旧目标证据保持。当前可继续T47/T48来源/恢复边界对账。未提交或推送。
+
+
+## 2026-10-21：T47 与 T48 克隆身份边界、APFS 快照与四层来源对账
+
+承接T08后续任务，完成T47（`rename` 派生mDNS跟随、`clone(newIdentity:)` 身份与独占网络清理、复制前后停机与无漂移签名校验、根级 `.firmware-*` 与 `Snapshots` 排除、SEP/Data密钥共享说明）和T48（`<bundle>/Snapshots/<name>/Snapshot.plist` 必选/可选状态文件整组CoW快照、`.snapshot-revert-*` 事务日志与崩溃恢复门控、恢复后缺失收据重置、四层 `launchpad.json` 对账及 `vm snapshot create|list|revert|delete` CLI）全部实现。
+
+7个Swift测试套件（`BundleActivityTests` 12项、`BundleSnapshotsTests` 12项、`BundleOpsTests` 29项、`BundleCloneStateTests` 12项、`MachineSnapshotsTests` 4项、`FirmwareDesiredPlanStoreTests` 18项、`VMSnapshotAndCloneCLITests` 2项）共89项测试全部通过（退出0）。快照恢复与新身份克隆均拒绝直接复用源机 `FirmwareDesiredPlanStore` 预检资格。真实64GiB VM快照恢复与双机并行启动仍未验收，历史status保持。详见T47_T48_clone_snapshots_20261021.md及evidence/T47-T48-20261021/manifest.json。未提交或推送。
+
+
+## 2026-10-21：T52 恢复验证与归档
+
+读取中断交接并核对保留源码。完成进程分类、停止保护、Launchpad绑定顺序和CFW外部挂载工作区的离线验证。新增真实lsof自身排除/外部读者检查与长Unix socket探活回归。发现最终只读挂载根绑定失败会跳过清理，修复前副本故障注入稳定复现，正式驱动修复后通过，原磁盘摘要/inode保持且未发布。
+
+首轮Python沙箱staging遇到EPERM，无沙箱同套件50项通过。最终Swift定向55项、Kit239项（跳过11）、停止/锁35项通过。Python11模块235项中234项通过，唯一Undo驱动夹具缺模块失败修正后原用例1项补验通过；断言和生产拒绝条件保持，无未解决测试失败。
+
+setBundle当前仅有库接口，GUI/控制命令接线、真实跨设备/devfs与VM安装启动仍待验证。保留历史status/target_review/依赖与新目标accepted=false。未操作真实VM或冻结.app；未提交或推送。报告：T52_disk_exclusivity_20261021.md；证据：evidence/T52-20261021/manifest.json。
+
 
 ## 2026-10-21：T51 实现和离线验证
 
@@ -342,4 +498,293 @@ Launchpad接入物理计量与Allocated/Exclusive/Unknown展示、30秒刷新/15
 
 2026-10-21 T51真实启动续验完成：仅使用用户批准419d5a6c候选，对已rebase的target执行两次真实启动和生产vm stop。guest连接、26.1/23B85、不同boottime/instanceID、正常关机和磁盘/目录锁释放均通过。实际r2运行实例、Unknown/缓存提示、关机后当前计量回归通过；运行中rebase拒绝。原输入完整摘要/身份复核保持，base未启动，vm-2607仍为原PID；helper8387已停止且PID不存在，无持久允许名单写入。最终证据evidence/T51-runtime-20261021/authorized-boots/manifest.json，范围见T51_runtime_acceptance_20261021.md。外置卷仍暂缓；accepted=false，未提交或推送。
 
+
+2026-10-21 T52入口续验：T51已提交4b5117d6，未推送。本轮接入机器绑定弹窗及新绑定Bundle的环境更新协议，保留完整备份、来源和认证约束；实际子进程成功/失败/取消与绑定漂移拒绝回归通过。Swift各扩展组256/35/2/42项、Python相关218项和最终绑定模块56项通过，分组不相加。用户具名批准后的签名候选绑定界面回归通过，取消后所检查VM文件保持。root-owned store不存在，真实绑定及环境替换尚未验收；外置物理盘按用户要求暂缓。本轮源码未提交、accepted=false；见T52_entrypoints_20261021.md及evidence/T52-entrypoints-20261021/manifest.json。
+
+
+2026-10-21 T52真实验收续跑：root-owned具名Bundle安装与收据核验通过，独立regular/v2恢复通过。CFW因验收命令的仓库资源覆盖选择0.8.5 guest载荷，与0.8.6 pins不匹配而退出；原盘抽样/身份保持，暂存盘未发布。批准Bundle内0.8.6组合只读检查通过；修正参数后因8份资源快照保留上限拒绝，已完整备份并核验一份失败快照，待用户批准删除仓库外该原副本。绑定和实际环境替换仍待执行，accepted=false。报告：T52_real_bundle_environment_20261021.md；证据：evidence/T52-real-20261021/manifest.json。
+
+2026-10-22 T52真实续验：regular/v2 CFW、first_boot及verification全部succeeded/verified，命令退出0；五库-O0基线只读检查为offline_update。实际界面完成完整备份核验和2.6.2-local.cd529f26a150绑定，环境预检因Process.environment=nil丢失PATH而找不到lsof，未替换盘。实际子进程回归先失败，修复后23项定向和完整Kit258项测试通过、跳过17项；新候选签名/封装及内嵌字节保持检查通过，待新候选打开授权后继续。原boot-window三次附加后停止且PID不存在，不复用。外置物理卷仍按用户要求暂缓，accepted=false，未提交或推送。
+
+2026-10-22 03:40 T52续推：实际GUI经批准Bundle完成五库环境替换，事务20261021T163833Z-aCYGC037于00:43:02 published且exit_code=0。独立只读already_current、33项断言和历史原盘inode/抽样复核通过，系统Bundle收据及受保护VM复核通过。Mac锁定，完成界面与替换后启动尚未验证；已请求手动解锁及新的600秒单哈希一次附加窗口批准，新脚本未执行。单次续推未新增重复调度；外置卷暂缓、accepted=false、未提交。见T52_real_bundle_environment_20261021.md及evidence/T52-real-20261021/manifest.json。
+
+2026-10-22 07:14 T52替换后验收：默认GUI绑定启动与五库客户机摘要读回通过，但未启用API的默认停止超时，框架强制停止，原失败保留。API模式同一Bundle/绑定启动，经实际GUI正常停止，apiAccepted和Guest stopped、退出0、磁盘/锁释放通过；五库当前映射确认，24项运行证据断言通过。单哈希600秒窗口仅附加一次，352.713秒后停止且PID不存在，原VM/受保护副本/系统Bundle最终核对通过。默认GUI关机限制未修复；应用行为和外置物理卷未验收，accepted=false、未提交，调度保持暂停。见T52_real_bundle_environment_20261021.md及evidence/T52-real-20261021/manifest.json。
+
+
+## 2026-10-22：T52 默认 GUI 关机修复候选
+
+默认停止路径新增仅停止时使用的直接VSOCK API请求，不创建宿主HTTP监听。生产选择路径及客户机Connection: close协议回归先失败后通过；最终分组108项通过，既有APIProxy混合运行失败原因未查明，单项及11项独立套件通过。独立候选2.6.2-local.af333c78ac3b签名/依赖/封装通过，客户机资源与Framework库字节保持。具名安装、t52-v2宿主重绑及600秒新单哈希批准请求已提交；均未执行，真实默认GUI关机仍待验收，accepted=false、未提交。详见[T52_default_GUI_shutdown_20261022.md](T52_default_GUI_shutdown_20261022.md)。
+
+T52默认GUI候选已获具名安装/宿主重绑和600秒一次附加单CDHash的明确批准。sudo -n需要认证，脚本未运行；已请求用户终端执行，实际GUI可读取，重绑准备弹窗已取消，目标仍为原绑定且停止。批准范围保持有效，后续无需重新批准。
+
+
+## 2026-10-22：T52 默认 GUI 真实正常关机通过
+
+具名2.6.2-local.af333c78ac3b已安装并复核，仅t52-v2宿主重绑，客户机环境更新未重跑。实际默认图形启动无HTTP API监听，26.1/23B85及五库目标摘要匹配；实际GUI停止经直接VSOCK请求获得apiAccepted、Guest stopped及退出0，磁盘/目录锁释放，身份配置和新绑定保持。实例969AF5BD-896B-4636-B7E4-260EC4AEE33A、PID64720。验收脚本日志轮换偏移缺陷已保存失败并修正，4项边界回归通过，未重复启动VM。600秒单哈希窗口仅附加一次，205.739秒后停止且PID独立确认不存在；原VM33355和受保护副本保持，两版Bundle收据核验通过。默认GUI问题已完成修复与真实验收，混合套件既有APIProxy失败原因未查明，应用行为和物理外置卷仍未验收，T52整项accepted=false、未提交。见[T52_default_GUI_shutdown_20261022.md](T52_default_GUI_shutdown_20261022.md)。
+
+
+## 2026-10-22：APIProxy 混合失败已定位并修复
+
+停止先关闭全局准入再逐个关闭客户端，原reserveAttempt将停止与容量耗尽都返回false，调用方可能在客户端关闭前误发503。独立12轮1次复现；100轮竞争20个错误503，10轮阶段对照通过；无探针单变量反证55个错误503。修复在同一锁内区分三种准入结果，停止直接结束，真实上限503保持。APIProxy13项通过；原混合组合加2项回归后110项连续3轮通过，未隔离失败测试。临时探针已移除，源码与证据已保存；未重建/安装Bundle、启动VM、修改AMFI或提交。报告见[T52_APIProxy_stop_race_20261022.md](T52_APIProxy_stop_race_20261022.md)。
+
+APIProxy修复已提交a0119127，未推送，其他未提交工作保持。部署候选2.6.2-local.266810c8ae29完成签名/依赖/资源解析与512个源码摘要核验，客户机资源和Framework库字节保持。sudo -n需要密码，安装脚本未执行；已请求用户终端认证。安装后仅重绑t52-v2，核验脚本已准备，不启动VM或修改AMFI。详见[T52_APIProxy_deployment_20261022.md](T52_APIProxy_deployment_20261022.md)。
+
 APIProxy修复a0119127已部署为2.6.2-local.266810c8ae29，仅切换已停止的t52-v2宿主绑定；新旧收据、安装字节、绑定及磁盘元数据/选定配置摘要核验通过，原VM和受保护副本保持。客户机资源与Framework库字节保持，未重跑环境更新，未启动VM、未修改AMFI、未推送；新版本真实启动未验证，T52整项accepted=false。详见[T52_APIProxy_deployment_20261022.md](T52_APIProxy_deployment_20261022.md)。
+
+2026-10-22续推：T52新宿主版本停止/绑定界面与只读基线通过，应用探针构建和10项验收资产回归通过；已批准900秒单哈希窗口仍待终端认证。下一项T53固定源码审计、3个C程序及实际SystemHook/DeviceHub隔离构建通过，修正Undo夹具合同后106项Python、14项Swift通过；未接入或部署T53产品，迁移与真实工具验收待完成。详见T52_application_acceptance_20261022.md及T53_developer_compatibility_20261022.md。
+
+T52后续实际执行：新版本默认GUI真实启停通过；同一独立VM的API会话保持运行。辅助进程在745.972秒、一次附加后停止且独立确认不存在。用户完成初始设置后，设置应用启动对照通过；探针启动仍失败，kernel记录System Policy process-exec拒绝。arm64单变量对照未消除失败，已准备原始arm64e正式容器IPA；当前等待仅注销本轮注册项及原生安装暂存清理的明确批准，未执行该步骤。T53隔离候选与回归结果保持，未接入产品或部署。
+
+
+2026-10-22 T52正式容器续验：已执行用户批准的本轮注册项注销及apps.install安装，旧探针文件摘要和原数据路径保持。正式容器启动仍failed且无进程，kernel出现TXM CodeSignature错误，具体条件未查明；移除platform-application及arm64对照均失败，已恢复原始安装字节。系统相机/地图能启动，但cameraPresent=false、连接未建立；实际classic daemon与v2相机库包含不同共享内存路径，源码头大小定义256/64不同，连接重置的具体原因仍待验证。定位来源确认未计消费通过。本轮来源及系统对照应用已停止，受保护VM和绑定复核通过；t52-v2按用户要求保持运行，AMFI辅助未重启。下一步查明签名拒绝条件、统一相机组件接口后补定位/QR消费验收；外置物理卷暂缓，T52 accepted=false、未提交。见T52_application_acceptance_20261022.md及其证据清单。
+
+### 2026-10-22：T52 签名/相机接口实际续验
+
+CMS单变量ABA启动通过；共享协议统一及相关回归通过，全量Python970项通过（4跳过）。.938候选已部署，两库事务发布，完整旧盘保持，只读复核already_current。实际定位仅一条七字段正确回调，相机仍无设备/无回执；探针共享帧open=EPERM、定位桥接文件open=ENOENT，消费未通过。临时辅助与debugserver在900秒内结束并独立确认，原VM与三副本复核保持。仅增加可读初始化日志的.56诊断候选已构建核验，未安装，新的具名部署和单次窗口批准待答；当前VM保持运行、来源与探针停止。详见T52_signature_camera_20261022.md与161项证据manifest；accepted=false。
+
+
+2026-10-22 T52 诊断部署续推：用户批准及认证后，2.6.2-local.56be1ce20ded两库事务发布、旧盘保留和只读already_current核验完成。新实例372C906F-9315-4ED3-B596-94670EEA9AAA/PID98713就绪，独立监督窗口一次附加69.615秒后结束。完整日志确认虚拟源创建成功，代码页修改和共享帧访问失败；空设备枚举完整原因仍未查明。定位正常授权后仅1条正确回调，严格双回调失败；API对照被owner/generation校验拒绝，未绕过。启动socket竞态3项回归及工具组合18项通过。85项新证据独立归档，前批161项保持；来源和探针停止，五库/旧盘/收据/受保护对象复核通过。待在所有权发布链接入定位桥接、修复相机访问及枚举条件后补消费，accepted=false。详见T52_signature_camera_20261022.md及evidence/T52-camera-diagnostic-20261022/manifest.json。
+
+
+2026-10-22 T52功能候选2.6.2-local.cc05d88f441f已封装及核验；完整Python995项通过（4跳过）、最终定向36项通过。用户明确批准五库/API/发布端缓存的完整克隆替换、临时探针、新900秒单哈希一次窗口。首次安装store busy拒绝，保留日志；t52-v2现已通过系统设置正常关机，PID98713退出，原VM33355保持，正在重试同一归档，窗口尚未开始。消费accepted=false。见T52_consumer_fix_20261022.md。
+
+
+T52 补充批准后的实际部署完成：cc05d88f441f 的 System 五库/API 克隆事务发布，旧盘完整保持；辅助一次附加 60.199 秒后退出，原 amfid 自行退出，旧 SIGCONT 认证取消，无重新附加。匹配发布端切换及新旧摘要核验通过。两个定位坐标各 5 条七字段回调通过，相机 v3 双层复制回执通过；标准相机授权为 Authorized，但公开视频设备为空，QR 仍失败。不重启的实时日志记录普通视频源返回 0，完整原因未查明。原探针恢复并停止，来源 off，原 VM 和三个受保护副本保持；22 项工具回归在沙箱外通过。一次具名 cameracaptured 重建日志计划已准备并请求补充批准，尚未执行；accepted=false。详见 T52_consumer_fix_20261022.md。
+
+
+2026-10-23 T52：已批准的一次相机重启完成，日志确认backing/hook安装，但原生视频源为0。应用内原生共享provider查询返回nil；同版本控制流显示无源信息时共享实例不创建。仅实例getter的缺接收者回归先失败，增加共享getter fallback后通过；原生类/实际backing应用内诊断通过，原程序恢复。单库候选4bd0cce62c46封装核验通过，其他客户机库/API/发布端/宿主VM字节保持；完整Python1017项（4跳过）、单库事务9项、工具24项通过。正式QR仍失败，回执通过；来源和探针停止、受保护对象保持。新候选部署计划待具名批准，未执行，accepted=false。见 T52_provider_fix_20261023.md。
+
+
+2026-10-23 T52单库候选4bd0cce62c46已按批准部署，完整旧盘重新计算SHA相同，其他库/API/发布端保持。新实例C56C5714-474B-4E54-9E2D-52FC17900A2F定位两点各5条七字段正确回调，QR A/中性帧6.183秒无QR/QR B及v3回执全部通过。正常权限探针未编入诊断hook；cameracaptured普通类型1源返回1。一次辅助窗口86.345秒后进程与debugserver独立确认不存在，同一amfid未暂停，无SIGCONT。原探针恢复、数据保持、来源off、原VM和三个副本核验通过；首次路径失败和启动后探针前置拒绝保留。当前应用消费范围完成，外置物理卷按此前要求暂缓，业务应用未验，整项accepted=false；无提交或推送。运行证据另存evidence/T52-provider-fix-20261023/runtime/manifest.json。
+
+
+2026-10-23 T32/T33推进：新增正式cfw verify-effects，独立只读核验当前盘4681个目标，4680匹配，仅hardware:/AA.gl内容摘要不同；DSC .42完整摘要、6885代码页和原件关联通过，符号派生语义仍为w3=0x560。保留发布镜像4681项全部匹配，具体写入者和原因未查明。最终Python1030项（4跳过）、相关100项、Swift命令3项、新reader16项及运行准备2项通过。包含原盘的12个根级持久文件完整备份通过，元数据保持。更广撤销、图形/补丁运行效果及受信guest来源仍待补；新一次GUI/AA.gl摘要/显示帧观察与单哈希900秒一次窗口已形成具名计划，尚未批准/执行。accepted=false，无提交推送。见T32_T33_installed_effects_20261023.md及独立证据。
+
+2026-10-23 T32/T33具名运行诊断：一次GUI/API启动并正常关机；AA.gl file_get返回EPERM，显示帧未采集，运行效果未通过。限定辅助一次附加18.847秒后退出、amfid未暂停；未重附加。修复观察脚本独立阶段错误处理，4项回归通过，实际旧失败保持。启动后磁盘只读核验等待系统认证；无新增固件/内核/DSC补丁，更广Undo与受信guest来源仍未完成。详见T32_T33_installed_effects_20261023.md。
+
+2026-10-23 T32/T33启动后只读核验完成：4680/4681匹配，唯一AA.gl在本次受限操作区间内由f92c991d…变为ff2f7d4b…，具体写入者、时点和原因未查明；其余4680目标与启动前相同，6885签名页通过。严格退出1及原基线保持。两卷正常卸载、镜像detach，独立确认目标未附加，审计期间身份与元数据稳定。一次运行诊断结束，无再次启动或附加；设置显示、更广Undo、受信guest来源及补丁运行因果效果仍未通过。报告T32_T33_installed_effects_20261023.md；新增只读证据post-runtime-readonly，accepted=false。
+
+2026-10-23 T32/T33续推：普通v5逐声明收据、固定Mach-O/Preboot数据的generation原件及完整文件Undo已实现并通过回归；全量Python1059项（4跳过）、Swift3项、文件/审计定向28项通过。候选f25c0583c438、335冻结输入及完整12项备份已核验，用户批准cdb74f7a…离线计划并完成认证，真实三项Mach-O on/off/on执行中。无新VM启动或辅助窗口；受信guest来源、GUI运行和整项验收仍未通过。详见T32_T33_completion_20261023.md。
+
+
+2026-10-23 T32/T33隔离验收进度校正：原计划cdb74f7a…首阶段在写盘前被身份门拒绝，三项Mach-O应用、撤销、重应用均未完成；12项持久文件及335项冻结输入保持。两份早期v4祖先记录缺少盘、postimage和effect-blobs，缺失时点及原因未查明。Swift身份读取器另已补齐v5/schema3兼容并通过v4/v5、完整文件Undo和真实只读回放。新候选a88440c704e4及新隔离计划f3eabf4a…已获用户批准，340项冻结输入复核通过，当前等待macOS系统认证，尚未创建新副本。两批准备/失败证据共119及40项分别归档并逐项核验。未启动VM或开启新窗口；受信guest来源、GUI/补丁运行效果与整项验收仍未完成，accepted=false。详见T32_T33_completion_20261023.md。
+
+2026-10-23 用户已完成新隔离计划f3eabf4a…的系统认证，原生root执行器已启动，fresh-offline-acceptance目录及根执行日志已生成。执行器先检查具名缓存及磁盘空间，再完整复核原VM的12项启动文件；尚无任何on/off/on通过结论，不启动VM或辅助窗口。
+
+
+2026-10-23 新隔离计划f3eabf4a…实际结束：generation=34abf58b3c5166e0b393f8e9c53b14deee5835efc4ec561f6629ef0c79c89664，语义计划与批准相同；首次CFW已采集generation文件原件，但旧assert_mount_under_vm在SystemOS挂载前拒绝批准的外部工作目录。没有新磁盘发布，三阶段均未计通过；按失败即停止，未重试。两盘均无附件，失败暂存正常卸载并清理，失败journal保留。独立完整摘要确认原VM12项身份/元数据/内容保持，新副本10项启动文件仍与备份相同且inode独立，340项冻结输入保持；两个受保护VM仍运行。正在建立该路径检查的复现及修复；新候选续验需具体方案，原批准不自动重试。accepted=false。
+
+
+2026-10-23 外部挂载路径修复：实际shell复现3项仅合格外部路径失败，拒绝分支保持。assert_mount_under_vm对外部路径改用现有private_path门：重读冻结计划、继承VM锁、核对journal中mountRoot的dev/inode/uid及无符号链接路径；真实mount-cryptex仍单独核验固定挂载目标、源镜像和generation。16项挂载/工作目录及121项相关shell、计划门、宿主事务和文件Undo回归通过，续验执行门2项通过，语法和空白检查通过。未增加固件、内核或DSC指令补丁。
+
+修复候选2.6.2-local.887b0069c62a封装及签名/依赖闭包/Bundle核验通过，归档SHA-256为55b37cf5f02ed228e4dfda0b423161b7bf7747995db29dc985259eb083777c9a，194647552字节；VM及guest载荷相对基底保持，未安装到Store。新resumed-file-acceptance-plan.json（SHA-256 ba1279954c64ab30712e0e92eb4428c2b222f91d0cf9e621a39ad358f6d7fd95）冻结342项输入，仅拟在同一新副本和新generation上执行一次on/off/on，原12项和新10项完整摘要/身份先复核，每阶段严格独立只读审计；root重新读取实际desired和manifest，正式CLI重新验证完整generation/磁盘身份。允许正式CFW正常清理该新副本的.cfw_temp（含此前失败生成的可重建源缓存）及新暂存，保留原VM、旧盘、generation、失败journal和证据。新候选及失败后的再次执行尚未获准，未重试；不启动VM或窗口，不重建generation、不安装或重绑。受信Guest来源和运行效果仍未通过，accepted=false。
+
+2026-10-23 用户明确批准续验计划ba1279954c64ab30712e0e92eb4428c2b222f91d0cf9e621a39ad358f6d7fd95；342项冻结输入再次复核通过，独立批准标记及用户原文已保存。已排除旧执行/认证进程，发起本次具名系统认证，等待认证后执行。此次只在保留的新副本上验三项Mach-O，无VM启动、窗口、Store安装或重绑；原计划的失败记录和已归档证据保持。
+
+续验认证已确认；原VM12项和新副本10项完整内容/身份复核通过，实际root重新读取同generation/同语义计划及归档关联后进入on阶段，候选887b0069c62a在.cfw_disk.xoAlcrnT采集新原件。尚未发布或完成任何一个验收阶段。
+
+2026-10-23 续验进展：on事务20261023T074423Z-xoAlcrnT通过独立只读审计，4681项目标及5项代码页记录核验通过，磁盘摘要与发布记录相同；三项撤销事务20261023T082509Z-gml5bJzX已发布并保留前盘，正在进行独立只读审计及完整原件/签名页复核。尚未执行重应用，整项accepted=false；本轮未启动VM或辅助窗口。
+
+2026-10-23 续验off独立审计及三项完整原件/签名页复核通过，on与off均完成。执行器已进入reapplied阶段的已有发布链核验，尚未完成最终发布/审计和原VM最终完整复核。三阶段全部通过前不计完整文件on/off/on通过；本轮无VM启动或辅助窗口，accepted=false。
+
+2026-10-23 运行观察器独立复验：原4项回归通过。代码核查GuestAPI.apps.foreground总是提供verified字段，旧观察器仅比较bundle_id；新增失败复现中verified=false、缺失、1及字符串true均被错误计为显示通过。修复为要求verified is True并保存原始前台返回，5项回归通过，AA.gl拒绝仍保留失败并继续显示检查。该观察器不属于当前离线冻结输入，未用于本轮VM运行，也未开启新窗口。日志runtime-foreground-red.log/runtime-foreground-green.log。
+
+2026-10-23 续验计划ba127995…已结束，结果为失败；保留已通过阶段和原始失败记录，没有自动重试、回滚、VM启动或辅助窗口。错误：Reapplied target differs from the first on state: system:/usr/libexec/seputil。T32/T33整项accepted=false。
+
+2026-10-23 签名差异已定位并独立核验：相同签名前输入和参数经ldid产生不同CMS signingTime及其签名值。三项文件的CMS以外全部字节、证书、算法、其他签名属性和安装元数据一致；六份CMS密码学校验及全部代码页通过。原始完整文件字节相等验收继续失败，不改写旧记录。新增独立CMS核验6项回归通过，包含有效/无效时间篡改、签名损坏、证书/字段修改及代码改变的拒绝。独立保存证据核验同时确认原VM12项完整内容/身份、342项冻结输入及66项旧归档保持。无新挂载或VM写入。
+
+同一隔离副本10项启动文件的完整备份已核验；completed-runtime/runtime-plan.json已准备，SHA-256 8f47f172215467fc7f9aef31c464ae71b1709acdd0b59e32ff9587e3462e5621，冻结365项工具/证明，资格明确为原件精确恢复+CMS签名时间差异的密码学校验，原完整字节验收仍失败。计划仅拟一次GUI/Settings显示与AA.gl摘要观察，原窗口已消耗，新计划尚未批准、未启动VM或辅助窗口。AA.gl既有EPERM继续保留为失败，不能由显示通过覆盖。可信Guest来源桥接、真实Preboot数据撤销及运行效果仍未完成，accepted=false。
+
+2026-10-23 GUI计划8f47f172…已消耗一次启动和一次辅助窗口，结果失败：宿主在启动后报告invalid or oversized socket path，未进入API/显示及AA.gl观察。目标vphone.sock路径为124字节，macOS sun_path仅104字节含终止符。宿主requestStop超时后自行执行框架停止，正常关机未通过。独立确认VM/worker/supervisor及debugserver均已退出；辅助20.348秒、一次附加、无持久名单，amfid身份保持且未暂停，不需SIGCONT。10项完整启动备份、原VM12项完整内容/身份及365项工具复核通过，目标无挂载。没有重试或回滚。accepted=false。
+
+2026-10-23 套接字前置检查已修复：根窗口准备及GUI观察器在启动前按Darwin sockaddr_un的104字节容量（含NUL）检查UTF-8长度；实际长路径bind拒绝、根入口不能先启动helper及字节边界回归由红转绿，含原观察器共8项通过。新短路径诊断副本.build/t32r-20261023从保留的启动前完整备份准备，10项完整摘要与源相同且inode独立，不复制generation/journal/binding资格，不改变故障副本或旧历史；尚未启动。新socket含NUL64字节。新计划short-runtime/runtime-plan.json，SHA-256 12b5f5aecd6ae878587521ee20204ce91e710e5ba6c8ec6e5ff303b0530f69f3，368项工具及wrapper路径已复核。计划显式请求允许仅该新诊断副本宿主自身在致命错误/停止超时时的requestStop→框架停止回退，并将回退计正常关机失败；无agent强停/杀进程。新启动和新窗口尚未批准。来源桥接、Preboot实际验收和运行效果仍待完成，accepted=false。
+
+
+2026-10-23 短路径诊断计划12b5f5ae…经明确批准后已完成一次GUI启动和一次辅助窗口。API就绪，system.shutdown返回成功、Guest stopped、VM退出0，正常关机通过，无宿主停止回退。辅助窗口14.502782秒、一次附加；独立核实VM/worker/supervisor/debugserver均退出，原amfid身份保持且未暂停，无SIGCONT。AA.gl读取返回EPERM；screen.unlock返回api_timeout并提示operation_may_continue，之后仅执行Preferences终止清理，未执行应用启动或截图，显示验收未通过。10项完整启动备份、原VM12项完整内容/身份、368项冻结输入通过，目标无挂载。54项执行证据和原源码归档于evidence/T32-T33-completion-20261023/short-runtime-outcome/manifest.json，清单SHA-256 ccb1bc0aadad1ed8dbe47022c699731ea6f9471ed827ad734cceebb7bc3a6df7。没有重试或重新开启窗口，accepted=false。
+
+运行观察器已将解锁与显示拆分为独立观察，保留解锁错误及总失败；继续要求verified is True、非空白且有变化的显示帧。新增回归先失败后通过，3项解锁隔离及8项原观察器/套接字回归通过。修复后脚本尚未用于真实VM；旧运行结果和归档保持。GuestScreenUnlock.swift明确指出SpringBoard启动前锁屏快照可能误报unlocked/lit，不能据此认定解锁多余；实际超时原因未查明。此完成续推阶段累计两次GUI启动/两次窗口，分别属于两个已消耗计划；早期独立followup批次不计入本阶段。受信Guest来源桥接、真实Preboot数据撤销、显示/AA.gl及补丁运行效果仍待完成。
+
+
+修复后的显示续验计划已准备，尚待新增批准：.build/t32-t33-completion-20261023/display-runtime/runtime-plan.json，SHA-256 2f85665429b501a7502f9941f1eef95ab8c9f5f19ede503d02b8d4576c5e4ee1。目标仍为.build/t32r-20261023，使用其正常关机后的当前状态，10项启动文件已完整克隆/复制并逐项摘要复核，376项工具/证明冻结。执行协调器也已冻结并要求显式计划摘要；缺批准时在管理员认证前拒绝。初版协调器错误引用旧WORK被计划摘要门拒绝，修复后在新WORK因缺批准拒绝，两次均未开启认证或窗口。备份不授权恢复；本计划不改变CFW、原件或来源。拟一次GUI、解锁/AA.gl独立失败记录及Preferences显示、正常关机；需要新启动及新辅助窗口批准。实际新增VMStarts=0、securityWindows=0，accepted=false。
+
+
+2026-10-23 用户已批准显示续验计划2f85665429b501a7502f9941f1eef95ab8c9f5f19ede503d02b8d4576c5e4ee1；376项输入及目标身份再次核验通过。原生认证执行器已启动，当前等待macOS管理员认证；尚未出现authorization-window或本轮VM观察目录，不计新增启动/附加。
+
+
+2026-10-23 显示续验计划2f856654…已执行结束：一次GUI进程启动、API连接就绪，screen.unlock与apps.launch均返回api_timeout；AA.gl继续EPERM。观察脚本已继续独立显示步骤，取得1290×2796的before-settings.png；视觉复核为Apple启动标志和进度条，未取得设置前台或第二显示帧。API就绪时health.setupPending=true；该字段和启动画面均不能证明桌面就绪，也不能据此判定系统长期停滞。system.shutdown成功、Guest stopped、VM退出0，正常关机通过，无宿主停止回退。辅助窗口14.486517秒、一次附加、按期结束；独立确认VM/worker/supervisor/debugserver退出，原amfid未暂停，无SIGCONT。10项完整备份、原VM12项内容/身份及376项冻结输入保持，目标无挂载。无自动重试。此完成续推阶段累计三次启动/三次窗口，早期独立followup批次另记；accepted=false。
+
+
+2026-10-23 离线期限复现及修复：VPhoneAppDelegate为APIClient配置timeout=5，该期限同时用于健康探测与HTTP/WebSocket RPC；GuestScreenUnlock默认10秒、允许1至60秒，VPhoneStartupUnlock请求60秒。本轮screen.unlock和apps.launch距前一回复分别约5.065秒、5.249秒返回api_timeout，与5秒配置一致；不能据此认定客户机初始化或启动画面停留的唯一原因。以同一客户端的短探测期限与较长RPC预算构造本地回归，HTTP/WebSocket两个真实请求均先失败；随后将VPhoneAPIClient的RPC期限显式分离为可选rpcTimeout，未指定时仍使用原timeout，健康探测维持原期限，宿主配置5秒探测/75秒RPC。参数仍受0至130秒有限正数约束，HTTP及WebSocket同时接入，取消仍及时结束等待。新增5项回归及APIKit全部测试通过：XCTest37项、Swift Testing41项，共78项，退出0；CLI/VM产品编译通过。命令swift test --filter VPhoneAPIKitTests，运行前清除固件验收环境选择器；red日志的两个期限失败保持。该修复仅在源码和本地夹具验证，未安装/部署/签名运行新候选，未新增VM启动或辅助窗口，不能提升真实显示验收。
+
+
+2026-10-24 T32/T33：受信Store生产者租约及同journal来源/Receipt/恢复、签名产物复用与普通安装来源失效处理已实现；实际隔离on→Undo→on完整字节通过。Python全量1084项（4跳过）及相关Swift通过。签名候选2.6.2-local.4f9d10893183已封装，未安装。新regular/EXP离线计划d5cc7bf5…冻结287项输入，10项完整启动备份/两IPSW/原始ROM通过；初始要求75GiB，观测44.25GiB，尚待容量和具名批准。未新增VM启动/窗口，旧失败保持，真实来源/EXP Preboot/显示/AA.gl仍未验收，accepted=false。详见T32_T33_completion_20261023.md及producer-implementation-20261024/manifest.json。
+
+
+## 2026-10-24 T32/T33 来源身份续验
+
+计划b98e0a56…已获批准并在执行，候选2.6.2-local.a84f5889b159已安装。regular新首次应用20261024T044848Z-v8ovSVP3独立审计通过：4681/4681目标匹配、5项代码页记录通过，来源收据与host/guest绑定均对应该候选。已进入三项Mach-O撤销，完整原件恢复和精确重应用尚未通过；EXP两plist尚未执行。VMStarts=0、securityWindows=0、accepted=false，旧失败保持。详见TASKS.md与origin-identity-acceptance-20261024-r2/execution/regular/on.json。
+
+
+2026-10-24 15:43 regular/off事务20261024T064924Z-hG5gtVTI已发布；CLI完成并报告Guest来源unknown，撤销前完整磁盘保留。原root11603正在独立只读审计及完整原件复核，尚无off.json，不能计撤销通过；精确重应用与EXP仍待执行。本轮VMStarts=0/securityWindows=0。
+
+
+2026-10-24 16:06 regular/off通过：事务20261024T064924Z-hG5gtVTI的4681项目标全部匹配，执行器在保存off.json前完成三Mach-O完整原件、mode/uid/gid和代码页复核；保存的三项目标状态与已密封原件索引另行比较一致。Guest来源unknown且guestEnvironment已清除，host Bundle仍a84f5889b159，runtimeValidated=false。原root11603已进入reapplied，完整字节与首次on精确相同尚待验收；EXP未创建。旧失败保持，本轮无VM启动/辅助窗口，accepted=false。
+
+
+2026-10-24 17:18 regular重应用：Cryptex内容已复制、源SystemOS/AppOS镜像正常卸载，SwapEnd补丁完成，进入CFW第2/7 seputil阶段。原root11603持续执行，暂存.kbuBz8Io；尚无reapplied.json/transition.json，EXP未创建，accepted=false。17:15可用71.33GiB；正常CFW末尾会按正式流程清理本轮.cfw_temp，未额外删除任何目录。后续运行入口已修复隔离importlib路径，最终10项夹具回归通过，571/94项离线输入保持。
+
+
+2026-10-24 19:10 三Mach-O宿主暂存签名产物完整SHA-256及mode/uid/gid与首次a84 on均相同；证据signing-scratch-observation-20261024T1910.json。正式CFW进入第7/7 LaunchDaemons，尚未发布或完成独立安装目标审计，不能计on/off/on通过。后续摘要日志封装针对files.read嵌套content与ui.describe截图先6项失败后通过，联合入口/传输共16项回归通过、1.645秒；封装未接入真实入口/计划，全部为夹具。源码和原始日志见hash-only-response-preparation-20261024/manifest.json。原root11603持续执行，收尾session9928/PID82942，监控session68867；EXP未创建，本轮无VM启动/辅助窗口，accepted=false。
+
+
+2026-10-24 20:22 regular重应用七个CFW安装阶段均已执行，LaunchDaemons安装步骤完成，进入临时文件清理。尚无reapplied.json/transition.json，最终读回、host正常卸载、发布和独立审计均不能计完成。三份宿主暂存签名产物已在19:10确认与首次a84 on完整SHA-256及mode/uid/gid相同。原root11603持续执行；只读收尾82942/session9928、监控session68867保持，EXP未创建、VMStarts=0/securityWindows=0、accepted=false。应用消费与摘要日志准备见T32_T33_application_acceptance_preparation_20261024.md，16项夹具回归通过；没有创建或执行新运行计划。
+
+2026-10-24T20:30:55.732257+08:00 计划b98e0a56仍由原root11603执行。regular重应用已进入快照处理后的最终效果核验，第一轮效果读回及正常卸载有日志，发布/独立审计尚未完成。后续入口现接入摘要日志（17项夹具回归），页面/完整文件证据校验另9项纯夹具通过；均未执行真实运行。571/94项冻结输入保持，无VM启动或辅助窗口，accepted=false。
+
+2026-10-24T20:57:58.182321+08:00 regular重应用事务20261024T081630Z-kbuBz8Io已发布，当前盘inode250582318，旧盘保留于该事务/Disk.img；host/guest绑定均为a84f5889b159。来源12份原始JSON/JSONL记录已复制归档，checkpoint密封的10份摘要匹配，attestation保持root/0444/单链接；密封final-effects中的三目标完整state与首次a84 on相同。此观察仅核对密封记录，不构成新的磁盘/blob读回，正式reapplied.json/transition.json和独立安装目标审计仍待完成；EXP未创建，accepted=false。证据regular-reapplied-provenance-20261024/manifest.json。
+
+2026-10-24T21:04:15.565267+08:00 regular三Mach-O完整on/off/on通过：事务044848Z-v8ovSVP3、064924Z-hG5gtVTI、081630Z-kbuBz8Io均独立审计4681/4681匹配，同一generation55d399…。transition.json明确complete file bytes and mode/uid/gid，重应用与首次a84 on三份完整文件state精确相同，撤销完整原件复核通过；重应用originQualified=true，runtimeValidated=false。原root11603开始EXP新副本创建，尚未通过EXP验收或本轮最终保留检查。整项accepted=false，VMStarts=0/securityWindows=0。证据regular-strict-transition-20261024/manifest.json（原阶段报告完整摘要引用；不新增磁盘读回）。
+
+2026-10-24T21:12:01.850770+08:00 EXP新generation 9084e09ef4fd59891f6279dfccf33b79cf46a5b63ffda790a3563cd6521bfa1a由正式入口生成；原生run_target通过variant和来源归档摘要核对后已进入首次on（on.log已创建）。普通用户额外读取desired-plan被PermissionError拒绝，未改变权限或请求新认证，因此未记录为独立generation manifest核验。输出及限制见exp-generation-preparation-20261024/manifest.json。regular完整on/off/on已通过，EXP安装阶段尚未验收，accepted=false，VMStarts=0/securityWindows=0。
+
+2026-10-24T21:31:06.453902+08:00 本轮原生及只读收尾均已结束。regular三Mach-O严格on/off/on通过；EXP首次on在cryptex_source.attach的baselineTree采集时拒绝，未发布，off/reapplied未执行。收尾源备份10项完整读回、571/94项冻结输入、12个无关磁盘身份及无目标附件通过，原生私有12项写前备份完整复核通过；归档33文件完整摘要复核通过，manifest=0b9a83ea3334aea7300149e8cf5c38c1eba9e748ec5c583c32e513d36694722a。补存中断恢复及暂存观察记录于continuation-outcome-supplement-20261024/manifest.json。
+
+真实缓存只读诊断确认327条硬链接路径/34组，第一项Bookmarks.bundle/_CodeSignature/CodeResources为普通文件nlink38，默认tree通过单链接snapshot reader拒绝；同一真实tree在修复前复现同一报错。修复只允许完整位于观察树内、读取期间稳定的硬链接组，不改变effect/patch目标的单链接限制。9项定向回归通过，真实缓存2931条目新读取与严格只读参考摘要相同，诊断磁盘已正常卸载。完整Python回归正在执行session34922。生产源码修改发生在原生及收尾结束、原571/94核验完成后；旧候选及旧证据保持，不能再以当前源码重跑旧计划。修复候选尚未打包/安装，新EXP执行未批准，不重试CFW，不启动VM/窗口。
+
+2026-10-24T21:47:58.184519+08:00 EXP拒绝修复完成准备：9项定向及完整Python1093项（4跳过，314.103秒）通过，真实只读缓存2931条目与严格只读参考摘要相同、正常卸载；观察到的327条硬链接均不属于DSC写入目标。修复候选2.6.2-local.16f1cc296c84（归档36c919af81ef8b893abe7189fde414f103aa9352435364f78a021bec0efdb8b7）签名/资源核验通过，CLI非签名字节及entitlements保持，VM/客户机资产逐字节保持。两个失败打包目录保留，未删除。
+
+新续验计划 74985b1c614eb7686564992acff1f885a75fbf955019670b1a9bfc16a3ec40e7 已准备，路径.build/t32-t33-completion-20261023/exp-cryptex-links-acceptance-20261024/offline-plan.json；861项计划输入、94项执行输入冻结，7项执行器回归通过。仅现有EXP新候选应用→两plist撤销→精确重应用，复用generation9084e09e；写前完整备份14项（含两个现存缓存），13项准备完整读回，root私有desired预期摘要取自前轮原生原件索引，新原生前置完整读回必需。备份后允许正式清理EXP可重建.cfw_temp，全部旧盘、原件、历史、regular已通过结果及其他VM保留。失败停止，无自动重试/回滚，无VM启动/窗口。该新计划尚未批准、未执行，候选未安装；旧失败计划不得重跑。待用户批准新范围后再启动原生认证和单次执行。报告T32_T33_EXP_cryptex_hardlinks_20261024.md，修复证据33份完整摘要复核通过。
+
+
+2026-10-25 T32/T33：只读Preboot路径检查已结束，Cryptexes/OS/System不存在，正常卸载和磁盘身份保持。补丁入口对暂存Preboot文件错误使用System默认目标的原因已复现并修复；本地EXP脚本补入上游的System/Cryptexes文件。目标表摘要cf03209f…54a8，旧74985b1c计划撤回执行建议，旧候选16f1cc未安装。完整Python1113项（4跳过）、组合30项、Swift计划/绑定30项、新执行器7项及追加撤销资格1项通过。新候选caa8df845ab6、仅针对新EXP副本t33s-20261025的计划b3b98f37…805b已准备，289/94输入核验，源备份10项完整读回、14个保留磁盘身份、实际封装CLI规则及无附件检查通过。新目标未创建、新候选未安装、新范围尚未批准；可用57.04GiB低于75GiB门槛约17.96GiB，不自动清理。regular既有三Mach-O严格循环保持；EXP原生循环、真实Settings/显示、AA.gl及应用消费未完成，accepted=false，VMStarts=0/securityWindows=0。主证据target-binding-20261025/manifest.json（48份，482ed323…001cd），追加资格证据target-binding-undo-eligibility-20261025/manifest.json。详见T32_T33_target_binding_20261025.md。
+
+
+2026-10-25 T32/T33续推：原root4181已于01:31失败停止，launchd签名覆盖非零字节，未发布。真实保存字节复现并确认冻结候选漏接现有签名空间预留；完整受限注入/补丁/实际签名/最终效果链通过。另复现并修复EXP跳过缓存复制，以及libellekit合法LINKEDIT额外虚拟页被误拒绝；保留原覆盖、任意扩张及内容变化拒绝。最终Python1123项（4跳过）、312.478秒、退出0，执行器7项通过。实际剩余资源编译/签名/代码页及bootstrap成员预检通过。候选a480e6e8785e完整封装核验通过，未安装；新计划b2f587be…冻结290/94输入，保留源备份10项完整读回和10个磁盘身份通过。真实尾部只读检查等待本次原生认证，仓库外安装范围确认待回复，容量约73GiB低于75GiB，不删除数据或降低门槛。未启动VM/窗口，regular通过保持，EXP和真实消费仍未通过，accepted=false。详见T32_T33_signing_followup_20261025.md。
+
+2026-10-25补充：本次原生认证及真实尾部只读检查已结束，System两份plist副本恢复/重应用及实际DeviceTree IMG4修改/重复执行通过；Preboot目标缺失。正常卸载、目标无附件、磁盘身份保持，无CFW写入/VM启动/辅助窗口。原39份归档不改写，尾部结果和最终报告另存signing-followup-20261025/supplement/manifest.json。仓库外安装确认及75GiB容量门仍待满足。
+
+2026-10-25只读空间评估完成：8个目录3.18GiB分配量，当前382个唯一冻结文件路径无引用、无Git跟踪文件及打开句柄；5份旧解包目录1395个文件与保留tar完整比较通过。本轮未删除数据；当前可用80691200000字节（75.15GiB）超过75GiB，增加原因未查明。按既有有效批准已请求一次b2f587be…原生离线执行认证，session65041；尚待实际执行状态，禁止重复启动。报告research/project_storage_review_20261025.md。
+
+2026-10-25 b2f587be…已失败收尾：原root71942及收尾75263均退出，launchd签名步骤通过，JB-2新增149个未声明AppleDouble成员被拒绝，未发布、off/reapplied未执行。独立源备份10项完整读回、290/94输入、10个保留磁盘身份及无附件通过，manifest 9214d9c4…9ccc62。已用实际资源快速复现并改为归档流单成员替换；完整本地链又提前捕获base→JB两次不同归档覆盖的最终效果拒绝，调整为base前准备及唯一解包，最终实际资源链472项输出通过。新候选e12747163c76封装核验通过未安装，相关18项通过，最终全量复验进行中。只读复用/旧EXP容量检查等待session49823系统认证，不重跑旧计划、不修改Store/VM或删除。报告T32_T33_dev_overlay_20261025.md。
+
+2026-10-25 复用执行准备：最终全量Python1131项（4跳过）、309.110秒、退出0；修复证据33文件摘要复核通过，manifest f2432b0d…cf6627f。未发布t33t同generation续验执行器草稿新增9项、联合19项隔离回归通过，缺只读结果时准备入口退出1且不生成计划。原只读认证PID14737/session49823仍等待，输出目录为空；不重复开启。当前约53.4GiB低于75GiB，未删除、未安装e127、未重试CFW或启动VM/窗口。后续实际复用证据、独立收尾及输入冻结、容量方案均待完成，accepted=false。
+
+2026-10-25 原session49823用户认证后退出0：完整64GiB t33t Disk摘要与原始来源相同，12项启动/身份文件、同一generation、仅failed历史和正式verify-plan通过。新计划242f80d4…14edd准备未批准，复用t33t并拟退役四项旧EXP状态（分配量108.489GiB，实际回收未知）；源备份10项完整读回、581项计划输入、102项执行输入、8个保留磁盘身份、四项根目录和磁盘元数据通过。续验/退役新增18项、联合28项隔离回归通过，独立收尾工具已准备。审阅前约54.65GiB，75/50GiB门槛保持；候选e127未安装、新CFW/删除/VM启动/辅助窗口均未执行。详见T32_T33_dev_overlay_execution_review_20261025.md，等待具名删除及仓库外安装新批准，accepted=false。
+
+2026-10-25 用户明确批准四项旧EXP退役及新计划242f80d4…14edd，批准原文和双批准标记已保存；581/102项输入复核通过。已请求一次原生执行，session96536、osascript69319等待macOS认证，尚无worker日志；只读独立收尾session96444等待原worker身份。未重复开启认证或执行。
+
+2026-10-25 原worker79703完成获批四项退役：255份小型记录读回、1363条完整清单，源备份10项删除前后完整读回及t33t保留检查通过。可用记录56473042944→90340343808字节（52.59→84.14GiB），增加33867300864字节；75GiB门通过，同一worker进入native-running。尚无新Store安装或CFW阶段结果，未启动VM/辅助窗口，accepted=false。
+
+2026-10-25 e127离线续验已失败收尾：安装/绑定/12项写前备份及三类旧缓存保留通过，首次on于cached SystemOS树读取报effect input changed during read，未发布、off/reapplied未执行。原worker/收尾退出，源备份10项完整读回、581/102输入、8个磁盘身份及无附件通过，manifest8192df5f…13d1c（25文件复核）。实际新缓存克隆两次普通用户重放均为可写tree changed、只读2931项通过；第二次新增.fseventsd及fseventsd-uuid，原缓存完整摘要/身份保持。错误尚不完全同原生，原因未查明；同root诊断请求PID13967/session53763等待认证，不重试CFW或修改校验器。详见T32_T33_cryptex_tree_stability_20261025.md。
+
+2026-10-25 用户要求优先清理旧失败轮次并确保空间。新清理计划96cd7a4f…1d563已准备：13项首批失败/可恢复产物，不足100GiB时才使用旧DSC的3项具名guest状态（其中CFW历史含已通过记录，须明确批准）。591项保护输入、源备份10项及当前EXP完整Disk摘要、8个磁盘身份、旧generation/固件历史元数据通过；9项隔离回归、791份小型记录预归档读回通过。审阅时79.19GiB，未实际删除。root诊断session53763已结束，仍为可写树新增.fseventsd、只读2931通过，未修改生产校验器或重试CFW；多余只读du认证25106已在未执行时取消。详见research/failed_rounds_cleanup_20261025.md。
+
+2026-10-25 获批清理计划96cd7a4f…1d563单次执行退出0。首批13项及旧DSC CFW历史删除，共14项；旧DSC Disk/Restore按容量门跳过保留。执行记录空间79.13→112.87GiB、增加33.74GiB；独立statvfs112.53GiB达到100目标。正式791份小型记录逐成员读回、14项已删/2项保留、8个磁盘身份通过；执行器前后591项保护输入、源备份10项完整读回、当前EXP完整Disk摘要和旧generation/固件历史元数据通过。旧DSC完整CFW Undo/重放链已退役，当前regular/EXP、ROM和备份保留。没有CFW重试/VM启动/辅助窗口，空间清理完成，读取拒绝仍待修复。结果research/evidence/failed-rounds-cleanup-20261025/result.json。
+
+
+2026-10-25 T32/T33续推：补齐可写挂载后backing image完整摘要步骤，在两个新克隆复现确切effect input changed during read，mtime/ctime变化；只读对照通过。EXP的hv_vmm/camera移至只读Cryptex复制和卸载之后的暂存客户机DSC，保留完整性校验。全量Python1135项（4跳过）、新执行门联合14项通过。真实资源hv_vmm/camera/IOMFB及2931个最终目标、14份修改DSC完整签名页通过，源缓存完整摘要/身份保持，正常卸载；计划和generation为夹具。候选9770cba52828封装通过未安装，新计划准备中；旧计划不得重跑。没有新CFW/VM启动/辅助窗口，accepted=false。详见T32_T33_staged_dsc_20261025.md。
+
+2026-10-25 最终准备：候选9770cba52828、新计划98a945b11297ed51b169f5a2ab1b0892d5bc49f5949c4b5304874b5ef9145f2e及一次性后台启动器已冻结872/102项输入，联合16项执行门回归通过。源备份10项及当前EXP完整Disk摘要、两次失败记录和8个保留磁盘身份通过；最终109.86GiB。私有desired本次仅核身份，root前置完整读回必需。未批准、未安装、未执行CFW/启动VM/窗口；待新仓库外Store范围确认。报告T32_T33_staged_dsc_20261025.md。
+
+2026-10-25 用户批准候选9770及计划98a945b1…145f2e一次离线序列；原文及批准标记保存，872/102输入、8个保留盘和无附件复核通过，可用119141642240字节。唯一原生认证session55673已发起，等待worker实际状态；不重复启动、不扩展VM/辅助窗口范围。
+
+2026-10-25 17:59 原生认证已生效，唯一root worker49952已脱离认证进程启动，root-launch与native-root-identity PID一致；处于完整预检，无第二次启动。
+
+2026-10-25 18:05 同一root49952完成12份完整写前备份读回，cfw_input/.cfw_temp两类缓存和两次失败记录保留。候选9770安装/Store核验、绑定和正式verify-plan通过，同一generation保持；首次on待阶段完成，未计发布或验收。VMStarts=0/securityWindows=0，accepted=false。
+
+2026-10-25 首次on暂存Bvlz2q7C完成只读SystemOS/AppOS复制并正常卸载，进入暂存客户机DSC的hv_vmm步骤。约18:14可用93.21GiB，高于50GiB；尚未发布或执行off/reapplied，原Disk未交换。只读收尾PID50902/session20012等待同一root49952。锁定环境PYTHONDONTWRITEBYTECODE=1，Store资源无新增pyc；不改冻结输入。
+
+2026-10-25 root49952首次on继续：基础7阶段、EXP launchd/debugserver/watchdogd修改完成，bootstrap3额外包下载/暂存成功，受限安装子进程活跃；未发布阶段报告。另补consumer运行准备入口，6项隔离测试及实际pending拒绝通过，未创建运行计划/备份/VM/窗口，原102项冻结输入不变。后续必须先通过完整离线及独立收尾，再准备具名运行范围。详见T32_T33_staged_dsc_20261025.md。
+
+2026-10-25 计划98a945b1原生/独立收尾失败结束，最终效果核验拒绝consumed container still has required members，未发布、未off/reapplied。完整源备份10项、写前12项、872/102输入、8盘和无附件通过，manifest49456ade…8088f7；旧计划不得重跑。33481条原始记录静态重放与实际Shell/guard回归定位*(N)遗漏.procursus_strapped且吞错误；EXP改*(DN)并失败停止，目标表/校验器保持。真实bootstrap6528成员、32639记录、19583最终目标及标记漂移拒绝通过，未部署。全量复验session81564；新候选/计划待准备。consumer等待器失败停止，无运行准备/启动/窗口，accepted=false。
+
+2026-10-25 bootstrap修复准备完成：全量1137项（4跳过）、308.834秒、退出0；真实6528成员/19583目标完整链及19项新执行门通过。候选3ffd已封装未安装，新计划821b1d69278b77cb650a7a4b11cccc8bfb5b373928dcae8515e1307b0d8d15bc未批准；1159/102输入冻结，当前Disk完整摘要与源相同、源备份10项、三份failed记录及8盘通过，准备102.82GiB。现有SSH标记内容及UID0原始元数据独立记录，普通用户载体UID501已精确冻结，初次准备差异拒绝记录保留。没有新CFW/VM/窗口。详见T32_T33_bootstrap_execution_review_20261025.md。
+
+2026-10-25 最终审阅复核：1159/102输入及SSH源/存档通过，30文件新准备清单cfa52fa5babf1d937d2622be3604ffbdd8addfa65314eb1ae378d059992b1ff5逐项读回。当前可用103.38GiB，新候选Store、批准、native claim和execution均不存在；待具名新范围批准，不重试已消费98a945b1。
+
+2026-10-25 19:42 用户明确批准3ffd及821b计划，原文/批准标记已保存；1159/102输入、SSH源与存档、8盘及无附件通过，初始可用110337474560字节。原生认证session9855生效，唯一root12587已启动并正在完整预检。独立只读收尾session67411跟踪同一进程，consumer准备等待session44457只在完整离线/独立收尾通过后生成待审阅计划，VM/辅助窗口不自动启动。
+
+2026-10-25 19:49 本次root12587完成12份完整写前备份读回、cfw_input/cfw_jb_input两类缓存保留，3ffd安装/Store核验、绑定和正式plan验证通过；首次on暂存zhZ5OOCf开始。另确认EXP正常首次启动脚本会在done marker缺失时安装包、执行APT update/upgrade及uicache，后续计划现明确列出这些自动行为，当前离线不启动VM。准备等待器原session44457因源码更新按守卫停止，r2/session70506另名继续等待；独立离线收尾session67411不变。
+
+
+## 821b执行结果与暂存生命周期修复
+
+原生root12587及独立收尾session67411已结束。首次on事务20261025T114952Z-zhZ5OOCf完成全部生产步骤，最终核验报transport input differs from preceding observed output，未发布，off/reapplied未执行。源备份10项和写前12项完整读回、SSH完整内容及原始UID0元数据存档、1159/102输入、8盘及无附件通过；manifest5d5a3039a107d3e2fc618b5b8966845d3728643d90b79dbee2f48a67bdddea5a。原Disk未交换；原生original_check仅身份和66段采样通过，不宣称新完整盘读回。consumer r2/session70506因离线失败停止，未生成实际运行备份/计划或启动VM/窗口。原821b计划不得重跑。
+
+33482条原始记录的全部状态衔接扫描只发现一处：index33459对.cfw_temp/launchd.plist的复制输入为missing，基础阶段index753的上次记录仍为file。基础脚本通过cfw_guest_write清理临时目录；私有临时删除不会形成Guest目标效果。EXP后续复用同名文件使两次暂存生命周期混在同一路径中。实际base复制/清理、EXP两次LaunchDaemon注入、真实guard和完整最终transport回归先复现同一错误后通过；EXP使用独立jb_launchd.plist，不改目标表、权限边界或校验器。
+
+针对完整原始记录，诊断副本只改EXP后续6条记录中的临时路径，所有before/after状态保持不变；真实组合谓词和必需效果覆盖通过，24292个模型目标。另按现有保存BLOB验证接口检查119组历史字节/签名链，0失败，原始journal SHA f8f2d9963fef16e250663c956b515e702fd2c63470bd31229568706136d01be3保持。模型不读取最终磁盘或Guest当前元数据，不计部署或运行验收；没有修改原始失败记录或放宽生产校验。证据transport-continuity-scan-20261025.json、transport-chronology-analysis-20261025.json、recorded-effect-chains-20261025.json。
+
+完整Python1139项（4跳过）、325.124秒、退出0。新候选与新具名计划尚待准备，没有新Store安装、CFW、VM启动或辅助窗口。
+
+2026-10-25 EXP新候选f430/计划4376d79c…d14dd7准备完成，未批准、未安装、未执行。完整当前Disk及源10项读回通过，8盘、四份失败记录/两类缓存保持；1460/102输入冻结，初始93.83GiB。26项组合回归通过；1139项Python（4跳过）沿用本次修复后完整结果。运行准备已引用本轮独立收尾manifest，实际运行计划尚未生成。证据归档进行中；须新具名Store/离线批准。
+
+2026-10-25 续验准备证据归档完成：40份文件逐一复制及完整读回，manifest `12d833e09f757485aad9d466f2dfd031f318aec1dc774905437d4f16276d5255`；包含56,008,539字节原始失败journal，摘要保持。候选f430/计划4376d79c…d14dd7尚未批准、未安装或执行。下一步仅等待本轮具名Store及一次离线计划批准；没有VM/辅助窗口批准。
+
+2026-10-25 21:22 用户明确批准f430/4376一次离线计划，原文与批准标记已保存。1460/102输入、SSH存档、8盘、无附件及初始101694894080字节通过；原生认证session24930完成，唯一root74293（21:21:44）启动完整预检。只读收尾与consumer准备等待器跟踪本轮；无重试/回滚/VM启动/辅助窗口，candidateInstalled尚待确认。
+
+2026-10-25 21:29 唯一root74293完成12份完整写前备份读回及cfw_input/cfw_jb_input移入新备份；f430 Store安装/核验通过（安装时间13:28:19Z、VM CDHash f5f400e7e2c9e582059f52080dafe66850444973）。执行到bind/verify-plan，首次on尚待日志确认。独立收尾session20331、consumer等待session63044保持；无VM启动或辅助窗口。
+
+2026-10-25 f430首次on暂存adMN63qO继续：绑定/正式plan通过，源Cryptex只读复制后正常卸载，hv_vmm与camera处理已执行，进入IOMFB。实际最终效果、发布和独立审计尚未通过；off/reapplied未开始。root74293、只读收尾20331、consumer等待63044保持，不重跑或修改冻结输入。
+
+2026-10-25 f430首次on全部生产步骤完成，进入暂存磁盘最终Guest效果核验。原生命令观察确认bootstrap移动包含.procursus_strapped，sshd回写使用独立.cfw_temp/jb_launchd.plist；jb-setup/sshd注入及两份SystemVersion改写均有完成日志。尚无最终效果通过、发布或独立审计报告；off/reapplied未执行。root74293及两等待器保持，冻结输入未修改。
+
+2026-10-25 f430首次on两轮最终效果核验均已越过旧失败点，正常卸载后seal/交换发布及finish完成；事务20261025T132920Z-adMN63qO，当前Disk inode251754611，原Disk保留在该事务/Disk.img。正式CLI日志完成并记录variant exp；尚无on.json，独立完整磁盘/目标审计待完成，不能计完整首次on验收，更不能计on/off/on或运行验收。root74293继续，不启动VM/辅助窗口。
+
+2026-10-25 22:37 首次on独立审计通过：24292/24292完整目标字节及mode/uid/gid一致，14项DSC及7项file来源关联；当前完整盘SHA104c89afb70841172e6eb8bd0991c4d1b7b72fde763731af4c8258b5ba301358，同一generation，来源收据与host/guest绑定均f430。on.log21:28:43至22:23:43，on.json22:36:51；22:37:03进入off。独立审计本身originQualified=false，来源资格由sourceReceipt及componentReceipts明确给出true，来源producer精确匹配候选。整体未完成、runtimeValidated=false。
+
+后续准备入口字段缺陷已独立复现并修正为prepare_t33_consumer_runtime_receipt.py，新增8项回归通过（含实际on报告字段合同＋夹具三阶段finalization，不能计真实离线/运行验收）。要求独立审计originQualified=false，同时严格核对来源收据资格、generation/transaction/完整盘摘要及producer版本/tar/CLI摘要；没有放宽来源门。旧consumer等待器63044及其源码保持冻结，预计完整离线成功后因旧字段拒绝且在创建备份前停止；届时先确认它已停止且无运行产物，再运行新入口一次。新入口未执行prepare，未生成实际运行备份/计划或启动VM。原离线1460/102冻结输入不包含这两个准备源码，执行器和finalizer未改。
+
+2026-10-25 耗时观察：用户询问当前进度与耗时。实测写前备份记录21:28:16，首次on.log21:28:43至22:23:43，on.json22:36:51，off.log22:37:03。安装/两轮核验/发布约55分钟，随后独立读回及来源/Undo检查约13分钟；不能据此估算重应用剩余时间。代码audit_locked在实际目标读回前后均调用committed_guest_evidence；inspect_phase随后另调用committed_guest_evidence、inspect_guest及Undo预览/原件读取。重复调用为代码事实，其各自耗时占比未测出。普通用户sample74293被系统权限拒绝；未为此请求新管理员认证或修改执行器。撤销实际原生子进程12235为prepare-undo，观察CPU约90.5%，当前没有错误或off.json。
+
+2026-10-25 22:53 撤销耗时的静态下界已查明：guest_undo.prepare先调用committed_guest_evidence，再不传已有parent调用preview；preview入口/末尾各调用一次committed_guest_evidence，prepare末尾再调用一次。因此此prepare成功路径至少4次完整已发布盘验证，另有checked_image_digest暂存盘1次。cfw_disk_txn.verify_guest_evidence每次先checked_image_digest，盘64GiB，故仅这些路径至少读取320GiB，尚不计BLOB复制/摘要、签名页和generation来源核验。preview已有_committed参数；prepare未复用parent。这是代码可证的重复读取机制，实际CPU/IO耗时占比未测出。当前root原生进程仍在prepare-undo，活动1460/102输入保持冻结，不热修或重跑。
+
+2026-10-26 恢复核查：主机于2026-10-25 23:20:02重启；root74293和两个等待器均结束，原执行没有result/finalization，不能伪造为正常收尾或重跑4376计划。首次on完整64GiB摘要104c89…1358与原发布相同；24292/24292目标重新只读核对通过。撤销W7aZSh3x仍staged，未密封/未发布，完整盘摘要bdebbae8…92ef，24292/24292目标与保留final效果一致；不构成Undo发布成功。1460/102输入完整摘要及私有desired保持。两盘无挂载。st_dev从16777231变为16777234，inode/size/mtime保持，生产is_same实际返回false；当前卷UUID1986C66F-89E4-4E75-9F4F-1515116F1A52，历史记录没有该稳定卷身份。历史未改写，无CFW重试/恢复/密封/发布/VM启动。归档6项，manifest 8f280065c4a502693c223a13b1baa3684bd26dd2ab5ed8edee718e9f05201316。恢复方案需处理跨重启身份与未完成密封，现有自动recover不授予跨dev继续发布资格。
+
+2026-10-26 用户选择保留结果并修复跨重启续行；隔离身份比较模块7项回归通过，尚未接入生产/授予恢复权限。设计T32_T33_reboot_recovery_20261026.md：root显式恢复记录＋Swift/Python共同限定比较；保留旧W7aZ事务，克隆其已恢复盘建立新恢复事务，仅重建证明/密封/发布，不重复回写。旧102项执行源码及Swift读取器已预归档。待可信记录注册、双语言桥接、新恢复事务、组合回归与候选审阅；无Store修改/磁盘发布/VM启动。
+
+2026-10-26 跨重启恢复实现：Python/Swift限定身份读取接入；恢复新事务从保留Undo副本克隆，schema2应用观察明确无重复回写，密封绑定旧来源与完整源盘摘要。1157项Python（4跳过、301.180秒）通过，52项相关原生/5项Swift验证通过。真实只读4镜像＋双语言发布链回放等待macOS认证PID33141/session30699；实际VM未注册恢复身份或发布。候选release CLI构建已开始，准备复用f430保留guest载荷并重建/签名宿主可执行文件。比对旧provenance411个Swift源，仅本次FirmwareGuestDiskIdentity.swift改变，其余保持；新增恢复模块另计。
+
+
+2026-10-26 02:29 后续恢复准备：候选2.6.2-local.73b536cbb70c已打包、未安装，tar SHA d3afe1d6d12bfc3961041bbb8f6e1ab0122c00697320b48d99217242821acdaf；CLI/VM重建，私有entitlements保持，全部客户机载荷与目标规则保持，12个宿主Mach-O依赖闭包及完整资源签名通过。首次打包仅因Xcode本机rpath被拒绝，失败输出保留；r2按现有可移植规则处理新宿主二进制后通过。
+
+新Swift回归先复现无条件历史dev转换破坏新子记录原生dev比较；改为按当前记录期望设备号比较。完整合成父子发布链及postimage篡改拒绝通过。恢复工作进程组合回归发现直接调用最终读取后缺undo_provenance.seal；按正式入口补齐write_final/seal，实际克隆/最终读取/密封/交换/归档夹具通过，最终读取失败时父盘保持且不发布。旧回写器被断言为不得调用。以上为仓库内隔离验证，APFS/外部Swift计划验证由夹具提供，不能计真实恢复验收。
+
+完整Python1160项、4跳过、300.577秒、退出0；新工作进程/执行门12项、1.988秒、退出0。原只读认证PID33141/session30699仍等待，四盘/双语言实际回放未开始。预检测试二进制独立冻结，不受后续构建覆盖。没有新Store安装、真实身份注册/源移动/磁盘发布/重应用或VM/窗口。新计划尚未生成；审阅T32_T33_reboot_recovery_execution_review_20261026.md。
+
+
+2026-10-26 本轮恢复准备证据归档完成：90项逐文件复制与完整读回，manifest 80cb4c965d7f6fb594566424b834d2cd4c94683cc973acc707099b933feea39c（reboot-recovery-preparation-20261026/manifest.json）。最终工作进程/执行门12项、2.000秒通过；增加有限Disk.img.previous改名路径及保留源改名后的目录同步，真实VM尚无恢复注册、源移动或发布。当前可用141.14GiB。唯一只读认证仍为PID33141/session30699，尚无输出日志；新一次恢复计划须待实际只读回放通过后生成，候选73b536cbb70c未安装、未批准，accepted=false。
+
+
+2026-10-26 07:10 用户完成原只读认证，仍使用osascript33141/session30699，唯一root只读进程69161已开始；未创建第二执行器。四份64GiB镜像完整摘要173.953秒通过，Python/Swift历史回放继续。89项上轮归档来源摘要全部保持。新后续运行准备入口prepare_t33_reboot_consumer_runtime.py及8项隔离回归通过，严格核对f430首次应用与73b重应用来源、恢复事务关联和实际VM SHA/CDHash；仅完整离线收尾通过后才准备运行备份/计划，不启动VM或辅助窗口。
+
+
+2026-10-26 07:20 实际只读预检完成：原session30699退出0，四份64GiB镜像173.953秒完整摘要通过，Python完整发布链及Swift实际历史链（49.690秒）通过；默认未注册读取仍拒绝，没有新注册/密封/发布/VM启动。新运行准备入口8项和联合20项（2.009秒）通过，未执行实际运行准备。
+
+候选73b536cbb70c的新计划2e48952320c7b10206b3ff8e3eecdf891d0c194f984979d8a2f7d44b01c324cb已冻结1878/112输入，当前11份可读启动/绑定输入及源10项完整读取通过，私有desired沿用既有完整摘要＋元数据，原生执行前仍须新root完整读回；8盘、四失败记录、两缓存、SSH源/载体通过，可用141.17GiB。一次普通沙箱准备在diskutil查询卷UUID前停止、未创建计划；原生只读环境准备成功，原日志保留。29项审阅归档完整读回，manifest4d6c40858ad352e4901b2a8fcbff28ba70555a290483d533c3ff087180fd289e。
+
+待新具名批准：安装73b、注册四镜像精确恢复身份、完整保留移动W7、新克隆仅完成撤销证明/密封/发布、独立原件审计后一次EXP精确重应用。不重做regular/首次on/撤销回写，无新退役、自动重试/回滚或VM/窗口。具体审阅T32_T33_reboot_recovery_execution_review_20261026.md；尚无approval/claim/Store/真实注册。
+
+
+2026-10-26 07:35 用户明确批准候选73b及计划2e489523…c324cb，原问题/答复与精确approval.json已保存。1878/112项输入、SSH源/存档、8盘与初始151142400000字节（高于75GiB）复核通过，hdiutil无任何现存镜像挂载。唯一原生认证PID71229/session55762退出0，root71252（0 Mon Oct 26 07:35:33 2026）启动；当前source-preflight已完成，进入complete-backup，未确认Store安装或恢复发布。
+
+独立只读收尾PID71695（UID501、07:39:35）只跟踪同一root；4项观察门夹具通过。原生无result时不伪造收尾、不重启；仅离线全部通过后调用已冻结的新consumer准备器生成待审阅计划，不执行VM/辅助窗口。新watcher与其测试为只读观察代码，未改1878/112项执行输入；现有原生源码保持冻结。整体accepted=false。
+
+
+2026-10-26 07:50 唯一root71252完成12份完整写前备份及两次完整预检，complete-backup实际769.886秒；两类缓存移入保留备份。锁定Python探针通过，73b Store安装及核验通过，installedAt=2026-10-25T23:49:20Z、VM CDHash f5966c5e0d003dc964c1ab898b1ff1aba32aaa58，与批准候选相同。当前register-and-preserve阶段继续完整核对四份镜像和旧W7完整文件；尚未确认注册/源移动或恢复发布。无VM/窗口、无重试/回滚。
+
+
+2026-10-26 08:10 2e489523执行已失败结束，root71252和只读收尾71695均不在进程表；独立收尾完成，manifest 1d6ab2a0ce3d5c90e7a6d664aad9c273cdba18d8fba60ec3d46800d3dc63eac8。73b安装、12份写前备份、四盘root注册和W7全目录保留移动均已完成；恢复工作进程在guest_undo.preview→undo_provenance.build拒绝Undo source no longer matches original observation，尚未创建新transaction.json或Disk克隆。原首次on磁盘未交换，off/reapplied未执行；保留空.cfw_disk.reboot20261026，不删除或重跑。源10项、备份12项、两缓存、四失败历史、SSH存档及旧W7全部5343文件前后完整复核通过，无挂载，无VM/窗口。新consumer未准备。原批准一次范围已消费。
+
+覆盖遗漏：四盘身份和已发布链回放未执行完整Undo预览，测试的设备变化仅覆盖Disk身份，未覆盖generation原件来源观察。候选原因依次为来源device变化、inode变化、manifest/目录摘要变化；普通用户读取两份私有原件元数据被拒绝，尚不把device解释写为已确认结论。112项本次原执行依赖已完整预归档，manifest cb63c6fa4ba006b628d43fbe13b005b323c1212c8a1e64ba40a98ab9dbb768c8。新只读诊断73682/session94579已认证并运行，使用安装的73b代码保存实际字段差异和原错误/内存模型完整预览，绝不注册/克隆/发布或启动VM。
+
+
+2026-10-26 来源观察修复准备：root只读诊断确认两份generation原件唯一资格差异为device16777231→16777234；inode/大小/完整摘要和manifest/目录摘要保持，原错误复现，内存模型完整Undo预览及原索引逐字节重建通过。新增限定两个来源的独立root注册，历史字段不改写；11项定向及全量Python1171项（4跳过、301.298秒）通过。候选729bd605278a打包/签名/12项宿主依赖闭包/精确变更集合通过，CLI非签名代码、VM/guest资产及目标规则保持；未安装。新执行器复用原完整12份备份、增加4份小型主机备份，真实注册读取器完整预览在克隆前执行；23项执行/收尾/consumer/watcher/恢复工作进程组合通过（1.631秒）。实际打包代码只读完整预检仍等待原认证89004/session40433，尚无root日志或结果，不启动第二请求。新计划未冻结/未批准，旧2e不重跑，无VM/窗口。详见T32_T33_source_identity_execution_review_20261026.md。
+
+2026-10-26 来源修复准备证据33项已逐文件复制和完整读回，manifest3718d83a1d3d790597abe39358e6f395fdebfc1025f30e8af81851712b535e75。现有只读认证PID89004/session40433仍待系统认证，未开始root读取，无新失败或新离线计划；不重复启动。
+
+2026-10-26 用户完成既有只读认证89004/session40433；唯一root91034已开始新打包代码完整预检。尚无result/stopped，不重复请求、注册或启动执行；新候选729仍未安装，新计划待实际预检完成。
+
+2026-10-26 实际打包代码只读预检完成：原session40433退出0，四盘完整摘要、父事务发布链、完整Undo预览、历史索引逐字节重建与W7来源核验通过；无真实注册/写事务/发布/VM。新计划3d98012abcd1bd61105d38ce7f042f46eca2ee2d9159d3e26cdc1691a3d88490及729候选已准备未批准/安装，2189/114输入冻结，源10项完整读取及8盘/无附件/无执行产物通过；可用138.85GiB。复用原12份完整备份，新建4份小型主机备份，旧四盘注册和W7保留位置保持，原空失败目录另存；不重复regular/首次on/Undo回写。实际预检和具体计划25项归档完整读回，manifest073ed107190630e3f6e3db310d2aa4d7861908aebe40c3b0bffe0092876db597。待新具名Store/一次剩余离线续行批准，运行另批；旧2e不重跑。
+
+2026-10-26 09:46 用户明确批准729/3d98012a一次离线续行，原问题/答复及精确approval.json已保存。2189/114输入、8盘、目标无附件及初始149094400000字节（高于75GiB）通过；唯一原生认证93131/session13507退出0，root93178于09:46:10启动source-backup。独立只读收尾93204/session50437跟踪同一身份，仅全离线成功后准备待审阅运行计划；无VM/窗口。所有冻结源码保持，旧2e不重跑。

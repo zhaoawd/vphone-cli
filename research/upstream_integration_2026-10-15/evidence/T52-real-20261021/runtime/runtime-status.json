@@ -1,0 +1,153 @@
+{
+  "state": "binding_environment_and_api_runtime_verified_default_gui_shutdown_limit_open",
+  "createSession": 18630,
+  "createProcess": {
+    "pid": 87143,
+    "startedAt": 1792597928.013793
+  },
+  "stages": [
+    {
+      "stage": "prepare",
+      "status": "succeeded",
+      "error": null
+    },
+    {
+      "stage": "patch",
+      "status": "succeeded",
+      "error": null
+    },
+    {
+      "stage": "restore",
+      "status": "succeeded",
+      "error": null
+    },
+    {
+      "stage": "cfw",
+      "status": "succeeded",
+      "error": null
+    },
+    {
+      "stage": "first_boot",
+      "status": "succeeded",
+      "error": null
+    },
+    {
+      "stage": "jb_finalize",
+      "status": "not_applicable",
+      "error": null
+    },
+    {
+      "stage": "verification",
+      "status": "succeeded",
+      "error": null
+    }
+  ],
+  "helper": {
+    "pid": 17044,
+    "cdhash": "2d9b99f3a41e6f7ba7bb3d5558f15524b409b3b5",
+    "startedAt": 1792624107.2520692,
+    "deadline": 1792624707.2520692,
+    "maxSeconds": 600,
+    "maxAttachments": 1,
+    "attempt": 1,
+    "state": "stopped",
+    "observedAt": 1792624108.390761,
+    "targetPID": 15425,
+    "stoppedAt": 1792624459.9653509
+  },
+  "helperDeadlineUnix": 1792624707.2520692,
+  "authorization": "Approved boot-window: same VM CDHash, 1800 seconds absolute, max 3 attachments",
+  "next": [
+    "Known limitation: default GUI launch without API lacks a working guest normal-shutdown path in this experiment",
+    "Application camera/location behavior and physical external volume are outside this completed acceptance scope",
+    "Human review remains required; accepted=false"
+  ],
+  "restoreStarted": true,
+  "createResult": {
+    "exitCode": 0,
+    "finishedAt": 1792599281.70766
+  },
+  "remaining": [
+    "Known limitation: default GUI launch without API lacks a working guest normal-shutdown path in this experiment",
+    "Application camera/location behavior and physical external volume are outside this completed acceptance scope",
+    "Human review remains required; accepted=false"
+  ],
+  "renewal": "No active scoped AMFI allowance",
+  "observedAt": 1792624853.298471,
+  "diagnosis": {
+    "snapshotGuestAPI": "0.8.5",
+    "requiredAndApprovedGuestAPI": "0.8.6",
+    "readOnlySnapshotProbeExit": 1,
+    "readOnlyInstalledProbeExit": 0,
+    "failedTransactionOriginalUnchanged": "dev/inode/size/mtime and sampled:66 hash equal",
+    "bindingPublished": false
+  },
+  "helperStoppedAndIndependentlyConfirmed": true,
+  "targetVMProcessAbsent": true,
+  "protectedVM2607PID": 33355,
+  "snapshotRemovalApprovedAndVerified": true,
+  "creationResources": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/creation-toolchain/Contents/Resources",
+  "signingFix": {
+    "expandedTests": 217,
+    "finalSignatureUnitTests": 14,
+    "realBinaryReplay": "passed",
+    "originalRejection": "signature load command overwrote non-padding bytes",
+    "preservesUUIDAndCode": true,
+    "signingVerifierUnchanged": true
+  },
+  "twoFailedSnapshotsRemovedWithApproval": true,
+  "currentLog": "cfw-profile-fix/create.log",
+  "v2ProfileFix": {
+    "expandedTests": 235,
+    "baseAndV2CompositionRegression": "failed before fix; 9 targeted passed after fix",
+    "transportVerifierUnchanged": true
+  },
+  "newAMFIBootWindow": "stopped_after_max_attachments",
+  "binding": {
+    "bundle": "2.6.2-local.cd529f26a150"
+  },
+  "bindingPublished": true,
+  "environmentReplacementPassed": true,
+  "guiEnvironmentFailure": {
+    "error": "[Errno 2] No such file or directory: 'lsof'",
+    "cause": "Explicit Process.environment=nil clears inherited environment on current macOS",
+    "productionRegression": "failed before fix; 23 related tests passed after fix",
+    "originalDiskNotUpdated": true
+  },
+  "backupVerified": true,
+  "guiRepairCandidate": "/Users/kolar/github/vphone-cli/.build/t52-envfix-launchpad-20261022.app",
+  "guiRepairTests": {
+    "targeted": 23,
+    "fullKit": 258
+  },
+  "guiRepairCandidateApproved": true,
+  "guiRepairCandidatePID": 14198,
+  "environmentUpdateCLI": 15306,
+  "environmentUpdateLauncher": 15298,
+  "offlineAcceptanceChecks": 33,
+  "readbackClassification": "already_current",
+  "previousDiskRetentionVerified": true,
+  "finalUIObserved": true,
+  "UIBlockedBy": null,
+  "postUpdateBootPerformed": true,
+  "newPostUpdateBootWindow": "completed_stopped_before_deadline",
+  "lastHeartbeatCheck": {
+    "observedAt": 1792622465.6161711,
+    "source": "Single continuation heartbeat 2026-10-22 06:38 Asia/Shanghai",
+    "latestConversationChecked": true,
+    "newHumanApprovalReceived": false,
+    "diskStatMatchesPostUpdate": true,
+    "newWindowStarted": false,
+    "automation": {
+      "id": "t52",
+      "status": "PAUSED"
+    },
+    "next": "Wait for existing manual unlock and exact 600-second single-hash approval replies; no repeated environment update"
+  },
+  "postUpdateBootPassed": true,
+  "normalShutdownPassed": true,
+  "normalShutdownMode": "API enabled; started by bound CLI, stopped through actual Launchpad",
+  "defaultGUIGracefulShutdownPassed": false,
+  "runtimeAcceptanceChecks": 24,
+  "guestMappingsVerified": true
+}

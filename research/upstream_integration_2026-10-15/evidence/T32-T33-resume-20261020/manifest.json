@@ -1,0 +1,588 @@
+{
+  "recordedAt": "2026-10-20T19:07:28.837556+00:00",
+  "sourceCommit": "d968d02f5c69615b9f2f3bd45805b60e10540bfc",
+  "vm": "vm-t32-t33-dsc-20261018",
+  "transaction": "20261020T145635Z-QBLOIoqy",
+  "status": "scoped_dsc_preboot_on_off_on_passed",
+  "processes": {
+    "scopedPIDsAbsent": [
+      93069,
+      82196,
+      80317,
+      22832,
+      80729,
+      55934,
+      11968,
+      12127
+    ],
+    "psExitCode": 1,
+    "note": "No selected processes listed after acceptance. No process signalled."
+  },
+  "disk": "Reapplied v4 publication and postboot readers passed; current runtime image differs from the preserved publication image. Runtime effects are not established.",
+  "limitations": [
+    "graphics and runtime patch effects not established",
+    "Mach-O/Preboot Undo and arbitrary intermediate replay incomplete",
+    "trusted guest origin not advanced",
+    "payload images and effect blobs remain in original retained VM journals",
+    "The prior exit141 closed-consumer explanation remains an inference; no original live descriptor trace exists."
+  ],
+  "files": {
+    "api-restored-20261020/boot-1/SystemVersion.plist": {
+      "bytes": 571,
+      "sha256": "2b4802c09fc596b7f24c185846743b43a242d78adbe84b29ccf235fbea7551c3"
+    },
+    "api-restored-20261020/boot-1/boottime.json": {
+      "bytes": 761,
+      "sha256": "a41f825afe0a154a3cabd69d2d73d859a7de23c4255c37b4d8e60da401bb02e9"
+    },
+    "api-restored-20261020/boot-1/capabilities.json": {
+      "bytes": 5843,
+      "sha256": "c27b4bc3505177bd1fd789b4ded1d10591f55ec1220ab91a1ee7937e2840cc0e"
+    },
+    "api-restored-20261020/boot-1/disk-holders.json": {
+      "bytes": 52,
+      "sha256": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130"
+    },
+    "api-restored-20261020/boot-1/requests.jsonl": {
+      "bytes": 38482,
+      "sha256": "34ab3c96c4ebfac5359811886547ad0598bfc316725ea66eb9f82d6311681acf"
+    },
+    "api-restored-20261020/boot-1/runtime.json": {
+      "bytes": 255,
+      "sha256": "d21a4a774ab624060211222fe0a0fa14939c8f27f33099ee9d9c6f901199bed0"
+    },
+    "api-restored-20261020/boot-1/serial.log": {
+      "bytes": 86831,
+      "sha256": "672c7071d09ef86978da0dc142512806db368adaf5e03cf2fe7d63e33b64c988"
+    },
+    "api-restored-20261020/boot-1/stop.json": {
+      "bytes": 213,
+      "sha256": "a8d8c312768af961122f91763bd50933df1090a066ab2d64ee5fc08db6e79749"
+    },
+    "api-restored-20261020/boot-2/SystemVersion.plist": {
+      "bytes": 571,
+      "sha256": "2b4802c09fc596b7f24c185846743b43a242d78adbe84b29ccf235fbea7551c3"
+    },
+    "api-restored-20261020/boot-2/boottime.json": {
+      "bytes": 754,
+      "sha256": "eef77a75fe10a5b8d726e7c722caf13849e939b2fb7a53c151c7835a4a31ae15"
+    },
+    "api-restored-20261020/boot-2/capabilities.json": {
+      "bytes": 5843,
+      "sha256": "0f63c54d9d46b777cacfad9447bf43b680facce13e45f908f30c4d7cf6a9dbb5"
+    },
+    "api-restored-20261020/boot-2/disk-holders.json": {
+      "bytes": 52,
+      "sha256": "76effe7c0675621f33f593a9bcb0b6336fa14885ab7ca01737745fa1535d8130"
+    },
+    "api-restored-20261020/boot-2/requests.jsonl": {
+      "bytes": 27786,
+      "sha256": "459af04ca69f63af52881aa3ba33d1a45f7e467f59aebc0a9722fb023641d061"
+    },
+    "api-restored-20261020/boot-2/runtime.json": {
+      "bytes": 255,
+      "sha256": "97220ef4a04d31ed6184f50ae264399e0c6a0c0bc66ab763c7c2eafd499ba100"
+    },
+    "api-restored-20261020/boot-2/serial.log": {
+      "bytes": 82233,
+      "sha256": "eaaacbc6379ac9f526bbdc2b16c987002c7b75db713483611d0413da29b3ba6c"
+    },
+    "api-restored-20261020/boot-2/stop.json": {
+      "bytes": 213,
+      "sha256": "5a16ffaf5e61ef46169b2de51ad5bab6cd0ef7a0ddb5c490a165216a7eeeb7fb"
+    },
+    "api-restored-20261020/runtime-result.json": {
+      "bytes": 2350,
+      "sha256": "5d102afac862f04b0e3c4d4d01a03b46d705ea99f047a687db2ce367fbef50b3"
+    },
+    "archive-acceptance.py": {
+      "bytes": 5771,
+      "sha256": "7dae78c62b186b460a81e5a4d8d62e18059e6fcd8d2306f274888c9f2f1edb03"
+    },
+    "archive-gate-tests.log": {
+      "bytes": 494,
+      "sha256": "dbd47731ebb35e7d83b37b47e706207d0157459aedcb5f0c4057f492d859d53f"
+    },
+    "boot-argument-probe-after-auth.json": {
+      "bytes": 488,
+      "sha256": "f33a011fed371cca9af53ba68aa980e30d4ebb44ac31b0eaeda634c1711ac79f"
+    },
+    "boot-argument-probe.json": {
+      "bytes": 427,
+      "sha256": "ab51467ab374480a00386727864722ac601c5efb1dc09d5a98283eebe700616d"
+    },
+    "boot-argument-probe.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "boot-readiness-085927140167.json": {
+      "bytes": 507,
+      "sha256": "40442565c31cfd2da09dd190b533e823f2a25630eeaae90eecc7da2042764570"
+    },
+    "boot-readiness-090140703698.json": {
+      "bytes": 672,
+      "sha256": "998f34074ec5926b8abe0744d0366cc75a49bcd89a04e16c58746c48ef187ecb"
+    },
+    "boot-readiness-095258102968.json": {
+      "bytes": 672,
+      "sha256": "92906a79f07af148b9b9cff8893474f4e33d8b08fabd76dff3a1c1ac53cfe695"
+    },
+    "boot-readiness-live.json": {
+      "bytes": 255,
+      "sha256": "8e247ccff42f4759375d8ccfdcd5490aa59dd10815a5a59aa197d3365533d03c"
+    },
+    "check-readiness-during-acceptance.py": {
+      "bytes": 1942,
+      "sha256": "ff1504a32202349e46bb78ed2d00457652076a5af5bad973583dbcae1c8eae95"
+    },
+    "compare-output.py": {
+      "bytes": 2091,
+      "sha256": "0f35c82aa137260f28ebd0e6b165a6540921f34df4fbed87e0f61694b2a21737"
+    },
+    "current-image-check.json": {
+      "bytes": 578,
+      "sha256": "00a6dcb7c36d2a95532fff1f0b15cdf7ae161d6bc583253b14932ca16b9dc16b"
+    },
+    "current-progress-20261020.json": {
+      "bytes": 3694,
+      "sha256": "a085611cea3fc110bd5b65fb5a7fc22b34e06d987b4a5382cf55079f899c4207"
+    },
+    "diagnose-scoped-helper.py": {
+      "bytes": 2322,
+      "sha256": "17f937b61cbc802396d0d46550da4c6a4586b70d623c9ff44ccee61fa807539c"
+    },
+    "exit141-reproduction.json": {
+      "bytes": 2869,
+      "sha256": "9b2f3a777b8533012afa354fec9172f8b0d93ffc6fdbe98dbff79156e2083277"
+    },
+    "failed-transaction.json": {
+      "bytes": 2205,
+      "sha256": "22d74ca633a496ef98f15cc038b76870cb0e717f195a2f00416f3f14d264a706"
+    },
+    "finalization-state.json": {
+      "bytes": 857,
+      "sha256": "271950d909e14a863795a416733649391e759e2a2302c724da0084bec63fb3a7"
+    },
+    "finalization-watcher-pid.json": {
+      "bytes": 119,
+      "sha256": "ea368e32c607053d6ccbb0f9692e6f69f3f657e732a535ac14d3326028be341c"
+    },
+    "guest-changes.jsonl": {
+      "bytes": 1738025,
+      "sha256": "af5796744b5cc140f385e32a8b24e8e0187766437bcf9f58c9c6d869163d69e9"
+    },
+    "handback-result.json": {
+      "bytes": 386,
+      "sha256": "1526d85977b1c8d7534e49ed4d6800a7e725400033e1172df1dabb941ff49d2e"
+    },
+    "host-allowance-before-boots-20261020.json": {
+      "bytes": 561,
+      "sha256": "ac3922741aff980e82e9fd5ef66ea936566b0caaa61548477d05c0f8a15ece49"
+    },
+    "host-allowance-before-boots-20261020.log": {
+      "bytes": 42,
+      "sha256": "281c069c6b14fc73edee12604e34b87c782dfe79cb8028b0450287f2d4092a3b"
+    },
+    "host-allowance-diagnostic-launch.log": {
+      "bytes": 42,
+      "sha256": "b027b27a1109c411469ebb8e6770c699141c7cde4e3e4701f254354e29db681b"
+    },
+    "host-allowance-diagnostic-worker.log": {
+      "bytes": 1439,
+      "sha256": "4f1f0d07adcfc421b01b07fc86622e194ca189660cf4ee59b38927efb5600d3d"
+    },
+    "host-allowance-restore-retry-20261020.log": {
+      "bytes": 79,
+      "sha256": "2fbbca66896cef7ed55a9f618db8e6b7800821ccdd4adaee084ee428d97ae8b2"
+    },
+    "host-allowance-restore.json": {
+      "bytes": 1954,
+      "sha256": "de8f501dafac9366142cc9a363f7778a1cfad9d3f57cde555ef9b1877b9be428"
+    },
+    "host-allowance-restore.log": {
+      "bytes": 79,
+      "sha256": "369b77c4e320e2ee3350a9759d71df43582d99f707787c5497e4cccbb4315cd8"
+    },
+    "host-policy-20261020.log": {
+      "bytes": 667,
+      "sha256": "c94f09a0697295e751992637b9f32b840bf455d805c78a30c0d8464d6d8536f3"
+    },
+    "input-manifest.json": {
+      "bytes": 546,
+      "sha256": "e06b151b60f4174dc01aab58f5b8b651be8536e0f385335110f9addb1366be00"
+    },
+    "installed-20261020/guest-effects-final.json": {
+      "bytes": 1447535,
+      "sha256": "a80a359f35d128a2911ee08b3d3b2952db795b9348157a9d6aff6fcd7ed929cc"
+    },
+    "installed-20261020/guest-publication.json": {
+      "bytes": 28455,
+      "sha256": "e2c573779ac0a1a44f80a2cd5a1999fe2f753eb592caf5dec0bcf246a0311207"
+    },
+    "installed-20261020/guest-undo-provenance.json": {
+      "bytes": 1274,
+      "sha256": "1715c5bd4834a1a302433e557c94b2a9b29a7b2cce4eacac1110f82c4895dc47"
+    },
+    "installed-20261020/preview.json": {
+      "bytes": 1567,
+      "sha256": "b7604a31d9b46042e8d7f3b0c9922329ed7bf3ff2771bb709351ff37086658a6"
+    },
+    "installed-20261020/result.json": {
+      "bytes": 1195,
+      "sha256": "3fb591226680e596e8c2a9c772205844c402b2eb544f53ddfc538b02fda9e578"
+    },
+    "installed-20261020/source-diagnostic.json": {
+      "bytes": 725,
+      "sha256": "ce87d3a5ed535d3af033940418eaec9c2ff7f65e217657dde95a09bbee5ae460"
+    },
+    "installed-20261020/transaction.json": {
+      "bytes": 2641,
+      "sha256": "fe771863bcf310f8d6f8a9c1a5b8d94d874c612d994203e20d224574e89eb306"
+    },
+    "launch-after-handback.py": {
+      "bytes": 1618,
+      "sha256": "97e88eab6fd5c0d234ad5546d40a2e4d8e66a99aa3e39241f00359071c0953f7"
+    },
+    "observations.jsonl": {
+      "bytes": 21331,
+      "sha256": "fe7fe69f7acec8eacda32c9fe82fc1784385bc31865d8e1602fbf3c914993565"
+    },
+    "observe-acceptance.py": {
+      "bytes": 1561,
+      "sha256": "9fc0ecacaad5efdb8d8062d65fb06ff8bb54efb6627476cb5998215864fa3d3e"
+    },
+    "operation-summary.json": {
+      "bytes": 7526,
+      "sha256": "7ccabf856c4293be12f0be28d1a7f2afcd6f94f08da808a3eac3d2754d396c3c"
+    },
+    "output-control-result.json": {
+      "bytes": 768,
+      "sha256": "08bfd2e37fa70ea7cb5219116fa89da71e8b7da00c87cb903299d3094f84fac8"
+    },
+    "plan-verification-cost-20261020.json": {
+      "bytes": 1500,
+      "sha256": "9522343523bc6ef3431edf2616d08959788ade0ba1bd960e4f8732e0d3234275"
+    },
+    "postboot-restored-20261020/api-boot-evidence.json": {
+      "bytes": 2350,
+      "sha256": "5d102afac862f04b0e3c4d4d01a03b46d705ea99f047a687db2ce367fbef50b3"
+    },
+    "postboot-restored-20261020/guest-effects-final.json": {
+      "bytes": 1447045,
+      "sha256": "d230d584d667d8a5d20eb503b05e317ebc39667003ada2df754f018c5fef3587"
+    },
+    "postboot-restored-20261020/guest-publication.json": {
+      "bytes": 28740,
+      "sha256": "e061bae1e11cad0c66fd9784c226e76261efddd58a279a4d394594a19c171c7c"
+    },
+    "postboot-restored-20261020/receipts.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "postboot-restored-20261020/receipts.stdout": {
+      "bytes": 3030066,
+      "sha256": "8b8c9ce7dd227190261dc9590a7cc80509ddfa220baabc01c4ad1aa6793d6480"
+    },
+    "postboot-restored-20261020/result.json": {
+      "bytes": 1444,
+      "sha256": "ff042f389b5ed3e3ec7608ad835e3f82cdf5262805b80d782100d4f3ab91f1ed"
+    },
+    "postboot-restored-20261020/transaction.json": {
+      "bytes": 3085,
+      "sha256": "2834f2c72c1c0e9cc904b2eb10899e1417aaea2ae573259ae38e4b4e0d07de01"
+    },
+    "postboot-restored-20261020/verify-plan.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "postboot-restored-20261020/verify-plan.stdout": {
+      "bytes": 64401,
+      "sha256": "b1815528c17fb84d44406e79ecb0b9062efd4645511b95b666323acc99846a41"
+    },
+    "probe-boot-readiness.py": {
+      "bytes": 1103,
+      "sha256": "cf6b3f999d7c9c985ce5c951497d144543a4f6ffaf1bdde442595fcaaa15d5c3"
+    },
+    "progress-20261020-1934.json": {
+      "bytes": 3223,
+      "sha256": "07ad6702d978a3e10dbd01362b924ddfc7013c2f2f1efc0e36dea47d13487ecf"
+    },
+    "read-failed-transaction.py": {
+      "bytes": 535,
+      "sha256": "635090422bb8bc2c5bbde1a54a9f12e0bd60acdf8d46fe15952877d90d4e5829"
+    },
+    "read-operation-summary.py": {
+      "bytes": 510,
+      "sha256": "3c36cefcc520833370ef26b62f236b4457022beff95e86c83483493af2bff84c"
+    },
+    "readiness-observer-pid.json": {
+      "bytes": 93,
+      "sha256": "066302e37528ec727abac0b2111ce23ff7fc5cd94b9822870c211804146972ac"
+    },
+    "reproduce-exit141.py": {
+      "bytes": 1418,
+      "sha256": "c33d1699ed373b7ead5617db496a7be114dcec122d5bd42da10a7cf36e063b74"
+    },
+    "restored-20261020/guest-component-receipts.json": {
+      "bytes": 1446967,
+      "sha256": "efff77d1ee1c710c290e573321bcbeb08393c37110b5e183bb398e3ede980149"
+    },
+    "restored-20261020/guest-effects-final.json": {
+      "bytes": 1447045,
+      "sha256": "d230d584d667d8a5d20eb503b05e317ebc39667003ada2df754f018c5fef3587"
+    },
+    "restored-20261020/guest-publication.json": {
+      "bytes": 28740,
+      "sha256": "e061bae1e11cad0c66fd9784c226e76261efddd58a279a4d394594a19c171c7c"
+    },
+    "restored-20261020/guest-undo-applied.json": {
+      "bytes": 324,
+      "sha256": "5cbe2cff45f5504615d9d651de7dac3e64bbe44ed835a22fb90ecf2a0342b213"
+    },
+    "restored-20261020/guest-undo-provenance.json": {
+      "bytes": 355,
+      "sha256": "3344d8d14dfb66ee6c1384991be8fa594b81237edb808dc271799dc15024e930"
+    },
+    "restored-20261020/guest-undo-request.json": {
+      "bytes": 1690,
+      "sha256": "3826410633da5020017220215d990c7078784c250d791e5740d02b961d0684d9"
+    },
+    "restored-20261020/installed-proof.json": {
+      "bytes": 1195,
+      "sha256": "3fb591226680e596e8c2a9c772205844c402b2eb544f53ddfc538b02fda9e578"
+    },
+    "restored-20261020/result.json": {
+      "bytes": 998,
+      "sha256": "472ea1d24840411802c22672e7b2a68674836b49491d178e503ce19596890272"
+    },
+    "restored-20261020/source-diagnostic.json": {
+      "bytes": 725,
+      "sha256": "ce87d3a5ed535d3af033940418eaec9c2ff7f65e217657dde95a09bbee5ae460"
+    },
+    "restored-20261020/transaction.json": {
+      "bytes": 3085,
+      "sha256": "2834f2c72c1c0e9cc904b2eb10899e1417aaea2ae573259ae38e4b4e0d07de01"
+    },
+    "resume-observation.json": {
+      "bytes": 632,
+      "sha256": "771f5723542d37b2c2bcb53624e6e680f2d3f004c1872f55eb8e45716099303e"
+    },
+    "return-failed-artifacts.py": {
+      "bytes": 1730,
+      "sha256": "a6cca4dcc7f0eaee15ef164386ba39e5b959e6164ad0c9d365a936cbc25e8e43"
+    },
+    "run-acceptance.py": {
+      "bytes": 6399,
+      "sha256": "c6647bf5b29a3e40d873f7a1bc7d6c6ab525aeec471681f53ab93aafe95006f3"
+    },
+    "test-archive-gate.py": {
+      "bytes": 3158,
+      "sha256": "efe3a41c90d69f41e97729c7dd2c6ae914e46971d5d099531213ed1ad6ffc32d"
+    },
+    "transaction.json": {
+      "bytes": 1636,
+      "sha256": "5daa3679d49e6339f8195568b28adeb4d5999559a602e729104d47ace7883dac"
+    },
+    "undo-first-final-observation.json": {
+      "bytes": 1034,
+      "sha256": "8b11ad8bfaa495d0e4682490b969669f6af01e0ddb2d2ec96ed0c536d86c08f7"
+    },
+    "undo-published-20261020/guest-changes.jsonl": {
+      "bytes": 2476894,
+      "sha256": "55524e1455302681608091bb1dd5f7e0fae13adbfc9cc2337338f3fb5ab36152"
+    },
+    "undo-published-20261020/guest-component-receipts.json": {
+      "bytes": 1446967,
+      "sha256": "efff77d1ee1c710c290e573321bcbeb08393c37110b5e183bb398e3ede980149"
+    },
+    "undo-published-20261020/guest-context.json": {
+      "bytes": 915,
+      "sha256": "090f536c8a43f87c77681cd595d0e3428748ff3ffa249695fcb938ccc36a3c5a"
+    },
+    "undo-published-20261020/guest-effects-final.json": {
+      "bytes": 1447045,
+      "sha256": "d230d584d667d8a5d20eb503b05e317ebc39667003ada2df754f018c5fef3587"
+    },
+    "undo-published-20261020/guest-plan.json": {
+      "bytes": 64276,
+      "sha256": "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c"
+    },
+    "undo-published-20261020/guest-publication.json": {
+      "bytes": 28740,
+      "sha256": "e061bae1e11cad0c66fd9784c226e76261efddd58a279a4d394594a19c171c7c"
+    },
+    "undo-published-20261020/guest-undo-applied.json": {
+      "bytes": 324,
+      "sha256": "5cbe2cff45f5504615d9d651de7dac3e64bbe44ed835a22fb90ecf2a0342b213"
+    },
+    "undo-published-20261020/guest-undo-provenance.json": {
+      "bytes": 355,
+      "sha256": "3344d8d14dfb66ee6c1384991be8fa594b81237edb808dc271799dc15024e930"
+    },
+    "undo-published-20261020/guest-undo-request.json": {
+      "bytes": 1690,
+      "sha256": "3826410633da5020017220215d990c7078784c250d791e5740d02b961d0684d9"
+    },
+    "undo-published-20261020/transaction.json": {
+      "bytes": 3085,
+      "sha256": "2834f2c72c1c0e9cc904b2eb10899e1417aaea2ae573259ae38e4b4e0d07de01"
+    },
+    "undo-published-20261020/undo-preboot.log": {
+      "bytes": 1624,
+      "sha256": "8f9bb32731a6ea6316eec937949a8b98ea1aee16b63fd4ef6c8e3b0fba7dcf48"
+    },
+    "watch-and-archive.py": {
+      "bytes": 2754,
+      "sha256": "4d5b99079f1be4dc1fee675fdcab4f4cb6d7ac9240e4fd08a9119b18abf058a0"
+    },
+    "reapplication-current-observation.json": {
+      "bytes": 3513,
+      "sha256": "09860f8174d3a57fbf2e8f52159fb6d7c2d20412fa2c5512c772c5d703282ae2"
+    },
+    "reapplication-final-checks-observation.json": {
+      "bytes": 2788,
+      "sha256": "7c421ea27d7b1216f33fa57ea683e9a03bb5d71b1cefd0e5d963c8da1c1c3d38"
+    },
+    "final-frozen-input-checks.json": {
+      "bytes": 2076,
+      "sha256": "356a8ff52abb833f525151c69a1de3981247be829cb13b34a9a4296fe1dc2a69"
+    },
+    "final-archive-audit.json": {
+      "bytes": 1538,
+      "sha256": "6c595f4151168878b01f811f9407f8933faef17e547c582be569f60411acf85a"
+    },
+    "on-off-on-result.json": {
+      "bytes": 768,
+      "sha256": "1800fc1c59757c5271ab46cad940802d46ff981a1a8ebe7cd20dfd49c6111040"
+    },
+    "acceptance-completed-state.json": {
+      "bytes": 2394,
+      "sha256": "0797e0ece34439b6f544716918b54c3bc2d2f8230eb49f5315374744b2d04182"
+    },
+    "finalization-completed-state.json": {
+      "bytes": 668,
+      "sha256": "6da7e673bc14d6308b0bc4166abb4232f0c50bc65af267a766430dff29cfeba9"
+    },
+    "readiness-completed-state.json": {
+      "bytes": 269,
+      "sha256": "a17c75cbe7eee77e64deec0bd2404f5d5042d15fd9d481257cb78d55e72df24c"
+    }
+  },
+  "updatedAt": "2026-10-21T01:12:37.594437+00:00",
+  "actualTransaction": {
+    "status": "failed",
+    "exitCode": 141,
+    "lastObservedOperation": "remove GPU archive",
+    "observedRows": 109,
+    "originalCheckUnchanged": true,
+    "stagedRemoved": true
+  },
+  "finding": "Closing the output consumer reproduces the same exit141 and failed journal in an isolated real-driver fixture. Actual consumer disappearance remains an inference; no original live descriptor trace exists.",
+  "outputControlCases": 3,
+  "persistentRunnerPID": 93069,
+  "realRetry": {
+    "runnerPID": 93069,
+    "cliPID": 94446,
+    "rootInstallerPID": 66219,
+    "staged": ".cfw_disk.tjhO0rSZ",
+    "mount": ".cfw_mount.EGyykMAI",
+    "published": true,
+    "lastObservedOperation": "All ten acceptance stages and seven proof groups passed; archive and118 indexed file digests verified.",
+    "installedTransaction": "20261020T070734Z-tjhO0rSZ",
+    "installedProof": "installed-20261020/result.json",
+    "currentState": "passed",
+    "undoTransaction": "20261020T130129Z-EauDALvj",
+    "undoPublished": true,
+    "undoExitCode": 0,
+    "restoredProofPassed": true,
+    "restoredCodePages": 6885,
+    "restoredInstruction": "0x548",
+    "restoredAPICycles": 2,
+    "restoredNormalShutdowns": 2,
+    "restoredPostBoot": "passed",
+    "restoredReceiptExitCode": 0,
+    "restoredPlanExitCode": 0,
+    "reapplication": {
+      "frontendPID": 15708,
+      "rootInstallerPID": 17578,
+      "state": "reapply-cfw",
+      "observation": "reapplication-current-observation.json",
+      "recordedAt": "2026-10-21T00:03:31.001972+00:00",
+      "transactionID": "20261020T145635Z-QBLOIoqy",
+      "published": true,
+      "exitCode": 0,
+      "proofPassed": true,
+      "codePages": 6885,
+      "instruction": "0x560",
+      "APICycles": 2,
+      "normalShutdowns": 2,
+      "postBoot": "passed",
+      "receiptExitCode": 0,
+      "planExitCode": 0
+    },
+    "onOffOnResult": {
+      "state": "passed",
+      "scope": "DSC preboot Undo andsame-generation explicit reapplication",
+      "generationID": "6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42",
+      "transactions": {
+        "installed": "20261020T070734Z-tjhO0rSZ",
+        "restored": "20261020T130129Z-EauDALvj",
+        "reapplied": "20261020T145635Z-QBLOIoqy"
+      },
+      "originalSHA256": "e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5",
+      "installedSHA256": "2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac",
+      "verifiedCodePages": 6885,
+      "restoredAPICycles": 2,
+      "reappliedAPICycles": 2,
+      "restoredPostBoot": "passed",
+      "reappliedPostBoot": "passed",
+      "runtimeEffectsValidated": false,
+      "graphicsValidated": false,
+      "broaderT32T33Accepted": false
+    }
+  },
+  "hostBootReadiness": {
+    "probeExitCode": -9,
+    "programSHA256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+    "cdhash": "89b70a253cad2adea133b3e875519afaf72c5d17",
+    "amfidPID": 44463,
+    "reason": "restricted entitlements rejection confirmed by actual amfid log",
+    "restoration": "same approved CDHash helper80729 attached to amfid55934; bounded parser checks are ready",
+    "persistentConfigurationChanged": false,
+    "probeAfterAuthenticationExitCode": 64,
+    "sudoNoninteractiveAvailable": false,
+    "diagnosticRequestPID": 62237,
+    "diagnosticHelperPID": 62985,
+    "diagnosticState": "attached_and_parser_passed",
+    "priorAttachFailureCause": "unknown; exact by-name retry succeeded",
+    "latestProbeExitCode": 64,
+    "readinessObserverPID": 80317,
+    "observerScope": "bounded12h parser-only; stops at acceptance terminal state"
+  },
+  "latestProgress": "final-archive-audit.json",
+  "performanceFinding": "plan-verification-cost-20261020.json",
+  "finalization": {
+    "watcherPID": 82196,
+    "state": "passed",
+    "gateTests": 3,
+    "requiredGuestVersion": "26.0/23A341",
+    "scope": "archive only after seven actual proof groups; no Git or VM writes",
+    "archive": "evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json",
+    "verifiedFiles": 118,
+    "audit": "final-archive-audit.json"
+  },
+  "initialDiagnosis": {
+    "recordedAt": "2026-10-20T06:14:20.226457+00:00",
+    "transaction": "20261020T000756Z-iTDO2qSV",
+    "status": "scoped_handback_passed_real_reinstallation_running",
+    "processes": "prior installer, sequential acceptance and archive processes absent in global process inventory",
+    "disk": "dev/inode/size/mtime and 66 sample digests match pre-install reference",
+    "limitations": [
+      "actual SIGPIPE sender/closed consumer not traced",
+      "real reinstallation, Undo and on-off-on still pending",
+      "no graphics or runtime patch effect acceptance",
+      "no full-image hash recomputed",
+      "no production patch or signed executable modified"
+    ]
+  }
+}

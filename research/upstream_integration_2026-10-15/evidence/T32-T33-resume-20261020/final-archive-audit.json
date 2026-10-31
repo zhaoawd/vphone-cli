@@ -1,0 +1,74 @@
+{
+  "recordedAt": "2026-10-21T01:10:00.940870+00:00",
+  "state": "passed",
+  "archive": "research/upstream_integration_2026-10-15/evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume",
+  "manifestSHA256": "a5b860d28342226ad3ab1fdd4b739a8a7a9f3d18282c9bd8aaf18a71a51ccad3",
+  "verifiedFiles": 118,
+  "verifiedBytes": 26257055,
+  "proofGroups": {
+    "installed": "passed",
+    "restored": "passed",
+    "api-restored": "passed",
+    "postboot-restored": "passed",
+    "reapplied": "passed",
+    "api-reapplied": "passed",
+    "postboot-reapplied": "passed"
+  },
+  "stages": [
+    {
+      "stage": "install-cfw",
+      "exitCode": 0
+    },
+    {
+      "stage": "installed-proof",
+      "exitCode": 0
+    },
+    {
+      "stage": "undo-preboot",
+      "exitCode": 0
+    },
+    {
+      "stage": "restored-proof",
+      "exitCode": 0
+    },
+    {
+      "stage": "restored-api",
+      "exitCode": 0
+    },
+    {
+      "stage": "restored-postboot",
+      "exitCode": 0
+    },
+    {
+      "stage": "reapply-cfw",
+      "exitCode": 0
+    },
+    {
+      "stage": "reapplied-proof",
+      "exitCode": 0
+    },
+    {
+      "stage": "reapplied-api",
+      "exitCode": 0
+    },
+    {
+      "stage": "reapplied-postboot",
+      "exitCode": 0
+    }
+  ],
+  "scopedProcessCheck": {
+    "exitCode": 1,
+    "output": "",
+    "absentPIDs": [
+      93069,
+      82196,
+      80317,
+      22832,
+      80729,
+      55934,
+      11968,
+      12127
+    ],
+    "note": "ps returned no selected processes after acceptance; no process was signalled."
+  }
+}

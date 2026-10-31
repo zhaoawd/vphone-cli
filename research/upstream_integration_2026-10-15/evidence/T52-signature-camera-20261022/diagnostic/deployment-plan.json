@@ -1,0 +1,45 @@
+{
+  "state": "prepared_requires_new_approval",
+  "vm": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-v2",
+  "currentBundle": "2.6.2-local.93805a71796d",
+  "candidate": "2.6.2-local.56be1ce20ded",
+  "archiveSHA256": "59822dd34e15f7c9734fa69e5f4ceca9dcf1efa442c7d64bf5bac549f8ad05f4",
+  "candidateLibrarySHA256": {
+    "libcamfix.dylib": "e4d026ce6942b4d75ff1a123c0360143e8c6b4a9fd3d862523e61e98676a3747",
+    "libvcamcaptured.dylib": "a41d3f8438f9841de0751322bf87eece6b19a2e56e1123952a20aa1860f70c71"
+  },
+  "purpose": "Only make initialization/logging reasons visible when the existing shared-file log is denied; no functional camera or location fix claimed",
+  "preserve": [
+    "all old libraries and disks",
+    "all probe/data containers",
+    "all existing firmware and Undo authority checks",
+    "other VMs and protected copies",
+    "old Core Bundles"
+  ],
+  "changes": [
+    "install new named Core Bundle",
+    "normal stop and rebind only t52-v2",
+    "snapshot/full-SHA bound replacement of only two camera libraries; old disk retained",
+    "standard transaction cleanup of new scratch files",
+    "one new bounded host helper window for the unchanged VM CDHash"
+  ],
+  "window": {
+    "cdhash": "89cb8ee4c9f47b15a1c63bd73c99b53a0d43a541",
+    "maxSeconds": 900,
+    "maxAttachments": 1,
+    "persistentAllowlist": false,
+    "separateProcessSupervisor": true,
+    "stopOnVMReady": true,
+    "reserveEscalationSeconds": 7
+  },
+  "nativeHelpExit": -9,
+  "installed": false,
+  "vmStopped": false,
+  "consumerAccepted": false,
+  "scriptSHA256": {
+    "install-camera-diagnostic.zsh": "8377d9b5b0a5d0e4f2fbc8015280b1575c1f5ccec9aaab3ea41b49190dca3357",
+    "diagnostic-maintenance.py": "71eaa7a4151cc49ed7908e85b48a8df8d5b7135b282403f5ef04a9dbbd3ce250",
+    "boot-window/scoped-amfidont.py": "4569e126042d1ef24ab5717b1b4448d06614aeb7756d5ab08e6c8ae0e41d498a",
+    "t52_helper_supervisor.py": "0c1d94c15b23467dd9c99e1a44585d9d9d8116024567d60e28bac5da4aa7ab20"
+  }
+}

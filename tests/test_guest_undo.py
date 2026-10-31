@@ -49,7 +49,8 @@ class GuestUndoTests(unittest.TestCase):
             f.plan = f.f.load()
         f.produce()
         if second:
-            def change():
+            def change(*, guest_environment):
+                self.assertEqual(guest_environment, f.f.context['guestEnvironment'])
                 data = bytearray(f.dsc.read_bytes())
                 data[512:519] = b'second!'
                 data[4168:4200] = hashlib.sha256(data[:4096]).digest()
@@ -128,7 +129,7 @@ class GuestUndoTests(unittest.TestCase):
 
     def test_old_schema_and_non_dsc_declaration_do_not_gain_undo(self):
         self.commit()
-        with self.assertRaisesRegex(txn.Refused, 'no qualified DSC Undo'):
+        with self.assertRaisesRegex(txn.Refused, 'no qualified Undo'):
             self.preview(['system-cryptex-boot-install'])
         record = txn.load_record(self.archive)
         record['version'] = 2

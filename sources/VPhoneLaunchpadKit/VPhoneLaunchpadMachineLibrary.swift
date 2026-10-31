@@ -141,8 +141,7 @@ public final class VPhoneLaunchpadMachineLibrary {
         return nil
     }
 
-    /// True while `vm export` runs for `machine`. The CLI prints no progress
-    /// lines to a pipe, so progress is shown as indeterminate.
+    /// True while `vm export` runs. Older CLIs retain indeterminate progress.
     public func isExporting(_ machine: Path) -> Bool {
         exports[machine]?.isRunning == true
     }
@@ -258,7 +257,7 @@ public final class VPhoneLaunchpadMachineLibrary {
             isLaunched: launched[machine]?.isRunning == true,
             isHeld: runStates[machine] != .stopped,
             isBusy: activities[machine] != nil || exports[machine] != nil || creations[machine]?.isRunning == true,
-            isLibraryBusy: globalActivity != nil || listError != nil
+            isLibraryBusy: !imports.isEmpty || globalActivity != nil || listError != nil
         ).mayOpen
     }
 
@@ -411,9 +410,9 @@ public final class VPhoneLaunchpadMachineLibrary {
         }
     }
 
-    public func clone(_ machine: Path, as newName: String) async {
+    public func clone(_ machine: Path, as newName: String, newIdentity: Bool = false) async {
         let cloned = await perform(String(localized: "Cloning…"), on: machine,
-                                   VPhoneLaunchpadEditCommand.clone(machine, as: newName),
+                                   VPhoneLaunchpadEditCommand.clone(machine, as: newName, newIdentity: newIdentity),
                                    failure: String(localized: "Unable to Clone \(machine.name)"))
         if cloned {
             selection = [Path(libraryRoot: machine.libraryRoot, name: newName)]
@@ -430,11 +429,140 @@ public final class VPhoneLaunchpadMachineLibrary {
         }
     }
 
+    /// Rebind through the embedded CLI, which owns verification, backup and
+    /// the stopped VM lock. Environment replacement uses the new binding.
+    @discardableResult
+    public func setBundle(
+        _ machine: Path, version: String, backup: URL? = nil,
+        updateEnvironment: Bool = false,
+        workParent: URL? = nil,
+        expectedBindingSHA256: String? = nil,
+        willUpdate: (@MainActor () -> Void)? = nil
+    ) async -> VPhoneLaunchpadBundleChange? {
+        guard let commandLine, commandLine.acceptsNewCommands, canEdit(machine),
+              let bindingArguments = VPhoneLaunchpadBundleChange.bindingArguments(machine, version: version, backup: backup, expectedSHA256: expectedBindingSHA256),
+              let environmentArguments = VPhoneLaunchpadBundleChange.environmentArguments(machine, workParent: workParent) else { return nil }
+        activities[machine] = String(localized: "Changing Core Bundle…")
+        defer { activities[machine] = nil }
+        var didBind = false
+        do {
+            let result = try await VPhoneLaunchpadBundleChange.perform(
+                updatesEnvironment: updateEnvironment,
+                diskHolders: {
+                    let manifest = try VPhoneVirtualMachineManifest.load(from: machine.configURL)
+                    let disk = machine.url.appendingPathComponent(manifest.diskImage)
+                    return try await Task.detached { try VPhoneLaunchpadDiskHolders.read(disk) }.value
+                },
+                bind: {
+                    let bound = try await commandLine.run(bindingArguments)
+                    guard bound.succeeded else { throw VPhoneLaunchpadError("Core Bundle change refused", detail: bound.tail) }
+                    didBind = true
+                },
+                updateEnvironment: {
+                    guard let selected = try VPhoneMachineBinding.snapshot(machine.url), selected.binding.bundle == version else {
+                        throw VPhoneLaunchpadError("VM binding changed after publication; inspect it before retrying")
+                    }
+                    let updated = try await commandLine.run(
+                        environmentArguments,
+                        machine: machine.url, onStart: willUpdate, expectedBindingSHA256: selected.sha256)
+                    if !updated.succeeded {
+                        actionError = VPhoneLaunchpadError("Unable to Update Guest Environment", detail:
+                            "\(machine.name): host binding was saved as \(version), but its guest environment update did not complete.\n" + updated.tail)
+                    }
+                    return updated.succeeded
+                })
+            if case let .refused(holders) = result {
+                actionError = VPhoneLaunchpadError("Core Bundle Change Refused", detail:
+                    VPhoneProcessHolder.diskRefusal(holders, rerun: "change the Core Bundle again"))
+            }
+            await refresh()
+            return result
+        } catch {
+            let prefix = didBind ? "\(machine.name): host binding was saved as \(version), but its guest environment update did not complete.\n" : ""
+            let cause = (error as? VPhoneLaunchpadError)?.detail ?? error.localizedDescription
+            actionError = VPhoneLaunchpadError("Unable to Change Core Bundle", detail: prefix + cause)
+            await refresh()
+            return didBind ? .boundButNotUpdated : nil
+        }
+    }
+
+    // MARK: - Import
+
+    public struct Import: Identifiable, Sendable {
+        public enum State: Sendable {
+            case waiting, running, cancelling
+        }
+
+        public let id = UUID()
+        public let archive: URL
+        public fileprivate(set) var progress: VPhoneTransferProgress?
+        public fileprivate(set) var state = State.waiting
+        fileprivate let selectionID: UUID
+    }
+
+    private let importQueue = VPhoneLaunchpadTransferQueue()
+    private var importTasks: [UUID: Task<Bool, Never>] = [:]
+    public private(set) var imports: [Import] = []
+
     /// Imports an archive into the default library under its own name.
     public func importArchive(_ archive: URL) async {
-        await perform(String(localized: "Importing \(archive.lastPathComponent)…"), on: nil,
-                      VPhoneLaunchpadEditCommand.importArchive(archive, into: libraryRoot),
-                      failure: String(localized: "Unable to Import \(archive.lastPathComponent)"))
+        await importArchives([archive])
+    }
+
+    /// Each selection runs in arrival order. Failure or caller cancellation
+    /// stops its selection; cancelling one row skips only that item.
+    public func importArchives(_ archives: [URL]) async {
+        guard !archives.isEmpty, !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
+        let id = UUID()
+        let items = archives.map { Import(archive: $0, selectionID: id) }
+        imports += items
+        defer { imports.removeAll { $0.selectionID == id } }
+        await withTaskCancellationHandler {
+            await runImports(items, selectionID: id)
+        } onCancel: {
+            Task { @MainActor [weak self] in
+                for item in items { self?.cancelImport(item.id) }
+            }
+        }
+    }
+
+    private func runImports(_ items: [Import], selectionID: UUID) async {
+        guard let id = await importQueue.acquire(selectionID) else { return }
+        defer { importQueue.release(id) }
+        for item in items {
+            guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
+            guard let index = imports.firstIndex(where: { $0.id == item.id }) else { continue }
+            imports[index].state = .running
+            let task = Task {
+                guard !Task.isCancelled else { return false }
+                return await perform(String(localized: "Importing \(item.archive.lastPathComponent)…"), on: nil,
+                                     VPhoneLaunchpadEditCommand.importArchive(item.archive, into: libraryRoot),
+                                     failure: String(localized: "Unable to Import \(item.archive.lastPathComponent)"), onProgress: { [weak self] progress in
+                                         guard let self, let index = self.imports.firstIndex(where: { $0.id == item.id }) else { return }
+                                         self.imports[index].progress = progress
+                                     })
+            }
+            importTasks[item.id] = task
+            let succeeded = await task.value
+            importTasks[item.id] = nil
+            imports.removeAll { $0.id == item.id }
+            // A per-item cancel skips that item; a caller cancellation or
+            // failure still stops the rest of its selection.
+            guard succeeded || task.isCancelled else { return }
+        }
+    }
+
+    public func cancelImport(_ id: UUID) {
+        guard let index = imports.firstIndex(where: { $0.id == id }) else { return }
+        if let task = importTasks[id] {
+            imports[index].state = .cancelling
+            task.cancel()
+        } else {
+            let selectionID = imports.remove(at: index).selectionID
+            if !imports.contains(where: { $0.selectionID == selectionID }) {
+                importQueue.cancelWaiting(selectionID)
+            }
+        }
     }
 
     // MARK: - Export
@@ -442,6 +570,8 @@ public final class VPhoneLaunchpadMachineLibrary {
     /// An export queued or under way. `task` is nil while it waits its turn.
     public struct Export {
         public let destination: URL
+        public fileprivate(set) var progress: VPhoneTransferProgress?
+        fileprivate let selectionID: UUID
         public fileprivate(set) var startedAt: Date?
         fileprivate var task: Task<Void, Never>?
 
@@ -455,6 +585,7 @@ public final class VPhoneLaunchpadMachineLibrary {
     }
 
     public private(set) var exports: [Path: Export] = [:]
+    private let exportQueue = VPhoneLaunchpadTransferQueue()
 
     /// Exports each machine to its destination file, one at a time: each
     /// export reads a whole disk image. Existing destinations are refused,
@@ -463,6 +594,8 @@ public final class VPhoneLaunchpadMachineLibrary {
     public func export(
         _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing _: Bool
     ) async {
+        guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
+        let selectionID = UUID()
         var queued: [(machine: Path, destination: URL)] = []
         for item in items where exports[item.machine] == nil {
             if VPhoneLaunchpadExportOutput.exists(item.destination) {
@@ -471,21 +604,34 @@ public final class VPhoneLaunchpadMachineLibrary {
                     detail: String(localized: "\(item.destination.path) already exists."))
                 continue
             }
-            exports[item.machine] = Export(destination: item.destination)
+            exports[item.machine] = Export(destination: item.destination, selectionID: selectionID)
             queued.append(item)
         }
-        for item in queued {
-            // Cancelled while it waited.
-            guard exports[item.machine] != nil else {
-                continue
+        guard !queued.isEmpty else { return }
+        let selection = queued
+        defer { exports = exports.filter { $0.value.selectionID != selectionID } }
+        await withTaskCancellationHandler {
+            guard let token = await exportQueue.acquire(selectionID) else { return }
+            defer { exportQueue.release(token) }
+            for item in selection {
+                guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
+                // Per-item cancellation skips this item while keeping its selection.
+                guard exports[item.machine]?.selectionID == selectionID else { continue }
+                let task = Task {
+                    guard !Task.isCancelled else { return }
+                    await runExport(item.machine, to: item.destination, densest: densest, includeIPSW: includeIPSW)
+                }
+                exports[item.machine]?.task = task
+                exports[item.machine]?.startedAt = Date()
+                await task.value
+                exports[item.machine] = nil
             }
-            let task = Task {
-                await runExport(item.machine, to: item.destination, densest: densest, includeIPSW: includeIPSW)
+        } onCancel: {
+            Task { @MainActor [weak self] in
+                for item in selection where self?.exports[item.machine]?.selectionID == selectionID {
+                    self?.cancelExport(item.machine)
+                }
             }
-            exports[item.machine]?.task = task
-            exports[item.machine]?.startedAt = Date()
-            await task.value
-            exports[item.machine] = nil
         }
     }
 
@@ -499,13 +645,27 @@ public final class VPhoneLaunchpadMachineLibrary {
             task.cancel()
         } else {
             exports[machine] = nil
+            if !exports.values.contains(where: { $0.selectionID == export.selectionID }) {
+                exportQueue.cancelWaiting(export.selectionID)
+            }
         }
+    }
+
+    public var hasActiveTransfers: Bool { !imports.isEmpty || !exports.isEmpty }
+
+    /// Call after closing the command gate. Waiting items disappear without
+    /// starting children; active tasks retain their rows until output drains.
+    public func cancelTransfers() {
+        for item in imports { cancelImport(item.id) }
+        for machine in Array(exports.keys) { cancelExport(machine) }
     }
 
     private func runExport(_ machine: Path, to destination: URL, densest: Bool, includeIPSW: Bool) async {
         await perform(String(localized: "Exporting…"), on: machine,
                       VPhoneLaunchpadEditCommand.export(machine, to: destination, densest: densest, includeIPSW: includeIPSW),
-                      failure: String(localized: "Unable to Export \(machine.name)"))
+                      failure: String(localized: "Unable to Export \(machine.name)"), onProgress: { [weak self] progress in
+                          self?.exports[machine]?.progress = progress
+                      })
         // The CLI owns its private staging cleanup. A final-path file may be
         // committed output or another writer's file; cancellation proves neither
         // ownership nor incompleteness. Keep legacy CLI leftovers as well.
@@ -523,7 +683,8 @@ public final class VPhoneLaunchpadMachineLibrary {
     /// not reported. False unless the command ran and exited 0.
     @discardableResult
     private func perform(
-        _ activity: String, on machine: Path?, _ command: VPhoneLaunchpadEditCommand?, failure: String
+        _ activity: String, on machine: Path?, _ command: VPhoneLaunchpadEditCommand?, failure: String,
+        onProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil
     ) async -> Bool {
         guard let commandLine else {
             return false
@@ -548,7 +709,7 @@ public final class VPhoneLaunchpadMachineLibrary {
         }
         var succeeded = false
         do {
-            let result = try await commandLine.run(command)
+            let result = try await commandLine.run(command, onProgress: onProgress)
             succeeded = result.succeeded && !Task.isCancelled
             if !result.succeeded, !Task.isCancelled {
                 actionError = VPhoneLaunchpadError(failure, detail: result.tail)
@@ -570,5 +731,47 @@ public final class VPhoneLaunchpadMachineLibrary {
     /// name or path.
     nonisolated static func diagnostic(_ text: String) {
         FileHandle.standardOutput.write(Data("[launchpad] \(text)\n".utf8))
+    }
+}
+
+/// FIFO ownership spans a complete selection and the active child's output drain.
+@MainActor
+private final class VPhoneLaunchpadTransferQueue {
+    private struct Waiter {
+        let id: UUID
+        let continuation: CheckedContinuation<UUID?, Never>
+    }
+    private var active: UUID?
+    private var waiting: [Waiter] = []
+
+    func acquire(_ id: UUID) async -> UUID? {
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                guard !Task.isCancelled else { continuation.resume(returning: nil); return }
+                if active == nil {
+                    active = id
+                    continuation.resume(returning: id)
+                } else {
+                    waiting.append(Waiter(id: id, continuation: continuation))
+                }
+            }
+        } onCancel: {
+            Task { @MainActor [weak self] in self?.cancelWaiting(id) }
+        }
+    }
+
+    func cancelWaiting(_ id: UUID) {
+        guard let index = waiting.firstIndex(where: { $0.id == id }) else { return }
+        waiting.remove(at: index).continuation.resume(returning: nil)
+    }
+
+    func release(_ id: UUID) {
+        guard active == id else { return }
+        active = nil
+        if !waiting.isEmpty {
+            let next = waiting.removeFirst()
+            active = next.id
+            next.continuation.resume(returning: next.id)
+        }
     }
 }

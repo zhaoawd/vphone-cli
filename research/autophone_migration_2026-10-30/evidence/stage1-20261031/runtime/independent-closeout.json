@@ -1,0 +1,41 @@
+{
+  "recorded_at": "2026-10-31T00:55:40.877778+08:00",
+  "upstream_clean": {
+    "argv": [
+      "git",
+      "-C",
+      "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/upstream",
+      "status",
+      "--short"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "bundle_signature": {
+    "argv": [
+      "codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "disk_holders": {
+    "argv": [
+      "/usr/sbin/lsof",
+      "-t",
+      "--",
+      "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/Disk.img"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "matching_hdiutil_attachments": [],
+  "matching_processes": [],
+  "passed": true
+}

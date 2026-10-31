@@ -56,7 +56,9 @@ struct LocationTests {
     @Test func localIdentityIsSeparateFromUpstream() {
         let home = URL(fileURLWithPath: "/Users/someone", isDirectory: true)
         #expect(VPhoneLaunchpadIdentity.bundleIdentifier == "com.vphone.cli.launchpad")
-        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home).path == "/Users/someone/Library/Logs/vphone-cli-launchpad")
+        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home, override: nil).path == "/Users/someone/Library/Logs/vphone-cli-launchpad")
+        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home, override: "/tmp/isolated logs").path == "/tmp/isolated logs")
+        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home, override: "relative").path == "/Users/someone/Library/Logs/vphone-cli-launchpad")
         #expect(VPhoneLaunchpadIdentity.supportDirectory(home: home).path
             == "/Users/someone/Library/Application Support/vphone-cli-launchpad")
     }

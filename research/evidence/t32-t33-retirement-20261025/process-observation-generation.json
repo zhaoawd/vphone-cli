@@ -1,0 +1,32 @@
+{
+  "observedAt": "2026-10-25T01:10:28.774758+08:00",
+  "processes": [
+    {
+      "pid": 4181,
+      "ppid": 1,
+      "uid": 0,
+      "elapsed": "09:46",
+      "cpu": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -u /Users/kolar/github/vphone-cli/research/retire_t32_t33_states_20261025.py --apply-approved dd2799d50f0a3fbaa0edfe9af16e247f0c8b6cd8b9ea76e64ed99a8211b5a5bc"
+    },
+    {
+      "pid": 5512,
+      "ppid": 4181,
+      "uid": 0,
+      "elapsed": "07:23",
+      "cpu": "0.0",
+      "state": "S",
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/tools/execute_t33_target_binding_acceptance.py --execute-approved-plan dd2799d50f0a3fbaa0edfe9af16e247f0c8b6cd8b9ea76e64ed99a8211b5a5bc"
+    },
+    {
+      "pid": 8254,
+      "ppid": 5512,
+      "uid": 0,
+      "elapsed": "01:44",
+      "cpu": "95.9",
+      "state": "R",
+      "command": "/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.caa8df845ab6/VPhone.bundle/Contents/MacOS/vphone-cli fw generation-prepare t33s-20261025 --library-root /Users/kolar/github/vphone-cli/.build --iphone-source /Users/kolar/github/vphone-cli/ipsws/iPhone17,3_26.0_23A341_Restore.ipsw --cloudos-source /Users/kolar/.vphone/ipsws/399b664dd623358c3de118ffc114e42dcd51c9309e751d43-727c4f5e2432.ipsw --boot-rom-source /Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018/.firmware-generations/6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42/originals/AVPBooter.vresearch1.bin --variant exp"
+    }
+  ]
+}

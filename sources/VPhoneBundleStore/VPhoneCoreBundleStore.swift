@@ -87,6 +87,49 @@ public struct VPhoneCoreBundleStore: Sendable {
 
     // MARK: - Verification and use
 
+    /// Offline guest producers transfer this shared Store lease as a child
+    /// descriptor before that child acquires the VM lock. Closing the parent
+    /// descriptor must not unlock descendants still completing the operation.
+    package func withExecutableLease<T>(version: String, executable: VPhoneBundleExecutable,
+        body: (URL, VPhoneBundleReceipt, FileHandle, @escaping () throws -> Void) throws -> T) throws -> T {
+        try VPhoneBundleVersion.require(version)
+        try requireRoot()
+        let fd = try acquireLock(exclusive: false)
+        defer { close(fd) }
+        var active = true
+        defer { active = false }
+        let receipt = try verifiedReceipt(version)
+        let url = executableURL(directory(version).appendingPathComponent("VPhone.bundle"), executable)
+        let recheck = {
+            guard active else { throw VPhoneBundleStoreError("Core Bundle producer lease callback expired") }
+            _ = try self.inheritedExecutable(version: version, executable: executable, descriptor: fd)
+        }
+        let result = try body(url, receipt, FileHandle(fileDescriptor: fd, closeOnDealloc: false), recheck)
+        try recheck()
+        return result
+    }
+
+    /// Revalidate under the transferred lease, without acquiring Store after
+    /// the child has taken the VM lock. Production always uses the fixed root.
+    package func inheritedExecutable(version: String, executable: VPhoneBundleExecutable,
+                                     descriptor: Int32) throws -> (URL, VPhoneBundleReceipt) {
+        try VPhoneBundleVersion.require(version)
+        try requireRoot()
+        let path = root.appendingPathComponent(".store.lock")
+        let expected = try requireEntry(path, type: S_IFREG)
+        var observed = stat()
+        guard fstat(descriptor, &observed) == 0,
+              observed.st_dev == expected.st_dev, observed.st_ino == expected.st_ino,
+              observed.st_mode & S_IFMT == S_IFREG, observed.st_uid == owner,
+              observed.st_nlink == 1, observed.st_mode & 0o7022 == 0,
+              flock(descriptor, LOCK_SH | LOCK_NB) == 0 else {
+            throw VPhoneBundleStoreError("Guest producer has no matching inherited Store lease")
+        }
+        try requireNoACL(path)
+        let receipt = try verifiedReceipt(version)
+        return (executableURL(directory(version).appendingPathComponent("VPhone.bundle"), executable), receipt)
+    }
+
     public func verify(version: String) throws -> VPhoneBundleReceipt {
         try VPhoneBundleVersion.require(version)
         try requireRoot()

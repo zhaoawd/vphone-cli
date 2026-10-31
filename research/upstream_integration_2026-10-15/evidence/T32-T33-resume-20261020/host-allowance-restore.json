@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-10-20T08:34:39.265907+00:00",
+  "state": "exact_cdhash_allowance_effective",
+  "cdhash": "89b70a253cad2adea133b3e875519afaf72c5d17",
+  "programSHA256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+  "amfidPID": 44463,
+  "probeExitCode": -9,
+  "reason": "Actual LLDB error was discarded by installed helper; diagnostic attempt preserves it",
+  "authorization": "existing same-task exact-CDHash allowance; no expanded scope",
+  "helper": "research/upstream_integration_2026-10-15/tools/start_scoped_amfidont.py",
+  "persistentConfigurationChanged": false,
+  "priorHelperLogBytes": 2107,
+  "priorHelperLogMtimeNS": 1792395347579596658,
+  "updatedAt": "2026-10-20T09:02:32.162619+00:00",
+  "completedHelperPID": 60603,
+  "observedAmfidPID": 60692,
+  "attachError": "Failed to attach to process, should probably run as root",
+  "probeAfterAuthenticationExitCode": -9,
+  "sudoNoninteractiveAvailable": false,
+  "diagnosticRequestPID": 62237,
+  "diagnosticState": "attached_and_parser_verified",
+  "diagnosticHelperPID": 62985,
+  "diagnosticEUID": 0,
+  "attachResult": "success",
+  "parserProbe": {
+    "recordedAt": "2026-10-20T09:01:40.703698+00:00",
+    "argv": [
+      "/Users/kolar/github/vphone-cli/.build/t32-dsc-companions-final.app/Contents/MacOS/vphone-vm",
+      "--config",
+      "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018/config.plist",
+      "--vphone-acceptance-invalid-option"
+    ],
+    "exitCode": 64,
+    "sha256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+    "inode": 246999022,
+    "scope": "parameter parsing only; no VM boot",
+    "output": "Error: Unknown option '--vphone-acceptance-invalid-option'\nUsage: boot vphone-vm [<options>] --config <config>\n  See 'boot vphone-vm --help' for more information.\n",
+    "passed": true
+  },
+  "priorAttachFailureCause": "unknown; retry succeeded with same by-name attachment and same breakpoint handling"
+}

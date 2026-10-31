@@ -57,7 +57,8 @@ enum RealCLI {
             logsDirectory: URL(fileURLWithPath: root).appendingPathComponent(".logs"),
             runStateReader: VPhoneLaunchpadRunStateReader(readRecord: { _ in nil }, identity: { _ in nil })
         )
-        library.startMonitoring(with: VPhoneLaunchpadCommandLine(toolchain: toolchain, history: history))
+        library.startMonitoring(with: VPhoneLaunchpadCommandLine(executable: toolchain.executable, history: history,
+            logsDirectory: URL(fileURLWithPath: root).appendingPathComponent(".logs"), launcher: toolchain.launcher))
         library.stopMonitoring()
         await library.refresh()
         return library
@@ -217,7 +218,7 @@ struct RealCLIEditTests {
         let c = VPhoneLaunchpadMachinePath(libraryRoot: l1, name: "c")
         // Incompressible data, so `xz -9` keeps the export busy for seconds.
         let dd = try LaunchpadProcess.run("/bin/dd", ["if=/dev/urandom", "of=\(c.url.appendingPathComponent("Disk.img").path)",
-                                                       "bs=1m", "count=192", "conv=notrunc"])
+                                                       "bs=1m", "count=32", "conv=notrunc"])
         try #require(dd.status == 0, "dd failed: \(dd.output)")
         let history = VPhoneLaunchpadCommandHistory()
         let library = await RealCLI.library(l1, toolchain: toolchain, history: history)
@@ -225,10 +226,14 @@ struct RealCLIEditTests {
 
         let started = Date()
         let export = Task { await library.export([(c, archive)], densest: true, includeIPSW: false, replacing: false) }
-        #expect(await eventually(60) { ((try? FileManager.default.attributesOfItem(atPath: archive.path)[.size] as? Int) ?? 0) > 0 })
-        // Mid-export, not at the first bytes.
-        try await Task.sleep(for: .seconds(2))
-        let size = (try? FileManager.default.attributesOfItem(atPath: archive.path)[.size] as? Int) ?? 0
+        var partial: URL?
+        try #require(await eventually(60) {
+            let directories = (try? FileManager.default.contentsOfDirectory(at: temp.url, includingPropertiesForKeys: nil)) ?? []
+            partial = directories.first { $0.lastPathComponent.hasPrefix(".vphone-export-") }?.appendingPathComponent("output")
+            return partial.map { ((try? FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int) ?? 0) > 0 } ?? false
+        })
+        #expect(!FileManager.default.fileExists(atPath: archive.path))
+        let size = try #require(partial).resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
         let cancelledAfter = Date().timeIntervalSince(started)
         #expect(library.isExporting(c))
         library.cancelExport(c)
@@ -238,13 +243,14 @@ struct RealCLIEditTests {
 
         #expect(!FileManager.default.fileExists(atPath: archive.path))
         #expect(library.actionError == nil)
-        #expect(history.entries.last?.status == SIGINT)
+        #expect(history.entries.last?.status == 128 + SIGINT)
+        #expect(history.entries.last?.outputDrained == true)
         // The tar processes `vm export` started end once their pipe closes;
         // none recreates the file.
-        try await Task.sleep(for: .seconds(3))
         #expect(!FileManager.default.fileExists(atPath: archive.path))
         let ps = try LaunchpadProcess.run("/bin/ps", ["-axo", "pid=,command="])
         #expect(!ps.output.contains(archive.path))
+        #expect(!(try FileManager.default.contentsOfDirectory(atPath: temp.url.path)).contains { $0.hasPrefix(".vphone-export-") })
 
         await library.configure([c], .init(cpu: 3))
         #expect(library.actionError == nil)

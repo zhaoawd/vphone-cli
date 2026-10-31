@@ -42,6 +42,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var hostControl: VPhoneHostControl?
     private var apiProxy: VPhoneAPIProxy?
     private var apiSession: VPhoneAPISession?
+    private var shutdownConnector: VPhoneAPIProxy.Connector?
     private var startupUnlock: VPhoneStartupUnlock?
     private let hostInputQueue = VPhoneHostInputQueue()
     private var cameraServer: VPhoneCameraServer?
@@ -50,6 +51,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var didAttemptAutoInstall = false
     private var shutdownPlan = VPhoneShutdownPlan()
     private var shutdownTimeoutTask: Task<Void, Never>?
+    private var guestShutdownTask: Task<Void, Never>?
 
     init(cli: VPhoneBootCLI) {
         self.cli = cli
@@ -150,13 +152,16 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             cameraServer = camServer
 
             if let device = vm.virtualMachine.socketDevices.first as? VZVirtioSocketDevice {
+                shutdownConnector = VPhoneAPIVSockConnector.make(device: device)
                 if let apiOptions {
                     let proxy = try VPhoneAPIProxy(token: apiOptions.token, connector: VPhoneAPIVSockConnector.make(device: device))
                     let url = try proxy.start(port: apiOptions.port)
                     apiProxy = proxy
                     if let vmLock {
                         let session = VPhoneAPISession(
-                            client: try VPhoneAPIClient(baseURL: url, token: proxy.internalToken, timeout: 5),
+                            // The guest permits screen.unlock to run for 60 s.
+                            // Keep health probes short without timing out that RPC first.
+                            client: try VPhoneAPIClient(baseURL: url, token: proxy.internalToken, timeout: 5, rpcTimeout: 75),
                             vmInstanceID: vmLock.state.instanceID)
                         apiSession = session
                         let persistedUnlock = try VPhoneVirtualMachineManifest.load(from: options.configURL).usesStartupUnlock
@@ -404,6 +409,23 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         apiSession?.snapshot.state == .ready && apiSession?.snapshot.health?.capabilities.contains("system_shutdown") == true
     }
 
+    func guestAPIShutdownRequest(connector: VPhoneAPIProxy.Connector?) -> (() async throws -> Bool)? {
+        guard !cli.dfu, !cli.noVphoned else { return nil }
+        if apiCanShutdown {
+            return { [weak self] in
+                guard let session = self?.apiSession else { return false }
+                let reply = try await session.call("system.shutdown", params: ["force": .bool(true)], requiring: "system_shutdown")
+                if case let .object(fields) = reply { return fields["accepted"] == .bool(true) }
+                return false
+            }
+        }
+        guard let connector else { return nil }
+        return {
+            print("[vphone] guest shutdown via direct API VSOCK")
+            return try await VPhoneAPIGuestShutdown(connector: connector).request()
+        }
+    }
+
     /// Ask the guest to power off, wait a bounded time for
     /// `guestDidStop`, then force-stop the VM through the framework so the
     /// teardown is the framework's and not this process dying.
@@ -433,9 +455,10 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        let api = guestAPIShutdownRequest(connector: shutdownConnector)
         let action = shutdownPlan.start(VPhoneShutdownPlan.Conditions(
             vmRunning: vm.isRunning,
-            guestShellAvailable: apiCanShutdown || (control?.canHaltGuest ?? false),
+            guestShellAvailable: api != nil || (control?.canHaltGuest ?? false),
             canRequestStop: vm.canRequestStop))
 
         switch action {
@@ -445,12 +468,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         case .guestCommand:
             print("[vphone] graceful shutdown via guest power-off command over vsock")
             startGracefulTimeout()
-            Task { @MainActor in
-                let api: (() async throws -> Bool)? = self.apiCanShutdown ? {
-                    guard let session = self.apiSession else { return false }
-                    let reply = try await session.call("system.shutdown", params: ["force": .bool(true)], requiring: "system_shutdown")
-                    return { if case let .object(fields) = reply { return fields["accepted"] == .bool(true) }; return false }()
-                } : nil
+            guestShutdownTask = Task { @MainActor in
                 let request = VPhoneGuestShutdown(api: api, classic: { [weak self] in
                     guard let self, !self.shutdownPlan.forceStopRequested else { return false }
                     return await self.control?.haltGuest() == true
@@ -500,6 +518,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         guard action == .forceStop else { return }
         shutdownTimeoutTask?.cancel()
         shutdownTimeoutTask = nil
+        guestShutdownTask?.cancel()
+        guestShutdownTask = nil
         guard let vm else {
             NSApp.terminate(nil)
             return
@@ -519,6 +539,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_: Notification) {
+        guestShutdownTask?.cancel()
+        shutdownConnector = nil
         startupUnlock?.stop()
         apiSession?.stop()
         apiProxy?.stop()

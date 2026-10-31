@@ -6,12 +6,16 @@ import Virtualization
 public enum VPhoneNetworkingError: Error, Equatable {
     /// hostOnly has no native Virtualization.framework attachment.
     case hostOnlyUnsupported
+    /// tunnel mode requires the userspace network runtime.
+    case tunnelUnsupported
     /// A bridge interface was requested but no such interface exists on the host.
     case bridgeInterfaceNotFound(requested: String, available: [String])
     /// bridged mode was selected but the host exposes no bridgeable interfaces.
     case noBridgeInterfaces
     /// `--bridge-interface` was given without selecting bridged mode.
     case bridgeInterfaceWithoutBridgedMode
+    /// An mDNS localHostName is not a valid DNS label.
+    case invalidLocalHostName(String)
 }
 
 extension VPhoneNetworkingError: CustomStringConvertible, LocalizedError {
@@ -19,12 +23,16 @@ extension VPhoneNetworkingError: CustomStringConvertible, LocalizedError {
         switch self {
         case .hostOnlyUnsupported:
             "network mode 'hostOnly' is not supported (Virtualization.framework has no host-only attachment); use nat, bridged, or none"
+        case .tunnelUnsupported:
+            "network mode 'tunnel' is not supported by this runtime; use nat, bridged, or none"
         case let .bridgeInterfaceNotFound(requested, available):
             "bridge interface '\(requested)' not found; available: \(available.isEmpty ? "(none)" : available.joined(separator: ", "))"
         case .noBridgeInterfaces:
             "bridged mode requires a host interface, but none are available for bridging"
         case .bridgeInterfaceWithoutBridgedMode:
             "--bridge-interface is only valid with --network bridged"
+        case let .invalidLocalHostName(name):
+            "invalid mDNS host name '\(name)'; expected 1..63 ASCII letters, digits, or internal hyphens"
         }
     }
     public var errorDescription: String? { description }
@@ -66,6 +74,34 @@ public enum VPhoneNetworking {
         return first
     }
 
+    /// The mDNS name `--mdns on` gives a VM: its name with everything but
+    /// letters and digits turned into hyphens, as a DNS label allows.
+    public static func localHostName(forVMName name: String) -> String {
+        var label = ""
+        for scalar in name.unicodeScalars {
+            let allowed = scalar.isASCII && CharacterSet.alphanumerics.contains(scalar)
+            if allowed {
+                label.unicodeScalars.append(scalar)
+            } else if !label.hasSuffix("-") {
+                label += "-"
+            }
+        }
+        label = String(label.trimmingCharacters(in: CharacterSet(charactersIn: "-")).prefix(63))
+        label = label.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        return label.isEmpty ? "vphone" : label
+    }
+
+    /// `name`, if it is one DNS label: 1 to 63 letters, digits and hyphens,
+    /// with no hyphen at either end. A trailing `.local` is dropped.
+    public static func validLocalHostName(_ name: String) throws -> String {
+        let label = name.lowercased().hasSuffix(".local") ? String(name.dropLast(6)) : name
+        let allowed = label.unicodeScalars.allSatisfy { $0.isASCII && (CharacterSet.alphanumerics.contains($0) || $0 == "-") }
+        guard (1...63).contains(label.count), allowed, !label.hasPrefix("-"), !label.hasSuffix("-") else {
+            throw VPhoneNetworkingError.invalidLocalHostName(name)
+        }
+        return label
+    }
+
     /// Merge partial edits onto an existing config, validating the result.
     /// A nil argument leaves that field unchanged.
     public static func merge(
@@ -77,6 +113,9 @@ public enum VPhoneNetworking {
         if newMode == .hostOnly {
             throw VPhoneNetworkingError.hostOnlyUnsupported
         }
+        if newMode == .tunnel {
+            throw VPhoneNetworkingError.tunnelUnsupported
+        }
         let newBridge: String?
         if newMode == .bridged {
             newBridge = try resolveBridgeInterface(requested: bridgeInterface, current: current.bridgeInterface)
@@ -86,7 +125,7 @@ public enum VPhoneNetworking {
             }
             newBridge = current.bridgeInterface
         }
-        return NetworkConfig(mode: newMode, macAddress: current.macAddress, bridgeInterface: newBridge)
+        return current.with(mode: newMode, bridgeInterface: .some(newBridge))
     }
 
     /// Build the VZ network device for a config, or nil for `.off` (no NIC).
@@ -98,6 +137,8 @@ public enum VPhoneNetworking {
             return nil
         case .hostOnly:
             throw VPhoneNetworkingError.hostOnlyUnsupported
+        case .tunnel:
+            throw VPhoneNetworkingError.tunnelUnsupported
         case .nat:
             let net = VZVirtioNetworkDeviceConfiguration()
             net.attachment = VZNATNetworkDeviceAttachment()

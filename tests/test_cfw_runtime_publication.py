@@ -80,17 +80,28 @@ class RuntimePublicationTests(unittest.TestCase):
         self.runtime_write()
         with self.assertRaises(txn.Refused): txn.inspect_guest(self.vm)
 
-    def test_v4_cannot_downgrade_to_v3_or_disable_postimage(self):
+    def test_new_journal_cannot_downgrade_or_disable_postimage(self):
         self.transaction(); self.seal()
         record = txn.load_record(self.work)
-        self.assertEqual(record['version'], 4)
-        changed = dict(record, version=3)
-        txn.save_record(self.work, changed)
-        with self.assertRaises(txn.Refused): txn.publish(self.args)
+        self.assertEqual(record['version'], 5)
+        for version in (4,3):
+            changed = dict(record, version=version)
+            txn.save_record(self.work, changed)
+            with self.assertRaises(txn.Refused): txn.publish(self.args)
         changed = dict(record, runtimeImageEvidenceRequired=False)
         txn.save_record(self.work, changed)
         with self.assertRaises(txn.Refused): txn.publish(self.args)
         self.assertEqual(self.disk.read_bytes(), b'original disk')
+
+    def test_legacy_v4_runtime_reader_does_not_fabricate_new_component_receipts(self):
+        self.transaction()
+        record=txn.load_record(self.work);record['version']=4;txn.save_record(self.work,record)
+        self.seal();txn.publish(self.args)
+        with contextlib.redirect_stdout(io.StringIO()):txn.finish(self.args)
+        self.runtime_write();result=txn.inspect_guest(self.vm)
+        self.assertEqual(result['state'],'committed-publication')
+        self.assertNotIn('componentReceipts',result)
+        self.assertFalse(result['originQualified'])
 
     def test_clone_unavailable_preserves_verified_independent_postimage(self):
         self.transaction()

@@ -1,0 +1,37 @@
+from pathlib import Path
+import gzip,hashlib,json,shutil,re,subprocess,datetime
+root=Path.cwd();base=root/'research/upstream_integration_2026-10-15';work=root/'.build/t08-icli086-20261021';out=base/'evidence/T08-icli086-20261021'
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def dump(p,x):p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+full=(work/'python-full.log').read_text(errors='replace');m=re.search(r'Ran (\d+) tests in ([\d.]+)s\s+OK \(skipped=(\d+)\)',full);assert m
+nio=(work/'nio-pipe-tests.log').read_text();assert re.search(r'Ran 2 tests in [\d.]+s\s+OK',nio)
+validation={'pythonFull':{'tests':int(m[1]),'seconds':float(m[2]),'skippedClasses':int(m[3]),'exitCode':0,'sourceBoundary':'Before isolated SourcePackages support was added to pipe ownership fixture.'},'nioPipeSupplement':{'tests':2,'seconds':15.725,'exitCode':0,'configuredSourcePackages':'.build/daemon-api-icli086-20261021/Xcode/SourcePackages','pinnedRevisionChecked':True},'pinOverlay':{'tests':16,'exitCode':0},'icliHost':{'tests':3,'seconds':4.071,'exitCode':0,'skipped':0},'iOSRelease':{'exitCode':0,'Xcode':'27.1 / 27A9269','SDK':'iPhoneOS27.1','profiles':['classic','v2'],'installed':False,'activated':False,'runtimeValidated':False}}
+for name in ['python-full.log','nio-pipe-tests.log']:
+ with gzip.open(out/(name+'.gz'),'wb') as f:f.write((work/name).read_bytes())
+# Source-bound records keep all pins and overlays reproducible separately from prior candidates.
+paths=['dependencies/daemon-api-pins.json','dependencies/daemon-api-overlays/manifest.json','dependencies/daemon-api-overlays/icli-jpeg-copy.patch','sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj','sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved','scripts/build_daemon_api.sh','scripts/check_daemon_api.py','scripts/daemon_api_overlays.py','tests/test_daemon_api_build.py','tests/test_daemon_api_icli.py','tests/test_daemon_pipe_ownership.py','scripts/python_environment.py','scripts/check_python_runtime.py','dependencies/python-darwin-arm64-3.14.lock','requirements.txt']
+# Verify unchanged patch and protected frozen application binaries against the initial snapshot.
+before=json.loads((work/'before.json').read_text());assert digest(root/'dependencies/daemon-api-overlays/icli-jpeg-copy.patch')==before['files']['dependencies/daemon-api-overlays/icli-jpeg-copy.patch']
+for p,h in json.loads((work/'frozen-applications.json').read_text()).items():assert digest(root/p)==h,p
+for profile in ['candidate','candidate-v2']:
+ directory=root/'.build/daemon-api-icli086-20261021'/profile
+ metadata=json.loads((directory/'manifest.json').read_text())
+ assert metadata['activated'] is False and metadata['runtime_validated'] is False
+ for name,h in metadata['files_sha256'].items():assert digest(directory/name)==h,(profile,name)
+# Independent DAG check for the updated planning record.
+ledger=json.loads((base/'tasks.json').read_text());byid={t['id']:t for t in ledger['tasks']};assert len(byid)==len(ledger['tasks'])==66
+seen=set();active=set()
+def visit(k):
+ if k in seen:return
+ assert k not in active,k
+ active.add(k)
+ for dep in byid[k].get('dependencies',[]):assert dep in byid;visit(dep)
+ active.remove(k);seen.add(k)
+for k in byid:visit(k)
+source={p:digest(root/p) for p in paths}
+dump(out/'validation.json',validation)
+shutil.copyfile(work/'archive-final.py',out/'archive-recipe.py.txt')
+manifest={'status':'icli086_adaptation_and_isolated_candidates_validated_guest_acceptance_pending','date':'2026-10-21','head':before['head'],'upstream':'2a0d3aca9fb79344d939365cc337b915ae9f2f97','dependency':{'identity':'icli','oldRevision':'815ef234df5461b8eb9455931d38cb1c37992fe6','revision':'651ce0d0aed59d2601c35595f1a2ba7e29bb4169','version':'0.8.6','otherSixPinsUnchanged':True,'JPEGSourceAndOverlayContentUnchanged':True},'validation':validation,'sourceSHA256':source,'files':{p.name:{'bytes':p.stat().st_size,'sha256':digest(p)} for p in out.iterdir() if p.is_file() and p.name!='manifest.json'},'limitations':['No candidate deployment, restore, boot or guest RPC acceptance.','Foreground UID guard verified with the dependency host stand-in, not real tvOS.','No new screenshot memory acceptance; existing JPEG overlay implementation preserved.','No full Core Bundle upgrade; previous frozen CLI/VM binaries preserved.','Formal full Python run skipped one hardcoded-path class; its two tests passed after fixture path support was corrected.','No root Swift full suite or firmware tests; actual iOS compile/link and Python checks cover this dependency change.'],'failuresPreserved':['Initial setup and Xcode resolve sandbox network failures; authorized retries passed.','Manual overlay check used a parent without an icli subdirectory and was rejected before source writes.'],'accepted':False,'committed':False,'pushed':False}
+dump(out/'manifest.json',manifest)
+for name,entry in manifest['files'].items():assert digest(out/name)==entry['sha256'] and (out/name).stat().st_size==entry['bytes'],name
+print(json.dumps({'status':manifest['status'],'validation':validation,'evidenceFiles':len(manifest['files'])},ensure_ascii=False,indent=2))

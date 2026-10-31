@@ -21,7 +21,7 @@ class GuestPublicationTests(unittest.TestCase):
     publish = fixtures.FrozenGateTests.publish
     load = fixtures.FrozenGateTests.load
 
-    def transaction(self):
+    def transaction(self,invalidate_guest_origin=False):
         self.work = self.evidence.parent
         self.work.mkdir()
         self.disk = self.vm / 'Disk.img'
@@ -29,7 +29,8 @@ class GuestPublicationTests(unittest.TestCase):
         self.fd = os.open(self.disk, os.O_RDONLY)
         self.addCleanup(lambda: os.close(self.fd) if self.fd is not None else None)
         self.args = SimpleNamespace(vm=self.vm, work=self.work, fd=self.fd,
-            owner_pid=os.getpid(), guest_evidence=True, phase=None, exit_code=0, retain_staged=False)
+            owner_pid=os.getpid(), guest_evidence=True, phase=None, exit_code=0, retain_staged=False,
+            invalidate_guest_origin=invalidate_guest_origin)
         self.holders = patch.object(txn, 'holders', return_value=[])
         self.holders.start(); self.addCleanup(self.holders.stop)
         with contextlib.redirect_stdout(io.StringIO()): txn.stage(self.args)
@@ -41,11 +42,12 @@ class GuestPublicationTests(unittest.TestCase):
         self.assertEqual(self.disk.read_bytes(), b'original disk')
         self.assertEqual((self.work / 'Disk.img').read_bytes(), b'new guest disk')
 
-    def seal(self, release_mount=False):
+    def seal(self, release_mount=False, preexisting=False):
         plan = self.load()
         source = self.stage / 'dropbear.plist'; source.write_bytes(b'required guest effect')
         target = self.mount / 'mnt1/System/Library/LaunchDaemons/dropbear.plist'
         target.parent.mkdir(parents=True)
+        if preexisting:target.write_bytes(source.read_bytes())
         guest_write.run(plan, ['cp', str(source), str(target)])
         raw = self.evidence.read_bytes()
         rows = [json.loads(line) for line in raw.splitlines()]
@@ -95,8 +97,8 @@ class GuestPublicationTests(unittest.TestCase):
     def test_checkpoint_requirement_cannot_be_removed_from_new_journal(self):
         self.transaction(); self.seal()
         original = txn.load_record(self.work)
-        self.assertEqual(original['version'], 4)
-        for version, required in ((4, None), (4, False), (3, True), (2, True), (1, True)):
+        self.assertEqual(original['version'], 5)
+        for version, required in ((5, None), (5, False), (4, True), (3, True), (2, True), (1, True)):
             record = dict(original, version=version)
             if required is None: record.pop('guestEvidenceRequired')
             else: record['guestEvidenceRequired'] = required

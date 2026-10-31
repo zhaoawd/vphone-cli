@@ -53,7 +53,13 @@ assert_mount_under_vm() {
     abs_mnt="$(cd "$mnt" && pwd -P)"
     case "$abs_mnt/" in
         "$abs_vm/"*) ;;
-        *) die "Unsafe ${label}: ${abs_mnt} (must be inside ${abs_vm})" ;;
+        *)
+            # External workspaces must retain the live plan, VM lock and exact
+            # journal-bound mount-root identity; a path prefix alone is insufficient.
+            local python="${PYTHON3:-$(_resolve_python3)}"
+            "$python" "$SCRIPT_DIR/patchers/plan_gate.py" private-path "$mnt" \
+                || die "Unsafe ${label}: ${abs_mnt} (requires this transaction's private mount root)"
+            ;;
     esac
 }
 
@@ -127,7 +133,7 @@ cfw_detach_with() {
     local mnt="$1"
     shift
     if mount | grep -Fq " on $mnt "; then
-        "$@" detach -force "$mnt" 2>/dev/null || true
+        "$@" detach "$mnt" 2>/dev/null || true
     fi
 }
 
@@ -169,6 +175,10 @@ cfw_stage_api() {
     local guest="$1" python
     python="${VPHONE_PYTHON:-${PYTHON3:-python3}}"
     "$python" "$SCRIPT_DIR/check_guest_api.py" "$guest"
+    if [[ "${VPHONE_GUEST_ENVIRONMENT:-classic}" == v2 ]]; then
+        echo "[*] API daemon installation is owned by the v2 profile stage"
+        return
+    fi
     cfw_guest_write /bin/mkdir -p "$MNT1/usr/libexec" "$MNT1/System/Library/LaunchDaemons"
     cfw_guest_write cp "$guest/api/vphoned" "$MNT1/usr/libexec/vphoned-api"
     cfw_guest_write /bin/chmod 0755 "$MNT1/usr/libexec/vphoned-api"

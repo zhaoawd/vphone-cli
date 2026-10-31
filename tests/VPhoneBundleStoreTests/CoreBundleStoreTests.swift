@@ -97,6 +97,55 @@ private final class BundleFixture {
 
 @Suite(.serialized)
 struct CoreBundleStoreTests {
+    @Test func guestProducerLeaseRevalidatesAndRejectsExpiredOrForeignDescriptors() throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        var escaped: (() throws -> Void)?
+        try fixture.store.withExecutableLease(version: "2.2.3-local", executable: .cli) { executable, receipt, input, recheck in
+            let (observed, actual) = try fixture.store.inheritedExecutable(
+                version: "2.2.3-local", executable: .cli, descriptor: input.fileDescriptor)
+            #expect(observed == executable && actual == receipt)
+            #expect(throws: (any Error).self) {
+                try fixture.store.inheritedExecutable(version: "2.2.3-local", executable: .cli,
+                    descriptor: FileHandle.nullDevice.fileDescriptor)
+            }
+            escaped = recheck
+            try recheck()
+        }
+        #expect(throws: (any Error).self) { try escaped?() }
+    }
+
+    @Test func guestProducerLeaseSurvivesTheParentCallbackUntilItsChildExits() throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        let release = fixture.directory.appendingPathComponent("release-child")
+        let child = Process()
+        let output = Pipe()
+        defer {
+            if child.isRunning { child.terminate(); child.waitUntilExit() }
+        }
+        try fixture.store.withExecutableLease(version: "2.2.3-local", executable: .cli) { _, _, input, _ in
+            child.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
+            child.arguments = ["-c", "import pathlib,time,sys; print('ready',flush=True); end=time.monotonic()+10\nwhile not pathlib.Path(sys.argv[1]).exists() and time.monotonic()<end: time.sleep(.01)", release.path]
+            child.standardInput = input
+            child.standardOutput = output
+            child.standardError = FileHandle.nullDevice
+            try child.run()
+            let ready = try output.fileHandleForReading.read(upToCount: 6)
+            #expect(ready == Data("ready\n".utf8))
+        }
+        let fd = open(fixture.store.root.appendingPathComponent(".store.lock").path, O_RDONLY | O_NOFOLLOW)
+        #expect(fd >= 0)
+        guard fd >= 0 else { return }
+        defer { close(fd) }
+        #expect(flock(fd, LOCK_EX | LOCK_NB) != 0)
+        try Data().write(to: release)
+        child.waitUntilExit()
+        #expect(child.terminationStatus == 0)
+        #expect(flock(fd, LOCK_EX | LOCK_NB) == 0)
+        flock(fd, LOCK_UN)
+    }
+
     @Test @MainActor func asyncVerificationKeepsLockAndExpiresRecheck() async throws {
         let fixture = try BundleFixture()
         try fixture.install()

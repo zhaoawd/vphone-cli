@@ -1,0 +1,107 @@
+{
+  "recordedAt": "2026-10-20T08:11:20.192359+00:00",
+  "sourceBase": "d968d02f5c69615b9f2f3bd45805b60e10540bfc",
+  "upstreamTarget": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+  "status": "import_state_cancel_and_transfer_shutdown_implemented_related_checks_passed",
+  "focused": {
+    "tests": 31,
+    "suites": 3,
+    "exitCode": 0
+  },
+  "full": {
+    "tests": 216,
+    "suites": 47,
+    "configuredSkippedTests": 6,
+    "exitCode": 0,
+    "durationSeconds": 9.1,
+    "scope": "production source stable; run predates addition of opt-in RealCLIImportQueueTests"
+  },
+  "realCLI": {
+    "tests": 1,
+    "exitCode": 0,
+    "durationSeconds": 6.656,
+    "proof": "real-cli-result.json",
+    "scope": "signed embedded CLI, new disposable fixtures; no VM boot"
+  },
+  "localization": {
+    "keys": 285,
+    "languages": [
+      "en",
+      "zh-Hans"
+    ],
+    "issues": 0
+  },
+  "signedCandidate": {
+    "path": "/Users/kolar/github/vphone-cli/.build/t60-import-state-20261020.app",
+    "signatureVerified": true,
+    "embeddedToolchain": {
+      "gitHash": "d968d02f",
+      "schema": "vphone.launchpad.embedded-toolchain",
+      "version": 1,
+      "vphoneCLI": {
+        "cdhash": "3dbd56dc35a1ff19926bcd7b59ff6adc076910a2"
+      },
+      "vphoneVM": {
+        "cdhash": "89b70a253cad2adea133b3e875519afaf72c5d17"
+      }
+    },
+    "outerExecutableSHA256": "5c168fd8a65cc9d5902bddfe0b18e612ff3a583dd6223b8f127dea194b334fc2"
+  },
+  "sources": {
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "3c4411d47c195cb47f745f731b23b71d82124492cd6042d1e1b8c638529e6f9e",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "a2f3ba00b6065ca67c06b25fe10e8996ff6c2a22fdcb65c80834e6640a561017",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift": "f169eaf78c0732fe7691491c0f7a584fd5758620f5b3125eaecbc3b97c428741",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift": "cd77cc42d9b58f13589b5d98f7dabd32f9af55a27a643b223e34f1d7c5838676",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift": "eae6134859a8b9eafbecff89fcd5801b2b18c2ebbac703e7a23395406f2eca83",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift": "9a13a95683318b2234e0bb7d9d693a4007953fcd3cdb1abba8ea3e10334a83a9",
+    "sources/VPhoneLaunchpad/Localizable.xcstrings": "6f6d5747ea3a5fda090d824c6dd0954f4f56a76b25560cedeea771b04ace0caa",
+    "tests/VPhoneLaunchpadKitTests/EditTests.swift": "34f5f333c334ee762e83c28566c2cfd3e6ad008e3bb8bab25a97222f57314d9a",
+    "tests/VPhoneLaunchpadKitTests/ImportQueueTests.swift": "96cfd4f16d7557d5716368ea4bafebbd605caf6bc8c29d65036e2238de1509b8",
+    "tests/VPhoneLaunchpadKitTests/RealCLIImportQueueTests.swift": "8bd47c678b60517ed49c95f80ebe0962444814f01075f0173022bb0966a8e052"
+  },
+  "limitations": [
+    "no live NSOpenPanel selection/row interaction acceptance",
+    "byte progress is indeterminate; no piped progress protocol added",
+    "real VM transfer and mixed-version/create/termination matrix incomplete",
+    "broader T60 not accepted",
+    "DSC installation is separate and still running on frozen inputs"
+  ],
+  "files": {
+    "build-first.log.gz": {
+      "bytes": 915,
+      "sha256": "c2d38ec6c3df6b2ccc235def449a2aca1373ff7bc053e0ce23950187b535c60c"
+    },
+    "real-cli.log.gz": {
+      "bytes": 3286,
+      "sha256": "772d2ca609399561eee18a0e95fb7655176718a290f427e0b126fd8623053d27"
+    },
+    "focused.log.gz": {
+      "bytes": 4286,
+      "sha256": "9e79680358ba73fb3b44477d25de903e4749d1d74ade78d610419a727611c524"
+    },
+    "full.log.gz": {
+      "bytes": 11746,
+      "sha256": "21289d4a3754e0e1b5a813df52d2850216f1ba6dd6192a5f56b327cff8ace7af"
+    },
+    "build-passed.log.gz": {
+      "bytes": 1382,
+      "sha256": "fd8bae66b4e2be7761ac6dce384a4c2131e970028f08eb015039b6e79f4b1723"
+    },
+    "real-cli-result.json": {
+      "bytes": 435,
+      "sha256": "9f71c3a7f81acdc6556bc61f624a6b2b87134c47f764f138e54da6f2735f399f"
+    },
+    "build-candidate.sh": {
+      "bytes": 5150,
+      "sha256": "0472df5045bcc3594bf1d51e81bee12b9807162a572a8f4634781d1508ecc023"
+    },
+    "build-dsym.log.gz": {
+      "bytes": 1849,
+      "sha256": "41beaeaa176cc4a2e4ee442abb45fa7aadef22de9fa623840ae19cea8d7f83a7"
+    },
+    "termination.log.gz": {
+      "bytes": 4208,
+      "sha256": "82ea7580afaf4800a68e1bbd49559f7692983267ab9b47784344ae99ff954773"
+    }
+  }
+}

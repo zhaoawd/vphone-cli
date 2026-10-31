@@ -15,6 +15,7 @@ HOST_EXECUTABLES = (
     'Contents/MacOS/vphone-cli', 'Contents/MacOS/vphone-vm', 'Contents/MacOS/ldid',
     'Contents/MacOS/vphone-launchpad', 'Contents/MacOS/vphone-launchpad-launcher',
     'Contents/Resources/.tools/bin/trustcache', 'Contents/Resources/.tools/bin/insert_dylib',
+    'Contents/Resources/.tools/bin/zstd', 'Contents/Resources/.tools/bin/xz',
 )
 
 

@@ -128,18 +128,25 @@ def run(plan):
     evidence=Path(os.environ['VPHONE_GUEST_EVIDENCE']);work=evidence.parent
     image=gate.private_path(plan,work/'Disk.img')
     record=json.loads(gate.strict_bytes(work/'transaction.json'))
-    if record.get('version') not in (2,3,4) or record.get('provenanceMode')!='required' or record.get('status')!='staged' or record.get('vm')!=plan.context['vmDirectory']:
+    if record.get('version') not in (2,3,4,5) or record.get('provenanceMode')!='required' or record.get('status')!='staged' or record.get('vm')!=plan.context['vmDirectory']:
         raise ValueError('final reader requires this VM staged transaction')
     transaction.require_staged(work,record['staged'])
     rows=[json.loads(line) for line in gate.strict_bytes(evidence).splitlines()]
     wanted={row['target'].split(':',1)[0] for row in rows}
+    from . import guest_undo
+    if record.get('operation') in guest_undo.OPERATIONS:
+        wanted.update(entry['target'].split(':',1)[0] for entry in guest_undo.request_for(work,record)['selection']['entries'])
     if 'dsc' in wanted: wanted.remove('dsc');wanted.add('system')
     roots, mounted, identities = mount_roots(plan, image, wanted)
     reference = mounted['ContainerReference']
     transaction.require_staged(work,record['staged'])
     image_before=transaction.identity(image.lstat())
     evidence_sha=effects.digest(evidence)
-    outputs=effects.verify_rows(plan,rows,roots,work/'effect-blobs')
+    empty_file_undo=(not rows and record.get('version')==5 and record.get('operation')==guest_undo.OPERATION
+                     and all(entry.get('kind') in ('macho','data') for entry in
+                             guest_undo.request_for(work,record)['selection']['entries']))
+    outputs=[] if empty_file_undo else effects.verify_rows(plan,rows,roots,work/'effect-blobs')
+    outputs=guest_undo.restore_outputs(work,record,roots,outputs)
     def recheck_final():
         transaction.require_staged(work,record['staged']);gate.recheck(plan)
         if evidence_sha!=effects.digest(evidence) or attachments(image)!=mounted:

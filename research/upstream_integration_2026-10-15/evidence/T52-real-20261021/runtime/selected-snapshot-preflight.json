@@ -1,0 +1,41 @@
+{
+  "snapshot": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a",
+  "recordedAt": 1792594835.168849,
+  "checks": [
+    {
+      "argv": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_guest_api.py",
+        "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/guest-resources"
+      ],
+      "exitCode": 0,
+      "stdout": "Default classic control/camera and independent pinned API verified; runtime not validated\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_guest_components.py",
+        "--stage",
+        "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/GuestInputs/components"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_guest_components.py\", line 85, in <module>\n    main()\n    ~~~~^^\n  File \"/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_guest_components.py\", line 71, in main\n    check_sources(pins)\n    ~~~~~~~~~~~~~^^^^^^\n  File \"/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_guest_components.py\", line 30, in check_sources\n    if digest(root / entry[\"local\"]) != entry.get(\"local_sha256\", entry[\"upstream_sha256\"]):\n       ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_guest_components.py\", line 24, in digest\n    raise ValueError(f\"Expected a nonempty regular file: {path}\")\nValueError: Expected a nonempty regular file: /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/sources/VPhoneGuestComponents/CamFix/libcamfix.m\n"
+    },
+    {
+      "argv": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_daemon_api.py",
+        "--candidate",
+        "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/GuestInputs/daemon-api"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_daemon_api.py\", line 142, in <module>\n    main()\n    ~~~~^^\n  File \"/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/scripts/check_daemon_api.py\", line 124, in main\n    pins = json.loads(LOCK.read_text())['pins']\n                      ~~~~~~~~~~~~~~^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/b3c82a8f-7d92-4936-bccc-c147a047360a/VPhone.bundle/Contents/Resources/sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'\n"
+    }
+  ]
+}

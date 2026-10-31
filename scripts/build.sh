@@ -62,6 +62,8 @@ echo "  bundled → ${BUNDLE}"
 if [[ "$BUILD_VPHONED" -eq 1 ]]; then
   zsh "$SCRIPT_DIR/build_guest_payloads.sh"
 fi
+# The declared environment-update protocol needs its sealed guest libraries.
+zsh "$SCRIPT_DIR/build_guest_components.sh"
 
 # --- Bundle the standalone runtime mini-repo into Contents/Resources ---
 RES="${BUNDLE}/Contents/Resources"
@@ -84,6 +86,16 @@ for t in trustcache insert_dylib; do
   if [[ -x ".tools/bin/$t" ]]; then cp -f ".tools/bin/$t" "${RES}/.tools/bin/$t"
   else echo "Error: .tools/bin/$t missing — run ./scripts/setup_tools.sh first" >&2; exit 1; fi
 done
+# bsdtar delegates zstd/xz filters to executables when the OS codec is absent.
+# Finder's launch environment must not depend on a package-manager PATH.
+for compressor in zstd xz; do
+  compressor_source="$(command -v "$compressor")"
+  [[ -x "$compressor_source" ]] || { print -u2 "Missing build input: $compressor"; exit 1; }
+  cp -f "$compressor_source" "${RES}/.tools/bin/$compressor"
+  # Preserve the original relative library search during staging; the portable
+  # dependency pass resolves this build input and removes the temporary rpath.
+  install_name_tool -add_rpath "${compressor_source:h}/../lib" "${RES}/.tools/bin/$compressor"
+done
 python3 "$SCRIPT_DIR/check_guest_payloads.py" .build/guest
 python3 "$SCRIPT_DIR/check_guest_api.py" .build/guest
 mkdir -p "${RES}/guest-resources"
@@ -96,6 +108,8 @@ cp -f .build/guest/cohort.json "${RES}/guest-resources/cohort.json"
 # (see VPhoneResources.pythonExecutable) — the app carries no venv itself.
 cp -f requirements.txt "${RES}/requirements.txt"
 cp -R dependencies "${RES}/dependencies"
+mkdir -p "${RES}/.build/guest-components-v2"
+cp -R .build/guest-components-v2/stage "${RES}/.build/guest-components-v2/stage"
 # debs.list = extra-deb manifest (fetch_debs.sh reads $base/debs.list); README.md
 # = the Tested-Environments table fw_prepare.sh reads to label Supported firmwares.
 cp -f debs.list "${RES}/debs.list"

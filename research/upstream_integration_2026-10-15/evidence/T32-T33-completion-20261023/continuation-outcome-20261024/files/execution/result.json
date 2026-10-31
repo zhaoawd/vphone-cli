@@ -1,0 +1,34 @@
+{
+  "state": "failed",
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "originalVMWritten": false,
+  "targets": [
+    {
+      "vm": "/Users/kolar/github/vphone-cli/.build/t32q-20261024",
+      "generationID": "55d399c351c3c49c05e293b0f996afa01816c95d9cff82a2be4cc10390752275",
+      "phases": [
+        "20261024T044848Z-v8ovSVP3",
+        "20261024T064924Z-hG5gtVTI",
+        "20261024T081630Z-kbuBz8Io"
+      ],
+      "transition": {
+        "passed": true,
+        "scope": "complete file bytes and mode/uid/gid",
+        "targets": [
+          "system:/usr/libexec/seputil",
+          "system:/usr/libexec/launchd_cache_loader",
+          "system:/usr/libexec/mobileactivationd"
+        ],
+        "runtimeValidated": false
+      }
+    }
+  ],
+  "error": "Command '['/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.a84f5889b159/VPhone.bundle/Contents/MacOS/vphone-cli', 'cfw', 'install', 't33q-20261024', '--library-root', '/Users/kolar/github/vphone-cli/.build', '--variant', 'exp', '--qualify-origin', '--keep-artifacts', '--work-parent', '/private/tmp', '--spoof-build', '23Z999999']' returned non-zero exit status 1.",
+  "baseline": {
+    "files": 10,
+    "fullReadbackPassed": true
+  },
+  "regularBeforeWriteBackupVerified": true,
+  "targetAttachments": []
+}

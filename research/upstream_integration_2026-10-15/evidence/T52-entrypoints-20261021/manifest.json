@@ -1,0 +1,492 @@
+{
+  "schema": "vphone.research.evidence",
+  "date": "2026-10-21",
+  "head": "4b5117d6634a0ccf84a63408a73de3ad7b6dcb9a",
+  "task": "T52",
+  "status": "entrypoints_and_signed_gui_validated_real_bound_environment_update_pending",
+  "accepted": false,
+  "committed": false,
+  "sourceScope": "Full current file snapshots include preserved WIP; source-diff includes tracked file differences only. No claim that all changes originate in this round.",
+  "validation": {
+    "swiftTargetedGroups": [
+      22,
+      1,
+      10
+    ],
+    "swiftExpandedGroups": [
+      256,
+      35,
+      2,
+      42
+    ],
+    "swiftSkipped": 12,
+    "pythonExpanded": 218,
+    "pythonFinalGate": 56,
+    "unresolvedFailures": 0
+  },
+  "realGUI": {
+    "state": "passed",
+    "recordedAt": "2026-10-21T12:28:10.762Z",
+    "appPath": "/Users/kolar/github/vphone-cli/.build/t52-entrypoints-launchpad-20261021.app",
+    "assertions": [
+      "exact candidate identity",
+      "stopped target",
+      "first complete backup required",
+      "only verified compatible Bundle selectable",
+      "environment update defaults off",
+      "work parent and authentication notice",
+      "Apply disabled without Bundle even with backup path",
+      "cancel returns without backup creation",
+      "reopen resets options",
+      "binding remains absent"
+    ],
+    "appliedBinding": false,
+    "vmStarted": false,
+    "amfiChanged": false
+  },
+  "uiFirstRun": "incomplete_on_menu_reopen; prior observations preserved",
+  "selectedVMFilesUnchanged": true,
+  "limitations": [
+    "Root-owned Bundle store absent; actual bind/authentication/environment replacement unverified",
+    "No new VM boot or AMFI change",
+    "Physical external disk deferred by user; devfs/network volume matrix unverified",
+    "Other template/trim entrypoints remain in their own tasks"
+  ],
+  "files": [
+    {
+      "path": "T51_commit_scope_20261021.md",
+      "bytes": 1913,
+      "sha256": "f1ea0b7d68fa0ae258e9a6868cc0d724014cf240898dca172ca7792bb05c7c32"
+    },
+    {
+      "path": "T52_entrypoints_20261021.md",
+      "bytes": 7400,
+      "sha256": "f1cebf9a40f2a0debb5f77c2087e20ab14cccb3f306ab2fd01a7b2143af61df6"
+    },
+    {
+      "path": "build-cli.log.gz",
+      "bytes": 4881,
+      "sha256": "5da76215328e18415175ee70b5151ffe8825f1a75aceece0619d767247b36fc4"
+    },
+    {
+      "path": "build-cli.sh",
+      "bytes": 6534,
+      "sha256": "fb0dd4e0f69d2613667d45d547bfe239527927b6c5d5e24967bfec4990b12b9f"
+    },
+    {
+      "path": "build-launchpad.log.gz",
+      "bytes": 2124,
+      "sha256": "435586d20dcac253e5f41be8885c00da4b8c3487b3f184ef8763efb52c2f2a2c"
+    },
+    {
+      "path": "build-launchpad.sh",
+      "bytes": 5650,
+      "sha256": "83d1f6b5d42da7791d6306445c4c5504191911d674de727fced7ac0c915b496c"
+    },
+    {
+      "path": "candidate-info.json",
+      "bytes": 2511,
+      "sha256": "c62acdfbfd81d906d934639476866700ad3f6460e748fed439c68d093d0f4bc5"
+    },
+    {
+      "path": "candidate-signatures.json",
+      "bytes": 1384,
+      "sha256": "9d25491ee1a351225935cd9002e1838cf3ec6bf70503ceaed5fc663eef53dabe"
+    },
+    {
+      "path": "cli-seal-final.log.gz",
+      "bytes": 440,
+      "sha256": "901778b76234cd794be292a8958688694abb29cda3a946425abc7e6e183c579e"
+    },
+    {
+      "path": "launchpad-seal-final.log.gz",
+      "bytes": 500,
+      "sha256": "d9f442a7a7e36c87a2372345331eec067617a4ad83b455f8cad4b759fe31fb12"
+    },
+    {
+      "path": "python-binding-writer-r2.log.gz",
+      "bytes": 51,
+      "sha256": "30e80f692600e480c71f478386876b7516b2d504a56bef1a20d5d71324b14ead"
+    },
+    {
+      "path": "python-binding-writer.log.gz",
+      "bytes": 302,
+      "sha256": "eb11d24b0c98e2c47d8a17b3381730ae61e052a6e1ded16280b9bd5a1031c8a5"
+    },
+    {
+      "path": "python-binding.log.gz",
+      "bytes": 142,
+      "sha256": "0d6c56a3475a5bc2f18c86db3669728c97694c19f38dcbe9c6e3b809078cc0c2"
+    },
+    {
+      "path": "python-expanded.log.gz",
+      "bytes": 644,
+      "sha256": "c58a12026eb3a65c7fb7122a529ab38e70f59abba62b6512aa011ede0617c7d1"
+    },
+    {
+      "path": "python-gate-final.log.gz",
+      "bytes": 315,
+      "sha256": "d7cee24a76a7d6d22ea3593ae6cc92215b433667122054da394f3f876e37ad49"
+    },
+    {
+      "path": "python-targeted-r2.log.gz",
+      "bytes": 317,
+      "sha256": "458a7e1b35292dde514874ca7f0ed465b419f36e168cb2b35e648f908810ccc2"
+    },
+    {
+      "path": "python-targeted.log.gz",
+      "bytes": 803,
+      "sha256": "451eed0a6bc5b62a011f073a54919ed65cc2a5b4d245e15f6160f2cc790388ac"
+    },
+    {
+      "path": "route-red.log.gz",
+      "bytes": 3055,
+      "sha256": "2d20da0af22b2bd739a50729b99f6fa515204258e11f461546dfef5832bc1a72"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/accept_t52_binding_ui.cua.mjs",
+      "bytes": 5172,
+      "sha256": "7b3faa8ccbe6219d46170c149b2177437de05173727f0e1dcb7c4e8055511cd8"
+    },
+    {
+      "path": "source/scripts/cfw_disk_txn.py",
+      "bytes": 43757,
+      "sha256": "c892ccf6f3c821565d07ca8902393bb9b2f2c44ccf8db3fe0e57bd4044b17334"
+    },
+    {
+      "path": "source/scripts/cfw_env_update.py",
+      "bytes": 42841,
+      "sha256": "e70dde3035550196483153c5a00dd032b34435dde543d5f599feae8128bbad5a"
+    },
+    {
+      "path": "source/scripts/cfw_install_host.sh",
+      "bytes": 28549,
+      "sha256": "64a8178dc4775643ed531abdb2fe233e5bfa04a5499a0de5c0097eb6c7e20b3e"
+    },
+    {
+      "path": "source/scripts/patchers/plan_gate.py",
+      "bytes": 21039,
+      "sha256": "413e01b55530d36a7755ca9cf5030b223f09a826268ac1ae5d19fbdfae2f4195"
+    },
+    {
+      "path": "source/sources/Info.plist",
+      "bytes": 1447,
+      "sha256": "b2fe3025e77f1a152d69de13899ccc9b21c057096947419df5cffaffca3adb1c"
+    },
+    {
+      "path": "source/sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift",
+      "bytes": 5718,
+      "sha256": "43106804689902213eb66945fe5feb5209f19650ce9b9cdfc3aa6fa5fd93269e"
+    },
+    {
+      "path": "source/sources/VPhoneCore/VPhoneBundleActivity.swift",
+      "bytes": 6634,
+      "sha256": "47364b956b19026502e22e2f4643c9275dead9905527ab617e85af37982c8bd2"
+    },
+    {
+      "path": "source/sources/VPhoneCore/VPhoneMachineBindingPersistence.swift",
+      "bytes": 6131,
+      "sha256": "ed5ac5f528b38413e6af1f47e7e5fb3fe538784726381ca3400404612061cf00"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpad/Localizable.xcstrings",
+      "bytes": 119386,
+      "sha256": "4af046073b937720decf401826f9bf6ac4d9b1be9609de432128379ac16ce7d2"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpad/VPhoneLaunchpadBundleChangeView.swift",
+      "bytes": 6820,
+      "sha256": "0f034d7d1bea511c7173029bb91b362aafcee9e2bebea2660f6e54cb41cfaba0"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpad/VPhoneLaunchpadCoreBundleView.swift",
+      "bytes": 6231,
+      "sha256": "84735538ce9f25b69da8588272168fbd300316198d1415033c34bb67ea7b5260"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+      "bytes": 23731,
+      "sha256": "49d0a8eab34e7403f19a99849f5662125f914c6603b6554a8e0759aaec8414e8"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift",
+      "bytes": 3954,
+      "sha256": "12abd0badfdd8009293efdd8642e738a77240566408cc47b0fcc84a10d6cde64"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+      "bytes": 17124,
+      "sha256": "379422f9b85de5ebc4b132989c885de7c369f8d49ee6fc437832e780e2b01ad3"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpadKit/VPhoneLaunchpadLaunchRoute.swift",
+      "bytes": 1266,
+      "sha256": "73463d4088d41e53e0cc9a79c3f5006fed191c317484518f5931a62a9b53e10b"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+      "bytes": 35373,
+      "sha256": "d1168c5ccd7e06f420701d8be6743662b5abba21b73c2cf357a273c8378217cf"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpadLauncherEntry/VPhoneLaunchpadLauncherProcess.swift",
+      "bytes": 6230,
+      "sha256": "7de37f5129e679776643ba0a95ae26530ed84cb4bc52a967d1c420e5420b5ca6"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpadLauncherEntry/main.swift",
+      "bytes": 2410,
+      "sha256": "a2e9ba8c047680d46e34ed07650b21f2c4592d7d7257fef5be5ece972da038ef"
+    },
+    {
+      "path": "source/sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift",
+      "bytes": 17001,
+      "sha256": "5de4744387f4b8c4b4cda5d741d1a8f932cd7925f6007842288111e23d097c49"
+    },
+    {
+      "path": "source/sources/vphone-cli/VPhoneVMBindingCLI.swift",
+      "bytes": 1898,
+      "sha256": "46273b605b42f3320ac495e49ed5b6ca8e742bceff8139f1610433c255f5bab2"
+    },
+    {
+      "path": "source/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift",
+      "bytes": 6940,
+      "sha256": "93a8d67485aa02a5ff7b15591a602e509a7d8ea69d21361d831983eee614be02"
+    },
+    {
+      "path": "source/tests/VPhoneCLITests/CFWWorkParentTests.swift",
+      "bytes": 1290,
+      "sha256": "a6899d87a837dbdacb56bab0a5a1f63c3b48cfe2605bf9352d87d76b77a5ad33"
+    },
+    {
+      "path": "source/tests/VPhoneCLITests/EnvironmentBindingTests.swift",
+      "bytes": 2311,
+      "sha256": "a41dcf54efc9fb4ba376ce30053ab97dc3fb0916a16c1149427b7abfb482c162"
+    },
+    {
+      "path": "source/tests/VPhoneLaunchpadKitTests/BundleChangeLibraryTests.swift",
+      "bytes": 7379,
+      "sha256": "c8c6839aa3ea2d3b94bb4a71010f00e95d39b7a050afcf6a7e28e0a1f284e126"
+    },
+    {
+      "path": "source/tests/VPhoneLaunchpadKitTests/BundleChangeTests.swift",
+      "bytes": 5622,
+      "sha256": "61e6d00f195f7bade2d57759b610f7f4cd9306a2f6d8e94ff98252f44880b11a"
+    },
+    {
+      "path": "source/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift",
+      "bytes": 5884,
+      "sha256": "690836bf54ae3a6bbc46141a3d20a5df6f8c62896dd96022bfb5c2062d6d09ba"
+    },
+    {
+      "path": "source/tests/test_launchpad_bundle.py",
+      "bytes": 24876,
+      "sha256": "ac18736066e4c897c16bcb8371ff949b88c06a0b5577ec29d825c492f5e69496"
+    },
+    {
+      "path": "source/tests/test_patch_plan_gate.py",
+      "bytes": 74484,
+      "sha256": "33090c84129bb059163bc0b079ef1d147cb8b2fbdb86841974bd1c62ddf39179"
+    },
+    {
+      "path": "source-diff.patch",
+      "bytes": 94468,
+      "sha256": "01a1c6d060b7f7154c55fc27646db5314d751d2d74de6e765dffcff24d4a6bc6"
+    },
+    {
+      "path": "static.log.gz",
+      "bytes": 614,
+      "sha256": "ea7cb7c36ad6a7532ef55dac0c8db46122223bf36548f66eb835b188454a02d7"
+    },
+    {
+      "path": "strings-r2.log.gz",
+      "bytes": 125,
+      "sha256": "b8c9ab000061cf14c23f5abe7ec4b4e969a11c15d3f107ff10a47fd326b28ba7"
+    },
+    {
+      "path": "strings.log.gz",
+      "bytes": 244,
+      "sha256": "a76ac3f386915ca22b639bd43585272224c583c5c333fc98a560e8d8eca56336"
+    },
+    {
+      "path": "swift-expanded.log.gz",
+      "bytes": 17683,
+      "sha256": "c205cce0dd117cbe520d9b38899bec5b21a2a0e03c9f264d11caac965c8f0097"
+    },
+    {
+      "path": "swift-library-r2.log.gz",
+      "bytes": 4576,
+      "sha256": "e70621b602169b40f67268e03a15dfc592aba4ed374d32816b806dbff8c08659"
+    },
+    {
+      "path": "swift-library.log.gz",
+      "bytes": 4890,
+      "sha256": "91a1095a08b6479c25647d783e6b7d1ea22176a253c0b7f5bf158bfcb20fe8ed"
+    },
+    {
+      "path": "swift-targeted-r2.log.gz",
+      "bytes": 831,
+      "sha256": "7a2d837ef2a3391117ab4b98dc938a3d007c0e272f599dee7cb3b4839faa18d8"
+    },
+    {
+      "path": "swift-targeted-r3.log.gz",
+      "bytes": 4979,
+      "sha256": "5bde34d75c68a9d8cdd6abc5cd12f6f46a37c36f63ce597f875fe5577eca60b7"
+    },
+    {
+      "path": "swift-targeted.log.gz",
+      "bytes": 4748,
+      "sha256": "850f0974318c97e5af0f9b5c7551fe84e06f896596fb8da82be1a58577f927a3"
+    },
+    {
+      "path": "ui/backup-entered.ax.txt",
+      "bytes": 1249,
+      "sha256": "612d2d26d057edf9675422fb870440cbe1d0af668d0bf4626f459ae9e7e617c3"
+    },
+    {
+      "path": "ui/backup-entered.png",
+      "bytes": 165332,
+      "sha256": "3d9f54a3e4afad565ebee5b4c49c00f8cd4b9a17c413a8efe860547f5add3797"
+    },
+    {
+      "path": "ui/cancelled.ax.txt",
+      "bytes": 3549,
+      "sha256": "364f0545ba466283415509e8743159ae2390c3f97faa261cc27455b73fe45d4e"
+    },
+    {
+      "path": "ui/cancelled.png",
+      "bytes": 165224,
+      "sha256": "e0eea46da75411706421f916610db17eeca75272665ba66c51f7245d717ff962"
+    },
+    {
+      "path": "ui/default.ax.txt",
+      "bytes": 859,
+      "sha256": "369316d3e7a1de3f8ad52a68d8e52afeaf62c4f4277d8815560fc07583440132"
+    },
+    {
+      "path": "ui/default.png",
+      "bytes": 124206,
+      "sha256": "b079d8f5948d0ca8dcab4207d0c0f4fe9447bbf8c2c2284fb075507b7a8233b4"
+    },
+    {
+      "path": "ui/environment-enabled.ax.txt",
+      "bytes": 1071,
+      "sha256": "b4a6e6e5546ea4fd378106cd77c2ea4385a15cee1573df37c3cf282a02ec6c64"
+    },
+    {
+      "path": "ui/environment-enabled.png",
+      "bytes": 150937,
+      "sha256": "bd4374ab9050ea8913399c5d44508701a56620c5540f6d9f9fd6ca71924b59f4"
+    },
+    {
+      "path": "ui/menu.ax.txt",
+      "bytes": 3549,
+      "sha256": "364f0545ba466283415509e8743159ae2390c3f97faa261cc27455b73fe45d4e"
+    },
+    {
+      "path": "ui/selected.ax.txt",
+      "bytes": 3549,
+      "sha256": "364f0545ba466283415509e8743159ae2390c3f97faa261cc27455b73fe45d4e"
+    },
+    {
+      "path": "ui/selected.png",
+      "bytes": 165224,
+      "sha256": "e0eea46da75411706421f916610db17eeca75272665ba66c51f7245d717ff962"
+    },
+    {
+      "path": "ui-after.json",
+      "bytes": 1763,
+      "sha256": "dde37687d35bc73e8b53598d76a509541760e358f1abf991da7286a472da76ee"
+    },
+    {
+      "path": "ui-approval.json",
+      "bytes": 545,
+      "sha256": "a9fa9692b5016d9dcb78695ff0b92b406803dc95b89fcb25695e39a9b1377da7"
+    },
+    {
+      "path": "ui-before.json",
+      "bytes": 1605,
+      "sha256": "caecd674b7424df8bf1559047deb61cc826b4cd41b9a9c6c54f1c365c9654906"
+    },
+    {
+      "path": "ui-r2/backup-entered.ax.txt",
+      "bytes": 1255,
+      "sha256": "5f9a67be712ad029690bc3718414c36c4335564d8b74e51d9357dbbdc60e7d0f"
+    },
+    {
+      "path": "ui-r2/backup-entered.png",
+      "bytes": 165695,
+      "sha256": "780cf97a5b28f3e236250d81533c2dbf56325a96414f613b3eabd77064f5f7bf"
+    },
+    {
+      "path": "ui-r2/cancelled.ax.txt",
+      "bytes": 3549,
+      "sha256": "364f0545ba466283415509e8743159ae2390c3f97faa261cc27455b73fe45d4e"
+    },
+    {
+      "path": "ui-r2/cancelled.png",
+      "bytes": 165224,
+      "sha256": "e0eea46da75411706421f916610db17eeca75272665ba66c51f7245d717ff962"
+    },
+    {
+      "path": "ui-r2/default.ax.txt",
+      "bytes": 859,
+      "sha256": "369316d3e7a1de3f8ad52a68d8e52afeaf62c4f4277d8815560fc07583440132"
+    },
+    {
+      "path": "ui-r2/default.png",
+      "bytes": 124051,
+      "sha256": "fb02454e9c37d4f20c889ad3e92d755d7e432b71b3a3f6c8a919abc88de5f921"
+    },
+    {
+      "path": "ui-r2/environment-enabled.ax.txt",
+      "bytes": 1071,
+      "sha256": "b4a6e6e5546ea4fd378106cd77c2ea4385a15cee1573df37c3cf282a02ec6c64"
+    },
+    {
+      "path": "ui-r2/environment-enabled.png",
+      "bytes": 150937,
+      "sha256": "bd4374ab9050ea8913399c5d44508701a56620c5540f6d9f9fd6ca71924b59f4"
+    },
+    {
+      "path": "ui-r2/final.ax.txt",
+      "bytes": 3549,
+      "sha256": "364f0545ba466283415509e8743159ae2390c3f97faa261cc27455b73fe45d4e"
+    },
+    {
+      "path": "ui-r2/final.png",
+      "bytes": 165224,
+      "sha256": "e0eea46da75411706421f916610db17eeca75272665ba66c51f7245d717ff962"
+    },
+    {
+      "path": "ui-r2/menu-0.ax.txt",
+      "bytes": 4038,
+      "sha256": "40da647074423b31844cca246de95b227910d009b85a689ae82ca033f08b204a"
+    },
+    {
+      "path": "ui-r2/reopened.ax.txt",
+      "bytes": 859,
+      "sha256": "369316d3e7a1de3f8ad52a68d8e52afeaf62c4f4277d8815560fc07583440132"
+    },
+    {
+      "path": "ui-r2/reopened.png",
+      "bytes": 124051,
+      "sha256": "fb02454e9c37d4f20c889ad3e92d755d7e432b71b3a3f6c8a919abc88de5f921"
+    },
+    {
+      "path": "ui-r2/result.json",
+      "bytes": 646,
+      "sha256": "7cba5eaa98208f7805cc3fc03548f2bdb18a09319242bfd9d5ad028eb02667a6"
+    },
+    {
+      "path": "ui-r2/selected.ax.txt",
+      "bytes": 3549,
+      "sha256": "364f0545ba466283415509e8743159ae2390c3f97faa261cc27455b73fe45d4e"
+    },
+    {
+      "path": "ui-r2/selected.png",
+      "bytes": 165224,
+      "sha256": "e0eea46da75411706421f916610db17eeca75272665ba66c51f7245d717ff962"
+    }
+  ]
+}

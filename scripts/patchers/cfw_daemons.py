@@ -57,8 +57,10 @@ def inject_daemon(plist_path, daemon_path, key):
         plistlib.dump(target, stream, sort_keys=False)
 
 
-def inject_daemons(plist_path, daemon_dir):
+def inject_daemons(plist_path, daemon_dir, *, include_api=True, guest_environment='classic'):
     """Inject bash/dropbear/trollvnc entries into launchd.plist."""
+    if guest_environment not in ('classic', 'v2'):
+        raise ValueError('unknown guest camera environment')
     # Convert to XML first (macOS binary plist -> XML)
     subprocess.run(["plutil", "-convert", "xml1", plist_path], capture_output=True)
 
@@ -66,6 +68,8 @@ def inject_daemons(plist_path, daemon_dir):
         target = plistlib.load(f)
 
     for name in ("bash", "dropbear", "trollvnc", "vphoned", "vphoned-api", "rpcserver_ios"):
+        if name == "vphoned-api" and not include_api:
+            continue
         src = os.path.join(daemon_dir, f"{name}.plist")
         if not os.path.exists(src):
             print(f"  [!] Missing {src}, skipping")
@@ -76,6 +80,9 @@ def inject_daemons(plist_path, daemon_dir):
 
         if name == "dropbear":
             patch_dropbear_daemon(daemon)
+        if name == 'vphoned' and guest_environment == 'v2':
+            daemon.setdefault('EnvironmentVariables', {})['VPHONED_CAMERA_LAYOUT'] = 'v2'
+            daemon['EnvironmentVariables']['VPHONED_LOCATION_LAYOUT'] = 'v2'
 
         key = f"/System/Library/LaunchDaemons/{name}.plist"
         target.setdefault("LaunchDaemons", {})[key] = daemon

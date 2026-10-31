@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-25T00:34:23.276489+08:00",
+  "state": "assessment-and-draft-not-approved",
+  "currentPlanSHA256": "b3b98f370e384a3659dea2428651cb033566e01a8641897651038a3701f8805b",
+  "currentPlanConditionalApprovalRecorded": true,
+  "currentAvailableBytes": 63897600000,
+  "minimumInitialFreeBytes": 80530636800,
+  "retirementTargets": [
+    {
+      "path": ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023",
+      "allocatedBytesLowerBound": 137011412992,
+      "sizeComplete": false,
+      "rootIdentity": {
+        "dev": 16777231,
+        "ino": 250045468,
+        "mode": 16877,
+        "uid": 501,
+        "gid": 20
+      },
+      "frozenInputReferences": [],
+      "preservationEntries": [
+        ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/Disk.img",
+        ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/.cfw-history/20261023T074423Z-xoAlcrnT/Disk.img",
+        ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/.cfw-history/20261023T082509Z-gml5bJzX/Disk.img",
+        ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/.cfw-history/20261023T093802Z-XHDHXIve/Disk.img"
+      ],
+      "fullVMStateWillBeLost": true
+    },
+    {
+      "path": ".build/t32r-20261023",
+      "allocatedBytesLowerBound": 15460876288,
+      "sizeComplete": true,
+      "rootIdentity": {
+        "dev": 16777231,
+        "ino": 250161432,
+        "mode": 16832,
+        "uid": 501,
+        "gid": 20
+      },
+      "frozenInputReferences": [],
+      "preservationEntries": [
+        ".build/t32r-20261023/Disk.img"
+      ],
+      "fullVMStateWillBeLost": true
+    },
+    {
+      "path": ".build/t32-t33-completion-20261023/display-runtime/pre-runtime-backup",
+      "allocatedBytesLowerBound": 15174766592,
+      "sizeComplete": true,
+      "rootIdentity": {
+        "dev": 16777231,
+        "ino": 250164940,
+        "mode": 16832,
+        "uid": 501,
+        "gid": 20
+      },
+      "frozenInputReferences": [],
+      "preservationEntries": [],
+      "fullVMStateWillBeLost": true
+    },
+    {
+      "path": ".build/t32-t33-followup-20261023/pre-runtime-backup",
+      "allocatedBytesLowerBound": 14707822592,
+      "sizeComplete": true,
+      "rootIdentity": {
+        "dev": 16777231,
+        "ino": 249783571,
+        "mode": 16832,
+        "uid": 501,
+        "gid": 20
+      },
+      "frozenInputReferences": [],
+      "preservationEntries": [],
+      "fullVMStateWillBeLost": true
+    }
+  ],
+  "allocatedBytesLowerBound": 182354878464,
+  "physicalBytesReclaimable": "not measured; APFS shared blocks prevent a guaranteed sum",
+  "preservedDiskEntriesRemoved": [
+    ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/Disk.img",
+    ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/.cfw-history/20261023T074423Z-xoAlcrnT/Disk.img",
+    ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/.cfw-history/20261023T082509Z-gml5bJzX/Disk.img",
+    ".build/t32-t33-completion-20261023/fresh-library/t32-t33-file-acceptance-20261023/.cfw-history/20261023T093802Z-XHDHXIve/Disk.img",
+    ".build/t32r-20261023/Disk.img"
+  ],
+  "preservedDiskEntriesAfter": 9,
+  "amendedPlanDraft": "/Users/kolar/github/vphone-cli/research/evidence/t32-t33-storage-review-20261025/offline-plan-after-retirement.json",
+  "amendedPlanSHA256": "dd2799d50f0a3fbaa0edfe9af16e247f0c8b6cd8b9ea76e64ed99a8211b5a5bc",
+  "amendedActivePlanPublished": false,
+  "VMStarts": 0,
+  "CFWWrites": 0,
+  "filesDeleted": 0,
+  "beforeDeletionRequired": [
+    "explicit authorization for four named roots and preservation exception",
+    "complete root-readable inventory and small metadata archive with readback",
+    "no mounts/open holders/active operations; lock target roots and disk images",
+    "preserve tracked files and all 289/94 frozen inputs",
+    "retain original plan/approval; activate only reviewed amended plan and matching executor manifest"
+  ],
+  "preserve": [
+    "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/pre-acceptance-backup",
+    "/Users/kolar/github/vphone-cli/.build/t32q-20261024",
+    "/Users/kolar/github/vphone-cli/.build/t33q-20261024",
+    "/Users/kolar/github/vphone-cli/.build/t32-qualified-cache-20261024",
+    "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/exp-target-binding-package-20261025/VPhone.bundle",
+    "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/2.6.2-local.caa8df845ab6.tar",
+    "firmware IPSWs and original ROM",
+    "research reports/evidence and source code",
+    "other VMs"
+  ]
+}

@@ -72,7 +72,7 @@ class FrozenGateTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         self.vm = self.root / 'vm'; self.vm.mkdir()
         self.lock_fd=os.open(self.vm,os.O_RDONLY|os.O_DIRECTORY);fcntl.flock(self.lock_fd,fcntl.LOCK_EX)
         self.addCleanup(os.close,self.lock_fd)
@@ -112,6 +112,28 @@ class FrozenGateTests(unittest.TestCase):
 
     def load(self):
         return gate.load_plan(self.path,self.digest,self.context)
+
+    def test_binding_drift_refuses_entry_and_the_actual_guarded_writer(self):
+        binding = self.vm / 'launchpad.json'
+        raw = json.dumps({'bundle': '2.6.2'}).encode()
+        binding.write_bytes(raw)
+        expected = {'VPHONE_EXPECTED_BINDING_SHA256': hashlib.sha256(raw).hexdigest(),
+                    'VPHONE_EXPECTED_CORE_BUNDLE': '2.6.2'}
+        target = self.mount / 'mnt1/System/Library/LaunchDaemons/dropbear.plist'
+        target.parent.mkdir(parents=True)
+        target.write_bytes(b'preserve-target')
+        source = self.stage / 'dropbear.plist'
+        source.write_bytes(b'replacement')
+        with patch.dict(os.environ, expected):
+            plan = gate.from_environment()
+            gate.recheck(plan)
+            binding.write_text(json.dumps({'bundle': '2.6.3'}))
+            with self.assertRaisesRegex(ValueError, 'binding changed'):
+                gate.from_environment()
+            with self.assertRaisesRegex(ValueError, 'binding changed'):
+                guest_write.run(plan, ['cp', str(source), str(target)])
+        self.assertEqual(target.read_bytes(), b'preserve-target')
+        self.assertFalse(self.evidence.exists())
 
     def test_obsolete_implementation_refused_before_real_entrypoint_side_effects(self):
         self.plan['gates']['iosBaseIs27'] = True
@@ -543,6 +565,7 @@ class FrozenGateTests(unittest.TestCase):
 
     def test_common_signing_function_emits_producer_evidence(self):
         from tests.test_component_signatures import signed_macho
+        key=self.vm/'cfw_input/signcert.p12';key.parent.mkdir();key.write_bytes(b'fixture signing key')
         source=self.stage/'seputil';source.write_bytes(signed_macho())
         signed=self.root/'signed';signed.write_bytes(signed_macho(entitlements={'new':1}))
         signer=self.root/'ldid';signer.write_text('#!/bin/sh\nfor final; do :; done\n/bin/cp '+str(signed)+' "$final"\n');signer.chmod(0o755)
@@ -602,11 +625,13 @@ class FrozenGateTests(unittest.TestCase):
         with patch.object(Path,'lstat',observed): yield
 
     def test_v2_signature_after_host_handoff_and_failed_attempt_retry(self):
-        from tests.test_component_signatures import signed_macho
+        from tests.test_component_signatures import signed_macho, SigningCommandSpaceTests
         from patchers import component_effects as effects
         self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
         plan=self.load();self.staged_signing_transaction()
-        target=self.mount/'mnt1/sbin/launchd';target.parent.mkdir();target.write_bytes(signed_macho())
+        target=self.mount/'mnt1/sbin/launchd';target.parent.mkdir()
+        initial, text = SigningCommandSpaceTests.signed_injection_input()
+        target.write_bytes(initial)
         original=target.read_bytes()
         with self.handed_back_staging_owner():
             for attempt in ('initial','retry'):
@@ -634,7 +659,10 @@ class FrozenGateTests(unittest.TestCase):
                     except ValueError as error:
                         self.fail('normal handed-back staging blocked v2 producer: '+str(error))
                     if attempt=='initial': self.assertEqual(target.read_bytes(),original)
-                    else: self.assertIn(b'/vh',target.read_bytes())
+                    else:
+                        self.assertIn(b'/vh',target.read_bytes())
+                        self.assertEqual(target.read_bytes()[text:4096],original[text:4096])
+                        self.assertIn(b'uuid-preserved!!',target.read_bytes())
                 if attempt=='initial':
                     # A host retry gets a fresh staged transaction and evidence.
                     self.evidence=self.vm/'.cfw_disk.retry/guest-changes.jsonl'
@@ -804,7 +832,7 @@ class FrozenGateTests(unittest.TestCase):
             rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
             with self.assertRaises(ValueError):effects.verify_rows(plan,rows,{'preboot':self.mount/'mnt5'},self.evidence.parent/'effect-blobs')
 
-    def test_cryptex_image_member_effects_before_and_after_tree_copy_compose(self):
+    def test_cryptex_image_member_effects_before_and_after_tree_copy_compose(self, hardlinked=False, build_version=False):
         from patchers import component_effects as effects, cryptex_source
         from tests.test_component_signatures import signed_macho
         import struct
@@ -814,9 +842,15 @@ class FrozenGateTests(unittest.TestCase):
             struct.pack_into('<QQ',data,0x28,4096,len(data)-4096)
             data[4168:4200]=hashlib.sha256(data[:4096]).digest();return data
         _,digest=guest_write.target_table()
-        for declaration in ['system-cryptex-boot-install','dyld-exp-hv_vmm','dyld-cfw-camera']:
+        declarations=['system-cryptex-boot-install','dyld-exp-hv_vmm','dyld-cfw-camera']
+        if build_version:
+            declarations.append('system-systemversion-cfw-build_version');self.context['spoofBuild']='23Z999999'
+        for declaration in declarations:
             self.entries.append(dict(id=declaration,disposition='guestUncovered',recordRules=[dict(literal='guest-target-map-v1:'+digest+':'+declaration,hexadecimalOffsetSuffix=False)]))
         self.plan['variant']='exp';self.plan['gates']['variant']='exp';self.context['variant']='exp';self.publish()
+        if build_version:
+            os.environ.update(VPHONE_CFW_VARIANT='exp',VPHONE_FROZEN_PLAN_SHA256=self.digest,
+                              VPHONE_FROZEN_CONTEXT=json.dumps(self.context))
         plan=self.load();gate.require_write_context(plan);store=self.evidence.parent/'effect-blobs'
         relative=Path('System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e')
         earlier=self.mount/'mnt_sysos_hv_vmm'/relative;earlier.parent.mkdir(parents=True)
@@ -827,6 +861,15 @@ class FrozenGateTests(unittest.TestCase):
         binding=dict(schemaVersion=1,generationID=self.context['generationID'],planDigest=plan.record['planSHA256'],source=str(original),sourceSHA256=cryptex_source.file_sha(original),cacheSHA256=initial['sha256'],imageBefore=initial)
         earlier.write_bytes(cache(b'00000000'));before=effects.capture_input(earlier,store);observed=gate.snapshot(earlier)
         (self.mount/'mnt_sysos_hv_vmm'/'required-sibling').write_bytes(b'unchanged sibling')
+        if build_version:
+            version_relative=Path('System/Library/CoreServices/SystemVersion.plist')
+            version_source=self.mount/'mnt_sysos_hv_vmm'/version_relative
+            version_source.parent.mkdir(parents=True)
+            version_source.write_bytes(plistlib.dumps({'ProductBuildVersion':'23A341','ProductVersion':'26.0'}))
+            version_original=effects.capture_input(version_source,store)
+        if hardlinked:
+            os.link(self.mount/'mnt_sysos_hv_vmm/required-sibling',
+                    self.mount/'mnt_sysos_hv_vmm/required-sibling-alias')
         binding['baselineTree']=cryptex_source.tree(self.mount/'mnt_sysos_hv_vmm')
         cryptex_source.marker(image).write_bytes(gate.canonical(binding))
         earlier.write_bytes(cache(b'10000000'))
@@ -836,16 +879,57 @@ class FrozenGateTests(unittest.TestCase):
             cryptex_source.refresh(plan,image)
         source=self.mount/'mnt_sysos';shutil.copytree(self.mount/'mnt_sysos_hv_vmm',source)
         (source/'required-sibling').write_bytes(b'unchanged sibling')
+        if hardlinked:
+            (source/'required-sibling-alias').unlink()
+            os.link(source/'required-sibling',source/'required-sibling-alias')
         destination=self.mount/'mnt1/System/Cryptexes/OS';destination.mkdir(parents=True)
         info=plistlib.dumps({'images':[{'image-path':str(image),'system-entities':[{'mount-point':str(source)}]}]})
-        with patch.object(cryptex_source.subprocess,'check_output',return_value=info):
+        from contextlib import nullcontext
+        require_readonly=effects.regular.require_readonly
+        def source_mount_is_readonly(reader):
+            if source in reader.path.parents:
+                self.assertTrue(reader.readonly_source)
+                return
+            return require_readonly(reader)
+        # Only the mount's readonly flag and hdiutil table are fixtures;
+        # source traversal, actual cp, effects and final verification run.
+        readonly_fixture=(patch.object(effects.regular,'require_readonly',source_mount_is_readonly)
+                          if hardlinked else nullcontext())
+        with patch.object(cryptex_source.subprocess,'check_output',return_value=info), readonly_fixture:
             guest_write.run(plan,['cp','-R',str(source)+'/.',str(destination)])
+        if hardlinked:
+            self.assertEqual((destination/'required-sibling').stat().st_nlink,1)
+            self.assertEqual((destination/'required-sibling-alias').stat().st_nlink,1)
         final=destination/relative;before=effects.capture_input(final,store);observed=gate.snapshot(final)
         final.write_bytes(cache(b'10000001'))
         gate.append_evidence(plan,'dyld-cfw-camera','dsc:/'+final.name,final,observed,gate.snapshot(final),effect=effects.capture_change(before,final,store))
+        if build_version:
+            version_final=destination/version_relative;version_stage=self.stage/'version.plist'
+            guest_write.run(plan,['cp',str(version_final),str(version_stage)])
+            with patch.object(sys,'argv',['cfw.py','patch-build-version',str(version_stage),'23Z999999']):
+                with self.assertRaises(SystemExit) as result:cfw.main()
+                self.assertEqual(result.exception.code,0)
+            guest_write.run(plan,['cp',str(version_stage),str(version_final)])
         rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
         roots={'system':self.mount/'mnt1','dsc':final.parent}
-        effects.verify_rows(plan,rows,roots,store)
+        outputs=effects.verify_rows(plan,rows,roots,store)
+        if build_version:
+            from patchers import file_undo
+            version_target='system:/System/Cryptexes/OS/'+str(version_relative)
+            entries=file_undo.build(plan,rows,outputs,store,{'members':{
+                version_target:{'state':version_original,'kind':'data'}}})
+            self.assertEqual(len(entries),1)
+            self.assertEqual(entries[0]['target'],version_target)
+            self.assertEqual(entries[0]['originalSHA256'],version_original['sha256'])
+            self.assertEqual(entries[0]['finalSHA256'],effects.digest(version_final))
+            self.assertEqual({op['declarationID'] for op in entries[0]['operations']},
+                             {'system-systemversion-cfw-build_version'})
+            from patchers.installed_effects import undo_eligibility
+            eligibility=next(row for row in undo_eligibility(rows,{'entries':entries})
+                             if row['declarationID']=='system-systemversion-cfw-build_version')
+            self.assertEqual(eligibility['state'],'qualified_file_restore')
+            self.assertEqual(eligibility['requiredDeclarations'],['system-systemversion-cfw-build_version'])
+            self.assertEqual(eligibility['unsupportedTargets'],[])
         import copy
         forged=copy.deepcopy(rows);forged[1]['sourceImageProof']['image']['sha256']='0'*64
         with self.assertRaises(ValueError): effects.verify_rows(plan,forged,roots,store)
@@ -853,6 +937,12 @@ class FrozenGateTests(unittest.TestCase):
         with self.assertRaises(ValueError): effects.verify_rows(plan,forged,roots,store)
         (destination/'required-sibling').unlink()
         with self.assertRaises(ValueError): effects.verify_rows(plan,rows,roots,store)
+
+    def test_exp_cryptex_hardlinks_survive_transform_copy_and_effect_verification(self):
+        self.test_cryptex_image_member_effects_before_and_after_tree_copy_compose(hardlinked=True)
+
+    def test_exp_tree_copy_then_staged_build_version_keeps_original_and_effects(self):
+        self.test_cryptex_image_member_effects_before_and_after_tree_copy_compose(hardlinked=True,build_version=True)
 
     def test_later_unrelated_copy_cannot_discard_installed_content(self):
         from patchers import component_effects as effects
@@ -961,6 +1051,9 @@ class FrozenGateTests(unittest.TestCase):
         import shutil
         import struct
         fixture=InstallTests();fixture.setUp();self.addCleanup(fixture.doCleanups)
+        _, digest = guest_write.target_table()
+        self.entries.append(dict(id='system-vphoned-boot-install',disposition='guestUncovered',
+            recordRules=[dict(literal='guest-target-map-v1:'+digest+':system-vphoned-boot-install',hexadecimalOffsetSuffix=False)]))
         self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
         os.environ.update(VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context))
         shutil.copytree(fixture.vm/'.create-checkpoint',self.vm/'.create-checkpoint')
@@ -987,6 +1080,30 @@ class FrozenGateTests(unittest.TestCase):
         value=plistlib.loads(boot_plist.read_bytes());value['LaunchDaemons']['preserved-boot-job']={'Label':'preserved-boot-job'}
         boot_plist.write_bytes(plistlib.dumps(value))
         gate.append_evidence(plan,'system-launchdaemons-boot-install','system:/System/Library/xpc/launchd.plist',boot_plist,old,gate.snapshot(boot_plist),effect=effects.capture_change(before,boot_plist,store))
+        # Run the actual base API staging function before v2. Its preflight
+        # is a candidate-check double; emitted write commands use the real gate.
+        guest = self.root/'base-guest';(guest/'api').mkdir(parents=True)
+        (guest/'api/vphoned').write_bytes(signed_macho())
+        (guest/'api/vphoned.plist').write_bytes((ROOT/'sources/VPhoneDaemon/Configuration/vphoned.plist').read_bytes())
+        checks = self.root/'base-checker';checks.mkdir()
+        (checks/'check_guest_api.py').write_text('pass\n')
+        import shlex
+        emit = shlex.quote(sys.executable) + " -B -c 'import json,sys;print(\"COMMAND \"+json.dumps(sys.argv[1:]))' \"$@\""
+        shell = 'source "$1"; cfw_guest_write() { ' + emit + '; }; cfw_stage_api "$2"'
+        result = subprocess.run(['/bin/zsh','-c',shell,'fixture',str(ROOT/'scripts/lib/cfw_common.sh'),str(guest)],
+            env=dict(os.environ,SCRIPT_DIR=str(checks),VPHONE_PYTHON=sys.executable,
+                     VPHONE_GUEST_ENVIRONMENT='v2',MNT1=str(system.resolve())),capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        for line in result.stdout.splitlines():
+            if line.startswith('COMMAND '): guest_write.run(plan,json.loads(line.removeprefix('COMMAND ')))
+        # Cached classic API jobs must also be excluded from the base merge.
+        jobs=self.vm/'cfw_input/jb/LaunchDaemons';jobs.mkdir(parents=True)
+        (jobs/'vphoned-api.plist').write_bytes((guest/'api/vphoned.plist').read_bytes())
+        base_plist=self.stage/'launchd.plist'
+        guest_write.run(plan,['cp',str(boot_plist),str(base_plist)])
+        with patch.object(sys,'argv',['cfw.py','inject-daemons',str(base_plist),str(jobs)]):
+            cfw.main()
+        guest_write.run(plan,['cp',str(base_plist),str(boot_plist)])
         transaction_id=self.staged_signing_transaction()
         with self.handed_back_staging_owner():
             code=fixture.installer.install_mounted(system,self.vm,fixture.stage,fixture.daemon,self.root/'v2-initial-report.json',
@@ -1020,3 +1137,32 @@ class FrozenGateTests(unittest.TestCase):
         target=self.mount/'mnt1/System/Library/xpc/launchd.plist';target.parent.mkdir(parents=True);target.write_bytes(b'preserve')
         with self.assertRaises(ValueError): guest_write.run(self.load(),['cp',str(source),str(target)])
         self.assertEqual(target.read_bytes(),b'preserve')
+
+
+class ExpectedCoreBindingTests(unittest.TestCase):
+    def test_expected_binding_is_rechecked_before_writes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            vm = Path(directory)
+            binding = vm / 'launchpad.json'
+            raw = json.dumps({'bundle': '2.6.2', 'guestEnvironment': '2.6.1'}).encode()
+            binding.write_bytes(raw)
+            expected = {'VPHONE_EXPECTED_BINDING_SHA256': hashlib.sha256(raw).hexdigest(),
+                        'VPHONE_EXPECTED_CORE_BUNDLE': '2.6.2'}
+            with patch.dict(os.environ, expected):
+                gate.verify_expected_binding(vm)
+                binding.write_text(json.dumps({'bundle': '2.6.3'}))
+                with self.assertRaisesRegex(ValueError, 'binding changed'):
+                    gate.verify_expected_binding(vm)
+            binding.write_bytes(raw)
+            with patch.dict(os.environ, {**expected, 'VPHONE_EXPECTED_CORE_BUNDLE': ''}):
+                with self.assertRaisesRegex(ValueError, 'incomplete'):
+                    gate.verify_expected_binding(vm)
+            with patch.dict(os.environ, {**expected, 'VPHONE_EXPECTED_BINDING_SHA256': 'bad'}):
+                with self.assertRaisesRegex(ValueError, 'incomplete'):
+                    gate.verify_expected_binding(vm)
+            binding.unlink()
+            binding.symlink_to(vm / 'untrusted')
+            (vm / 'untrusted').write_bytes(raw)
+            with patch.dict(os.environ, expected):
+                with self.assertRaises(OSError):
+                    gate.verify_expected_binding(vm)

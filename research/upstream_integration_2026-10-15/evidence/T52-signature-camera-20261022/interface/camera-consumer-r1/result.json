@@ -1,0 +1,33 @@
+{
+  "state": "failed",
+  "vmInstanceID": "55A25B78-4CAD-4053-9C3E-9CFCD3E75F64",
+  "phases": [],
+  "error": "Matching two-level camera receipt was not observed: {'role': 'qr', 'protocol_version': 3, 'streaming': True, 'presentation_id': '305A5563-35FC-43CD-ADE7-069B34161AF7', 'generation': 't52-camera-bb1b8371f1734ea7afd7434d9e392ce4', 'error': 'two-level transport receipt unavailable for t52-camera-bb1b8371f1734ea7afd7434d9e392ce4', 'ok': False, 'source': 'image'}",
+  "neutralCleanup": {
+    "presentation_id": "974CAB56-E1DA-4F34-929E-B8F845539BB6",
+    "source": "image",
+    "generation": "2712E50A-CD1F-4908-8821-8C7EA02005A1",
+    "connected": true,
+    "host_scheduled_frame_index": 9,
+    "error": "neutral transport receipt unavailable",
+    "host_published_frame_index": 9,
+    "ok": false,
+    "protocol_version": 3,
+    "streaming": true,
+    "matches_requested": true,
+    "host_frame_index_semantics": "scheduled_tick",
+    "stop_policy": "neutral",
+    "neutral_generation": "2712E50A-CD1F-4908-8821-8C7EA02005A1",
+    "role": "neutral"
+  },
+  "cleanupError": "Camera source cleanup did not complete",
+  "probeStop": {
+    "method": "apps.terminate",
+    "ok": true,
+    "result": {
+      "killed": "org.vphone.acceptance.t52.20261022",
+      "pids": [],
+      "already_stopped": true
+    }
+  }
+}

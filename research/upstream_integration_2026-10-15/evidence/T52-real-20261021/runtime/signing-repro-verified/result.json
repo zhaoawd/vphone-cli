@@ -1,0 +1,26 @@
+{
+  "state": "passed",
+  "originalRejection": "signature load command overwrote non-padding bytes",
+  "executableBytesPreserved": true,
+  "entitlementsPreserved": true,
+  "finalCodeDirectoryPagesVerified": true,
+  "contentStart": 3208,
+  "preparedEnd": 3192,
+  "signedEnd": 3208,
+  "commands": [
+    [
+      "/opt/homebrew/bin/ldid",
+      "-S/Users/kolar/github/vphone-cli/.build/t52-real-20261021/signing-repro-verified/entitlements.plist",
+      "-M",
+      "-K/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-v2/cfw_input/signcert.p12",
+      "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/signing-repro-verified/unreserved-signed"
+    ],
+    [
+      "/opt/homebrew/bin/ldid",
+      "-S/Users/kolar/github/vphone-cli/.build/t52-real-20261021/signing-repro-verified/entitlements.plist",
+      "-M",
+      "-K/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-v2/cfw_input/signcert.p12",
+      "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/signing-repro-verified/reserved-signed"
+    ]
+  ]
+}

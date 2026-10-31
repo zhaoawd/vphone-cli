@@ -1,0 +1,95 @@
+{
+  "recordedAt": "2026-10-20T09:53:39.635821+00:00",
+  "scope": "independent DSC preboot Undo and explicit reapplication acceptance",
+  "vm": "vm-t32-t33-dsc-20261018",
+  "installerSubstep": "6/7: mobileactivationd signing preflight",
+  "published": false,
+  "runnerPID": 93069,
+  "currentObservation": {
+    "recordedAt": "2026-10-20T09:52:46.903241+00:00",
+    "stage": "install-cfw",
+    "runnerPID": 93069,
+    "runnerAlive": true,
+    "rootInstallerPIDs": [
+      97562
+    ],
+    "processes": [
+      {
+        "user": "root",
+        "pid": 2478,
+        "ppid": 97562,
+        "elapsed": "02:45:09",
+        "cpuTime": "0:00.08",
+        "cpuPercent": "0.0",
+        "command": "zsh .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/cfw_install.sh ."
+      },
+      {
+        "user": "root",
+        "pid": 84212,
+        "ppid": 2478,
+        "elapsed": "02:31",
+        "cpuTime": "0:00.12",
+        "cpuPercent": "0.0",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/patchers/plan_gate.py sign /opt/homebrew/bin/ldid -S -M -Kvm-t32-t33-dsc-20261018/cfw_input/signcert.p12 vm-t32-t33-dsc-20261018/.cfw_temp/mobileactivationd"
+      },
+      {
+        "user": "root",
+        "pid": 84216,
+        "ppid": 84212,
+        "elapsed": "02:31",
+        "cpuTime": "2:26.81",
+        "cpuPercent": "97.3",
+        "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw verify-plan vm-t32-t33-dsc-20261018 --expected-sha256 bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c"
+      },
+      {
+        "user": "kolar",
+        "pid": 93069,
+        "ppid": 1,
+        "elapsed": "03:05:29",
+        "cpuTime": "0:03.25",
+        "cpuPercent": "0.0",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -u .build/t32-resume-acceptance-20261020/run-acceptance.py"
+      },
+      {
+        "user": "kolar",
+        "pid": 94446,
+        "ppid": 93069,
+        "elapsed": "03:02:28",
+        "cpuTime": "2:03.57",
+        "cpuPercent": "0.0",
+        "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw install vm-t32-t33-dsc-20261018 --library-root /Users/kolar/github/vphone-cli --variant regular --guest-environment classic --keep-artifacts --reinstall-cryptex --root-popup"
+      },
+      {
+        "user": "root",
+        "pid": 97562,
+        "ppid": 94401,
+        "elapsed": "02:55:40",
+        "cpuTime": "0:00.08",
+        "cpuPercent": "0.0",
+        "command": "/bin/zsh .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/cfw_install_host.sh --variant regular --reinstall-cryptex vm-t32-t33-dsc-20261018"
+      }
+    ]
+  },
+  "hostReadiness": {
+    "helperActive": false,
+    "lastHelperExit": "Unexpected process state10",
+    "currentParserExit": 64,
+    "programUnchanged": true,
+    "priorAttachFailureCause": "unknown"
+  },
+  "remaining": [
+    "complete installer substep6/7 and7/7",
+    "two final read-only verifications, snapshot, seal and publication",
+    "unbooted installed proof; preboot Undo and restored proof",
+    "two restored API boot/shutdown cycles and postboot readback",
+    "same-generation explicit Cryptex reapplication",
+    "reapplied proof; two API boot/shutdown cycles and postboot readback; final archive"
+  ],
+  "accepted": false,
+  "runtimeEffectsValidated": false,
+  "graphicsValidated": false,
+  "git": {
+    "HEAD": "d968d02f5c69615b9f2f3bd45805b60e10540bfc",
+    "newChangesCommitted": false
+  }
+}

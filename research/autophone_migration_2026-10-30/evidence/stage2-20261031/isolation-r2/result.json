@@ -1,0 +1,269 @@
+{
+  "accepted": false,
+  "checks": [
+    {
+      "name": "start_0",
+      "passed": true,
+      "value": {
+        "action": "start",
+        "status": "running",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage2",
+        "rig_generation": 2,
+        "affected_pids": [],
+        "detail": ""
+      },
+      "seconds": 6.819006332996651
+    },
+    {
+      "name": "start_1",
+      "passed": true,
+      "value": {
+        "action": "start",
+        "status": "running",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage2-peer",
+        "rig_generation": 3,
+        "affected_pids": [],
+        "detail": ""
+      },
+      "seconds": 0.7410229579982115
+    },
+    {
+      "name": "unlock_both",
+      "passed": true,
+      "value": [
+        {
+          "screen_off": false,
+          "was_screen_off": false,
+          "locked": false,
+          "was_locked": true
+        },
+        {
+          "locked": false,
+          "was_screen_off": false,
+          "screen_off": false,
+          "was_locked": true
+        }
+      ],
+      "seconds": 1.1823900000017602
+    },
+    {
+      "name": "independent_runtime_and_locks",
+      "passed": true,
+      "value": [
+        {
+          "ok": true,
+          "source": "autophone-process-observation/v1",
+          "contract_version": "v1",
+          "host": {
+            "pid": 88656,
+            "process_start": "Sat Oct 31 08:53:13 2026",
+            "path": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm",
+            "binary_sha256": "0f86660fa63f85614fdb5bb81cbf76d4193d7b4fc3a3e4c82fd7b48e3eac8a88"
+          },
+          "guest": {
+            "pid": 300,
+            "process_start": "Sat Oct 31 08:52:05 2026",
+            "path": "/private/var/root/Library/Caches/vphoned",
+            "binary_sha256": "73df3c1625d736be80b183d0270d735ebe82c9dc00e120df43915be7a625269b",
+            "boot_id": "556A3C44-FE0F-4CB2-AD1C-43D2077A5275"
+          },
+          "binding": {
+            "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+            "device": 16777233,
+            "inode": 269327339,
+            "rig_id": "migration-stage2",
+            "rig_generation": 2
+          }
+        },
+        {
+          "ok": true,
+          "source": "autophone-process-observation/v1",
+          "contract_version": "v1",
+          "host": {
+            "pid": 88507,
+            "process_start": "Sat Oct 31 08:52:34 2026",
+            "path": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm",
+            "binary_sha256": "0f86660fa63f85614fdb5bb81cbf76d4193d7b4fc3a3e4c82fd7b48e3eac8a88"
+          },
+          "guest": {
+            "pid": 328,
+            "process_start": "Sat Oct 31 08:52:40 2026",
+            "path": "/private/var/root/Library/Caches/vphoned",
+            "binary_sha256": "73df3c1625d736be80b183d0270d735ebe82c9dc00e120df43915be7a625269b",
+            "boot_id": "8A3B156D-9B48-48DF-B319-7B88F9C02B2F"
+          },
+          "binding": {
+            "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer/vphone.sock",
+            "device": 16777233,
+            "inode": 269325883,
+            "rig_id": "migration-stage2-peer",
+            "rig_generation": 3
+          }
+        }
+      ],
+      "seconds": 0.6149295419891132
+    },
+    {
+      "name": "bound_cross_socket_refusal",
+      "passed": true,
+      "value": {
+        "refused": "protocol target socket mismatch"
+      },
+      "seconds": 0.00013324999599717557
+    },
+    {
+      "name": "clipboard_isolation",
+      "passed": true,
+      "value": {
+        "text": [
+          "isolation-A-3909b5df485948948efb35fcc4d7e275",
+          "isolation-B-f478b519aa984086bbf49f50eefb446d"
+        ]
+      },
+      "seconds": 0.07036191699444316
+    },
+    {
+      "name": "headless_screenshot",
+      "passed": true,
+      "value": {
+        "headless": true,
+        "image_bytes_base64": 45824
+      },
+      "seconds": 0.07346475000667851
+    },
+    {
+      "name": "native_running_disk_refusal",
+      "passed": true,
+      "value": {
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Error: VM 'isolation-peer' is running (process 88508 com.apple.Virtualization.VirtualMachine, 88510 com.apple.Virtualization.VirtualMachine). Stop it, then try again.\n"
+      },
+      "seconds": 0.030799583008047193
+    },
+    {
+      "name": "stop_pending_request_preserves_peer",
+      "passed": false,
+      "error": "AssertionError: {'ok': False, 'error': '客户机代理未连接。请等待连接后重试。'}",
+      "seconds": 4.844129292003345
+    },
+    {
+      "name": "reconnect_new_runtime_identity",
+      "passed": true,
+      "value": {
+        "ok": true,
+        "source": "autophone-process-observation/v1",
+        "contract_version": "v1",
+        "host": {
+          "pid": 88849,
+          "process_start": "Sat Oct 31 08:53:27 2026",
+          "path": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm",
+          "binary_sha256": "0f86660fa63f85614fdb5bb81cbf76d4193d7b4fc3a3e4c82fd7b48e3eac8a88"
+        },
+        "guest": {
+          "pid": 326,
+          "process_start": "Sat Oct 31 08:53:32 2026",
+          "path": "/private/var/root/Library/Caches/vphoned",
+          "binary_sha256": "73df3c1625d736be80b183d0270d735ebe82c9dc00e120df43915be7a625269b",
+          "boot_id": "06414033-C316-4DC4-9BEC-6F74C6996CAA"
+        },
+        "binding": {
+          "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+          "device": 16777233,
+          "inode": 269327643,
+          "rig_id": "migration-stage2",
+          "rig_generation": 2
+        }
+      },
+      "seconds": 8.934373334006523
+    },
+    {
+      "name": "stop_0",
+      "passed": true,
+      "value": {
+        "action": "stop",
+        "status": "stopped",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage2",
+        "rig_generation": 2,
+        "affected_pids": [
+          88849
+        ],
+        "detail": ""
+      },
+      "seconds": 4.547907583008055
+    },
+    {
+      "name": "stop_1",
+      "passed": true,
+      "value": {
+        "action": "stop",
+        "status": "stopped",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage2-peer",
+        "rig_generation": 3,
+        "affected_pids": [
+          88507
+        ],
+        "detail": ""
+      },
+      "seconds": 4.183689415993285
+    },
+    {
+      "name": "closeout",
+      "passed": true,
+      "value": {
+        "locks_released": true,
+        "disk_holders": [
+          "",
+          ""
+        ]
+      },
+      "seconds": 0.21740104199852794
+    }
+  ],
+  "targets": [
+    {
+      "host_id": "migration-local",
+      "rig_id": "migration-stage2",
+      "rig_generation": 2,
+      "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+      "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline",
+      "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+      "expected_usb_udid": "0000FE01-2119AAF5C1E70D2F",
+      "ssh_host": "127.0.0.1",
+      "ssh_port": 22242,
+      "frida_host": "127.0.0.1",
+      "frida_port": 37042,
+      "frida_guest_port": 27042,
+      "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2/logs",
+      "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2/tmp",
+      "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage2/packages",
+      "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2/runtime",
+      "protocol": "upstream_v1",
+      "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+    },
+    {
+      "host_id": "migration-local",
+      "rig_id": "migration-stage2-peer",
+      "rig_generation": 3,
+      "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+      "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer",
+      "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer/vphone.sock",
+      "expected_usb_udid": "0000FE01-32F7B33D02134DC5",
+      "ssh_host": "127.0.0.1",
+      "ssh_port": 22243,
+      "frida_host": "127.0.0.1",
+      "frida_port": 37043,
+      "frida_guest_port": 27042,
+      "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2-peer/logs",
+      "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2-peer/tmp",
+      "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage2-peer/packages",
+      "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2-peer/runtime",
+      "protocol": "upstream_v1",
+      "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+    }
+  ]
+}

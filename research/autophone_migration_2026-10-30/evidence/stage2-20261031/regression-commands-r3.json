@@ -1,0 +1,54 @@
+{
+  "cwd": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration",
+  "python": "/Users/kolar/github/autophone/.venv/bin/python",
+  "pytest": [
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_upstream_wire.py",
+    "tests/test_upstream_rig_lifecycle.py",
+    "tests/test_rig_lifecycle.py",
+    "tests/test_start_vphone_script.py",
+    "tests/test_device_execution.py",
+    "tests/test_lock_state_helper.py",
+    "tests/test_vphone_target.py",
+    "tests/test_device_session_channel.py",
+    "tests/test_vphone_capabilities.py",
+    "tests/test_device_runtime_observation.py",
+    "tests/test_stage_guard.py",
+    "tests/test_upstream_vphone_lifecycle.py",
+    "tests/test_transfer_atomicity.py",
+    "tests/test_vsock_health_client.py",
+    "tests/test_actions_launch_app.py",
+    "tests/test_platform_launch_blocker.py",
+    "tests/test_actions_press_key.py",
+    "-m",
+    "not live_device and not live_frida"
+  ],
+  "native_shell": [
+    "/Users/kolar/github/vphone-cli/.venv/bin/python",
+    "-m",
+    "unittest",
+    "-v",
+    "research.autophone_migration_2026-10-30.test_shell_exec"
+  ],
+  "live": [
+    "-m",
+    "tools.phase1.upstream_compat",
+    "--target",
+    "/Users/kolar/github/vphone-cli/.build/am31/stage2/runtime/target-2.json",
+    "--output",
+    "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage2-20261031/live-r3"
+  ],
+  "isolation": [
+    "-m",
+    "tools.phase1.upstream_isolation",
+    "--target",
+    "/Users/kolar/github/vphone-cli/.build/am31/stage2/runtime/target-2.json",
+    "--peer",
+    "/Users/kolar/github/vphone-cli/.build/am31/stage2-peer/runtime/target-3.json",
+    "--output",
+    "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage2-20261031/isolation-r3"
+  ],
+  "repeat_requires_new_output_directory": true
+}

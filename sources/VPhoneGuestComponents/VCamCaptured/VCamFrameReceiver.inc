@@ -1,5 +1,7 @@
 // MARK: - shared-frame reader
 
+#include "../Shared/VPhoneSimulationAccess.h"
+
 // The latest frame copied out of the vphoned-published shm. Mutated only
 // from the reader callback thread; readers (AVF stream production, next
 // stage) take the lock for the brief duration of a copy.
@@ -16,14 +18,84 @@ static uint64_t vcc_frames_received = 0;
 static uint8_t *vcc_staging_pixels = NULL;
 static size_t vcc_staging_capacity = 0;
 
+static uint8_t *vcc_observe_base = NULL;
+static uint64_t vcc_observe_count = 0;
+
+static uint64_t vcc_monotonic_ns(void) {
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) return 0;
+  return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+}
+
+// Lazily create + map the observe shm read-write (we own it). Idempotent.
+static void vcc_observe_map(void) {
+  if (vcc_observe_base) return;
+  vpSimulationConsumeTokens(VP_SIM_OBSERVE_WRITE);
+  int fd = open(VPHONE_VCAM_OBSERVE_SHM_PATH, O_RDWR | O_CREAT | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC, 0644);
+  if (fd < 0) {
+    vcc_log(@"  observe open(%s) failed: %s", VPHONE_VCAM_OBSERVE_SHM_PATH,
+            strerror(errno));
+    return;
+  }
+  struct stat info;
+  if (fstat(fd, &info) < 0 || !S_ISREG(info.st_mode) || info.st_nlink != 1 || info.st_uid != geteuid()) {
+    close(fd); return;
+  }
+  if (ftruncate(fd, VPHONE_VCAM_OBSERVE_SHM_SIZE) < 0) {
+    vcc_log(@"  observe ftruncate failed: %s", strerror(errno));
+    close(fd);
+    return;
+  }
+  fchmod(fd, 0644);
+  void *base = mmap(NULL, VPHONE_VCAM_OBSERVE_SHM_SIZE, PROT_READ | PROT_WRITE,
+                    MAP_SHARED, fd, 0);
+  close(fd);
+  if (base == MAP_FAILED) {
+    vcc_log(@"  observe mmap failed: %s", strerror(errno));
+    return;
+  }
+  memset(base, 0, VPHONE_VCAM_OBSERVE_SHM_SIZE);
+  vcc_observe_base = (uint8_t *)base;
+  vcc_log(@"  observe shm mapped %s -> %p", VPHONE_VCAM_OBSERVE_SHM_PATH,
+          vcc_observe_base);
+}
+
+// Publish an observe record for a frame we just copied out of the frame shm.
+// seq even/odd discipline so vphoned reads a stable snapshot.
+static void vcc_observe_write(uint64_t frame_index, const char *generation, const uint8_t presentation_id[16]) {
+  if (!vcc_observe_base) vcc_observe_map();
+  if (!vcc_observe_base) return;
+  vphone_vcam_observe_header_t *oh = (vphone_vcam_observe_header_t *)vcc_observe_base;
+
+  uint64_t prev = atomic_load_explicit(
+      (_Atomic uint64_t *)&oh->seq, memory_order_acquire);
+  uint64_t writing = (prev | 1ull) + 2ull;
+  atomic_store_explicit((_Atomic uint64_t *)&oh->seq, writing,
+                        memory_order_release);
+
+  memcpy(oh->presentation_id, presentation_id, 16);
+  oh->observed_frame_index = frame_index;
+  oh->observed_at_ns = vcc_monotonic_ns();
+  oh->observed_count = ++vcc_observe_count;
+  memset(oh->observed_generation, 0, VPHONE_VCAM_GENERATION_MAX);
+  if (generation && generation[0]) {
+    size_t glen = strnlen(generation, VPHONE_VCAM_GENERATION_MAX - 1);
+    memcpy(oh->observed_generation, generation, glen);
+  }
+
+  atomic_store_explicit((_Atomic uint64_t *)&oh->seq, writing + 1ull,
+                        memory_order_release);
+}
+
 static int vcc_shm_map(void) {
-  int fd = open(VPHONE_VCAM_SHM_PATH, O_RDONLY);
+  vpSimulationConsumeTokens(VP_SIM_CAMERA_READ);
+  int fd = open(VPHONE_VCAM_SHM_PATH, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC);
   if (fd < 0) {
     vcc_log(@"  shm open(%s) failed: %s", VPHONE_VCAM_SHM_PATH, strerror(errno));
     return -1;
   }
   struct stat st;
-  if (fstat(fd, &st) < 0 || st.st_size < (off_t)VPHONE_VCAM_SHM_TOTAL_SIZE) {
+  if (fstat(fd, &st) < 0 || !S_ISREG(st.st_mode) || st.st_nlink != 1 || st.st_size < (off_t)VPHONE_VCAM_SHM_TOTAL_SIZE) {
     vcc_log(@"  shm fstat failed or undersized");
     close(fd);
     return -1;
@@ -57,6 +129,11 @@ static int vcc_shm_read_latest(void) {
   uint32_t fmt = hdr->pixel_format;
   uint64_t idx = hdr->frame_index;
   uint32_t pix_len = hdr->pixels_length;
+  char generation[VPHONE_VCAM_GENERATION_MAX];
+  memcpy(generation, hdr->generation, sizeof(generation));
+  generation[sizeof(generation) - 1] = '\0';
+  uint8_t presentation[16];
+  memcpy(presentation, hdr->presentation_id, sizeof(presentation));
 
   if (pix_len == 0 || pix_len > VPHONE_VCAM_SHM_MAX_PIXELS) return 0;
   if (w == 0 || h == 0 || bpr == 0 || pix_len < (size_t)bpr * h) return 0;
@@ -91,6 +168,7 @@ static int vcc_shm_read_latest(void) {
 
   vcc_last_seq_seen = seq_a;
   vcc_frames_received++;
+  vcc_observe_write(idx, generation, presentation);
   if ((vcc_frames_received & 29) == 1) {
     vcc_log(@"  shm frame #%llu (idx=%llu) w=%u h=%u bpr=%u fmt=0x%08x",
             (unsigned long long)vcc_frames_received,

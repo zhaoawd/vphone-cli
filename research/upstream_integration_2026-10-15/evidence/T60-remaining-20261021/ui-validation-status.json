@@ -1,0 +1,25 @@
+{
+  "actualIdleQuit": {
+    "candidate": ".build/t60-closeout-20261021.app",
+    "processExitedAfterActualCommandQ": true,
+    "pid": 78563,
+    "evidence": "actual-idle-quit.json",
+    "processCheckBeforeAnyFurtherAXRead": true
+  },
+  "actualGUIImportFailure": {
+    "candidate": ".build/t60-remaining-20261021.app",
+    "library": ".build/t60-remaining-20261021/ui-library",
+    "selection": ["ui-first.tzst", "ui-second.tzst"],
+    "alert": "tar: Error opening archive: Can't initialize filter; unable to run program \"zstd -d -qq\"",
+    "reproduction": "minimal-path-red.log",
+    "finalCandidateFormalMinimalPATHRegression": "passed for tzst and txz; real-cli-current-final.log",
+    "finalCandidateActualGUIRecheck": false
+  },
+  "currentBlocker": {
+    "tool": "mcp__cua_repl.js",
+    "action": "finderCheck.pressKey('super+shift+g')",
+    "result": "The Mac is locked and automatic unlock could not unlock it. Ask the user to unlock the Mac manually before continuing.",
+    "requestedUserUnlock": true
+  },
+  "unverified": ["actual GUI active/waiting Cancel", "actual GUI Quit during transfer and timeout", "actual Finder Open With/cold launch", "actual GUI creation Quit"]
+}

@@ -31,7 +31,8 @@ do {
         // protocols refuse before starting a child; ordinary launch stays local.
         if request.isKernelUpdate { try VPhoneLaunchpadLauncherRequest.validateKernelUpdateProtocol(executable: verified) }
         if request.isKernelRollback { try VPhoneLaunchpadLauncherRequest.validateKernelRollbackProtocol(executable: verified) }
-        let executable = request.isKernelUpdate || request.isKernelRollback ? verified : toolchain.executable
+        if request.isEnvironmentUpdate { try VPhoneLaunchpadLauncherRequest.validateEnvironmentUpdateProtocol(executable: verified) }
+        let executable = request.isKernelUpdate || request.isKernelRollback || request.isEnvironmentUpdate ? verified : toolchain.executable
         return try VPhoneLaunchpadLauncherProcess.run(path: executable.path,
             argv: [executable.path] + request.arguments + ["--expected-core-bundle", request.version])
     }

@@ -3,6 +3,33 @@ import Testing
 @testable import VPhoneBundleStore
 
 struct LauncherPolicyTests {
+    @Test func environmentReplacementRequiresItsOwnProtocol() throws {
+        let request = try VPhoneLaunchpadLauncherRequest(executable: target,
+            arguments: ["cfw", "update-environment", "machine", "--library-root", "/vm library", "--root-popup", "--work-parent", "/private/tmp"])
+        #expect(request.isEnvironmentUpdate && !request.isKernelUpdate && !request.isKernelRollback)
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let executable = root.appendingPathComponent("Contents/MacOS/vphone-cli")
+        try FileManager.default.createDirectory(at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        for value in ["", "vphone.environment-update.v0", "vphone.environment-update.v1"] {
+            try PropertyListSerialization.data(fromPropertyList: ["VPhoneEnvironmentUpdateProtocol": value], format: .xml, options: 0)
+                .write(to: root.appendingPathComponent("Contents/Info.plist"))
+            if value == "vphone.environment-update.v1" {
+                try VPhoneLaunchpadLauncherRequest.validateEnvironmentUpdateProtocol(executable: executable)
+            } else {
+                #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest.validateEnvironmentUpdateProtocol(executable: executable) }
+            }
+        }
+    }
+
+    @Test(arguments: [["--components", "/tmp/unverified"], ["--project-root", "/tmp"], ["--work-parent", "relative"],
+                       ["--root-popup", "--root-popup"], ["--expected-binding-sha256", "bad"], ["--library-root"]])
+    func environmentRejectsResourceOverridesAndMalformedOptions(options: [String]) {
+        #expect(throws: (any Error).self) {
+            try VPhoneLaunchpadLauncherRequest(executable: target, arguments: ["cfw", "update-environment", "machine"] + options)
+        }
+    }
+
     let target = "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli"
 
     @Test func permitsExplicitCommittedKernelRollbackRoute() throws {

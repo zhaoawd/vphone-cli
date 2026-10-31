@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import VPhoneKernelIOTrace
 @testable import FirmwarePatcher
 
 @Suite struct FirmwareDesiredPlanStoreTests {
@@ -35,6 +36,28 @@ extension FirmwareDesiredPlanStoreTests {
             onto: VPhoneBundle(url: baseURL, manifest: manifest))
         #expect(try Data(contentsOf: f.disk) == disk)
         #expect(try Data(contentsOf: f.vm.appendingPathComponent(Store.filename)) == desired)
+        #expect(throws: Store.Failure.identityMismatch) { try Store.read(in: f.vm) }
+    }
+    /// The trace regression checks complete generation reads inside this span.
+    @Test func measuredReadRevalidatesOriginalsForEveryRequest() throws {
+        let (f, prepared) = try ready()
+        _ = try Store.publish(prepared, expectedSHA256: nil)
+        for _ in 0..<2 {
+            try KernelIOTrace.measure("regression.desired-plan.read") { _ in
+                guard case .ready(let record) = try Store.read(in: f.vm) else {
+                    Issue.record("saved plan did not validate"); return
+                }
+                #expect(record == prepared.record)
+            }
+        }
+        let root = f.vm.appendingPathComponent(".firmware-generations/\(prepared.record.generationID)/originals")
+        let restore = try #require(FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
+            .first { $0.lastPathComponent.contains("Restore") })
+        let original = restore.appendingPathComponent("kernelcache.test")
+        let attributes = try FileManager.default.attributesOfItem(atPath: original.path)
+        let data = try Data(contentsOf: original)
+        try Data(repeating: 0x58, count: data.count).write(to: original)
+        try FileManager.default.setAttributes([.modificationDate: try #require(attributes[.modificationDate])], ofItemAtPath: original.path)
         #expect(throws: Store.Failure.identityMismatch) { try Store.read(in: f.vm) }
     }
     @Test func missingIsDistinctFromPermissionDenied() throws {
@@ -115,6 +138,23 @@ extension FirmwareDesiredPlanStoreTests {
 }
 
 extension FirmwareDesiredPlanStoreTests {
+    @Test func previousGuestTargetTableCannotAuthorizeCurrentPlan() throws {
+        let (f, prepared) = try ready()
+        let generation = try FirmwareGeneration.loadVerified(in: f.vm, id: prepared.record.generationID)
+        let previous = "5f259f42583bb7b1f1426b986a86801fc421e17921fc157fe4a74bd596771213"
+        #expect(GuestTargetRules.digest != previous)
+        var object = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(prepared.record.plan)) as? [String: Any])
+        var entries = try #require(object["guestUncovered"] as? [[String: Any]])
+        let index = try #require(entries.firstIndex { ($0["id"] as? String) == "system-seputil-boot-gigalocker_uuid" })
+        entries[index]["recordRules"] = [["literal": "guest-target-map-v1:\(previous):system-seputil-boot-gigalocker_uuid",
+                                          "hexadecimalOffsetSuffix": false]]
+        object["guestUncovered"] = entries
+        let old = try JSONDecoder().decode(VariantPlanResolver.VariantPlan.self, from: JSONSerialization.data(withJSONObject: object))
+        #expect(throws: Store.Failure.invalidPlan) { try Store.prepare(in: f.vm, plan: old, generation: generation) }
+        // A current plan still prepares against verified inputs; old rules are never rewritten in place.
+        _ = try Store.prepare(in: f.vm, plan: prepared.record.plan, generation: generation)
+        #expect(old.guestUncovered[index].recordRules != prepared.record.plan.guestUncovered[index].recordRules)
+    }
     @Test func decodedManifestAndLegacyRulesAreNotAuthority() throws {
         let (f, p) = try ready()
         let generation = try FirmwareGeneration.loadVerified(in: f.vm, id: p.record.generationID)
@@ -238,5 +278,40 @@ extension FirmwareDesiredPlanStoreTests {
         #expect(!result.record.plan.enabledSteps.contains("ibss.IBootPatcher.patchSerialLabels"))
         guard case .ready(let saved) = try Store.read(in: f.vm) else { Issue.record("no saved plan"); return }
         #expect(saved == result.record)
+    }
+
+    @Test func snapshotRevertAndCloneDoNotReuseSourceFirmwarePlanQualification() throws {
+        let (f, p) = try ready()
+        _ = try Store.publish(p, expectedSHA256: nil)
+        let library = VPhoneLibrary(root: f.vm.deletingLastPathComponent())
+        let vmName = f.vm.lastPathComponent
+        let rom = f.root.appendingPathComponent("rom.bin")
+        try Data([0xAA]).write(to: rom)
+        try Data([1, 2, 3]).write(to: f.vm.appendingPathComponent("SEPStorage"))
+        try Data([4, 5, 6]).write(to: f.vm.appendingPathComponent("nvram.bin"))
+        try Data([0xAA]).write(to: f.vm.appendingPathComponent("AVPBooter.vresearch1.bin"))
+        try Data([0xBB]).write(to: f.vm.appendingPathComponent("AVPSEPBooter.vresearch1.bin"))
+        let manifest = VPhoneVirtualMachineManifest(
+            machineIdentifier: Data([1, 2]),
+            cpuCount: 2,
+            memorySize: 2048 * 1024 * 1024,
+            romImages: .init(avpBooter: "AVPBooter.vresearch1.bin", avpSEPBooter: "AVPSEPBooter.vresearch1.bin")
+        )
+        try manifest.write(to: f.vm.appendingPathComponent("config.plist"))
+        let bundle = try library.bundle(named: vmName)
+
+        // Clone omits host-local `.firmware-*` files so the clone starts unqualified.
+        let cloned = try VPhoneBundleOps.clone(bundleNamed: vmName, to: vmName + "-clone", in: library, newIdentity: true)
+        guard case .missing = try Store.read(in: cloned.url) else {
+            Issue.record("cloned VM unexpectedly inherited source firmware desired plan")
+            return
+        }
+
+        // Snapshot revert replaces Disk.img with an APFS clone (new inode), invalidating the pre-revert plan binding.
+        try VPhoneMachineSnapshots.create("snap", of: bundle)
+        try VPhoneMachineSnapshots.revert(to: "snap", of: bundle)
+        #expect(throws: Store.Failure.identityMismatch) {
+            try Store.read(in: f.vm)
+        }
     }
 }

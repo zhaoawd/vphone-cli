@@ -1,0 +1,2596 @@
+diff --git a/README.md b/README.md
+index a54d9acb..8ed53970 100644
+--- a/README.md
++++ b/README.md
+@@ -18,7 +18,7 @@ Boot a virtual iPhone via Apple's Virtualization.framework using PCC research VM
+ **Dependencies:**
+ 
+ ```bash
+-brew install python@3.13 aria2 wget gnu-tar openssl@3 ldid-procursus sshpass keystone cmake libusb ipsw zstd
++brew install python@3.13 aria2 wget gnu-tar openssl@3 ldid-procursus sshpass keystone cmake libusb ipsw zstd xz
+ ```
+ 
+ ## Install
+diff --git a/TASKS.md b/TASKS.md
+index 5e9a11b4..69f61314 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1,6 +1,6 @@
+ # T32/T33 当前执行清单
+ 
+-2026-10-20 当前状态：21ae78d3已push。显式Cryptex重装事务20261019T124601Z-vZh3Hh4C最终核验拒绝，原盘身份/mtime与66样本保持，两个顺序验收脚本停止，未执行Undo或启动。已用真实删除记录与实际安装脚本复现已有目录符号链接的ln -sf额外写入，改用ln -sfn，并在写入入口拒绝跟随目录或尾斜杠；最终严格比较保持并新增目标/字段诊断。相关43项及最终完整Python948项（跳过2项）通过，签名应用和原VM程序保持核验通过。修复后重试CLI4097/session59096已发起，Undo及on→off→on尚待验收，T32/T33未accepted。
++2026-10-21 09:12 CST 更新：本轮独立 DSC 启动前 Undo→同 generation 显式重新应用的真实 VM 验证于09:07通过。三份 v4 journal 已发布；DSC .42 原件/补丁件完整摘要、0x548/0x560 和6885代码页通过；恢复与重新应用状态各两次真实无界面 API 启动/正常关机、运行后 Receipt/generation 读回通过。10个阶段均退出0，7组证明与118个归档索引文件摘要核对通过。指定 runner、观察进程、caffeinate、VM子进程和旧CDHash helper PID均已不在进程表。本轮使用冻结构建；性能优化候选未纳入，图形/补丁运行效果、Mach-O/Preboot撤销、任意中间重打和受信guest来源不在已通过范围，T32/T33整体仍未 accepted。
+ 
+ 固定上游目标：`8a75092013eda87a4e30ed029b72028cb9279ac4`。
+ 起点：`2df4be8c`。保留已有 Capstone overlay；以下为 2026-10-15 的初始隔离验证范围，后续真实 VM 授权与结果按日期记录。
+@@ -286,10 +286,183 @@
+ - [x] 事务 `20261019T124601Z-vZh3Hh4C` 在首次最终核验拒绝，退出 1；原盘 dev/inode/size/mtime 与 66 样本相同，staged 已由安装器清理。两个顺序验收脚本均停止，未执行 Undo 或启动。
+ - [x] 实际安装脚本隔离回归约 3 秒复现：已有目录符号链接时，`ln -sf` 在 Cryptex 内创建同名链接。真实删除记录包含 `com.apple.dyld/com.apple.dyld` 与 `dyld/dyld` 两个应不存在目标。
+ - [x] 用真实两条删除记录和实际安装脚本重放最终比较，复现相同 `final transported member differs from recorded output`。失败 staged 已清理，无法直接读回此次失败的全部最终状态；该证据限制保留。
+-- [ ] 修复链接替换及 guarded writer 参数/目标检查，保存回归和错误目标诊断；执行相关与完整 Python 验证。
++- [x] 修复链接替换及 guarded writer 参数/目标检查，保存回归和错误目标诊断；执行相关与完整 Python 验证。
+ - [ ] 更新签名 host 应用资源并保持原获批 VM 程序；再次实际显式重装、Undo、重新应用及启停验收，归档后提交 push。
+ 
+ - [x] 目录符号链接修复及严格拒绝回归完成；相关43项、完整Python948项（跳过2项）通过；签名应用资源/依赖核验及原VM字节/inode保持通过。
+ 
+ - [x] 最终完整 Python 948 项（跳过 2 项）259.925 秒退出 0；427 份归档文件大小及 SHA-256 核对通过。
+ - [ ] 修复后顺序验收 session59096/CLI4097 已通过安装前核验；本次 osascript10018 等待 macOS 原生管理员验证，尚无 root 安装进程。后续使用原获批 VM 程序，无新增 CDHash 授权。
++
++- [x] 用户完成本次验证；全局检查确认 root24328 已运行，正在核验冻结计划及历史事务。原生提权由系统授权服务启动，不能仅依据 CLI 子树判断是否已生效。
++- [ ] 同一重装 session59096/CLI4097/root24328 持续执行；首次发布通过后由既有顺序脚本保存新 installed 证明并执行未启动 Undo，尚未计作通过。
++
++- [x] 实际目录核对确认新 staged `.cfw_disk.iTDO2qSV` 与 mount `.cfw_mount.mzBPvwgT` 已建立；原 Disk.img inode247084001/mtime保持，本次仅核对元数据，未重新抽样或整盘哈希。root24328/session59096继续执行，尚未发布。
++
++- [x] 补充验收全部通过后的归档/普通提交/push步骤 `.build/t32-cryptex-symlink-debug/archive-after-pass.py`；3 个合成数据回归函数通过，包含 14 个拒绝用例与文件复制限制。合成结果不作为真实 VM 证据。
++- [ ] 归档步骤仅在真实顺序验收 state=passed、七组证明通过、三个 journal/generation/6885页/API次数匹配时执行；冻结 HEAD d968d02f、当前文档摘要和目标分支，仓库/远端变化则拒绝自动提交。归档步骤启动后请先查看 `.build/t32-cryptex-symlink-debug/archive-state.json`，不要假定已经提交；若继续修改这些进度文档，该步骤会拒绝提交，需要之后人工核对。
++
++## 2026-10-20：恢复执行状态核对
++
++- [x] 全局只读进程检查确认旧安装器、顺序验收及自动归档均已退出；旧 acceptance-state.json 不能作为仍在执行的证据。
++- [x] 确认新增历史事务 20261020T000756Z-iTDO2qSV；无 .cfw_disk.* 或 .cfw_mount.* 目录。当前 Disk.img dev/inode/size/mtime 与先前记录一致，仅证明元数据保持。
++- [ ] 读取 root 持有的指定事务；sudo 非交互读取要求密码，已发起只读 macOS 原生管理员验证，未修改所有权、权限或磁盘。
++- [ ] 取得错误原文后建立最小失败回归，必要时修复并执行相关验证；不依据旧错误推定本轮原因。
++- [ ] 按同一 generation 完成安装发布、启动前 Undo、原件/代码页读回、撤销后启停及重新应用启停。旧自动归档基线已因本次进度更新失效，后续需先人工核对。
++
++## 2026-10-20：续跑只读核验
++
++已取得 VM 目录锁，按正式 cfw_disk_txn.sample_digest 计算 66 段采样，SHA-256 为 6715076b65c9b03b5313ab5f62c0a5e69dd352072cb63e5f8fe5e56543b35108，与安装前记录一致。完整磁盘摘要未重算，未启动或写入 VM。指定 root 历史事务等待原生验证读取；尚不能确认退出原因。旧验收/归档进程不存在，未重启安装或自动归档。证据：`research/upstream_integration_2026-10-15/evidence/T32-T33-resume-20261020/manifest.json`。
++
++## 2026-10-20：141 退出复现及持久日志重试准备
++
++已只读取得事务与最后 14 条操作摘要。真实退出为 141，109 条操作止于 GPU 归档删除；无最终效果报告或发布证据。原事务明确记录原盘身份及 66 段采样保持。
++
++隔离正式 host-driver 对照命令：`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python3 .build/t32-resume-20261020/compare-output.py`。三个场景通过：关闭 stdout 消费者得到 141/failed，普通日志得到 0/published，普通日志加安装错误得到 37/failed；三个场景原盘均保持且无残留 staged。该结果证明可复现路径，不能确认真实输出消费者退出原因。
++
++持久进程 PID93069 使用普通日志，先等待指定失败事务及 .cfw_temp 的原有 invoker handback，再检查签名/输入/磁盘身份，执行同 generation 的安装、启动前撤销、重新应用及各两次 API 启停和读回。所有生产核验保持；未改动 VM 程序、宿主放行或 Git。重试安装前仍须系统原生管理员验证。证据：`research/upstream_integration_2026-10-15/evidence/T32-T33-resume-20261020/manifest.json`。
++
++- [x] 读取真实失败事务及操作摘要。
++- [x] 完成 SIGPIPE 路径隔离复现和三场景对照，保存可重复脚本及证据。
++- [ ] 完成指定生成物交还的原生验证，观察持久顺序验收进入安装阶段。
++- [ ] 完成实际安装/Undo/重新应用/启停，按实际结果归档；不提前提升整项验收。
++
++## 2026-10-20：持久验收执行与 T60 独立工作
++
++- [x] 指定失败事务及 .cfw_temp 所有权交还通过；事务内容摘要保持。
++- [x] 全局进程核对确认安装原生验证已完成，root97562 执行 staged .cfw_disk.tjhO0rSZ；无重复安装。
++- [x] 归档真实失败事务、109 条操作及交还结果。
++- [ ] 继续本次真实 DSC 顺序验收；只使用现有冻结签名应用与已批准 VM 程序。
++- [ ] T60：建立并发导入不应丢失第二个请求、取消等待项不应影响其余项的回归；完成 FIFO 导入及批量选择接线。
++- [ ] T60：验证退出门关闭后队列不启动新命令；执行 Launchpad 相关回归和构建。完整 T60/混合版本/实际 UI 验收范围继续单列。
++
++## 2026-10-20：T60 导入 FIFO 与批量选择
++
++当前源码实现 FIFO 等待、批量选择、等待项取消和退出门关闭后不启动下一项。原实现 2 项回归记录 4 个失败；实现后相关 26 项及完整 LaunchpadKit 210 项通过，6 项真实 CLI/烟测按配置跳过。首次沙箱运行的 4 个权限失败保留，同一已构建测试在沙箱外通过。逐项队列行/进度/取消 UI、签名交互和完整退出矩阵未完成；T60 整体未 accepted。详情：`research/upstream_integration_2026-10-15/T60_import_queue.md`。DSC 冻结安装继续在独立持久进程中运行，未由本轮源码构建替换。
++
++- [x] T60 并发请求不丢失的失败回归、FIFO 与批量选择接线。
++- [x] 等待/活动取消、Unicode、失败中止当前批次及退出门回归。
++- [x] 相关 26 项、完整 LaunchpadKit 210 项及本地化 JSON 检查通过。
++- [ ] 逐项队列状态 UI、签名交互及完整退出矩阵；继续独立 DSC 实际验收。
++
++## 2026-10-20：T60 导入状态和取消入口
++
++- [x] 新增逐项 waiting/running/cancelling 状态；等待取消不执行命令，活动取消保留行直到命令输出排空。
++- [x] 应用退出先关闭命令入口，再取消导入/导出的等待和活动项；保留超时取消退出及已发布输出。
++- [x] 主窗口显示导入列表和逐项取消，允许继续添加选择；使用不确定进度，不推断字节比例。
++- [x] 相关 31 项、完整 LaunchpadKit 216 项（6 项配置性跳过）通过；285 项源字符串与中英文目录检查通过。
++- [ ] 独立签名候选 .build/t60-import-state-20261020.app 构建与资源/依赖/签名检查；保留现有所有应用。
++- [ ] 真实 UI/归档迁移和完整混合版本退出矩阵；继续 DSC 同一持久安装事务验收。
++
++- [x] 独立签名候选构建和完整资源/本机依赖/嵌套工具链摘要检查通过；冻结 CLI/VM 字节保持。
++- [x] 真实签名 CLI 隔离并发导入验证通过：两个归档均发布，源盘/目标盘/归档完整摘要保持，输出排空且无 import staging。补存具体摘要后定向复验中。
++
++## 2026-10-20：T60 状态/取消/退出后续验证
++
++逐项导入状态和取消入口、等待选择取消、活动项排空、退出时混合转移取消及超时保留状态已实施。31项定向、216项完整LaunchpadKit通过；独立Release签名候选及嵌套工具链/依赖/资源检查通过。真实签名CLI的隔离并发导入复验通过：两个归档发布、源盘/目标盘/归档完整摘要保持、输出排空；具体摘要已归档。真实UI操作、字节进度、真实VM迁移及完整混合版本退出矩阵仍未验收，T60整体未accepted。证据：`research/upstream_integration_2026-10-15/evidence/T60-import-state-20261020/manifest.json`。
++
++- [x] 具体摘要归档后的真实CLI并发导入复验通过（6.656秒，两个命令退出0，输出排空）；冻结验收输入摘要保持。
++- [ ] 最新全局观察：seputil 原件复制入口的冻结计划核验正在执行；当前磁盘未发布。
++
++## 2026-10-20：用户要求完成当前项
++
++本轮仅继续 T32/T33 独立 DSC 的真实安装→启动前Undo→撤销后启停→同generation重新应用→启停及运行后读取。沿用持久 runner93069/CLI94446/root97562，不扩展其他功能，不重启安装。最新进程为 Hardware/AA.gl 移动入口的冻结计划核验；尚未发布。
++
++- [ ] 等待本次安装结束，核对真实 v4 发布和当前未启动磁盘的 DSC 原件/补丁/6885代码页。
++- [ ] 完成实际 Undo 发布和恢复原件证明，再执行两次 API 正常启停及运行后读取。
++- [ ] 同 generation 显式重新应用 Cryptex，核对新事务、代码页、两次 API 启停及运行后读取。
++- [ ] 核对三份不同 journal、同 generation、原件/补丁摘要及全部证明，归档具体结果；保持更广 T32/T33 范围未验收。
++
++### 冻结 VM 执行条件复查
++
++冻结程序字节/inode/CDHash保持，但非法参数探测返回-9。16:33:10 的amfid日志明确记录restricted entitlements拒绝；当前amfid44463，无旧helper。按本任务既有同CDHash授权发起既有临时helper恢复，等待系统原生验证；不加载/修改持久允许列表、不更改SIP或启动参数。安装仍在同一staged事务继续。
++
++## 2026-10-20：完成当前DSC项的执行条件
++
++用户要求继续完成当前项，本轮仅继续已有T32/T33验收。安装已从seputil推进到GPU归档提取入口，持久进程存活，未发布；未启动重复安装。后续VM程序的参数探测返回-9，程序字节、inode和已批准CDHash保持；16:33:10宿主日志确认amfid的restricted entitlements拒绝。仅按既有同哈希授权恢复临时helper，等待系统管理员验证，不扩展允许范围、不改SIP/启动参数或持久列表。准备了最终归档脚本，只有七组真实证明、三份journal、同generation、6885代码页和两组正常启停/读回全部匹配才会通过；脚本目前仅做语法检查，未执行最终归档。
++
++## 当前执行：计划核验性能优化（2026-10-20）
++
++- [x] 用现有 I/O trace 建立每次计划读取的完整 generation 核验次数基线，保存能捕获重复校验的回归。
++- [x] 消除单次请求内重复完整核验；每次新请求仍重新验证原件、身份及发布证据。
++- [x] 验证原件篡改、inode/身份变化、历史发布副本与blob篡改继续拒绝；执行相关固件无关回归。
++- [x] 使用独立候选测量优化前后调用次数/耗时并归档；当前冻结真实VM验收程序保持。
++
++- [x] 本轮重新恢复同CDHash临时放行，参数检查持续64；不加载或修改持久允许列表。
++- [x] 归档检查3项回归通过，覆盖代码页/父事务/系统版本/正常启停和读回错误拒绝；watcher82196等待全部真实证明后归档，不写VM或Git。
++
++## 当前真实DSC验收进程与恢复入口（2026-10-20）
++
++- 持久执行器 PID93069，状态 `.build/t32-resume-acceptance-20261020/acceptance-state.json`；只继续该执行器，不启动重复安装。
++- 只读观察 `.venv/bin/python3 .build/t32-resume-acceptance-20261020/observe-acceptance.py`；watcher82196每30秒记录观察，并在全部实际证明通过后调用严格归档脚本。归档状态见同目录 `finalization-state.json`，日志 `watch-and-archive.log`；无Git操作。
++- 启动执行条件观察器80317，每30秒执行冻结程序非法参数，返回64表示进入解析；验收终态或12小时自动停止。当前同CDHash临时helper80729附加amfid55934，恢复记录 `host-allowance-before-boots-20261020.json`。不加载或修改持久允许列表。
++- 当前真实VM为 `vm-t32-t33-dsc-20261018`，generation `6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42`；Undo staged `.cfw_disk.EauDALvj`。当前已完成prepare/apply、两次最终核验、封存；在publish内最后一次计划复核，尚不能确认磁盘交换或finish。
++- 后续按原脚本执行恢复证明、两次API启停及读回、显式重新应用、再次证明/两次启停/读回。reapply仍可能需要系统原生管理员验证；未完成验证时不得重复启动安装。
++- 最终归档需七组实际证明、三份不同journal、同generation、原件/补丁摘要与6885页、26.0/23A341及正常关机/释放磁盘；不是整项T32/T33或图形效果验收。
++
++- [x] 本轮未启动Undo实际发布：20261020T130129Z-EauDALvj，退出0；guest来源仍为unknown，恢复证明/启停及重新应用尚待完成。
++
++- [x] 本轮恢复原件证明及撤销后两次真实API正常启停通过，结果已归档；运行后读回与重新应用仍待完成。
++
++- [x] 撤销后运行读回通过：cfw receipts及verify-plan均退出0，关联同Undo journal，区分当前运行镜像与封存发布镜像，runtimeValidated保持false。
++
++
++## 2026-10-21：T60 收尾及计划核验性能优化收尾（当前聊天）
++
++范围：先完成 T60 可独立执行的实现、离线回归和界面验证，再完成计划核验性能优化的评审、回归和隔离基准。当前真实 DSC 验收沿用冻结程序；不在本聊天启动或改写其 VM。现有未提交修改保留。
++
++- [x] 核对现有源码、测试和证据；T60 队列/逐项取消已实现，现有 opt-in 导出取消测试仍观察旧最终路径，需修正为真实私有 staging。
++- [x] 修复跨选择导出和调用方取消；保存源变化合同、FIFO/等待取消/退出边界回归。两个指定签名CLI候选各6项通过；全部历史混合版本范围仍未验收。
++- [ ] 实际多选两归档及两个16GiB源/目标完整摘要通过；Computer Use随后连续timeoutReached，界面Cancel/AppKit Quit未验证。库/真实CLI取消和退出已有保存回归通过。
++- [x] T60完整相关回归、候选签名/资源检查和证据归档完成，配置性跳过及真实VM/完整矩阵限制单列。
++- [x] 评审单次计划校验去重、直接Store.read身份/证据拒绝回归及4GiB历史镜像隔离基准：7.156秒→3.658秒，读取字节减半；冻结真实验收程序保持。
++- [x] 研究记录、台账、执行命令和证据索引已更新；保留UI阻塞及真实VM未验证范围，未提交或推送。
++
++
++2026-10-21 T60 收尾（当前聊天）：已修复跨选择导出并发及调用方取消未传播，保留失败回归；新增两后端源变化发布拒绝及最终提交前复查。完整 LaunchpadKit221项/Core436项和Python37项通过；正式run_launchpad_cli_tests对上一候选与当前候选分别6项通过。独立签名候选为.build/t60-closeout-20261021.app。实际NSOpenPanel已多选两个16GiB稀疏夹具并发布，两份成功日志和源归档摘要保持；随后界面工具多次timeoutReached，重绑定和会话重置未恢复，1秒sample显示主线程处于正常事件循环。UI取消和AppKit Quit保持未验证，整项T60不accepted；不阻止后续隔离性能验证。当前聊天不操作真实验收VM。
++
++
++## 2026-10-21：继续完成T60剩余内容
++
++- [x] 保存创建退出原实现2项/6个issue失败；创建纳入进程组中断及输出/日志有期限等待，运行VM生命周期保持独立。
++- [x] Finder归档打开在工具链验证前排队，完成入口/UTI接线和正式冷启动/无效选择回归；实际Finder交互仍待解锁。
++- [x] 版本化可选JSONL进度和旧CLI不确定进度回退；socket排除、未知总量及两后端源状态合同保持。
++- [x] 实际GUI发现Finder PATH缺zstd；打包zstd/xz及依赖/许可证，最小PATH两格式正式导入导出通过。
++- [x] 最终独立r3签名候选和完整资源/本机依赖/嵌入清单检查通过；Kit227项（跳过10）、Core441项（跳过1）、ArchiveCLI2函数、Python62+7项通过。新/旧具名签名CLI分别8项通过；真实信号导入4+导出4场景通过。
++- [x] 原候选实际idle Command-Q退出；旧真实VM的APFS克隆导出14.5GiB归档通过，源持久文件完整摘要保存；当前DSC验收VM/冻结程序保持。
++- [ ] Mac当前锁定，等待用户手动解锁后完成最终候选实际活动/等待Cancel、传输Quit/超时及Finder冷打开；真实创建退出仅有受控替身回归，未执行实际restore。
++- [ ] 真实VM导入预检需30,044,004,352字节空闲（含4GiB保留），当前约27.7GB；待释放至少3GiB后重新检查。原始归档和VM保留，未删数据。
++- [x] 更新研究、台账和证据：research/upstream_integration_2026-10-15/evidence/T60-remaining-20261021/manifest.json。T60未accepted；未提交或推送。
++
++
++## 2026-10-21：独立 DSC 真实 VM 验证结果
++
++- [x] 初装、启动前撤销和同 generation 显式重新应用：三份不同 v4 journal、完整摘要与6885代码页。
++- [x] 恢复后和重新应用后各两次真实无界面 API 启动、正常关机及磁盘释放。
++- [x] 两种状态的运行后生产 Receipt 和 Swift generation verifier 退出0。
++- [x] 七组证明归档，独立核对118个索引文件的大小和SHA-256；冻结输入和两份应用签名通过。
++
++证据：`research/upstream_integration_2026-10-15/evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json`。上面的整体待办继续保留，本结果仅完成DSC启动前撤销/重新应用范围。
++
++
++2026-10-21 T60恢复：用户已解锁并清理空间。最终r3实际等待/活动Cancel、传输Quit超时提示及及时恢复后的排空退出通过；Finder冷打开与热打开均已启动导入。真实native VM导入两次触及4GiB保留量并退出130，均清理未发布staging。第二次记录目标分配超过60GB，源约25GB；原因待查，正在建立源/目标分配量回归。当前不增加新的真实导入重试。
++
++
++## 2026-10-21：T60恢复后的实际验收
++
++- [x] r3实际导入/导出等待及活动取消、传输Quit超时保留与排空退出、Finder冷/热打开；两个16GiB源/目标及归档完整摘要保持。
++- [x] 真实64GiB默认system-tar往返8个持久文件摘要一致，源VM/归档保持，无staging，未启动VM。
++- [x] 正式native1GiB稀疏盘/硬链接回归；新旧签名CLI各9项/4 suites通过；完整Kit228项（跳过11）通过。
++- [ ] native真实大盘两次容量中断并清理，分配差异原因未查明；待批准清理本次具名system-tar/restored测试副本，需73,766,043,199字节保守空闲后复验。
++- [ ] 实际create/restore退出和更广历史组合保持未验证；不提前登记accepted。
++- [x] 更新研究/台账及evidence/T60-resume-20261021；冻结DSC输入保持，未提交或推送。
++
++
++## 2026-10-21：T60具名验收矩阵完成
++
++- [x] 用户批准后仅删除本次system-tar/restored测试副本；原VM、归档和验证结果保持。
++- [x] 相同r3候选与归档完成native64GiB导入，8个持久文件完整摘要相等，无staging、未启动VM；容量阻塞解除。
++- [x] GUI取消/退出/Finder、新旧签名CLI各9项、创建退出受控回归和真实两后端具名矩阵完成。候选签名及冻结DSC输入复查保持。
++- [x] 归档最终结果及批准清理记录，更新台账；当前实现与具名矩阵可提交评审，不代替人审accepted。
++
++验证限制：导入后启动、实际restore阶段AppKit退出、全部历史Bundle及跨主机文件系统组合未覆盖。分配量差异原因未查明；未修改生产归档实现，保守容量预检和4GiB运行保留量保持。未提交或推送。最终证据：research/upstream_integration_2026-10-15/evidence/T60-final-20261021/manifest.json。
+diff --git a/research/0_binary_patch_comparison.md b/research/0_binary_patch_comparison.md
+index bbdec625..d4cf5735 100644
+--- a/research/0_binary_patch_comparison.md
++++ b/research/0_binary_patch_comparison.md
+@@ -1670,3 +1670,18 @@ IcliKit 固定到 `0.8.5 / 815ef234df5461b8eb9455931d38cb1c37992fe6`，原 B22 J
+ regular的跳过分支、复制分支与development同类命令改用ln -sfn；guarded writer仅新增此参数，并拒绝会跟随已有目录符号链接、带尾斜杠目录目标或真实目录目标的调用。新增实际安装脚本和写入入口失败回归、带旧内部链接的整树替换/发布/原件Undo组合回归。最终比较仍逐字段严格相等，错误增加目标和不一致字段名，AA.gl漂移拒绝保持。
+ 
+ 最终完整Python命令make test_python，948项、跳过2项、259.925秒退出0。相关43项、12.775秒退出0；沙箱fclone EPERM原日志保留，宿主原断言重跑通过。此次未修改Swift和二进制补丁；host CLI仅因资源封签改变签名字节，可执行内容保持；原获批VM程序字节、inode和CDHash保持。证据：`evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json`。
++
++## 2026-10-20：独立DSC启动前撤销及真实启停证据
++
++对象为独立vm-t32-t33-dsc-20261018，iOS26.0/23A341、同generation6ebc5f67…，声明仅dyld-boot-iomfb_swapend。显式Cryptex重装事务20261020T070734Z-tjhO0rSZ发布并通过installed证明：原件w3为0x548，补丁为0x560，原件/补丁各6885代码页。启动前Undo事务20261020T130129Z-EauDALvj以RENAME_SWAP发布、exit0；恢复证明确认原件完整SHA256相同、w3为0x548、6885页，guest来源unknown。
++
++撤销后两次真实API启动均读回26.0/23A341，启动时间/boot session UUID不同；均正常关机、vm/stop退出0、无framework强制停止、磁盘释放、config/staged daemon摘要保持。运行后cfw receipts和verify-plan均退出0，关联同Undo事务；发布镜像与当前运行镜像摘要分开，runtimeValidated仍false。现在开始显式同generation重新应用，尚未记录其发布或后续启停通过，整组DSC顺序验收及T32/T33整体均未完成。证据：[本轮续跑清单](upstream_integration_2026-10-15/evidence/T32-T33-resume-20261020/manifest.json)。本轮性能修改只去重单次计划读取的完整核验，未修改固件指令匹配或替换算法；正在运行的冻结CLI/VM程序保持。
++
++
++### 2026-10-21：独立 DSC 启动前撤销与重新应用的真实 VM 结果
++
++独立 `vm-t32-t33-dsc-20261018`（iOS26.0/23A341 + cloudOS26.1/23B85，regular/classic）本轮验证通过。初装 `20261020T070734Z-tjhO0rSZ`、启动前 Undo `20261020T130129Z-EauDALvj`、显式重新应用 `20261020T145635Z-QBLOIoqy` 为同generation的三个不同published v4 journal。DSC `.42` 的原件/补丁完整摘要保持前述值，指令分别为0x548/0x560，6885个CodeDirectory代码页通过。
++
++恢复状态和重新应用状态各两次真实无界面API启动/正常关机通过，均读回26.0/23A341，独立会话、退出0、无框架强制停止，磁盘释放；两组运行后生产Receipt与Swift generation verifier均退出0。归档七组证明并独立核对118个索引文件的大小和SHA-256。未新增补丁算法或补丁计数；本轮使用冻结构建，性能优化候选未纳入。
++
++结果仅证明所述启动前撤销/同generation重新应用及记录的启停、读取。guest来源保持unknown；不授予补丁运行效果、图形、Mach-O/Preboot、任意中间重打或T32/T33整体接受状态。证据：`upstream_integration_2026-10-15/evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json`。
+diff --git a/research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md b/research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md
+index f3f993f7..2e6f3ca1 100644
+--- a/research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md
++++ b/research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md
+@@ -203,3 +203,35 @@
+ regular的跳过分支、复制分支与development同类命令改用ln -sfn；guarded writer仅新增此参数，并拒绝会跟随已有目录符号链接、带尾斜杠目录目标或真实目录目标的调用。新增实际安装脚本和写入入口失败回归、带旧内部链接的整树替换/发布/原件Undo组合回归。最终比较仍逐字段严格相等，错误增加目标和不一致字段名，AA.gl漂移拒绝保持。
+ 
+ 最终完整Python命令make test_python，948项、跳过2项、259.925秒退出0。相关43项、12.775秒退出0；沙箱fclone EPERM原日志保留，宿主原断言重跑通过。此次未修改Swift和二进制补丁；host CLI仅因资源封签改变签名字节，可执行内容保持；原获批VM程序字节、inode和CDHash保持。证据：`evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json`。
++
++
++## 2026-10-20—21：独立 DSC 启动前撤销与重新应用
++
++截至2026-10-21 05:47 CST，安装事务 `20261020T070734Z-tjhO0rSZ` 与启动前 Undo 事务 `20261020T130129Z-EauDALvj` 均已发布。安装后、启动前的独立证明通过；撤销后 DSC `.42` 的完整原件摘要、`w3=0x548` 与6885个 CodeDirectory 代码页均通过。原件 SHA-256 为 `e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5`，补丁件 SHA-256 为 `2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac`。
++
++撤销后两次真实无界面 API 启动均读回 iOS26.0/23A341，启动时间与会话 UUID 不同；两次 API 关机均退出0、记录 Guest stopped、无框架强制停止，磁盘释放。运行后的生产 Receipt 与 Swift generation verifier 均退出0；历史发布与当前运行后镜像分别记录，runtimeValidated 仍为 false。
++
++同 generation 的显式 `--reinstall-cryptex` 重新应用正在执行第7/7项 LaunchDaemons。classic vphoned、独立 API 载荷与其 plist 的安装步骤已结束，其他 daemon plist 与 launchd 配置仍在处理；新发布、完整重新应用证明、两次启停与运行后读取尚未完成。本轮沿用冻结 CLI/VM 构建，前一性能优化候选未切入当前安装。
++
++当前恢复阶段证据见 `evidence/T32-T33-resume-20261020/manifest.json`；执行状态见仓库根 `TASKS.md`。该结果尚未完成完整 on→off→on；guest 来源保持 unknown，补丁运行效果与图形行为未验证，T32/T33 整体未 accepted。
++
++
++### 最终结果（2026-10-21 09:07 CST）
++
++本轮 DSC 启动前撤销与同 generation 显式重新应用验证通过，自动归档通过。三个事务均为v4、published、退出0，generation 为 `6ebc5f6705cf0bffb32da62bf3006cc7ece5027edee4306abc8031aee9f4bb42`。
++
++| 状态 | 事务 | DSC .42 指令 | 本轮真实 API 启停 |
++| --- | --- | --- | --- |
++| 初装 | `20261020T070734Z-tjhO0rSZ` | `w3=0x560` | 启动前即执行 Undo |
++| 恢复 | `20261020T130129Z-EauDALvj` | `w3=0x548` | 2次通过 |
++| 重新应用 | `20261020T145635Z-QBLOIoqy` | `w3=0x560` | 2次通过 |
++
++原件和补丁件完整 SHA-256 与前述值一致，6885个 CodeDirectory 代码页均通过。重新应用发布镜像 SHA-256 为 `bc794249dcb21b0e2648e7933435ec7487ac932b04c6d1f69f86b7e5d0191c88`；两次运行后当前镜像 SHA-256 为 `c7bb43708c40cb9f48b86f7b8413904e4a0135d73aa3cfe1db3d0e8eb4ad5c59`。两者分别记录，不把历史发布摘要提升为当前效果证明。
++
++执行入口为 `.build/t32-resume-acceptance-20261020/run-acceptance.py`；安装和重新应用均显式使用 `cfw install --reinstall-cryptex`。实际运行 `verify_dsc_publication.py` 的三种状态证明、`verify_legacy_vm_boot.py --api` 的两组双启动验证，以及 `verify_post_boot_cfw.py` 的两组运行后读取；主序列10个阶段均退出0。四次启动均读回26.0/23A341，每组启动时间和会话UUID不同，正常API关机、进程退出0，无框架强制停止，磁盘释放，配置/已暂存daemon摘要保持。两组生产 `cfw receipts --json` 和 Swift `cfw verify-plan` 均退出0。
++
++归档门核对七组证明、三个不同journal、同generation和原件/补丁摘要，自动归档完成；独立审核118个索引文件、26,257,055字节的大小及SHA-256全部一致。四份冻结输入摘要和两份应用的 `codesign --verify --deep --strict` 通过。指定runner、观察进程、caffeinate、VM子进程及旧CDHash helper PID未出现在收尾进程表；未发送终止信号。
++
++证据：`evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json`。归档 manifest SHA-256 为 `a5b860d28342226ad3ab1fdd4b739a8a7a9f3d18282c9bd8aaf18a71a51ccad3`；独立摘要审核见 `evidence/T32-T33-resume-20261020/final-archive-audit.json`。原始镜像和effect blob保留在VM journal中，未复制进研究归档。
++
++本轮使用冻结 CLI/VM 构建，性能优化候选未纳入。guest来源仍为unknown；补丁运行效果、图形行为、Mach-O/Preboot撤销及任意中间操作重打未由本轮证明，T32/T33整体未标记accepted。当前工作树的其他改动不属于这次冻结构建的真实VM证据范围。
+diff --git a/research/upstream_integration_2026-10-15/local_reconciliation.json b/research/upstream_integration_2026-10-15/local_reconciliation.json
+index ead58e7b..327320e1 100644
+--- a/research/upstream_integration_2026-10-15/local_reconciliation.json
++++ b/research/upstream_integration_2026-10-15/local_reconciliation.json
+@@ -5396,7 +5396,159 @@
+         ],
+         "next_action": "补断管与取消分离、队列/退出最终状态和新排除项；保留本地归档路径/owner 保护。"
+       },
+-      "runtime_validation_this_turn": false
++      "runtime_validation_this_turn": false,
++      "import_queue_20261020": {
++        "status": "import_queue_and_cancellation_validated_transfer_ui_and_exit_matrix_pending",
++        "evidence": [
++          "T60_import_queue.md",
++          "evidence/T60-import-queue-20261020/manifest.json"
++        ],
++        "sourceSHA256": {
++          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "c629e23120f0311b212eb4740a01585466eb4e9e09c350d1be538fcfb29f13b6",
++          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "a2f3ba00b6065ca67c06b25fe10e8996ff6c2a22fdcb65c80834e6640a561017",
++          "sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift": "eae6134859a8b9eafbecff89fcd5801b2b18c2ebbac703e7a23395406f2eca83",
++          "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift": "a6245fb0196f24d734edfbd6d31d4d277375bc08dbd27ca60e670c571d7b58ea",
++          "sources/VPhoneLaunchpad/Localizable.xcstrings": "86c5c30ba12ff5bcbf14c29f6dd1533a16edb52230f10c82b15c3c8065a31e78",
++          "tests/VPhoneLaunchpadKitTests/EditTests.swift": "5b8e91d811d9563fccbf812758b69439b835cd1e28299a590713c8c2a61af204",
++          "tests/VPhoneLaunchpadKitTests/ImportQueueTests.swift": "b4eb7c2618100abda95d7bcbd05f97c28548f53c18d32df81fde75e1ad295974"
++        },
++        "overallAccepted": false
++      },
++      "import_state_20261020": {
++        "status": "implemented_related_validation_passed",
++        "sourceSHA256": {
++          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "3c4411d47c195cb47f745f731b23b71d82124492cd6042d1e1b8c638529e6f9e",
++          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "a2f3ba00b6065ca67c06b25fe10e8996ff6c2a22fdcb65c80834e6640a561017",
++          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift": "f169eaf78c0732fe7691491c0f7a584fd5758620f5b3125eaecbc3b97c428741",
++          "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift": "cd77cc42d9b58f13589b5d98f7dabd32f9af55a27a643b223e34f1d7c5838676",
++          "sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift": "eae6134859a8b9eafbecff89fcd5801b2b18c2ebbac703e7a23395406f2eca83",
++          "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift": "9a13a95683318b2234e0bb7d9d693a4007953fcd3cdb1abba8ea3e10334a83a9",
++          "sources/VPhoneLaunchpad/Localizable.xcstrings": "6f6d5747ea3a5fda090d824c6dd0954f4f56a76b25560cedeea771b04ace0caa",
++          "tests/VPhoneLaunchpadKitTests/EditTests.swift": "34f5f333c334ee762e83c28566c2cfd3e6ad008e3bb8bab25a97222f57314d9a",
++          "tests/VPhoneLaunchpadKitTests/ImportQueueTests.swift": "96cfd4f16d7557d5716368ea4bafebbd605caf6bc8c29d65036e2238de1509b8",
++          "tests/VPhoneLaunchpadKitTests/RealCLIImportQueueTests.swift": "8bd47c678b60517ed49c95f80ebe0962444814f01075f0173022bb0966a8e052"
++        },
++        "evidence": "evidence/T60-import-state-20261020/manifest.json",
++        "overallAccepted": false
++      },
++      "closeout_20261021": {
++        "evidence": "evidence/T60-closeout-20261021/manifest.json",
++        "implemented": [
++          "global FIFO export selections",
++          "caller cancellation of active and queued exports",
++          "pre/post source identity and metadata checks for both archive backends",
++          "final import source check before publication",
++          "formal opt-in runner includes import queue and termination suites"
++        ],
++        "validation": {
++          "LaunchpadKit": 221,
++          "Core": 436,
++          "Python": 37,
++          "signedCLICandidates": 2,
++          "realCLITestsPerCandidate": 6,
++          "actualOpenPanelMultiselection": "two 16GiB sparse fixtures, all source/target disk SHA256 equal"
++        },
++        "pending": [
++          "actual UI Cancel and AppKit Quit (Computer Use timeoutReached)",
++          "full real VM/mixed Bundle/create exit matrix",
++          "piped byte progress protocol"
++        ],
++        "accepted": false
++      },
++      "remaining_20261021": {
++        "evidence": "evidence/T60-remaining-20261021/manifest.json",
++        "implemented": [
++          "create group interrupt and bounded output/log drain",
++          "Finder cold-open queue and UTI",
++          "versioned best-effort progress with legacy fallback",
++          "runtime socket exclusions",
++          "packaged zstd/xz and portable libraries/licenses"
++        ],
++        "validation": {
++          "LaunchpadKitReported": 227,
++          "LaunchpadKitSkipped": 10,
++          "CoreReported": 441,
++          "CoreSkipped": 1,
++          "archiveCLIFunctions": 2,
++          "PythonBundle": 62,
++          "PythonProgress": 7,
++          "selectedSignedCLICandidates": 2,
++          "realCLITestsPerCandidate": 8,
++          "realSignalImport": 4,
++          "realSignalExport": 4
++        },
++        "realVMExportBytes": 15564157664,
++        "realVMImportRequiredFreeBytes": 30044004352,
++        "pending": [
++          "manual Mac unlock then actual active Cancel/transfer Quit/timeout/Finder open validation",
++          "free at least 3GiB then real VM import and full digest comparison",
++          "actual create/restore exit and wider historical compatibility combinations"
++        ],
++        "accepted": false
++      },
++      "resume_20261021": {
++        "evidence": "evidence/T60-resume-20261021/manifest.json",
++        "actualGUI": [
++          "waiting/active import Cancel",
++          "waiting/active export Cancel",
++          "transfer Quit timeout and drain",
++          "Finder cold/warm Open With"
++        ],
++        "GUIFullDiskSHA256Matches": true,
++        "realVM": {
++          "backend": "system-tar",
++          "logicalDiskBytes": 68719476736,
++          "persistentFiles": 8,
++          "allDigestsMatch": true,
++          "sourceAndArchiveUnchanged": true,
++          "bootValidated": false
++        },
++        "CLI": {
++          "selectedCandidates": 2,
++          "testsPerCandidate": 9,
++          "suites": 4,
++          "nativeSparseAndHardlinks": true
++        },
++        "LaunchpadKit": {
++          "reported": 228,
++          "configuredSkipped": 11
++        },
++        "nativeLargeVM": "cancelled130 on capacity twice; no final publication",
++        "allocationDifferenceCause": "unresolved",
++        "pending": [
++          "approval to delete only generated system-tar/restored copy for native capacity",
++          "real native64GiB roundtrip",
++          "actual create/restore Quit and broader historical combinations"
++        ],
++        "accepted": false
++      },
++      "final_20261021": {
++        "evidence": "evidence/T60-final-20261021/manifest.json",
++        "status": "selected_matrix_complete_ready_for_review",
++        "approvedCleanup": "only .build/t60-remaining-20261021/real-vm-r3/import-system-tar/restored",
++        "realVM": {
++          "exportBackend": "native",
++          "importBackends": [
++            "system-tar",
++            "native"
++          ],
++          "logicalDiskBytes": 68719476736,
++          "persistentFiles": 8,
++          "allDigestsMatch": true,
++          "sourceAndArchiveUnchanged": true,
++          "stagingRemaining": 0,
++          "nativeAllocatedBytes": 29551001600,
++          "bootValidated": false
++        },
++        "allocationCause": "unresolved; no production fix claimed",
++        "remainingValidationLimits": [
++          "post-import boot",
++          "actual restore-stage AppKit Quit",
++          "all historical Bundle combinations",
++          "cross-host filesystem matrix"
++        ],
++        "humanReviewAccepted": false
++      }
+     }
+   ],
+   "new_vm_2026_10_18": {
+@@ -5421,15 +5573,31 @@
+       "patch": "committed c1c3bbd5-e615-4ba5-8700-0fc885925167; 7 component groups, 58 records",
+       "restore": "SHSH and restore exit 0; DFU exit 0; disk and directory lock released",
+       "source_diagnostic": "readonly SwapEnd 0x548 -> 0x560; corresponding 6885 CodeDirectory pages verified; source unchanged",
+-      "cfw": "Explicit reinstall 20261019T124601Z-vZh3Hh4C failed strict final verification; original metadata and 66 samples unchanged; directory-symlink mechanism reproduced and fixed; corrected bundle retry CLI4097/session59096 started; current stage in acceptance-state.json",
+-      "guest_undo": "Previous continuations stopped on install failure; no Undo or boot; corrected on/off/on runner prepared; actual acceptance pending",
+-      "normal_boot": "Earlier first publication boots passed; new rebaseline notbooted. No current reapplication acceptance.",
++      "cfw": "Initial20261020T070734Z-tjhO0rSZ and explicit reapplication20261020T145635Z-QBLOIoqy both v4 published, exit0; full DSC proofs passed.",
++      "guest_undo": "Preboot Undo20261020T130129Z-EauDALvj published, original SHA/w3=0x548/all6885 CodeDirectory pages passed; guest origin remains unknown.",
++      "normal_boot": "Restored and reapplied states each passed two real headless API boot/normal-shutdown cycles on26.0/23A341; distinct sessions, exit0, no forced framework stop, disk released, config and staged daemon unchanged.",
+       "accepted": false,
+-      "installed_dsc_proof": "original e41db9aa... and installed2fc23949...; w3 0x548->0x560;6885 pages each; unbooted raw/publication SHA match",
+-      "post_boot": "actual receipts and Swift verify-plan exit0; committed-publication; runtimeImageChanged true; runtimeValidated false",
+-      "on_off_on": "Pending explicit Cryptex reinstall, preboot Undo, restored boots, explicit reapplication andboots"
++      "installed_dsc_proof": "source e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5; installed2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac; pages6885; w3 0x548->0x560",
++      "post_boot": "Both restored and reapplied production receipts and Swift verify-plan exited0; historical publication and current runtime images remain distinct; runtime effects not validated.",
++      "on_off_on": "Passed: same generation, three distinct published journals, original/patched SHA and6885 pages verified, two API cycles and postboot readers for each state.",
++      "dsc_preboot_validation": {
++        "state": "passed",
++        "scope": "independent DSC Undo and same-generation reapplication",
++        "evidence": "evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json",
++        "transactions": {
++          "installed": "20261020T070734Z-tjhO0rSZ",
++          "restored": "20261020T130129Z-EauDALvj",
++          "reapplied": "20261020T145635Z-QBLOIoqy"
++        },
++        "restoredAPICycles": 2,
++        "reappliedAPICycles": 2,
++        "runtimeEffectsValidated": false,
++        "graphicsValidated": false,
++        "broaderT32T33Accepted": false,
++        "completedAt": "2026-10-21T01:07:12.446945+00:00"
++      }
+     },
+-    "current_evidence": "evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json",
++    "current_evidence": "evidence/T32-T33-resume-20261020/manifest.json",
+     "runtime_evidence_boundary": "v3 post-boot raw SHA/mtime mismatch refuses receipts and plan qualification; checkpoint, 5 files and 297 blobs unchanged; v4 independent postimage under implementation",
+     "runtime_publication_v4": "implemented; independent postimage and historical association; current target verification required for Undo; legacy v3 remains strict",
+     "final_host_allowance": "89b70a253cad2adea133b3e875519afaf72c5d17 explicitly authorized and scoped helper executed; argument-validation probes passed"
+diff --git a/research/upstream_integration_2026-10-15/progress.md b/research/upstream_integration_2026-10-15/progress.md
+index b46d0fa4..3c25d99c 100644
+--- a/research/upstream_integration_2026-10-15/progress.md
++++ b/research/upstream_integration_2026-10-15/progress.md
+@@ -1,6 +1,6 @@
+ # 8a75092 范围核验与本地对账（2026-10-15）
+ 
+-2026-10-20 当前状态：21ae78d3已push。显式Cryptex重装事务20261019T124601Z-vZh3Hh4C最终核验拒绝，原盘身份/mtime与66样本保持，两个顺序验收脚本停止，未执行Undo或启动。已用真实删除记录与实际安装脚本复现已有目录符号链接的ln -sf额外写入，改用ln -sfn，并在写入入口拒绝跟随目录或尾斜杠；最终严格比较保持并新增目标/字段诊断。相关43项及最终完整Python948项（跳过2项）通过，签名应用和原VM程序保持核验通过。修复后重试CLI4097/session59096已发起，Undo及on→off→on尚待验收，T32/T33未accepted。
++2026-10-20 当前状态：当前项固定为T32/T33独立DSC真实顺序验收。持久runner93069/CLI94446/root97562在staged .cfw_disk.tjhO0rSZ继续，最新进入GPU归档提取入口，尚未最终核验/发布。冻结VM程序字节/inode/CDHash保持，但参数探测被信号9终止；amfid44463日志确认restricted entitlements拒绝。按本任务既有精确CDHash授权发起临时helper恢复，系统原生验证待完成。安装不受此验证等待影响；后续启动依赖其完成。Undo、重新应用及on→off→on仍未验收，整项未accepted。
+ 
+ ## 2026-10-16 roothide journal 实际核对
+ 
+@@ -319,3 +319,124 @@ DSC 验收组合已更正：regular 26.1 没有默认 DSC 字节操作，r2 仅
+ regular的跳过分支、复制分支与development同类命令改用ln -sfn；guarded writer仅新增此参数，并拒绝会跟随已有目录符号链接、带尾斜杠目录目标或真实目录目标的调用。新增实际安装脚本和写入入口失败回归、带旧内部链接的整树替换/发布/原件Undo组合回归。最终比较仍逐字段严格相等，错误增加目标和不一致字段名，AA.gl漂移拒绝保持。
+ 
+ 最终完整Python命令make test_python，948项、跳过2项、259.925秒退出0。相关43项、12.775秒退出0；沙箱fclone EPERM原日志保留，宿主原断言重跑通过。此次未修改Swift和二进制补丁；host CLI仅因资源封签改变签名字节，可执行内容保持；原获批VM程序字节、inode和CDHash保持。证据：`evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json`。
++
++## 2026-10-20：续跑只读核验
++
++已取得 VM 目录锁，按正式 cfw_disk_txn.sample_digest 计算 66 段采样，SHA-256 为 6715076b65c9b03b5313ab5f62c0a5e69dd352072cb63e5f8fe5e56543b35108，与安装前记录一致。完整磁盘摘要未重算，未启动或写入 VM。指定 root 历史事务等待原生验证读取；尚不能确认退出原因。旧验收/归档进程不存在，未重启安装或自动归档。证据：`evidence/T32-T33-resume-20261020/manifest.json`。
++
++## 2026-10-20：141 退出复现及持久日志重试准备
++
++已只读取得事务与最后 14 条操作摘要。真实退出为 141，109 条操作止于 GPU 归档删除；无最终效果报告或发布证据。原事务明确记录原盘身份及 66 段采样保持。
++
++隔离正式 host-driver 对照命令：`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python3 .build/t32-resume-20261020/compare-output.py`。三个场景通过：关闭 stdout 消费者得到 141/failed，普通日志得到 0/published，普通日志加安装错误得到 37/failed；三个场景原盘均保持且无残留 staged。该结果证明可复现路径，不能确认真实输出消费者退出原因。
++
++持久进程 PID93069 使用普通日志，先等待指定失败事务及 .cfw_temp 的原有 invoker handback，再检查签名/输入/磁盘身份，执行同 generation 的安装、启动前撤销、重新应用及各两次 API 启停和读回。所有生产核验保持；未改动 VM 程序、宿主放行或 Git。重试安装前仍须系统原生管理员验证。证据：`evidence/T32-T33-resume-20261020/manifest.json`。
++
++## 2026-10-20：T60 导入 FIFO 与批量选择
++
++当前源码实现 FIFO 等待、批量选择、等待项取消和退出门关闭后不启动下一项。原实现 2 项回归记录 4 个失败；实现后相关 26 项及完整 LaunchpadKit 210 项通过，6 项真实 CLI/烟测按配置跳过。首次沙箱运行的 4 个权限失败保留，同一已构建测试在沙箱外通过。逐项队列行/进度/取消 UI、签名交互和完整退出矩阵未完成；T60 整体未 accepted。详情：`T60_import_queue.md`。DSC 冻结安装继续在独立持久进程中运行，未由本轮源码构建替换。
++
++## 2026-10-20：T60 状态/取消/退出后续验证
++
++逐项导入状态和取消入口、等待选择取消、活动项排空、退出时混合转移取消及超时保留状态已实施。31项定向、216项完整LaunchpadKit通过；独立Release签名候选及嵌套工具链/依赖/资源检查通过。真实签名CLI的隔离并发导入复验通过：两个归档发布、源盘/目标盘/归档完整摘要保持、输出排空；具体摘要已归档。真实UI操作、字节进度、真实VM迁移及完整混合版本退出矩阵仍未验收，T60整体未accepted。证据：`evidence/T60-import-state-20261020/manifest.json`。
++
++## 2026-10-20：完成当前DSC项的执行条件
++
++用户要求继续完成当前项，本轮仅继续已有T32/T33验收。安装已从seputil推进到GPU归档提取入口，持久进程存活，未发布；未启动重复安装。后续VM程序的参数探测返回-9，程序字节、inode和已批准CDHash保持；16:33:10宿主日志确认amfid的restricted entitlements拒绝。仅按既有同哈希授权恢复临时helper，等待系统管理员验证，不扩展允许范围、不改SIP/启动参数或持久列表。准备了最终归档脚本，只有七组真实证明、三份journal、同generation、6885代码页和两组正常启停/读回全部匹配才会通过；脚本目前仅做语法检查，未执行最终归档。
++
++## 2026-10-20：管理员验证后附加失败
++
++用户确认已完成原生验证并在终端执行 sudo -v。第二次调用实际返回 helper60603，但日志记录附加失败；当前 amfid60692 存在。冻结 VM 参数探测再次返回 -9，程序摘要与 inode 保持。工具进程 sudo -n 返回需要密码，用户终端凭据在该进程不可用。当前安装已推进到 GPU 文件 chmod 的冻结计划核验，未发布。已保存探测脚本及诊断辅助脚本；后者沿用唯一获批 CDHash 和现有断点处理，只增加 euid、LLDB 附加错误和目标 PID 记录。其原生验证待完成，尚不能判定附加失败原因。
++
++## 2026-10-20：同 CDHash 放行复验通过
++
++用户完成诊断调用原生验证。09:01:23 UTC 的日志记录 euid0、按名称附加成功、目标 amfid60692 和两个各有一处位置的既有断点；helper62985 仅载入获批 CDHash。保存的 probe-boot-readiness.py 在恢复前返回 -9，09:01:40 UTC 复验进入参数解析并按预期返回64，冻结 VM 摘要和 inode 保持。此前附加失败原因未查明；成功重试未改变目标查找方法或断点处理，不能据此确认进程重启、名称匹配或权限中的具体原因。只验证了程序执行条件，未启动 VM。CFW 继续至 GPU CodeResources chmod 的冻结计划核验，未发布；当前项的后续 Undo/重新应用/正常启停仍由既有顺序 runner 执行。证据：evidence/T32-T33-resume-20261020/manifest.json。
++
++## 2026-10-20 17:52 CST：DSC 安装第6/7步
++
++本轮只读观察确认第4/7步 iosbinpack64 已推进至第6/7步 mobileactivationd 签名前核验，verify-plan CPU97.3%，持久 runner93069/CLI94446/root97562继续。安装 CLI约3小时，尚未最终核验、封存或交换，on-off-on-result.json不存在；未把子步骤序号换算为全体验收百分比。诊断 helper因目标state10退出，但冻结 VM参数检查仍退出64，程序摘要/inode保持，未重复请求系统验证。保存 current-progress-20261020.json 和观察记录；当前剩余顺序为安装发布、未启动Undo、原件/6885代码页证明、两次正常启停、同generation显式重新应用、重复证明/两次启停/读回。T60代码已有31定向、216完整LaunchpadKit及1真实CLI检查通过，真实UI和完整VM退出矩阵待验收；本轮无新源码修改、提交或推送。
++
++## 2026-10-20：在DSC安装期间推进T60
++
++DSC独立VM和冻结程序继续执行安装，第7/7步vphoned安装入口已观察到，尚未发布。并行在独立临时库中补充真实CLI导入中的退出协调回归，2项9.065秒退出0；等待项不启动、活动CLI退出130、输出排空、无残留和指定摘要保持均通过。强化了真实 `.import-` 目录断言，首次测试观察路径错误和成功复验均保存；生产源码未修改。实际AppKit交互与完整VM/混合版本退出矩阵仍未验收，T60整项未accepted。证据：evidence/T60-real-import-termination-20261020/manifest.json。
++
++## 2026-10-20 19:34 CST：状态复核
++
++DSC仍在首次安装，已从vphoned推进到第7/7步末段launchd.plist的chmod前核验；verifier CPU94.2%，持久runner存活，CLI累计4小时44分钟。未最终核验或发布，未进入本轮Undo/重新应用/启停；最终on-off-on结果不存在。T60最近结果仍为18:11归档的2项真实CLI回归通过，之后没有新增UI或完整矩阵验证，不提升accepted。源码及证据未新增提交或推送。实际观察见 evidence/T32-T33-resume-20261020/progress-20261020-1934.json。
++
++## 2026-10-20：安装计划核验的重复完整读取
++
++源码确认 plan_gate 每次 write/sign 先经 from_environment/load_plan 调 Swift verify-plan；后者的 DesiredPlanStore.validate 先调用 loadVerified，再经 originalURLs 第二次调用 loadVerified。该路径核验generation原件；在CFW已交换inode后，还沿发布记录检查完整postimage和全部effect blob摘要。实际观察小型chmod/sign阶段分别等待数分钟，核验进程CPU持续90%以上。重复完整核验是当前主要已定位性能问题，各类摘要/读取的时间占比尚未测量；一次1秒sample因普通用户无权采样root进程退出255，未额外请求系统验证。未改变校验门或中断安装；安装当前已从launchd.plist chmod进入临时目录清理前核验，未发布。优化应先建立明确性能基线和篡改/身份变化回归，再决定如何复用已验证结果；不能直接以永久缓存替代当前读取要求。证据：evidence/T32-T33-resume-20261020/plan-verification-cost-20261020.json。
++
++## 2026-10-20：单次计划读取完整校验去重
++
++已将DesiredPlanStore.validate中第二次loadVerified改为从本次刚核验的manifest解析原件路径；每次新请求仍完整核验，无跨请求缓存。trace回归优化前捕获2次并退出1，优化后1次退出0；修改原件并恢复mtime仍拒绝。47项相关Swift及实际Release CLI的5种写入/8类变更拒绝回归通过。独立证据链夹具交替对照中位143.313ms→85.219ms，完整fileSHA256字节减半，输出与夹具摘要保持；不能外推真实64GiB安装时间。真实DSC安装发布/installed证明已通过，冻结程序继续执行启动前Undo，尚未整体验收。见T32_T33_plan_verification_performance.md及对应manifest。本轮未提交/推送。
++
++## 2026-10-20 21:07 CST：继续真实DSC验收
++
++用户要求继续完成真实VM验收。确认首次安装及installed-proof均退出0，事务20261020T070734Z-tjhO0rSZ、同generation、6885代码页及原件/补丁指令通过；当前root66219执行prepare-undo，尚无撤销发布。冻结CLI/VM/runner/postboot工具摘要均保持。参数预检查再次返回-9，已按既有唯一CDHash授权请求诊断helper恢复，原生验证待完成；有期限参数检查只执行非法选项，终态或12小时自动退出，不写VM或改宿主配置。Undo继续，不因启动前置条件等待停止。
++
++## 2026-10-20 22:21 CST：真实启动前Undo发布
++
++事务20261020T130129Z-EauDALvj（guest-dsc-undo-v1）于14:20:42 UTC完成，version4、status published、exit0，使用RENAME_SWAP。实际日志确认两个最终效果核验、挂载清理、发布及ownership handback通过；组件Receipt已共同发布，guest来源仍unknown。当前restored-proof正在核对恢复原件；尚未报告恢复证明、撤销后启停或重新应用通过。真实事务metadata和日志已保存至evidence/T32-T33-resume-20261020/undo-published-20261020，不包含镜像或blob原件；原件继续保留于VM journal。
++
++## 2026-10-20 22:24 CST：恢复证明及两次正常启停通过
++
++restored-proof退出0：实际原件SHA256为e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5，w3恢复0x548，6885代码页核验通过；parent为本轮installed事务，guestOrigin unknown。撤销后两次API启动均读回26.0/23A341，bootSeconds和bootSessionUUID不同，stop/vm退出0、guestStopped true、forcedFrameworkStop false、diskReleased true；config/staged daemon摘要保持。当前运行后Receipt/generation读取正在执行；未将history读取或显示/运行时效果提前记为通过。实际证明已保存至evidence/T32-T33-resume-20261020/restored-20261020和api-restored-20261020。
++
++## 2026-10-20 22:30 CST：撤销后运行读回通过并开始重新应用
++
++Receipt和verify-plan均退出0，关联Undo事务20261020T130129Z-EauDALvj。状态committed-publication、runtimeImageChanged true、runtimeValidated false；发布SHA79e94266…与当前运行SHA6458b911…分开，磁盘物理身份保持。显式同generation重新应用CLI15708已开始普通用户预检；尚未观察到新root安装器或新磁盘事务。此前恢复原件、6885页及两次API正常启停证据均已封存到本轮续跑证据目录。重新应用及最终重复证明/启停/读回尚待执行。
++
++2026-10-20 23:03 CST：重新应用的 root installer17578 已完成 host 入口检查并启动 regular 安装器入口校验。进程观察已保存为 `evidence/T32-T33-resume-20261020/reapplication-current-observation.json`；验收 runner、原始 CLI 和 VM 程序保持，当前无新发布结果。
++
++2026-10-21 00:04 CST：重新应用已完成 SystemOS/AppOS 挂载，当前 staged Cryptex 替换操作仍在执行；新磁盘尚未发布。只读观察与 TASKS.md 已更新。
++
++2026-10-21 00:54 CST：重新应用已完成两份 Cryptex 复制和 dyld 链接设置，DSC SwapEnd producer 按目标0x560启动，目前执行完整计划校验；无新发布结果。可用空间只读检查约46GiB。
++
++2026-10-21 01:51 CST：重新应用已结束 Cryptex/DSC、seputil 和 gigalocker 步骤，进入第3/7项 GPU 驱动安装；尚未发布，完整 DSC 字节/代码页仍待独立证明。
++
++2026-10-21 03:07 CST：重新应用已结束第3/7项 GPU 驱动安装，进入第4/7项 iosbinpack64 安装。恢复阶段的完整证明、两次正常启停和读回已通过；重新应用发布及后续证明仍待完成。resume manifest 顶层状态已更正为当前进度，原退出141诊断字段保存于 initialDiagnosis。
++
++2026-10-21 04:09 CST：重新应用已结束第4/7项 iosbinpack64、第5/7项 launchd_cache_loader，当前进入第6/7项 mobileactivationd。安装器仍未报告失败；发布、独立证明和后续运行验证未完成。
++
++2026-10-21 04:44 CST：重新应用已结束第6/7项 mobileactivationd，进入第7/7项 LaunchDaemons。冻结 cfw_common.sh 与 cfw_install.sh 中该项约有27个写入/补丁调用；按近期单次约7分钟估算，本项仍需约3小时，最终校验和发布另计。该数值为执行时间估算，未完成范围保持。
++
++2026-10-21 05:46 CST：重新应用第7/7项中 classic vphoned、独立 API 的执行文件和 plist 安装步骤已结束，进入 bash plist 写入。当前仍未发布。冻结 CLI/VM 保持，前一性能优化候选不属于本轮运行输入。
++
++2026-10-21 06:44 CST：重新应用第7/7项中 bash、dropbear、trollvnc plist 写入与权限步骤已结束，进入 rpcserver_ios plist 写入。安装器未报告失败，发布与后续验证未完成。
++
++2026-10-21 07:09 CST：用户询问是否卡住。最新进程观察显示 runner 存活、verify-plan CPU约92%，已完成 rpcserver_ios 配置与 classic vphoned plist 写入，当前执行权限设置前校验。总状态 reapply-cfw 在完整安装结束前保持；按近期单次约7分钟和剩余步骤估计约1–2小时，未作为完成时限。
++
++
++## 2026-10-21：T60 独立收尾及性能验证续跑（当前聊天）
++
++修复跨选择导出并发和调用方取消未传播，保存原始失败回归；两后端导入/导出接入最终发布前源变化复查。完整LaunchpadKit221项、Core436项和Python37项通过。正式CLI入口对上一和本轮签名候选各6项通过。实际NSOpenPanel多选两个16GiB稀疏夹具，两个源/目标完整磁盘摘要均相等，无staging；随后UI工具的AX/截图/重绑定/重置连续timeoutReached。1秒sample显示主线程处于正常事件循环，超时原因未查明；实际UI取消和AppKit Quit不提升通过。T60保持未accepted，详见T60_import_queue.md和evidence/T60-closeout-20261021/manifest.json。
++
++按用户顺序继续计划读取性能优化收尾。已构造含两个4GiB历史postimage的独立合成夹具，并通过正式Swift/Python验证链发布及Undo。新增通过Store.read直接核验身份/历史证据拒绝的断言，相关48项通过、可选fixture按配置跳过；完整trace确认两个独立读取各一次loadVerified和verifyOriginals。首轮对照输出及夹具摘要保持；该轮部分时间与回归并行，正在独立重测作为最终时间证据。不替换正在真实验收的冻结程序，不操作其VM。
++
++
++2026-10-21 当前聊天最终复核：4GiB历史证据链独立Release对照中位7.155970秒→3.657979秒，完整摘要读取17179943362→8589971681字节；每请求generation核验2→1，输出/夹具摘要保持。48项相关回归包含1项配置性跳过，执行47个函数通过；具体identityMismatch断言的3个实际verifier函数再次通过。两份新证据索引的全部文件和源码SHA256复核通过，66个任务ID唯一、JSON有效、git diff --check通过。真实冻结CLI/VM摘要保持。T60实际UI取消/Quit仍因工具超时未验证；T60与T32/T33整体状态不提升，源码/证据仍未提交或推送。
++
++2026-10-21 08:03 CST：重新应用全部7项组件安装与清理步骤已结束，进入第一轮最终效果核验。快照处理、第二轮核验、封存/交换及重新应用后的独立证明与运行验证仍未完成。
++
++2026-10-21 08:13 CST：按当前 root17578 的两次直接 verify-final 调用及冻结脚本顺序核对，第一轮最终效果核验、cleanup 与启动快照处理已结束，进入第二轮只读核验。已保存调用PID/观察时间及host脚本SHA；封存、发布和后续独立/运行证明仍未完成。
++
++2026-10-21 08:36 CST：两轮最终效果核验和启动快照处理已进入后续 seal。封存进程74327先后执行两个直接 verify-plan 子进程74344/83091；两者均已结束，seal仍在运行。进程观察和研究清单已更新；未确认封存、发布或重新应用后的运行验证通过。
++
++
++### 2026-10-21：T60剩余实现和离线矩阵
++
++完成创建退出等待、Finder归档排队/UTI、版本化JSONL进度、socket排除；实际GUI缺zstd已复现并打包zstd/xz和依赖/许可证。最终r3候选签名/资源/依赖通过，Kit227（跳过10）/Core441（跳过1）/ArchiveCLI2函数/Python62+7通过；新旧具名签名CLI各8项、真实信号导入4+导出4场景通过。旧VM克隆导出15,564,157,664字节归档通过。实际GUI因Mac锁定待手动解锁；真实VM导入需30,044,004,352字节空闲且当前差约2.2GiB，待释放至少3GiB后复核。未删数据，未启动旧VM，不更改DSC冻结输入；T60未accepted。证据：evidence/T60-remaining-20261021/manifest.json。未提交或推送。
++
++2026-10-21 09:12 CST：独立 DSC 启动前 Undo→同generation显式重新应用真实VM序列已通过。10阶段退出0，7组证明通过；恢复与重新应用状态各2次真实API启动/正常关机、26.0/23A341、磁盘释放和运行后Receipt/generation读取通过。最终归档118个索引文件/26,257,055字节的大小与SHA-256独立核对通过；指定后台PID均已不在进程表。源构建冻结基线d968d02f，优化候选未纳入本轮；不推进运行效果、图形、Mach-O/Preboot或受信来源的接受状态。证据：`evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json`。本轮未执行Git提交或推送。
++
++
++### 2026-10-21：T60用户解锁后实际矩阵
++
++最终r3实际导入/导出等待和活动Cancel、传输Quit超时保留及排空退出、Finder冷/热打开通过；两个16GiB完整摘要保持。真实64GiB默认system-tar导入完成，8个持久文件及源VM/归档完整摘要保持，无staging、未启动VM。新增正式native稀疏/硬链接回归，新旧签名CLI各9项通过；Kit228项（跳过11）通过。native真实大盘两次触及保留空间并取消，分配差异原因未查明，未修改生产归档代码。待批准清理本次约62GiB的system-tar/restored测试副本后复验，原盘/归档/结果保留。实际create/restore与更广历史组合仍未验收，T60未accepted。证据：evidence/T60-resume-20261021/manifest.json。
++
++
++### 2026-10-21：T60具名矩阵完成
++
++用户批准后仅删除本次system-tar/restored测试副本，空闲恢复77.824GB。相同r3候选/归档的native64GiB真实导入通过，8个持久文件完整摘要一致，原VM/归档保持，无staging、未启动VM；native目标分配约27.5GiB。GUI、两个签名CLI各9项及两个真实导入后端的具名矩阵完成，可提交评审。分配差异原因未查明，不声称修复；实际restore退出、导入后启动和全部历史组合仍未覆盖，不代替人审accepted。最终证据：evidence/T60-final-20261021/manifest.json。未提交、推送或发布。
+diff --git a/research/upstream_integration_2026-10-15/tasks.json b/research/upstream_integration_2026-10-15/tasks.json
+index d3c5cf8e..89f2e907 100644
+--- a/research/upstream_integration_2026-10-15/tasks.json
++++ b/research/upstream_integration_2026-10-15/tasks.json
+@@ -3310,15 +3310,31 @@
+           "patch": "committed c1c3bbd5-e615-4ba5-8700-0fc885925167; 7 component groups, 58 records",
+           "restore": "SHSH and restore exit 0; DFU exit 0; disk and directory lock released",
+           "source_diagnostic": "readonly SwapEnd 0x548 -> 0x560; corresponding 6885 CodeDirectory pages verified; source unchanged",
+-          "cfw": "Explicit reinstall 20261019T124601Z-vZh3Hh4C failed strict final verification; original metadata and 66 samples unchanged; directory-symlink mechanism reproduced and fixed; corrected bundle retry CLI4097/session59096 started; current stage in acceptance-state.json",
+-          "guest_undo": "Previous continuations stopped on install failure; no Undo or boot; corrected on/off/on runner prepared; actual acceptance pending",
+-          "normal_boot": "Earlier first publication boots passed; new rebaseline notbooted. No current reapplication acceptance.",
++          "cfw": "Initial20261020T070734Z-tjhO0rSZ and explicit reapplication20261020T145635Z-QBLOIoqy both v4 published, exit0; full DSC proofs passed.",
++          "guest_undo": "Preboot Undo20261020T130129Z-EauDALvj published, original SHA/w3=0x548/all6885 CodeDirectory pages passed; guest origin remains unknown.",
++          "normal_boot": "Restored and reapplied states each passed two real headless API boot/normal-shutdown cycles on26.0/23A341; distinct sessions, exit0, no forced framework stop, disk released, config and staged daemon unchanged.",
+           "accepted": false,
+-          "installed_dsc_proof": "original e41db9aa... and installed2fc23949...; w3 0x548->0x560;6885 pages each; unbooted raw/publication SHA match",
+-          "post_boot": "actual receipts and Swift verify-plan exit0; committed-publication; runtimeImageChanged true; runtimeValidated false",
+-          "on_off_on": "Pending explicit Cryptex reinstall, preboot Undo, restored boots, explicit reapplication andboots"
++          "installed_dsc_proof": "source e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5; installed2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac; pages6885; w3 0x548->0x560",
++          "post_boot": "Both restored and reapplied production receipts and Swift verify-plan exited0; historical publication and current runtime images remain distinct; runtime effects not validated.",
++          "on_off_on": "Passed: same generation, three distinct published journals, original/patched SHA and6885 pages verified, two API cycles and postboot readers for each state.",
++          "dsc_preboot_validation": {
++            "state": "passed",
++            "scope": "independent DSC Undo and same-generation reapplication",
++            "evidence": "evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json",
++            "transactions": {
++              "installed": "20261020T070734Z-tjhO0rSZ",
++              "restored": "20261020T130129Z-EauDALvj",
++              "reapplied": "20261020T145635Z-QBLOIoqy"
++            },
++            "restoredAPICycles": 2,
++            "reappliedAPICycles": 2,
++            "runtimeEffectsValidated": false,
++            "graphicsValidated": false,
++            "broaderT32T33Accepted": false,
++            "completedAt": "2026-10-21T01:07:12.446945+00:00"
++          }
+         },
+-        "current_evidence": "evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json",
++        "current_evidence": "evidence/T32-T33-resume-20261020/manifest.json",
+         "runtime_evidence_boundary": "v3 post-boot raw SHA/mtime mismatch refuses receipts and plan qualification; checkpoint, 5 files and 297 blobs unchanged; v4 independent postimage under implementation",
+         "runtime_publication_v4": "implemented; independent postimage and historical association; current target verification required for Undo; legacy v3 remains strict",
+         "final_host_allowance": "89b70a253cad2adea133b3e875519afaf72c5d17 explicitly authorized and scoped helper executed; argument-validation probes passed"
+@@ -3533,15 +3549,31 @@
+           "patch": "committed c1c3bbd5-e615-4ba5-8700-0fc885925167; 7 component groups, 58 records",
+           "restore": "SHSH and restore exit 0; DFU exit 0; disk and directory lock released",
+           "source_diagnostic": "readonly SwapEnd 0x548 -> 0x560; corresponding 6885 CodeDirectory pages verified; source unchanged",
+-          "cfw": "Explicit reinstall 20261019T124601Z-vZh3Hh4C failed strict final verification; original metadata and 66 samples unchanged; directory-symlink mechanism reproduced and fixed; corrected bundle retry CLI4097/session59096 started; current stage in acceptance-state.json",
+-          "guest_undo": "Previous continuations stopped on install failure; no Undo or boot; corrected on/off/on runner prepared; actual acceptance pending",
+-          "normal_boot": "Earlier first publication boots passed; new rebaseline notbooted. No current reapplication acceptance.",
++          "cfw": "Initial20261020T070734Z-tjhO0rSZ and explicit reapplication20261020T145635Z-QBLOIoqy both v4 published, exit0; full DSC proofs passed.",
++          "guest_undo": "Preboot Undo20261020T130129Z-EauDALvj published, original SHA/w3=0x548/all6885 CodeDirectory pages passed; guest origin remains unknown.",
++          "normal_boot": "Restored and reapplied states each passed two real headless API boot/normal-shutdown cycles on26.0/23A341; distinct sessions, exit0, no forced framework stop, disk released, config and staged daemon unchanged.",
+           "accepted": false,
+-          "installed_dsc_proof": "original e41db9aa... and installed2fc23949...; w3 0x548->0x560;6885 pages each; unbooted raw/publication SHA match",
+-          "post_boot": "actual receipts and Swift verify-plan exit0; committed-publication; runtimeImageChanged true; runtimeValidated false",
+-          "on_off_on": "Pending explicit Cryptex reinstall, preboot Undo, restored boots, explicit reapplication andboots"
++          "installed_dsc_proof": "source e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5; installed2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac; pages6885; w3 0x548->0x560",
++          "post_boot": "Both restored and reapplied production receipts and Swift verify-plan exited0; historical publication and current runtime images remain distinct; runtime effects not validated.",
++          "on_off_on": "Passed: same generation, three distinct published journals, original/patched SHA and6885 pages verified, two API cycles and postboot readers for each state.",
++          "dsc_preboot_validation": {
++            "state": "passed",
++            "scope": "independent DSC Undo and same-generation reapplication",
++            "evidence": "evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json",
++            "transactions": {
++              "installed": "20261020T070734Z-tjhO0rSZ",
++              "restored": "20261020T130129Z-EauDALvj",
++              "reapplied": "20261020T145635Z-QBLOIoqy"
++            },
++            "restoredAPICycles": 2,
++            "reappliedAPICycles": 2,
++            "runtimeEffectsValidated": false,
++            "graphicsValidated": false,
++            "broaderT32T33Accepted": false,
++            "completedAt": "2026-10-21T01:07:12.446945+00:00"
++          }
+         },
+-        "current_evidence": "evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json",
++        "current_evidence": "evidence/T32-T33-resume-20261020/manifest.json",
+         "runtime_evidence_boundary": "v3 post-boot raw SHA/mtime mismatch refuses receipts and plan qualification; checkpoint, 5 files and 297 blobs unchanged; v4 independent postimage under implementation",
+         "runtime_publication_v4": "implemented; independent postimage and historical association; current target verification required for Undo; legacy v3 remains strict",
+         "final_host_allowance": "89b70a253cad2adea133b3e875519afaf72c5d17 explicitly authorized and scoped helper executed; argument-validation probes passed"
+@@ -5585,16 +5617,24 @@
+       "historical_status_target": null,
+       "target_review": {
+         "target": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+-        "status": "import_export_cancellation_and_exclusive_publication_validated_queue_pending",
++        "status": "implementation_and_selected_acceptance_matrix_complete_ready_for_review",
+         "assessment": "existing_foundation_delta_pending",
+         "evidence": [
+           "local_reconciliation.json#T60",
+           "T60_progress_pipe.md",
+           "evidence/parallel-three/README.md",
+           "T60_import_cancellation.md",
+-          "T60_export_cancellation.md"
++          "T60_export_cancellation.md",
++          "T60_import_queue.md",
++          "evidence/T60-import-queue-20261020/manifest.json",
++          "evidence/T60-import-state-20261020/manifest.json",
++          "evidence/T60-real-import-termination-20261020/manifest.json",
++          "evidence/T60-closeout-20261021/manifest.json",
++          "evidence/T60-remaining-20261021/manifest.json",
++          "evidence/T60-resume-20261021/manifest.json",
++          "evidence/T60-final-20261021/manifest.json"
+         ],
+-        "finding": "导出接入两后端信号取消与私有staging、排他发布，已有目标保持；Launchpad取消盲删修复。真实CLI4取消+2正常往返通过，进度回退经41项修复回归；队列与完整退出状态仍待验收。"
++        "finding": "导出接入两后端信号取消与私有staging、排他发布，已有目标保持；Launchpad取消盲删修复。真实CLI4取消+2正常往返通过，进度回退经41项修复回归；队列与完整退出状态仍待验收。 2026-10-20补充FIFO导入、批量选择、等待取消和退出门关闭接线；26项定向及210项LaunchpadKit通过，6项配置性跳过。逐项队列/进度/取消UI、签名UI和完整退出矩阵仍待验收。 后续新增逐项状态/取消UI和退出时取消转移接线；31项定向、216项LaunchpadKit、独立签名候选及1项真实CLI并发导入/完整摘要检查通过。真实UI、字节进度和完整VM/混合版本退出矩阵仍待验收。 2026-10-20新增真实CLI导入中退出协调回归，两个测试9.065秒通过；等待项未启动、CLI退出130、输出排空、无残留与指定摘要保持。AppKit实际交互和完整VM矩阵仍待验收。 2026-10-21补充跨选择导出FIFO/调用方取消、两后端源变化最终发布拒绝；LaunchpadKit221/Core436/Python37及两个签名CLI各6项正式回归通过。实际NSOpenPanel多选两个16GiB夹具，源/目标完整SHA256相等。UI工具随后timeoutReached，取消/Quit及完整VM矩阵仍未验收；不提升accepted。 2026-10-21剩余工作补充：创建组退出等待、Finder冷打开队列、版本化JSONL进度和socket排除已实现；Finder缺zstd实际复现后打包zstd/xz及依赖。Kit227/Core441/Python62+7、ArchiveCLI2函数及新旧签名CLI各8项通过；两后端信号导入4+导出4场景通过。真实旧VM克隆导出14.5GiB归档；完整导入差约2.2GiB且实际GUI等待Mac解锁，未提升accepted。 用户解锁后最终r3实际导入/导出等待和活动取消、Command-Q超时保留/正常排空、Finder冷/热打开均通过；两个16GiB完整摘要保持。真实64GiB默认system-tar往返8个持久文件完整摘要通过。新旧签名CLI各9项通过，新增native稀疏/硬链接正式回归。native真实大盘两次保留空间中断，分配差异原因未查明；待批准清理本次具名测试副本后复验。实际create/restore及更广历史组合未验收。 用户明确批准清理本次已验证system-tar测试副本后，native64GiB真实导入通过：8个持久文件完整摘要与源一致，原VM/归档保持，无staging，未启动VM。具名两后端/GUI/新旧CLI矩阵完成，可提交评审；分配量差异原因未查明，保守容量预检及4GiB保留量保持。历史accepted和更广未覆盖范围不提升。"
+       },
+       "release_scope": "candidate",
+       "planning_review": {
+@@ -5846,15 +5886,31 @@
+         "patch": "committed c1c3bbd5-e615-4ba5-8700-0fc885925167; 7 component groups, 58 records",
+         "restore": "SHSH and restore exit 0; DFU exit 0; disk and directory lock released",
+         "source_diagnostic": "readonly SwapEnd 0x548 -> 0x560; corresponding 6885 CodeDirectory pages verified; source unchanged",
+-        "cfw": "Explicit reinstall 20261019T124601Z-vZh3Hh4C failed strict final verification; original metadata and 66 samples unchanged; directory-symlink mechanism reproduced and fixed; corrected bundle retry CLI4097/session59096 started; current stage in acceptance-state.json",
+-        "guest_undo": "Previous continuations stopped on install failure; no Undo or boot; corrected on/off/on runner prepared; actual acceptance pending",
+-        "normal_boot": "Earlier first publication boots passed; new rebaseline notbooted. No current reapplication acceptance.",
++        "cfw": "Initial20261020T070734Z-tjhO0rSZ and explicit reapplication20261020T145635Z-QBLOIoqy both v4 published, exit0; full DSC proofs passed.",
++        "guest_undo": "Preboot Undo20261020T130129Z-EauDALvj published, original SHA/w3=0x548/all6885 CodeDirectory pages passed; guest origin remains unknown.",
++        "normal_boot": "Restored and reapplied states each passed two real headless API boot/normal-shutdown cycles on26.0/23A341; distinct sessions, exit0, no forced framework stop, disk released, config and staged daemon unchanged.",
+         "accepted": false,
+-        "installed_dsc_proof": "original e41db9aa... and installed2fc23949...; w3 0x548->0x560;6885 pages each; unbooted raw/publication SHA match",
+-        "post_boot": "actual receipts and Swift verify-plan exit0; committed-publication; runtimeImageChanged true; runtimeValidated false",
+-        "on_off_on": "Pending explicit Cryptex reinstall, preboot Undo, restored boots, explicit reapplication andboots"
++        "installed_dsc_proof": "source e41db9aa09ab60cb6015282c9230fba89a8971129fae00c16156b29b1855c9b5; installed2fc23949b0ee8f17d01af28d83e814ee96aabc4918f46537f890843233a113ac; pages6885; w3 0x548->0x560",
++        "post_boot": "Both restored and reapplied production receipts and Swift verify-plan exited0; historical publication and current runtime images remain distinct; runtime effects not validated.",
++        "on_off_on": "Passed: same generation, three distinct published journals, original/patched SHA and6885 pages verified, two API cycles and postboot readers for each state.",
++        "dsc_preboot_validation": {
++          "state": "passed",
++          "scope": "independent DSC Undo and same-generation reapplication",
++          "evidence": "evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/manifest.json",
++          "transactions": {
++            "installed": "20261020T070734Z-tjhO0rSZ",
++            "restored": "20261020T130129Z-EauDALvj",
++            "reapplied": "20261020T145635Z-QBLOIoqy"
++          },
++          "restoredAPICycles": 2,
++          "reappliedAPICycles": 2,
++          "runtimeEffectsValidated": false,
++          "graphicsValidated": false,
++          "broaderT32T33Accepted": false,
++          "completedAt": "2026-10-21T01:07:12.446945+00:00"
++        }
+       },
+-      "current_evidence": "evidence/T32-T33-new-vm-20261018/cryptex-symlink-20261020/manifest.json",
++      "current_evidence": "evidence/T32-T33-resume-20261020/manifest.json",
+       "runtime_evidence_boundary": "v3 post-boot raw SHA/mtime mismatch refuses receipts and plan qualification; checkpoint, 5 files and 297 blobs unchanged; v4 independent postimage under implementation",
+       "runtime_publication_v4": "implemented; independent postimage and historical association; current target verification required for Undo; legacy v3 remains strict",
+       "final_host_allowance": "89b70a253cad2adea133b3e875519afaf72c5d17 explicitly authorized and scoped helper executed; argument-validation probes passed"
+diff --git a/scripts/build.sh b/scripts/build.sh
+index fdf02815..3c025cbe 100755
+--- a/scripts/build.sh
++++ b/scripts/build.sh
+@@ -84,6 +84,16 @@ for t in trustcache insert_dylib; do
+   if [[ -x ".tools/bin/$t" ]]; then cp -f ".tools/bin/$t" "${RES}/.tools/bin/$t"
+   else echo "Error: .tools/bin/$t missing — run ./scripts/setup_tools.sh first" >&2; exit 1; fi
+ done
++# bsdtar delegates zstd/xz filters to executables when the OS codec is absent.
++# Finder's launch environment must not depend on a package-manager PATH.
++for compressor in zstd xz; do
++  compressor_source="$(command -v "$compressor")"
++  [[ -x "$compressor_source" ]] || { print -u2 "Missing build input: $compressor"; exit 1; }
++  cp -f "$compressor_source" "${RES}/.tools/bin/$compressor"
++  # Preserve the original relative library search during staging; the portable
++  # dependency pass resolves this build input and removes the temporary rpath.
++  install_name_tool -add_rpath "${compressor_source:h}/../lib" "${RES}/.tools/bin/$compressor"
++done
+ python3 "$SCRIPT_DIR/check_guest_payloads.py" .build/guest
+ python3 "$SCRIPT_DIR/check_guest_api.py" .build/guest
+ mkdir -p "${RES}/guest-resources"
+diff --git a/scripts/build_native_dependencies.py b/scripts/build_native_dependencies.py
+index 565c9c69..057ee8c8 100644
+--- a/scripts/build_native_dependencies.py
++++ b/scripts/build_native_dependencies.py
+@@ -15,6 +15,7 @@ HOST_EXECUTABLES = (
+     'Contents/MacOS/vphone-cli', 'Contents/MacOS/vphone-vm', 'Contents/MacOS/ldid',
+     'Contents/MacOS/vphone-launchpad', 'Contents/MacOS/vphone-launchpad-launcher',
+     'Contents/Resources/.tools/bin/trustcache', 'Contents/Resources/.tools/bin/insert_dylib',
++    'Contents/Resources/.tools/bin/zstd', 'Contents/Resources/.tools/bin/xz',
+ )
+ 
+ 
+diff --git a/scripts/check_bundle.py b/scripts/check_bundle.py
+index 64f3efc3..9f86cc43 100644
+--- a/scripts/check_bundle.py
++++ b/scripts/check_bundle.py
+@@ -28,7 +28,9 @@ REQUIRED = (
+     'dependencies/python-darwin-arm64-3.13.json', 'dependencies/python-darwin-arm64-3.14.json',
+     'scripts/resources/cfw_input.tar.zst', 'scripts/resources/cfw_jb_input.tar.zst',
+     'scripts/resources/cfw_dev/rpcserver_ios', 'scripts/vphoned/signcert.p12',
+-    'tools/apfs_snap_rename.py', '.tools/bin/trustcache', '.tools/bin/insert_dylib',
++    'tools/apfs_snap_rename.py', '.tools/bin/trustcache', '.tools/bin/insert_dylib', '.tools/bin/zstd', '.tools/bin/xz',
++    'scripts/licenses/LZ4.txt', 'scripts/licenses/zstd.txt', 'scripts/licenses/xz.txt', 'scripts/licenses/xz-0BSD.txt',
++    'scripts/licenses/xz-GPLv2.txt', 'scripts/licenses/xz-LGPLv2.1.txt',
+     'guest-resources/vphoned', 'guest-resources/vphoned-less',
+     'guest-resources/vphoned.plist', 'guest-resources/vphoned.entitlements.plist',
+     'guest-resources/manifest.json', 'vphone-amfidont',
+@@ -51,7 +53,7 @@ def check_resources(bundle):
+         path = bundle / 'Contents/MacOS' / name
+         if not path.is_file() or not os.access(path, os.X_OK) or not path.resolve().is_relative_to(bundle.resolve()):
+             raise ValueError(f'Missing executable: {path}')
+-    for name in ('.tools/bin/trustcache', '.tools/bin/insert_dylib', 'guest-resources/vphoned', 'guest-resources/vphoned-less', 'vphone-amfidont'):
++    for name in ('.tools/bin/zstd', '.tools/bin/xz', '.tools/bin/trustcache', '.tools/bin/insert_dylib', 'guest-resources/vphoned', 'guest-resources/vphoned-less', 'vphone-amfidont'):
+         if not os.access(resources / name, os.X_OK):
+             raise ValueError(f'Resource is not executable: {name}')
+     return resources
+diff --git a/scripts/record_build_dependencies.py b/scripts/record_build_dependencies.py
+index bb1c0b4a..71de01a7 100644
+--- a/scripts/record_build_dependencies.py
++++ b/scripts/record_build_dependencies.py
+@@ -32,6 +32,7 @@ report = {
+ for path in sorted(resources.rglob('*')):
+     if path.is_file() and path.name != 'build-dependencies.json':
+         report['files_sha256'][str(path.relative_to(resources))] = hashlib.sha256(path.read_bytes()).hexdigest()
+-for path in [resources / '.tools/bin/trustcache', resources / '.tools/bin/insert_dylib', bundle / 'Contents/MacOS/ldid']:
++for path in [resources / '.tools/bin/trustcache', resources / '.tools/bin/insert_dylib',
++             resources / '.tools/bin/zstd', resources / '.tools/bin/xz', bundle / 'Contents/MacOS/ldid']:
+     report['host_tool_libraries'][str(path.relative_to(bundle))] = output('otool', '-L', str(path))
+ (resources / 'build-dependencies.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+diff --git a/scripts/run_launchpad_cli_tests.sh b/scripts/run_launchpad_cli_tests.sh
+index 790c6e86..2f262500 100644
+--- a/scripts/run_launchpad_cli_tests.sh
++++ b/scripts/run_launchpad_cli_tests.sh
+@@ -2,7 +2,9 @@
+ # run_launchpad_cli_tests.sh — Launchpad tests against the embedded vphone-cli
+ # (T26 B6, `make test_launchpad_cli`).
+ #
+-# Runs RealCLIEditTests (B3: vm new/config/rename/clone/export/import/delete
++# Runs RealCLIImportQueueTests (FIFO/transfer shutdown), RealCLISparseTests
++# (native sparse disk/hardlink round trip),
++# RealCLIEditTests (B3: vm new/config/rename/clone/export/import/delete
+ # on fixtures) and RealCLICreateTests (B4: fw catalog --json, vm create --help,
+ # vm create-status --json) with the vphone-cli embedded in
+ # .build/vphone-launchpad.app, verified as the app verifies it. Every command
+@@ -20,8 +22,8 @@ SCRIPT_DIR="${0:A:h}"
+ PROJECT_ROOT="${SCRIPT_DIR:h}"
+ cd "$PROJECT_ROOT"
+ 
+-APP="${PROJECT_ROOT}/.build/vphone-launchpad.app"
+-SUITES=(RealCLIEditTests RealCLICreateTests)
++APP="${VPHONE_LAUNCHPAD_APP:-${PROJECT_ROOT}/.build/vphone-launchpad.app}"
++SUITES=(RealCLIEditTests RealCLICreateTests RealCLIImportQueueTests RealCLISparseTests)
+ 
+ if [[ ! -d "$APP" ]]; then
+   print -u2 -- "Missing ${APP}; run make launchpad first."
+diff --git a/scripts/setup_tools.sh b/scripts/setup_tools.sh
+index d06101bd..e1828575 100755
+--- a/scripts/setup_tools.sh
++++ b/scripts/setup_tools.sh
+@@ -27,7 +27,7 @@ ensure_repo_submodule() {
+ 
+ echo "[1/4] Checking brew packages..."
+ 
+-BREW_PACKAGES=(aria2 gnu-tar openssl@3 ldid-procursus sshpass zstd cmake keystone)
++BREW_PACKAGES=(aria2 gnu-tar openssl@3 ldid-procursus sshpass zstd xz cmake keystone)
+ BREW_MISSING=()
+ 
+ for pkg in "${BREW_PACKAGES[@]}"; do
+diff --git a/sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift b/sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift
+index fa72ea3f..e80f4c05 100644
+--- a/sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift
++++ b/sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift
+@@ -181,7 +181,10 @@ public enum FirmwareDesiredPlanStore {
+               try record.catalogSHA256 == FirmwarePlanBinding.catalogDigest(),
+               try record.planSHA256 == FirmwareGeneration.planDigest(record.plan) else { throw Failure.invalidPlan }
+         try FirmwarePlanBinding.validateCurrentPlan(record.plan)
+-        let originals = try FirmwareGeneration.originalURLs(in: directory, id: record.generationID)
++        // This request has just verified this manifest, its originals and disk
++        // ancestry. Resolve paths from that result without loading it again.
++        let originalsRoot = directory.appendingPathComponent(".firmware-generations/\(generation.id)/originals")
++        let originals = generation.content.originals.map { originalsRoot.appendingPathComponent($0.name) }
+         guard let restore = originals.first(where: { $0.lastPathComponent.contains("Restore") }),
+               let variant = FirmwarePipeline.Variant(rawValue: record.plan.variant) else { throw Failure.invalidPlan }
+         let versions = try FirmwareVersionInputs.read(in: restore)
+diff --git a/sources/Info.plist b/sources/Info.plist
+index 0f9094be..ff1ac5fc 100644
+--- a/sources/Info.plist
++++ b/sources/Info.plist
+@@ -30,5 +30,7 @@
+ 	<string>vphone-cli forwards your location to the guest VM for location simulation.</string>
+ 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+ 	<string>vphone-cli forwards your location to the guest VM for location simulation.</string>
++	<key>VPhoneTransferProgressVersion</key>
++	<integer>1</integer>
+ </dict>
+ </plist>
+diff --git a/sources/VPhoneCore/VPhoneBundleOps.swift b/sources/VPhoneCore/VPhoneBundleOps.swift
+index d7cc7213..8472658e 100644
+--- a/sources/VPhoneCore/VPhoneBundleOps.swift
++++ b/sources/VPhoneCore/VPhoneBundleOps.swift
+@@ -301,7 +301,7 @@ public enum VPhoneBundleOps {
+     /// `.cfw-history` the host-local CFW transaction records and the previous
+     /// Disk.img kept for rollback (T15). Always excluded.
+     static let exportExcludePatterns = ["*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*",
+-                                        "*.cfw_disk.*", "*.cfw-history*", "*.vphone-runtime.json"]
++                                        "*.cfw_disk.*", "*.cfw-history*", "*.vphone-runtime.json", "vphone.sock"]
+ 
+     /// When `to` is an existing directory, the archive is written inside it as
+     /// `<name>.<compression.fileExtension>`. Returns the resolved output URL.
+@@ -374,10 +374,17 @@ public enum VPhoneBundleOps {
+                                                attributes: [.posixPermissions: 0o700])
+         defer { try? FileManager.default.removeItem(at: staging) }
+         let temporary = staging.appendingPathComponent("output")
++        var excludes = exportExcludePatterns
++        if !includeIPSW { excludes.append("*_Restore*") }
++        excludes += try VPhoneNativeTransfer.socketExclusions(in: bundle.url, excluding: excludes)
++        let sourceState = try VPhoneTransferSource.tree(bundle.url, excluding: excludes, isCancelled: isCancelled)
+         try writeExport(bundle: bundle, name: name, to: temporary, includeIPSW: includeIPSW,
+-                        compression: compression, in: library, backend: backend,
++                        compression: compression, in: library, backend: backend, excluding: excludes,
+                         isCancelled: isCancelled, progress: progress)
+         if isCancelled?() == true { throw CancellationError() }
++        guard try VPhoneTransferSource.tree(bundle.url, excluding: excludes, isCancelled: isCancelled) == sourceState else {
++            throw VPhoneBundleOpsError.badArchive("export source changed during transfer")
++        }
+         // Publication is the commit point. Never replace a concurrently created
+         // destination, and never roll back a completed publication on a late signal.
+         guard renamex_np(temporary.path, output.path, UInt32(RENAME_EXCL)) == 0 else {
+@@ -389,11 +396,9 @@ public enum VPhoneBundleOps {
+     private static func writeExport(
+         bundle: VPhoneBundle, name: String, to outFile: URL, includeIPSW: Bool,
+         compression: ExportCompression, in library: VPhoneLibrary, backend: ArchiveBackend,
+-        isCancelled: (() -> Bool)?, progress: ((Int64, Int64) -> Void)?
++        excluding excludes: [String], isCancelled: (() -> Bool)?, progress: ((Int64, Int64) -> Void)?
+     ) throws {
+         if backend == .native {
+-            var excludes = exportExcludePatterns
+-            if !includeIPSW { excludes.append("*_Restore*") }
+             let total = progress == nil ? 0 : VPhoneNativeTransfer.logicalSize(of: bundle.url, excluding: excludes)
+             try VPhoneArchiveWriter.create(
+                 archive: outFile, from: bundle.url, topLevel: name, format: .gnutar,
+@@ -407,8 +412,7 @@ public enum VPhoneBundleOps {
+         // consumer's `@-` reader misbid the stream as mtree ("Line too long")
+         // on large members; gnutar also carries files >8 GB (ustar cannot).
+         var producer = ["--format", "gnutar", "-cf", "-"]
+-        if !includeIPSW { producer += ["--exclude", "*_Restore*"] }
+-        for pattern in exportExcludePatterns { producer += ["--exclude", pattern] }
++        for pattern in excludes { producer += ["--exclude", pattern] }
+         producer += ["-C", library.root.path, name]
+         let consumer = ["-cf", outFile.path] + compression.tarArgs + ["@-"]
+ 
+@@ -486,6 +490,8 @@ public enum VPhoneBundleOps {
+         guard stat(inFile.path, &archiveInfo) == 0, archiveInfo.st_mode & S_IFMT == S_IFREG else {
+             throw VPhoneBundleOpsError.badArchive("archive source must be a regular file")
+         }
++        let archiveState = try VPhoneTransferSource.file(inFile)
++        let archiveTargetState = try VPhoneTransferSource.file(inFile, followLinks: true)
+         // Fail fast when the destination name is already known (explicit rename).
+         if let name {
+             try requireValidName(name)
+@@ -546,6 +552,10 @@ public enum VPhoneBundleOps {
+             if try VPhoneCloneCopy.exists(at: dst) { throw VPhoneLibraryError.alreadyExists(name: finalName) }
+             try afterNameCheck?()
+             try checkCancellation()
++            guard try VPhoneTransferSource.file(inFile) == archiveState,
++                  try VPhoneTransferSource.file(inFile, followLinks: true) == archiveTargetState else {
++                throw VPhoneBundleOpsError.badArchive("import archive changed during transfer")
++            }
+             // The exclusive rename commits publication. Cancellation observed
+             // after this point does not undo an already imported bundle.
+             guard renamex_np(extracted.path, dst.path, UInt32(RENAME_EXCL)) == 0 else {
+diff --git a/sources/VPhoneCore/VPhoneNativeTransfer.swift b/sources/VPhoneCore/VPhoneNativeTransfer.swift
+index cf685886..949680c1 100644
+--- a/sources/VPhoneCore/VPhoneNativeTransfer.swift
++++ b/sources/VPhoneCore/VPhoneNativeTransfer.swift
+@@ -60,6 +60,28 @@ enum VPhoneNativeTransfer {
+         }
+     }
+ 
++    /// Socket payloads are runtime endpoints. Escape exact physical paths so
++    /// a socket named with glob characters cannot exclude an ordinary file.
++    static func socketExclusions(in root: URL, excluding patterns: [String]) throws -> [String] {
++        var result: [String] = []
++        func literal(_ value: String) -> String {
++            value.reduce("") { $0 + ("\\*?[".contains($1) ? "\\" : "") + String($1) }
++        }
++        func visit(_ directory: URL, depth: Int) throws {
++            guard depth <= 128 else { throw VPhoneBundleOpsError.badArchive("VM directory nesting exceeds 128") }
++            for name in try FileManager.default.contentsOfDirectory(atPath: directory.path) {
++                let url = directory.appendingPathComponent(name)
++                let relative = String(url.path.dropFirst(root.path.count + 1))
++                if patterns.contains(where: { fnmatch($0, relative, 0) == 0 || fnmatch($0, name, 0) == 0 }) { continue }
++                if fileType(at: url) == S_IFSOCK {
++                    result += [literal(relative), literal(root.lastPathComponent + "/" + relative)]
++                } else if fileType(at: url) == S_IFDIR { try visit(url, depth: depth + 1) }
++            }
++        }
++        try visit(root, depth: 0)
++        return result
++    }
++
+     /// Match the native writer's exclusions and count hardlinked payload only once.
+     static func logicalSize(of root: URL, excluding patterns: [String]) -> Int64 {
+         guard let entries = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else { return 0 }
+diff --git a/sources/VPhoneCore/VPhoneProcessRunner.swift b/sources/VPhoneCore/VPhoneProcessRunner.swift
+index b12987d6..d4f5c111 100644
+--- a/sources/VPhoneCore/VPhoneProcessRunner.swift
++++ b/sources/VPhoneCore/VPhoneProcessRunner.swift
+@@ -201,7 +201,15 @@ public enum VPhoneProcessRunner {
+ 
+         let group = DispatchGroup()
+ 
++        let resources = VPhoneResources.resolve()
++        let compressors = resources.base.appendingPathComponent(".tools/bin")
++        var tarEnvironment = resources.processEnvironment
++        if FileManager.default.isExecutableFile(atPath: compressors.appendingPathComponent("zstd").path),
++           FileManager.default.isExecutableFile(atPath: compressors.appendingPathComponent("xz").path) {
++            tarEnvironment["PATH"] = compressors.path + ":/usr/bin:/bin:/usr/sbin:/sbin"
++        }
+         let consumer = Process()
++        consumer.environment = tarEnvironment
+         consumer.executableURL = tar
+         consumer.arguments = consumerArgs
+         let cIn = Pipe()
+@@ -222,6 +230,7 @@ public enum VPhoneProcessRunner {
+         let pErrBox = DataBox()
+         if let producerArgs {
+             let p = Process()
++            p.environment = tarEnvironment
+             p.executableURL = tar
+             p.arguments = producerArgs
+             let pOut = Pipe()
+diff --git a/sources/VPhoneLaunchpad-Info.plist b/sources/VPhoneLaunchpad-Info.plist
+index 4878413f..d68b803e 100644
+--- a/sources/VPhoneLaunchpad-Info.plist
++++ b/sources/VPhoneLaunchpad-Info.plist
+@@ -39,5 +39,41 @@
+ 	<string>vphone-launchpad forwards your location to the guest VM for location simulation.</string>
+ 	<key>NSPrincipalClass</key>
+ 	<string>NSApplication</string>
++	<key>CFBundleDocumentTypes</key>
++	<array>
++		<dict>
++			<key>CFBundleTypeName</key>
++			<string>Virtual iPhone Archive</string>
++			<key>CFBundleTypeRole</key>
++			<string>Viewer</string>
++			<key>LSHandlerRank</key>
++			<string>Alternate</string>
++			<key>LSItemContentTypes</key>
++			<array>
++				<string>com.vphone.cli.archive</string>
++			</array>
++		</dict>
++	</array>
++	<key>UTExportedTypeDeclarations</key>
++	<array>
++		<dict>
++			<key>UTTypeIdentifier</key>
++			<string>com.vphone.cli.archive</string>
++			<key>UTTypeDescription</key>
++			<string>Virtual iPhone Archive</string>
++			<key>UTTypeConformsTo</key>
++			<array>
++				<string>public.data</string>
++			</array>
++			<key>UTTypeTagSpecification</key>
++			<dict>
++				<key>public.filename-extension</key>
++				<array>
++					<string>tzst</string>
++					<string>txz</string>
++				</array>
++			</dict>
++		</dict>
++	</array>
+ </dict>
+ </plist>
+diff --git a/sources/VPhoneLaunchpad/Localizable.xcstrings b/sources/VPhoneLaunchpad/Localizable.xcstrings
+index 226dda86..9412195a 100644
+--- a/sources/VPhoneLaunchpad/Localizable.xcstrings
++++ b/sources/VPhoneLaunchpad/Localizable.xcstrings
+@@ -449,6 +449,22 @@
+         }
+       }
+     },
++    "Cancelling…": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Cancelling…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "正在取消…"
++          }
++        }
++      }
++    },
+     "Cannot read the volume of %@": {
+       "localizations": {
+         "en": {
+@@ -641,18 +657,34 @@
+         }
+       }
+     },
+-    "Choose an exported machine archive (.tzst or .txz). It is imported into %@.": {
++    "Choose local .tzst or .txz archives.": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Choose local .tzst or .txz archives."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "请选择本地 .tzst 或 .txz 归档。"
++          }
++        }
++      }
++    },
++    "Choose one or more exported machine archives (.tzst or .txz). They are imported in order into %@.": {
+       "localizations": {
+         "en": {
+           "stringUnit": {
+             "state": "translated",
+-            "value": "Choose an exported machine archive (.tzst or .txz). It is imported into %@."
++            "value": "Choose one or more exported machine archives (.tzst or .txz). They are imported in order into %@."
+           }
+         },
+         "zh-Hans": {
+           "stringUnit": {
+             "state": "needs_review",
+-            "value": "选择导出的虚拟机归档（.tzst 或 .txz）。归档会导入到 %@。"
++            "value": "选择一个或多个导出的虚拟机归档（.tzst 或 .txz）。归档将依次导入到 %@。"
+           }
+         }
+       }
+@@ -1473,6 +1505,22 @@
+         }
+       }
+     },
++    "Export creates a new archive. Choose a destination that does not already exist. Cancel Export requests cancellation; completed archives are kept.": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Export creates a new archive. Choose a destination that does not already exist. Cancel Export requests cancellation; completed archives are kept."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "needs_review",
++            "value": "导出会创建新归档。请选择尚不存在的目标路径。“取消导出”会请求取消；已完成的归档会保留。"
++          }
++        }
++      }
++    },
+     "Export to": {
+       "localizations": {
+         "en": {
+@@ -1841,6 +1889,22 @@
+         }
+       }
+     },
++    "Importing…": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Importing…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "正在导入…"
++          }
++        }
++      }
++    },
+     "Import…": {
+       "localizations": {
+         "en": {
+@@ -2849,34 +2913,34 @@
+         }
+       }
+     },
+-    "Quitting was cancelled because command output has not finished. The reader and log remain active. Wait for the command to finish, then quit again.": {
++    "Quit": {
+       "localizations": {
+         "en": {
+           "stringUnit": {
+             "state": "translated",
+-            "value": "Quitting was cancelled because command output has not finished. The reader and log remain active. Wait for the command to finish, then quit again."
++            "value": "Quit"
+           }
+         },
+         "zh-Hans": {
+           "stringUnit": {
+             "state": "translated",
+-            "value": "命令输出尚未结束，应用已取消退出。日志读取和写入继续运行。请等待命令结束后再次退出。"
++            "value": "退出"
+           }
+         }
+       }
+     },
+-    "Quit": {
++    "Quitting was cancelled because command output has not finished. The reader and log remain active. Wait for the command to finish, then quit again.": {
+       "localizations": {
+         "en": {
+           "stringUnit": {
+             "state": "translated",
+-            "value": "Quit"
++            "value": "Quitting was cancelled because command output has not finished. The reader and log remain active. Wait for the command to finish, then quit again."
+           }
+         },
+         "zh-Hans": {
+           "stringUnit": {
+             "state": "translated",
+-            "value": "退出"
++            "value": "命令输出尚未结束，应用已取消退出。日志读取和写入继续运行。请等待命令结束后再次退出。"
+           }
+         }
+       }
+@@ -4081,6 +4145,22 @@
+         }
+       }
+     },
++    "Unable to Import Archives": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Unable to Import Archives"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "无法导入归档"
++          }
++        }
++      }
++    },
+     "Unable to Rename %@": {
+       "localizations": {
+         "en": {
+@@ -4305,6 +4385,22 @@
+         }
+       }
+     },
++    "Waiting to import…": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Waiting to import…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "等待导入…"
++          }
++        }
++      }
++    },
+     "You cannot write to %@.": {
+       "localizations": {
+         "en": {
+@@ -4496,22 +4592,6 @@
+           }
+         }
+       }
+-    },
+-    "Export creates a new archive. Choose a destination that does not already exist. Cancel Export requests cancellation; completed archives are kept.": {
+-      "localizations": {
+-        "en": {
+-          "stringUnit": {
+-            "state": "translated",
+-            "value": "Export creates a new archive. Choose a destination that does not already exist. Cancel Export requests cancellation; completed archives are kept."
+-          }
+-        },
+-        "zh-Hans": {
+-          "stringUnit": {
+-            "state": "needs_review",
+-            "value": "导出会创建新归档。请选择尚不存在的目标路径。“取消导出”会请求取消；已完成的归档会保留。"
+-          }
+-        }
+-      }
+     }
+   },
+   "version": "1.0"
+diff --git a/sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift b/sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift
+index 8f19b616..f4ef28c6 100644
+--- a/sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift
++++ b/sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift
+@@ -47,6 +47,7 @@ private struct VPhoneLaunchpadMainWindowContent: View {
+             .environment(model)
+             .onAppear {
+                 delegate.model = model
++                model.connectArchiveOpens(delegate.archiveOpens)
+                 delegate.openWindow = openWindow
+             }
+     }
+@@ -63,6 +64,7 @@ private struct VPhoneLaunchpadMainWindowContent: View {
+ @MainActor
+ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
+     weak var model: VPhoneLaunchpadModel?
++    let archiveOpens = VPhoneLaunchpadArchiveOpenQueue()
+     /// The window scene's open action, kept for the smoke check's reopen.
+     var openWindow: OpenWindowAction?
+     private let dockPolicy = VPhoneLaunchpadDockPolicy()
+@@ -78,6 +80,10 @@ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
+         runSmokeWindowSteps()
+     }
+ 
++    func application(_: NSApplication, open urls: [URL]) {
++        if !archiveOpens.enqueue(urls) { model?.machines.actionError = archiveOpens.error }
++    }
++
+     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
+         VPhoneLaunchpadMenuBar.terminatesAfterLastWindowClosed()
+     }
+@@ -96,10 +102,12 @@ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
+             }
+             VPhoneLaunchpadQuit.confirmed(library)
+         }
+-        guard let commandLine = model?.commandLine, commandLine.hasActiveCommands else {
++        guard let commandLine = model?.commandLine,
++              commandLine.hasActiveCommands || model?.machines.hasActiveTransfers == true else {
+             return .terminateNow
+         }
+         guard commandLine.beginTermination() else { return .terminateCancel }
++        model?.machines.cancelTransfers()
+         terminationPending = true
+         Task { @MainActor in
+             let result = await commandLine.waitForTermination()
+diff --git a/sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift b/sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift
+index 63a1a753..e9f5d1ef 100644
+--- a/sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift
++++ b/sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift
+@@ -18,3 +18,17 @@ extension NSSavePanel {
+         }
+     }
+ }
++
++extension NSOpenPanel {
++    func presentSelection(_ choose: @escaping @MainActor ([URL]) -> Void) {
++        guard let window = NSApp.keyWindow ?? NSApp.mainWindow else {
++            if runModal() == .OK { choose(urls) }
++            return
++        }
++        beginSheetModal(for: window) { [self] response in
++            if response == .OK {
++                MainActor.assumeIsolated { choose(urls) }
++            }
++        }
++    }
++}
+diff --git a/sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift b/sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift
+index 1437ce72..07d9b955 100644
+--- a/sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift
++++ b/sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift
+@@ -7,29 +7,36 @@ import VPhoneLaunchpadKit
+ /// A machine's run state as the table and the inspector show it. An
+ /// activity Launchpad runs on the machine (`Stopping…`, `Exporting…`) takes
+ /// the place of the state; a panic line in the console turns the icon
+-/// amber. `indeterminate` draws an indeterminate bar beside the activity:
+-/// `vm export` prints no progress lines to a pipe.
++/// amber. Transfers use a known fraction when available and an indeterminate
++/// bar for older CLIs or a backend whose total is unknown.
+ struct VPhoneLaunchpadMachineStateLabel: View {
+     let state: VPhoneLaunchpadRunState
+     var activity: String?
+     var panicked = false
+     var indeterminate = false
++    var fraction: Double?
++    var bytes: Int64?
+ 
+     var body: some View {
+         if indeterminate, let activity {
+             HStack(spacing: VPhoneLaunchpadTheme.unit) {
+-                ProgressView()
++                ProgressView(value: fraction)
+                     .progressViewStyle(.linear)
+                     .controlSize(.small)
+                     .frame(width: 48)
+-                Text(verbatim: activity).lineLimit(1)
++                Text(verbatim: progressText(activity)).lineLimit(1)
+             }
+-            .help(Text(verbatim: activity))
++            .help(Text(verbatim: progressText(activity)))
+         } else {
+             label
+         }
+     }
+ 
++    private func progressText(_ activity: String) -> String {
++        guard let bytes else { return activity }
++        return activity + " " + ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
++    }
++
+     @ViewBuilder
+     private var label: some View {
+         let (status, text, instance): (VPhoneLaunchpadStatus, String, String?) = if let activity {
+@@ -78,7 +85,9 @@ struct VPhoneLaunchpadMachineInspector: View {
+                         state: library.state(of: machine.path),
+                         activity: library.activity(of: machine.path),
+                         panicked: library.panicked.contains(machine.path),
+-                        indeterminate: library.isExporting(machine.path)
++                        indeterminate: library.isExporting(machine.path),
++                        fraction: library.exports[machine.path]?.progress?.fraction,
++                        bytes: library.exports[machine.path]?.progress?.bytes
+                     )
+                 }
+                 if let export = library.exports[machine.path] {
+diff --git a/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift b/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift
+index d505bb79..b8e4e0b2 100644
+--- a/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift
++++ b/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift
+@@ -68,13 +68,19 @@ struct VPhoneLaunchpadMachinesView: View {
+ 
+     var body: some View {
+         @Bindable var library = library
+-        Group {
+-            if library.machines.isEmpty {
+-                emptyState
+-            } else if rows.isEmpty {
+-                ContentUnavailableView.search(text: filter)
+-            } else {
+-                table(selection: $library.selection)
++        VStack(spacing: 0) {
++            if !library.imports.isEmpty {
++                importQueue
++                Rectangle().fill(VPhoneLaunchpadTheme.border).frame(height: 1)
++            }
++            Group {
++                if library.machines.isEmpty {
++                    emptyState
++                } else if rows.isEmpty {
++                    ContentUnavailableView.search(text: filter)
++                } else {
++                    table(selection: $library.selection)
++                }
+             }
+         }
+         // At least as wide as the columns (B2: with the inspector open the
+@@ -134,6 +140,41 @@ struct VPhoneLaunchpadMachinesView: View {
+ 
+     // MARK: - Toolbar
+ 
++    private var importQueue: some View {
++        ScrollView {
++            VStack(spacing: VPhoneLaunchpadTheme.unit) {
++                ForEach(library.imports) { item in
++                    HStack(spacing: VPhoneLaunchpadTheme.padding) {
++                        if item.state == .waiting {
++                            Image(systemName: "clock").foregroundStyle(.secondary)
++                        } else {
++                            ProgressView(value: item.progress?.fraction).controlSize(.small).frame(width: 56)
++                        }
++                        Text(verbatim: item.archive.lastPathComponent)
++                            .lineLimit(1).truncationMode(.middle)
++                            .help(item.archive.path)
++                        Spacer()
++                        if let progress = item.progress {
++                            Text(verbatim: ByteCountFormatter.string(fromByteCount: progress.bytes, countStyle: .file))
++                                .foregroundStyle(.secondary).monospacedDigit()
++                        }
++                        switch item.state {
++                        case .waiting: Text("Waiting to import…").foregroundStyle(.secondary)
++                        case .running: Text("Importing…")
++                        case .cancelling: Text("Cancelling…").foregroundStyle(.secondary)
++                        }
++                        Button("Cancel") { library.cancelImport(item.id) }
++                            .disabled(item.state == .cancelling)
++                    }
++                    .frame(height: 28)
++                }
++            }
++            .padding(VPhoneLaunchpadTheme.padding)
++        }
++        .frame(height: CGFloat(min(library.imports.count, 4)) * 36 + 16)
++        .fontDesign(.monospaced)
++    }
++
+     @ToolbarContentBuilder
+     private var toolbar: some ToolbarContent {
+         ToolbarItem(placement: .automatic) {
+@@ -164,7 +205,6 @@ struct VPhoneLaunchpadMachinesView: View {
+                 Label("Import…", systemImage: "square.and.arrow.down")
+             }
+             .help("Import a machine archive into the default library")
+-            .disabled(library.globalActivity != nil)
+         }
+         ToolbarItem(placement: .automatic) {
+             VPhoneLaunchpadSearchField(text: $filter, prompt: String(localized: "Search machines"))
+@@ -318,7 +358,9 @@ struct VPhoneLaunchpadMachinesView: View {
+                     state: library.state(of: machine.path),
+                     activity: library.activity(of: machine.path),
+                     panicked: library.panicked.contains(machine.path),
+-                    indeterminate: library.isExporting(machine.path)
++                    indeterminate: library.isExporting(machine.path),
++                    fraction: library.exports[machine.path]?.progress?.fraction,
++                    bytes: library.exports[machine.path]?.progress?.bytes
+                 )
+             }
+             .width(min: 120, ideal: Column.state)
+@@ -364,7 +406,6 @@ struct VPhoneLaunchpadMachinesView: View {
+             } actions: {
+                 Button("New Machine…") { sheet = .newMachine }
+                 Button("Import…") { chooseImport() }
+-                    .disabled(library.globalActivity != nil)
+             }
+         }
+     }
+@@ -411,11 +452,11 @@ struct VPhoneLaunchpadMachinesView: View {
+         let library = library
+         let panel = NSOpenPanel()
+         panel.title = String(localized: "Import Machine")
+-        panel.message = String(localized: "Choose an exported machine archive (.tzst or .txz). It is imported into \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))).")
++        panel.message = String(localized: "Choose one or more exported machine archives (.tzst or .txz). They are imported in order into \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))).")
+         panel.canChooseDirectories = false
+-        panel.allowsMultipleSelection = false
+-        panel.present { url in
+-            Task { await library.importArchive(url) }
++        panel.allowsMultipleSelection = true
++        panel.presentSelection { urls in
++            Task { await library.importArchives(urls) }
+         }
+     }
+ 
+diff --git a/sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift b/sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift
+index 2e27fe2b..1c77f09f 100644
+--- a/sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift
++++ b/sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift
+@@ -27,6 +27,14 @@ final class VPhoneLaunchpadModel {
+     private(set) var coreBundle: VPhoneLaunchpadCoreBundle?
+     /// The embedded `vphone-cli`, once verified (New Machine's catalog).
+     private(set) var commandLine: VPhoneLaunchpadCommandLine?
++    private var archiveOpens: VPhoneLaunchpadArchiveOpenQueue?
++
++    func connectArchiveOpens(_ queue: VPhoneLaunchpadArchiveOpenQueue) {
++        archiveOpens = queue
++        if let error = queue.error { machines.actionError = error }
++        guard commandLine != nil else { return }
++        queue.attach { [weak self] urls in await self?.machines.importArchives(urls) }
++    }
+ 
+     /// Checks the embedded toolchain, then lists machines. Nothing is listed
+     /// and no command runs when the check fails.
+@@ -46,6 +54,7 @@ final class VPhoneLaunchpadModel {
+             host = VPhoneLaunchpadHostSetup(commandLine: commandLine, libraryRoot: machines.libraryRoot)
+             coreBundle = VPhoneLaunchpadCoreBundle(commandLine: commandLine)
+             machines.startMonitoring(with: commandLine)
++            if let archiveOpens { connectArchiveOpens(archiveOpens) }
+             openRequestedPanel()
+         case let .failure(failure):
+             toolchain = .failed(failure)
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift
+index 9d7b8d93..01cfc907 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift
+@@ -44,6 +44,7 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
+     init(
+         executable: URL,
+         arguments: [String],
++        environment: [String: String]? = nil,
+         logFile: URL? = nil,
+         appendingToLog: Bool = false,
+         preamble: String? = nil,
+@@ -52,6 +53,7 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
+     ) throws {
+         process.executableURL = executable
+         process.arguments = arguments
++        process.environment = environment
+         process.standardInput = FileHandle.nullDevice
+ 
+         if let logFile {
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift
+index c72254aa..d50ffb91 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift
+@@ -1,5 +1,6 @@
+ import Foundation
+ import Observation
++import VPhoneCore
+ 
+ // MARK: - Errors
+ 
+@@ -135,6 +136,7 @@ public struct VPhoneLaunchpadCommandLine {
+     private let activity = VPhoneLaunchpadCommandActivity()
+ 
+     public var hasActiveCommands: Bool { activity.hasActiveCommands }
++    var acceptsNewCommands: Bool { activity.acceptsNewCommands }
+ 
+     /// Synchronously closes the ordinary-command gate and interrupts owned
+     /// children. False if a termination request has already begun. The caller
+@@ -187,13 +189,19 @@ public struct VPhoneLaunchpadCommandLine {
+         recordInHistory: Bool = true,
+         machine: URL? = nil,
+         warningStatuses: Set<Int32> = [],
+-        onLine: (@Sendable (String) -> Void)? = nil
++        onLine: (@Sendable (String) -> Void)? = nil,
++        transferDirection: VPhoneTransferProgress.Direction? = nil,
++        onTransferProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil
+     ) async throws -> VPhoneLaunchpadCommandResult {
+         let operation = try activity.begin()
+         var drained = false
+         defer { activity.finish(operation, outputDrained: drained) }
+         let writer = try recordInHistory ? logsDirectory.map { try VPhoneLaunchpadLogWriter(url: $0.appendingPathComponent("command-\(UUID().uuidString).log")) } : nil
+         let entry = recordInHistory ? history.record(Self.display(arguments), warningStatuses: warningStatuses) : nil
++        let progress = (onTransferProgress == nil ? nil : transferDirection).flatMap { direction in
++            logsDirectory.flatMap { try? VPhoneTransferProgressChannel(parent: $0, direction: direction) }
++        }
++        defer { progress?.close() }
+         let collector = VPhoneLaunchpadLineCollector()
+         let child: VPhoneLaunchpadChildProcess
+         do {
+@@ -201,7 +209,8 @@ public struct VPhoneLaunchpadCommandLine {
+             if let snapshot = route?.snapshot, let machine, !snapshot.matches(machine) {
+                 throw VPhoneLaunchpadError("VM binding changed before command start.")
+             }
+-            child = try VPhoneLaunchpadChildProcess(executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments) { line in
++            child = try VPhoneLaunchpadChildProcess(executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments,
++                environment: progress?.environment) { line in
+                 writer?.write(line)
+                 collector.append(line)
+                 onLine?(line)
+@@ -212,11 +221,21 @@ public struct VPhoneLaunchpadCommandLine {
+             throw error
+         }
+         activity.attach(child, to: operation)
++        let progressPoll = progress.map { channel in
++            Task { @MainActor in
++                while !Task.isCancelled {
++                    if let value = channel.read() { onTransferProgress?(value) }
++                    try? await Task.sleep(for: .milliseconds(100))
++                }
++            }
++        }
++        defer { progressPoll?.cancel() }
+         let completion = await withTaskCancellationHandler {
+             await child.waitForCompletion()
+         } onCancel: {
+             child.interrupt()
+         }
++        if let value = progress?.read() { onTransferProgress?(value) }
+         drained = completion.outputDrained
+         do { try await writer?.finish() }
+         catch { drained = false; collector.append("Log persistence failed: \(error.localizedDescription)") }
+@@ -228,6 +247,30 @@ public struct VPhoneLaunchpadCommandLine {
+             outputDrained: drained, omittedLineCount: output.omitted)
+     }
+ 
++    /// Creation is detached for its console log, but Quit must still own its
++    /// process group and wait for its reader/history completion.
++    func startCreation(_ arguments: [String], display: String, logFile: URL, appendingToLog: Bool,
++                       onLine: @escaping @Sendable (String) -> Void) throws -> VPhoneLaunchpadChildProcess {
++        let operation = try activity.begin()
++        let entry = history.record(display)
++        let child: VPhoneLaunchpadChildProcess
++        do {
++            child = try VPhoneLaunchpadChildProcess(executable: executable, arguments: arguments,
++                logFile: logFile, appendingToLog: appendingToLog, onLine: onLine)
++        } catch {
++            history.finish(entry, status: -1, outputDrained: false)
++            activity.finish(operation, outputDrained: false)
++            throw error
++        }
++        activity.attach(child, to: operation, interruptGroup: true)
++        Task {
++            let completion = await child.waitForCompletion()
++            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
++            activity.finish(operation, outputDrained: completion.outputDrained)
++        }
++        return child
++    }
++
+     /// Runs a stopped kernel update through the VM's selected verified source.
+     public func updateKernel(name: String, libraryRoot: URL, machine: URL, recover: Bool = false) async throws -> VPhoneLaunchpadCommandResult {
+         var arguments = ["vm", "update-kernel", name, "--library-root", libraryRoot.path]
+@@ -278,16 +321,17 @@ public enum VPhoneLaunchpadCommandTermination: Equatable, Sendable {
+ }
+ 
+ /// Shared by every copy of one CommandLine, including the monitoring and
+-/// panel callers. Detached launch/create children retain their own lifecycle.
++/// panel callers. VM launches retain their independent lifecycle; creates join the drain.
+ @MainActor
+ private final class VPhoneLaunchpadCommandActivity {
+     private enum Phase { case accepting, draining, waiting, sealed }
+-    private struct Operation { var child: VPhoneLaunchpadChildProcess? }
++    private struct Operation { var child: VPhoneLaunchpadChildProcess?; var interruptGroup = false }
+     private var operations: [UUID: Operation] = [:]
+     private var phase = Phase.accepting
+     private var failedDrain = false
+ 
+     var hasActiveCommands: Bool { !operations.isEmpty }
++    var acceptsNewCommands: Bool { phase == .accepting }
+ 
+     func begin() throws -> UUID {
+         guard phase == .accepting else { throw VPhoneLaunchpadError("Application is waiting for command output before quitting.") }
+@@ -296,8 +340,9 @@ private final class VPhoneLaunchpadCommandActivity {
+         return id
+     }
+ 
+-    func attach(_ child: VPhoneLaunchpadChildProcess, to id: UUID) {
++    func attach(_ child: VPhoneLaunchpadChildProcess, to id: UUID, interruptGroup: Bool = false) {
+         operations[id]?.child = child
++        operations[id]?.interruptGroup = interruptGroup
+     }
+ 
+     func finish(_ id: UUID, outputDrained: Bool) {
+@@ -309,7 +354,10 @@ private final class VPhoneLaunchpadCommandActivity {
+         guard phase == .accepting else { return false }
+         phase = .draining
+         failedDrain = false
+-        for operation in operations.values { operation.child?.interrupt() }
++        for operation in operations.values {
++            if operation.interruptGroup { operation.child?.interruptGroup() }
++            else { operation.child?.interrupt() }
++        }
+         return true
+     }
+ 
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift
+index cca18dad..1c34849d 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift
+@@ -262,16 +262,8 @@ public extension VPhoneLaunchpadCommandLine {
+         _ command: VPhoneLaunchpadCreateCommand, logFile: URL, appendingToLog: Bool,
+         onLine: @escaping @Sendable (String) -> Void
+     ) throws -> VPhoneLaunchpadChildProcess {
+-        let entry = history.record(command.display)
+-        let child = try VPhoneLaunchpadChildProcess(
+-            executable: executable, arguments: command.arguments, logFile: logFile,
+-            appendingToLog: appendingToLog, onLine: onLine)
+-        let history = history
+-        Task {
+-            let completion = await child.waitForCompletion()
+-            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
+-        }
+-        return child
++        try startCreation(command.arguments, display: command.display, logFile: logFile,
++                          appendingToLog: appendingToLog, onLine: onLine)
+     }
+ }
+ 
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift
+index 5e275056..aacc0098 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift
+@@ -319,9 +319,10 @@ public final class VPhoneLaunchpadCreation {
+         await onFinish?()
+     }
+ 
+-    /// SIGINT to the run's process group. `vm create` has no SIGINT handler
+-    /// and ends; the stage it was running stays `running` in the checkpoint,
+-    /// which then reads `interrupted`. False when nothing was sent.
++    /// SIGINT to the run's process group. `vm create` forwards cancellation to
++    /// its owned stage children and waits for them; the running stage remains
++    /// `running` in the checkpoint, which then reads `interrupted`.
++    /// False when nothing was sent.
+     @discardableResult
+     public func cancel() -> Bool {
+         guard let child, child.isRunning else {
+@@ -433,7 +434,7 @@ public enum VPhoneLaunchpadQuit {
+     public static func decision(_ library: VPhoneLaunchpadMachineLibrary) -> Decision {
+         let running = library.creations.values.filter(\.isRunning).map(\.machine.name).sorted()
+         if !running.isEmpty { return .confirm(machines: running) }
+-        return library.currentCommandLine?.hasActiveCommands == true ? .drainCommands : .quit
++        return library.currentCommandLine?.hasActiveCommands == true || library.hasActiveTransfers ? .drainCommands : .quit
+     }
+ 
+     /// The user confirmed: SIGINT to every create run's process group.
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift
+index 475910bb..2a08c158 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift
+@@ -1,5 +1,6 @@
+ import Darwin
+ import Foundation
++import VPhoneCore
+ 
+ // MARK: - Machine names
+ 
+@@ -201,8 +202,14 @@ public struct VPhoneLaunchpadEditCommand: Equatable, Sendable {
+ public extension VPhoneLaunchpadCommandLine {
+     /// Runs one edit command, recorded in the history. Cancelling the
+     /// calling task sends SIGINT to this child only.
+-    func run(_ command: VPhoneLaunchpadEditCommand) async throws -> VPhoneLaunchpadCommandResult {
+-        try await run(command.arguments)
++    func run(_ command: VPhoneLaunchpadEditCommand,
++             onProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil) async throws -> VPhoneLaunchpadCommandResult {
++        let direction: VPhoneTransferProgress.Direction? = switch command.kind {
++        case .importArchive: .importArchive
++        case .export: .exportArchive
++        default: nil
++        }
++        return try await run(command.arguments, transferDirection: direction, onTransferProgress: onProgress)
+     }
+ }
+ 
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift
+index d5e0d084..c40d0f1e 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift
+@@ -1,5 +1,6 @@
+ import Foundation
+ import Observation
++import VPhoneCore
+ 
+ /// The VM library, listed through `vphone-cli vm list --json`, started with
+ /// `vm launch`, stopped with `vm stop`, edited offline with `vm config`,
+@@ -137,8 +138,7 @@ public final class VPhoneLaunchpadMachineLibrary {
+         return nil
+     }
+ 
+-    /// True while `vm export` runs for `machine`. The CLI prints no progress
+-    /// lines to a pipe, so progress is shown as indeterminate.
++    /// True while `vm export` runs. Older CLIs retain indeterminate progress.
+     public func isExporting(_ machine: Path) -> Bool {
+         exports[machine]?.isRunning == true
+     }
+@@ -367,11 +367,83 @@ public final class VPhoneLaunchpadMachineLibrary {
+         }
+     }
+ 
++    // MARK: - Import
++
++    public struct Import: Identifiable, Sendable {
++        public enum State: Sendable {
++            case waiting, running, cancelling
++        }
++
++        public let id = UUID()
++        public let archive: URL
++        public fileprivate(set) var progress: VPhoneTransferProgress?
++        public fileprivate(set) var state = State.waiting
++        fileprivate let selectionID: UUID
++    }
++
++    private let importQueue = VPhoneLaunchpadTransferQueue()
++    private var importTasks: [UUID: Task<Bool, Never>] = [:]
++    public private(set) var imports: [Import] = []
++
+     /// Imports an archive into the default library under its own name.
+     public func importArchive(_ archive: URL) async {
+-        await perform(String(localized: "Importing \(archive.lastPathComponent)…"), on: nil,
+-                      VPhoneLaunchpadEditCommand.importArchive(archive, into: libraryRoot),
+-                      failure: String(localized: "Unable to Import \(archive.lastPathComponent)"))
++        await importArchives([archive])
++    }
++
++    /// Each selection runs in arrival order. Failure or caller cancellation
++    /// stops its selection; cancelling one row skips only that item.
++    public func importArchives(_ archives: [URL]) async {
++        guard !archives.isEmpty, !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++        let id = UUID()
++        let items = archives.map { Import(archive: $0, selectionID: id) }
++        imports += items
++        defer { imports.removeAll { $0.selectionID == id } }
++        await withTaskCancellationHandler {
++            await runImports(items, selectionID: id)
++        } onCancel: {
++            Task { @MainActor [weak self] in
++                for item in items { self?.cancelImport(item.id) }
++            }
++        }
++    }
++
++    private func runImports(_ items: [Import], selectionID: UUID) async {
++        guard let id = await importQueue.acquire(selectionID) else { return }
++        defer { importQueue.release(id) }
++        for item in items {
++            guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++            guard let index = imports.firstIndex(where: { $0.id == item.id }) else { continue }
++            imports[index].state = .running
++            let task = Task {
++                guard !Task.isCancelled else { return false }
++                return await perform(String(localized: "Importing \(item.archive.lastPathComponent)…"), on: nil,
++                                     VPhoneLaunchpadEditCommand.importArchive(item.archive, into: libraryRoot),
++                                     failure: String(localized: "Unable to Import \(item.archive.lastPathComponent)"), onProgress: { [weak self] progress in
++                                         guard let self, let index = self.imports.firstIndex(where: { $0.id == item.id }) else { return }
++                                         self.imports[index].progress = progress
++                                     })
++            }
++            importTasks[item.id] = task
++            let succeeded = await task.value
++            importTasks[item.id] = nil
++            imports.removeAll { $0.id == item.id }
++            // A per-item cancel skips that item; a caller cancellation or
++            // failure still stops the rest of its selection.
++            guard succeeded || task.isCancelled else { return }
++        }
++    }
++
++    public func cancelImport(_ id: UUID) {
++        guard let index = imports.firstIndex(where: { $0.id == id }) else { return }
++        if let task = importTasks[id] {
++            imports[index].state = .cancelling
++            task.cancel()
++        } else {
++            let selectionID = imports.remove(at: index).selectionID
++            if !imports.contains(where: { $0.selectionID == selectionID }) {
++                importQueue.cancelWaiting(selectionID)
++            }
++        }
+     }
+ 
+     // MARK: - Export
+@@ -379,6 +451,8 @@ public final class VPhoneLaunchpadMachineLibrary {
+     /// An export queued or under way. `task` is nil while it waits its turn.
+     public struct Export {
+         public let destination: URL
++        public fileprivate(set) var progress: VPhoneTransferProgress?
++        fileprivate let selectionID: UUID
+         public fileprivate(set) var startedAt: Date?
+         fileprivate var task: Task<Void, Never>?
+ 
+@@ -392,6 +466,7 @@ public final class VPhoneLaunchpadMachineLibrary {
+     }
+ 
+     public private(set) var exports: [Path: Export] = [:]
++    private let exportQueue = VPhoneLaunchpadTransferQueue()
+ 
+     /// Exports each machine to its destination file, one at a time: each
+     /// export reads a whole disk image. Existing destinations are refused,
+@@ -400,6 +475,8 @@ public final class VPhoneLaunchpadMachineLibrary {
+     public func export(
+         _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing _: Bool
+     ) async {
++        guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++        let selectionID = UUID()
+         var queued: [(machine: Path, destination: URL)] = []
+         for item in items where exports[item.machine] == nil {
+             if VPhoneLaunchpadExportOutput.exists(item.destination) {
+@@ -408,21 +485,34 @@ public final class VPhoneLaunchpadMachineLibrary {
+                     detail: String(localized: "\(item.destination.path) already exists."))
+                 continue
+             }
+-            exports[item.machine] = Export(destination: item.destination)
++            exports[item.machine] = Export(destination: item.destination, selectionID: selectionID)
+             queued.append(item)
+         }
+-        for item in queued {
+-            // Cancelled while it waited.
+-            guard exports[item.machine] != nil else {
+-                continue
++        guard !queued.isEmpty else { return }
++        let selection = queued
++        defer { exports = exports.filter { $0.value.selectionID != selectionID } }
++        await withTaskCancellationHandler {
++            guard let token = await exportQueue.acquire(selectionID) else { return }
++            defer { exportQueue.release(token) }
++            for item in selection {
++                guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++                // Per-item cancellation skips this item while keeping its selection.
++                guard exports[item.machine]?.selectionID == selectionID else { continue }
++                let task = Task {
++                    guard !Task.isCancelled else { return }
++                    await runExport(item.machine, to: item.destination, densest: densest, includeIPSW: includeIPSW)
++                }
++                exports[item.machine]?.task = task
++                exports[item.machine]?.startedAt = Date()
++                await task.value
++                exports[item.machine] = nil
+             }
+-            let task = Task {
+-                await runExport(item.machine, to: item.destination, densest: densest, includeIPSW: includeIPSW)
++        } onCancel: {
++            Task { @MainActor [weak self] in
++                for item in selection where self?.exports[item.machine]?.selectionID == selectionID {
++                    self?.cancelExport(item.machine)
++                }
+             }
+-            exports[item.machine]?.task = task
+-            exports[item.machine]?.startedAt = Date()
+-            await task.value
+-            exports[item.machine] = nil
+         }
+     }
+ 
+@@ -436,13 +526,27 @@ public final class VPhoneLaunchpadMachineLibrary {
+             task.cancel()
+         } else {
+             exports[machine] = nil
++            if !exports.values.contains(where: { $0.selectionID == export.selectionID }) {
++                exportQueue.cancelWaiting(export.selectionID)
++            }
+         }
+     }
+ 
++    public var hasActiveTransfers: Bool { !imports.isEmpty || !exports.isEmpty }
++
++    /// Call after closing the command gate. Waiting items disappear without
++    /// starting children; active tasks retain their rows until output drains.
++    public func cancelTransfers() {
++        for item in imports { cancelImport(item.id) }
++        for machine in Array(exports.keys) { cancelExport(machine) }
++    }
++
+     private func runExport(_ machine: Path, to destination: URL, densest: Bool, includeIPSW: Bool) async {
+         await perform(String(localized: "Exporting…"), on: machine,
+                       VPhoneLaunchpadEditCommand.export(machine, to: destination, densest: densest, includeIPSW: includeIPSW),
+-                      failure: String(localized: "Unable to Export \(machine.name)"))
++                      failure: String(localized: "Unable to Export \(machine.name)"), onProgress: { [weak self] progress in
++                          self?.exports[machine]?.progress = progress
++                      })
+         // The CLI owns its private staging cleanup. A final-path file may be
+         // committed output or another writer's file; cancellation proves neither
+         // ownership nor incompleteness. Keep legacy CLI leftovers as well.
+@@ -460,7 +564,8 @@ public final class VPhoneLaunchpadMachineLibrary {
+     /// not reported. False unless the command ran and exited 0.
+     @discardableResult
+     private func perform(
+-        _ activity: String, on machine: Path?, _ command: VPhoneLaunchpadEditCommand?, failure: String
++        _ activity: String, on machine: Path?, _ command: VPhoneLaunchpadEditCommand?, failure: String,
++        onProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil
+     ) async -> Bool {
+         guard let commandLine else {
+             return false
+@@ -485,7 +590,7 @@ public final class VPhoneLaunchpadMachineLibrary {
+         }
+         var succeeded = false
+         do {
+-            let result = try await commandLine.run(command)
++            let result = try await commandLine.run(command, onProgress: onProgress)
+             succeeded = result.succeeded && !Task.isCancelled
+             if !result.succeeded, !Task.isCancelled {
+                 actionError = VPhoneLaunchpadError(failure, detail: result.tail)
+@@ -509,3 +614,45 @@ public final class VPhoneLaunchpadMachineLibrary {
+         FileHandle.standardOutput.write(Data("[launchpad] \(text)\n".utf8))
+     }
+ }
++
++/// FIFO ownership spans a complete selection and the active child's output drain.
++@MainActor
++private final class VPhoneLaunchpadTransferQueue {
++    private struct Waiter {
++        let id: UUID
++        let continuation: CheckedContinuation<UUID?, Never>
++    }
++    private var active: UUID?
++    private var waiting: [Waiter] = []
++
++    func acquire(_ id: UUID) async -> UUID? {
++        await withTaskCancellationHandler {
++            await withCheckedContinuation { continuation in
++                guard !Task.isCancelled else { continuation.resume(returning: nil); return }
++                if active == nil {
++                    active = id
++                    continuation.resume(returning: id)
++                } else {
++                    waiting.append(Waiter(id: id, continuation: continuation))
++                }
++            }
++        } onCancel: {
++            Task { @MainActor [weak self] in self?.cancelWaiting(id) }
++        }
++    }
++
++    func cancelWaiting(_ id: UUID) {
++        guard let index = waiting.firstIndex(where: { $0.id == id }) else { return }
++        waiting.remove(at: index).continuation.resume(returning: nil)
++    }
++
++    func release(_ id: UUID) {
++        guard active == id else { return }
++        active = nil
++        if !waiting.isEmpty {
++            let next = waiting.removeFirst()
++            active = next.id
++            next.continuation.resume(returning: next.id)
++        }
++    }
++}
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift
+index 7d2591ff..eed22674 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift
+@@ -12,9 +12,17 @@ public enum VPhoneLaunchpadIdentity {
+     public static let bundleIdentifier = "com.vphone.cli.launchpad"
+     public static let dataDirectoryName = "vphone-cli-launchpad"
+ 
+-    /// `~/Library/Logs/vphone-cli-launchpad`. B1 computes the path only.
++    /// Signed test bundles may isolate diagnostics with an absolute directory
++    /// in Info.plist. Normal bundles use `~/Library/Logs/vphone-cli-launchpad`.
+     public static func logsDirectory(home: URL = FileManager.default.homeDirectoryForCurrentUser) -> URL {
+-        home.appendingPathComponent("Library/Logs", isDirectory: true)
++        logsDirectory(home: home, override: Bundle.main.object(forInfoDictionaryKey: "VPhoneLaunchpadDiagnosticsDirectory") as? String)
++    }
++
++    static func logsDirectory(home: URL, override: String?) -> URL {
++        if let path = override, path.hasPrefix("/"), !path.contains("\0") {
++            return URL(fileURLWithPath: path, isDirectory: true)
++        }
++        return home.appendingPathComponent("Library/Logs", isDirectory: true)
+             .appendingPathComponent(dataDirectoryName, isDirectory: true)
+     }
+ 
+diff --git a/sources/vphone-cli/VPhoneVMTransferCLI.swift b/sources/vphone-cli/VPhoneVMTransferCLI.swift
+index 0bf81c8e..4cc20adf 100644
+--- a/sources/vphone-cli/VPhoneVMTransferCLI.swift
++++ b/sources/vphone-cli/VPhoneVMTransferCLI.swift
+@@ -42,6 +42,9 @@ struct VPhoneVMExportCommand: ParsableCommand {
+         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
+         let compression: VPhoneBundleOps.ExportCompression = max ? .max : .fast
+         let bar = VPhoneProgressBar(label: "exporting \(name)")
++        let progress = VPhoneTransferProgressReporter(direction: .exportArchive)
++        var lastBytes: Int64 = 0
++        var lastTotal: Int64?
+         let cancellation = VPhoneChildCancellation(log: { _ in })
+         cancellation.install()
+         defer { cancellation.complete(); cancellation.uninstall() }
+@@ -51,9 +54,14 @@ struct VPhoneVMExportCommand: ParsableCommand {
+                     bundleNamed: name, to: URL(fileURLWithPath: out), includeIPSW: includeIpsw,
+                     compression: compression, in: lib.library, backend: archiveBackend,
+                     isCancelled: { cancellation.isRequested },
+-                    progress: { done, total in bar.update(done: done, total: total) })
++                    progress: { done, total in
++                        bar.update(done: done, total: total)
++                        lastBytes = done; lastTotal = archiveBackend == .native ? total : nil
++                        progress?.update(bytes: done, total: lastTotal)
++                    })
+             }
+             bar.finish()
++            progress?.update(bytes: lastBytes, total: lastTotal, completed: true)
+             print("exported \(name) → \(outURL.path)")
+         } catch {
+             if let signal = cancellation.requestedSignal {
+@@ -78,6 +86,9 @@ struct VPhoneVMImportCommand: ParsableCommand {
+ 
+     func run() throws {
+         let bar = VPhoneProgressBar(label: "importing")
++        let progress = VPhoneTransferProgressReporter(direction: .importArchive)
++        var lastBytes: Int64 = 0
++        var lastTotal: Int64?
+         let cancellation = VPhoneChildCancellation(log: { _ in })
+         cancellation.install()
+         defer { cancellation.complete(); cancellation.uninstall() }
+@@ -86,9 +97,14 @@ struct VPhoneVMImportCommand: ParsableCommand {
+                 try VPhoneBundleOps.importArchive(
+                     from: URL(fileURLWithPath: input), name: name, in: lib.library, backend: archiveBackend,
+                     isCancelled: { cancellation.isRequested },
+-                    progress: { done, total in bar.update(done: done, total: total) })
++                    progress: { done, total in
++                        bar.update(done: done, total: total)
++                        lastBytes = done; lastTotal = total
++                        progress?.update(bytes: done, total: total)
++                    })
+             }
+             bar.finish()
++            progress?.update(bytes: lastBytes, total: lastTotal, completed: true)
+             print("imported → \(bundle.name)")
+         } catch {
+             if let signal = cancellation.requestedSignal {
+diff --git a/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift b/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift
+index babb6fb4..6fc83142 100644
+--- a/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift
++++ b/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift
+@@ -1,5 +1,6 @@
+ import Foundation
+ import Testing
++import VPhoneKernelIOTrace
+ @testable import FirmwarePatcher
+ 
+ @Suite struct FirmwareDesiredPlanStoreTests {
+@@ -20,6 +21,28 @@ import VPhoneCore
+ 
+ extension FirmwareDesiredPlanStoreTests {
+     typealias Store = FirmwareDesiredPlanStore
++    /// The trace regression checks complete generation reads inside this span.
++    @Test func measuredReadRevalidatesOriginalsForEveryRequest() throws {
++        let (f, prepared) = try ready()
++        _ = try Store.publish(prepared, expectedSHA256: nil)
++        for _ in 0..<2 {
++            try KernelIOTrace.measure("regression.desired-plan.read") { _ in
++                guard case .ready(let record) = try Store.read(in: f.vm) else {
++                    Issue.record("saved plan did not validate"); return
++                }
++                #expect(record == prepared.record)
++            }
++        }
++        let root = f.vm.appendingPathComponent(".firmware-generations/\(prepared.record.generationID)/originals")
++        let restore = try #require(FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
++            .first { $0.lastPathComponent.contains("Restore") })
++        let original = restore.appendingPathComponent("kernelcache.test")
++        let attributes = try FileManager.default.attributesOfItem(atPath: original.path)
++        let data = try Data(contentsOf: original)
++        try Data(repeating: 0x58, count: data.count).write(to: original)
++        try FileManager.default.setAttributes([.modificationDate: try #require(attributes[.modificationDate])], ofItemAtPath: original.path)
++        #expect(throws: Store.Failure.identityMismatch) { try Store.read(in: f.vm) }
++    }
+     @Test func missingIsDistinctFromPermissionDenied() throws {
+         let f = try FirmwarePlanBindingTests.Fixture()
+         guard case .missing = try Store.read(in: f.root) else { Issue.record("not missing"); return }
+diff --git a/tests/VPhoneCLITests/CFWFrozenPlanTests.swift b/tests/VPhoneCLITests/CFWFrozenPlanTests.swift
+index 323fb24c..e7c89307 100644
+--- a/tests/VPhoneCLITests/CFWFrozenPlanTests.swift
++++ b/tests/VPhoneCLITests/CFWFrozenPlanTests.swift
+@@ -10,6 +10,34 @@ import VPhoneCore
+ private final class CFWFrozenTestBundle: NSObject {}
+ 
+ @Suite struct CFWFrozenPlanTests {
++    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_PLAN_COST_FIXTURE"] != nil))
++    func prepareIsolatedPlanCostFixture() throws {
++        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
++        let path = URL(fileURLWithPath: try #require(ProcessInfo.processInfo.environment["VPHONE_PLAN_COST_FIXTURE"]))
++        try #require(!FileManager.default.fileExists(atPath: path.path), "benchmark fixture must be new")
++        let vm = try fixture(profile: false, variant: .exp, directory: path)
++        let sizeMiB = try #require(UInt64(ProcessInfo.processInfo.environment["VPHONE_PLAN_COST_POSTIMAGE_MIB"] ?? "64"))
++        try #require([64, 256, 1024, 4096].contains(sizeMiB), "bounded synthetic postimage size required")
++        let disk = try FileHandle(forWritingTo: vm.appendingPathComponent("Disk.img"))
++        try disk.truncate(atOffset: sizeMiB << 20)
++        try disk.close()
++        let context = try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: nil, guestEnvironment: "classic", spoofBuild: "")
++        let verifier = try executable()
++        var object = try #require(JSONSerialization.jsonObject(with: Data(context.json.utf8)) as? [String: Any])
++        object["verifierPath"] = verifier.path
++        object["verifierSHA256"] = SHA256.hash(data: try Data(contentsOf: verifier)).map { String(format: "%02x", $0) }.joined()
++        var env = ProcessInfo.processInfo.environment.merging(try context.environment) { _, new in new }
++        env["VPHONE_FROZEN_CONTEXT"] = String(decoding: try JSONSerialization.data(withJSONObject: object,
++            options: [.sortedKeys, .withoutEscapingSlashes]), as: UTF8.self)
++        let python = root.appendingPathComponent(".venv/bin/python3")
++        let result = try VPhoneProcessRunner.runCapturing(python, [root.appendingPathComponent("scripts/vm_lock.py").path,
++            vm.path, "cfw-record", "--", python.path, root.appendingPathComponent("tests/cfw_identity_bridge_fixture.py").path, vm.path], env: env)
++        try #require(result.succeeded, Comment(rawValue: result.stdout + result.stderr))
++        guard case .ready = try FirmwareDesiredPlanStore.read(in: vm) else { Issue.record("benchmark plan invalid"); return }
++        try JSONSerialization.data(withJSONObject: ["schema": "vphone.synthetic-plan-cost.v1", "postimageMiB": sizeMiB,
++            "generationID": context.generationID], options: [.sortedKeys]).write(to: vm.appendingPathComponent("plan-cost-fixture.json"))
++        print("[plan-cost-fixture] retained isolated \(sizeMiB)MiB fixture with two CFW publications and Undo at \(vm.path)")
++    }
+     @Test(arguments: ["valid", "checkpoint", "disk", "machine", "retained", "postimage", "postimage-replaced", "runtime-resized"])
+     func committedCFWSwapPreservesActualSwiftGenerationQualification(change: String) throws {
+         let vm = try fixture(profile: false, variant: .exp)
+@@ -31,6 +59,10 @@ private final class CFWFrozenTestBundle: NSObject {}
+         #expect(try VPhoneFirmwareIdentity.read(in: vm) != original)
+         #expect(try FirmwareGeneration.loadVerified(in: vm,id:context.generationID).content.identity == original)
+         #expect(try VPhoneCFWFrozenContext.prepare(in: vm,requestedVariant:nil,guestEnvironment:"classic",spoofBuild:"").generationID == context.generationID)
++        guard case .ready(let saved) = try FirmwareDesiredPlanStore.read(in: vm) else {
++            Issue.record("committed fixture did not validate through desired-plan read"); return
++        }
++        #expect(saved.generationID == context.generationID)
+         if change == "valid" { return }
+         let archive = try #require(FileManager.default.contentsOfDirectory(at: vm.appendingPathComponent(".cfw-history"),
+             includingPropertiesForKeys: nil).first(where: { $0.lastPathComponent.hasSuffix("identity2") }))
+@@ -62,9 +94,10 @@ private final class CFWFrozenTestBundle: NSObject {}
+         default: Issue.record("Unknown identity fixture")
+         }
+         #expect(throws: (any Error).self) { try FirmwareGeneration.loadVerified(in:vm,id:context.generationID) }
++        #expect(throws: FirmwareDesiredPlanStore.Failure.identityMismatch) { try FirmwareDesiredPlanStore.read(in: vm) }
+     }
+-    private func fixture(profile: Bool, variant: FirmwarePipeline.Variant = .regular) throws -> URL {
+-        let path = FileManager.default.temporaryDirectory.appendingPathComponent("cfw-frozen-" + UUID().uuidString)
++    private func fixture(profile: Bool, variant: FirmwarePipeline.Variant = .regular, directory: URL? = nil) throws -> URL {
++        let path = directory ?? FileManager.default.temporaryDirectory.appendingPathComponent("cfw-frozen-" + UUID().uuidString)
+         try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
+         let vm = path.standardizedFileURL.resolvingSymlinksInPath()
+         try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: true)
+diff --git a/tests/VPhoneCoreTests/NativeTransferTests.swift b/tests/VPhoneCoreTests/NativeTransferTests.swift
+index 2da3e586..8b7574a2 100644
+--- a/tests/VPhoneCoreTests/NativeTransferTests.swift
++++ b/tests/VPhoneCoreTests/NativeTransferTests.swift
+@@ -6,8 +6,8 @@ import VPhoneArchiveKit
+ 
+ @Suite(.serialized)
+ struct NativeTransferTests {
+-    private func withFixture(_ body: (URL, VPhoneLibrary, VPhoneBundle) throws -> Void) throws {
+-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("native-transfer-\(UUID())")
++    private func withFixture(short: Bool = false, _ body: (URL, VPhoneLibrary, VPhoneBundle) throws -> Void) throws {
++        let root = (short ? URL(fileURLWithPath: "/tmp") : FileManager.default.temporaryDirectory).appendingPathComponent("nt-\(UUID())")
+         let directory = root.appendingPathComponent("library/source")
+         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+         defer { try? FileManager.default.removeItem(at: root) }
+@@ -185,6 +185,131 @@ struct NativeTransferTests {
+         }
+     }
+ 
++    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases, ["rewrite", "replace", "add", "symlink"])
++    func changedExportSourceIsNotPublished(backend: VPhoneBundleOps.ArchiveBackend, change: String) throws {
++        try withFixture { root, library, source in
++            let destination = root.appendingPathComponent("changed.tzst")
++            let disk = source.url.appendingPathComponent("Disk.img")
++            let before = try FileManager.default.attributesOfItem(atPath: disk.path)
++            var changed = false
++            #expect(throws: (any Error).self) {
++                try VPhoneBundleOps.export(bundleNamed: "source", to: destination, includeIPSW: false,
++                    in: library, backend: backend, progress: { _, _ in
++                        guard !changed else { return }
++                        changed = true
++                        do {
++                            switch change {
++                            case "rewrite":
++                                let handle = try FileHandle(forWritingTo: disk)
++                                try handle.write(contentsOf: Data("X".utf8))
++                                try handle.close()
++                                // Same size and mtime; ctime must still detect the write.
++                                try FileManager.default.setAttributes([.modificationDate: before[.modificationDate]!], ofItemAtPath: disk.path)
++                            case "replace":
++                                let replacement = source.url.appendingPathComponent("replacement")
++                                try Data(contentsOf: disk).write(to: replacement)
++                                try FileManager.default.removeItem(at: disk)
++                                try FileManager.default.moveItem(at: replacement, to: disk)
++                            case "add": try Data([1]).write(to: source.url.appendingPathComponent("new-member"))
++                            default:
++                                let link = source.url.appendingPathComponent("relative-link")
++                                try FileManager.default.removeItem(at: link)
++                                try FileManager.default.createSymbolicLink(atPath: link.path, withDestinationPath: "boot.bin")
++                            }
++                        } catch { Issue.record("could not change source: \(error)") }
++                    })
++            }
++            #expect(changed)
++            #expect(!FileManager.default.fileExists(atPath: destination.path))
++            #expect(!(try FileManager.default.contentsOfDirectory(atPath: root.path)).contains { $0.hasPrefix(".vphone-export-") })
++        }
++    }
++
++    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases, [false, true])
++    func changedImportArchiveIsNotPublished(backend: VPhoneBundleOps.ArchiveBackend, replace: Bool) throws {
++        try withFixture { root, library, source in
++            let archive = root.appendingPathComponent("input.tzst")
++            try VPhoneBundleOps.export(bundleNamed: "source", to: archive, includeIPSW: false, in: library, backend: backend)
++            let destination = VPhoneLibrary(root: root.appendingPathComponent("destination"))
++            var changed = false
++            #expect(throws: (any Error).self) {
++                try VPhoneBundleOps.importArchive(from: archive, name: "copy", in: destination,
++                    backend: backend, progress: { _, _ in
++                        guard !changed else { return }
++                        changed = true
++                        do {
++                            let data = try Data(contentsOf: archive)
++                            if replace { try data.write(to: archive, options: .atomic) }
++                            else {
++                                let handle = try FileHandle(forWritingTo: archive)
++                                try handle.seekToEnd()
++                                try handle.write(contentsOf: Data([0]))
++                                try handle.close()
++                            }
++                        } catch { Issue.record("could not change input archive: \(error)") }
++                    })
++            }
++            #expect(changed)
++            #expect(!FileManager.default.fileExists(atPath: destination.url(forName: "copy").path))
++            #expect(try FileManager.default.contentsOfDirectory(atPath: destination.root.path).isEmpty)
++            #expect(try Data(contentsOf: source.url.appendingPathComponent("Disk.img")) == Data("Disk.img contents".utf8))
++        }
++    }
++
++    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
++    func importRechecksArchiveImmediatelyBeforePublicationAndAcceptsStableAlias(backend: VPhoneBundleOps.ArchiveBackend) throws {
++        try withFixture { root, library, _ in
++            let archive = root.appendingPathComponent("input.tzst")
++            try VPhoneBundleOps.export(bundleNamed: "source", to: archive, includeIPSW: false, in: library, backend: backend)
++            let alias = root.appendingPathComponent("alias.tzst")
++            try FileManager.default.createSymbolicLink(atPath: alias.path, withDestinationPath: archive.path)
++            let destination = VPhoneLibrary(root: root.appendingPathComponent("destination"))
++            let restored = try VPhoneBundleOps.importArchive(from: alias, name: "stable", in: destination, backend: backend)
++            #expect(restored.name == "stable")
++            #expect(throws: (any Error).self) {
++                try VPhoneBundleOps.importArchive(from: alias, name: "changed", in: destination,
++                    backend: backend, progress: nil, afterNameCheck: {
++                        let handle = try FileHandle(forWritingTo: archive)
++                        try handle.seekToEnd()
++                        try handle.write(contentsOf: Data([0]))
++                        try handle.close()
++                    })
++            }
++            #expect(try FileManager.default.contentsOfDirectory(atPath: destination.root.path) == ["stable"])
++        }
++    }
++
++    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
++    func runtimeSocketsAreExcludedWithoutTreatingTheirNamesAsGlobs(backend: VPhoneBundleOps.ArchiveBackend) throws {
++        try withFixture(short: true) { root, library, source in
++            let fd = socket(AF_UNIX, SOCK_STREAM, 0)
++            try #require(fd >= 0)
++            defer { Darwin.close(fd) }
++            let path = source.url.appendingPathComponent("control[1]").path
++            var address = sockaddr_un()
++            address.sun_family = sa_family_t(AF_UNIX)
++            address.sun_len = UInt8(MemoryLayout<sockaddr_un>.size)
++            let bytes = Array(path.utf8CString)
++            try #require(bytes.count <= MemoryLayout.size(ofValue: address.sun_path))
++            withUnsafeMutableBytes(of: &address.sun_path) { target in
++                bytes.withUnsafeBytes { target.copyBytes(from: $0) }
++            }
++            let result = withUnsafePointer(to: &address) { pointer in
++                pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) { Darwin.bind(fd, $0, socklen_t(MemoryLayout<sockaddr_un>.size)) }
++            }
++            try #require(result == 0, "socket bind errno=\(errno)")
++            try Data("ordinary file".utf8).write(to: source.url.appendingPathComponent("control1"))
++            let archive = root.appendingPathComponent("sockets.tzst")
++            try VPhoneBundleOps.export(bundleNamed: "source", to: archive, includeIPSW: false, in: library, backend: backend)
++            let entries = try VPhoneArchiveReader.entries(of: archive).map(\.path)
++            #expect(!entries.contains { $0.contains("control[1]") })
++            #expect(entries.contains { $0.hasSuffix("/control1") })
++            #expect(VPhoneNativeTransfer.fileType(at: URL(fileURLWithPath: path)) == S_IFSOCK)
++            let imported = try VPhoneBundleOps.importArchive(from: archive, name: "copy", in: library, backend: backend)
++            #expect(try String(contentsOf: imported.url.appendingPathComponent("control1"), encoding: .utf8) == "ordinary file")
++        }
++    }
++
+     @Test func nativeExportHonorsLockExclusionsAndExistingOutput() throws {
+         try withFixture { (root: URL, library: VPhoneLibrary, source: VPhoneBundle) throws -> Void in
+             let archive = root.appendingPathComponent("out.tzst")
+diff --git a/tests/VPhoneLaunchpadKitTests/EditTests.swift b/tests/VPhoneLaunchpadKitTests/EditTests.swift
+index dda08844..35222441 100644
+--- a/tests/VPhoneLaunchpadKitTests/EditTests.swift
++++ b/tests/VPhoneLaunchpadKitTests/EditTests.swift
+@@ -166,7 +166,12 @@ struct LaunchpadEditStandIn {
+         fi
+         case "$2" in
+         import)
+-          trap 'echo "import got SIGINT"; exit 130' INT
++          if [ -e "$root/.import-ignore-int" ]; then
++            trap '' INT
++          else
++            trap 'echo "import got SIGINT"; exit 130' INT
++          fi
++          : > "$root/.import-started"
+           while [ -e "$root/.import-block" ]; do sleep 0.03; done
+           echo "import ok" ;;
+         export)
+@@ -352,8 +357,9 @@ struct EditLibraryTests {
+         try FileManager.default.removeItem(at: blocker)
+         await first.value
+         await second.value
+-        #expect(standIn.edits.count == 1)
++        #expect(standIn.edits.count == 2)
+         #expect(standIn.edits.first?.contains("first.tzst") == true)
++        #expect(standIn.edits.last?.contains("second.tzst") == true)
+         #expect(library.globalActivity == nil)
+     }
+ 
+diff --git a/tests/VPhoneLaunchpadKitTests/LibraryTests.swift b/tests/VPhoneLaunchpadKitTests/LibraryTests.swift
+index a63dc94a..71a792bd 100644
+--- a/tests/VPhoneLaunchpadKitTests/LibraryTests.swift
++++ b/tests/VPhoneLaunchpadKitTests/LibraryTests.swift
+@@ -56,7 +56,9 @@ struct LocationTests {
+     @Test func localIdentityIsSeparateFromUpstream() {
+         let home = URL(fileURLWithPath: "/Users/someone", isDirectory: true)
+         #expect(VPhoneLaunchpadIdentity.bundleIdentifier == "com.vphone.cli.launchpad")
+-        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home).path == "/Users/someone/Library/Logs/vphone-cli-launchpad")
++        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home, override: nil).path == "/Users/someone/Library/Logs/vphone-cli-launchpad")
++        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home, override: "/tmp/isolated logs").path == "/tmp/isolated logs")
++        #expect(VPhoneLaunchpadIdentity.logsDirectory(home: home, override: "relative").path == "/Users/someone/Library/Logs/vphone-cli-launchpad")
+         #expect(VPhoneLaunchpadIdentity.supportDirectory(home: home).path
+             == "/Users/someone/Library/Application Support/vphone-cli-launchpad")
+     }
+diff --git a/tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift b/tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift
+index 48d8ae25..0adf1a9b 100644
+--- a/tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift
++++ b/tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift
+@@ -57,7 +57,8 @@ enum RealCLI {
+             logsDirectory: URL(fileURLWithPath: root).appendingPathComponent(".logs"),
+             runStateReader: VPhoneLaunchpadRunStateReader(readRecord: { _ in nil }, identity: { _ in nil })
+         )
+-        library.startMonitoring(with: VPhoneLaunchpadCommandLine(toolchain: toolchain, history: history))
++        library.startMonitoring(with: VPhoneLaunchpadCommandLine(executable: toolchain.executable, history: history,
++            logsDirectory: URL(fileURLWithPath: root).appendingPathComponent(".logs"), launcher: toolchain.launcher))
+         library.stopMonitoring()
+         await library.refresh()
+         return library
+@@ -217,7 +218,7 @@ struct RealCLIEditTests {
+         let c = VPhoneLaunchpadMachinePath(libraryRoot: l1, name: "c")
+         // Incompressible data, so `xz -9` keeps the export busy for seconds.
+         let dd = try LaunchpadProcess.run("/bin/dd", ["if=/dev/urandom", "of=\(c.url.appendingPathComponent("Disk.img").path)",
+-                                                       "bs=1m", "count=192", "conv=notrunc"])
++                                                       "bs=1m", "count=32", "conv=notrunc"])
+         try #require(dd.status == 0, "dd failed: \(dd.output)")
+         let history = VPhoneLaunchpadCommandHistory()
+         let library = await RealCLI.library(l1, toolchain: toolchain, history: history)
+@@ -225,10 +226,14 @@ struct RealCLIEditTests {
+ 
+         let started = Date()
+         let export = Task { await library.export([(c, archive)], densest: true, includeIPSW: false, replacing: false) }
+-        #expect(await eventually(60) { ((try? FileManager.default.attributesOfItem(atPath: archive.path)[.size] as? Int) ?? 0) > 0 })
+-        // Mid-export, not at the first bytes.
+-        try await Task.sleep(for: .seconds(2))
+-        let size = (try? FileManager.default.attributesOfItem(atPath: archive.path)[.size] as? Int) ?? 0
++        var partial: URL?
++        try #require(await eventually(60) {
++            let directories = (try? FileManager.default.contentsOfDirectory(at: temp.url, includingPropertiesForKeys: nil)) ?? []
++            partial = directories.first { $0.lastPathComponent.hasPrefix(".vphone-export-") }?.appendingPathComponent("output")
++            return partial.map { ((try? FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int) ?? 0) > 0 } ?? false
++        })
++        #expect(!FileManager.default.fileExists(atPath: archive.path))
++        let size = try #require(partial).resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+         let cancelledAfter = Date().timeIntervalSince(started)
+         #expect(library.isExporting(c))
+         library.cancelExport(c)
+@@ -238,13 +243,14 @@ struct RealCLIEditTests {
+ 
+         #expect(!FileManager.default.fileExists(atPath: archive.path))
+         #expect(library.actionError == nil)
+-        #expect(history.entries.last?.status == SIGINT)
++        #expect(history.entries.last?.status == 128 + SIGINT)
++        #expect(history.entries.last?.outputDrained == true)
+         // The tar processes `vm export` started end once their pipe closes;
+         // none recreates the file.
+-        try await Task.sleep(for: .seconds(3))
+         #expect(!FileManager.default.fileExists(atPath: archive.path))
+         let ps = try LaunchpadProcess.run("/bin/ps", ["-axo", "pid=,command="])
+         #expect(!ps.output.contains(archive.path))
++        #expect(!(try FileManager.default.contentsOfDirectory(atPath: temp.url.path)).contains { $0.hasPrefix(".vphone-export-") })
+ 
+         await library.configure([c], .init(cpu: 3))
+         #expect(library.actionError == nil)
+diff --git a/tests/test_bundle_validation.py b/tests/test_bundle_validation.py
+index e787a851..104a7284 100644
+--- a/tests/test_bundle_validation.py
++++ b/tests/test_bundle_validation.py
+@@ -55,6 +55,21 @@ class BundleValidationTests(unittest.TestCase):
+         with self.assertRaisesRegex(ValueError, 'not executable'):
+             module.check_resources(self.bundle)
+ 
++    def test_compression_tools_are_required_and_executable(self):
++        for name in ('zstd', 'xz'):
++            with self.subTest(tool=name):
++                path = self.resources / '.tools/bin' / name
++                path.chmod(0o644)
++                with self.assertRaisesRegex(ValueError, 'not executable'):
++                    module.check_resources(self.bundle)
++                path.chmod(0o755)
++                original = path.read_bytes()
++                path.unlink()
++                with self.assertRaisesRegex(ValueError, 'Missing or empty bundle resource: .tools/bin/' + name):
++                    module.check_resources(self.bundle)
++                path.write_bytes(original)
++                path.chmod(0o755)
++
+     def test_kernel_update_protocol_requires_exact_marker(self):
+         info = self.bundle / 'Contents/Info.plist'
+         for value in ('', 'vphone.kernel-update.v0', 'vphone.kernel-update.v1'):
+diff --git a/tests/test_launchpad_bundle.py b/tests/test_launchpad_bundle.py
+index 7ac085ac..1529d700 100644
+--- a/tests/test_launchpad_bundle.py
++++ b/tests/test_launchpad_bundle.py
+@@ -278,7 +278,7 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
+         for path, text in launchpad_swift().items():
+             runs += re.findall(r'\.run\(\s*\[([^\]]*)\]', text)
+             starts += re.findall(r'commandLine\.start\(\s*(\w+)', text)
+-            typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*\)', text)
++            typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*(?:,\s*onProgress:\s*onProgress\s*)?\)', text)
+             catalog += re.findall(r'commandLine\.run\(\s*VPhoneLaunchpadCreateCommand\.(\w+)', text)
+         self.assertEqual(sorted(re.findall(r'"([^"]+)"', arguments)[:3] for arguments in runs),
+                          [['vm', 'list', '--json'], ['vm', 'stop']])
+@@ -291,6 +291,16 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
+         library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
+         self.assertIn('var arguments = ["vm", "launch", machine.name] + machine.libraryArguments', library)
+ 
++    def test_finder_archive_types_are_alternate_viewers_only(self):
++        info = plistlib.loads((ROOT / 'sources/VPhoneLaunchpad-Info.plist').read_bytes())
++        documents = info['CFBundleDocumentTypes']
++        self.assertEqual(len(documents), 1)
++        self.assertEqual(documents[0]['CFBundleTypeRole'], 'Viewer')
++        self.assertEqual(documents[0]['LSHandlerRank'], 'Alternate')
++        types = info['UTExportedTypeDeclarations']
++        self.assertEqual(documents[0]['LSItemContentTypes'], [types[0]['UTTypeIdentifier']])
++        self.assertEqual(types[0]['UTTypeTagSpecification']['public.filename-extension'], ['tzst', 'txz'])
++
+     def test_executable_comes_only_from_the_embedded_app(self):
+         toolchain = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadToolchain.swift').read_text()
+         self.assertIn('verify(appBundle: Bundle.main.bundleURL)', toolchain)
+diff --git a/tests/test_progress_pipe.py b/tests/test_progress_pipe.py
+index 4cb4b4e0..6f6c0fda 100644
+--- a/tests/test_progress_pipe.py
++++ b/tests/test_progress_pipe.py
+@@ -25,7 +25,7 @@ class ProgressPipeTests(unittest.TestCase):
+             str(ROOT / 'sources/vphone-cli/VPhoneProgressBar.swift'),
+             *[str(ROOT / 'sources/VPhoneCore' / name) for name in (
+                 'VPhoneProcessRunner.swift', 'VPhoneChildCancellation.swift',
+-                'VPhoneProcessIdentity.swift', 'VPhoneShutdownPolicy.swift')],
++                'VPhoneProcessIdentity.swift', 'VPhoneShutdownPolicy.swift', 'VPhoneResources.swift')],
+             str(ROOT / 'tests/fixtures/progress_pipe/main.swift'), '-o', str(cls.binary),
+         ], capture_output=True, text=True, timeout=90)
+         if result.returncode:
+diff --git a/vendor/libcapstone-spm b/vendor/libcapstone-spm
+--- a/vendor/libcapstone-spm
++++ b/vendor/libcapstone-spm
+@@ -1 +1 @@
+-Subproject commit ea98aa0a31693d7ea2930c4372f9b5858b0bc7a3
++Subproject commit ea98aa0a31693d7ea2930c4372f9b5858b0bc7a3-dirty

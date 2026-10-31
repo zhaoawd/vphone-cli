@@ -1,0 +1,72 @@
+{
+  "returncode": 141,
+  "records": [
+    {
+      "checks": [
+        {
+          "at": "2026-10-20T06:43:58Z",
+          "phase": "stage",
+          "result": "passed"
+        },
+        {
+          "at": "2026-10-20T06:43:58Z",
+          "phase": "pre-mount",
+          "result": "passed"
+        },
+        {
+          "at": "2026-10-20T06:43:59Z",
+          "phase": "pre-install",
+          "result": "passed"
+        }
+      ],
+      "clone_error": null,
+      "copy": null,
+      "exit_code": 141,
+      "failure": "install step exited with status 141",
+      "finished_at": "2026-10-20T06:43:59Z",
+      "guestEvidenceRequired": true,
+      "id": "20261020T064358Z-NXewMud6",
+      "location": "/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d6irjsl1/vm/.cfw-history/20261020T064358Z-NXewMud6",
+      "method": "clone",
+      "original": {
+        "blocks": 0,
+        "dev": 16777231,
+        "gid": 20,
+        "ino": 247489538,
+        "mode": 420,
+        "mtime_ns": 1792478638570076452,
+        "sample": {
+          "kind": "full",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "size": 0,
+        "uid": 501
+      },
+      "original_check": {
+        "checked_at": "2026-10-20T06:43:59Z",
+        "detail": "dev/inode/size/mtime equal; full SHA-256 equal",
+        "unchanged": true
+      },
+      "provenanceMode": "required",
+      "runtimeImageEvidenceRequired": true,
+      "staged": {
+        "blocks": 0,
+        "dev": 16777231,
+        "gid": 20,
+        "ino": 247489544,
+        "mode": 420,
+        "mtime_ns": 1792478638570076452,
+        "size": 0,
+        "uid": 501
+      },
+      "staged_removed": true,
+      "staged_retained": false,
+      "started_at": "2026-10-20T06:43:58Z",
+      "status": "failed",
+      "version": 4,
+      "vm": "/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d6irjsl1/vm"
+    }
+  ],
+  "pending": [],
+  "stderr": "cleanup:print:16: write error: broken pipe\ncleanup:16: write error: broken pipe\nunmount_volume:1: write error: broken pipe\nunmount_volume:3: write error: broken pipe\ncleanup:print:16: write error: broken pipe\ncleanup:16: write error: broken pipe\nunmount_volume:1: write error: broken pipe\nunmount_volume:3: write error: broken pipe\ncleanup:15: write error: broken pipe\ncleanup:39: write error: broken pipe\ncleanup:45: write error: broken pipe\ntxn_abort:1: write error: broken pipe\n[-] CFW install did not change /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d6irjsl1/vm/Disk.img; record: /private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/cfw host test d6irjsl1/vm/.cfw-history/20261020T064358Z-NXewMud6/transaction.json\n[!] ownership of host-side artifacts NOT restored: invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)\n"
+}

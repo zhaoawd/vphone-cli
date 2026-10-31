@@ -46,7 +46,8 @@ public struct VPhoneShutdownPlan: Sendable {
     /// What the boot process knows about the VM when the interrupt arrives.
     public struct Conditions: Sendable {
         public var vmRunning: Bool
-        /// vphoned is connected and advertises the `shell` capability.
+        /// A guest power-off command is available, or the VM's API connection
+        /// can be probed for `system_shutdown` without a host listener.
         public var guestShellAvailable: Bool
         /// `VZVirtualMachine.canRequestStop`.
         public var canRequestStop: Bool

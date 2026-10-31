@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "CFWWrites": 0,
+  "checks": {
+    "system:/System/Library/CoreServices/SystemVersion.plist": {
+      "state": "copy-patch-restore-reapply-passed",
+      "sourceSHA256": "2b4802c09fc596b7f24c185846743b43a242d78adbe84b29ccf235fbea7551c3"
+    },
+    "system:/System/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist": {
+      "state": "copy-patch-restore-reapply-passed",
+      "sourceSHA256": "1fc51cba9f36744b9e7bf170d6e013b2644bfa68d85ebf99df2f87170d6ccf22"
+    },
+    "preboot:/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist": {
+      "state": "absent",
+      "deploymentPassed": false
+    },
+    "devicetree": {
+      "passed": true,
+      "changedProperties": 1,
+      "sourceSHA256": "64f70523e3e853096ed97a7f9a991f8fc5acd8ecc12663a9f9879c77f25aadad",
+      "localOutputSHA256": "754b6c2462ddc0202972c747f0f670dfb15b3f1df9f4c37b9b4d44a12f54fcfa",
+      "scope": "actual restored IMG4 copy; native writeback pending"
+    }
+  },
+  "guestMountsNormallyReleased": true,
+  "diskIdentityPreserved": true,
+  "targetAttachments": []
+}

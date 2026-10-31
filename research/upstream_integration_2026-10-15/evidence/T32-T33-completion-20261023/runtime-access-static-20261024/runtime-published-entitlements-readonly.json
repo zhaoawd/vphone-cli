@@ -1,0 +1,87 @@
+{
+  "system:/usr/libexec/seputil": {
+    "sha256": "a42091c62e5ebcdbc5fee2af2ddc5852b850fffdb411553c79a7374acde2174d",
+    "entitlements": {
+      "com.apple.private.applesepmanager.allow": true,
+      "com.apple.private.kernel.get-kext-info": true,
+      "com.apple.security.iokit-user-client-class": [
+        "AppleSEPUserClient"
+      ]
+    }
+  },
+  "system:/usr/libexec/launchd_cache_loader": {
+    "sha256": "2ffbdd4344fa0e77408a27d1c35e94d24aa675383a9cc62af8bdde3de50427c1",
+    "entitlements": {
+      "com.apple.private.amfi.can-check-trust-cache": true,
+      "com.apple.security.iokit-user-client-class": [
+        "AppleMobileFileIntegrityUserClient"
+      ]
+    }
+  },
+  "system:/usr/libexec/mobileactivationd": {
+    "sha256": "becec7432a1e37c5219e3276eccff447c5b691058199fdbd37515858cd055df9",
+    "entitlements": {
+      "FairPlay-Classic-Client": true,
+      "abs-client": "584196299",
+      "com.apple.CommCenter.fine-grained": [
+        "cellular-plan",
+        "spi",
+        "identity"
+      ],
+      "com.apple.accounts.appleaccount.fullaccess": true,
+      "com.apple.accounts.idms.fullaccess": true,
+      "com.apple.authkit.client.private": true,
+      "com.apple.icloud.findmydeviced.access": true,
+      "com.apple.keystore.absinthe": true,
+      "com.apple.keystore.device.uuid": true,
+      "com.apple.keystore.sik.access": true,
+      "com.apple.managedconfiguration.profiled-access": true,
+      "com.apple.mobileactivationd.spi": true,
+      "com.apple.networkd.allow_bootstrap_cellular_service_request": true,
+      "com.apple.nfcd.hwmanager": true,
+      "com.apple.private.FairPlayIOKitUserClient.access": true,
+      "com.apple.private.MobileGestalt.AllowedProtectedKeys": [
+        "WifiAddress",
+        "WifiAddressData",
+        "BluetoothAddressData",
+        "BluetoothAddress",
+        "IntegratedCircuitCardIdentifier",
+        "MobileEquipmentIdentifier",
+        "InternationalMobileEquipmentIdentity",
+        "UniqueChipID",
+        "SerialNumber",
+        "UniqueDeviceID",
+        "UniqueDeviceIDData"
+      ],
+      "com.apple.private.ProvInfoIOKitUserClient.access": true,
+      "com.apple.private.PurpleReverseProxy.allowed": true,
+      "com.apple.private.eligibilityd.setInput": true,
+      "com.apple.private.iokit.batterydateoffirstuse": true,
+      "com.apple.private.mobilestoredemo.helper": true,
+      "com.apple.private.system-keychain": true,
+      "com.apple.private.vfs.allow-low-space-writes": true,
+      "com.apple.private.xpc.launchd.app-server": true,
+      "com.apple.security.attestation.access": true,
+      "com.apple.security.exception.mach-lookup.global-name": [
+        "com.apple.iokit.powerdxpc",
+        "com.apple.fairplayd.xpc"
+      ],
+      "com.apple.security.network.client": true,
+      "com.apple.security.system-container": true,
+      "com.apple.security.system-groups": [
+        "systemgroup.com.apple.mobileactivationd",
+        "systemgroup.com.apple.pisco.suinfo",
+        "systemgroup.com.apple.regulatory_images"
+      ],
+      "com.apple.timed": true,
+      "fairplay-client": 1209439590,
+      "keychain-access-groups": [
+        "lockdown-identities",
+        "com.apple.mfiaccessory"
+      ],
+      "seatbelt-profiles": [
+        "mobileactivationd"
+      ]
+    }
+  }
+}

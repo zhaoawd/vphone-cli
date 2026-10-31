@@ -9,13 +9,11 @@
  *   2. That bottoms out at `FigCaptureSourceRemoteCopyCaptureSources(1)`
  *      which XPC-calls cameracaptured's
  *      `_captureSourceServer_handleCopySourcesMessage`.
- *   3. The daemon iterates `_sSourceList` (CFMutableArrayRef in
- *      CMCapture's __DATA_DIRTY.__bss) under `_sSourceListLock` and
- *      serializes each via `_captureSourceServer_createSerializedSource`.
- *   4. We build a synthetic source using Apple's own
- *      `FigCaptureSourceCreateFromBacking` — which produces a proper
- *      CMBaseObject with valid PAC-signed vtable — then append it to
- *      `_sSourceList` under the lock.
+ *   3. Native enumeration asks FigCaptureSourceBackingsProvider for its
+ *      sourceBackings, then creates sources for the requesting audit token.
+ *   4. Add our FigCaptureSourceBacking at that provider boundary. The native
+ *      server retains ownership, source creation, locking and serialization.
+ *      No source-list mutation or per-client filter patch is needed.
  *   5. Post the Darwin notification subscribed-to by AVF clients so they
  *      drop their cached device list and re-query.
  *
@@ -25,18 +23,14 @@
  *     - dlsym for exported functions (FigCaptureSourceServerStart,
  *       FigCaptureSourceCreateFromBacking, CMBaseObjectGetVTable).
  *     - getsectiondata to map CMCapture's __text bounds.
- *     - Structural xref pattern scan of __text to find the
- *       `_sSourceList` / `_sSourceListLock` slots:
- *         `adrp Xn, <page>; ldr Xm, [Xn, #<imm>]`
- *       where #imm matches the slot's per-page offset (compiler emits the
- *       same instruction pair from every xref site, so we expect multiple
- *       matches; we accept only when all matches agree).
+ *     - Objective-C runtime lookup of the provider's sourceBackings getter.
  */
 
 #import <CoreFoundation/CoreFoundation.h>
 #import <CoreMedia/CoreMedia.h>
 #import <CoreVideo/CoreVideo.h>
 #import <Foundation/Foundation.h>
+#import <os/log.h>
 #import <objc/message.h>
 #import <objc/runtime.h>
 #include <dlfcn.h>
@@ -61,6 +55,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
 #include "VCamFrameProtocol.h"
 
 // MARK: - shared frame layout (matches vphoned_vcam.h)
@@ -91,7 +86,10 @@ static void vcc_log(NSString *fmt, ...) {
     (void)write(fd, data.bytes, data.length);
     close(fd);
   }
-  NSLog(@"vcamcaptured: %@", msg);
+  // Initialization can fail before the shared directory exists or when the
+  // daemon sandbox denies that directory. Keep the reason visible in the
+  // scoped unified-log capture used by the acceptance harness.
+  os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_DEFAULT, "vcamcaptured: %{public}s", msg.UTF8String ?: "?");
 }
 
 
@@ -99,6 +97,7 @@ static void vcc_log(NSString *fmt, ...) {
 // private runtime state and order-sensitive symbol declarations. Each include
 // owns one capture subsystem; none becomes a public dylib interface.
 #include "VCamImageResolution.inc"
+#include "VCamSourceProvider.inc"
 #include "VCamSourceInstallation.inc"
 #include "VCamCaptureObservation.inc"
 #include "VCamSyntheticDevice.inc"
@@ -115,9 +114,8 @@ __attribute__((constructor)) static void vcc_init(void) {
     vcc_log(@"loaded (argv0=%@)",
             NSProcessInfo.processInfo.arguments.firstObject ?: @"?");
 
-    // Schedule install after the daemon has run its own init. The delay
-    // gives FigCaptureSourceServerStart's `dispatch_once` block time to
-    // allocate _sSourceList before we try to mutate it.
+    // Let daemon initialization load the provider class. Native enumeration
+    // will create client-owned sources from our backing on its own queue.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)),
                    dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
                      @autoreleasepool {

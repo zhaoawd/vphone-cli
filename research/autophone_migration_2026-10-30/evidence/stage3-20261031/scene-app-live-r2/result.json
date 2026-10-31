@@ -1,0 +1,192 @@
+{
+  "accepted": false,
+  "target": {
+    "host_id": "migration-local",
+    "rig_id": "migration-stage3",
+    "rig_generation": 4,
+    "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+    "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline",
+    "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+    "expected_usb_udid": "0000FE01-2119AAF5C1E70D2F",
+    "ssh_host": "127.0.0.1",
+    "ssh_port": 22242,
+    "frida_host": "127.0.0.1",
+    "frida_port": 37042,
+    "frida_guest_port": 27042,
+    "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/logs",
+    "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/tmp",
+    "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage3/packages",
+    "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/runtime",
+    "protocol": "upstream_v1",
+    "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+  },
+  "build_id": "bld-55aa823b42bb77f5e70fc8b3a6748e5eeb54001d27aadc25f1d595c80c159c39",
+  "checks": [
+    {
+      "name": "formal_cli_install",
+      "passed": true,
+      "value": {
+        "returncode": 0
+      }
+    },
+    {
+      "name": "provisioning_readback",
+      "passed": true,
+      "value": {
+        "status": "passed",
+        "changed": false,
+        "installed_build": {
+          "slot": "001",
+          "label": "food-coupons-ios27-scene-r2",
+          "file": "blobs/e8e45f5488e18fb9572c2d7dae6c0e3f6d4cf8ef4e564d0559083a22fd04ad68.ipa",
+          "bundle_id": "com.autophone.foodorderingdemo.v2",
+          "version": "1.0.0",
+          "release_like": true,
+          "release_evidence": "embedded_js_bundle:Payload/FoodAIVerification.app/main.jsbundle",
+          "sha256": "e8e45f5488e18fb9572c2d7dae6c0e3f6d4cf8ef4e564d0559083a22fd04ad68",
+          "size": 9955032,
+          "added_at": "2026-10-31T14:19:20+08:00",
+          "app": "food_ordering_v2",
+          "short_version": "1.0.0",
+          "build_id": "bld-55aa823b42bb77f5e70fc8b3a6748e5eeb54001d27aadc25f1d595c80c159c39",
+          "build_version": "1",
+          "source_revision": {
+            "kind": "source_tree",
+            "state": "generated",
+            "tree_sha256": "312096bb6b8854281ca6c27ac84410c3786659db6c11c5da52a1cb9b75a3c9fa",
+            "base_commit_sha": "f6a72613482ec50b639829d39884868828798e76"
+          },
+          "artifact_sha256": "e8e45f5488e18fb9572c2d7dae6c0e3f6d4cf8ef4e564d0559083a22fd04ad68",
+          "resolution_source": "slot_build_id",
+          "verified": true,
+          "installed_at": "2026-10-31T14:19:36+08:00",
+          "installer": "vphone_native"
+        },
+        "detail": "desired build already observed",
+        "build_ref": {
+          "app": "food_ordering_v2",
+          "slot": "001",
+          "short_version": "1.0.0",
+          "build_id": "bld-55aa823b42bb77f5e70fc8b3a6748e5eeb54001d27aadc25f1d595c80c159c39",
+          "build_version": "1",
+          "source_revision": {
+            "kind": "source_tree",
+            "state": "generated",
+            "tree_sha256": "312096bb6b8854281ca6c27ac84410c3786659db6c11c5da52a1cb9b75a3c9fa",
+            "base_commit_sha": "f6a72613482ec50b639829d39884868828798e76"
+          },
+          "artifact_sha256": "e8e45f5488e18fb9572c2d7dae6c0e3f6d4cf8ef4e564d0559083a22fd04ad68",
+          "resolution_source": "build_id"
+        },
+        "install_receipt": null,
+        "readback": {
+          "app": "food_ordering_v2",
+          "bundle_id": "com.autophone.foodorderingdemo.v2",
+          "short_version": "1.0.0",
+          "build_version": "1",
+          "slot": null,
+          "sha256": null,
+          "build_id": null
+        },
+        "build_marker": {
+          "state": "present",
+          "expected_sha256": "2e0600faa3fb4a26aa45b3070a5e52d1c74c8d0169cb450a3c108c3bfdf526c9",
+          "readback_sha256": "2e0600faa3fb4a26aa45b3070a5e52d1c74c8d0169cb450a3c108c3bfdf526c9",
+          "readback_error": null
+        }
+      }
+    },
+    {
+      "name": "launch_acknowledgement",
+      "passed": true,
+      "value": {
+        "bundle_id": "com.autophone.foodorderingdemo.v2"
+      }
+    }
+  ],
+  "ui_events": [],
+  "failed_observations": [
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    }
+  ],
+  "error": "RuntimeError: UI assertion deadline: home.recommendation.title",
+  "screen_lock_released": true
+}

@@ -1,0 +1,92 @@
+{
+  "status": "offline_implementation_and_regression_validated_real_vm_acceptance_pending",
+  "date": "2026-10-21",
+  "head": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "upstream": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "tasks": [
+    "T47",
+    "T48"
+  ],
+  "validation": {
+    "BundleActivityTests": {
+      "tests": 12,
+      "exitCode": 0
+    },
+    "BundleSnapshotsTests": {
+      "tests": 12,
+      "exitCode": 0
+    },
+    "BundleOpsTests": {
+      "tests": 29,
+      "exitCode": 0
+    },
+    "BundleCloneStateTests": {
+      "tests": 12,
+      "exitCode": 0
+    },
+    "MachineSnapshotsTests": {
+      "tests": 4,
+      "exitCode": 0
+    },
+    "FirmwareDesiredPlanStoreTests": {
+      "tests": 18,
+      "exitCode": 0
+    },
+    "VMSnapshotAndCloneCLITests": {
+      "tests": 2,
+      "exitCode": 0
+    },
+    "totalSuites": 7,
+    "totalTests": 89
+  },
+  "sourceSHA256": {
+    "sources/VPhoneCore/VPhoneBundleActivity.swift": "47364b956b19026502e22e2f4643c9275dead9905527ab617e85af37982c8bd2",
+    "sources/VPhoneCore/VPhoneBundleOps.swift": "0e3d5ccbd341674ff3292dfbbb891052b378bbb78faabb220738ae20e4c96392",
+    "sources/VPhoneCore/VPhoneLaunchLayout.swift": "c8c91967cc8cc402583cebb9f319f208af2e62688a8325f9f9c341ae14b532e9",
+    "sources/VPhoneCore/VPhoneMachineBinding.swift": "43acd6313895e55dbc6a19dbb790de19ba32fb5c268c90e8719e2ceb2ab84d7f",
+    "sources/VPhoneCore/VPhoneMachineSnapshots.swift": "9334d24b966cda72753ec9a7a1289099309a5b6c0b35b238449ea57d9568f1ea",
+    "sources/VPhoneCore/VPhoneNetworking.swift": "36a6e6d91b40ce07339fdc47b478ea2b1a33034d294477ae0be058ea8c16069f",
+    "sources/VPhoneCore/VPhonePortForwardPlan.swift": "b9fe950e37496b10fa559fb3c92f3db117140d722c8dedb8038038e40070b479",
+    "sources/VPhoneCore/VPhoneUnixSocket.swift": "6d47e4e15869f22bb483e5778a11b0ed6e8537268552ba6b2e4bb9b76d911b1e",
+    "sources/VPhoneCore/VPhoneVMLock.swift": "33fb0870cd40d1c6d96336836f6f7c09fcd5a00fbc9c16b76527c69484599300",
+    "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift": "943967a0e5783a57947d780ea83050982a12b25f0b8bbb9ab23d5c83d246cf78",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineBinding.swift": "5964058f347c401808c9c914d8d638f06a6a595df757040b49c06b1d984616fe",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift": "3aeef213fcc64f821c1f7cdda8491fd3cb6ba16fb02aaaaf18923b3d5e4b9ea4",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "c8ab45a095a8242f7e822f87d607022906900db069071daf8bbfe1ee9777d2ea",
+    "sources/vphone-cli/VPhoneVMCLI.swift": "e6a27d93df3da597109db9740ba139833f83e32882c550415982f2df6b5cd67c",
+    "sources/vphone-cli/VPhoneVMSnapshotCLI.swift": "1c244003a836b9dc2889bc43cfdb0f36aea68db8b1e4e79906eddbf1cea13884",
+    "sources/vphone-cli/VPhoneVMTransferCLI.swift": "cc8f0da658e01e79b793e58433a1ff8a5171c3e42bf774cd01067abe91cf5ba8",
+    "tests/VPhoneCoreTests/BundleActivityTests.swift": "126214a1adf99e515686aad11def6efe97e50e8dcbb8d11b189a4063db646444",
+    "tests/VPhoneCoreTests/BundleSnapshotsTests.swift": "8ede377cf26166bd265c0bce1323dcd8cab7f637ccecb905723fdb1a965595e7",
+    "tests/VPhoneCoreTests/BundleOpsTests.swift": "ec8962164eccd07dac835be1595c76b843a650442f94ee6cd219d857d1dd6556",
+    "tests/VPhoneCoreTests/BundleCloneStateTests.swift": "69407c3ef1afdd112e9b2359784ff1fe65f15aae90be3c6af5cc5225a0f08751",
+    "tests/VPhoneLaunchpadKitTests/MachineSnapshotsTests.swift": "261e35f9256b0e37e9514d2e59bdd2930605e0d4f8d2bf68bcbce5618bade40d",
+    "tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift": "3cd01f3d07f906fb59bce545f8b2342fdfb72badeb646cfdd9d6215ed31b95bf",
+    "tests/VPhoneCLITests/VMSnapshotAndCloneCLITests.swift": "3548cb9148c5eb64328e81c3d31486f42f77f86d2e9d089d2d12b71840afb934"
+  },
+  "documentsSHA256": {
+    "research/upstream_integration_2026-10-15/T47_T48_clone_snapshots_20261021.md": "8738a106bf8776b478d0ea8d7892fac69a62a0a6acbd925cda4416ad7202a83c",
+    "research/upstream_integration_2026-10-15/tasks.json": "ab09fcfe2f46cb5965c49660fbc6d028b0816ffe447e5604947d42119a47e68f",
+    "research/upstream_integration_2026-10-15/local_reconciliation.json": "9f1e9171a9c6d4023aa119b48605cb56214e89c718dd480cb8d6191d62cee8a5",
+    "research/upstream_integration_2026-10-15/plan.md": "d3aed2c6ae0870585e60c5eee81f59fadfef5ff6dcd319a9ed9babe35d4064b2",
+    "research/upstream_integration_2026-10-15/progress.md": "68a42fd63dc3b1d6a8f02841751d101f3c01834f5878514acd1150ceaa59f93f",
+    "TASKS.md": "284b9649d9aff2ac9ef3eb393a7d50f298119cfa33fba65d2cbbe435b86f307a"
+  },
+  "files": {
+    "swift-tests-sandbox-eperm.log.gz": {
+      "bytes": 6894,
+      "sha256": "f0bdc3810f6627d84182c0fc140f5bc42bfccea41a8304ecb996a834c18f672c"
+    },
+    "swift-tests.log.gz": {
+      "bytes": 6074,
+      "sha256": "d44d1767da813a2978818036617a58d6c5d3890e1fcb2580e2c79e3862e58a6e"
+    }
+  },
+  "limitations": [
+    "No real 64 GiB restored VM snapshot revert + boot or dual-VM parallel boot with --new-identity executed in this turn.",
+    "Frozen .app artifacts remain untouched; candidate .app with snapshot UI not repackaged yet."
+  ],
+  "accepted": false,
+  "committed": false,
+  "pushed": false
+}

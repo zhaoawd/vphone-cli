@@ -134,6 +134,7 @@ def from_environment():
     try:
         plan = load_plan(os.environ['VPHONE_FROZEN_PLAN'], os.environ['VPHONE_FROZEN_PLAN_SHA256'],
                          json.loads(os.environ['VPHONE_FROZEN_CONTEXT']))
+        verify_expected_binding(plan.path.parent)
         require_supported_implementations(plan)
         return plan
     except (KeyError, OSError, json.JSONDecodeError) as error:
@@ -164,18 +165,49 @@ def require_supported_implementations(plan, *, command=None):
 
 
 def recheck(plan):
+    verify_expected_binding(plan.path.parent)
     if sha(strict_bytes(plan.path)) != plan.raw_sha256:
         raise ValueError('frozen plan changed before write')
     if (plan.path.parent / '.firmware-desired-pending.json').exists():
         raise ValueError('desired plan publication uncertain')
 
 
+def verify_expected_binding(vm):
+    digest = os.environ.get('VPHONE_EXPECTED_BINDING_SHA256')
+    version = os.environ.get('VPHONE_EXPECTED_CORE_BUNDLE')
+    if digest is None and version is None:
+        return
+    if not isinstance(digest, str) or not DIGEST.fullmatch(digest) or not version:
+        raise ValueError('incomplete expected Core Bundle binding')
+    raw = strict_bytes(Path(vm) / 'launchpad.json')
+    record = json.loads(raw)
+    if sha(raw) != digest or not isinstance(record, dict) or record.get('bundle') != version:
+        raise ValueError('Core Bundle binding changed before environment write')
+
+
 def private_path(plan, path):
     """Validate invocation-local staging without granting guest ownership."""
     vm = Path(plan.context['vmDirectory'])
     path = Path(os.path.abspath(path))
-    if path == vm or vm not in path.parents:
+    if path == vm:
         raise ValueError('private staging outside bound VM')
+    if vm not in path.parents:
+        # External mount roots are explicit journal members. Disk staging,
+        # evidence and publication remain inside the VM on its own volume.
+        from cfw_disk_txn import require_mount_root, Refused
+        root = Path(os.environ.get('CFW_HOST_MNT', ''))
+        sink = Path(os.environ.get('VPHONE_GUEST_EVIDENCE', ''))
+        try:
+            require_mount_root(vm, sink.parent, root)
+            if path != root and root not in path.parents:
+                raise ValueError('private staging outside bound mount root')
+            current = path
+            while current != root:
+                if current.is_symlink(): raise ValueError('linked private staging path')
+                current = current.parent
+            return path
+        except (Refused, OSError) as error:
+            raise ValueError(str(error)) from error
     relative = path.relative_to(vm)
     first = relative.parts[0]
     if first not in {'.cfw_temp', '.iosbinpack_tmp', '.vphoned.signed', 'cfw_input', 'cfw_jb_input'} and not first.startswith(('.cfw_mount.', '.cfw_disk.')):
@@ -192,6 +224,7 @@ def require_write_context(plan):
     require_supported_implementations(plan)
     from vm_lock import check_inherited
     vm = Path(plan.context['vmDirectory'])
+    verify_expected_binding(vm)
     if plan.context['variant'] == 'less':
         import fcntl
         transaction = Path(plan.context['filesystemTransaction'])
@@ -214,7 +247,7 @@ def require_write_context(plan):
         return
     check_inherited(vm)
     root = private_path(plan, os.environ['CFW_HOST_MNT'])
-    if root.parent != vm or not root.name.startswith('.cfw_mount.') or not root.is_dir():
+    if not root.name.startswith('.cfw_mount.') or not root.is_dir():
         raise ValueError('guest mount root differs from bound invocation')
     destination = private_path(plan, os.environ['VPHONE_GUEST_EVIDENCE'])
     if destination.parent.parent != vm or not destination.parent.name.startswith('.cfw_disk.') or destination.name != 'guest-changes.jsonl':
@@ -335,6 +368,10 @@ def validate_entry(plan, entry):
 
 def main():
     plan = from_environment()
+    if len(sys.argv) == 3 and sys.argv[1] == 'private-path':
+        require_write_context(plan)
+        private_path(plan, sys.argv[2])
+        return
     if len(sys.argv) == 2 and sys.argv[1] == 'verify-final':
         from .final_guest import run
         result=run(plan)

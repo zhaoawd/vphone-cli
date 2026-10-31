@@ -92,3 +92,29 @@ class GuestAPICohortTests(unittest.TestCase):
             self.assertEqual(entries['existing'], {'Label': 'existing'})
             self.assertEqual(entries['/System/Library/LaunchDaemons/vphoned.plist'], classic)
             self.assertEqual(entries['/System/Library/LaunchDaemons/vphoned-api.plist'], self.job)
+
+
+    def test_v2_base_plist_merge_leaves_api_to_the_v2_installer(self):
+        from patchers.cfw_daemons import inject_daemons
+        jobs=self.root/'base-jobs';jobs.mkdir()
+        api={'Label':'classic-api'};classic={'Label':'classic-control'}
+        (jobs/'vphoned-api.plist').write_bytes(plistlib.dumps(api))
+        (jobs/'vphoned.plist').write_bytes(plistlib.dumps(classic))
+        target=self.root/'base-boot.plist';target.write_bytes(plistlib.dumps({'LaunchDaemons':{}}))
+        inject_daemons(str(target),str(jobs),include_api=False)
+        entries=plistlib.loads(target.read_bytes())['LaunchDaemons']
+        self.assertNotIn('/System/Library/LaunchDaemons/vphoned-api.plist',entries)
+        self.assertEqual(entries['/System/Library/LaunchDaemons/vphoned.plist'],classic)
+
+    def test_v2_classic_control_selects_matching_camera_and_location_layouts(self):
+        from patchers.cfw_daemons import inject_daemons
+        jobs = self.root / 'v2-camera-jobs'; jobs.mkdir()
+        classic = {'Label': 'com.vphone.vphoned', 'ProgramArguments': ['/usr/bin/vphoned'],
+                   'EnvironmentVariables': {'EXISTING': 'preserved'}}
+        (jobs / 'vphoned.plist').write_bytes(plistlib.dumps(classic))
+        target = self.root / 'v2-camera-boot.plist'
+        target.write_bytes(plistlib.dumps({'LaunchDaemons': {}}))
+        inject_daemons(str(target), str(jobs), include_api=False, guest_environment='v2')
+        job = plistlib.loads(target.read_bytes())['LaunchDaemons']['/System/Library/LaunchDaemons/vphoned.plist']
+        self.assertEqual(job['EnvironmentVariables'], {'EXISTING': 'preserved', 'VPHONED_CAMERA_LAYOUT': 'v2',
+                                                      'VPHONED_LOCATION_LAYOUT': 'v2'})

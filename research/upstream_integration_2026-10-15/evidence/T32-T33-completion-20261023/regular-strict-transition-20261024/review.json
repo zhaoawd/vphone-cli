@@ -1,0 +1,156 @@
+{
+  "observedAt": "2026-10-24T21:04:15.565267+08:00",
+  "planSHA256": "b98e0a565583ebd57380c5984be62ff0ed491fe499e7357c4d111c8fe5f87230",
+  "candidate": "2.6.2-local.a84f5889b159",
+  "regularStrictWholeFileTransitionPassed": true,
+  "transition": {
+    "passed": true,
+    "scope": "complete file bytes and mode/uid/gid",
+    "targets": [
+      "system:/usr/libexec/seputil",
+      "system:/usr/libexec/launchd_cache_loader",
+      "system:/usr/libexec/mobileactivationd"
+    ],
+    "runtimeValidated": false
+  },
+  "phaseSummary": {
+    "on": {
+      "transactionID": "20261024T044848Z-v8ovSVP3",
+      "generationID": "55d399c351c3c49c05e293b0f996afa01816c95d9cff82a2be4cc10390752275",
+      "independentAuditPassed": true,
+      "targets": 4681,
+      "matched": 4681,
+      "codePageRecords": 5,
+      "originQualified": true,
+      "runtimeValidated": false,
+      "targetsState": {
+        "system:/usr/libexec/launchd_cache_loader": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "1116f4ca0150ab7cbb1a5b634c8f1047c17a1c64b8ccd4c78b71796711969493",
+          "uid": 0
+        },
+        "system:/usr/libexec/mobileactivationd": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3ac0179529cec3a059aa8f54690caf847ad0d1dc7680f9916bb89623b2f703c2",
+          "uid": 0
+        },
+        "system:/usr/libexec/seputil": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "21f7f954910738b3024b2d93fd13ee78a9dcfe7d9809b12b169dd8e5c5699703",
+          "uid": 0
+        }
+      },
+      "cleanup": {
+        "mountsReleased": true,
+        "imageDetached": true
+      }
+    },
+    "off": {
+      "transactionID": "20261024T064924Z-hG5gtVTI",
+      "generationID": "55d399c351c3c49c05e293b0f996afa01816c95d9cff82a2be4cc10390752275",
+      "independentAuditPassed": true,
+      "targets": 4681,
+      "matched": 4681,
+      "codePageRecords": 2,
+      "originQualified": false,
+      "runtimeValidated": false,
+      "targetsState": {
+        "system:/usr/libexec/launchd_cache_loader": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "f567fa8a283ce1a169f5fe2629a01ad0743e8654ad541c11daaec6bc9e8d4e9b",
+          "uid": 0
+        },
+        "system:/usr/libexec/mobileactivationd": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "499f63c2a7db9e59bc522006a82bbd74c1373e85cfd39cd5f76707e430ed3fc7",
+          "uid": 0
+        },
+        "system:/usr/libexec/seputil": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "384fb6c2e49f1a9a793c17aa96026572b084859971091769419afc537cc88683",
+          "uid": 0
+        }
+      },
+      "cleanup": {
+        "mountsReleased": true,
+        "imageDetached": true
+      }
+    },
+    "reapplied": {
+      "transactionID": "20261024T081630Z-kbuBz8Io",
+      "generationID": "55d399c351c3c49c05e293b0f996afa01816c95d9cff82a2be4cc10390752275",
+      "independentAuditPassed": true,
+      "targets": 4681,
+      "matched": 4681,
+      "codePageRecords": 5,
+      "originQualified": true,
+      "runtimeValidated": false,
+      "targetsState": {
+        "system:/usr/libexec/launchd_cache_loader": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "1116f4ca0150ab7cbb1a5b634c8f1047c17a1c64b8ccd4c78b71796711969493",
+          "uid": 0
+        },
+        "system:/usr/libexec/mobileactivationd": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "3ac0179529cec3a059aa8f54690caf847ad0d1dc7680f9916bb89623b2f703c2",
+          "uid": 0
+        },
+        "system:/usr/libexec/seputil": {
+          "gid": 0,
+          "kind": "file",
+          "mode": 493,
+          "sha256": "21f7f954910738b3024b2d93fd13ee78a9dcfe7d9809b12b169dd8e5c5699703",
+          "uid": 0
+        }
+      },
+      "cleanup": {
+        "mountsReleased": true,
+        "imageDetached": true
+      }
+    }
+  },
+  "sourceReports": [
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/origin-identity-acceptance-20261024-r2/execution/regular/on.json",
+      "bytes": 8078533,
+      "sha256": "069ff33bab3ea244f30cabb2965e682aab19f6721b335649dc7847860a735013"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/origin-identity-acceptance-20261024-r2/execution/regular/off.json",
+      "bytes": 7464395,
+      "sha256": "f4c998f39a9902ea5fbd52a9e78386793bb8aec55069488f70c3175699c6f515"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/origin-identity-acceptance-20261024-r2/execution/regular/reapplied.json",
+      "bytes": 8078540,
+      "sha256": "b7b6af36f96401b85bbc37c7901059a361581add876e7f62c9b0013228f536e4"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/origin-identity-acceptance-20261024-r2/execution/regular/transition.json",
+      "bytes": 248,
+      "sha256": "522f82c3985650173e3917ffa18d7242cb992db4c0b2e13386b79530c955cf5a"
+    }
+  ],
+  "EXPState": "fresh target creation started; no on/off/on acceptance",
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "runtimeValidated": false,
+  "accepted": false
+}

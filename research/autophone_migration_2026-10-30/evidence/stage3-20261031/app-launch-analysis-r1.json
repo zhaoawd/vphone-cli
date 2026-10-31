@@ -1,0 +1,107 @@
+{
+  "ipa_info": {
+    "CFBundleIdentifier": "com.autophone.foodorderingdemo.v2",
+    "CFBundleShortVersionString": "1.0.0",
+    "CFBundleVersion": "1",
+    "DTSDKName": "iphoneos27.1",
+    "DTXcode": "2710",
+    "UIApplicationSceneManifest": null
+  },
+  "crashes": [
+    {
+      "path": "FoodAIVerification-2026-10-31-125544.ips",
+      "exception": {
+        "codes": "0x0000000000000001, 0x0000000185abd2b8",
+        "rawCodes": [
+          1,
+          6537597624
+        ],
+        "type": "EXC_BREAKPOINT",
+        "signal": "SIGTRAP"
+      },
+      "termination": {
+        "flags": 0,
+        "code": 5,
+        "namespace": "SIGNAL",
+        "indicator": "Trace/BPT trap: 5",
+        "byProc": "exc handler",
+        "byPid": 1978
+      },
+      "top_frames": [
+        {
+          "imageOffset": 19280568,
+          "symbol": "___UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption_block_invoke",
+          "symbolLocation": 700,
+          "imageIndex": 6
+        },
+        {
+          "imageOffset": 114612,
+          "symbol": "_dispatch_client_callout",
+          "symbolLocation": 16,
+          "imageIndex": 7
+        },
+        {
+          "imageOffset": 19296,
+          "symbol": "_dispatch_once_callout",
+          "symbolLocation": 32,
+          "imageIndex": 7
+        },
+        {
+          "imageOffset": 1172208,
+          "symbol": "-[UIApplication workspace:didCreateScene:withTransitionContext:completion:]",
+          "symbolLocation": 324,
+          "imageIndex": 6
+        }
+      ]
+    },
+    {
+      "path": "FoodAIVerification-2026-10-31-125623.ips",
+      "exception": {
+        "codes": "0x0000000000000001, 0x0000000185abd2b8",
+        "rawCodes": [
+          1,
+          6537597624
+        ],
+        "type": "EXC_BREAKPOINT",
+        "signal": "SIGTRAP"
+      },
+      "termination": {
+        "flags": 0,
+        "code": 5,
+        "namespace": "SIGNAL",
+        "indicator": "Trace/BPT trap: 5",
+        "byProc": "exc handler",
+        "byPid": 1985
+      },
+      "top_frames": [
+        {
+          "imageOffset": 19280568,
+          "symbol": "___UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption_block_invoke",
+          "symbolLocation": 700,
+          "imageIndex": 6
+        },
+        {
+          "imageOffset": 114612,
+          "symbol": "_dispatch_client_callout",
+          "symbolLocation": 16,
+          "imageIndex": 7
+        },
+        {
+          "imageOffset": 19296,
+          "symbol": "_dispatch_once_callout",
+          "symbolLocation": 32,
+          "imageIndex": 7
+        },
+        {
+          "imageOffset": 1172208,
+          "symbol": "-[UIApplication workspace:didCreateScene:withTransitionContext:completion:]",
+          "symbolLocation": 324,
+          "imageIndex": 6
+        }
+      ]
+    }
+  ],
+  "cause": "UIKit rejects SDK 27 app without scene lifecycle",
+  "apple_reference": "https://developer.apple.com/documentation/uikit/transitioning-to-the-uikit-scene-based-life-cycle",
+  "business_accepted": false
+}

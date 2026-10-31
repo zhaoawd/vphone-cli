@@ -1,0 +1,203 @@
+{
+  "recorded_at": "2026-10-31T00:32:09.078146+08:00",
+  "stage": 1,
+  "stage_accepted": false,
+  "status": "waiting_for_host_allowlist_approval_and_firmware_choice",
+  "autophone": {
+    "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration",
+    "branch": "feat/autophone-upstream-migration",
+    "base": "3bf50e8848b15cb5fe9848aa5087c85c8bd42c15",
+    "status": {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "stdout": " M CHANGELOG.md\n M TASKS.md\n?? autophone/rig/upstream.py\n?? tests/test_upstream_vphone_lifecycle.py\n",
+      "stderr": ""
+    }
+  },
+  "upstream": {
+    "source": "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/upstream",
+    "head": {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/upstream",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "39324ee7fcbb1d909bfa293f6188a8ef752ba734\n",
+      "stderr": ""
+    },
+    "status": {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/upstream",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "bundle": {
+    "path": "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle",
+    "info": {
+      "CFBundleShortVersionString": "2.14.1",
+      "CFBundleVersion": "58",
+      "VPhoneBuildHash": "39324ee"
+    },
+    "signature": {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "vm_signature": {
+      "argv": [
+        "codesign",
+        "-dvvv",
+        "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Executable=/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-5555494471f4a69146be3837a14912ced7e73658\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=67947 flags=0x2(adhoc) hashes=2112+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=5b2fde525d99a1783343762ea168b24410e0a9d1\nCandidateCDHashFull sha256=5b2fde525d99a1783343762ea168b24410e0a9d14909a9a8c05bb44af93a0bf8\nHash choices=sha256\nCMSDigest=5b2fde525d99a1783343762ea168b24410e0a9d14909a9a8c05bb44af93a0bf8\nCMSDigestType=2\nCDHash=5b2fde525d99a1783343762ea168b24410e0a9d1\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    }
+  },
+  "build": {
+    "exit_code": 0,
+    "log": "build-final.log",
+    "command": [
+      "xcodebuild",
+      "-workspace",
+      "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/upstream/VPhone.xcworkspace",
+      "-scheme",
+      "VPhone",
+      "-configuration",
+      "Debug",
+      "-destination",
+      "platform=macOS,arch=arm64",
+      "-derivedDataPath",
+      "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData",
+      "build"
+    ]
+  },
+  "tests": {
+    "passed": 153,
+    "skipped": 8,
+    "seconds": 8.17,
+    "exit_code": 0,
+    "log": "autophone-tests-final.log",
+    "skipped_reason": "AUTOPHONE_TEST_POSTGRES_DSN is not configured",
+    "command": [
+      "/Users/kolar/github/autophone/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_upstream_vphone_lifecycle.py",
+      "tests/test_start_vphone_script.py",
+      "tests/test_rig_lifecycle.py",
+      "tests/test_vphone_target.py",
+      "tests/test_m6_same_host_multi_rig.py",
+      "-m",
+      "not live_device and not live_frida"
+    ]
+  },
+  "ruff": {
+    "exit_code": 0,
+    "log": "ruff.log"
+  },
+  "preflight": {
+    "exit_code": 1,
+    "log": "host-preflight-final.log",
+    "error": "AMFI blocked vphone-vm",
+    "vm_cdhash": "5b2fde525d99a1783343762ea168b24410e0a9d1"
+  },
+  "allowlist": {
+    "approved": false,
+    "executed": false,
+    "command": [
+      "sudo",
+      "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-escalator",
+      "allow",
+      "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm"
+    ]
+  },
+  "proposed_firmware": {
+    "confirmed": false,
+    "device": "iPhone17,3",
+    "iphone_version": "27.0.1",
+    "iphone_build": "24A446",
+    "cloudos_version": "26.4 beta",
+    "cloudos_build": "23E5207q",
+    "preset": "standard"
+  },
+  "runtime": {
+    "vm_created": false,
+    "vm_started": false,
+    "shutdown_tested": false,
+    "second_boot_tested": false,
+    "lock_release_tested": false
+  },
+  "file_hashes": [
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/autophone/rig/upstream.py",
+      "sha256": "f9d78eae0e4071c75a2eeb3c056ce7812857c0289585ae75a995e607a873a910",
+      "size": 3868
+    },
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/tests/test_upstream_vphone_lifecycle.py",
+      "sha256": "4d1cbd1562c2bd29f584ca2a85bb264bed9add89fc216558cf50fd2ec2421c2c",
+      "size": 4766
+    },
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/CHANGELOG.md",
+      "sha256": "a13d36838e7c2faa47c4c7a436a2e3c0d9627006af6c22c0f5153cd386f51ef8",
+      "size": 232393
+    },
+    {
+      "path": "/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration/TASKS.md",
+      "sha256": "77e6386d06d4b72cd38d4bc324a17b4c00f919aca50841c15f00f0c44c2a1f3c",
+      "size": 47639
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/Info.plist",
+      "sha256": "b6199f8f9616e7c69ddb2fce5b182a020c1ddbb0485a5bb25269ced6a15ceb7e",
+      "size": 1303
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-cli",
+      "sha256": "a5678c4490a5ad3903ffcb0a3e819b69487bd7213d68532504fbbcbf77ecb5a5",
+      "size": 27432976
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm",
+      "sha256": "6a4f658543c8d9dfc638236f3eab56dae32a950381aad027aa2a8370a5876d02",
+      "size": 34659536
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/autophone-migration-20261031/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-escalator",
+      "sha256": "8cbd7924b64492e728f2604d1bf167fd0f24488e4a8214039be259d45bd59a50",
+      "size": 177152
+    }
+  ],
+  "limitations": [
+    "Existing full-stack start_vphone.sh and RigLifecycle are unchanged",
+    "No PostgreSQL multi-rig integration or live VM acceptance",
+    "No stages 2 or 3 acceptance",
+    "Not committed, merged, or published"
+  ]
+}

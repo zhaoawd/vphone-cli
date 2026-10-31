@@ -75,8 +75,12 @@ class UndoProvenanceTests(unittest.TestCase):
             cryptex_source.attach(self.plan,self.image,self.mount)
         with patch.object(cryptex_source.subprocess,'check_output',side_effect=self.source_query):
             guest_write.run(self.plan,['cp','-R',str(self.mount)+'/.',str(self.target)])
+        def patch_cache(*, guest_environment):
+            self.assertEqual(guest_environment, self.plan.context['guestEnvironment'])
+            return self.dsc.write_bytes(cache(b'changed'))
+
         with patch.object(sys,'argv',['cfw.py','patch-camera-dsc',str(self.dsc.parent),str(self.dsc)]), \
-             patch.object(cfw,'_dispatch',side_effect=lambda:self.dsc.write_bytes(cache(b'changed'))):
+             patch.object(cfw,'_dispatch',side_effect=patch_cache):
             cfw.main()
 
     def final_query(self,args):

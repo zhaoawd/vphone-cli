@@ -1,0 +1,25 @@
+{
+  "result": "pass",
+  "basis": "readable execution log and current filesystem; privileged archive not independently reread",
+  "execution": {
+    "state": "completed",
+    "startedAt": "2026-10-30T23:24:06.163000+08:00",
+    "freeBytesBefore": 64939687936,
+    "deleted": [
+      ".build/t32q-20261024",
+      ".build/t32q-20261024-binding-backup",
+      ".build/t33t-20261025",
+      ".build/t32-t33-completion-20261023"
+    ],
+    "freeBytesAfter": 149089505280,
+    "completedAt": "2026-10-30T23:24:12.948255+08:00",
+    "freeBytesDelta": 84149817344
+  },
+  "roots_absent": 4,
+  "archive_bytes": 1362710905,
+  "free_bytes_now": 149094400000,
+  "limitations": [
+    "root-only result and archive contents not independently reread in this check",
+    "protected files matched within original executor before completion; current full protected hash check not repeated"
+  ]
+}

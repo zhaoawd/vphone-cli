@@ -44,6 +44,8 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import <Foundation/Foundation.h>
+#import <CoreImage/CoreImage.h>
+#import <os/log.h>
 #import <ImageIO/ImageIO.h>
 #import <IOSurface/IOSurfaceRef.h>
 #include <stdio.h>
@@ -69,17 +71,22 @@ static void cfxlog(NSString *fmt, ...) {
     fprintf(fp, "[camfix:%d] %s\n", getpid(), line.UTF8String ?: "?");
     fclose(fp);
   } else {
-    NSLog(@"camfix: %@", line);
+    os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_DEFAULT, "camfix: %{public}s", line.UTF8String ?: "?");
   }
 }
 
 // MARK: - shm reader
+
+#include "../Shared/VPhoneSimulationAccess.h"
 
 static int cfx_shm_fd = -1;
 static const uint8_t *cfx_shm_base = NULL;
 static size_t cfx_shm_size = 0;
 
 static BOOL cfx_shm_open(void) {
+  if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] != AVAuthorizationStatusAuthorized)
+    return NO;
+  vpSimulationConsumeTokens(VP_SIM_CAMERA_READ);
   if (cfx_shm_base) return YES;
   cfx_shm_fd = open(VPHONE_VCAM_SHM_PATH, O_RDONLY);
   if (cfx_shm_fd < 0) {
@@ -1385,12 +1392,15 @@ static void cfx_install_session_state_lies(void) {
 
 static dispatch_once_t cfx_install_once_token;
 
+#include "CameraMetadataOutput.inc"
+
 static void cfx_install_all_hooks(void) {
   dispatch_once(&cfx_install_once_token, ^{
     cfxlog(@"installing hooks (process=%@, pid=%d)",
            NSProcessInfo.processInfo.processName ?: @"?", getpid());
     cfx_install_setActiveFormat_hook();
     cfx_install_capturePhoto_hook();
+    cfx_install_metadata_output_hooks();
     cfx_install_moment_capture_hooks();
     cfx_install_session_guards();
     cfx_install_session_state_lies();

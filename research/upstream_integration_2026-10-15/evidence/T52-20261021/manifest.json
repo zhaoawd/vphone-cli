@@ -1,0 +1,163 @@
+{
+  "status": "foundation_regression_validated_entrypoint_and_real_vm_acceptance_pending",
+  "date": "2026-10-21",
+  "timezone": "Asia/Shanghai",
+  "head": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "upstream": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "tasks": [
+    "T52"
+  ],
+  "validation": {
+    "swiftTargeted": {
+      "tests": 55,
+      "exitCode": 0
+    },
+    "swiftExpanded": {
+      "launchpadKitTests": 239,
+      "launchpadKitSkipped": 11,
+      "stopAndLockTests": 35,
+      "exitCode": 0
+    },
+    "pythonExpanded": {
+      "tests": 235,
+      "failures": 1,
+      "exitCode": 1,
+      "failure": "Undo driver fixture missing workspace preflight modules"
+    },
+    "pythonUndoDriverAfterFixtureFix": {
+      "tests": 1,
+      "exitCode": 0,
+      "resolvesExpandedFailure": true
+    },
+    "unresolvedFailures": 0
+  },
+  "expectedFailureReproduction": {
+    "test": "test_final_mount_binding_failure_cleans_external_root_without_publishing",
+    "beforeFixExitCode": 1,
+    "afterFixExitCode": 0,
+    "beforeFixChangesOnlyDisposableDriverCopy": true
+  },
+  "sourceSHA256": {
+    "sources/VPhoneCore/VPhoneLaunchLayout.swift": "c8c91967cc8cc402583cebb9f319f208af2e62688a8325f9f9c341ae14b532e9",
+    "sources/VPhoneCore/VPhoneBundleActivity.swift": "47364b956b19026502e22e2f4643c9275dead9905527ab617e85af37982c8bd2",
+    "sources/VPhoneCore/VPhoneMachineBindingPersistence.swift": "ed5ac5f528b38413e6af1f47e7e5fb3fe538784726381ca3400404612061cf00",
+    "sources/VPhoneCore/VPhoneVMStopper.swift": "fb0ab09120f5ca5b2ed6c4f6a27b6f3df977b26da246b574b79923842066edb9",
+    "sources/VPhoneCore/VPhoneVMRuntimeState.swift": "1087cb9134b4c3b6a10d51b17fdc0f6e1fa3d234ad40d65ec8268df7c0b370aa",
+    "sources/VPhoneCore/VPhoneUnixSocket.swift": "6d47e4e15869f22bb483e5778a11b0ed6e8537268552ba6b2e4bb9b76d911b1e",
+    "sources/VPhoneCore/VPhoneVMLock.swift": "33fb0870cd40d1c6d96336836f6f7c09fcd5a00fbc9c16b76527c69484599300",
+    "sources/VPhoneCore/VPhoneOnlineOperationLock.swift": "593f63aadff5c9d9a15061523d7d24b17406baf5e120c3cdae863d849a62d979",
+    "sources/VPhoneCore/VPhoneBundleGuard.swift": "41e6d9e1e568a5fb99422d8edf6763d14b48356a0c76e18c87eca1f2f15edb9b",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift": "3329b218cdf56e06903a0a65e1c5ee910c5ce76d884956ddc17cd713d9048e36",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "0e32c880eb3e73bce9e21d9dc57b9657778d0a9d978618df84ee17a028848733",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "c1845f809e36c8c430beb741fafb6599069f0942335ff02ffaf8ca226986f2e8",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift": "3aeef213fcc64f821c1f7cdda8491fd3cb6ba16fb02aaaaf18923b3d5e4b9ea4",
+    "sources/vphone-cli/VPhoneVMCLI.swift": "e6a27d93df3da597109db9740ba139833f83e32882c550415982f2df6b5cd67c",
+    "sources/vphone-cli/VPhoneVMLaunchCLI.swift": "1c00286c37902525d27351e35a251d05c559560088cbd5d9b02789f5e0b1b68f",
+    "sources/vphone-cli/VPhoneVMBindingCLI.swift": "a0a2caf05fe87976fac7f61f0f6428bd74f4c4be4c27c75402fd9d5ef4bf353e",
+    "sources/vphone-cli/VPhoneRestoreCLI.swift": "c4e0ebbaa292ca49d332d5f062f97ddf540bce79f9adb999e44497e3aa4f3404",
+    "sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift": "82d82e66495c74dbd62c1781a24b93cdb3132881b23d4f678c70ba85e39a1f66",
+    "scripts/cfw_install_host.sh": "64a8178dc4775643ed531abdb2fe233e5bfa04a5499a0de5c0097eb6c7e20b3e",
+    "scripts/cfw_disk_txn.py": "c892ccf6f3c821565d07ca8902393bb9b2f2c44ccf8db3fe0e57bd4044b17334",
+    "scripts/patchers/plan_gate.py": "6cf5c955a9e2902c3d270ebb76be31231dbcd07b3272c8890a0255517ce5de02",
+    "scripts/vm_lock.py": "1547d8821e12f0a801b952a539bee0d92c9452d7b062290e116b96c6dbe39745",
+    "tests/VPhoneCoreTests/LaunchLayoutTests.swift": "6d12a79e3166a582ef649f39638cb56da233e91c2c8dc11df9f73427da9caf3c",
+    "tests/VPhoneCoreTests/BundleActivityTests.swift": "30a4c1c744d3651e72c7193a6d16f55cc4fd9c2d651fd538a2697400c6e5354c",
+    "tests/VPhoneCoreTests/VMStopTests.swift": "ee0e82be238144cd8c8090d23279a819c9bfd8f7b0dd8c214e5bf64391a24238",
+    "tests/VPhoneCoreTests/VMLockTests.swift": "c46325860a9c2baa8fd58c2a94c3acb20636af74647b82a855b06c9c7cd2fd59",
+    "tests/VPhoneLaunchpadKitTests/BundleChangeTests.swift": "511c5568aca2a661bf57bbaa2a3f90ff9a9cf0675161b6f20e357eeeefedbf0e",
+    "tests/VPhoneLaunchpadKitTests/BindingPersistenceTests.swift": "b6daf9dccfea2487c2aee57b431398b11c04847d16c94424d8ed910576ae8bfc",
+    "tests/VPhoneLaunchpadKitTests/EditTests.swift": "2600faa3c6e51658e1a5f6f6326a78e537d38b678793f5f609026dd20eb06d2a",
+    "tests/VPhoneCLITests/CFWWorkParentTests.swift": "a6899d87a837dbdacb56bab0a5a1f63c3b48cfe2605bf9352d87d76b77a5ad33",
+    "tests/test_cfw_work_parent.py": "4a1fd85e4dbd7ecada56166da6f8637e0fb43c5cca2962dde0c2ada55eb4acc7",
+    "tests/test_cfw_disk_transaction.py": "8f81ab9f19c9b0e010a80dcaac5b80df5e0c41dcd916b692c19662bdc630bf0d",
+    "tests/test_cfw_host_isolation.py": "e428062b50caf3e6aeeb6c451916d4c9afbdf22e608f80c2c5857d7e350372f2",
+    "tests/test_cfw_guest_undo_driver.py": "973dc2c0c4b0ebe64d14ddf9698d14624f610c3a71fa531651963a9b22fa5f72",
+    "tests/cfw_disk_txn_faults.py": "033181c61d89f5597a73f203e72d2273fb637349ef2f46547e2ce16ed73c6193"
+  },
+  "documentsSHA256": {
+    "research/upstream_integration_2026-10-15/T52_disk_exclusivity_20261021.md": "d14899fe36d278b342f93228759cd17779cb2ef48ff3c3614699512123dbe716",
+    "research/upstream_integration_2026-10-15/tasks.json": "c6092a08001195d94071d23ec6ce006d78a1a5f06cf0f97031381b82560e9e2c",
+    "research/upstream_integration_2026-10-15/local_reconciliation.json": "084b2c65ce41d8b78d218b13b864f0f56fcb4dcc4c949c19a03e6f553ff2202e",
+    "research/upstream_integration_2026-10-15/plan.md": "b60b6e502b7d803ba9ca74067316ca7f3038046e435df030527e337bdd548088",
+    "research/upstream_integration_2026-10-15/progress.md": "890f9d5f4796ac5dad7f8046174f39ea826ad668ed390130c88a649621121158",
+    "TASKS.md": "0e21dd5867df18a3b1c22674d08d486bc379d789bb32d74d02fd238d09cada91"
+  },
+  "files": {
+    "ledger-check.log.gz": {
+      "bytes": 322,
+      "sha256": "eaf5f4f52b3898df6a1e402ec6cce09b76cd240027ba29cafd8da893fa50f830"
+    },
+    "python-bind-mount-before-fix.log.gz": {
+      "bytes": 492,
+      "sha256": "8d1c6dd85dc775fefba625773acb42b4a883f5a767f990c9b6c7760ec24b67a5"
+    },
+    "python-bind-mount-final.log.gz": {
+      "bytes": 154,
+      "sha256": "c01bdcc904a1328e9f7a97db4a38728b486068aa6319168389987e6ff36e4dca"
+    },
+    "python-expanded.log.gz": {
+      "bytes": 7711,
+      "sha256": "b6bbc078debb072babcd1ea8db3cccce38d2778645851ed87b66b5b25b4917be"
+    },
+    "python-external-unsandboxed.log.gz": {
+      "bytes": 155,
+      "sha256": "180e2eb77d7e368f5289d187689a2f173d180a3aaa429b1951361d24779a9d96"
+    },
+    "python-sandbox.log.gz": {
+      "bytes": 8143,
+      "sha256": "48616def322fd800ad62200ead68fdfc24cccbf39dc1eadde4f21d018dc0908b"
+    },
+    "python-transaction-unsandboxed.log.gz": {
+      "bytes": 1429,
+      "sha256": "50761f412e62476ac5bbc6de1135b2824aca68a0087656c1eac61e2e9205a075"
+    },
+    "python-undo-driver-final.log.gz": {
+      "bytes": 208,
+      "sha256": "8f43434d4cea8633548fd5e1634fada4c923e9220f96e38e55f561ce3879441c"
+    },
+    "python-work-parent.log.gz": {
+      "bytes": 270,
+      "sha256": "0718c17c65e391e1b136de0c073b43442384e1d928c08e077f8218424f145526"
+    },
+    "source-and-documents.tar.gz": {
+      "bytes": 311451,
+      "sha256": "7de8969a88ff70d2e6a0ea62db7b525c16c687ea11889e7bbc5628b5f903d0dc"
+    },
+    "static.log.gz": {
+      "bytes": 149,
+      "sha256": "9aa96a519398090ab66236ef39b31a9c9adc815060cc3f2617e863c498a84f55"
+    },
+    "swift-expanded.log.gz": {
+      "bytes": 14623,
+      "sha256": "db2927177ef91ef68d8cb13a0c675f98b962f8bc55d7310f0e8a098326ed8c29"
+    },
+    "swift-lifecycle.log.gz": {
+      "bytes": 5387,
+      "sha256": "9cb8f4be3d17f8615791fdf0b322651ac67df22a8c2cd3545c3043c2ea850a39"
+    },
+    "swift-targeted-final.log.gz": {
+      "bytes": 4876,
+      "sha256": "746aafcda0e47696541ce4f3f5c106a18e9138b71a84a9318aad55ea5c4a3815"
+    },
+    "swift-targeted-initial.log.gz": {
+      "bytes": 4739,
+      "sha256": "90efda2be2739318a19db4ab977074e11597f27800310a2140c17d6e058327fd"
+    },
+    "tracked-diff.patch.gz": {
+      "bytes": 55617,
+      "sha256": "56331352893a1d8119f8b90efcd12cf9515fd5afbd4b62c696761ad3003bbad5"
+    }
+  },
+  "limitations": [
+    "setBundle is a library interface without local GUI/control-command callers; no actual rebind+environment-update acceptance.",
+    "External scratch fixture uses another directory on the same host filesystem; no real cross-device, devfs, external/network-volume validation.",
+    "No real VM install/update/restore/boot or signed candidate app acceptance; frozen .app artifacts not operated on.",
+    "Snapshot/clone guards reuse earlier work; rebase/template/trim caller integration remains with their capability tasks.",
+    "Python expanded run contains one fixture failure resolved by the affected test rerun; 234 other tests not repeated.",
+    "Swift Kit result includes 11 opt-in skips; suites overlap and counts must not be added.",
+    "Snapshot contains pre-existing uncommitted work; tracked diff is cumulative, not solely authored by this turn."
+  ],
+  "accepted": false,
+  "committed": false,
+  "pushed": false
+}

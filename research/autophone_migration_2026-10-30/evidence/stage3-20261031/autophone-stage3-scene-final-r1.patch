@@ -1,0 +1,3296 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 8902fcba0..4a29e8353 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -8,6 +8,12 @@
+ 
+ ## [Unreleased]
+ 
++- upstream_v1 安装接入独立暂存、原生注册和标记回读；Expo 53 验证模板支持 UIScene 生命周期。补齐真实验收的 Fixture 消费前置并修正 AX 选中态解码，新 food_ordering_v2 精确 Build 在 iOS 27 两轮菜单／购物车 D04 通过；相关回归 844 项通过、1 项环境跳过，Ruff 通过。旧构建和失败证据保留。
++
++- 新增显式 Per-Rig `upstream_v1` 协议与 bundle 绑定，接入能力检查、健康三态、应用/文件/单次 Shell 映射及独立 Rig 启停。upstream 应用启动失败后不自动重发，启动失败仅清理本次新建 VM。相关隔离回归 451 项、基础真实回归 25 项和双 VM 真实回归 13 项通过；阶段 2 的业务验收范围以后续阶段 3 结果为准。
++
++- 新增纯上游 Core Bundle 的独立 VM 启停入口，显式绑定 bundle 和 schemaVersion=2 VM，并拒绝经该入口重复启动同一 VM；基础 Rig 启停已接入显式 upstream_v1 流程，业务能力按阶段继续迁移。
++
+ - 浏览器退出诊断继续跟踪本轮已观察到且身份匹配的重新托管子进程，并采集受限标准流标识；PID 复用与探测失败不记为进程已退出。新增受控继承管道与隐私过滤回归。
+ 
+ - 交付浏览器回归的诊断附件补充初始化请求和导航序号，可区分刷新前保存成功与刷新后输入查询仍未完成；新增受控等待释放后恢复草稿的回归。
+diff --git a/TASKS.md b/TASKS.md
+index 01fef39db..e75a1b04d 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1,3 +1,60 @@
++# autophone 上游迁移阶段 3（2026-10-31，首批业务验收通过）
++
++- [x] 用户采用 food_ordering_v2 精确构建 bld-0eef57d16616da2938cf1d701b3ae6e3732f6552d8674a1dc3d6f9879fcba225；隔离 State/包仓库和 generation=4 目标已建立。
++- [x] upstream_v1 接入专用输入副本、原生 IPA 安装、原生注册检查和显式 UDS 传输；保留权限、未知完成状态不重试及 SpringBoard Tag 255 残留拒绝。
++- [x] 旧 procexp 区域查询引发 VM kernel panic；原始记录保留，内核原因未查明。新增 proc_pidinfo 只读查询工具，完整计数与实际 Tag 255 阳性对照通过。
++- [x] 正式 CLI 指定 build-id 安装通过；RigProvisioner 独立回读版本 1.0.0 (1) 和构建标记，SHA-256 相同。隔离回归 333 项、Ruff 通过。
++- [x] 保存并执行 tools.phase1.upstream_app；应用启动后崩溃，首页断言失败，accepted=false。两份原始 .ips 指向 UIKit NoSceneLifecycleAdoption；IPA 使用 iOS 27.1 SDK 且没有 UIApplicationSceneManifest。
++- [x] baseline 正常停止；独立确认 baseline/peer 均 stopped，磁盘无占用、启动锁/ScreenLock 释放、socket 不可达；原 IPA 和批准 host bundle 摘要保持。
++- [x] 用户批准生成兼容 iOS 27 的独立新 build-id 并继续验收；原构建及历史证据保持。
++- [x] 续验：最终 r9 仅新增 Scene 配置插件及 app.json 注册，原业务源码、依赖锁与 newArchEnabled=true 保持。Release 精确 Build bld-e6ecfbb834f844e2dd566771c69a1d58190aa4f4babbac0debed79eaf7b44fff 已登记、正式安装和独立回读。
++- [x] 修正验收入口遗漏 Fixture 及 AX 选中态解码：复用 nonce 回执与稳定快照校验；最终两轮 D04 均 accepted=true，应用 PID/nonce 不同，SpringBoard PID 36/启动时间保持，商品小计 ¥82、2 份。
++- [x] 最终联合回归 844 passed / 1 skipped（缺少靶 A tsc）/ 1 项既有警告，Ruff 通过；最终残留检查 clean，两台 VM stopped、磁盘无占用、各自锁释放，原 IPA 与 host bundle 保持。
++- [x] 保存候选、失败归因修正及最终证据；Frida、定位、相机、深链和完整需求出口闸不属于本轮真实验收。
++
++记录：`/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/stage3_scene_execution_2026-10-31.md`；首次失败记录保留在 stage3_execution_2026-10-31.md。本阶段未合入、未发布。以下条目保留历史含义。
++
++# autophone 上游迁移阶段 2（2026-10-31，基础兼容验收通过）
++
++- [x] 同一 worktree 完成显式 Per-Rig `legacy` / `upstream_v1` 绑定、能力准入、健康三态和上游 Rig 启停；逻辑权限检查先于 wire 映射。
++- [x] 截图 `save:false` 与 430×932 JPEG 门禁，应用/文件/单次 Shell 映射；upstream 启动失败不通过 shell/图标自动重发。
++- [x] 启动异常仅清理本次新建 VM；写操作 EOF、损坏响应和超时保留未知结果信息。原问题均先复现并保留失败日志。
++- [x] 相关隔离回归 451 passed（1 项 websockets 弃用警告，15.37 秒）；Ruff 通过。native Shell 10 项、Swift 控制器 11 项、宿主 I/O 6 项通过。
++- [x] 精确宿主 CDHash `1259c91630fc141bc5a1687b5792f42694c1bc3f` 获用户批准；原 osascript 消失且预检仍拒绝。可见 Terminal 中的同一精确命令退出 0，amfid 采用新规则，预检通过，无再次索取批准。
++- [x] 新 guest 自动更新并核对 SHA-256；新 VM 安装 Irisin 与官方 rootless 工具。引导缺失 sh/cp/dpkg-divert 的失败、真实文件预置和后续完整事务均保存证据，grep 隐式依赖已补齐。
++- [x] 保存并执行 `tools.phase1.upstream_compat`：最终 25 项真实检查通过，覆盖 RGB JPEG、实际 Unicode 粘贴、四类硬件键、应用查询启停、2 MiB 文件、755、cwd/stdin EOF、Shell 输出/超时/断连/并发和身份。
++- [x] 保存并执行 `tools.phase1.upstream_isolation`：最终 13 项真实检查通过，覆盖独立身份双 VM、绑定拒绝、剪贴板隔离、headless、运行中 clone 拒绝、在途请求停止、另一 Rig 健康保持及重连身份变化。首轮在途证据不足和第二轮测试辅助函数错误均保留，最终使用 r3。
++- [x] 独立收尾确认两台测试 VM 均已停止、磁盘无占用、启动锁释放、socket 不可达；两台 VM 保留用于后续阶段。
++- [ ] 阶段 3 指定 build-id 安装与基础应用操作验收尚未开始；不自动扩展为合入或发布。
++
++记录：`/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/stage2_execution_2026-10-31.md`。未删除历史数据。以下阶段 1 条目保留当时含义。
++
++# autophone 上游迁移阶段 1（2026-10-31）
++
++- worktree：`/Users/kolar/github/autophone/.claude/worktrees/autophone-upstream-migration`
++- 分支：`feat/autophone-upstream-migration`；基线：`3bf50e8848b15cb5fe9848aa5087c85c8bd42c15`。
++- 上游固定提交：`39324ee7fcbb1d909bfa293f6188a8ef752ba734`。
++- [x] 新增独立入口 `python -m autophone.rig.upstream`，显式指定 `--bundle`、`--vm-dir`；提供 preflight、launch、stop、dry-run。
++- [x] launch/stop 只接受 schemaVersion=2；委托上游 CLI 正常启停，启动锁由本入口维护；无 AMFI 自动授权或旧协议自动回退。
++- [x] 相关隔离回归 153 passed / 8 skipped（未配置 PostgreSQL DSN）；Ruff 通过。上游最终构建与签名检查通过，版本戳 39324ee。
++- [x] 用户批准精确构建 allowlist；执行后同一 CDHash 的 host preflight 退出 0。固件已确认为 iPhone17,3 27.0.1/24A446 + cloudOS 23E5207q/standard，新 VM。
++- [x] 新入口增加同 VM 启动锁；独立进程验证 exec 后持锁、重复启动拒绝、退出释放，stop 不等待启动锁。相关回归 156 passed / 8 skipped，Ruff 通过。锁仅约束经新入口启动，不宣称覆盖直接调用上游 CLI。
++- [x] `.build/am31/machines/baseline` 固件准备、standard 补丁与恢复完成；正常启停验证见下方结果。
++- [x] 新 VM 完整启停两轮通过：iPhone17,3 / iOS27.0.1，boot session UUID 不同；正常关机，启动锁和磁盘句柄均释放。独立收尾确认 VM 停止，无 CFW 附件或安装进程。
++- [x] CFW 安装与已选固件恢复成功；VM 为 `/Users/kolar/github/vphone-cli/.build/am31/machines/baseline`。
++- [x] 验收脚本 6 项隔离测试与 Ruff 通过。初轮 device.info 的 3 秒超时证据保留；探针按上游 180 秒 RPC 截止时间调整，复测实际耗时 16.396 秒及 0.056 秒。
++
++该入口用于阶段 1 的纯上游基线，不启动 SSH、Frida、健康守护或 Control Plane。现有 `scripts/start_vphone.sh` 和 RigLifecycle 仍为旧流程，阶段 2 再接入新的 Per-Rig 协议绑定。阶段 1 已通过；阶段 2/3 尚未实施或验收。未合入、未发布，worktree 保留用于后续阶段。完整记录：`/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/stage1_execution_2026-10-31.md`。
++
++示例（在本 worktree 根目录执行，路径须替换为本轮构建与新 VM）：
++
++```sh
++python -m autophone.rig.upstream preflight --bundle /absolute/VPhone.bundle
++python -m autophone.rig.upstream launch --bundle /absolute/VPhone.bundle --vm-dir /absolute/library/migration-baseline --dry-run
++python -m autophone.rig.upstream launch --bundle /absolute/VPhone.bundle --vm-dir /absolute/library/migration-baseline
++python -m autophone.rig.upstream stop --bundle /absolute/VPhone.bundle --vm-dir /absolute/library/migration-baseline
++```
++
+ # BL-232 推进清单
+ 
+ 范围：阶段 3 上线后的 §12.8 活机验证，以及阶段 2 剩余验证。开始日期：2026-10-12。
+diff --git a/autophone/device/session.py b/autophone/device/session.py
+index 09d327f2c..1c69a108c 100644
+--- a/autophone/device/session.py
++++ b/autophone/device/session.py
+@@ -11,7 +11,7 @@ import shlex
+ import subprocess
+ from dataclasses import asdict, dataclass, field
+ from contextlib import contextmanager
+-from functools import wraps
++from functools import partial, wraps
+ from pathlib import Path
+ from typing import Any, Callable, Mapping, Protocol
+ 
+@@ -147,6 +147,7 @@ def probe_uds_state(
+     *,
+     request_fn: RequestFn = _default_request,
+     timeout: float = 3.0,
++    protocol: str | None = None,
+ ) -> dict[str, Any]:
+     """Classify one UDS endpoint into unreachable / host_only / guest_ready.
+ 
+@@ -173,7 +174,10 @@ def probe_uds_state(
+         produced after the request crosses vsock into vphoned. This is the only
+         state that sets ``available=True``.
+ 
+-    Command choice: ``app_list`` is the read-only verb the guest actually
++    In upstream_v1 mode, capabilities first proves host reachability and reports
++    guest connectivity. Failure of the subsequent apps probe remains host_only.
++
++    Legacy command choice: ``app_list`` is the read-only verb the guest actually
+     implements (there is no ``ping`` on this UDS face — the host answers it
+     ``ok=false unknown command`` without ever touching the guest, so a ``ping``
+     round trip cannot separate ``host_only`` from ``guest_ready``). It takes no
+@@ -187,8 +191,20 @@ def probe_uds_state(
+     whose whole job is to report unavailability must be able to report it.
+     """
+     socket = str(sock_path)
++    from .target import resolve_protocol
++    mode = resolve_protocol(socket, protocol)
++    host_answered = False
++    send = partial(request_fn, protocol=mode) if mode != "legacy" and request_fn is _default_request else request_fn
+     try:
+-        response, _ = request_fn(
++        if mode == "upstream_v1":
++            capabilities, _ = send({"t": "capabilities", "screen": False}, sock_path=socket,
++                                   timeout=timeout, parse_image=False)
++            host_answered = True
++            if (capabilities.get("ok") is not True or capabilities.get("protocol") != "upstream_v1"
++                    or capabilities.get("guest_connected") is not True):
++                return {"state": UDS_HOST_ONLY, "available": False,
++                        "evidence": f"uds={socket} host answered; upstream guest/protocol not ready"}
++        response, _ = send(
+             {"t": "app_list", "filter": "running", "screen": False},
+             sock_path=socket,
+             timeout=timeout,
+@@ -196,9 +212,9 @@ def probe_uds_state(
+         )
+     except Exception as exc:  # noqa: BLE001 - transport failure is a probe verdict
+         return {
+-            "state": UDS_UNREACHABLE,
++            "state": UDS_HOST_ONLY if host_answered else UDS_UNREACHABLE,
+             "available": False,
+-            "evidence": f"uds={socket} unreachable: {type(exc).__name__}: {exc}",
++            "evidence": f"uds={socket} guest/transport unavailable: {type(exc).__name__}: {exc}",
+         }
+     apps = response.get("apps")
+     if response.get("ok") is True and isinstance(apps, list):
+@@ -444,9 +460,16 @@ class VPhoneDeviceSession:
+         self.stage_guard = StageGuard.current()
+         self._closed = False
+         self.write_fence = write_fence
+-        self._request_fn = request_fn
+-        self._shell_fn = shell_fn
+-        self._transfer_fn = transfer_fn
++        mode = getattr(target, "protocol", "legacy")
++        self._request_fn = partial(request_fn, protocol=mode) if mode != "legacy" and request_fn is _default_request else request_fn
++        self._shell_fn = partial(shell_fn, protocol=mode) if mode != "legacy" and shell_fn is _default_shell else shell_fn
++        if mode == "upstream_v1" and transfer_fn is _ssh_stream_transfer:
++            from .transfer import upstream_transfer
++            self._transfer_fn = lambda local, remote, selected: upstream_transfer(
++                local, remote, sock_path=str(selected.socket),
++            )
++        else:
++            self._transfer_fn = transfer_fn
+         self._install_package_fn = install_package_fn
+         self._build_marker_fn = build_marker_fn
+         self.package_root = package_root
+@@ -543,7 +566,8 @@ class VPhoneDeviceSession:
+         See ``probe_uds_state`` for the state semantics. Only ``guest_ready``
+         yields ``available=True``, which is what Assignment preflight gates on.
+         """
+-        return probe_uds_state(self.target.socket, request_fn=self._request_fn)
++        return probe_uds_state(self.target.socket, request_fn=self._request_fn,
++                               protocol=getattr(self.target, "protocol", "legacy"))
+ 
+     @_stage_operation(OperationClass.APP)
+     def install_build(self, build_ref: Mapping[str, Any]) -> Mapping[str, Any]:
+diff --git a/autophone/device/shell.py b/autophone/device/shell.py
+index 13a36c0ae..24c202703 100644
+--- a/autophone/device/shell.py
++++ b/autophone/device/shell.py
+@@ -83,6 +83,7 @@ def run_shell(
+     check: bool = False,
+     allow_truncated: bool = False,
+     sock_path: str | None = None,
++    protocol: str | None = None,
+ ) -> ShellResult:
+     """Run `cmd` as root in the guest via /var/jb/bin/sh -c.
+ 
+@@ -107,6 +108,7 @@ def run_shell(
+         sock_path=sock_path or resolve_sock(),
+         timeout=timeout_ms / 1000 + SOCK_TIMEOUT_MARGIN_S,
+         parse_image=False,
++        **({"protocol": protocol} if protocol is not None else {}),
+     )
+     if not resp.get("ok"):
+         raise ShellError(f"shell request failed: {resp.get('error')!r}")
+diff --git a/autophone/device/springboard_residue.py b/autophone/device/springboard_residue.py
+index f824940b1..900e74a86 100644
+--- a/autophone/device/springboard_residue.py
++++ b/autophone/device/springboard_residue.py
+@@ -154,7 +154,9 @@ def _criterion() -> dict[str, Any]:
+     return {"tag": RESIDUE_TAG, "match": RESIDUE_MATCH}
+ 
+ 
+-def inspect_springboard_residue(shell: ShellFn) -> dict[str, Any]:
++def inspect_springboard_residue(
++    shell: ShellFn, *, procexp: str = PROCEXP, regions_reader: ShellFn | None = None,
++) -> dict[str, Any]:
+     """读取 SpringBoard 区域表并判定；不抛异常，结果写在返回记录的 ``verdict`` 中。
+ 
+     ``shell(command) -> (exit_code, output)`` 在 guest 内执行命令（安装链路已有的 guest shell）。
+@@ -179,9 +181,9 @@ def inspect_springboard_residue(shell: ShellFn) -> dict[str, Any]:
+     try:
+         before = _springboard(shell)
+         record["springboard"] = {"pid": before.pid, "started": before.started}
+-        command = f"{PROCEXP} {before.pid} regions"
++        command = f"{procexp} {before.pid} regions"
+         record["command"] = command
+-        code, output = shell(command)
++        code, output = (regions_reader or shell)(command)
+         if code != 0:
+             raise ResidueCheckError(f"procexp exited {code}: {str(output).strip()[:200]!r}")
+         regions = parse_regions(str(output))
+diff --git a/autophone/device/stage_guard.py b/autophone/device/stage_guard.py
+index ef5ca7d75..781e74755 100644
+--- a/autophone/device/stage_guard.py
++++ b/autophone/device/stage_guard.py
+@@ -439,7 +439,7 @@ class StageGuard:
+ 
+ 
+ def uds_operation(command: str) -> OperationClass:
+-    if command in {'screenshot', 'app_list', 'ping', 'runtime_info', 'capabilities'}:
++    if command in {'screenshot', 'app_list', 'app_foreground', 'ping', 'runtime_info', 'capabilities'}:
+         return OperationClass.READ
+     if command in {'file_get', 'file_put'}:
+         return OperationClass.TRANSFER
+diff --git a/autophone/device/target.py b/autophone/device/target.py
+index 2f43e6b9b..d2945914b 100644
+--- a/autophone/device/target.py
++++ b/autophone/device/target.py
+@@ -29,6 +29,11 @@ class VPhoneTarget:
+     vm_dir: Path
+     sock: Path
+     device: str
++    protocol: str = "legacy"
++
++    def __post_init__(self) -> None:
++        if self.protocol not in {"legacy", "upstream_v1"}:
++            raise VPhoneTargetBindingError(f"unsupported vphone protocol: {self.protocol}")
+ 
+     def public_dict(self) -> dict[str, str]:
+         """Dashboard-safe identity for the selected VM target.
+@@ -126,7 +131,8 @@ def resolve_target(
+     else:
+         device = vm_dir.name or CURRENT_DEVICE
+ 
+-    return VPhoneTarget(cli_dir=root, vm_dir=vm_dir, sock=sock, device=device)
++    return VPhoneTarget(cli_dir=root, vm_dir=vm_dir, sock=sock, device=device,
++                        protocol=env.get("AUTOPHONE_VPHONE_PROTOCOL", "legacy"))
+ 
+ 
+ def resolve_screen_lock_target(
+@@ -182,8 +188,28 @@ def resolve_screen_lock_target(
+         vm_dir=baseline.vm_dir,
+         sock=resolved_sock,
+         device=device_key,
++        protocol=baseline.protocol,
+     )
+ 
+ 
+ def default_device() -> str:
+     return resolve_target().device
++
++
++def resolve_protocol(sock: str | Path, explicit: str | None = None) -> str:
++    target = _BOUND_TARGET.get()
++    if target is not None:
++        if Path(sock).expanduser().resolve() != target.sock.expanduser().resolve():
++            raise VPhoneTargetBindingError("protocol target socket mismatch")
++        if explicit is not None and explicit != target.protocol:
++            raise VPhoneTargetBindingError("protocol conflicts with bound target")
++        mode = target.protocol
++    elif explicit is not None:
++        mode = explicit
++    else:
++        mode = os.environ.get("AUTOPHONE_VPHONE_PROTOCOL", "legacy")
++        if mode != "legacy" and Path(sock).expanduser().resolve() != resolve_target().sock.expanduser().resolve():
++            raise VPhoneTargetBindingError("upstream protocol requires an explicit socket binding")
++    if mode not in {"legacy", "upstream_v1"}:
++        raise VPhoneTargetBindingError(f"unsupported vphone protocol: {mode}")
++    return mode
+diff --git a/autophone/device/transfer.py b/autophone/device/transfer.py
+index fa4c5bcdb..05b6b3d86 100644
+--- a/autophone/device/transfer.py
++++ b/autophone/device/transfer.py
+@@ -128,3 +128,15 @@ class GuestTransfer:
+ 
+     def cleanup_command(self) -> str:
+         return _GUEST_PATH + f"rm -f -- {shlex.quote(self.staging)}"
++
++
++def upstream_transfer(local, remote: str, *, sock_path: str, timeout: float = 120) -> None:
++    """Publish verified host bytes through the selected upstream file route once."""
++    from autophone.device.uds import request
++    from autophone.device.session import DeviceProtocolError
++
++    response, _ = request({"t": "file_put", "load": str(local), "path": remote,
++                           "perm": "644", "screen": False}, sock_path=sock_path,
++                          protocol="upstream_v1", parse_image=False, timeout=timeout)
++    if response.get("ok") is not True:
++        raise DeviceProtocolError(f"upstream transfer failed: {response.get('error')}")
+diff --git a/autophone/device/uds.py b/autophone/device/uds.py
+index b97173d30..dceba90c0 100644
+--- a/autophone/device/uds.py
++++ b/autophone/device/uds.py
+@@ -126,11 +126,13 @@ def request(
+     sock_path: str = DEFAULT_SOCK,
+     timeout: float = 15.0,
+     parse_image: bool = True,
++    protocol: str | None = None,
+ ) -> tuple[dict[str, Any], Sample]:
+     from autophone.device.stage_guard import StageGuard, uds_operation
+ 
+     with StageGuard.operation_if_bound(uds_operation(str(msg.get("t") or "")), socket_path=sock_path):
+-        result = _request(msg, sock_path=sock_path, timeout=timeout, parse_image=parse_image)
++        result = _request(msg, sock_path=sock_path, timeout=timeout, parse_image=parse_image,
++                          **({"protocol": protocol} if protocol is not None else {}))
+         response = result[0] if isinstance(result, tuple) and result else None
+         if StageGuard.binding() is not None and isinstance(response, dict) and response.get("image"):
+             # BL-227：执行侧（已绑定 Stage）取到的画面记为「最近帧」，预览通道在 Run 期间
+@@ -147,6 +149,7 @@ def _request(
+     sock_path: str = DEFAULT_SOCK,
+     timeout: float = 15.0,
+     parse_image: bool = True,
++    protocol: str | None = None,
+ ) -> tuple[dict[str, Any], Sample]:
+     """Send one request. Returns (parsed_response, timing_sample).
+ 
+@@ -156,7 +159,7 @@ def _request(
+       t_read_total_ms    - time from first byte to EOF
+       rt_ms              - total wall time from connect() to close()
+     """
+-    if msg.get("t") not in {"screenshot", "app_list", "ping", "file_get", "capabilities"}:
++    if msg.get("t") not in {"screenshot", "app_list", "app_foreground", "ping", "file_get", "capabilities"}:
+         from autophone.device.target import check_device_write
+ 
+         check_device_write(str(msg.get("t") or "unknown"))
+@@ -169,41 +172,31 @@ def _request(
+     ):
+         msg = {**msg, "color": True}
+ 
+-    t_connect = time.perf_counter()
+-    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+-    s.settimeout(timeout)
+-    s.connect(sock_path)
+-
+-    payload = (json.dumps(msg) + "\n").encode("utf-8")
+-    s.sendall(payload)
+-    try:
+-        s.shutdown(socket.SHUT_WR)
+-    except OSError as e:
+-        # Server already closed its side (fast non-image responses sometimes
+-        # beat our shutdown call). That's fine — sendall already completed.
+-        if e.errno not in (57, 32):  # ENOTCONN, EPIPE
+-            raise
+-    t_shutdown = time.perf_counter()
+-
+-    buf = b""
+-    first_chunk_at: float | None = None
+-    while True:
+-        chunk = s.recv(65536)
+-        if not chunk:
+-            break
+-        if first_chunk_at is None:
+-            first_chunk_at = time.perf_counter()
+-        buf += chunk
+-    t_eof = time.perf_counter()
+-    s.close()
+-
+-    nl = buf.find(b"\n")
+-    try:
+-        obj = json.loads(buf[:nl] if nl >= 0 else buf)
+-    except json.JSONDecodeError as e:
+-        raise ProtocolError(f"bad response: {e}; head={buf[:120]!r}") from e
+-
+-    image_b64 = obj.get("image") if parse_image else None
++    from autophone.device.target import resolve_protocol
++    from autophone.device.upstream_wire import admitted, prepare
++    mode = resolve_protocol(sock_path, protocol)
++    if mode == "upstream_v1":
++        try:
++            with prepare(msg) as (wire, decode):
++                if len((json.dumps(wire, ensure_ascii=False) + "\n").encode()) > 1 << 20:
++                    raise ProtocolError("request exceeds protocol frame limit")
++                budget_start = time.monotonic()
++                request_start = time.perf_counter()
++                if msg.get("t") not in {"ping", "capabilities"}:
++                    capabilities, _, _ = _exchange({"t": "capabilities", "screen": False}, sock_path, timeout, mode)
++                    if not admitted(capabilities, msg.get("t")):
++                        raise ProtocolError(f"upstream command is not admitted: {msg.get('t')}")
++                remaining = timeout - (time.monotonic() - budget_start)
++                obj, times, buf = _exchange(wire, sock_path, remaining, mode, logical_command=msg.get("t"))
++                times = (request_start, *times[1:])
++                obj = decode(obj)
++        except ValueError as exc:
++            raise ProtocolError(str(exc)) from exc
++    else:
++        obj, times, buf = _exchange(msg, sock_path, timeout, mode)
++    t_connect, t_shutdown, first_chunk_at, t_eof = times
++
++    image_b64 = obj.get("image") if parse_image or (mode == "upstream_v1" and msg.get("t") == "screenshot") else None
+     image_bytes = 0
+     image_fmt: str | None = None
+     image_wh: tuple[int, int] | None = None
+@@ -212,6 +205,8 @@ def _request(
+         image_bytes = len(img)
+         image_fmt = _detect_image_fmt(img)
+         image_wh = _parse_jpeg_dims(img) if image_fmt == "jpeg" else None
++        if mode == "upstream_v1" and msg.get("t") == "screenshot" and (image_fmt != "jpeg" or image_wh != EXPECTED_PREVIEW):
++            raise GeometryDrift(f"upstream screenshot geometry/format refused: {image_fmt} {image_wh}")
+ 
+     rt_ms = (t_eof - t_connect) * 1000
+     sample = Sample(
+@@ -233,6 +228,84 @@ def _request(
+     return obj, sample
+ 
+ 
++
++def _check_peer_uid(channel):
++    import sys
++    if sys.platform == "darwin":
++        version, peer_uid = struct.unpack_from("II", channel.getsockopt(0, 1, 80))
++        if version != 0 or peer_uid != os.geteuid():
++            raise ProtocolError("UDS peer UID mismatch")
++    elif sys.platform.startswith("linux"):
++        _pid, peer_uid, _gid = struct.unpack("3i", channel.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
++        if peer_uid != os.geteuid():
++            raise ProtocolError("UDS peer UID mismatch")
++    else:
++        raise ProtocolError("unsupported UDS peer credential platform")
++
++def _exchange(message, sock_path, timeout, mode, *, logical_command=None):
++    if timeout <= 0:
++        raise ValueError("positive UDS timeout required")
++    limit = (1 if mode == "upstream_v1" else 2) << 20
++    payload = (json.dumps(message, ensure_ascii=False) + "\n").encode("utf-8")
++    if len(payload) > limit:
++        raise ProtocolError("request exceeds protocol frame limit")
++    t_connect = time.perf_counter()
++    deadline = time.monotonic() + timeout
++    channel = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
++    chunks = []
++    size = 0
++    first = None
++    dispatched = False
++    try:
++        channel.settimeout(timeout)
++        channel.connect(sock_path)
++        if mode == "upstream_v1":
++            _check_peer_uid(channel)
++        dispatched = True
++        channel.sendall(payload)
++        if mode == "legacy":
++            try:
++                channel.shutdown(socket.SHUT_WR)
++            except OSError as exc:
++                if exc.errno not in (57, 32):
++                    raise
++        t_shutdown = time.perf_counter()
++        while True:
++            remaining = deadline - time.monotonic()
++            if remaining <= 0:
++                raise TimeoutError("UDS response deadline exceeded")
++            channel.settimeout(remaining)
++            chunk = channel.recv(65536)
++            if not chunk:
++                break
++            if first is None:
++                first = time.perf_counter()
++            size += len(chunk)
++            if size > limit:
++                raise ProtocolError("response exceeds protocol frame limit")
++            chunks.append(chunk)
++        t_eof = time.perf_counter()
++        data = b"".join(chunks)
++        line, separator, rest = data.partition(b"\n")
++        if (mode == "upstream_v1" and not separator) or rest.strip():
++            raise ProtocolError("incomplete or multiple UDS responses")
++        try:
++            obj = json.loads(line)
++        except (ValueError, UnicodeError) as exc:
++            raise ProtocolError(f"bad response: {exc}") from exc
++        if not isinstance(obj, dict) or type(obj.get("ok")) is not bool:
++            raise ProtocolError("response must be an object with boolean ok")
++        return obj, (t_connect, t_shutdown, first, t_eof), data
++    except (OSError, ProtocolError) as exc:
++        if dispatched and logical_command not in {None, "ping", "capabilities", "app_list", "app_foreground"}:
++            exc.operation_may_continue = True
++            exc.command = logical_command
++        raise
++    finally:
++        channel.close()
++
++
++
+ class GeometryGuard:
+     """Locks onto the first observed screenshot geometry; rejects drift.
+ 
+@@ -363,6 +436,11 @@ def ipa_install(
+     Raises:
+         ProtocolError: If response is malformed or connection fails
+     """
++    from .target import resolve_protocol
++    if resolve_protocol(sock_path) == "upstream_v1":
++        from .upstream_install import install_copy
++        return install_copy(guest_ipa_path, registration=registration, cert_path=cert_path,
++                            sock_path=sock_path, timeout=timeout)
+     msg: dict[str, Any] = {
+         "t": "ipa_install",
+         "path": guest_ipa_path,
+diff --git a/autophone/execution/engine/actions.py b/autophone/execution/engine/actions.py
+index 7ff86f9c5..f4afe3989 100644
+--- a/autophone/execution/engine/actions.py
++++ b/autophone/execution/engine/actions.py
+@@ -45,6 +45,7 @@ from autophone.device.uds import (
+ from autophone.device.ax_target import find_node
+ from autophone.device.ocr_target import Match, OcrError, find_text, run_ocr
+ from autophone.device.shell import ShellError, run_shell
++from autophone.device.target import resolve_protocol
+ from autophone.device.springboard import (
+     SpringBoardIdentity,
+     SpringBoardProbeError,
+@@ -1215,7 +1216,8 @@ class CaseContext:
+ 
+         Updated vphoned builds expose an entitled native ``app_launch`` command;
+         use it first so launch does not occupy the serial shell channel.  Older
+-        guests that reject the command fall back to the ``uiopen`` CLI.  PID/ready
++        legacy guests that reject the command fall back to the ``uiopen`` CLI.
++        upstream_v1 failures never replay via shell or icon taps. PID/ready
+         marker verification below remains fail-closed for both paths.
+ 
+         SpringBoard 在启动转场中崩溃时 App 进程随之消失（2026-09-24 vm-2607 两次复现）。
+@@ -1246,6 +1248,7 @@ class CaseContext:
+     ) -> ActionResult:
+         t0 = time.perf_counter()
+         launch_via = "native app_launch"
++        legacy_fallback = resolve_protocol(self.sock_path) == "legacy"
+         native_failure = ""
+         # 就绪标记兜底只在 pid 不可得时生效；先留一帧启动前画面，用于核对标记所在帧是否新鲜。
+         baseline = self._pre_launch_frame() if ready_markers else None
+@@ -1263,6 +1266,14 @@ class CaseContext:
+                 native_failure = f"rejected: {response.get('error')!r}"
+ 
+         if native_failure:
++            if not legacy_fallback:
++                res = self._record(
++                    "launch_app", False,
++                    f"launch {bundle_id!r} failed: native app_launch {native_failure}; "
++                    "operation may continue; no automatic replay",
++                    t0, kind="launch_failed",
++                )
++                raise StepFailure(res)
+             try:
+                 r = run_shell(
+                     f"uiopen --bundleid {shlex.quote(bundle_id)}",
+@@ -1315,7 +1326,7 @@ class CaseContext:
+                     f"launched {bundle_id!r} pid=unavailable ready marker={marker!r}",
+                     t0,
+                 )
+-            if springboard_icon_preview is not None:
++            if legacy_fallback and springboard_icon_preview is not None:
+                 self._tap_springboard_icon(springboard_icon_preview)
+                 marker = self._await_app_ready_marker(ready_markers or [], deadline_s=5.0)
+                 if marker and self._marker_frame_is_stale(baseline):
+diff --git a/autophone/execution/handlers.py b/autophone/execution/handlers.py
+index 5e4037ec1..a7434dec5 100644
+--- a/autophone/execution/handlers.py
++++ b/autophone/execution/handlers.py
+@@ -37,6 +37,7 @@ class _RunServiceHandler:
+             vm_dir=explicit.vm_dir,
+             sock=explicit.socket,
+             device=explicit.rig_id,
++            protocol=getattr(explicit, "protocol", "legacy"),
+         )), device_write_scope(context.device.write_fence.check), device_scope(context.device):
+             handle = self.run_service.submit(dict(run_spec))
+         return RunHandlerOutput(dict(handle.result), Path(handle.run_dir))
+diff --git a/autophone/packages/store.py b/autophone/packages/store.py
+index 2f4b1beea..807319a2d 100644
+--- a/autophone/packages/store.py
++++ b/autophone/packages/store.py
+@@ -1723,9 +1723,25 @@ def _springboard_residue_check(shell: ShellFn) -> dict[str, Any]:
+     """安装前残留检查的接缝；隔离测试由 ``tests/conftest.py`` 替换为通过的桩。"""
+     from autophone.device.springboard_residue import inspect_springboard_residue
+ 
++    from autophone.device.target import resolve_protocol, resolve_target
++    target = resolve_target()
++    if resolve_protocol(target.sock) == "upstream_v1":
++        from autophone.device.upstream_install import residue_check
++        return residue_check(shell, sock_path=str(target.sock))
+     return inspect_springboard_residue(shell)
+ 
+ 
++
++def _default_transfer(local: Path, remote: str) -> None:
++    from autophone.device.target import resolve_protocol, resolve_target
++    from autophone.device.transfer import upstream_transfer
++
++    target = resolve_target()
++    if resolve_protocol(target.sock) == "upstream_v1":
++        return upstream_transfer(local, remote, sock_path=str(target.sock))
++    return scp_to_guest(local, remote)
++
++
+ def _default_shell() -> ShellFn:
+     from autophone.device.shell import ShellError, run_shell
+ 
+@@ -1745,6 +1761,11 @@ def verify_registered(bundle_id: str, shell: ShellFn) -> bool:
+     `uicache -i <id>` prints an info block headed by "Bundle Identifier: <id>"
+     for a registered app, or "<id> is an invalid bundle id" otherwise — and
+     exits 0 either way, so we match on the output, not the code."""
++    from autophone.device.target import resolve_protocol, resolve_target
++    target = resolve_target()
++    if resolve_protocol(target.sock) == "upstream_v1":
++        from autophone.device.upstream_install import verify_registered as upstream_registered
++        return upstream_registered(bundle_id, sock_path=str(target.sock))
+     _code, out = shell(f"uicache -i {bundle_id}")
+     return f"Bundle Identifier: {bundle_id}" in out
+ 
+@@ -1876,7 +1897,7 @@ def install_package(
+     install_fingerprint = install_target_fingerprint(install_target)
+     target_receipt_path(app, install_fingerprint, root=root).unlink(missing_ok=True)
+ 
+-    transfer = transfer or scp_to_guest
++    transfer = transfer or _default_transfer
+     installer = installer or (
+         lambda remote_path: vphone_native_install(
+             remote_path, registration="User", sock_path=install_target["socket"], timeout_s=300.0,
+diff --git a/autophone/rig/lifecycle.py b/autophone/rig/lifecycle.py
+index f1beb6c1e..088fefa74 100644
+--- a/autophone/rig/lifecycle.py
++++ b/autophone/rig/lifecycle.py
+@@ -7,6 +7,7 @@ import os
+ import shlex
+ import signal
+ import subprocess
++import sys
+ import time
+ from dataclasses import asdict, dataclass
+ from pathlib import Path
+@@ -154,6 +155,8 @@ class RigLifecycle:
+         send_signal: SendSignal = os.kill,
+         process_alive: ProcessAlive = _process_alive,
+         sleep: Callable[[float], None] = time.sleep,
++        start_process: Callable = subprocess.Popen,
++        probe_uds: Callable | None = None,
+     ) -> None:
+         self.target = target
+         self.repository = (repository or Path(__file__).resolve().parents[2]).resolve()
+@@ -162,6 +165,8 @@ class RigLifecycle:
+         self._send_signal = send_signal
+         self._process_alive = process_alive
+         self._sleep = sleep
++        self._start_process = start_process
++        self._probe_uds = probe_uds
+ 
+     @guarded_device_operation(OperationClass.VM, identity=lambda a: {
+         "rig_id": a["self"].target.rig_id,
+@@ -176,6 +181,8 @@ class RigLifecycle:
+     ) -> LifecycleReceipt:
+         self._validate_target_files()
+         self.target.ensure_local_directories()
++        if getattr(self.target, "protocol", "legacy") == "upstream_v1":
++            return self._start_upstream(allow_multi_vm=allow_multi_vm, timeout_s=timeout_s)
+         script = self.repository / "scripts" / "start_vphone.sh"
+         if not script.is_file():
+             raise RigLifecycleError(f"start script does not exist: {script}")
+@@ -267,6 +274,14 @@ class RigLifecycle:
+                     affected.append(process.pid)
+ 
+         vphones = self._target_vphone_processes(processes)
++        if getattr(self.target, "protocol", "legacy") == "upstream_v1":
++            command = self._upstream_command("stop", timeout=max(1, int(timeout_s)))
++            result = self._run_command(command, cwd=str(self.repository),
++                                       env={**os.environ, **self.target.process_environment()},
++                                       capture_output=True, text=True, timeout=timeout_s + 15)
++            if result.returncode != 0:
++                raise RigLifecycleError(f"upstream stop failed: {result.stderr or result.stdout}")
++            return self._receipt("stop", "stopped", affected_pids=tuple(p.pid for p in vphones))
+         for process in vphones:
+             if self._send_term(process.pid):
+                 affected.append(process.pid)
+@@ -285,6 +300,71 @@ class RigLifecycle:
+             affected_pids=tuple(sorted(set(affected))),
+         )
+ 
++    def _upstream_command(self, action: str, *, timeout: int = 20) -> list[str]:
++        from .upstream import lifecycle_command
++        return lifecycle_command(action, bundle=self.target.core_bundle,
++                                 vm_dir=self.target.vm_dir, timeout=timeout)
++
++    def _start_upstream(self, *, allow_multi_vm: bool, timeout_s: float) -> LifecycleReceipt:
++        from autophone.device.session import probe_uds_state
++        environment = {**os.environ, **self.target.process_environment()}
++        preflight = self._run_command(self._upstream_command("preflight"),
++                                      cwd=str(self.repository), env=environment,
++                                      capture_output=True, text=True, timeout=15)
++        if preflight.returncode != 0:
++            raise RigLifecycleError(f"upstream preflight failed: {preflight.stderr or preflight.stdout}")
++        processes = self._process_snapshot()
++        target = self._target_vphone_processes(processes)
++        others = [p for p in processes if _command_arguments(p.command)
++                  and Path(_command_arguments(p.command)[0]).name in {"vphone-cli", "vphone-vm"}
++                  and _command_config(p.command) is not None and p not in target]
++        if others and not allow_multi_vm:
++            raise RigLifecycleError("another VM is running; enable allow_multi_vm explicitly")
++        launcher = None
++        if not target:
++            command = [sys.executable, "-m", "autophone.rig.upstream", "launch", "--bundle",
++                       str(self.target.core_bundle), "--vm-dir", str(self.target.vm_dir)]
++            with (self.target.log_dir / "vphone.log").open("ab") as log:
++                launcher = self._start_process(command, cwd=str(self.repository), env=environment,
++                                               stdin=subprocess.DEVNULL, stdout=log,
++                                               stderr=subprocess.STDOUT, start_new_session=True)
++        probe = self._probe_uds or probe_uds_state
++        deadline = time.monotonic() + timeout_s
++        try:
++            while time.monotonic() < deadline:
++                if launcher is not None and launcher.poll() is not None:
++                    raise RigLifecycleError(f"upstream launcher exited: {launcher.returncode}")
++                state = probe(self.target.socket, protocol="upstream_v1", timeout=min(3, max(.01, deadline - time.monotonic())))
++                if state.get("state") == "guest_ready":
++                    health = self._run_command(
++                        [sys.executable, "-m", "tools.phase1.health_daemon", "ensure",
++                         "--sock", str(self.target.socket), "--state-file", str(self.target.health_state_file),
++                         "--pid-file", str(self.target.health_pid_file), "--log-file", str(self.target.health_log_file),
++                         "--on-down", str(self.repository / "scripts/on_vphone_down.sh")],
++                        cwd=str(self.repository), env=environment, capture_output=True, text=True, timeout=20,
++                    )
++                    if health.returncode != 0:
++                        raise RigLifecycleError(f"health daemon startup failed: {health.stderr or health.stdout}")
++                    return self._receipt("start", "running")
++                self._sleep(.2)
++            raise RigLifecycleError("upstream guest readiness timed out")
++        except Exception as exc:
++            cleanup_error = None
++            if launcher is not None:
++                try:
++                    cleanup = self._run_command(
++                        self._upstream_command("stop"), cwd=str(self.repository), env=environment,
++                        capture_output=True, text=True, timeout=40,
++                    )
++                    if cleanup.returncode != 0:
++                        cleanup_error = cleanup.stderr or cleanup.stdout or f"exit {cleanup.returncode}"
++                except (OSError, subprocess.SubprocessError) as stop_exc:
++                    cleanup_error = str(stop_exc)
++            detail = str(exc)
++            if cleanup_error:
++                detail += f"; owned VM cleanup failed: {cleanup_error}"
++            raise RigLifecycleError(detail) from exc
++
+     def _validate_target_files(self) -> None:
+         if not self.target.config_path.is_file():
+             raise RigLifecycleError(f"VM config does not exist: {self.target.config_path}")
+@@ -303,7 +383,9 @@ class RigLifecycle:
+         return tuple(
+             process
+             for process in (processes if processes is not None else self._process_snapshot())
+-            if _command_config(process.command) == expected
++            if _command_arguments(process.command)
++            and Path(_command_arguments(process.command)[0]).name in {"vphone-cli", "vphone-vm"}
++            and _command_config(process.command) == expected
+         )
+ 
+     def _process_snapshot(self) -> tuple[ProcessInfo, ...]:
+diff --git a/autophone/rig/target.py b/autophone/rig/target.py
+index 0dbe37db7..702b8d6bf 100644
+--- a/autophone/rig/target.py
++++ b/autophone/rig/target.py
+@@ -39,8 +39,14 @@ class DeviceTarget:
+     # `AUTOPHONE_RIG_RUNTIME_DIR`——两者不一致时 agent 子进程读到的
+     # VPHONE_HEALTH_STATE_FILE 是一个没人写的路径，健康读数恒 missing。
+     runtime_dir: Path | None = None
++    protocol: str = "legacy"
++    core_bundle: Path | None = None
+ 
+     def __post_init__(self) -> None:
++        if self.protocol not in {"legacy", "upstream_v1"}:
++            raise TargetConfigurationError("unsupported vphone protocol")
++        if self.protocol == "upstream_v1" and (self.core_bundle is None or not self.core_bundle.is_absolute()):
++            raise TargetConfigurationError("upstream_v1 requires absolute core_bundle")
+         if self.runtime_dir is None:
+             object.__setattr__(self, "runtime_dir", self.temp_dir / "runtime")
+         if (
+@@ -70,7 +76,7 @@ class DeviceTarget:
+     @classmethod
+     def from_mapping(cls, raw: Mapping[str, Any]) -> "DeviceTarget":
+         path_fields = {
+-            "cli_dir", "vm_dir", "socket", "log_dir", "temp_dir", "package_cache", "runtime_dir",
++            "cli_dir", "vm_dir", "socket", "log_dir", "temp_dir", "package_cache", "runtime_dir", "core_bundle",
+         }
+         values = dict(raw)
+         for field in path_fields:
+@@ -126,13 +132,29 @@ class DeviceTarget:
+                 raw[key] = str(value)
+         return raw
+ 
++    @property
++    def runtime_target_file(self) -> Path:
++        return self.runtime_dir / f"target-{self.rig_generation}.json"
++
+     def ensure_local_directories(self) -> None:
+         for path in (self.log_dir, self.temp_dir, self.package_cache, self.runtime_dir):
+             path.mkdir(parents=True, exist_ok=True)
++        if self.protocol == "upstream_v1":
++            content = json.dumps(self.public_dict(), ensure_ascii=False, sort_keys=True, indent=2) + "\n"
++            try:
++                with self.runtime_target_file.open("x", encoding="utf-8") as stream:
++                    stream.write(content)
++                self.runtime_target_file.chmod(0o600)
++            except FileExistsError:
++                if self.runtime_target_file.read_text() != content:
++                    raise TargetConfigurationError("target generation configuration changed")
+ 
+     def process_environment(self) -> dict[str, str]:
+         """Compatibility environment for one target-bound child process."""
+         return {
++            "AUTOPHONE_VPHONE_PROTOCOL": self.protocol,
++            **({"AUTOPHONE_RIG_TARGET": str(self.runtime_target_file)} if self.protocol == "upstream_v1" else {}),
++            **({"AUTOPHONE_CORE_BUNDLE": str(self.core_bundle)} if self.core_bundle else {}),
+             "VPHONE_CLI_DIR": str(self.cli_dir),
+             "VM_DIR": str(self.vm_dir),
+             "VPHONE_SOCK": str(self.socket),
+diff --git a/autophone/workflow/ui_verification/ui_verification_food_ordering.py b/autophone/workflow/ui_verification/ui_verification_food_ordering.py
+index a128c256c..f13c43ca5 100644
+--- a/autophone/workflow/ui_verification/ui_verification_food_ordering.py
++++ b/autophone/workflow/ui_verification/ui_verification_food_ordering.py
+@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any, Literal
+ 
+ from autophone.contracts import validate_or_raise, write_json
+ from autophone.paths import CODE_ROOT
++from .expo_scene_lifecycle import PLUGIN as SCENE_PLUGIN, PLUGIN_FILE as SCENE_PLUGIN_FILE, PLUGIN_SOURCE as SCENE_PLUGIN_SOURCE
+ from autophone.workflow.ui_verification.ui_verification_eval_target import (
+     assert_source_root_excludes_mutation_truth,
+     build_runtime_registry,
+@@ -50,6 +51,7 @@ GENERATED_FILES = (
+     "verification/observation.tsx",
+     "verification/runtime.ts",
+     "verification/withAutophoneFmtCompatibility.js",
++    SCENE_PLUGIN_FILE,
+ )
+ # 包内资源根（autophone/_data 的父目录）：不用 __file__ 相对层数，搬目录不会把它指偏。
+ _AUTOPHONE_PACKAGE_ROOT = Path(autophone.__file__).resolve().parent
+@@ -664,6 +666,7 @@ def _updated_app_json(source: bytes, profile: dict[str, Any]) -> bytes:
+         )
+     ]
+     expo["plugins"].append("./verification/withAutophoneFmtCompatibility")
++    expo["plugins"].append(SCENE_PLUGIN)
+     expo["extra"] = {
+         **dict(expo.get("extra") or {}),
+         "autophoneVerification": {
+@@ -2229,6 +2232,7 @@ def _build_updates(
+             _eval_observation_source(profile) if evaluation else OBSERVATION_SOURCE
+         ),
+         "verification/withAutophoneFmtCompatibility.js": FMT_COMPATIBILITY_PLUGIN_SOURCE,
++        SCENE_PLUGIN_FILE: SCENE_PLUGIN_SOURCE.encode("utf-8"),
+     }
+     if evaluation:
+         updates["app/(tabs)/profile.tsx"] = _updated_profile(
+diff --git a/scripts/start_vphone.sh b/scripts/start_vphone.sh
+index e537f1c95..ecdbe8e22 100755
+--- a/scripts/start_vphone.sh
++++ b/scripts/start_vphone.sh
+@@ -28,6 +28,16 @@ set -euo pipefail
+ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ AUTOPHONE_DIR="$(dirname "$SCRIPT_DIR")"
+ 
++# Explicit upstream targets never enter the legacy AMFI/SSH/guest repair path.
++if [ "${AUTOPHONE_VPHONE_PROTOCOL:-legacy}" = "upstream_v1" ]; then
++    [ -n "${AUTOPHONE_RIG_TARGET:-}" ] || { echo "upstream_v1 requires AUTOPHONE_RIG_TARGET" >&2; exit 1; }
++    cd "$AUTOPHONE_DIR"
++    if [ "${AUTOPHONE_EXPERIMENTAL_MULTI_VM:-0}" = "1" ]; then
++        exec "${PYTHON_BIN:-python3}" -m autophone.rig.lifecycle start --target "$AUTOPHONE_RIG_TARGET" --allow-multi-vm
++    fi
++    exec "${PYTHON_BIN:-python3}" -m autophone.rig.lifecycle start --target "$AUTOPHONE_RIG_TARGET"
++fi
++
+ _first_dir() { for d in "$@"; do [ -d "$d" ] && { echo "$d"; return; }; done; echo "$1"; }
+ VPHONE_CLI_DIR="${VPHONE_CLI_DIR:-$(_first_dir "$AUTOPHONE_DIR/../vphone-cli" "$HOME/Documents/github/vphone-cli" "$HOME/github/vphone-cli")}"
+ VPHONE_BIN="$VPHONE_CLI_DIR/.build/vphone-cli.app/Contents/MacOS/vphone-cli"
+diff --git a/tests/test_actions_launch_app.py b/tests/test_actions_launch_app.py
+index a11782462..5a184fb5f 100644
+--- a/tests/test_actions_launch_app.py
++++ b/tests/test_actions_launch_app.py
+@@ -361,3 +361,33 @@ def test_launch_app_still_accepts_ready_marker_on_a_fresh_frame(
+ 
+     assert result.ok is True
+     assert "pid=unavailable ready marker='立即下单'" in result.detail
++
++
++@pytest.mark.parametrize("failure", ["timeout", "rejected"])
++def test_upstream_launch_failure_does_not_replay_via_shell(tmp_path, monkeypatch, failure):
++    from autophone.device.target import VPhoneTarget, target_scope
++    calls = []
++    def request(msg, **kwargs):
++        calls.append(msg)
++        if failure == "timeout":
++            raise TimeoutError("operation may continue")
++        return {"ok": False, "error": "launch verification failed"}, _sample(msg)
++    monkeypatch.setattr(A, "request", request)
++    monkeypatch.setattr(A, "run_shell", lambda *a, **k: pytest.fail("write replay via shell"))
++    ctx = A.CaseContext(case_id="launch", shot_dir=tmp_path, sock_path="/fake.sock")
++    target = VPhoneTarget(tmp_path, tmp_path, Path("/fake.sock"), "test", "upstream_v1")
++    with target_scope(target), pytest.raises(A.StepFailure, match="failed"):
++        ctx.launch_app("com.example.test")
++    assert len(calls) == 1 and calls[0]["t"] == "app_launch"
++
++
++def test_upstream_missing_pid_does_not_replay_via_icon_tap(tmp_path, monkeypatch):
++    from autophone.device.target import VPhoneTarget, target_scope
++    monkeypatch.setattr(A, "request", lambda msg, **k: ({"ok": True, "pid": 2468}, _sample(msg)))
++    monkeypatch.setattr(A.CaseContext, "_await_app_pid", lambda *a, **k: 0)
++    monkeypatch.setattr(A.CaseContext, "_await_app_ready_marker", lambda *a, **k: "")
++    monkeypatch.setattr(A.CaseContext, "_tap_springboard_icon", lambda *a, **k: pytest.fail("write replay via tap"))
++    ctx = A.CaseContext(case_id="launch", shot_dir=tmp_path, sock_path="/fake.sock")
++    target = VPhoneTarget(tmp_path, tmp_path, Path("/fake.sock"), "test", "upstream_v1")
++    with target_scope(target), pytest.raises(A.StepFailure, match="did not start"):
++        ctx.launch_app("com.example.test", springboard_icon_preview=(10, 10))
+diff --git a/tests/test_ui_verification_food_ordering.py b/tests/test_ui_verification_food_ordering.py
+index 4568cf96c..80c4e6211 100644
+--- a/tests/test_ui_verification_food_ordering.py
++++ b/tests/test_ui_verification_food_ordering.py
+@@ -331,6 +331,8 @@ def test_apply_overlay_freezes_product_seams_and_writes_receipt(
+         for plugin in plugins
+     )
+     assert "./verification/withAutophoneFmtCompatibility" in plugins
++    assert "./verification/withAutophoneSceneLifecycle" in plugins
++    assert (checkout / "verification/withAutophoneSceneLifecycle.js").read_text() == overlay.SCENE_PLUGIN_SOURCE
+     root_layout = (checkout / "app" / "_layout.tsx").read_text(encoding="utf-8")
+     assert "if (!isVerificationBuild)" in root_layout
+     assert "resetObservationExport" in root_layout
+diff --git a/autophone/device/upstream_install.py b/autophone/device/upstream_install.py
+new file mode 100644
+index 000000000..f1febdb90
+--- /dev/null
++++ b/autophone/device/upstream_install.py
+@@ -0,0 +1,101 @@
++"""Upstream installation inputs and independent guest readback."""
++from __future__ import annotations
++
++import base64
++from pathlib import Path
++import plistlib
++import json
++import re
++import shlex
++import tempfile
++import uuid
++
++from .uds import ProtocolError, request
++from .upstream_wire import admitted
++
++PROCEXP = '/var/jb/usr/local/bin/autophone-proc-regions'
++
++
++def _send(message, *, sock_path, timeout=60):
++    response, sample = request(message, sock_path=sock_path, protocol='upstream_v1',
++                               parse_image=False, timeout=timeout)
++    if response.get('ok') is not True:
++        raise ProtocolError(f"upstream installation operation failed: {response.get('error')}")
++    return response, sample
++
++
++def install_copy(path, *, sock_path, registration='User', cert_path=None, timeout=300):
++    """Only the uniquely staged copies are consumed by apps.install."""
++    if registration not in {'User', 'System'}:
++        raise ValueError('registration must be User or System')
++    for value in [path] + ([cert_path] if cert_path else []):
++        if not isinstance(value, str) or not value.startswith('/') or '\0' in value:
++            raise ValueError('installation inputs must be absolute guest paths')
++    caps, _ = _send({'t': 'capabilities', 'screen': False}, sock_path=sock_path)
++    if not admitted(caps, 'ipa_install'):
++        raise ProtocolError('upstream command is not admitted: ipa_install')
++    from .target import check_device_write
++    from .stage_guard import OperationClass, StageGuard
++    with StageGuard.operation_if_bound(OperationClass.APP, socket_path=sock_path):
++        check_device_write('ipa_install')
++        directory = '/var/mobile/Media/autophone/staging'
++        def rpc(method, params):
++            return _send({'t': 'rpc', 'method': method, 'params': params, 'screen': False}, sock_path=sock_path)
++        rpc('files.mkdir', {'path': directory})
++        token = uuid.uuid4().hex
++        staged = f'{directory}/{token}.ipa'
++        rpc('files.copy', {'from': path, 'to': staged})
++        message = {'t': 'ipa_install', 'path': staged, 'registration': registration}
++        if cert_path:
++            certificate = f'{directory}/{token}.p12'
++            rpc('files.copy', {'from': cert_path, 'to': certificate})
++            message['cert_path'] = certificate
++        # After dispatch the guest owns cleanup, including a late completion.
++        # A timeout never triggers a second install or removal of in-use input.
++        return _send(message, sock_path=sock_path, timeout=timeout)
++
++
++def verify_registered(bundle_id, *, sock_path):
++    def row():
++        response, _ = _send({'t': 'app_list', 'filter': 'all', 'screen': False}, sock_path=sock_path)
++        matches = [item for item in response['apps'] if item.get('bundle_id') == bundle_id]
++        return matches[0] if len(matches) == 1 else None
++    before = row()
++    if before is None:
++        return False
++    path = before.get('path')
++    if not isinstance(path, str) or not path.startswith('/') or '\0' in path:
++        return False
++    response, _ = _send({'t': 'file_get', 'path': path.rstrip('/') + '/Info.plist', 'screen': False}, sock_path=sock_path)
++    info = plistlib.loads(base64.b64decode(response['data_b64'], validate=True))
++    after = row()
++    return (isinstance(info, dict) and info.get('CFBundleIdentifier') == bundle_id
++            and after is not None and after.get('path') == path)
++
++
++def residue_check(shell, *, sock_path):
++    from .springboard_residue import inspect_springboard_residue, parse_regions
++    def capture(command):
++        code, control = shell(f'{PROCEXP} --self-test')
++        evidence = json.loads(control) if code == 0 else {}
++        if (evidence.get('complete') is not True or evidence.get('tag255_control_seen') is not True
++                or not isinstance(evidence.get('regions'), int) or evidence['regions'] <= 0):
++            raise ProtocolError('region tag positive control failed')
++        remote = '/var/jb/tmp/autophone-regions-' + uuid.uuid4().hex + '.txt'
++        try:
++            code, errors = shell(f'{command} > {shlex.quote(remote)}')
++            if code:
++                return code, errors
++            with tempfile.TemporaryDirectory(prefix='autophone-regions-') as directory:
++                local = Path(directory) / 'regions.txt'
++                _send({'t': 'file_get', 'path': remote, 'save': str(local), 'screen': False}, sock_path=sock_path)
++                text = local.read_text(errors='strict')
++                complete = re.search(r"^# complete regions=(\d+) method=proc_pidinfo\n?\Z", text, re.MULTILINE)
++                if not complete or int(complete[1]) != len(parse_regions(text)):
++                    raise ProtocolError('region query is incomplete or region count differs')
++                return 0, text + errors
++        finally:
++            code, detail = shell(f'rm -f {shlex.quote(remote)}')
++            if code:
++                raise ProtocolError(f'region output cleanup failed: {detail}')
++    return inspect_springboard_residue(shell, procexp=PROCEXP, regions_reader=capture)
+diff --git a/autophone/device/upstream_wire.py b/autophone/device/upstream_wire.py
+new file mode 100644
+index 000000000..ae063cde1
+--- /dev/null
++++ b/autophone/device/upstream_wire.py
+@@ -0,0 +1,103 @@
++"""Wire adaptation only: callers retain their logical operation and permission class."""
++from __future__ import annotations
++
++import base64
++from contextlib import contextmanager
++from pathlib import Path
++import tempfile
++
++RPC = {
++    "app_list": "apps.list", "app_foreground": "apps.foreground",
++    "app_launch": "apps.launch", "app_terminate": "apps.terminate",
++    "open_url": "apps.open_url", "shell": "shell.exec", "ipa_install": "apps.install",
++}
++DIRECT = {"ping", "capabilities", "tap", "swipe", "key", "type", "rpc"}
++INLINE_LIMIT = 512 * 1024
++
++
++def admitted(capabilities: dict, kind: str) -> bool:
++    commands = capabilities.get("commands")
++    if (capabilities.get("ok") is not True or capabilities.get("protocol") != "upstream_v1"
++            or not isinstance(commands, dict)):
++        return False
++    if kind == "ipa_install":
++        guest = capabilities.get("guest_capabilities")
++        return (commands.get("ipa_install", True) is True and commands.get("rpc") is True
++                and capabilities.get("guest_connected") is True and isinstance(guest, list)
++                and "ipa_install" in guest)
++    return commands.get(kind) is True
++
++
++@contextmanager
++def prepare(message: dict):
++    """Yield (one wire message, response decoder). Never retry a write."""
++    kind = message.get("t")
++    if kind in RPC:
++        params = {k: v for k, v in message.items() if k not in {"t", "screen", "delay"}}
++        wire = {"t": "rpc", "method": RPC[kind], "params": params,
++                "screen": message.get("screen", False)}
++        yield wire, lambda response: decode(kind, response)
++    elif kind == "screenshot":
++        yield {**message, "save": bool(message.get("path"))}, lambda response: response
++    elif kind in DIRECT:
++        yield dict(message), lambda response: response
++    elif kind in {"file_get", "file_put"}:
++        path = message.get("path")
++        if not isinstance(path, str) or not path.startswith("/"):
++            raise ValueError("file transfer requires an absolute guest path")
++        with tempfile.TemporaryDirectory(prefix="autophone-wire-") as directory:
++            scratch = Path(directory) / "payload"
++            if kind == "file_put":
++                local = message.get("load")
++                if local is None:
++                    data = message.get("data_b64")
++                    if not isinstance(data, str) or len(data) > ((INLINE_LIMIT + 2) // 3) * 4:
++                        raise ValueError("inline upload exceeds limit or lacks data_b64")
++                    payload = base64.b64decode(data, validate=True)
++                    if len(payload) > INLINE_LIMIT:
++                        raise ValueError("inline upload exceeds limit")
++                    scratch.write_bytes(payload)
++                    local = str(scratch)
++                local = str(Path(local).expanduser().resolve())
++                mode = message.get("perm", "644")
++                if not isinstance(mode, str) or not mode or any(c not in "01234567" for c in mode) or int(mode, 8) > 0o777:
++                    raise ValueError("file permission must be an octal string up to 777")
++                yield {"t": "push", "local": local, "path": path, "mode": mode}, lambda response: decode(kind, response)
++            else:
++                destination = message.get("save")
++                local = Path(destination).expanduser().resolve() if destination else scratch
++                def finish(response):
++                    result = decode(kind, response)
++                    if result.get("ok") is True and not destination:
++                        if local.stat().st_size > INLINE_LIMIT:
++                            raise ValueError("inline download exceeds limit; use save")
++                        result["data_b64"] = base64.b64encode(local.read_bytes()).decode("ascii")
++                    return result
++                yield {"t": "pull", "path": path, "local": str(local)}, finish
++    else:
++        raise ValueError(f"unsupported upstream logical command: {kind}")
++
++
++def decode(kind: str, response: dict) -> dict:
++    if response.get("ok") is not True:
++        return response
++    result = response.get("result")
++    if not isinstance(result, dict):
++        raise ValueError(f"{kind}: missing upstream result object")
++    output = {**result, **{k: v for k, v in response.items() if k != "result"}}
++    if kind == "app_list":
++        apps = result.get("apps")
++        if not isinstance(apps, list) or not all(isinstance(a, dict) for a in apps):
++            raise ValueError("apps.list returned invalid apps")
++        output["apps"] = [{**a, **({"data_container": a["data_path"]} if "data_path" in a else {})} for a in apps]
++    if kind == "app_launch":
++        if type(result.get("pid")) is not int or result["pid"] <= 0 or result.get("frontmost_verified") is not True:
++            output.update(ok=False, error="application launch/foreground was not verified", operation_may_continue=True)
++    if kind == "shell":
++        required = {"stdout": str, "stderr": str, "exit_code": int, "timed_out": bool,
++                    "stdout_truncated": bool, "stderr_truncated": bool}
++        if any(type(result.get(key)) is not value for key, value in required.items()):
++            raise ValueError("shell.exec returned an invalid result")
++        output["code"] = result["exit_code"]
++        output["truncated"] = result["stdout_truncated"] or result["stderr_truncated"]
++    return output
+diff --git a/autophone/rig/upstream.py b/autophone/rig/upstream.py
+new file mode 100644
+index 000000000..7f8140ad0
+--- /dev/null
++++ b/autophone/rig/upstream.py
+@@ -0,0 +1,127 @@
++"""Explicit lifecycle entry point for schema-v2 VMs and an upstream Core Bundle.
++
++This stage-1 entry point runs the upstream CLI in the foreground. It does not
++start SSH, Frida, health daemons or the Control Plane.
++"""
++from __future__ import annotations
++
++import argparse
++from contextlib import contextmanager
++import fcntl
++import json
++import os
++from pathlib import Path
++import plistlib
++import stat
++from typing import Sequence
++
++from autophone.device.stage_guard import OperationClass, guarded_device_operation
++
++
++class UpstreamConfigurationError(ValueError):
++    pass
++
++
++def lifecycle_command(
++    action: str, *, bundle: Path, vm_dir: Path | None = None,
++    headless: bool = False, timeout: int = 20,
++) -> list[str]:
++    """Resolve one command without probing, launching or retrying a VM."""
++    if action not in {"preflight", "launch", "stop"}:
++        raise UpstreamConfigurationError(f"unsupported action: {action}")
++    if headless and action != "launch":
++        raise UpstreamConfigurationError("--headless requires launch")
++    if isinstance(timeout, bool) or not isinstance(timeout, int) or timeout <= 0:
++        raise UpstreamConfigurationError("--timeout must be a positive integer")
++    bundle = bundle.expanduser().resolve()
++    macos = bundle / "Contents" / "MacOS"
++    for name in ("vphone-cli", "vphone-vm", "vphone-escalator"):
++        binary = macos / name
++        if not binary.is_file() or not os.access(binary, os.X_OK):
++            raise UpstreamConfigurationError(f"executable is missing: {binary}")
++    cli = str(macos / "vphone-cli")
++    if action == "preflight":
++        return [cli, "host", "preflight"]
++    if vm_dir is None:
++        raise UpstreamConfigurationError("--vm-dir is required for launch/stop")
++    vm_dir = vm_dir.expanduser().resolve()
++    config = vm_dir / "config.plist"
++    try:
++        with config.open("rb") as stream:
++            manifest = plistlib.load(stream)
++    except (OSError, ValueError, plistlib.InvalidFileException) as exc:
++        raise UpstreamConfigurationError(f"cannot read {config}: {exc}") from exc
++    if (
++        not isinstance(manifest, dict)
++        or type(manifest.get("schemaVersion")) is not int
++        or manifest["schemaVersion"] != 2
++    ):
++        raise UpstreamConfigurationError(f"schemaVersion=2 is required: {config}")
++    command = [cli, "vm", action, "--library-root", str(vm_dir.parent)]
++    if headless:
++        command.append("--headless")
++    if action == "stop":
++        command.extend(["--timeout", str(timeout)])
++    return [*command, "--", vm_dir.name]
++
++
++@contextmanager
++def launch_lock(vm_dir: Path):
++    """Coordinate launches through this entry point; raw upstream CLI bypasses it."""
++    path = vm_dir.expanduser().resolve() / ".autophone-launch.lock"
++    descriptor = os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
++    try:
++        metadata = os.fstat(descriptor)
++        if (not stat.S_ISREG(metadata.st_mode) or metadata.st_uid != os.geteuid()
++                or metadata.st_nlink != 1):
++            raise UpstreamConfigurationError(f"unsafe launch lock: {path}")
++        try:
++            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        except BlockingIOError as exc:
++            raise UpstreamConfigurationError(f"VM launch is already active: {vm_dir}") from exc
++        # vphone-cli waits for its companion, retaining this fd until it exits.
++        os.set_inheritable(descriptor, True)
++        yield
++    finally:
++        os.close(descriptor)
++
++
++@guarded_device_operation(OperationClass.VM, identity=lambda a: {
++    "socket_path": a["vm_dir"].expanduser().resolve() / "vphone.sock",
++})
++def _execute_vm(command: list[str], vm_dir: Path) -> None:
++    # Replace the wrapper so SIGINT reaches the upstream lifecycle process.
++    if command[1:3] == ["vm", "launch"]:
++        with launch_lock(vm_dir):
++            os.execv(command[0], command)
++    else:
++        os.execv(command[0], command)
++
++
++def main(argv: Sequence[str] | None = None) -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("action", choices=("preflight", "launch", "stop"))
++    parser.add_argument("--bundle", type=Path, required=True)
++    parser.add_argument("--vm-dir", type=Path)
++    parser.add_argument("--headless", action="store_true")
++    parser.add_argument("--timeout", type=int, default=20)
++    parser.add_argument("--dry-run", action="store_true")
++    args = parser.parse_args(argv)
++    try:
++        command = lifecycle_command(
++            args.action, bundle=args.bundle, vm_dir=args.vm_dir,
++            headless=args.headless, timeout=args.timeout,
++        )
++        if args.dry_run:
++            print(json.dumps(command, ensure_ascii=False))
++        elif args.action == "preflight":
++            os.execv(command[0], command)
++        else:
++            _execute_vm(command, args.vm_dir)
++    except (UpstreamConfigurationError, OSError) as exc:
++        parser.exit(1, f"{exc}\n")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/autophone/workflow/ui_verification/expo_scene_lifecycle.py b/autophone/workflow/ui_verification/expo_scene_lifecycle.py
+new file mode 100644
+index 000000000..2b0f8d891
+--- /dev/null
++++ b/autophone/workflow/ui_verification/expo_scene_lifecycle.py
+@@ -0,0 +1,180 @@
++"""Export the Expo 53 scene lifecycle plugin as a hashed product source input."""
++from __future__ import annotations
++
++import json
++from pathlib import Path
++import shutil
++
++PLUGIN = './verification/withAutophoneSceneLifecycle'
++PLUGIN_FILE = 'verification/withAutophoneSceneLifecycle.js'
++PLUGIN_SOURCE = r'''const { withAppDelegate, withInfoPlist } = require('@expo/config-plugins');
++
++const bootstrap = `#if os(iOS) || os(tvOS)
++    window = UIWindow(frame: UIScreen.main.bounds)
++    factory.startReactNative(
++      withModuleName: "main",
++      in: window,
++      launchOptions: launchOptions)
++#endif`;
++const sceneMethods = `
++  var sceneLaunchOptions: [UIApplication.LaunchOptionsKey: Any]?
++
++  public func application(_ application: UIApplication,
++                          configurationForConnecting session: UISceneSession,
++                          options: UIScene.ConnectionOptions) -> UISceneConfiguration {
++    let configuration = UISceneConfiguration(name: "Autophone", sessionRole: session.role)
++    configuration.sceneClass = UIWindowScene.self
++    configuration.delegateClass = AutophoneSceneDelegate.self
++    return configuration
++  }
++
++  func connectScene(_ sceneWindow: UIWindow, options: UIScene.ConnectionOptions) {
++    guard let factory = reactNativeFactory else {
++      preconditionFailure("React Native factory was not initialized")
++    }
++    var launchOptions = sceneLaunchOptions ?? [:]
++    if let context = options.urlContexts.first {
++      launchOptions[.url] = context.url
++      launchOptions[.sourceApplication] = context.options.sourceApplication
++    }
++    if let activity = options.userActivities.first(where: { $0.activityType == NSUserActivityTypeBrowsingWeb }) {
++      let key = UIApplication.LaunchOptionsKey(rawValue: "UIApplicationLaunchOptionsUserActivityDictionaryKey")
++      launchOptions[key] = [
++        "UIApplicationLaunchOptionsUserActivityTypeKey": activity.activityType,
++        "UIApplicationLaunchOptionsUserActivityKey": activity
++      ]
++    }
++    window = sceneWindow
++    factory.startReactNative(withModuleName: "main", in: sceneWindow, launchOptions: launchOptions)
++    sceneWindow.makeKeyAndVisible()
++  }
++`;
++const sceneDelegate = `
++
++@objc(AutophoneSceneDelegate)
++class AutophoneSceneDelegate: UIResponder, UIWindowSceneDelegate {
++  var window: UIWindow?
++
++  func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
++             options connectionOptions: UIScene.ConnectionOptions) {
++    guard let windowScene = scene as? UIWindowScene,
++          let app = UIApplication.shared.delegate as? AppDelegate else { return }
++    let sceneWindow = UIWindow(windowScene: windowScene)
++    sceneWindow.frame = windowScene.coordinateSpace.bounds
++    self.window = sceneWindow
++    app.connectScene(sceneWindow, options: connectionOptions)
++    self.scene(scene, openURLContexts: connectionOptions.urlContexts)
++    for activity in connectionOptions.userActivities {
++      _ = app.application(UIApplication.shared, continue: activity, restorationHandler: { _ in })
++    }
++  }
++
++  func sceneDidDisconnect(_ scene: UIScene) {
++    if let app = UIApplication.shared.delegate as? AppDelegate, app.window === window {
++      app.window = nil
++    }
++    window = nil
++  }
++
++  func sceneDidBecomeActive(_ scene: UIScene) {
++    (UIApplication.shared.delegate as? AppDelegate)?.applicationDidBecomeActive(UIApplication.shared)
++  }
++
++  func sceneWillResignActive(_ scene: UIScene) {
++    (UIApplication.shared.delegate as? AppDelegate)?.applicationWillResignActive(UIApplication.shared)
++  }
++
++  func sceneWillEnterForeground(_ scene: UIScene) {
++    (UIApplication.shared.delegate as? AppDelegate)?.applicationWillEnterForeground(UIApplication.shared)
++  }
++
++  func sceneDidEnterBackground(_ scene: UIScene) {
++    (UIApplication.shared.delegate as? AppDelegate)?.applicationDidEnterBackground(UIApplication.shared)
++  }
++
++  func scene(_ scene: UIScene, openURLContexts contexts: Set<UIOpenURLContext>) {
++    guard let app = UIApplication.shared.delegate as? AppDelegate else { return }
++    for context in contexts {
++      var options: [UIApplication.OpenURLOptionsKey: Any] = [.openInPlace: context.options.openInPlace]
++      if let source = context.options.sourceApplication { options[.sourceApplication] = source }
++      if let annotation = context.options.annotation { options[.annotation] = annotation }
++      _ = app.application(UIApplication.shared, open: context.url, options: options)
++    }
++  }
++
++  func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
++    guard let app = UIApplication.shared.delegate as? AppDelegate else { return }
++    _ = app.application(UIApplication.shared, continue: userActivity, restorationHandler: { _ in })
++  }
++}
++`;
++function migrateAppDelegate(contents, language) {
++  if (language !== 'swift') throw new Error('Scene lifecycle requires the frozen Expo 53 Swift template');
++  if (contents.includes('@objc(AutophoneSceneDelegate)')) {
++    if (contents.includes(bootstrap) || !contents.includes('sceneLaunchOptions = launchOptions')) {
++      throw new Error('Scene lifecycle template is partially applied');
++    }
++    return contents;
++  }
++  if (contents.split(bootstrap).length !== 2 ||
++      contents.split('  // Linking API').length !== 2) {
++    throw new Error('Expo 53 AppDelegate bootstrap differs; refuse incomplete scene migration');
++  }
++  return contents.replace(bootstrap, '    sceneLaunchOptions = launchOptions')
++    .replace('  // Linking API', sceneMethods + '\n  // Linking API') + sceneDelegate;
++}
++module.exports = function withAutophoneSceneLifecycle(config) {
++  config = withAppDelegate(config, config => {
++    config.modResults.contents = migrateAppDelegate(config.modResults.contents, config.modResults.language);
++    return config;
++  });
++  return withInfoPlist(config, config => {
++    const existing = config.modResults.UIApplicationSceneManifest;
++    const manifest = {
++      UIApplicationSupportsMultipleScenes: false,
++      UISceneConfigurations: {
++        UIWindowSceneSessionRoleApplication: [{
++          UISceneConfigurationName: 'Autophone',
++          UISceneClassName: 'UIWindowScene',
++          UISceneDelegateClassName: 'AutophoneSceneDelegate'
++        }]
++      }
++    };
++    if (existing && JSON.stringify(existing) !== JSON.stringify(manifest)) {
++      throw new Error('An existing scene manifest must be migrated explicitly');
++    }
++    config.modResults.UIApplicationSceneManifest = manifest;
++    return config;
++  });
++};
++module.exports.migrateAppDelegate = migrateAppDelegate;
++'''
++
++
++def add_scene_lifecycle(source: Path) -> None:
++    """Modify only a caller-owned new source tree, before it is frozen/built."""
++    source = Path(source)
++    path = source / PLUGIN_FILE
++    if path.exists() and (path.is_symlink() or path.read_text() != PLUGIN_SOURCE):
++        raise ValueError('existing scene plugin differs')
++    app_path = source / 'app.json'
++    if app_path.is_symlink():
++        raise ValueError('app.json must be a regular file')
++    app = json.loads(app_path.read_text())
++    plugins = app['expo']['plugins']
++    if not isinstance(plugins, list):
++        raise ValueError('expo.plugins must be an array')
++    if PLUGIN not in plugins:
++        plugins.append(PLUGIN)
++    path.parent.mkdir(parents=True, exist_ok=True)
++    path.write_text(PLUGIN_SOURCE)
++    app_path.write_text(json.dumps(app, ensure_ascii=False, indent=2)+'\n')
++
++
++def export_scene_workspace(source: Path, output: Path) -> Path:
++    source, output = Path(source).resolve(), Path(output).absolute()
++    if output.exists() or output.is_symlink() or output.is_relative_to(source):
++        raise ValueError('output must be a new directory outside the source')
++    shutil.copytree(source, output)
++    add_scene_lifecycle(output)
++    return output
+diff --git a/tests/fixtures/expo53/AppDelegate.swift b/tests/fixtures/expo53/AppDelegate.swift
+new file mode 100644
+index 000000000..a7887e1e5
+--- /dev/null
++++ b/tests/fixtures/expo53/AppDelegate.swift
+@@ -0,0 +1,70 @@
++import Expo
++import React
++import ReactAppDependencyProvider
++
++@UIApplicationMain
++public class AppDelegate: ExpoAppDelegate {
++  var window: UIWindow?
++
++  var reactNativeDelegate: ExpoReactNativeFactoryDelegate?
++  var reactNativeFactory: RCTReactNativeFactory?
++
++  public override func application(
++    _ application: UIApplication,
++    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
++  ) -> Bool {
++    let delegate = ReactNativeDelegate()
++    let factory = ExpoReactNativeFactory(delegate: delegate)
++    delegate.dependencyProvider = RCTAppDependencyProvider()
++
++    reactNativeDelegate = delegate
++    reactNativeFactory = factory
++    bindReactNativeFactory(factory)
++
++#if os(iOS) || os(tvOS)
++    window = UIWindow(frame: UIScreen.main.bounds)
++    factory.startReactNative(
++      withModuleName: "main",
++      in: window,
++      launchOptions: launchOptions)
++#endif
++
++    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
++  }
++
++  // Linking API
++  public override func application(
++    _ app: UIApplication,
++    open url: URL,
++    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
++  ) -> Bool {
++    return super.application(app, open: url, options: options) || RCTLinkingManager.application(app, open: url, options: options)
++  }
++
++  // Universal Links
++  public override func application(
++    _ application: UIApplication,
++    continue userActivity: NSUserActivity,
++    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
++  ) -> Bool {
++    let result = RCTLinkingManager.application(application, continue: userActivity, restorationHandler: restorationHandler)
++    return super.application(application, continue: userActivity, restorationHandler: restorationHandler) || result
++  }
++}
++
++class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {
++  // Extension point for config-plugins
++
++  override func sourceURL(for bridge: RCTBridge) -> URL? {
++    // needed to return the correct URL for expo-dev-client.
++    bridge.bundleURL ?? bundleURL()
++  }
++
++  override func bundleURL() -> URL? {
++#if DEBUG
++    return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: ".expo/.virtual-metro-entry")
++#else
++    return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
++#endif
++  }
++}
+diff --git a/tests/fixtures/expo53/README.md b/tests/fixtures/expo53/README.md
+new file mode 100644
+index 000000000..8c06f470f
+--- /dev/null
++++ b/tests/fixtures/expo53/README.md
+@@ -0,0 +1,3 @@
++# Expo 53 模板夹具
++
++`AppDelegate.swift` 来自已保留的 Expo bare-minimum 53.0.34 生成工程，用于检验真实启动块向 UIScene 生命周期迁移。该模板包声明许可证为 `0BSD`。夹具保留原模板内容；配置插件未知或部分改写模板的拒绝行为在 `tests/test_expo_scene_lifecycle.py` 验证。
+diff --git a/tests/fixtures/upstream-dish-selection.json b/tests/fixtures/upstream-dish-selection.json
+new file mode 100644
+index 000000000..f9782087c
+--- /dev/null
++++ b/tests/fixtures/upstream-dish-selection.json
+@@ -0,0 +1,38 @@
++[
++  {
++    "traits": 8589934600,
++    "x": 116.5,
++    "enabled": true,
++    "frame": {
++      "y": 369,
++      "height": 52,
++      "width": 189,
++      "x": 22
++    },
++    "role": "element",
++    "visible": 1,
++    "y": 395,
++    "identifier": "dish.portion.standard",
++    "clickable": true,
++    "label": "标准份",
++    "value": "checked"
++  },
++  {
++    "traits": 8589934592,
++    "x": 313.5,
++    "enabled": true,
++    "frame": {
++      "y": 369,
++      "height": 52,
++      "width": 189,
++      "x": 219
++    },
++    "role": "element",
++    "visible": 1,
++    "y": 395,
++    "identifier": "dish.portion.large",
++    "clickable": true,
++    "label": "大份 +¥6",
++    "value": "unchecked"
++  }
++]
+diff --git a/tests/test_expo_scene_lifecycle.py b/tests/test_expo_scene_lifecycle.py
+new file mode 100644
+index 000000000..f0f16bbe9
+--- /dev/null
++++ b/tests/test_expo_scene_lifecycle.py
+@@ -0,0 +1,84 @@
++from pathlib import Path
++import json
++import subprocess
++
++import pytest
++
++from autophone.workflow.ui_verification.expo_scene_lifecycle import (
++    PLUGIN, PLUGIN_FILE, PLUGIN_SOURCE, export_scene_workspace,
++)
++
++FIXTURE = Path(__file__).parent / 'fixtures/expo53/AppDelegate.swift'
++
++
++def run_plugin(tmp_path, source, *, language='swift', manifest=None):
++    plugin = tmp_path / 'plugin.js'
++    plugin.write_text(PLUGIN_SOURCE)
++    script = r'''
++const vm = require('vm'), fs = require('fs');
++const data = JSON.parse(fs.readFileSync(0, 'utf8'));
++let appCallback, plistCallback;
++const sandbox = {module:{exports:{}},require:(name)=>{
++ if (name !== '@expo/config-plugins') throw new Error('unexpected dependency');
++ return {withAppDelegate:(c,f)=>{appCallback=f;return c;},withInfoPlist:(c,f)=>{plistCallback=f;return c;}};
++}};
++vm.runInNewContext(fs.readFileSync(process.argv[1], 'utf8'), sandbox);
++sandbox.module.exports({});
++try {
++ const app = appCallback({modResults:{contents:data.source,language:data.language}}).modResults.contents;
++ const plist = plistCallback({modResults:data.manifest ? {UIApplicationSceneManifest:data.manifest} : {}}).modResults;
++ const again = appCallback({modResults:{contents:app,language:data.language}}).modResults.contents;
++ console.log(JSON.stringify({app,plist,idempotent:app===again}));
++} catch(error) {console.error(error.message);process.exit(1);}
++'''
++    return subprocess.run(['node', '-e', script, str(plugin)], input=json.dumps(
++        {'source': source, 'language': language, 'manifest': manifest}), text=True, capture_output=True)
++
++
++def test_frozen_expo_bootstrap_moves_to_scene_window(tmp_path):
++    result = run_plugin(tmp_path, FIXTURE.read_text())
++    assert result.returncode == 0, result.stderr
++    output = json.loads(result.stdout)
++    swift = output['app']
++    assert output['idempotent']
++    assert 'UIWindow(frame: UIScreen.main.bounds)' not in swift
++    assert swift.count('factory.startReactNative(') == 1
++    assert swift.index('factory.startReactNative(') > swift.index('func connectScene(')
++    assert 'UIWindow(windowScene: windowScene)' in swift
++    assert swift.index('self.window = sceneWindow') < swift.index('app.connectScene(sceneWindow')
++    assert swift.index('sceneWindow.frame = windowScene.coordinateSpace.bounds') < swift.index('app.connectScene(sceneWindow')
++    for event in ['applicationDidBecomeActive', 'applicationWillResignActive', 'applicationWillEnterForeground', 'applicationDidEnterBackground']:
++        assert event in swift
++    assert 'sceneLaunchOptions = launchOptions' in swift
++    assert 'configuration.delegateClass = AutophoneSceneDelegate.self' in swift
++    assert 'configuration.sceneClass = UIWindowScene.self' in swift
++    assert 'openURLContexts contexts' in swift and 'continue userActivity' in swift
++    assert 'openURLContexts: connectionOptions.urlContexts' in swift
++    assert 'UIApplicationLaunchOptionsUserActivityDictionaryKey' in swift
++    assert 'autophone-scene-trace.log' not in swift
++    manifest = output['plist']['UIApplicationSceneManifest']
++    assert manifest['UIApplicationSupportsMultipleScenes'] is False
++    assert manifest['UISceneConfigurations']['UIWindowSceneSessionRoleApplication'][0]['UISceneDelegateClassName'] == 'AutophoneSceneDelegate'
++
++
++@pytest.mark.parametrize('source,language,manifest', [
++    ('class AppDelegate {}', 'swift', None),
++    (FIXTURE.read_text(), 'objc', None),
++    (FIXTURE.read_text(), 'swift', {'UISceneConfigurations': {'existing': []}}),
++    (FIXTURE.read_text()+'\n@objc(AutophoneSceneDelegate)', 'swift', None),
++])
++def test_unknown_or_partial_templates_fail_closed(tmp_path, source, language, manifest):
++    result = run_plugin(tmp_path, source, language=language, manifest=manifest)
++    assert result.returncode != 0
++
++
++def test_export_does_not_modify_frozen_source_and_plugin_changes_identity(tmp_path):
++    source = tmp_path / 'frozen'; source.mkdir()
++    original = json.dumps({'expo': {'plugins': ['expo-router'], 'newArchEnabled': True}})
++    (source / 'app.json').write_text(original)
++    out = export_scene_workspace(source, tmp_path / 'new')
++    assert (source / 'app.json').read_text() == original and not (source / PLUGIN_FILE).exists()
++    assert json.loads((out / 'app.json').read_text())['expo']['plugins'] == ['expo-router', PLUGIN]
++    assert (out / PLUGIN_FILE).read_text() == PLUGIN_SOURCE
++    assert json.loads((out / 'app.json').read_text())['expo']['newArchEnabled'] is True
++    with pytest.raises(ValueError): export_scene_workspace(source, out)
+diff --git a/tests/test_proc_regions.py b/tests/test_proc_regions.py
+new file mode 100644
+index 000000000..0fc442f3a
+--- /dev/null
++++ b/tests/test_proc_regions.py
+@@ -0,0 +1,56 @@
++"""Actual Darwin region-tag positive control and captured gap regression."""
++from pathlib import Path
++import json
++import subprocess
++import sys
++
++import pytest
++
++from autophone.device.springboard_residue import parse_regions, is_residue
++
++pytestmark = pytest.mark.skipif(sys.platform != 'darwin', reason='Darwin libproc required')
++SOURCE = Path(__file__).resolve().parents[1] / 'tools/guest/proc_regions.c'
++
++
++@pytest.fixture
++def helper(tmp_path):
++    binary = tmp_path / 'proc-regions'
++    subprocess.run(['xcrun', 'clang', '-Wall', '-Wextra', '-Werror', str(SOURCE), '-o', str(binary)], check=True)
++    return binary
++
++
++def test_actual_tag255_positive_control_and_legacy_parser(helper):
++    control = subprocess.run([str(helper), '--self-test'], check=True, capture_output=True, text=True)
++    assert json.loads(control.stdout)['tag255_control_seen'] is True
++    rows = subprocess.run([str(helper), '--self-test-regions'], check=True, capture_output=True, text=True)
++    parsed = parse_regions(rows.stdout)
++    assert parsed and any(is_residue(region) for region in parsed)
++    assert rows.stdout.splitlines()[-1] == f'# complete regions={len(parsed)} method=proc_pidinfo'
++
++
++def test_gap_record_is_queried_at_exact_next_start(tmp_path):
++    # Captured guest behavior: a zero-size record supplies the next start.
++    harness = tmp_path / 'gap.c'
++    harness.write_text(f'''#define proc_pidinfo fixture_pidinfo
++#define main helper_main
++#include "{SOURCE}"
++#undef main
++int fixture_pidinfo(int pid, int flavor, uint64_t address, void *buffer, int length) {{
++    (void)pid; (void)flavor; (void)length;
++    struct proc_regioninfo *r = buffer;
++    memset(r, 0, sizeof(*r));
++    if (address == 0) {{ r->pri_address=100; r->pri_size=10; return sizeof(*r); }}
++    if (address == 110) {{ r->pri_address=200; return sizeof(*r); }}
++    if (address == 200) {{ r->pri_address=200; r->pri_size=10; r->pri_user_tag=255; return sizeof(*r); }}
++    if (address != 210) abort();
++    errno=EINVAL; return 0;
++}}
++int main(void) {{ return collect(123, 0, false); }}
++''')
++    binary = tmp_path / 'gap'
++    subprocess.run(['xcrun', 'clang', '-Wall', '-Wextra', '-Werror', str(harness), '-o', str(binary)], check=True)
++    result = subprocess.run([str(binary)], capture_output=True, text=True)
++    assert result.returncode == 0, result.stderr
++    rows = parse_regions(result.stdout)
++    assert len(rows) == 2 and is_residue(rows[1])
++    assert result.stdout.endswith('# complete regions=2 method=proc_pidinfo\n')
+diff --git a/tests/test_upstream_app_acceptance.py b/tests/test_upstream_app_acceptance.py
+new file mode 100644
+index 000000000..668468766
+--- /dev/null
++++ b/tests/test_upstream_app_acceptance.py
+@@ -0,0 +1,55 @@
++import json
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++from apps.food_ordering_v2 import home_bag as hb
++from tools.phase1.upstream_app import prepare_home_fixture, normalized_ax_node
++
++
++def test_fixture_requires_current_nonce_and_stable_product_observation(tmp_path):
++    calls = []
++    selector = None
++    gets = 0
++    def send(message):
++        nonlocal selector, gets
++        calls.append(message)
++        if message['t'] == 'file_put':
++            selector = json.loads(Path(message['load']).read_text())
++            return {'ok': True}
++        gets += 1
++        if message['path'].endswith(hb.SELECTION_RECEIPT_DOCUMENT):
++            payload = {'schema_version': hb.RECEIPT_SCHEMA, 'nonce': 'stale' if gets == 1 else selector['nonce'],
++                       'mutation_id': hb.BASELINE_MUTATION_ID, 'mutation_epoch': 0}
++        else:
++            payload = {'schema_version': hb.OBSERVATION_SCHEMA, 'elements': [
++                {'stable_id': hb.BAG_BADGE_ID, 'visible': True, 'text': '2'},
++                {'stable_id': hb.PRIMARY_ACTION_ID, 'visible': True, 'text': hb.PRIMARY_ACTION_IDLE_LABEL}],
++                'stability': {'snapshot_hash': 'same'}}
++        Path(message['save']).write_text(json.dumps(payload))
++        return {'ok': True}
++    session = SimpleNamespace(app_list=lambda: [{'bundle_id': hb.BUNDLE_ID, 'data_container': '/private/var/mobile/Containers/Data/Application/test', 'pid': 9}],
++                              terminate_app=lambda bundle: calls.append({'terminate': bundle}),
++                              launch_app=lambda bundle: calls.append({'launch': bundle}))
++    result = prepare_home_fixture(session, send, tmp_path, hb.BUNDLE_ID)
++    assert result['nonce'] == selector['nonce'] and result['bag_count'] == 2
++    assert len([c for c in calls if c.get('t') == 'file_put']) == 1
++    assert gets >= 5  # stale receipt, then two identical product observations
++    assert calls[0] == {'terminate': hb.BUNDLE_ID}
++    assert calls[1]['path'].endswith(hb.SELECTOR_DOCUMENT)
++    assert calls[2] == {'launch': hb.BUNDLE_ID}
++
++
++@pytest.mark.parametrize("container", ["/etc", "/private/var/mobile/Containers/Data/Application/../../etc"])
++def test_fixture_refuses_container_outside_registered_user_roots(tmp_path, container):
++    session = SimpleNamespace(app_list=lambda: [{'bundle_id': hb.BUNDLE_ID, 'data_container': container}])
++    with pytest.raises(RuntimeError, match='container'):
++        prepare_home_fixture(session, lambda message: pytest.fail('unexpected device write'), tmp_path, hb.BUNDLE_ID)
++
++
++def test_captured_selected_state_matches_standard_and_large_portions():
++    rows = json.loads((Path(__file__).parent / 'fixtures/upstream-dish-selection.json').read_text())
++    nodes = {row['identifier']: normalized_ax_node(row) for row in rows}
++    assert nodes['dish.portion.standard']['selected'] is True
++    assert nodes['dish.portion.large']['selected'] is False
+diff --git a/tests/test_upstream_install.py b/tests/test_upstream_install.py
+new file mode 100644
+index 000000000..2394c4761
+--- /dev/null
++++ b/tests/test_upstream_install.py
+@@ -0,0 +1,129 @@
++from __future__ import annotations
++
++
++import pytest
++
++from autophone.device import upstream_wire
++from autophone.device.target import VPhoneTarget, target_scope
++from autophone.packages import store
++
++
++def target(tmp_path):
++    return VPhoneTarget(tmp_path, tmp_path / 'vm', tmp_path / 'vm/vphone.sock', 'migration', 'upstream_v1')
++
++
++def test_ipa_install_wire_preserves_registration_and_certificate():
++    message = {'t': 'ipa_install', 'path': '/private/staged.ipa', 'registration': 'User', 'cert_path': '/private/cert.p12'}
++    with upstream_wire.prepare(message) as (wire, decode):
++        assert wire == {'t': 'rpc', 'method': 'apps.install', 'params': {k: v for k, v in message.items() if k != 't'}, 'screen': False}
++        assert decode({'ok': True, 'result': {'bundle_id': 'com.example.app'}})['bundle_id'] == 'com.example.app'
++
++
++def test_ipa_admission_requires_specific_guest_capability():
++    capabilities = {'ok': True, 'protocol': 'upstream_v1', 'guest_connected': True,
++                    'commands': {'rpc': True}, 'guest_capabilities': ['ipa_install']}
++    assert upstream_wire.admitted(capabilities, 'ipa_install')
++    assert not upstream_wire.admitted({**capabilities, 'guest_capabilities': []}, 'ipa_install')
++    assert not upstream_wire.admitted({**capabilities, 'guest_connected': False}, 'ipa_install')
++    assert not upstream_wire.admitted({**capabilities, 'commands': {'rpc': True, 'ipa_install': False}}, 'ipa_install')
++
++
++def test_default_upstream_transfer_uses_selected_uds_without_ssh(tmp_path, monkeypatch):
++    calls = []
++    monkeypatch.setattr('autophone.device.uds.request', lambda msg, **kw: (calls.append((msg, kw)) or {'ok': True}, None))
++    monkeypatch.setattr(store, 'scp_to_guest', lambda *a, **k: pytest.fail('unexpected legacy SSH'))
++    local = tmp_path / 'input.ipa'; local.write_bytes(b'ipa')
++    with target_scope(target(tmp_path)):
++        store._default_transfer(local, '/var/mobile/Media/autophone/incoming/private.ipa')
++    assert calls[0][0]['t'] == 'file_put' and calls[0][0]['load'] == str(local)
++    assert calls[0][1]['sock_path'] == str(target(tmp_path).sock)
++    assert calls[0][1]['protocol'] == 'upstream_v1'
++
++
++def test_legacy_default_transfer_preserved(tmp_path, monkeypatch):
++    calls = []
++    monkeypatch.setattr(store, 'scp_to_guest', lambda *a: calls.append(a))
++    store._default_transfer(tmp_path / 'x.ipa', '/incoming/x.ipa')
++    assert calls == [(tmp_path / 'x.ipa', '/incoming/x.ipa')]
++
++
++@pytest.mark.parametrize("guest", [None, "ipa_install", {}, 7])
++def test_ipa_admission_rejects_malformed_guest_capabilities(guest):
++    assert not upstream_wire.admitted({"ok": True, "protocol": "upstream_v1",
++        "guest_connected": True, "commands": {"rpc": True, "ipa_install": True},
++        "guest_capabilities": guest}, "ipa_install")
++
++from autophone.device import upstream_install as install
++import base64
++import plistlib
++
++CAPS = {'ok': True, 'protocol': 'upstream_v1', 'commands': {'rpc': True},
++        'guest_connected': True, 'guest_capabilities': ['ipa_install']}
++
++
++def test_install_uses_private_inputs_and_never_retries_unknown_completion(monkeypatch):
++    calls = []
++    def send(message, **options):
++        calls.append(message)
++        if message['t'] == 'capabilities': return CAPS, None
++        if message['t'] == 'ipa_install': raise install.ProtocolError('operation_may_continue')
++        return {'ok': True}, None
++    monkeypatch.setattr(install, '_send', send)
++    with pytest.raises(install.ProtocolError, match='operation_may_continue'):
++        install.install_copy('/caller/original.ipa', cert_path='/caller/original.p12', sock_path='/selected.sock')
++    copies = [c['params'] for c in calls if c.get('method') == 'files.copy']
++    assert [c['from'] for c in copies] == ['/caller/original.ipa', '/caller/original.p12']
++    assert all(c['to'].startswith('/var/mobile/Media/autophone/staging/') for c in copies)
++    writes = [c for c in calls if c['t'] == 'ipa_install']
++    assert len(writes) == 1 and writes[0]['path'] == copies[0]['to']
++    assert writes[0]['cert_path'] == copies[1]['to']
++    assert not any(c.get('method') == 'files.remove' for c in calls)
++
++
++@pytest.mark.parametrize('refused', ['capability', 'fence'])
++def test_refusal_never_stages_install_inputs(monkeypatch, refused):
++    calls = []
++    def send(message, **options):
++        calls.append(message)
++        return ({**CAPS, 'guest_capabilities': []} if refused == 'capability' else CAPS), None
++    monkeypatch.setattr(install, '_send', send)
++    if refused == 'fence':
++        def expired(operation): raise RuntimeError('expired lease')
++        monkeypatch.setattr('autophone.device.target.check_device_write', expired)
++    with pytest.raises((install.ProtocolError, RuntimeError)):
++        install.install_copy('/caller/input.ipa', sock_path='/selected.sock')
++    assert calls == [{'t': 'capabilities', 'screen': False}]
++
++
++@pytest.mark.parametrize('case,expected', [('match', True), ('duplicate', False), ('bundle', False), ('drift', False)])
++def test_registration_requires_unique_row_plist_identity_and_stable_path(monkeypatch, case, expected):
++    queries = []
++    def send(message, **options):
++        queries.append(message)
++        if message['t'] == 'file_get':
++            info = {'CFBundleIdentifier': 'wrong' if case == 'bundle' else 'com.example.app'}
++            return {'data_b64': base64.b64encode(plistlib.dumps(info)).decode()}, None
++        path = '/new/App.app' if case == 'drift' and len(queries) > 1 else '/old/App.app'
++        rows = [{'bundle_id': 'com.example.app', 'path': path}]
++        return {'apps': rows * (2 if case == 'duplicate' else 1)}, None
++    monkeypatch.setattr(install, '_send', send)
++    assert install.verify_registered('com.example.app', sock_path='/selected.sock') is expected
++
++
++@pytest.mark.parametrize('case,verdict', [('clean', 'clean'), ('tag255', 'residue'), ('incomplete', 'check_failed'),
++                                        ('count', 'check_failed'), ('positive', 'check_failed')])
++def test_residue_preserves_tag_predicate_and_refuses_incomplete_output(monkeypatch, case, verdict):
++    row = 'Tag: %s 0x1 0000000100000000-0000000100004000 [16K]r-x/rwx 2\n' % ('255' if case == 'tag255' else '0')
++    text = row + ('' if case == 'incomplete' else '# complete regions=%d method=proc_pidinfo\n' % (2 if case == 'count' else 1))
++    def send(message, **options):
++        from pathlib import Path
++        Path(message['save']).write_text(text)
++        return {'ok': True}, None
++    def shell(command):
++        if command.startswith('LC_ALL=C'):
++            return 0, ' 37 Sat Oct 31 01:24:32 2026 /System/Library/CoreServices/SpringBoard.app/SpringBoard\n'
++        if command.endswith('--self-test'):
++            return 0, '{"complete":true,"regions":1,"tag255_control_seen":%s}' % ('false' if case == 'positive' else 'true')
++        return 0, ''
++    monkeypatch.setattr(install, '_send', send)
++    assert install.residue_check(shell, sock_path='/selected.sock')['verdict'] == verdict
+diff --git a/tests/test_upstream_rig_lifecycle.py b/tests/test_upstream_rig_lifecycle.py
+new file mode 100644
+index 000000000..02433723c
+--- /dev/null
++++ b/tests/test_upstream_rig_lifecycle.py
+@@ -0,0 +1,141 @@
++from __future__ import annotations
++
++from dataclasses import replace
++import plistlib
++import subprocess
++from types import SimpleNamespace
++
++import pytest
++
++from autophone.rig.lifecycle import ProcessInfo, RigLifecycle, RigLifecycleError
++from autophone.rig.target import TargetConfigurationError
++from tests.test_rig_lifecycle import _target
++
++
++def upstream_target(tmp_path):
++    target = _target(tmp_path)
++    bundle = tmp_path / "VPhone.bundle"
++    macos = bundle / "Contents/MacOS"
++    macos.mkdir(parents=True)
++    for name in ("vphone-cli", "vphone-vm", "vphone-escalator"):
++        path = macos / name
++        path.write_text("#!/bin/sh\nexit 0\n")
++        path.chmod(0o755)
++    target.config_path.write_bytes(plistlib.dumps({"schemaVersion": 2}))
++    return replace(target, protocol="upstream_v1", core_bundle=bundle)
++
++
++def test_new_rig_uses_bundle_and_health_daemon_without_legacy_script(tmp_path):
++    target = upstream_target(tmp_path)
++    calls, launches = [], []
++    def run(command, **kwargs):
++        calls.append((command, kwargs))
++        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
++    def start(command, **kwargs):
++        launches.append((command, kwargs))
++        return SimpleNamespace(pid=12345, poll=lambda: None, returncode=None)
++    receipt = RigLifecycle(target, repository=tmp_path, run_command=run,
++                           list_processes=lambda: (), start_process=start,
++                           probe_uds=lambda *a, **k: {"state": "guest_ready"}).start()
++    assert receipt.status == "running"
++    assert calls[0][0] == [str(target.core_bundle / "Contents/MacOS/vphone-cli"), "host", "preflight"]
++    assert "health_daemon" in calls[1][0][2]
++    assert launches[0][0][2] == "autophone.rig.upstream"
++    environment = launches[0][1]["env"]
++    assert environment["AUTOPHONE_VPHONE_PROTOCOL"] == "upstream_v1"
++    assert environment["VPHONE_SOCK"] == str(target.socket)
++    assert environment["AUTOPHONE_RIG_TARGET"] == str(target.runtime_target_file)
++    assert target.runtime_target_file.is_file()
++    assert not any("start_vphone.sh" in str(command) for command, _ in calls)
++
++
++def test_stop_delegates_sigint_to_selected_upstream_vm(tmp_path):
++    target = upstream_target(tmp_path)
++    calls, signals = [], []
++    def run(command, **kwargs):
++        calls.append(command)
++        return subprocess.CompletedProcess(command, 0, stdout="stopped", stderr="")
++    process = ProcessInfo(55, f"{target.core_bundle}/Contents/MacOS/vphone-vm --config {target.config_path}")
++    receipt = RigLifecycle(target, repository=tmp_path, run_command=run,
++                           list_processes=lambda: [process],
++                           send_signal=lambda *args: signals.append(args)).stop()
++    assert receipt.status == "stopped" and receipt.affected_pids == (55,)
++    assert calls[-1] == [str(target.core_bundle / "Contents/MacOS/vphone-cli"), "vm", "stop",
++                         "--library-root", str(target.vm_dir.parent), "--timeout", "20", "--", target.vm_dir.name]
++    assert not signals
++
++
++def test_readiness_timeout_stops_only_new_launch(tmp_path):
++    target = upstream_target(tmp_path)
++    calls = []
++    def run(command, **kwargs):
++        calls.append(command)
++        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
++    with pytest.raises(RigLifecycleError, match="readiness timed out"):
++        RigLifecycle(target, repository=tmp_path, run_command=run, list_processes=lambda: (),
++                     start_process=lambda *a, **k: SimpleNamespace(poll=lambda: None),
++                     probe_uds=lambda *a, **k: {"state": "host_only"}, sleep=lambda _: None).start(timeout_s=.001)
++    assert calls[-1][1:3] == ["vm", "stop"]
++
++
++def test_existing_unhealthy_vm_is_not_stopped_by_failed_start(tmp_path):
++    target = upstream_target(tmp_path)
++    calls = []
++    def run(command, **kwargs):
++        calls.append(command)
++        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
++    process = ProcessInfo(55, f"{target.core_bundle}/Contents/MacOS/vphone-vm --config {target.config_path}")
++    with pytest.raises(RigLifecycleError, match="readiness timed out"):
++        RigLifecycle(target, repository=tmp_path, run_command=run, list_processes=lambda: [process],
++                     start_process=lambda *a, **k: pytest.fail("duplicate launch"),
++                     probe_uds=lambda *a, **k: {"state": "host_only"}, sleep=lambda _: None).start(timeout_s=.001)
++    assert len(calls) == 1 and calls[0][1:3] == ["host", "preflight"]
++
++
++def test_target_generation_configuration_is_not_overwritten(tmp_path):
++    target = upstream_target(tmp_path)
++    target.ensure_local_directories()
++    previous = target.runtime_target_file.read_bytes()
++    with pytest.raises(TargetConfigurationError, match="generation configuration changed"):
++        replace(target, core_bundle=tmp_path / "different.bundle").ensure_local_directories()
++    assert target.runtime_target_file.read_bytes() == previous
++
++
++def test_target_round_trip_keeps_protocol_and_bundle(tmp_path):
++    from autophone.rig.target import DeviceTarget
++    target = upstream_target(tmp_path)
++    target.ensure_local_directories()
++    assert DeviceTarget.load(target.runtime_target_file) == target
++
++
++@pytest.mark.parametrize("existing", [False, True])
++@pytest.mark.parametrize("failure", ["status", "exception"])
++def test_health_start_failure_cleans_up_only_owned_launch(tmp_path, existing, failure):
++    target = upstream_target(tmp_path)
++    calls = []
++    def run(command, **kwargs):
++        calls.append(command)
++        if "tools.phase1.health_daemon" in command:
++            if failure == "exception":
++                raise subprocess.TimeoutExpired(command, 20)
++            return subprocess.CompletedProcess(command, 1, stdout="", stderr="health unavailable")
++        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
++    process = ProcessInfo(55, f"{target.core_bundle}/Contents/MacOS/vphone-vm --config {target.config_path}")
++    with pytest.raises(RigLifecycleError, match="health|timed out"):
++        RigLifecycle(target, repository=tmp_path, run_command=run,
++                     list_processes=lambda: [process] if existing else [],
++                     start_process=lambda *a, **k: SimpleNamespace(poll=lambda: None),
++                     probe_uds=lambda *a, **k: {"state": "guest_ready"}).start()
++    stops = [command for command in calls if command[1:3] == ["vm", "stop"]]
++    assert len(stops) == (0 if existing else 1)
++
++
++def test_failed_start_reports_cleanup_failure(tmp_path):
++    target = upstream_target(tmp_path)
++    def run(command, **kwargs):
++        status = 1 if command[1:3] == ["vm", "stop"] else 0
++        return subprocess.CompletedProcess(command, status, stdout="", stderr="stop refused" if status else "")
++    with pytest.raises(RigLifecycleError, match="readiness timed out.*cleanup failed.*stop refused"):
++        RigLifecycle(target, repository=tmp_path, run_command=run, list_processes=lambda: (),
++                     start_process=lambda *a, **k: SimpleNamespace(poll=lambda: None),
++                     probe_uds=lambda *a, **k: {"state": "host_only"}, sleep=lambda _: None).start(timeout_s=.001)
+diff --git a/tests/test_upstream_vphone_lifecycle.py b/tests/test_upstream_vphone_lifecycle.py
+new file mode 100644
+index 000000000..35b30a2ed
+--- /dev/null
++++ b/tests/test_upstream_vphone_lifecycle.py
+@@ -0,0 +1,178 @@
++from __future__ import annotations
++
++import json
++import plistlib
++import os
++import subprocess
++import sys
++import time
++from pathlib import Path
++
++import pytest
++
++from autophone.rig import upstream
++
++
++@pytest.fixture
++def target(tmp_path):
++    bundle = tmp_path / "Core Bundle" / "VPhone.bundle"
++    macos = bundle / "Contents" / "MacOS"
++    macos.mkdir(parents=True)
++    for name in ("vphone-cli", "vphone-vm", "vphone-escalator"):
++        binary = macos / name
++        binary.write_text("#!/bin/sh\nexit 0\n")
++        binary.chmod(0o755)
++    vm = tmp_path / "isolated library" / "test phone"
++    vm.mkdir(parents=True)
++    (vm / "config.plist").write_bytes(plistlib.dumps({"schemaVersion": 2}))
++    return bundle, vm
++
++
++def test_launch_uses_explicit_bundle_and_library(target):
++    bundle, vm = target
++    assert upstream.lifecycle_command("launch", bundle=bundle, vm_dir=vm, headless=True) == [
++        str(bundle / "Contents/MacOS/vphone-cli"), "vm", "launch", "--library-root",
++        str(vm.parent), "--headless", "--", vm.name,
++    ]
++
++
++def test_stop_delegates_graceful_shutdown_to_upstream(target):
++    bundle, vm = target
++    assert upstream.lifecycle_command("stop", bundle=bundle, vm_dir=vm, timeout=45)[1:] == [
++        "vm", "stop", "--library-root", str(vm.parent), "--timeout", "45", "--", vm.name,
++    ]
++
++
++def test_preflight_needs_no_vm(target):
++    bundle, _ = target
++    assert upstream.lifecycle_command("preflight", bundle=bundle)[1:] == ["host", "preflight"]
++
++
++@pytest.mark.parametrize("schema", [None, 1, "2", True])
++def test_legacy_or_invalid_schema_is_refused(target, schema):
++    bundle, vm = target
++    manifest = {} if schema is None else {"schemaVersion": schema}
++    (vm / "config.plist").write_bytes(plistlib.dumps(manifest))
++    with pytest.raises(upstream.UpstreamConfigurationError, match="schemaVersion=2"):
++        upstream.lifecycle_command("launch", bundle=bundle, vm_dir=vm)
++
++
++@pytest.mark.parametrize("action", ["launch", "stop"])
++def test_vm_path_is_required(target, action):
++    bundle, _ = target
++    with pytest.raises(upstream.UpstreamConfigurationError, match="vm-dir"):
++        upstream.lifecycle_command(action, bundle=bundle)
++
++
++@pytest.mark.parametrize("name", ["vphone-cli", "vphone-vm", "vphone-escalator"])
++def test_incomplete_bundle_fails_before_execution(target, name):
++    bundle, _ = target
++    (bundle / "Contents/MacOS" / name).chmod(0o644)
++    with pytest.raises(upstream.UpstreamConfigurationError, match="executable is missing"):
++        upstream.lifecycle_command("preflight", bundle=bundle)
++
++
++def test_invalid_manifest_fails_closed(target):
++    bundle, vm = target
++    (vm / "config.plist").write_text("invalid plist")
++    with pytest.raises(upstream.UpstreamConfigurationError, match="cannot read"):
++        upstream.lifecycle_command("stop", bundle=bundle, vm_dir=vm)
++
++
++def test_dry_run_never_executes(target, monkeypatch, capsys):
++    bundle, vm = target
++    monkeypatch.setattr(upstream.os, "execv", lambda *_: pytest.fail("unexpected exec"))
++    assert upstream.main(["launch", "--bundle", str(bundle), "--vm-dir", str(vm), "--dry-run"]) == 0
++    assert json.loads(capsys.readouterr().out)[-1] == vm.name
++
++
++def test_launch_executes_once_without_protocol_fallback(target, monkeypatch):
++    bundle, vm = target
++    calls = []
++    def refuse(*args):
++        calls.append(args)
++        raise OSError("launch refused")
++    monkeypatch.setattr(upstream.os, "execv", refuse)
++    with pytest.raises(SystemExit) as error:
++        upstream.main(["launch", "--bundle", str(bundle), "--vm-dir", str(vm)])
++    assert error.value.code == 1
++    assert len(calls) == 1
++
++
++@pytest.mark.parametrize("options", [{"headless": True}, {"timeout": 0}, {"timeout": -1}])
++def test_invalid_options_are_refused(target, options):
++    bundle, vm = target
++    with pytest.raises(upstream.UpstreamConfigurationError):
++        upstream.lifecycle_command("stop", bundle=bundle, vm_dir=vm, **options)
++
++
++def test_managed_execute_stage_cannot_launch(target, monkeypatch):
++    from autophone.device.stage_guard import StageAccessDenied, StageGuard
++    bundle, vm = target
++    monkeypatch.setattr(upstream.os, "execv", lambda *_: pytest.fail("unexpected exec"))
++    guard = StageGuard(owner_id="test", rig_id="test", generation=1, check_lease=lambda: None)
++    with guard.scope("execute"):
++        with pytest.raises(StageAccessDenied):
++            upstream.main(["launch", "--bundle", str(bundle), "--vm-dir", str(vm)])
++
++
++def test_exec_preserves_upstream_process_arguments(target, monkeypatch):
++    bundle, vm = target
++    command = upstream.lifecycle_command("launch", bundle=bundle, vm_dir=vm)
++    calls = []
++    monkeypatch.setattr(upstream.os, "execv", lambda *args: calls.append(args))
++    assert upstream.main(["launch", "--bundle", str(bundle), "--vm-dir", str(vm)]) == 0
++    assert calls == [(command[0], command)]
++
++
++def test_launch_lock_survives_exec_and_releases_after_exit(target, tmp_path):
++    bundle, vm = target
++    ready = tmp_path / "ready"
++    cli = bundle / "Contents/MacOS/vphone-cli"
++    cli.write_text(
++        f"#!{sys.executable}\n"
++        "import os, time\n"
++        "from pathlib import Path\n"
++        "Path(os.environ['TEST_READY']).write_text('ready')\n"
++        "time.sleep(float(os.environ.get('TEST_HOLD', '0')))\n"
++    )
++    command = [sys.executable, "-m", "autophone.rig.upstream", "launch",
++               "--bundle", str(bundle), "--vm-dir", str(vm)]
++    environment = {**os.environ, "TEST_READY": str(ready), "TEST_HOLD": "10",
++                   "PYTHONPATH": str(Path(__file__).resolve().parents[1])}
++    first = subprocess.Popen(command, env=environment, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
++    try:
++        deadline = time.monotonic() + 5
++        while not ready.exists() and time.monotonic() < deadline:
++            assert first.poll() is None
++            time.sleep(.01)
++        assert ready.exists()
++        second = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=3)
++        assert second.returncode == 1
++        assert "VM launch is already active" in second.stderr
++    finally:
++        first.terminate()
++        first.communicate(timeout=5)
++    third = subprocess.run(command, env={**environment, "TEST_HOLD": "0"},
++                           capture_output=True, text=True, timeout=3)
++    assert third.returncode == 0, third.stderr
++
++
++def test_stop_does_not_wait_for_launch_lock(target, monkeypatch):
++    bundle, vm = target
++    calls = []
++    monkeypatch.setattr(upstream.os, "execv", lambda *args: calls.append(args))
++    with upstream.launch_lock(vm):
++        assert upstream.main(["stop", "--bundle", str(bundle), "--vm-dir", str(vm)]) == 0
++    assert calls[0][1][2] == "stop"
++
++
++def test_launch_lock_refuses_symlink(target, tmp_path):
++    _, vm = target
++    outside = tmp_path / "outside"
++    outside.write_text("unchanged")
++    (vm / ".autophone-launch.lock").symlink_to(outside)
++    with pytest.raises(OSError):
++        with upstream.launch_lock(vm):
++            pytest.fail("symlink admitted")
++    assert outside.read_text() == "unchanged"
+diff --git a/tests/test_upstream_wire.py b/tests/test_upstream_wire.py
+new file mode 100644
+index 000000000..f5843869a
+--- /dev/null
++++ b/tests/test_upstream_wire.py
+@@ -0,0 +1,184 @@
++from __future__ import annotations
++
++import base64
++from contextlib import contextmanager
++import json
++from pathlib import Path
++import socket
++import tempfile
++import threading
++import time
++
++import pytest
++
++from autophone.device import uds
++from autophone.device.target import VPhoneTarget, VPhoneTargetBindingError, resolve_protocol, target_scope
++from autophone.device.upstream_wire import decode, prepare
++
++
++@contextmanager
++def endpoint(response, *, delay=0):
++    with tempfile.TemporaryDirectory(prefix="upwire-", dir="/tmp") as directory:
++        path = str(Path(directory) / "s")
++        server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
++        server.bind(path)
++        server.listen(1)
++        requests = []
++        def serve():
++            while True:
++                peer, _ = server.accept()
++                with peer:
++                    data = b""
++                    while b"\n" not in data:
++                        block = peer.recv(4096)
++                        if not block:
++                            return
++                        data += block
++                    message = json.loads(data.split(b"\n")[0])
++                    requests.append(message)
++                    if message.get("t") == "capabilities":
++                        capabilities = {"ok": True, "protocol": "upstream_v1", "guest_connected": True,
++                                        "commands": {kind: True for kind in ["app_list", "app_launch", "tap", "type", "file_get", "file_put", "rpc", "screenshot"]}}
++                        peer.sendall(json.dumps(capabilities).encode() + b"\n")
++                        continue
++                    time.sleep(delay)
++                    chunks = response(message) if callable(response) else response
++                    for block in chunks:
++                        try:
++                            peer.sendall(block)
++                        except BrokenPipeError:
++                            break
++                    return
++        worker = threading.Thread(target=serve, daemon=True)
++        worker.start()
++        try:
++            yield path, requests
++        finally:
++            server.close()
++            worker.join(timeout=2)
++            assert not worker.is_alive()
++
++
++def test_apps_mapping_and_fragmented_utf8_reply():
++    data = json.dumps({"ok": True, "result": {"apps": [{"name": "中文", "data_path": "/var/mobile/test"}]}}, ensure_ascii=False).encode() + b"\n"
++    with endpoint([bytes([value]) for value in data]) as (path, sent):
++        result, sample = uds.request({"t": "app_list", "filter": "running", "screen": False}, sock_path=path, protocol="upstream_v1")
++    assert sent == [{"t": "capabilities", "screen": False},
++                    {"t": "rpc", "method": "apps.list", "params": {"filter": "running"}, "screen": False}]
++    assert result["apps"][0]["data_container"] == "/var/mobile/test"
++    assert result["apps"][0]["name"] == "中文"
++    assert sample.cmd == "app_list"
++
++
++def test_read_mapping_preserves_write_fence_classification(monkeypatch):
++    monkeypatch.setattr("autophone.device.target.check_device_write", lambda *_: pytest.fail("read requested write fence"))
++    with endpoint([b'{"ok":true,"result":{"apps":[]}}\n']) as (path, _):
++        uds.request({"t": "app_list"}, sock_path=path, protocol="upstream_v1")
++
++
++def test_failed_write_is_not_replayed_with_another_protocol():
++    with endpoint([b'{"ok":false,"error":"unknown command: tap"}\n']) as (path, sent):
++        result, _ = uds.request({"t": "tap", "x": 1, "y": 2}, sock_path=path, protocol="upstream_v1")
++    assert result["ok"] is False
++    assert [m["t"] for m in sent] == ["capabilities", "tap"]
++
++
++@pytest.mark.parametrize("body", [b'{"ok":true}', b'{"ok":true}\n{}\n', b'[]\n', b'{"ok":1}\n'])
++def test_malformed_or_incomplete_reply_is_refused(body):
++    with endpoint([body]) as (path, _):
++        with pytest.raises(uds.ProtocolError):
++            uds.request({"t": "ping"}, sock_path=path, protocol="upstream_v1")
++
++
++def test_frame_limit_checked_before_connect():
++    with pytest.raises(uds.ProtocolError, match="request exceeds"):
++        uds.request({"t": "type", "text": "x" * (1 << 20)}, sock_path="/missing", protocol="upstream_v1")
++
++
++def test_response_limit():
++    with endpoint([b'{"ok":true,"padding":"' + b'x' * (1 << 20) + b'"}\n']) as (path, _):
++        with pytest.raises(uds.ProtocolError, match="response exceeds"):
++            uds.request({"t": "ping"}, sock_path=path, protocol="upstream_v1")
++
++
++def test_timeout_closes_connection_without_replay():
++    with endpoint([b'{"ok":true}\n'], delay=.1) as (path, sent):
++        with pytest.raises(TimeoutError) as error:
++            uds.request({"t": "type", "text": "once"}, sock_path=path, protocol="upstream_v1", timeout=.03)
++        assert error.value.operation_may_continue is True
++    assert [m["t"] for m in sent] == ["capabilities", "type"]
++
++
++def test_protocol_binding_cannot_cross_socket_or_change_mode(tmp_path):
++    target = VPhoneTarget(tmp_path, tmp_path, tmp_path / "a.sock", "rig", protocol="upstream_v1")
++    with target_scope(target):
++        assert resolve_protocol(target.sock) == "upstream_v1"
++        with pytest.raises(VPhoneTargetBindingError):
++            resolve_protocol(tmp_path / "b.sock")
++        with pytest.raises(VPhoneTargetBindingError):
++            resolve_protocol(target.sock, "legacy")
++
++
++def test_unknown_upstream_command_never_uses_legacy_wire():
++    with pytest.raises(uds.ProtocolError, match="unsupported upstream"):
++        uds.request({"t": "location_stream_start"}, sock_path="/missing", protocol="upstream_v1")
++
++
++def test_screenshot_suppresses_implicit_host_save():
++    with prepare({"t": "screenshot"}) as (wire, _):
++        assert wire == {"t": "screenshot", "save": False}
++
++
++def test_inline_file_upload_keeps_bytes_and_permissions():
++    with prepare({"t": "file_put", "path": "/var/tmp/test", "data_b64": base64.b64encode(b"bytes").decode(), "perm": "755"}) as (wire, finish):
++        assert wire["mode"] == "755"
++        assert Path(wire["local"]).read_bytes() == b"bytes"
++        assert finish({"ok": True, "result": {"size": 5}})["size"] == 5
++
++
++def test_inline_file_download():
++    with prepare({"t": "file_get", "path": "/var/tmp/test"}) as (wire, finish):
++        Path(wire["local"]).write_bytes(b"file")
++        assert finish({"ok": True, "result": {"size": 4}})["data_b64"] == "ZmlsZQ=="
++
++
++def test_shell_contract_maps_exit_and_truncation():
++    reply = {"ok": True, "result": {"stdout": "out", "stderr": "err", "exit_code": 7,
++             "timed_out": False, "stdout_truncated": False, "stderr_truncated": True}}
++    result = decode("shell", reply)
++    assert result["code"] == 7 and result["truncated"]
++    with pytest.raises(ValueError):
++        decode("shell", {"ok": True, "result": {"stdout": "partial"}})
++
++
++def test_health_guest_timeout_keeps_host_only():
++    from autophone.device.session import probe_uds_state
++    calls = []
++    def send(message, **kwargs):
++        calls.append(message["t"])
++        if message["t"] == "capabilities":
++            return {"ok": True, "protocol": "upstream_v1", "guest_connected": True}, None
++        raise TimeoutError("guest stalled")
++    result = probe_uds_state("/fake.sock", protocol="upstream_v1", request_fn=send)
++    assert result["state"] == "host_only" and not result["available"]
++    assert calls == ["capabilities", "app_list"]
++
++
++def test_health_disconnected_guest_never_sends_apps_request():
++    from autophone.device.session import probe_uds_state
++    calls = []
++    def send(message, **kwargs):
++        calls.append(message["t"])
++        return {"ok": True, "protocol": "upstream_v1", "guest_connected": False}, None
++    result = probe_uds_state("/fake.sock", protocol="upstream_v1", request_fn=send)
++    assert result["state"] == "host_only" and calls == ["capabilities"]
++
++
++@pytest.mark.parametrize("body", [b'', b'{"ok":true}', b'{"ok":true}\n{}\n', b'[]\n', b'{"ok":1}\n', b'\xff\n'])
++def test_invalid_write_reply_preserves_unknown_outcome_without_replay(body):
++    with endpoint([body]) as (path, sent):
++        with pytest.raises(uds.ProtocolError) as error:
++            uds.request({"t": "tap", "x": 1, "y": 2}, sock_path=path, protocol="upstream_v1")
++        assert error.value.operation_may_continue is True
++        assert error.value.command == "tap"
++    assert [message["t"] for message in sent] == ["capabilities", "tap"]
+diff --git a/tools/guest/README.md b/tools/guest/README.md
+new file mode 100644
+index 000000000..c81566c68
+--- /dev/null
++++ b/tools/guest/README.md
+@@ -0,0 +1,15 @@
++# 安装前区域检查工具
++
++`proc_regions.c` 使用 `proc_pidinfo(PROC_PIDREGIONINFO)` 输出区域标签，不获取目标 task port，不 attach 目标进程。`upstream_v1` 安装前由 `upstream_install.residue_check` 调用；legacy 保持原 procexp 路径。
++
++```sh
++zsh tools/guest/build_proc_regions.sh /absolute/output/proc-regions-ios
++```
++
++在明确绑定的测试 VM 将产物经 `file_put` 部署到 `/var/jb/usr/local/bin/autophone-proc-regions`，权限 `755`。该文件是 upstream 安装的显式前置；缺失时残留检查拒绝安装。构建脚本只构建和 ad-hoc 签名，不部署、不修改宿主 AMFI。
++
++验证须保存源码/产物摘要及三类证据：`--self-test` 的完整扫描与 Tag 255 阳性对照；`--self-test-regions` 输出经原有 `parse_regions` 解析后确实包含 Tag 255；SpringBoard 区域完整计数和查询前后相同 PID/启动时间。生产检查拒绝非零退出、阳性对照失败、缺少结束标记、计数不一致或进程身份变化。任何 Tag 255 区域仍判为残留。
++
++2026-10-31 的 iOS 27.0.1/24A446 + cloudOS 23E5207q standard VM 上，旧 iosbinpack64 procexp 查询 SpringBoard 时触发内核 panic，内核原因未查明。该组合不重跑旧工具。proc_pidinfo 实测会返回 size=0、address 指向下一段起点的间隙记录；工具继续查询该精确起点，不把间隙当成已观测区域。捕获样例保存在 `tests/test_proc_regions.py`。
++
++本工具只检查区域标签，不证明其他 Frida 或固件行为。
+diff --git a/tools/guest/build_proc_regions.sh b/tools/guest/build_proc_regions.sh
+new file mode 100644
+index 000000000..6f449197c
+--- /dev/null
++++ b/tools/guest/build_proc_regions.sh
+@@ -0,0 +1,11 @@
++#!/bin/zsh
++set -euo pipefail
++script_dir=${0:a:h}
++if (( $# != 1 )); then
++  print -u2 'usage: build_proc_regions.sh /absolute/output-binary'
++  exit 64
++fi
++[[ "$1" == /* ]] || { print -u2 'output must be absolute'; exit 64; }
++xcrun --sdk iphoneos clang -target arm64-apple-ios15.0 -Wall -Wextra -Werror "$script_dir/proc_regions.c" -o "$1"
++codesign --force --sign - --identifier com.autophone.proc-regions "$1"
++shasum -a 256 "$1"
+diff --git a/tools/guest/proc_regions.c b/tools/guest/proc_regions.c
+new file mode 100644
+index 000000000..e2fe6a439
+--- /dev/null
++++ b/tools/guest/proc_regions.c
+@@ -0,0 +1,106 @@
++// Read process region tags through libproc without task ports or task attachment.
++// ABI definitions: Apple SDK sys/proc_info.h (proc_regioninfo/PROC_PIDREGIONINFO).
++#include <errno.h>
++#include <inttypes.h>
++#include <limits.h>
++#include <mach/mach.h>
++#include <mach/vm_statistics.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#if __has_include(<libproc.h>)
++#include <libproc.h>
++#else
++struct proc_regioninfo {
++    uint32_t pri_protection, pri_max_protection, pri_inheritance, pri_flags;
++    uint64_t pri_offset;
++    uint32_t pri_behavior, pri_user_wired_count, pri_user_tag;
++    uint32_t pri_pages_resident, pri_pages_shared_now_private, pri_pages_swapped_out;
++    uint32_t pri_pages_dirtied, pri_ref_count, pri_shadow_depth, pri_share_mode;
++    uint32_t pri_private_pages_resident, pri_shared_pages_resident, pri_obj_id, pri_depth;
++    uint64_t pri_address, pri_size;
++};
++#define PROC_PIDREGIONINFO 7
++extern int proc_pidinfo(int, int, uint64_t, void *, int);
++#endif
++
++_Static_assert(sizeof(struct proc_regioninfo) == 96, "proc_regioninfo ABI differs");
++
++static void protection(uint32_t value, char result[4]) {
++    result[0] = (value & VM_PROT_READ) ? 'r' : '-';
++    result[1] = (value & VM_PROT_WRITE) ? 'w' : '-';
++    result[2] = (value & VM_PROT_EXECUTE) ? 'x' : '-';
++    result[3] = 0;
++}
++
++static int collect(int pid, uint64_t control, bool self_test) {
++    uint64_t address = 0;
++    unsigned count = 0;
++    bool control_seen = false;
++    for (unsigned queries = 0; queries < 1000000; queries++) {
++        struct proc_regioninfo region;
++        memset(&region, 0, sizeof(region));
++        errno = 0;
++        int size = proc_pidinfo(pid, PROC_PIDREGIONINFO, address, &region, sizeof(region));
++        if (size == 0 && errno == EINVAL && count > 0) {
++            if (self_test) {
++                printf("{\"complete\":true,\"regions\":%u,\"tag255_control_seen\":%s}\n",
++                       count, control_seen ? "true" : "false");
++            } else {
++                printf("# complete regions=%u method=proc_pidinfo\n", count);
++            }
++            return control != 0 && !control_seen ? 1 : 0;
++        }
++        if (size == sizeof(region) && region.pri_size == 0 && region.pri_address > address) {
++            // A gap can report the next start without describing a region.
++            // Query that exact start; never emit it as an observed region.
++            address = region.pri_address;
++            continue;
++        }
++        if (size != sizeof(region) || region.pri_address < address || region.pri_size == 0
++            || region.pri_address > UINT64_MAX - region.pri_size) {
++            fprintf(stderr, "region query incomplete: pid=%d address=0x%" PRIx64 " bytes=%d errno=%d start=0x%" PRIx64 " size=0x%" PRIx64 " depth=%u flags=%u\n",
++                    pid, address, size, errno, region.pri_address, region.pri_size, region.pri_depth, region.pri_flags);
++            return 74;
++        }
++        uint64_t end = region.pri_address + region.pri_size;
++        if (control >= region.pri_address && control < end && region.pri_user_tag == 255) {
++            control_seen = true;
++        }
++        if (!self_test) {
++            char current[4], maximum[4];
++            protection(region.pri_protection, current);
++            protection(region.pri_max_protection, maximum);
++            printf("Tag: %-3u 0x%x %016" PRIx64 "-%016" PRIx64 " [ %" PRIu64 "K]%s/%s %u\n",
++                   region.pri_user_tag, region.pri_obj_id, region.pri_address, end,
++                   region.pri_size / 1024, current, maximum, region.pri_share_mode);
++        }
++        address = end;
++        count++;
++    }
++    fprintf(stderr, "region count exceeds safety limit; no complete result\n");
++    return 74;
++}
++
++int main(int argc, char **argv) {
++    if (argc == 2 && (strcmp(argv[1], "--self-test") == 0 || strcmp(argv[1], "--self-test-regions") == 0)) {
++        vm_address_t memory = 0;
++        vm_size_t length = (vm_size_t)getpagesize();
++        kern_return_t status = vm_allocate(mach_task_self(), &memory, length,
++                                                VM_FLAGS_ANYWHERE | VM_MAKE_TAG(255));
++        if (status != KERN_SUCCESS) return 70;
++        memset((void *)(uintptr_t)memory, 0x41, (size_t)length);
++        int result = collect(getpid(), memory, strcmp(argv[1], "--self-test") == 0);
++        vm_deallocate(mach_task_self(), memory, length);
++        return result;
++    }
++    if (argc != 3 || strcmp(argv[2], "regions") != 0) return 64;
++    char *end = NULL;
++    long pid = strtol(argv[1], &end, 10);
++    if (!*argv[1] || *end || pid <= 1 || pid > INT_MAX) return 64;
++    return collect((int)pid, 0, false);
++}
+diff --git a/tools/phase1/upstream_app.py b/tools/phase1/upstream_app.py
+new file mode 100644
+index 000000000..68c03fb44
+--- /dev/null
++++ b/tools/phase1/upstream_app.py
+@@ -0,0 +1,230 @@
++"""Exact-build install/readback and saved D04 menu/cart acceptance on a named Rig.
++
++Standalone mode only: a configured Control Plane refuses this entry point.
++A launch acknowledgement is followed by PID/foreground/AX observations.
++"""
++from __future__ import annotations
++
++import argparse
++import base64
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++import time
++import secrets
++
++
++
++# UIAccessibilityTraitSelected (UIKit); the preceding bit is the image trait.
++UI_ACCESSIBILITY_TRAIT_SELECTED = 1 << 3
++
++
++def normalized_ax_node(node):
++    return {**node, 'selected': bool(node.get('traits', 0) & UI_ACCESSIBILITY_TRAIT_SELECTED)}
++
++
++def prepare_home_fixture(session, send, output, bundle_id, *, timeout=30):
++    from apps.food_ordering_v2 import home_bag as hb
++    rows = [row for row in session.app_list() if row.get('bundle_id') == bundle_id]
++    if len(rows) != 1:
++        raise RuntimeError('fixture app registration is ambiguous')
++    container = rows[0].get('data_container') or rows[0].get('data_path')
++    if (not isinstance(container, str) or not container.startswith(hb.DATA_CONTAINER_ROOTS)
++            or '\0' in container or '..' in container.split('/')):
++        raise RuntimeError('fixture data container is outside the user container root')
++    documents = container.rstrip('/') + '/Documents'
++    if rows[0].get('pid', 0) > 0:
++        session.terminate_app(bundle_id)
++    nonce = secrets.token_hex(16)
++    selector = output / 'selection-request.json'
++    selector.write_text(json.dumps({'mutation_id': hb.BASELINE_MUTATION_ID, 'nonce': nonce}, sort_keys=True)+'\n')
++    send({'t': 'file_put', 'path': documents + '/' + hb.SELECTOR_DOCUMENT, 'load': str(selector), 'perm': '644'})
++    session.launch_app(bundle_id)
++    deadline = time.monotonic() + timeout
++    previous = None
++    last = None
++    while True:
++        try:
++            receipt_path = output / 'selection-receipt.json'
++            send({'t': 'file_get', 'path': documents + '/' + hb.SELECTION_RECEIPT_DOCUMENT, 'save': str(receipt_path)})
++            receipt = json.loads(receipt_path.read_text())
++            if hb.receipt_matches(receipt, nonce):
++                observation_path = output / 'product-observation.json'
++                send({'t': 'file_get', 'path': documents + '/' + hb.OBSERVATION_DOCUMENT, 'save': str(observation_path)})
++                observation = json.loads(observation_path.read_text())
++                current = hb.observed_home_baseline(observation)
++                if current == previous:
++                    if current[0] != '2':
++                        raise RuntimeError('D04 requires the declared two-item baseline fixture')
++                    return {'nonce': nonce, 'receipt': receipt, 'bag_count': 2, 'snapshot_hash': current[1]}
++                previous = current
++        except (RuntimeError, OSError, ValueError) as exc:
++            last = str(exc)
++        if time.monotonic() >= deadline:
++            raise RuntimeError('fixture receipt/home observation deadline: ' + str(last))
++        time.sleep(.25)
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--target', type=Path, required=True)
++    parser.add_argument('--state-dir', type=Path, required=True)
++    parser.add_argument('--build-id', required=True)
++    parser.add_argument('--output', type=Path, required=True)
++    parser.add_argument('--install', action='store_true')
++    args = parser.parse_args(argv)
++    os.environ['AUTOPHONE_STATE_DIR'] = str(args.state_dir.resolve())
++    from autophone.rig.target import DeviceTarget
++    target = DeviceTarget.load(args.target)
++    if target.protocol != 'upstream_v1':
++        parser.error('explicit upstream_v1 target required')
++    os.environ.update(target.process_environment())
++    os.environ['AUTOPHONE_HOST_ID'] = target.host_id
++    from autophone.rig.control_plane_env import load_control_plane_env
++    if load_control_plane_env().configured:
++        raise RuntimeError('Control Plane configured: use its fenced Assignment execution')
++    from autophone.device import ScreenLock, VPhoneDeviceSession
++    from autophone.device.target import VPhoneTarget, target_scope, device_write_scope
++    from autophone.device.uds import request
++    from autophone.packages import store
++    from autophone.packages.build_identity import stored_build_marker
++    from autophone.rig.observed_state import FileRigObservedState
++    from autophone.rig.provisioning import RigProvisioner
++    from apps.food_ordering_v2.dish_flow import run_dish_scenario
++    output = args.output.resolve()
++    output.mkdir(parents=True, exist_ok=False)
++    result = {'accepted': False, 'target': target.public_dict(), 'build_id': args.build_id, 'checks': [], 'ui_events': []}
++    def save():
++        (output / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n')
++    def record(name, value):
++        result['checks'].append({'name': name, 'passed': True, 'value': value})
++        save()
++    lease = ScreenLock().try_lease(device=target.rig_id, owner_kind='run', owner_id=output.name)
++    if lease is None:
++        raise RuntimeError('ScreenLock occupied')
++    class StandaloneFence:
++        def check(self):
++            if lease.released:
++                raise RuntimeError('standalone ScreenLock lease released')
++        def run(self, action, *a, **kw):
++            self.check()
++            return action(*a, **kw)
++    fence = StandaloneFence()
++    def send(message, timeout=30):
++        fence.check()
++        response, _ = request({**message, 'screen': False}, sock_path=str(target.socket),
++                               protocol=target.protocol, timeout=timeout, parse_image=False)
++        if response.get('ok') is not True:
++            raise RuntimeError(str(response))
++        return response
++    bundle_id = 'com.autophone.foodorderingdemo.v2'
++    try:
++        with target_scope(VPhoneTarget(target.cli_dir, target.vm_dir, target.socket, target.rig_id, target.protocol)), device_write_scope(fence.check):
++            if args.install:
++                command = [sys.executable, '-m', 'autophone.cli', 'app', 'package', 'install',
++                           'food_ordering_v2', '--build-id', args.build_id]
++                with (output / 'install.log').open('x') as log:
++                    completed = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT,
++                                               pass_fds=(lease.fileno(),), check=False)
++                if completed.returncode:
++                    raise RuntimeError(f'formal CLI install failed: {completed.returncode}')
++                record('formal_cli_install', {'returncode': 0})
++            ref = store.resolve_build_ref('food_ordering_v2', build_id=args.build_id).to_dict()
++            observed = FileRigObservedState.compatibility()
++            session = VPhoneDeviceSession(target, fence, build_marker_fn=stored_build_marker)
++            from autophone.device.springboard import PS_COMMAND, parse_springboard_rows
++            def springboard_identity():
++                shell = session.shell(PS_COMMAND)
++                identities = parse_springboard_rows(shell.stdout) if shell.code == 0 else []
++                if len(identities) != 1:
++                    raise RuntimeError('SpringBoard identity is unavailable')
++                return {'pid': identities[0].pid, 'started': identities[0].started}
++            springboard_before = springboard_identity()
++            record('springboard_before', springboard_before)
++            def publish(state, capabilities):
++                observed.publish_installed_build(state['installed_build'])
++            provisioned = RigProvisioner(session, publish).ensure(
++                {'build_ref': ref}, app='food_ordering_v2', bundle_id=bundle_id,
++                capability_state={}, observed_state=observed.snapshot()['observed_state'])
++            record('provisioning_readback', provisioned.to_dict())
++            (output / 'installed-marker.json').write_bytes(session.read_build_marker(bundle_id))
++            send({'t': 'rpc', 'method': 'screen.unlock', 'params': {}})
++            fixture = prepare_home_fixture(session, send, output, bundle_id)
++            record('fixture_home_ready', fixture)
++            if springboard_identity() != springboard_before:
++                raise RuntimeError('SpringBoard identity changed during fixture setup')
++            class UI:
++                sequence = 0
++                pid = None
++                def tree(self):
++                    if springboard_identity() != springboard_before:
++                        raise RuntimeError('SpringBoard identity changed during UI acceptance')
++                    running = [row for row in session.app_list() if row.get('bundle_id') == bundle_id and row.get('pid', 0) > 0]
++                    if len(running) != 1:
++                        raise RuntimeError('selected app process is not running')
++                    pid = running[0]['pid']
++                    if self.pid is not None and self.pid != pid:
++                        raise RuntimeError('app process changed during UI acceptance')
++                    self.pid = pid
++                    foreground = send({'t': 'app_foreground'})
++                    if foreground.get('bundle_id') != bundle_id or foreground.get('verified') is not True:
++                        raise RuntimeError('selected app foreground is not verified')
++                    tree = send({'t': 'rpc', 'method': 'ui.tree', 'params': {'max_elements': 500}})['result']
++                    self.sequence += 1
++                    (output / f'ax-{self.sequence:03d}.json').write_text(json.dumps(tree, ensure_ascii=False, indent=2)+'\n')
++                    if tree.get('truncated') is True:
++                        raise RuntimeError('AX tree truncated')
++                    return tree['elements']
++                def expect(self, identifier, *, label=None, selected=None, enabled=None):
++                    deadline = time.monotonic() + 10
++                    attempts = []
++                    while True:
++                        try:
++                            matches = [node for node in self.tree() if node.get('identifier') == identifier]
++                            if len(matches) == 1:
++                                node = matches[0]
++                                fields = {'label': label, 'selected': selected, 'enabled': enabled}
++                                node = normalized_ax_node(node)
++                                if all(expected is None or node.get(key) == expected for key, expected in fields.items()):
++                                    result['ui_events'].append({'kind': 'assert', 'identifier': identifier, **fields, 'pid': self.pid})
++                                    save()
++                                    return node
++                            attempts.append({'identifier': identifier, 'matches': matches})
++                        except RuntimeError as exc:
++                            attempts.append({'error': str(exc)})
++                        if time.monotonic() >= deadline:
++                            result['failed_observations'] = attempts
++                            raise RuntimeError(f'UI assertion deadline: {identifier}')
++                        time.sleep(.25)
++                def tap(self, identifier):
++                    self.expect(identifier)
++                    send({'t': 'rpc', 'method': 'ui.tap_element', 'params': {'identifier': identifier}})
++                    result['ui_events'].append({'kind': 'tap', 'identifier': identifier})
++                    save()
++            ui = UI()
++            ui.expect('home.recommendation.title', label='炙烤牛肉拌饭')
++            record('foreground_home_ready', {'pid': ui.pid})
++            run_dish_scenario(ui, 'D04')
++            record('menu_and_cart_D04', {'pid': ui.pid, 'subtotal': '¥82', 'quantity': 2})
++            record('springboard_after', springboard_identity())
++            screenshot = send({'t': 'screenshot'})
++            (output / 'screen.jpg').write_bytes(base64.b64decode(screenshot['image'], validate=True))
++            result['accepted'] = True
++    except Exception as exc:
++        result['error'] = f'{type(exc).__name__}: {exc}'
++        try:
++            screenshot = send({'t': 'screenshot'})
++            (output / 'screen.jpg').write_bytes(base64.b64decode(screenshot['image'], validate=True))
++        except Exception as capture:
++            result['screenshot_error'] = str(capture)
++    finally:
++        lease.release()
++        result['screen_lock_released'] = lease.released
++        save()
++    return 0 if result['accepted'] else 1
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/tools/phase1/upstream_compat.py b/tools/phase1/upstream_compat.py
+new file mode 100644
+index 000000000..467ea2648
+--- /dev/null
++++ b/tools/phase1/upstream_compat.py
+@@ -0,0 +1,252 @@
++"""Explicit standalone stage-2 probes for a disposable, named upstream Rig.
++
++No default device, Control Plane fallback, protocol negotiation or write retry.
++"""
++from __future__ import annotations
++
++import argparse
++import base64
++import hashlib
++import json
++from pathlib import Path
++import socket
++import subprocess
++import time
++import uuid
++
++from autophone.device.session import probe_uds_state
++from autophone.device.shell import run_shell
++from autophone.device.target import VPhoneTarget, target_scope
++from autophone.device.uds import _check_peer_uid, request
++from autophone.rig.lifecycle import RigLifecycle
++from autophone.rig.target import DeviceTarget
++
++
++
++def paste_into_settings(send, output):
++    def rpc(method, params):
++        return send({"t": "rpc", "method": method, "params": params, "screen": False})
++    before = rpc("ui.tree", {"max_elements": 250})
++    fields = [item for item in before["result"]["elements"] if item.get("label") == "Search"]
++    if len(fields) != 1:
++        raise AssertionError("Settings Search field is not uniquely observable")
++    frame = fields[0]["frame"]
++    send({"t": "tap", "x": (frame["x"] + frame["width"] / 2) * 3,
++          "y": (frame["y"] + frame["height"] / 2) * 3, "screen": False})
++    token = "阶段二粘贴🌏é-" + uuid.uuid4().hex + "-文本" * 128
++    send({"t": "type", "text": token, "screen": False}, timeout=5)
++    clipboard = rpc("clipboard.get", {})
++    if clipboard["result"].get("text") != token:
++        raise AssertionError("Unicode clipboard mismatch before paste")
++    focus = rpc("ui.tree", {"max_elements": 250})
++    rpc("input.hid", {"page": 7, "usage": 227, "down": True})
++    try:
++        rpc("input.hid", {"page": 7, "usage": 4})
++        rpc("input.hid", {"page": 7, "usage": 25})
++    finally:
++        rpc("input.hid", {"page": 7, "usage": 227, "down": False})
++    observations = []
++    deadline = time.monotonic() + 8
++    while time.monotonic() < deadline:
++        tree = rpc("ui.tree", {"max_elements": 250})
++        observations.append(tree)
++        if any(item.get("label") == "Search" and item.get("value") == token
++               for item in tree["result"]["elements"]):
++            (output / "paste.json").write_text(json.dumps(
++                {"accepted": True, "text": token, "before": before, "focus": focus,
++                 "observations": observations}, ensure_ascii=False, indent=2) + "\n")
++            return {"characters": len(token), "input_value_verified": True}
++        time.sleep(.1)
++    (output / "paste.json").write_text(json.dumps(
++        {"accepted": False, "text": token, "before": before, "focus": focus,
++         "observations": observations}, ensure_ascii=False, indent=2) + "\n")
++    raise AssertionError("Settings input value does not equal pasted clipboard text")
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--target", type=Path, required=True)
++    parser.add_argument("--output", type=Path, required=True)
++    args = parser.parse_args(argv)
++    target = DeviceTarget.load(args.target)
++    if target.protocol != "upstream_v1":
++        parser.error("this probe requires an explicit upstream_v1 target")
++    output = args.output.resolve()
++    output.mkdir(parents=True, exist_ok=False)
++    results = {"accepted": False, "target": target.public_dict(), "checks": []}
++    def check(name, function):
++        start = time.monotonic()
++        try:
++            value = function()
++            results["checks"].append({"name": name, "passed": True, "seconds": time.monotonic()-start, "value": value})
++        except (OSError, ValueError, RuntimeError, AssertionError, subprocess.SubprocessError) as exc:
++            results["checks"].append({"name": name, "passed": False, "seconds": time.monotonic()-start,
++                                      "error": f"{type(exc).__name__}: {exc}"})
++        (output / "result.json").write_text(json.dumps(results, ensure_ascii=False, indent=2)+"\n")
++        return results["checks"][-1]["passed"]
++    def send(message, timeout=15):
++        response, _sample = request(message, sock_path=str(target.socket), protocol="upstream_v1", timeout=timeout)
++        if response.get("ok") is not True:
++            raise RuntimeError(str(response))
++        return response
++    def require(condition, detail):
++        if not condition:
++            raise AssertionError(detail)
++        return detail
++    def shell(command, timeout_ms=30000, **options):
++        return run_shell(command, sock_path=str(target.socket), protocol="upstream_v1",
++                         timeout_ms=timeout_ms, **options)
++    lifecycle = RigLifecycle(target)
++    with target_scope(VPhoneTarget(target.cli_dir, target.vm_dir, target.socket, target.rig_id, protocol=target.protocol)):
++        started = False
++        try:
++            started = check("start", lambda: lifecycle.start(timeout_s=300).to_dict())
++            if not started:
++                return 1
++            check("unlock", lambda: send({"t": "rpc", "method": "screen.unlock", "params": {}, "screen": False}))
++            check("health", lambda: require(probe_uds_state(target.socket, protocol="upstream_v1")["state"] == "guest_ready", "guest_ready"))
++            check("capabilities", lambda: send({"t": "capabilities", "screen": False}))
++            def screenshot():
++                response = send({"t": "screenshot", "screen": True})
++                require("path" not in response, "screenshot unexpectedly saved a host path")
++                data = base64.b64decode(response["image"], validate=True)
++                (output / "screen.jpg").write_bytes(data)
++                return {"jpeg_sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
++            check("screenshot_no_save_geometry", screenshot)
++            token = "stage2-中文-" + uuid.uuid4().hex
++            def clipboard():
++                send({"t": "type", "text": token, "screen": False}, timeout=5)
++                result = send({"t": "rpc", "method": "clipboard.get", "params": {}, "screen": False})
++                require(result.get("result", {}).get("text") == token, "guest clipboard round trip mismatch")
++                return {"text": token}
++            check("clipboard_round_trip", clipboard)
++            check("key_home", lambda: send({"t": "key", "name": "home", "screen": False}))
++            check("tap", lambda: send({"t": "tap", "x": 645, "y": 1398, "screen": False}))
++            check("swipe", lambda: send({"t": "swipe", "x1": 645, "y1": 2200, "x2": 645, "y2": 1000, "ms": 250, "screen": False}))
++            check("apps_list", lambda: {"count": len(send({"t": "app_list", "filter": "user", "screen": False})["apps"])})
++            check("apps_launch", lambda: send({"t": "app_launch", "bundle_id": "com.apple.Preferences", "screen": False}, timeout=30))
++            check("apps_foreground", lambda: require(send({"t": "app_foreground", "screen": False}).get("bundle_id") == "com.apple.Preferences", "Settings foreground verified"))
++            check("actual_unicode_paste", lambda: paste_into_settings(send, output))
++            check("apps_terminate", lambda: send({"t": "app_terminate", "bundle_id": "com.apple.Preferences", "screen": False}))
++            def volume_keys():
++                for name in ("volup", "voldown"):
++                    send({"t": "key", "name": name, "screen": False})
++                return {"keys": ["volup", "voldown"]}
++            check("volume_keys", volume_keys)
++            def power_key():
++                send({"t": "key", "name": "power", "screen": False})
++                deadline = time.monotonic() + 3
++                while time.monotonic() < deadline:
++                    info = send({"t": "rpc", "method": "device.info", "params": {}, "screen": False})["result"]
++                    if info["lock"]["screen_off"]:
++                        break
++                    time.sleep(.1)
++                else:
++                    raise AssertionError("power key did not turn screen off")
++                unlocked = send({"t": "rpc", "method": "screen.unlock", "params": {}, "screen": False})
++                require(unlocked["result"]["screen_off"] is False, "screen remained off after unlock")
++                return {"screen_off_after_power": True, "unlocked": True}
++            check("power_key_and_unlock", power_key)
++            def shell_cwd_stdin():
++                result = shell('printf "%s\\n" "$PWD"; if read input; then exit 99; else printf stdin-eof; fi', cwd="/var/jb/tmp")
++                require(result.code == 0 and result.stdout in {"/var/jb/tmp\nstdin-eof", "/private/var/jb/tmp\nstdin-eof"}, "cwd/stdin EOF contract mismatch")
++                return {"cwd_and_stdin": result.stdout}
++            check("shell_cwd_and_stdin_eof", shell_cwd_stdin)
++            def large_file():
++                local = output / "large-input.bin"
++                payload = bytes(range(256)) * 8192
++                local.write_bytes(payload)
++                path = "/var/jb/tmp/autophone-large-" + uuid.uuid4().hex
++                send({"t": "file_put", "path": path, "load": str(local), "perm": "644", "screen": False})
++                back = output / "large-returned.bin"
++                send({"t": "file_get", "path": path, "save": str(back), "screen": False})
++                require(back.read_bytes() == payload, "large transfer changed bytes")
++                return {"bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest(), "path": path}
++            check("large_file_path_transfer", large_file)
++            remote = "/var/jb/tmp/autophone-stage2-" + uuid.uuid4().hex
++            def files():
++                local = output / "helper.sh"
++                local.write_text("#!/var/jb/bin/sh\nprintf autophone-file-ok\n")
++                put = send({"t": "file_put", "path": remote, "load": str(local), "perm": "755"})
++                back = output / "helper-returned.sh"
++                send({"t": "file_get", "path": remote, "save": str(back)})
++                require(back.read_bytes() == local.read_bytes(), "file bytes changed")
++                result = shell(remote)
++                require(result.code == 0 and result.stdout == "autophone-file-ok", "755 helper could not execute")
++                return {"path": remote, "sha256": hashlib.sha256(back.read_bytes()).hexdigest(), "upload": put}
++            check("files_755_execute", files)
++            def shell_basic():
++                result = shell("printf '%s' \"$PPID\"; printf stderr >&2; exit 7")
++                require(result.stdout.strip().isdigit() and result.code == 7 and result.stderr == "stderr", "shell result contract mismatch")
++                return {"parent_pid": result.stdout, "exit_code": result.code}
++            check("shell_result", shell_basic)
++            def shell_cap():
++                result = shell("printf '%070000d' 0; printf '%070000d' 0 >&2", allow_truncated=True)
++                require(result.truncated and len(result.stdout) == 65536 and len(result.stderr) == 65536, "shell stream cap mismatch")
++                return {"stdout": len(result.stdout), "stderr": len(result.stderr), "truncated": result.truncated}
++            check("shell_caps", shell_cap)
++            def shell_timeout():
++                response = send({"t": "shell", "cmd": "/var/jb/usr/bin/sleep 60 & wait", "timeout_ms": 100, "screen": False}, timeout=5)
++                require(response.get("timed_out") is True and response.get("code") == 137, "shell timeout contract mismatch")
++                return {"exit_code": response["code"], "timed_out": True}
++            check("shell_timeout", shell_timeout)
++            def disconnect_cleanup():
++                marker = "/var/jb/tmp/autophone-cancel-" + uuid.uuid4().hex
++                command = f"/var/jb/usr/bin/sleep 60 & printf '%s:%s' \"$!\" \"$$\" > {marker}; wait"
++                connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
++                connection.settimeout(3)
++                connection.connect(str(target.socket))
++                _check_peer_uid(connection)
++                try:
++                    payload = {"t": "rpc", "method": "shell.exec", "params": {"cmd": command, "timeout_ms": 10000}, "screen": False}
++                    connection.sendall(json.dumps(payload).encode() + b"\n")
++                    deadline = time.monotonic() + 3
++                    identities = None
++                    while time.monotonic() < deadline:
++                        try:
++                            file = send({"t": "file_get", "path": marker, "screen": False})
++                            identities = [int(x) for x in base64.b64decode(file["data_b64"]).decode().split(":")]
++                            break
++                        except RuntimeError:
++                            time.sleep(.05)
++                    require(identities is not None and len(identities) == 2, "shell process identities were not published")
++                    start = time.monotonic()
++                    send({"t": "ping", "screen": False}, timeout=3)
++                    send({"t": "app_list", "filter": "running", "screen": False}, timeout=3)
++                    send({"t": "screenshot"}, timeout=3)
++                    concurrent_seconds = time.monotonic()-start
++                    connection.setblocking(False)
++                    try:
++                        data = connection.recv(1, socket.MSG_PEEK)
++                    except BlockingIOError:
++                        data = None
++                    require(data is None, "long shell ended before concurrent probes finished")
++                finally:
++                    connection.close()
++                deadline = time.monotonic() + 5
++                while time.monotonic() < deadline:
++                    rows = send({"t": "rpc", "method": "processes.list", "params": {}, "screen": False})["result"]["processes"]
++                    if not any(row.get("pid") in identities for row in rows):
++                        return {"cleaned_pids": identities, "concurrent_probe_seconds": concurrent_seconds}
++                    time.sleep(.05)
++                raise AssertionError("disconnected shell left live or unreaped processes")
++            check("shell_disconnect_cleanup_and_concurrency", disconnect_cleanup)
++            from autophone.device.session import VPhoneDeviceSession
++            class StandaloneFence:
++                def check(self):
++                    # The CLI requires the explicit disposable target above;
++                    # it does not construct or claim an Assignment lease.
++                    return None
++            session = VPhoneDeviceSession(target, StandaloneFence())
++            check("runtime_identity", lambda: session.runtime_info(timeout_s=10))
++        finally:
++            if started:
++                check("stop", lambda: lifecycle.stop().to_dict())
++    results["accepted"] = all(item["passed"] for item in results["checks"])
++    (output / "result.json").write_text(json.dumps(results, ensure_ascii=False, indent=2)+"\n")
++    print(json.dumps({"accepted": results["accepted"], "output": str(output)}))
++    return 0 if results["accepted"] else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/phase1/upstream_isolation.py b/tools/phase1/upstream_isolation.py
+new file mode 100644
+index 000000000..5369bbe78
+--- /dev/null
++++ b/tools/phase1/upstream_isolation.py
+@@ -0,0 +1,170 @@
++"""Saved live regression for two explicitly named disposable upstream Rigs."""
++from __future__ import annotations
++
++import argparse
++from concurrent.futures import ThreadPoolExecutor
++import fcntl
++import json
++from pathlib import Path
++import subprocess
++import time
++import uuid
++
++from autophone.device.session import VPhoneDeviceSession, probe_uds_state
++from autophone.device.target import VPhoneTarget, VPhoneTargetBindingError, target_scope
++from autophone.device.uds import request
++from autophone.rig.lifecycle import RigLifecycle
++from autophone.rig.target import DeviceTarget
++
++
++class StandaloneFence:
++    def check(self):
++        return None
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--target', type=Path, required=True)
++    parser.add_argument('--peer', type=Path, required=True)
++    parser.add_argument('--output', type=Path, required=True)
++    args = parser.parse_args(argv)
++    targets = [DeviceTarget.load(args.target), DeviceTarget.load(args.peer)]
++    if any(t.protocol != 'upstream_v1' for t in targets):
++        parser.error('both targets must explicitly use upstream_v1')
++    if targets[0].vm_dir == targets[1].vm_dir or targets[0].expected_usb_udid == targets[1].expected_usb_udid:
++        parser.error('two independent VM identities are required')
++    output = args.output.resolve()
++    output.mkdir(parents=True, exist_ok=False)
++    result = {'accepted': False, 'checks': [], 'targets': [t.public_dict() for t in targets]}
++    lifecycles = [RigLifecycle(t) for t in targets]
++    started = [False, False]
++    def check(name, function):
++        begin = time.monotonic()
++        try:
++            value = function()
++            item = dict(name=name, passed=True, value=value)
++        except (OSError, ValueError, RuntimeError, AssertionError, subprocess.SubprocessError) as exc:
++            item = dict(name=name, passed=False, error=f'{type(exc).__name__}: {exc}')
++        item['seconds'] = time.monotonic() - begin
++        result['checks'].append(item)
++        (output / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
++        return item
++    def require(condition, detail):
++        if not condition:
++            raise AssertionError(detail)
++    def send(index, message, timeout=15):
++        response, _ = request(message, sock_path=str(targets[index].socket), protocol='upstream_v1', timeout=timeout)
++        if response.get('ok') is not True:
++            raise RuntimeError(str(response))
++        return response
++    def rpc(index, method, params):
++        return send(index, {'t': 'rpc', 'method': method, 'params': params, 'screen': False})['result']
++    def runtime(index):
++        return VPhoneDeviceSession(targets[index], StandaloneFence()).runtime_info(timeout_s=15)
++    def lock_available(index):
++        path = targets[index].vm_dir / '.autophone-launch.lock'
++        with path.open('a+b') as stream:
++            try:
++                fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
++            except BlockingIOError:
++                return False
++            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
++            return True
++    try:
++        for i in range(2):
++            started[i] = check(f'start_{i}', lambda i=i: lifecycles[i].start(allow_multi_vm=True, timeout_s=300).to_dict())['passed']
++        if not all(started):
++            return 1
++        check('unlock_both', lambda: [rpc(i, 'screen.unlock', {}) for i in range(2)])
++        def identities():
++            rows = [runtime(i) for i in range(2)]
++            require(rows[0]['host']['pid'] != rows[1]['host']['pid'], 'host PID collision')
++            require(rows[0]['guest']['boot_id'] != rows[1]['guest']['boot_id'], 'guest boot identity collision')
++            require(all(not lock_available(i) for i in range(2)), 'launch lock not held')
++            return rows
++        before = check('independent_runtime_and_locks', identities)
++        def cross_binding():
++            t = targets[0]
++            with target_scope(VPhoneTarget(t.cli_dir, t.vm_dir, t.socket, t.rig_id, t.protocol)):
++                try:
++                    send(1, {'t': 'type', 'text': 'must-not-dispatch', 'screen': False})
++                except VPhoneTargetBindingError as exc:
++                    return {'refused': str(exc)}
++            raise AssertionError('cross-socket write was admitted')
++        check('bound_cross_socket_refusal', cross_binding)
++        def clipboard_isolation():
++            tokens = ['isolation-A-' + uuid.uuid4().hex, 'isolation-B-' + uuid.uuid4().hex]
++            for i in range(2):
++                send(i, {'t': 'type', 'text': tokens[i], 'screen': False})
++            read = [rpc(i, 'clipboard.get', {})['text'] for i in range(2)]
++            require(read == tokens, 'clipboard state crossed Rig sockets')
++            return {'text': read}
++        check('clipboard_isolation', clipboard_isolation)
++        def headless_capture():
++            cap = send(1, {'t': 'capabilities', 'screen': False})
++            require(cap.get('headless') is True, 'peer was not launched headless')
++            require(cap['commands']['screenshot'] is True, 'headless screenshot unavailable')
++            image = send(1, {'t': 'screenshot'})
++            require('path' not in image, 'headless screenshot saved a host path')
++            return {'headless': True, 'image_bytes_base64': len(image['image'])}
++        check('headless_screenshot', headless_capture)
++        def native_running_clone_refusal():
++            t = targets[1]
++            destination = 'must-refuse-running-' + uuid.uuid4().hex[:10]
++            command = [str(t.core_bundle / 'Contents/MacOS/vphone-cli'), 'vm', 'clone', '--library-root',
++                       str(t.vm_dir.parent), t.vm_dir.name, destination, '--new-identity']
++            process = subprocess.run(command, capture_output=True, text=True, timeout=10)
++            require(process.returncode != 0 and not (t.vm_dir.parent / destination).exists(), 'running clone was not refused')
++            return {'returncode': process.returncode, 'stdout': process.stdout, 'stderr': process.stderr}
++        check('native_running_disk_refusal', native_running_clone_refusal)
++        def stop_with_pending_request():
++            with ThreadPoolExecutor(max_workers=1) as pool:
++                future = pool.submit(send, 0, {'t': 'shell', 'cmd': '/var/jb/usr/bin/sleep 60', 'timeout_ms': 10000, 'screen': False}, 15)
++                time.sleep(.3)
++                require(not future.done(), 'shell request completed before stop; no pending-request evidence')
++                receipt = lifecycles[0].stop().to_dict()
++                started[0] = False
++                try:
++                    reply = future.result(timeout=16)
++                    outcome = {'response': reply}
++                except (OSError, ValueError, RuntimeError) as exc:
++                    outcome = {'error': f'{type(exc).__name__}: {exc}',
++                               'operation_may_continue': getattr(exc, 'operation_may_continue', None)}
++            require(lock_available(0), 'stopped Rig launch lock is held')
++            require(probe_uds_state(targets[0].socket, protocol='upstream_v1', timeout=1)['state'] == 'unreachable', 'stopped Rig is reachable')
++            require(probe_uds_state(targets[1].socket, protocol='upstream_v1', timeout=3)['state'] == 'guest_ready', 'peer health changed after stopping selected Rig')
++            holder = subprocess.run(['lsof', '-F', 'p', str(targets[0].vm_dir / 'Disk.img')], capture_output=True, text=True)
++            require(not holder.stdout.strip(), 'stopped disk still has holders')
++            return {'stop': receipt, 'pending_request': outcome, 'pending_before_stop': True, 'disk_holders': []}
++        check('stop_pending_request_preserves_peer', stop_with_pending_request)
++        def reconnect():
++            lifecycles[0].start(allow_multi_vm=True, timeout_s=300)
++            started[0] = True
++            after = runtime(0)
++            if before['passed']:
++                previous = before['value'][0]
++                require(previous['host']['pid'] != after['host']['pid'], 'host PID unchanged after restart')
++                require(previous['guest']['boot_id'] != after['guest']['boot_id'], 'guest boot ID unchanged after restart')
++            return after
++        check('reconnect_new_runtime_identity', reconnect)
++    finally:
++        for i in range(2):
++            if started[i]:
++                check(f'stop_{i}', lambda i=i: lifecycles[i].stop().to_dict())
++        def closeout():
++            holders = []
++            for i in range(2):
++                require(lock_available(i), f'Rig {i} launch lock remains held')
++                p = subprocess.run(['lsof', '-F', 'p', str(targets[i].vm_dir / 'Disk.img')], capture_output=True, text=True)
++                holders.append(p.stdout.strip())
++            require(not any(holders), 'disk holders remain')
++            return {'locks_released': True, 'disk_holders': holders}
++        check('closeout', closeout)
++    result['accepted'] = all(x['passed'] for x in result['checks'])
++    (output / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
++    print(json.dumps({'accepted': result['accepted'], 'output': str(output)}))
++    return 0 if result['accepted'] else 1
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())

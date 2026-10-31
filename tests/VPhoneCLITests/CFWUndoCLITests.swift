@@ -26,4 +26,22 @@ import Testing
         #expect(args == ["/app/cfw_install_host.sh", "--variant", "regular", "--generation", "generation",
             "--undo-declaration", "camera", "--undo-declaration", "maxslide", "/machines/sample"])
     }
+
+    @Test func installedEffectAuditIsAnExplicitReadOnlyCommand() throws {
+        let parsed = try VPhoneCLI.parseAsRoot(["cfw", "verify-effects", "sample",
+            "--work-parent", "/audit", "--report", "/audit/result.json", "--root-popup"])
+        let command = try #require(parsed as? VPhoneCFWVerifyEffectsCommand)
+        #expect(command.name == "sample")
+        #expect(command.workParent == "/audit")
+        #expect(command.rootPopup)
+        #expect(command.report == "/audit/result.json")
+        for args in [
+            ["cfw", "verify-effects", "sample"],
+            ["cfw", "verify-effects", "sample", "--work-parent", "/audit", "--root-popup"],
+            ["cfw", "verify-effects", "sample", "--work-parent", "/audit", "--declaration", "camera"],
+            ["cfw", "verify-effects", "sample", "--work-parent", "/audit", "--reinstall-cryptex"],
+        ] {
+            #expect(throws: (any Error).self) { try VPhoneCLI.parseAsRoot(args) }
+        }
+    }
 }

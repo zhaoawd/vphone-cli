@@ -1,0 +1,6 @@
+CLANG_MODULE_CACHE_PATH="$PWD/.build/test-module-cache" SWIFT_MODULECACHE_PATH="$PWD/.build/test-module-cache" swift test --disable-sandbox --cache-path "$PWD/.build/test-cache" --force-resolved-versions --filter 'VPhoneLaunchpadKitTests|VPhoneCoreTests'
+.venv/bin/python -m unittest tests.test_launchpad_bundle tests.test_launchpad_strings -q
+VPHONE_LAUNCHPAD_APP="$PWD/.build/t60-import-state-20261020.app" zsh scripts/run_launchpad_cli_tests.sh
+VPHONE_LAUNCHPAD_APP="$PWD/.build/t60-closeout-20261021.app" zsh scripts/run_launchpad_cli_tests.sh
+.venv/bin/python scripts/check_launchpad_bundle.py .build/t60-closeout-20261021.app --reference .build/t60-closeout-20261021-cli.app
+zsh -n scripts/run_launchpad_cli_tests.sh

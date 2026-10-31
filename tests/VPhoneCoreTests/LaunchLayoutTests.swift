@@ -219,3 +219,34 @@ struct LaunchLayoutTests {
         #expect(staged == Data([9, 9, 9, 9]))
     }
 }
+
+struct ProcessHolderTests {
+    @Test func classifiesExecutablePaths() {
+        #expect(VPhoneProcessHolder.kind(executablePath: "/a/VPhone.bundle/Contents/MacOS/vphone-vm") == .virtualMachine)
+        #expect(VPhoneProcessHolder.kind(executablePath: "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine") == .virtualizationService)
+        for path in [nil, "", "/bin/tail", "/tmp/com.apple.Virtualization.VirtualMachine", "/tmp/vphone-vm-other"] {
+            #expect(VPhoneProcessHolder.kind(executablePath: path) == .other)
+        }
+    }
+
+    @Test func ordersAndDescribesHolders() {
+        let vm = VPhoneProcessHolder(pid: 20, executablePath: "/copy/vphone-vm")
+        let reader = VPhoneProcessHolder(pid: 10, executablePath: "/bin/tail")
+        let unknown = VPhoneProcessHolder(pid: 30, executablePath: nil)
+        let split = VPhoneProcessHolder.classify([unknown, vm, reader])
+        #expect(split.machine == [vm])
+        #expect(split.others == [reader, unknown])
+        #expect(VPhoneProcessHolder.diskRefusal([], rerun: "retry") == nil)
+        let busy = VPhoneProcessHolder.diskRefusal([reader], rerun: "retry") ?? ""
+        #expect(busy.contains("10 tail"))
+        #expect(busy.contains("does not run the VM"))
+        let running = VPhoneProcessHolder.diskRefusal([reader, vm], rerun: "retry") ?? ""
+        #expect(running.contains("VM is running"))
+        #expect(running.contains("20 vphone-vm, 10 tail"))
+        let error = VPhoneBundleActivityError.running(name: "alpha", holders: [reader])
+        #expect(error.description.contains("10 tail"))
+        #expect(error.errorDescription == error.description)
+        #expect(VPhoneBundleActivityError.running(name: "alpha", holders: [vm]).description.contains("is running"))
+        #expect(VPhoneBundleActivityError.running(name: "alpha", holders: []).description.contains("is running"))
+    }
+}

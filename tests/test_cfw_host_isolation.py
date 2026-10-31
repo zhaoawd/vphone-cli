@@ -11,6 +11,10 @@ import time
 import subprocess
 import tempfile
 import unittest
+if __package__:
+    from .cfw_fixture_capacity import model_capacity
+else:
+    from cfw_fixture_capacity import model_capacity
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,9 +29,13 @@ class HostDriverFixture(unittest.TestCase):
         scripts = self.root / 'scripts'
         scripts.mkdir()
         shutil.copyfile(ROOT / "scripts/vm_lock.py", scripts / "vm_lock.py")
-        for name in ("cfw_disk_txn.py", "cfw_guest_evidence.py", "sparse_file.py"):
+        for name in ("cfw_disk_txn.py", "cfw_guest_evidence.py", "cfw_reboot_identity.py", "cfw_source_identity.py", "sparse_file.py"):
             if (ROOT / "scripts" / name).exists():
                 shutil.copyfile(ROOT / "scripts" / name, scripts / name)
+        # Model capacity for this bytes-sized disposable disk. Run the real
+        # 50 GiB policy against that observation; native capacity/refusal is
+        # covered separately in test_cfw_work_parent.
+        model_capacity(scripts/'cfw_disk_txn.py')
         driver = (ROOT / 'scripts/cfw_install_host.sh').read_text()
         # Only bypass privilege escalation; no real disk commands are permitted.
         guard = 'if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then'
@@ -86,6 +94,7 @@ print -r -- "/dev/disk92s1 on $CFW_HOST_MNT/mnt1 (apfs, local)" > "$TEST_MOUNTS"
 print -r -- "/dev/disk93s1 on $CFW_HOST_MNT/mnt_sysos_hv_vmm (apfs, local)" >> "$TEST_MOUNTS"
 print -r -- '/dev/disk80s1 on /private/tmp/another-task/mnt1 (apfs, local)' >> "$TEST_MOUNTS"
 mkdir -p "$PWD/.cfw_temp/sub" "$PWD/cfw_input"
+[[ ${ATTESTATION_FIXTURE:-0} == 1 ]] && print proof > "$PWD/.cfw_temp/guest-origin-attestation.json"
 print signed > "$PWD/.vphoned.signed"
 print -r -- "${SUDO_UID-<unset>} ${SUDO_USER-<unset>}" > "$PWD/installer-sudo-env"
 if [[ ${LINKED_ENTRIES:-0} == 1 ]]; then
@@ -124,13 +133,15 @@ exit ${INSTALL_EXIT:-0}
         env['PATH'] = '/usr/bin:/bin:/usr/sbin:/sbin'
         return env
 
-    def start(self, name='vm', variant='exp', bare=False, **env):
+    def start(self, name='vm', variant='exp', bare=False, work_parent=None, **env):
         vm = self.root / name
         vm.mkdir(exist_ok=True)
         if not (vm / 'Disk.img').exists():
             (vm / 'Disk.img').touch()
         base = self.bare_env() if bare else self.env
-        proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', variant, str(vm)],
+        arguments = ['/bin/zsh', str(self.driver), '--variant', variant]
+        if work_parent is not None: arguments += ['--work-parent', str(work_parent)]
+        proc = subprocess.Popen(arguments + [str(vm)],
                                     env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **dict(env, VPHONE_CFW_VARIANT=variant)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         def stop():
             try:
@@ -273,7 +284,7 @@ class HostIsolationTests(HostDriverFixture):
             # rows and the two observed marker blobs from the APFS test double.
             for name in ('.fixture-readbacks', 'guest-plan.json', 'guest-context.json', 'guest-changes.jsonl',
                          'guest-effects-final.json', 'guest-undo-provenance.json', 'guest-publication.json',
-                         'guest-postimage.img', 'effect-blobs'):
+                         'guest-install-receipts.json', 'guest-postimage.img', 'effect-blobs'):
                 paths.append(f'{history}/{record}/{name}')
             for data in (b'prior-state', b'CFW-PATCHED'):
                 paths.append(f'{history}/{record}/effect-blobs/{hashlib.sha256(data).hexdigest()}')
@@ -298,6 +309,15 @@ class HostIsolationTests(HostDriverFixture):
         self.assertEqual(self.chowned_paths(), self.returned_artifacts(vm))
         self.assertIn('restored ownership', output)
         self.assertNotIn('NOT restored', output)
+
+    def test_ownership_handback_preserves_the_root_attestation(self):
+        vm, proc = self.start(ATTESTATION_FIXTURE='1', **self.sudo_invoker())
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        proof = vm / '.cfw_temp/guest-origin-attestation.json'
+        self.assertEqual(proof.read_text().strip(), 'proof')
+        self.assertNotIn(str(proof.resolve()), self.chowned_paths())
+        self.assertEqual(self.chowned_paths(), self.returned_artifacts(vm))
 
     def test_explicit_invoker_takes_precedence_over_sudo(self):
         vm, proc = self.start(**dict(self.sudo_invoker(uid=os.getuid() + 424242), **self.popup_invoker()))

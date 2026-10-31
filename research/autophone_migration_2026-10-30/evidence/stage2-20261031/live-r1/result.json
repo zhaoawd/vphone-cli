@@ -1,0 +1,323 @@
+{
+  "accepted": true,
+  "target": {
+    "host_id": "migration-local",
+    "rig_id": "migration-stage2",
+    "rig_generation": 2,
+    "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+    "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline",
+    "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+    "expected_usb_udid": "0000FE01-2119AAF5C1E70D2F",
+    "ssh_host": "127.0.0.1",
+    "ssh_port": 22242,
+    "frida_host": "127.0.0.1",
+    "frida_port": 37042,
+    "frida_guest_port": 27042,
+    "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2/logs",
+    "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2/tmp",
+    "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage2/packages",
+    "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage2/runtime",
+    "protocol": "upstream_v1",
+    "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+  },
+  "checks": [
+    {
+      "name": "start",
+      "passed": true,
+      "seconds": 0.5610428749932908,
+      "value": {
+        "action": "start",
+        "status": "running",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage2",
+        "rig_generation": 2,
+        "affected_pids": [],
+        "detail": ""
+      }
+    },
+    {
+      "name": "health",
+      "passed": true,
+      "seconds": 0.09209212499263231,
+      "value": "guest_ready"
+    },
+    {
+      "name": "capabilities",
+      "passed": true,
+      "seconds": 0.00026849999267142266,
+      "value": {
+        "protocol": "upstream_v1",
+        "commands": {
+          "file_put": true,
+          "file_get": true,
+          "key": true,
+          "screenshot": true,
+          "swipe": true,
+          "capabilities": true,
+          "type": true,
+          "tap": true,
+          "rpc": true,
+          "app_launch": true,
+          "shell": true,
+          "app_list": true,
+          "app_terminate": true,
+          "app_foreground": true,
+          "ping": true
+        },
+        "headless": false,
+        "guest_connected": true,
+        "guest_capabilities": [
+          "apfs_snapshots",
+          "app_details",
+          "apps",
+          "audio",
+          "audio_host_latency",
+          "bootstrap_install",
+          "bootstrap_uninstall",
+          "camera",
+          "clipboard",
+          "clock",
+          "device_info",
+          "device_name",
+          "device_pose",
+          "display",
+          "display_auto_lock",
+          "display_orientation",
+          "environment_update",
+          "file_tools",
+          "files",
+          "files_app_drop",
+          "hid",
+          "input_gestures",
+          "ipa_install",
+          "keychain",
+          "keychain_edit",
+          "location",
+          "logs",
+          "motion_attitude",
+          "motion_gyroscope",
+          "motion_gyroscope_toggle",
+          "network_capture",
+          "network_hostname",
+          "network_ipv4",
+          "network_resolve",
+          "network_static_names",
+          "ota_system_apps",
+          "packages",
+          "port_forward",
+          "processes",
+          "screen_unlock",
+          "screenshot",
+          "script_js",
+          "service_kickstart",
+          "service_profile",
+          "services",
+          "setup_settle",
+          "setup_skip",
+          "shell",
+          "shell_exec",
+          "system_app_removal",
+          "system_control",
+          "system_shutdown",
+          "timezone",
+          "touch",
+          "touch2",
+          "touch_edge",
+          "udid_override",
+          "ui_inspection",
+          "url"
+        ],
+        "screen": {
+          "width": 1290,
+          "height": 2796,
+          "scale": 3
+        },
+        "shell": {
+          "single_stream_limit": 65536,
+          "timeout_ms_max": 120000,
+          "available": true
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "screenshot_no_save_geometry",
+      "passed": true,
+      "seconds": 0.04887608399440069,
+      "value": {
+        "jpeg_sha256": "e5cc38831953e10761b342d55124a41c2369705d4de82f6b496986cf53e23fb1",
+        "bytes": 27171
+      }
+    },
+    {
+      "name": "clipboard_round_trip",
+      "passed": true,
+      "seconds": 0.01755445900198538,
+      "value": {
+        "text": "stage2-中文-c1c3cc4b14734a87ae09730f7391a61c"
+      }
+    },
+    {
+      "name": "key_home",
+      "passed": true,
+      "seconds": 0.00028987499536015093,
+      "value": {
+        "ok": true
+      }
+    },
+    {
+      "name": "tap",
+      "passed": true,
+      "seconds": 0.10995558300055563,
+      "value": {
+        "ok": true
+      }
+    },
+    {
+      "name": "swipe",
+      "passed": true,
+      "seconds": 0.26324916700832546,
+      "value": {
+        "ok": true
+      }
+    },
+    {
+      "name": "apps_list",
+      "passed": true,
+      "seconds": 0.11481912499584723,
+      "value": {
+        "count": 0
+      }
+    },
+    {
+      "name": "apps_launch",
+      "passed": true,
+      "seconds": 0.7130061670031864,
+      "value": {
+        "frontmost_verified": true,
+        "pid": 705,
+        "ok": true
+      }
+    },
+    {
+      "name": "apps_foreground",
+      "passed": true,
+      "seconds": 0.16598420900118072,
+      "value": "Settings foreground verified"
+    },
+    {
+      "name": "apps_terminate",
+      "passed": true,
+      "seconds": 0.14004699999350123,
+      "value": {
+        "already_stopped": false,
+        "pids": [
+          705
+        ],
+        "killed": "com.apple.Preferences",
+        "ok": true
+      }
+    },
+    {
+      "name": "files_755_execute",
+      "passed": true,
+      "seconds": 0.010073582991026342,
+      "value": {
+        "path": "/var/jb/tmp/autophone-stage2-db2a3b4db27543cb9c1ba4f21b2c98ce",
+        "sha256": "8ea93ba7d31eb64ec31b2f82a932423547afc7e9433953f01870acb137be9a6e",
+        "upload": {
+          "size": 42,
+          "local": "/Users/kolar/github/vphone-cli/research/autophone_migration_2026-10-30/evidence/stage2-20261031/live-r1/helper.sh",
+          "path": "/var/jb/tmp/autophone-stage2-db2a3b4db27543cb9c1ba4f21b2c98ce",
+          "ok": true
+        }
+      }
+    },
+    {
+      "name": "shell_result",
+      "passed": true,
+      "seconds": 0.005279874996631406,
+      "value": {
+        "parent_pid": "300",
+        "exit_code": 7
+      }
+    },
+    {
+      "name": "shell_caps",
+      "passed": true,
+      "seconds": 0.006671666997135617,
+      "value": {
+        "stdout": 65536,
+        "stderr": 65536,
+        "truncated": true
+      }
+    },
+    {
+      "name": "shell_timeout",
+      "passed": true,
+      "seconds": 0.10432566700910684,
+      "value": {
+        "exit_code": 137,
+        "timed_out": true
+      }
+    },
+    {
+      "name": "shell_disconnect_cleanup_and_concurrency",
+      "passed": true,
+      "seconds": 0.29099116699944716,
+      "value": {
+        "cleaned_pids": [
+          714,
+          713
+        ],
+        "concurrent_probe_seconds": 0.16379470800166018
+      }
+    },
+    {
+      "name": "runtime_identity",
+      "passed": true,
+      "seconds": 0.10524129199620802,
+      "value": {
+        "ok": true,
+        "source": "autophone-process-observation/v1",
+        "contract_version": "v1",
+        "host": {
+          "pid": 84071,
+          "process_start": "Sat Oct 31 08:32:12 2026",
+          "path": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-vm",
+          "binary_sha256": "0f86660fa63f85614fdb5bb81cbf76d4193d7b4fc3a3e4c82fd7b48e3eac8a88"
+        },
+        "guest": {
+          "pid": 300,
+          "process_start": "Sat Oct 31 08:32:16 2026",
+          "path": "/private/var/root/Library/Caches/vphoned",
+          "binary_sha256": "73df3c1625d736be80b183d0270d735ebe82c9dc00e120df43915be7a625269b",
+          "boot_id": "6AA38DAE-51B1-4DFE-9E02-3100B4549661"
+        },
+        "binding": {
+          "path": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+          "device": 16777233,
+          "inode": 269298514,
+          "rig_id": "migration-stage2",
+          "rig_generation": 2
+        }
+      }
+    },
+    {
+      "name": "stop",
+      "passed": true,
+      "seconds": 4.573034999993979,
+      "value": {
+        "action": "stop",
+        "status": "stopped",
+        "host_id": "migration-local",
+        "rig_id": "migration-stage2",
+        "rig_generation": 2,
+        "affected_pids": [
+          84071
+        ],
+        "detail": ""
+      }
+    }
+  ]
+}

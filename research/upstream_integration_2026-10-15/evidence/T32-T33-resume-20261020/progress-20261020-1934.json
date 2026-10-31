@@ -1,0 +1,85 @@
+{
+  "recordedAt": "2026-10-20T11:34:43.410459+00:00",
+  "dsc": {
+    "state": "install-cfw",
+    "published": false,
+    "installerSubstep": "7/7 launchd.plist chmod preflight",
+    "observation": {
+      "recordedAt": "2026-10-20T11:34:43.410459+00:00",
+      "stage": "install-cfw",
+      "runnerPID": 93069,
+      "runnerAlive": true,
+      "rootInstallerPIDs": [
+        97562
+      ],
+      "processes": [
+        {
+          "user": "root",
+          "pid": 2478,
+          "ppid": 97562,
+          "elapsed": "04:27:06",
+          "cpuTime": "0:00.11",
+          "cpuPercent": "0.0",
+          "command": "zsh .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/cfw_install.sh ."
+        },
+        {
+          "user": "root",
+          "pid": 32928,
+          "ppid": 2478,
+          "elapsed": "00:56",
+          "cpuTime": "0:00.13",
+          "cpuPercent": "0.0",
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/patchers/plan_gate.py write /bin/chmod 0644 vm-t32-t33-dsc-20261018/.cfw_mount.EGyykMAI/mnt1/System/Library/xpc/launchd.plist"
+        },
+        {
+          "user": "root",
+          "pid": 32930,
+          "ppid": 32928,
+          "elapsed": "00:55",
+          "cpuTime": "0:50.86",
+          "cpuPercent": "94.2",
+          "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw verify-plan vm-t32-t33-dsc-20261018 --expected-sha256 bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c"
+        },
+        {
+          "user": "kolar",
+          "pid": 93069,
+          "ppid": 1,
+          "elapsed": "04:47:26",
+          "cpuTime": "0:05.31",
+          "cpuPercent": "0.0",
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -u .build/t32-resume-acceptance-20261020/run-acceptance.py"
+        },
+        {
+          "user": "kolar",
+          "pid": 94446,
+          "ppid": 93069,
+          "elapsed": "04:44:25",
+          "cpuTime": "2:07.25",
+          "cpuPercent": "0.0",
+          "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw install vm-t32-t33-dsc-20261018 --library-root /Users/kolar/github/vphone-cli --variant regular --guest-environment classic --keep-artifacts --reinstall-cryptex --root-popup"
+        },
+        {
+          "user": "root",
+          "pid": 97562,
+          "ppid": 94401,
+          "elapsed": "04:37:37",
+          "cpuTime": "0:00.08",
+          "cpuPercent": "0.0",
+          "command": "/bin/zsh .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/cfw_install_host.sh --variant regular --reinstall-cryptex vm-t32-t33-dsc-20261018"
+        }
+      ]
+    },
+    "undoStarted": false,
+    "reapplicationStarted": false,
+    "finalResultPresent": false
+  },
+  "t60": {
+    "newValidationSinceLastReport": false,
+    "latestRealCLITests": 2,
+    "latestRealCLIExitCode": 0,
+    "liveUIValidated": false,
+    "fullMixedVersionVMMatrixValidated": false,
+    "accepted": false
+  },
+  "newChangesCommitted": false
+}

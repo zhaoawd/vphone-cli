@@ -14,6 +14,7 @@ struct VPhoneLaunchpadMachinesView: View {
 
     enum Sheet: Identifiable {
         case settings([VPhoneLaunchpadMachine])
+        case bundleChange(MachinePath)
         case rename(MachinePath)
         case clone(MachinePath)
         case export([MachinePath])
@@ -24,6 +25,7 @@ struct VPhoneLaunchpadMachinesView: View {
 
         var id: String {
             switch self {
+            case let .bundleChange(machine): "bundle-change-\(machine.url.path)"
             case let .settings(machines): "settings-\(machines.map(\.path.url.path).joined(separator: "|"))"
             case let .rename(machine): "rename-\(machine.url.path)"
             case let .clone(machine): "clone-\(machine.url.path)"
@@ -68,13 +70,19 @@ struct VPhoneLaunchpadMachinesView: View {
 
     var body: some View {
         @Bindable var library = library
-        Group {
-            if library.machines.isEmpty {
-                emptyState
-            } else if rows.isEmpty {
-                ContentUnavailableView.search(text: filter)
-            } else {
-                table(selection: $library.selection)
+        VStack(spacing: 0) {
+            if !library.imports.isEmpty {
+                importQueue
+                Rectangle().fill(VPhoneLaunchpadTheme.border).frame(height: 1)
+            }
+            Group {
+                if library.machines.isEmpty {
+                    emptyState
+                } else if rows.isEmpty {
+                    ContentUnavailableView.search(text: filter)
+                } else {
+                    table(selection: $library.selection)
+                }
             }
         }
         // At least as wide as the columns (B2: with the inspector open the
@@ -134,6 +142,41 @@ struct VPhoneLaunchpadMachinesView: View {
 
     // MARK: - Toolbar
 
+    private var importQueue: some View {
+        ScrollView {
+            VStack(spacing: VPhoneLaunchpadTheme.unit) {
+                ForEach(library.imports) { item in
+                    HStack(spacing: VPhoneLaunchpadTheme.padding) {
+                        if item.state == .waiting {
+                            Image(systemName: "clock").foregroundStyle(.secondary)
+                        } else {
+                            ProgressView(value: item.progress?.fraction).controlSize(.small).frame(width: 56)
+                        }
+                        Text(verbatim: item.archive.lastPathComponent)
+                            .lineLimit(1).truncationMode(.middle)
+                            .help(item.archive.path)
+                        Spacer()
+                        if let progress = item.progress {
+                            Text(verbatim: ByteCountFormatter.string(fromByteCount: progress.bytes, countStyle: .file))
+                                .foregroundStyle(.secondary).monospacedDigit()
+                        }
+                        switch item.state {
+                        case .waiting: Text("Waiting to import…").foregroundStyle(.secondary)
+                        case .running: Text("Importing…")
+                        case .cancelling: Text("Cancelling…").foregroundStyle(.secondary)
+                        }
+                        Button("Cancel") { library.cancelImport(item.id) }
+                            .disabled(item.state == .cancelling)
+                    }
+                    .frame(height: 28)
+                }
+            }
+            .padding(VPhoneLaunchpadTheme.padding)
+        }
+        .frame(height: CGFloat(min(library.imports.count, 4)) * 36 + 16)
+        .fontDesign(.monospaced)
+    }
+
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
         ToolbarItem(placement: .automatic) {
@@ -164,7 +207,6 @@ struct VPhoneLaunchpadMachinesView: View {
                 Label("Import…", systemImage: "square.and.arrow.down")
             }
             .help("Import a machine archive into the default library")
-            .disabled(library.globalActivity != nil)
         }
         ToolbarItem(placement: .automatic) {
             VPhoneLaunchpadSearchField(text: $filter, prompt: String(localized: "Search machines"))
@@ -267,6 +309,8 @@ struct VPhoneLaunchpadMachinesView: View {
         Button("Settings…") { sheet = .settings(machines) }
             .disabled(!editable)
         if machines.count == 1, let machine = machines.first {
+            Button("Change Core Bundle…") { sheet = .bundleChange(machine.path) }
+                .disabled(!editable)
             Button("Rename…") { sheet = .rename(machine.path) }
                 .disabled(!editable)
             Button("Clone…") { sheet = .clone(machine.path) }
@@ -318,7 +362,9 @@ struct VPhoneLaunchpadMachinesView: View {
                     state: library.state(of: machine.path),
                     activity: library.activity(of: machine.path),
                     panicked: library.panicked.contains(machine.path),
-                    indeterminate: library.isExporting(machine.path)
+                    indeterminate: library.isExporting(machine.path),
+                    fraction: library.exports[machine.path]?.progress?.fraction,
+                    bytes: library.exports[machine.path]?.progress?.bytes
                 )
             }
             .width(min: 120, ideal: Column.state)
@@ -364,7 +410,6 @@ struct VPhoneLaunchpadMachinesView: View {
             } actions: {
                 Button("New Machine…") { sheet = .newMachine }
                 Button("Import…") { chooseImport() }
-                    .disabled(library.globalActivity != nil)
             }
         }
     }
@@ -374,6 +419,8 @@ struct VPhoneLaunchpadMachinesView: View {
     @ViewBuilder
     private func sheetContent(_ sheet: Sheet) -> some View {
         switch sheet {
+        case let .bundleChange(path):
+            VPhoneLaunchpadBundleChangeView(machine: path)
         case let .settings(machines):
             VPhoneLaunchpadMachineSettingsView(machines: machines)
         case let .rename(path):
@@ -411,11 +458,11 @@ struct VPhoneLaunchpadMachinesView: View {
         let library = library
         let panel = NSOpenPanel()
         panel.title = String(localized: "Import Machine")
-        panel.message = String(localized: "Choose an exported machine archive (.tzst or .txz). It is imported into \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))).")
+        panel.message = String(localized: "Choose one or more exported machine archives (.tzst or .txz). They are imported in order into \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))).")
         panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = false
-        panel.present { url in
-            Task { await library.importArchive(url) }
+        panel.allowsMultipleSelection = true
+        panel.presentSelection { urls in
+            Task { await library.importArchives(urls) }
         }
     }
 
@@ -441,6 +488,7 @@ struct VPhoneLaunchpadMachinesView: View {
         }
         let all = library.machines
         switch name {
+        case "bundleChangeSheet": sheet = .bundleChange(first.path)
         case "settingsSheet": sheet = .settings([first])
         case "renameSheet": sheet = .rename(first.path)
         case "cloneSheet": sheet = .clone(first.path)

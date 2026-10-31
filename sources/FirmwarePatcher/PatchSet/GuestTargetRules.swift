@@ -2,7 +2,7 @@
 import Foundation
 
 enum GuestTargetRules {
-    static let digest = "5f259f42583bb7b1f1426b986a86801fc421e17921fc157fe4a74bd596771213"
+    static let digest = "cf03209f536f245fb775a5a146eaa6a769d6c427ec061c644b9a5a1bc67354a8"
     static let declarationIDs: Set<String> = [
         "dyld-boot-iomfb_force_kern",
         "dyld-boot-iomfb_swapend",

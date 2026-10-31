@@ -1,0 +1,207 @@
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index 228442c..1d02451 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -65,6 +65,9 @@ jobs:
+       - name: Launchd plist paths and the RootHide rewrite
+         run: ./scripts/test-launchd-plist-paths.sh
+ 
++      - name: Foreground-uid lookup guard for tvOS
++        run: ./scripts/test-foreground-uid.sh
++
+       - name: RootHide root names and the root on disk
+         run: ./scripts/test-roothide-root.sh
+ 
+diff --git a/Resources/Info.plist b/Resources/Info.plist
+index fa12470..0f3e70c 100644
+--- a/Resources/Info.plist
++++ b/Resources/Info.plist
+@@ -11,8 +11,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>TOOL</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>0.8.5</string>
++	<string>0.8.6</string>
+ 	<key>CFBundleVersion</key>
+-	<string>44</string>
++	<string>45</string>
+ </dict>
+ </plist>
+diff --git a/Sources/IcliSystemPrivate/ForegroundUID.h b/Sources/IcliSystemPrivate/ForegroundUID.h
+new file mode 100644
+index 0000000..a2500fc
+--- /dev/null
++++ b/Sources/IcliSystemPrivate/ForegroundUID.h
+@@ -0,0 +1,21 @@
++#pragma once
++#include <stdbool.h>
++#include <stdint.h>
++
++/// libxpc's foreground-uid lookup and its user-session predicate, as resolved
++/// by dlsym: either may be NULL.
++typedef uint64_t (*icli_foreground_uid_lookup)(uint64_t);
++typedef bool (*icli_user_sessions_enabled)(void);
++
++/// The foreground user's uid into `uid`, or false when there is none to ask
++/// for. iOS 15 has no lookup. tvOS exports it but never enables user sessions,
++/// and there the lookup traps with _xpc_api_misuse ("must not be called if
++/// xpc_user_sessions_enabled() is false") rather than returning, so the
++/// predicate is asked first whenever libxpc has it. Kept apart from Launchd.m
++/// so scripts/test-foreground-uid.sh can check it on the Mac.
++static inline bool icli_foreground_uid(icli_foreground_uid_lookup lookup, icli_user_sessions_enabled enabled, uint64_t *uid) {
++    if (!lookup) return false;
++    if (enabled && !enabled()) return false;
++    *uid = lookup(0);
++    return true;
++}
+diff --git a/Sources/IcliSystemPrivate/Launchd.m b/Sources/IcliSystemPrivate/Launchd.m
+index 3de6ef0..cb402d8 100644
+--- a/Sources/IcliSystemPrivate/Launchd.m
++++ b/Sources/IcliSystemPrivate/Launchd.m
+@@ -1,5 +1,6 @@
+ #import "IcliSystemPrivate.h"
+ #import "SystemJSON.h"
++#import "ForegroundUID.h"
+ #import <Foundation/Foundation.h>
+ #import <xpc/xpc.h>
+ #import <dlfcn.h>
+@@ -86,17 +87,26 @@ static id objectFromXPC(xpc_object_t value) {
+ /// model that moved LaunchDaemons into the foreground user's domain; linked by
+ /// name, an iOS 15 dyld refuses to start any binary that carries this file.
+ /// On iOS 15 every daemon lives in the system domain alone.
++///
++/// tvOS exports the lookup but is single-user and never enables user sessions,
++/// so the lookup traps with _xpc_api_misuse ("must not be called if
++/// xpc_user_sessions_enabled() is false") rather than returning. Guard it with
++/// libxpc's own predicate (icli_foreground_uid) and fall back to the iOS 15
++/// behaviour there: the system domain alone, which is where a single-user
++/// system runs its daemons.
+ static bool foregroundUID(uint64_t *uid) {
+-    static uint64_t (*lookup)(uint64_t);
++    static icli_foreground_uid_lookup lookup;
++    static icli_user_sessions_enabled enabled;
+     static dispatch_once_t once;
+     dispatch_once(&once, ^{
+         // libxpc's own, not the first image that exports the name
+         void *xpc = dlopen("/usr/lib/system/libxpc.dylib", RTLD_LAZY | RTLD_NOLOAD);
+-        if (xpc) lookup = dlsym(xpc, "xpc_user_sessions_get_foreground_uid");
++        if (xpc) {
++            lookup = dlsym(xpc, "xpc_user_sessions_get_foreground_uid");
++            enabled = dlsym(xpc, "xpc_user_sessions_enabled");
++        }
+     });
+-    if (!lookup) return false;
+-    *uid = lookup(0);
+-    return true;
++    return icli_foreground_uid(lookup, enabled, uid);
+ }
+ 
+ // Domain types: 1 = system, 2 = a user (handle = uid), 7 = resolved from the
+diff --git a/Tests/ForegroundUID/main.c b/Tests/ForegroundUID/main.c
+new file mode 100644
+index 0000000..5d3a405
+--- /dev/null
++++ b/Tests/ForegroundUID/main.c
+@@ -0,0 +1,60 @@
++// Host-side regression for the foreground-uid lookup guard: tvOS exports
++// xpc_user_sessions_get_foreground_uid but traps in it while user sessions are
++// off, so the guard must ask xpc_user_sessions_enabled first.
++#include "ForegroundUID.h"
++#include <stdio.h>
++#include <stdlib.h>
++
++static bool sessionsOn;
++static int lookups;
++
++// Stands in for libxpc: like tvOS, it traps when sessions are off.
++static uint64_t lookup(uint64_t flags) {
++    (void)flags;
++    if (!sessionsOn) {
++        fprintf(stderr, "FAIL: lookup called while user sessions are off\n");
++        abort();
++    }
++    lookups++;
++    return 501;
++}
++
++static bool enabled(void) {
++    return sessionsOn;
++}
++
++static int failures;
++
++static void expect(bool condition, const char *what) {
++    if (!condition) {
++        fprintf(stderr, "FAIL: %s\n", what);
++        failures++;
++    }
++}
++
++int main(void) {
++    uint64_t uid = 0;
++
++    // iOS 15: no lookup at all.
++    expect(!icli_foreground_uid(NULL, enabled, &uid), "no lookup gives no uid");
++
++    // tvOS: lookup exported, sessions off. Must not reach the lookup.
++    sessionsOn = false;
++    lookups = 0;
++    expect(!icli_foreground_uid(lookup, enabled, &uid), "sessions off gives no uid");
++    expect(lookups == 0, "sessions off never calls the lookup");
++
++    // iOS 16 and later: sessions on.
++    sessionsOn = true;
++    uid = 0;
++    expect(icli_foreground_uid(lookup, enabled, &uid), "sessions on gives a uid");
++    expect(uid == 501 && lookups == 1, "sessions on returns the lookup's uid");
++
++    // A libxpc with the lookup but without the predicate keeps the old path.
++    uid = 0;
++    expect(icli_foreground_uid(lookup, NULL, &uid) && uid == 501, "no predicate keeps the lookup");
++
++    if (failures) return 1;
++    printf("foreground uid guard: ok\n");
++    return 0;
++}
+diff --git a/docs/releases/0.8.6.md b/docs/releases/0.8.6.md
+new file mode 100644
+index 0000000..145d718
+--- /dev/null
++++ b/docs/releases/0.8.6.md
+@@ -0,0 +1,2 @@
++- Launchd service operations no longer crash on tvOS when looking up the foreground user. tvOS exports the lookup but traps when user sessions are disabled; icli now checks whether sessions are enabled before calling it. Systems without the lookup retain their existing fallback.
++- A host-side regression test checks that disabled user sessions never reach the lookup, and runs in the release workflow.
+diff --git a/scripts/test-foreground-uid.sh b/scripts/test-foreground-uid.sh
+new file mode 100755
+index 0000000..24882e7
+--- /dev/null
++++ b/scripts/test-foreground-uid.sh
+@@ -0,0 +1,28 @@
++#!/bin/sh
++set -eu
++cd "$(dirname "$0")/.."
++# Host-side regression for the foreground-uid lookup on tvOS, where libxpc
++# exports xpc_user_sessions_get_foreground_uid but traps in it while user
++# sessions are off. Compiles the pure ForegroundUID.h against a stand-in that
++# traps the same way, then checks nothing reaches the lookup around it.
++work="$(mktemp -d)"
++trap 'rm -rf "$work"' EXIT
++xcrun clang -std=c11 -Wall -Wextra -Werror -ISources/IcliSystemPrivate \
++  Tests/ForegroundUID/main.c -o "$work/foreground-uid-tests"
++"$work/foreground-uid-tests"
++
++# Every use of the lookup goes through icli_foreground_uid: the symbol is only
++# ever resolved by name, never linked or called directly.
++direct="$(grep -rn 'xpc_user_sessions_get_foreground_uid' Sources | grep -v '^[^:]*:[0-9]*: *//' | grep -v 'dlsym(xpc, "xpc_user_sessions_get_foreground_uid")' || true)"
++if [ -n "$direct" ]; then
++  echo "FAIL: xpc_user_sessions_get_foreground_uid used outside the guarded dlsym:" >&2
++  echo "$direct" >&2
++  exit 1
++fi
++callers="$(grep -rn 'lookup(0)' Sources | grep -v 'ForegroundUID.h' || true)"
++if [ -n "$callers" ]; then
++  echo "FAIL: foreground-uid lookup called outside icli_foreground_uid:" >&2
++  echo "$callers" >&2
++  exit 1
++fi
++echo "foreground uid lookup: only through icli_foreground_uid"

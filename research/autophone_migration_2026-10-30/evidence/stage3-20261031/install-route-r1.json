@@ -1,0 +1,29 @@
+{
+  "target": {
+    "host_id": "migration-local",
+    "rig_id": "migration-stage3",
+    "rig_generation": 4,
+    "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+    "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline",
+    "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/baseline/vphone.sock",
+    "expected_usb_udid": "0000FE01-2119AAF5C1E70D2F",
+    "ssh_host": "127.0.0.1",
+    "ssh_port": 22242,
+    "frida_host": "127.0.0.1",
+    "frida_port": 37042,
+    "frida_guest_port": 27042,
+    "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/logs",
+    "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/tmp",
+    "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage3/packages",
+    "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3/runtime",
+    "protocol": "upstream_v1",
+    "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+  },
+  "control_plane_configured": false,
+  "key_sources": {
+    "AUTOPHONE_DATABASE_URL": "missing",
+    "AUTOPHONE_DATABASE_SCHEMA": "missing",
+    "AUTOPHONE_CONTROL_WS": "missing"
+  },
+  "env_file": "/Users/kolar/github/vphone-cli/.build/am31/stage3/runtime/control-plane.env"
+}

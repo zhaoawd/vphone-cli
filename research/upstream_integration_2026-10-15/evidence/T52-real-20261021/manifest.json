@@ -1,0 +1,1392 @@
+{
+  "schemaVersion": 1,
+  "scope": "T52 real Core Bundle and environment replacement; consult report for current completion and limitations",
+  "accepted": false,
+  "files": [
+    {
+      "path": "T52_real_bundle_environment_20261021.md",
+      "bytes": 18523,
+      "sha256": "fbd45adeafca7f897669399dcebcbe80899170625be77009005a3825b1f41146"
+    },
+    {
+      "path": "runtime/acceptance-plan.json",
+      "bytes": 5986,
+      "sha256": "1d818a6b8b8b6f79894318f6518fe1b107fd237ee1241c01706636d8a55dce18"
+    },
+    {
+      "path": "runtime/api-boot/guest-observer.log.gz",
+      "bytes": 1079,
+      "sha256": "4aaf126ccbada69e57cf52b625f4cefad762ed5d71be20be7f3d38d2d18acf4c"
+    },
+    {
+      "path": "runtime/api-boot/launch-result.json",
+      "bytes": 669,
+      "sha256": "ac68b162c71a25c86f31b486b78be15cf705ecae9505b67243c44dae369d6ce6"
+    },
+    {
+      "path": "runtime/api-boot/launch.json",
+      "bytes": 617,
+      "sha256": "4070de0958db8e70e332884971f36984a9fe7e3358c4a7a52656959928ef5bcb"
+    },
+    {
+      "path": "runtime/api-boot/launch.py",
+      "bytes": 1900,
+      "sha256": "f80cef3cc2d8bb2c62fcb06d114a69e7847bc77d077bb8aeb80284986a52cd8e"
+    },
+    {
+      "path": "runtime/api-boot/readiness.json",
+      "bytes": 6414,
+      "sha256": "08cd70e2780ed79bd2dcfc4776fb8d487e32a8324d25e5763475d914c9993a2a"
+    },
+    {
+      "path": "runtime/api-boot/serial.log.gz",
+      "bytes": 19411,
+      "sha256": "4bcdeca2fcbd38afdc44a235bca204d94fdadb6a857720108dcfc1e1930e95bf"
+    },
+    {
+      "path": "runtime/authorize-t52.zsh",
+      "bytes": 605,
+      "sha256": "770c3ce0d4456f7849953230c638d17a9ba5cb1a3e4ebedbca736d969943912f"
+    },
+    {
+      "path": "runtime/baseline-components-build.log.gz",
+      "bytes": 920,
+      "sha256": "439043153be94e26777bf3cafef60c4be87e402d90f6352e7fee7ecb5a98c9c2"
+    },
+    {
+      "path": "runtime/binding-backup-verified.json",
+      "bytes": 1286,
+      "sha256": "fdba23339d463b18688d74018a935d555fd57ab463cc9ac49384edfba0dd1670"
+    },
+    {
+      "path": "runtime/binding-monitor.jsonl",
+      "bytes": 252,
+      "sha256": "fa0f810150116fc87d9190d5405cb751e3d7e8b91dfd527e4fe26029eaf9daa1"
+    },
+    {
+      "path": "runtime/boot-window/amfid-help-probe.log.gz",
+      "bytes": 361,
+      "sha256": "5b228a42d5f31d7957676127868fb98bc38d377b0a6d060fafc8cc9b9f56facf"
+    },
+    {
+      "path": "runtime/boot-window/authorization-window.json",
+      "bytes": 117,
+      "sha256": "9af1a324dbf31135ad4949ba404381474df57b6c4bcfcf01755911f017ae4a62"
+    },
+    {
+      "path": "runtime/boot-window/helper-state.json",
+      "bytes": 357,
+      "sha256": "cb6a5357c7303ad1a0d23ceaa0f8d22d0667a5688dc9ec8ae60215e7606eef74"
+    },
+    {
+      "path": "runtime/boot-window/post-helper-amfid.log.gz",
+      "bytes": 448,
+      "sha256": "43b5991d4ee398b15a77c8529d6a457a77b3d788328b832ff044a27283e66d0a"
+    },
+    {
+      "path": "runtime/boot-window/post-helper-help-probe.json",
+      "bytes": 269,
+      "sha256": "4f150d42db91d3005281c8b82dd0d0ad1529b7c0e0350a93e8af15a4e0e910bc"
+    },
+    {
+      "path": "runtime/boot-window/prepared.json",
+      "bytes": 703,
+      "sha256": "dc332515ac0027c0f83b41ef0303384675756e7451bfca627059f6ca08f23115"
+    },
+    {
+      "path": "runtime/boot-window/runtime-help-probe.json",
+      "bytes": 304,
+      "sha256": "569c173306e2e24bd5d73c9313d3ae136e3c28efee79f63cb6e116809e943a99"
+    },
+    {
+      "path": "runtime/boot-window/scoped-amfidont.log.gz",
+      "bytes": 576,
+      "sha256": "234986b72bb07cbb157eee21a47fe368d459d266d536b62ed0163db26267c504"
+    },
+    {
+      "path": "runtime/boot-window/scoped-amfidont.py",
+      "bytes": 4321,
+      "sha256": "16a8ad502be1a9eca6fc226bfda96e16b36381f5cc7a0d8eea3789d93454bda6"
+    },
+    {
+      "path": "runtime/build-cli.log.gz",
+      "bytes": 4968,
+      "sha256": "f960c2a07641a41783e1b8b39c40e71e7ca64332ac5078f7753a99a233a536a6"
+    },
+    {
+      "path": "runtime/build-cli.sh",
+      "bytes": 6698,
+      "sha256": "bfb4ff968ffc262aa8fb35cc47fc839c209107cb8a055cfcea2810faa5f0b45d"
+    },
+    {
+      "path": "runtime/cfw-fix/create-invocation.json",
+      "bytes": 1281,
+      "sha256": "b269e08377500897ad4b57fb78cf1ad9cf8631a5d0e903de1828776bc738da9a"
+    },
+    {
+      "path": "runtime/cfw-fix/create-process.json",
+      "bytes": 53,
+      "sha256": "0202d174f47cbd5ff454525bac62739f2265896021b0e720a70cac7843715e93"
+    },
+    {
+      "path": "runtime/cfw-fix/create-result.json",
+      "bytes": 56,
+      "sha256": "537e89b421e0548c3e7393d3accb50d35c182949ab3926c72ee689e564e2233c"
+    },
+    {
+      "path": "runtime/cfw-fix/create.log.gz",
+      "bytes": 569,
+      "sha256": "922332363104a393f1ec3240b3aff4247fa9d48c34fcd6eb05936370e01eec2b"
+    },
+    {
+      "path": "runtime/cfw-fix/monitor.jsonl",
+      "bytes": 24240,
+      "sha256": "78a355e1f5535230cd95dcd04572444dcd561a110f061d63b644b5fa950716e7"
+    },
+    {
+      "path": "runtime/cfw-fix/selected-snapshot.json",
+      "bytes": 832,
+      "sha256": "d6a231b419801923330c563d9b0b14a112414b8b0b4ef27d0383c7cd2ae66f99"
+    },
+    {
+      "path": "runtime/cfw-profile-fix/create-invocation.json",
+      "bytes": 1258,
+      "sha256": "a66d2e2cb522df5553e6dced0380063bfd4ffdff693bdf471b5de36192085ed6"
+    },
+    {
+      "path": "runtime/cfw-profile-fix/create-process.json",
+      "bytes": 53,
+      "sha256": "77d418daa552096ab5d453fb47d172ffb0c5ead2f6aac558805f65bd8970e749"
+    },
+    {
+      "path": "runtime/cfw-profile-fix/create-result.json",
+      "bytes": 54,
+      "sha256": "4362fab85e68a27438fda62d95256ab6c843638defd2b51ca228d5881ee42693"
+    },
+    {
+      "path": "runtime/cfw-profile-fix/create.log.gz",
+      "bytes": 2311,
+      "sha256": "383fc8b6888182717fa30e8fee4bc152a1e26209b8affa33923dde8fb2974534"
+    },
+    {
+      "path": "runtime/child-environment-green.log.gz",
+      "bytes": 3821,
+      "sha256": "0549234ed09c36593f3e6b3e41b537e2854a5096383dd43b258711e5ac78368f"
+    },
+    {
+      "path": "runtime/child-environment-kit.log.gz",
+      "bytes": 13894,
+      "sha256": "c28e20905e4eb9d12fc0cde89746d45a2b6c2104c09ea3f2cf61543fce06cac8"
+    },
+    {
+      "path": "runtime/child-environment-red.log.gz",
+      "bytes": 7255,
+      "sha256": "22707ec90cf1fc1951c73cdb3d9659c28122058bd8f38ca0ecad4403652c6ee2"
+    },
+    {
+      "path": "runtime/clone.log.gz",
+      "bytes": 54,
+      "sha256": "5ae394124d4c251015fb745a727d2a30baac3af1d48bbac4042a54da3dbc1ffa"
+    },
+    {
+      "path": "runtime/component-comparison.json",
+      "bytes": 2187,
+      "sha256": "44c3b7346aba641da4ea9c2531d4bae40a995bb8d231b4b4f7edc2354ff7a72b"
+    },
+    {
+      "path": "runtime/components-build.log.gz",
+      "bytes": 926,
+      "sha256": "2d0b2c10c279ca1c2a5af2b05b0ed3267a0ea06e25c41ae03d4af0edcea01065"
+    },
+    {
+      "path": "runtime/core-bundle-candidate.json",
+      "bytes": 768,
+      "sha256": "1758fb539368b3bd7c188ddace89adc5fcf078441f3b655aef085812317a2dba"
+    },
+    {
+      "path": "runtime/create-help.txt.gz",
+      "bytes": 1661,
+      "sha256": "d276563e45905d75c7bbd103638e1ff21c1da1277b045b603aa3d144c536ba10"
+    },
+    {
+      "path": "runtime/create-invocation.json",
+      "bytes": 1218,
+      "sha256": "3de56433a8e573caac89db2817b4169e9a80c738d1544f654f37c0f5488a86a3"
+    },
+    {
+      "path": "runtime/create-process.json",
+      "bytes": 54,
+      "sha256": "2e1aa630c01fe361d3b9b19ba56d08f459988808518ee1d7ee16598bf64fcdbc"
+    },
+    {
+      "path": "runtime/create-result.json",
+      "bytes": 55,
+      "sha256": "10365e7796e613ae3d340434261388f6c575731d518b83de2ca5c62e0d10985c"
+    },
+    {
+      "path": "runtime/create.log.gz",
+      "bytes": 385,
+      "sha256": "b1c1d9fdb71c1ba56cf7eaaae2bc706df7ce18ec501958af81891755f16a5994"
+    },
+    {
+      "path": "runtime/creation-overlay-api-preflight.log.gz",
+      "bytes": 98,
+      "sha256": "a3bb7a185c5f69f829037a41b7de930112ef4b7b2be3504a1d844d1776831b0b"
+    },
+    {
+      "path": "runtime/creation-resource-fix.json",
+      "bytes": 1637,
+      "sha256": "9fc352831e74d9e2ac677838b2f54c5989213475ad96e6eaa672fbc10c412e2d"
+    },
+    {
+      "path": "runtime/eligibility-user.json",
+      "bytes": 6046,
+      "sha256": "6abbd0b9230e9ed05ec45577dc4b288fba0f035705448042aaae7123901433f4"
+    },
+    {
+      "path": "runtime/eligibility-user.log.gz",
+      "bytes": 238,
+      "sha256": "6bdb660d8a0a6144f59cba5d4d372aaed1ca1f39306cab48af764d4f40e6e976"
+    },
+    {
+      "path": "runtime/environment-acceptance.json",
+      "bytes": 2802,
+      "sha256": "2d264480d169cc3518bdf09860067ef58cb59ba286d27877cb547021044e20e0"
+    },
+    {
+      "path": "runtime/environment-after-invocation.json",
+      "bytes": 664,
+      "sha256": "829e24c76e2feba1885b403e8000f4282d014c9b149910750f45586b2c6784c1"
+    },
+    {
+      "path": "runtime/environment-after.json",
+      "bytes": 7522,
+      "sha256": "6004e4056aba2939ecca392e9d4defa6f6cb036dca62ab68508ef2b4f6cb63f1"
+    },
+    {
+      "path": "runtime/environment-after.stderr.log.gz",
+      "bytes": 308,
+      "sha256": "0d1ab38500e2bba10778c8ad583e7cf7e53ca35eab36158fba3323d5ec656ae8"
+    },
+    {
+      "path": "runtime/environment-after.stdout.log.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "runtime/environment-before-2-invocation.json",
+      "bytes": 669,
+      "sha256": "f5f89e3b02efc5f83cc90cb82fa804865e88c6c32383d32af4b42053cc22cd21"
+    },
+    {
+      "path": "runtime/environment-before-2.json",
+      "bytes": 8395,
+      "sha256": "6bbd1a9e6d06cb7ed6b96b8b6133f6ec7afe96a0002923460519d0d98627ebe8"
+    },
+    {
+      "path": "runtime/environment-before-2.stderr.log.gz",
+      "bytes": 309,
+      "sha256": "8f537d65133065d58a44081062cabf45d4d54b80ac667c3dc42b1c09523b9ddc"
+    },
+    {
+      "path": "runtime/environment-before-2.stdout.log.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "runtime/environment-before-invocation.json",
+      "bytes": 666,
+      "sha256": "f72ac7a35322e938376c9d36578054efb156c3fdf8a882129bc588ec18c6fcc7"
+    },
+    {
+      "path": "runtime/environment-before.json",
+      "bytes": 8395,
+      "sha256": "723ccb93b9f102fbe3a4fb48c29ba7ba702f5b0cfc98e9f17f7af51aa5fb680e"
+    },
+    {
+      "path": "runtime/environment-before.stderr.log.gz",
+      "bytes": 134,
+      "sha256": "03d4a1aeec50a0e689c05bcd46612b0ef3fbf04f61fb6ce342817333007ee1de"
+    },
+    {
+      "path": "runtime/environment-before.stdout.log.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "runtime/final-runtime-summary.json",
+      "bytes": 1383,
+      "sha256": "3a1a59248f27b867d743b47769f69b0f082b83c8a6e996a8564d2b456def410a"
+    },
+    {
+      "path": "runtime/final-verified-receipt.json",
+      "bytes": 314,
+      "sha256": "f6e0e298cf4352fa65127c4dfeaffa16ea92626c79d63e6707cbb53ea56b1d3d"
+    },
+    {
+      "path": "runtime/firmware-inputs.json",
+      "bytes": 969,
+      "sha256": "e4f1d9cc740a351f1394078a4e11787e3d10ab0da0f60714ea5ed16b422006e4"
+    },
+    {
+      "path": "runtime/fw-plan-help.txt.gz",
+      "bytes": 782,
+      "sha256": "2c23604d547c369c3fc890bc3bd53604e51c68aa1575337c1da53913b0e0e89a"
+    },
+    {
+      "path": "runtime/guest-input-preflight-final.log.gz",
+      "bytes": 164,
+      "sha256": "5b2be71cb0d10a7c6a9cb4480618c9b117298690f9be81709a476efe47a6cff5"
+    },
+    {
+      "path": "runtime/guest-input-preflight.json",
+      "bytes": 861,
+      "sha256": "fcb1ada29a7a5bf9a46216058fda15c6bf7740b9b21c692af5bce7d0d58ddb0b"
+    },
+    {
+      "path": "runtime/guest-input-preflight.log.gz",
+      "bytes": 382,
+      "sha256": "9abcfb7563a7875d7491eedc1eea7768fee99693fa3d0f2e4baf23b9c3a37f15"
+    },
+    {
+      "path": "runtime/gui-command-1B8E8786-573B-4512-8232-F60415F55EA8.log.gz",
+      "bytes": 114,
+      "sha256": "278b141a483be3ec229c6d97b53d266b2f9d11eb2248bfb56379e61292967d2c"
+    },
+    {
+      "path": "runtime/gui-command-74A7533E-534A-4957-A585-58D74DE3CBDE.log.gz",
+      "bytes": 230,
+      "sha256": "f75fde2eed7a35b427b48c040bc08258cc2d4b3e1d871cbebf76eae836bd7f1a"
+    },
+    {
+      "path": "runtime/gui-command-958052E4-A2C3-4DE7-9D06-428A99B99BFA.log.gz",
+      "bytes": 116,
+      "sha256": "3778db44ad46008a121f5e5389eae9437c58ff9c09ead9771841fc05c883b8f8"
+    },
+    {
+      "path": "runtime/gui-command-BF928C04-70C5-4A44-8F0D-A1957F55F55D.log.gz",
+      "bytes": 3373,
+      "sha256": "96cfb73fdf8ef07e5bceb479fbf4f1dec5b2c3a474e26bbbc932745bef1706cd"
+    },
+    {
+      "path": "runtime/gui-command-E24BFDBD-3154-4FFD-A3FA-465F1C26E302.log.gz",
+      "bytes": 114,
+      "sha256": "47874b0b82dc25260516ca4e2dde2c5a8eb98d446cb6a843e295f11ca9c9536f"
+    },
+    {
+      "path": "runtime/gui-command-EC0AEF16-13DC-4DA4-95D3-AEA404BCA3E3.log.gz",
+      "bytes": 116,
+      "sha256": "3778db44ad46008a121f5e5389eae9437c58ff9c09ead9771841fc05c883b8f8"
+    },
+    {
+      "path": "runtime/gui-environment-retry-result.json",
+      "bytes": 512,
+      "sha256": "bc09a8a7ffb3a1436c9e0b0eb1bfcce5daae22a36dccea135eea848c1ab3cedf"
+    },
+    {
+      "path": "runtime/heartbeat-20261022-0638.json",
+      "bytes": 445,
+      "sha256": "7900e0883dd19ee94edb22f4354130a0b84786546a74137514bbd7c5e44f4e7d"
+    },
+    {
+      "path": "runtime/helper-state.json",
+      "bytes": 187,
+      "sha256": "893b8c74cd70f169424d9caff9837faac34afa3f22227e8c3f898f89f5ab3565"
+    },
+    {
+      "path": "runtime/install-core-bundle.zsh",
+      "bytes": 1145,
+      "sha256": "ea21ad8eb2661033d99e0e1972d132a6508e8982e0b9eb5243fd0619d3f4f1b6"
+    },
+    {
+      "path": "runtime/launchpad-env-fix-approval.json",
+      "bytes": 610,
+      "sha256": "0904732adb129d544d7f75e32ba0c0bb8d4e7e0bc34e9ff05b3f538867185766"
+    },
+    {
+      "path": "runtime/launchpad-env-fix-assembly.log.gz",
+      "bytes": 746,
+      "sha256": "0120d7d429835048ed8507e1eba10b83bccfd38a18b4e0a571494b6b056ec75c"
+    },
+    {
+      "path": "runtime/launchpad-env-fix-build.log.gz",
+      "bytes": 1770,
+      "sha256": "f394517da6ef49b21ae6b7083310ff80218e654a936002e84177eb38f65223f4"
+    },
+    {
+      "path": "runtime/launchpad-env-fix-candidate.json",
+      "bytes": 442,
+      "sha256": "73be70cc0d6c557cbd77bedb7d4c30c9816f589e26ba1e19eedaba97a941f61e"
+    },
+    {
+      "path": "runtime/launchpad-task-environment.json",
+      "bytes": 414,
+      "sha256": "2f9142c2a1db91b11a29a88b53142ece6a021ff17db5c85757dabcc66f12d925"
+    },
+    {
+      "path": "runtime/metadata-after.json",
+      "bytes": 2132,
+      "sha256": "d354a806e1f9c1930fecd94bfe66bb2ad776ed2e7e62acbc67dc6327d7a0721b"
+    },
+    {
+      "path": "runtime/metadata-before-2.json",
+      "bytes": 1851,
+      "sha256": "50c1d5e1a3f6219fba057707b79cdcdfe70946645be477f4bf3f2566d5257b3c"
+    },
+    {
+      "path": "runtime/metadata-before.json",
+      "bytes": 1851,
+      "sha256": "50c1d5e1a3f6219fba057707b79cdcdfe70946645be477f4bf3f2566d5257b3c"
+    },
+    {
+      "path": "runtime/patch-sample-command.log.gz",
+      "bytes": 186,
+      "sha256": "cba46f07a019ef783425607e2628076152d5d59ecaa976f5da9e1c2ed907e922"
+    },
+    {
+      "path": "runtime/patch.sample.txt.gz",
+      "bytes": 53817,
+      "sha256": "9946f2ecdd05117af80a3bf668e54f7bb396ffaad9e415ff891751e5e466f5e3"
+    },
+    {
+      "path": "runtime/post-update-boot/authorization-window.json",
+      "bytes": 119,
+      "sha256": "35cc5e65e7c2011df19d4c17bb8ef4389c7c55710b1e2dbe65651e4ff7411e97"
+    },
+    {
+      "path": "runtime/post-update-boot/cleanup.json",
+      "bytes": 469,
+      "sha256": "5f5844402caccc3f19b4db705c705e532f520a208d1c16cd1a2ff981b4086107"
+    },
+    {
+      "path": "runtime/post-update-boot/current-runtime-help-probe.json",
+      "bytes": 268,
+      "sha256": "b6fb400b962ecc544b4b7990e40046ade5b90ee0ae4062edc16445429d7ae55b"
+    },
+    {
+      "path": "runtime/post-update-boot/helper-state.json",
+      "bytes": 318,
+      "sha256": "1d49a138b442417f0782bf91e9fb3e4596d32ce043a5743d13137388d537a69b"
+    },
+    {
+      "path": "runtime/post-update-boot/pre-attachment-probe.json",
+      "bytes": 67,
+      "sha256": "2a0aa57fa7e3da47f0a9d28f398f29470f04412badd83ea5732cdebb925c8492"
+    },
+    {
+      "path": "runtime/post-update-boot/prepared.json",
+      "bytes": 641,
+      "sha256": "bdad629f9739407158f8758f5e86042b81395eb6bd6b8092073a3446d744e083"
+    },
+    {
+      "path": "runtime/post-update-boot/scoped-amfidont.log.gz",
+      "bytes": 701,
+      "sha256": "c81c4a801e3a1764eb23a62e3f1d18ba9d61d5291701c0c197da73dd01d69b61"
+    },
+    {
+      "path": "runtime/post-update-boot/scoped-amfidont.py",
+      "bytes": 5031,
+      "sha256": "6568168c765ec5df32c348f4b39bfc6e2051846b1de020a983eed96e45da33bb"
+    },
+    {
+      "path": "runtime/post-update-capabilities.json",
+      "bytes": 5826,
+      "sha256": "4c8d8a41ee6f915af34c157cbaaca16dc2422f37f3a0f334f476f595dd38f997"
+    },
+    {
+      "path": "runtime/post-update-environment-status.json",
+      "bytes": 3214,
+      "sha256": "4514f6e57177baf92d822c79cbb9a1d208a4a25f13c56f0e970f2e0e7eb466ca"
+    },
+    {
+      "path": "runtime/post-update-final-cleanup.json",
+      "bytes": 1386,
+      "sha256": "bd9df9f600fac91cdf23f91351c24b0fa7f532901f578fd6ada8eb00f0a2e7c5"
+    },
+    {
+      "path": "runtime/post-update-guest-observer.log.gz",
+      "bytes": 1057,
+      "sha256": "8b180b00522a64b73a9e50dc4aaa6c791e011a8832344b60c5711d2349ce0a5d"
+    },
+    {
+      "path": "runtime/post-update-guest-requests.jsonl",
+      "bytes": 15827,
+      "sha256": "43c858113d92c3525ed2c0e14edc72437ce696d948fad244bcca049a2f42fb04"
+    },
+    {
+      "path": "runtime/post-update-guest-result.json",
+      "bytes": 2267,
+      "sha256": "d8bd85daba825d717c294182478bb659cf82fc372c5f4b75027c0925611a04fc"
+    },
+    {
+      "path": "runtime/post-update-host-cleanup.json",
+      "bytes": 472,
+      "sha256": "9e672c86b9d6c8d0cf606086f2824b2e8b501e1600fcd6ef32219f55662618a4"
+    },
+    {
+      "path": "runtime/post-update-runtime-acceptance.json",
+      "bytes": 2292,
+      "sha256": "c3fb63b61e4e754b553428a696b9bdbd1f9f57cda88e5eed60f000e977041b40"
+    },
+    {
+      "path": "runtime/post-update-runtime.json",
+      "bytes": 255,
+      "sha256": "dc45f928c24a73cae43822f2fbdf060f3fc70bdbfa2d9aae7030011fcc21f0a8"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/failure.json",
+      "bytes": 238,
+      "sha256": "534dee239fae39d01aa9560bf9d34ae3e8601908569fa6b61085faf3aa2c386e"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/post-update-capabilities.json",
+      "bytes": 1562,
+      "sha256": "49bb671125f0279f59a0a592f7df6013dc0630c822d84541f1c97556c6e216b7"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/post-update-environment-status.json",
+      "bytes": 94,
+      "sha256": "3467fab84b6c2c252de02a3e0bdbb792e840845f9f0b7069ea07d81615ba9da6"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/post-update-guest-requests.jsonl",
+      "bytes": 6894,
+      "sha256": "26384c7f344fe9ffc72fee1f5133bc4c2942e4d9d17bfa7f11e3dba92f5b39aa"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/post-update-guest-result.json",
+      "bytes": 2231,
+      "sha256": "fe80a5912fbedb4d46ac5002075d2bc90bce0db505dcd95bbb3088772ea74839"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/post-update-runtime.json",
+      "bytes": 255,
+      "sha256": "3e920ef3f98ac2ac3cd484e2adba80c8054ec9a6405f4b191ec90b8b9b60f952"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/serial.log.gz",
+      "bytes": 21873,
+      "sha256": "2833979fdad3c301131a1df1dcb786d69f4b40989f7aa8891865937ebc7ddc05"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/validation.json",
+      "bytes": 453,
+      "sha256": "61d69532f92ec5b8b5bb3401e1dca60491bd204dbd116397fe63b35beaf7c129"
+    },
+    {
+      "path": "runtime/post-update-stop-failure/validation.log.gz",
+      "bytes": 249,
+      "sha256": "0c9c5b6d83dec4fefe0d0b0455099eed23e2111da15011ded49992617fa5c238"
+    },
+    {
+      "path": "runtime/post-update-stop-result.json",
+      "bytes": 443,
+      "sha256": "265b3f9be88fc33f3048f239483545c541e3d090b30cba3157b7e35bc891fa49"
+    },
+    {
+      "path": "runtime/post-update-verified-receipt.json",
+      "bytes": 314,
+      "sha256": "f6e0e298cf4352fa65127c4dfeaffa16ea92626c79d63e6707cbb53ea56b1d3d"
+    },
+    {
+      "path": "runtime/pre-binding-store-verification.json",
+      "bytes": 296,
+      "sha256": "db26d86a8b457ad6a6a90daafb85a6739ded94b52d2d9707361a7bfb45ab27de"
+    },
+    {
+      "path": "runtime/pre-binding-verified-receipt.json",
+      "bytes": 314,
+      "sha256": "f6e0e298cf4352fa65127c4dfeaffa16ea92626c79d63e6707cbb53ea56b1d3d"
+    },
+    {
+      "path": "runtime/previous-disk-retention.json",
+      "bytes": 740,
+      "sha256": "c9dec7bec6ec59f232a6738c118e42a705411b6f82d426830e3eddc07bbd19c2"
+    },
+    {
+      "path": "runtime/protected-vms-after-binding.json",
+      "bytes": 3441,
+      "sha256": "fe343d7982ea8c7fad61c0eec6459de057c405b272378330d88903d0920a07a9"
+    },
+    {
+      "path": "runtime/protected-vms-after-update.json",
+      "bytes": 3440,
+      "sha256": "e9a52e0731396bbde3fbea8f232ec44b3516811c3b81e06d119045230f60a43e"
+    },
+    {
+      "path": "runtime/protected-vms-final.json",
+      "bytes": 3440,
+      "sha256": "304ba4641e0a18ea21e8b952131b1363c1e0a7ef60b409d7b703ea57b11f981f"
+    },
+    {
+      "path": "runtime/protected-vms-midrun.json",
+      "bytes": 3440,
+      "sha256": "aea933798d396cb31366cbfcb16e87b9f22d058fd92371546d541c40d93a59a1"
+    },
+    {
+      "path": "runtime/python-expanded.log.gz",
+      "bytes": 645,
+      "sha256": "c3dd79cbaab2089fae3f6f384ac44b65e970ce20bff95a6c978da4a8676edc78"
+    },
+    {
+      "path": "runtime/python-resources-final.log.gz",
+      "bytes": 54,
+      "sha256": "f19960ad4fafd2b053675c8da27f391a2ac0ce269d86cf8856bade59bca0631e"
+    },
+    {
+      "path": "runtime/python-resources.log.gz",
+      "bytes": 695,
+      "sha256": "ecf45dc006dd1e768184052557779d6adad205d31162e8f7c6f0ae33f7a053ed"
+    },
+    {
+      "path": "runtime/restore-amfid-log.txt.gz",
+      "bytes": 635,
+      "sha256": "fadd436874a1eade2e4dfb30fe34c80bdacc631bd612dc2e96f4746a972a4069"
+    },
+    {
+      "path": "runtime/retry-1/authorization-window.json",
+      "bytes": 117,
+      "sha256": "4aed7b53bea7d2f6adde27d37bc76963608345004b7737b71da031cf99d82d6a"
+    },
+    {
+      "path": "runtime/retry-1/create-elevated-process.json",
+      "bytes": 857,
+      "sha256": "0a42098bd219b17e7a13dd665572ebcc8ffdf0257da0fe0399005f82225ee55b"
+    },
+    {
+      "path": "runtime/retry-1/create-elevated-result.json",
+      "bytes": 55,
+      "sha256": "ff637848dc72c531d9e3c75a33c85b53f2fefb83b5ba347458db9401ac499215"
+    },
+    {
+      "path": "runtime/retry-1/create-elevated.log.gz",
+      "bytes": 456,
+      "sha256": "56f58715cbf162a462c34d16770d1d9be893e88a246413e991845ceedb0f708e"
+    },
+    {
+      "path": "runtime/retry-1/create-invocation.json",
+      "bytes": 841,
+      "sha256": "60597efa1d8ed66c492bb61fad5a712ae0b893d3b3424f19f901e43bd3984fdc"
+    },
+    {
+      "path": "runtime/retry-1/create-process.json",
+      "bytes": 53,
+      "sha256": "9294bb096a3aa4ccb4975d6ecd84b96544ef637ad537af5967d7c92f6f961ff5"
+    },
+    {
+      "path": "runtime/retry-1/create-result.json",
+      "bytes": 55,
+      "sha256": "9fc6284a38cf4b41187aeae8c5b0995967bf5fa5dea157e45e3008be5c6545ce"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed-invocation.json",
+      "bytes": 1093,
+      "sha256": "a7cf1975aad369f9e4b9ce3ee0286cc071f59fc10d430e82753d8925d602d3d6"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed-process.json",
+      "bytes": 51,
+      "sha256": "0fffad35276c3e121873daa9d6fcbe26878795698ebcd00a9a97857ee7e326b1"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed-r2-invocation.json",
+      "bytes": 1141,
+      "sha256": "0ed159892572cd1a617bcb74fa5a59ddc3200a7d5bcf72c3a2b45e9f79ff5328"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed-r2-process.json",
+      "bytes": 52,
+      "sha256": "3b216095c8fdaa358644f336d0df7ca0a9683b9135edbc66a21091d9251f0d37"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed-r2-result.json",
+      "bytes": 56,
+      "sha256": "bfd9c01ffbb8005da0932043caf04c8a82f0daead20fc3a761ee893e04fd591f"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed-r2.log.gz",
+      "bytes": 524,
+      "sha256": "733b6da879434c8d0e6fbf68ddcd64e265bdcb90d319c7f6bf8e91fb461159af"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed-result.json",
+      "bytes": 55,
+      "sha256": "1abad92456ac58bda9fa21e3ad2aa96c0bf3aeb5089d36e12d5cbcd6260e1411"
+    },
+    {
+      "path": "runtime/retry-1/create-sealed.log.gz",
+      "bytes": 290,
+      "sha256": "3e222d85ec7e0c7b8ee5e1b2b7ac1e24bc2c87f9834fcdee5e4b21f10d55a47b"
+    },
+    {
+      "path": "runtime/retry-1/create.log.gz",
+      "bytes": 282,
+      "sha256": "75957168b858ab40399bd4d750c72a5c445703a3cd54649c81b68aba02a01aa2"
+    },
+    {
+      "path": "runtime/retry-1/helper-state.json",
+      "bytes": 316,
+      "sha256": "fc9643464a3fcf69c7c7ca5e6e4c11e3dae4ac29a77ae515b141052eab632a07"
+    },
+    {
+      "path": "runtime/retry-1/installed-guest-api-probe.json",
+      "bytes": 506,
+      "sha256": "b8e22568ba481acc51e732efe4df2190e4119ad534cf0b7ff006b40e4f4dfb75"
+    },
+    {
+      "path": "runtime/retry-1/monitor.jsonl",
+      "bytes": 1506,
+      "sha256": "edc5fb0d98d40048829609861b3bd96ab6b87d592009d26780cf00e5ce7fc554"
+    },
+    {
+      "path": "runtime/retry-1/preflight.json",
+      "bytes": 515,
+      "sha256": "39f77c42f9f83008628feb246a28bc2bf6895a3babf41f48457f1d45fdcaae1a"
+    },
+    {
+      "path": "runtime/retry-1/scoped-amfidont.log.gz",
+      "bytes": 1521,
+      "sha256": "e29b766b2121b777711a0dbf32289f28e16741a0cd17707623c6710208b11b2c"
+    },
+    {
+      "path": "runtime/retry-1/scoped-amfidont.py",
+      "bytes": 4317,
+      "sha256": "f6450c467d5aa7f0104ea27344ce10f2b2bba7206bd5a50764d437545a24b82f"
+    },
+    {
+      "path": "runtime/retry-1/sealed-monitor.jsonl",
+      "bytes": 2379,
+      "sha256": "04ee068fdc3b072358ae2c0669a0c58ff4383880606dab1cf1fe0f3f935847d8"
+    },
+    {
+      "path": "runtime/retry-1/snapshot-dfu-probe.json",
+      "bytes": 407,
+      "sha256": "b7ac2011004e059928037b1af7d0b864546043cca4f6d24244af214892b7d127"
+    },
+    {
+      "path": "runtime/retry-1/snapshot-guest-api-probe.json",
+      "bytes": 1625,
+      "sha256": "fe1e7bc97a0bf610b60144c8a7e840f149b8fc8a37ce44138cdc56a098f4a68c"
+    },
+    {
+      "path": "runtime/retry-1/start.log.gz",
+      "bytes": 49,
+      "sha256": "a020aa4a7079d99c65649d3cca977f568029f67d515c37aff86a3f41fb8486cd"
+    },
+    {
+      "path": "runtime/retry-1/stop-process-verification.json",
+      "bytes": 468,
+      "sha256": "37e79c3ffc61189965290c190f82e0d62ef69b56b71d7855ca617b488f292cf4"
+    },
+    {
+      "path": "runtime/root-install-receipt.json",
+      "bytes": 314,
+      "sha256": "f6e0e298cf4352fa65127c4dfeaffa16ea92626c79d63e6707cbb53ea56b1d3d"
+    },
+    {
+      "path": "runtime/root-install.log.gz",
+      "bytes": 49,
+      "sha256": "a020aa4a7079d99c65649d3cca977f568029f67d515c37aff86a3f41fb8486cd"
+    },
+    {
+      "path": "runtime/root-verified-receipt.json",
+      "bytes": 314,
+      "sha256": "f6e0e298cf4352fa65127c4dfeaffa16ea92626c79d63e6707cbb53ea56b1d3d"
+    },
+    {
+      "path": "runtime/runtime-status.json",
+      "bytes": 5123,
+      "sha256": "8ea9b0f0f399609433fcf14c354ce46beaf66c519e97a3f32ec8922f5dd39f1c"
+    },
+    {
+      "path": "runtime/scoped-amfidont-t52.log.gz",
+      "bytes": 590,
+      "sha256": "1a809bb9765042afa962a2f0872fb5a15835d6af011ffb50aba60bd0b296e538"
+    },
+    {
+      "path": "runtime/scoped-amfidont.py",
+      "bytes": 2424,
+      "sha256": "820ed5aecaf019f3afeb588fa664b0ac607aa5e1861a814d926a251912bf9a12"
+    },
+    {
+      "path": "runtime/selected-snapshot-preflight.json",
+      "bytes": 4798,
+      "sha256": "88c7472ee19aa53ddbea5631046d1413af620db9103e79925c0c31027fb2e431"
+    },
+    {
+      "path": "runtime/selected-snapshot-production-preflight.json",
+      "bytes": 722,
+      "sha256": "1acb60e0e45a2b6bd1c65fb4986ef2abb80d8723054f1b94fb24e5a0f868044d"
+    },
+    {
+      "path": "runtime/signing-repro-verified/result.json",
+      "bytes": 1019,
+      "sha256": "436e9d79bf1e6de43eb65ce23e0977561f0ca16ea025c20d80eb2bbb4c08e63b"
+    },
+    {
+      "path": "runtime/signing-space-expanded.log.gz",
+      "bytes": 644,
+      "sha256": "27d39a67c3b334ca081c2282d247427b68e6db91f2b7094038c3c592c1d67ad8"
+    },
+    {
+      "path": "runtime/signing-space-final-unit.log.gz",
+      "bytes": 55,
+      "sha256": "4314f4d2f5d12655f2e2dda6e778bf89119ed6a3f1cdaf064ab9c31a01f24408"
+    },
+    {
+      "path": "runtime/signing-space-integration-green.log.gz",
+      "bytes": 307,
+      "sha256": "77e1a3754e3c6a51277d732673c1e58dc92c49ad04fa4f9cb3eec4698e74a407"
+    },
+    {
+      "path": "runtime/signing-space-integration-red.log.gz",
+      "bytes": 1083,
+      "sha256": "7c1ef1aa58ff444ac6a9738652049d8840a3a9d37c3e07464021d29d08f4e4fb"
+    },
+    {
+      "path": "runtime/signing-space-real-script.log.gz",
+      "bytes": 357,
+      "sha256": "ea8742deebedaa49ea74d9aa2a8a50b9510e0384dd4f267442cd6e85b71a0741"
+    },
+    {
+      "path": "runtime/signing-space-real.log.gz",
+      "bytes": 121,
+      "sha256": "59bdfdb91aa5bb1667a1e475f98cf469cb12952124120921d17a80628ba85c2c"
+    },
+    {
+      "path": "runtime/signing-space-red.log.gz",
+      "bytes": 421,
+      "sha256": "6c56958b2972e7a882f1d43bc922b06df9d7e5ade48116030c6f752f38f77fae"
+    },
+    {
+      "path": "runtime/signing-space-regression.log.gz",
+      "bytes": 805,
+      "sha256": "e32c9759699029f128b07f0a91ecfd55b78fef5418eb72e7133ddfe1b48041fa"
+    },
+    {
+      "path": "runtime/snapshot-help-probe.log.gz",
+      "bytes": 1062,
+      "sha256": "c90fc87a8e2e41bd5daca3b39a32cf07b0d538f06de5bad60eacb75510e88d39"
+    },
+    {
+      "path": "runtime/snapshot-retention-backup.json",
+      "bytes": 85404,
+      "sha256": "b6e94d7a5bd4e3408bb09b296c702e21b39922c7cb857e65b318d1b08678fb11"
+    },
+    {
+      "path": "runtime/snapshot-retention-backups-fix.json",
+      "bytes": 192123,
+      "sha256": "21d9c97bfe3759a2252ceb02339196c3cc2d527c32c005eb7ee92f7f3285c040"
+    },
+    {
+      "path": "runtime/snapshot-signature.log.gz",
+      "bytes": 172,
+      "sha256": "bd0327608257fc1ce08f09a3c5600c903fb8827ee0e7d320cf70071b3c36c67a"
+    },
+    {
+      "path": "runtime/swift-resources.log.gz",
+      "bytes": 8134,
+      "sha256": "b0aa0b0ced7b018b53816ab82af7031ed9844f8a275ad898d52c915c1553b14a"
+    },
+    {
+      "path": "runtime/swift-signed-archive.log.gz",
+      "bytes": 2684,
+      "sha256": "1d307ff884acbe1c88b909dddd8dd16bf7f76717df7bc7eb565b4dea464a30d3"
+    },
+    {
+      "path": "runtime/ui/cfw-failed-stopped.ax.txt.gz",
+      "bytes": 1699,
+      "sha256": "87ff452b54ffe18972e5f2ffccb34d52fc759afabfedf31f4eb9974dbe829270"
+    },
+    {
+      "path": "runtime/ui/cfw-failed-stopped.png",
+      "bytes": 179151,
+      "sha256": "0ac7113f52c2515e9574a22074656e15ba2af45d905481aebc939c287bf5d4b8"
+    },
+    {
+      "path": "runtime/ui/cfw-running.ax.txt.gz",
+      "bytes": 1773,
+      "sha256": "98b72e3dff64a4334243f8cd1d5ca6d02350aedb43e0917339d7dc2527d8950d"
+    },
+    {
+      "path": "runtime/ui/cfw-running.png",
+      "bytes": 181377,
+      "sha256": "bd3c31bc95eeecc05b0581d4f309a7e8acf3d8e4e7da9fc47a9bcda130b26976"
+    },
+    {
+      "path": "runtime/ui/environment-missing-lsof.ax.txt.gz",
+      "bytes": 516,
+      "sha256": "e8d551fb4636842285e25ef5332d95c032d9556e53d87b76edbe4879a59818b2"
+    },
+    {
+      "path": "runtime/ui/environment-missing-lsof.png",
+      "bytes": 100939,
+      "sha256": "610f18ca91d2322965be4db62ad26548636aa78bc4db35f29fb4ec51acb4f3af"
+    },
+    {
+      "path": "runtime/ui/environment-retry-default.ax.txt.gz",
+      "bytes": 479,
+      "sha256": "0aa95df6a2e2a97b99c38521beaa385523f8e7e290731283a67898218fc21b8e"
+    },
+    {
+      "path": "runtime/ui/environment-retry-default.png",
+      "bytes": 98541,
+      "sha256": "312874ff1310f7a71f692a90f737947bf2b1fe594405bc14da858acd70664883"
+    },
+    {
+      "path": "runtime/ui/environment-retry-prepared.ax.txt.gz",
+      "bytes": 610,
+      "sha256": "b3a20c76cf7488168aca65219d21e36f77abd2b5921ec767e337dc11a91730c9"
+    },
+    {
+      "path": "runtime/ui/environment-retry-prepared.png",
+      "bytes": 119816,
+      "sha256": "60fd5e130b7b6b6e2835cef6d8a563c0cf04d7df519c196711431ba881eafa3e"
+    },
+    {
+      "path": "runtime/ui/environment-retry-selected.ax.txt.gz",
+      "bytes": 1748,
+      "sha256": "af7b19305f75577990ea56a392826220d0b5e67fa55777bcaec003a7ae9555a0"
+    },
+    {
+      "path": "runtime/ui/environment-retry-selected.png",
+      "bytes": 179918,
+      "sha256": "ed77f95a3b1a2b5bd2bd6690f1270639eb18074df8716629756b14a9025337d8"
+    },
+    {
+      "path": "runtime/ui/environment-retry-started.ax.txt.gz",
+      "bytes": 649,
+      "sha256": "9616dc9b1a955b9852e0f5e005e060eda0ab2f82743f7a80e5c98f0463ae4280"
+    },
+    {
+      "path": "runtime/ui/environment-retry-started.png",
+      "bytes": 120087,
+      "sha256": "01f88836e37d0f2dfbb6fd2068ed5235d528dbd75c80080040ed8b14d89b6b6e"
+    },
+    {
+      "path": "runtime/ui/environment-retry-submission.json",
+      "bytes": 207,
+      "sha256": "94c2e7cbd87acf9db16fcd4ec0c613b9281900f85303c1ebfa8067a4a140ec1a"
+    },
+    {
+      "path": "runtime/ui/positive-binding-backup.ax.txt.gz",
+      "bytes": 808,
+      "sha256": "9f1b74b8191aeaf5fb89fde7ee72dc499e6a8bd9fb1429be95a9fec24eebf28a"
+    },
+    {
+      "path": "runtime/ui/positive-binding-backup.png",
+      "bytes": 157664,
+      "sha256": "d3fa86fb45b5417f0f587c6d00ab7644689e3b8fb2377f410e11aad1262d1c54"
+    },
+    {
+      "path": "runtime/ui/positive-binding-default.ax.txt.gz",
+      "bytes": 601,
+      "sha256": "ea080d1cbc21596fbdbff320d7f702a368d1a0748ac60a229bc3ccb4801902b5"
+    },
+    {
+      "path": "runtime/ui/positive-binding-default.png",
+      "bytes": 125577,
+      "sha256": "321d3a050cde64de54a6bcdd97ab6968f7f9e834caba81b79a391491dd4cad8a"
+    },
+    {
+      "path": "runtime/ui/positive-binding-prepared.ax.txt.gz",
+      "bytes": 774,
+      "sha256": "a7604ff0e8b1d57734c377999b51c3e98d1c9c442e1abc8ad5d66ad5b85db112"
+    },
+    {
+      "path": "runtime/ui/positive-binding-prepared.png",
+      "bytes": 167947,
+      "sha256": "40e7cd7a57d0a3c05d6cc29bbbeb7d2ab5dab10d7e0c9a99b3551db939860ad3"
+    },
+    {
+      "path": "runtime/ui/positive-binding-started.ax.txt.gz",
+      "bytes": 808,
+      "sha256": "9f1b74b8191aeaf5fb89fde7ee72dc499e6a8bd9fb1429be95a9fec24eebf28a"
+    },
+    {
+      "path": "runtime/ui/positive-binding-started.png",
+      "bytes": 107808,
+      "sha256": "404a8e21677a58a81df83be28c8d5668d31faef29ea79bba14dde6be790f21df"
+    },
+    {
+      "path": "runtime/ui/positive-binding-submission.json",
+      "bytes": 267,
+      "sha256": "d58c0b4c1814e50cabf9a29b0bf80b3dc6db16a82115628c71cbdadb7e7319a4"
+    },
+    {
+      "path": "runtime/ui/post-update-running.ax.txt.gz",
+      "bytes": 1828,
+      "sha256": "e73cb1d14b6d0a1cd9e092b3e0214c393ac810b3bb608ff21c6fb4b67775812c"
+    },
+    {
+      "path": "runtime/ui/post-update-running.json",
+      "bytes": 162,
+      "sha256": "fb8eeaf87b74dfb9602ce331ccc849f513c1300e16c0a24c46926a0e3d2f598e"
+    },
+    {
+      "path": "runtime/ui/post-update-running.png",
+      "bytes": 179632,
+      "sha256": "40503987d07cb800270eeec62c13fd197b98d773c5ec1965aa4921c31529bee4"
+    },
+    {
+      "path": "runtime/ui/post-update-start-submitted.ax.txt.gz",
+      "bytes": 1781,
+      "sha256": "9a42c4d09cd16dbd1473461f146e9c7e5873699495be62bb6fc14613e8b00950"
+    },
+    {
+      "path": "runtime/ui/post-update-start-submitted.json",
+      "bytes": 123,
+      "sha256": "96f9492724afb29d27d6c3a83615ab8ed886fdf257dae02899000d4ac14cc021"
+    },
+    {
+      "path": "runtime/ui/post-update-start-submitted.png",
+      "bytes": 178033,
+      "sha256": "c81f26c601d31d2b27a0c7f596eacc10bf464db02a2f95d1adc382da0bf700ae"
+    },
+    {
+      "path": "runtime/ui/post-update-stop-submitted.ax.txt.gz",
+      "bytes": 1801,
+      "sha256": "e1a9872723a1c679ffdd6cc7c5e1d18354ba657e24704a00273f43a019bcaf2c"
+    },
+    {
+      "path": "runtime/ui/post-update-stop-submitted.json",
+      "bytes": 122,
+      "sha256": "68eff7c7933d4a4dd9c4ff02138d903c806d427d05b576ae05eef2f6071091d5"
+    },
+    {
+      "path": "runtime/ui/post-update-stop-submitted.png",
+      "bytes": 180657,
+      "sha256": "71ea7174ca8870041ab83c64e0177a9444ddb34595a96c77ebcd1965e4c4e8c1"
+    },
+    {
+      "path": "runtime/ui/post-update-stopped.ax.txt.gz",
+      "bytes": 1783,
+      "sha256": "c16eabc3b24e2ab832090c24b335dc8bd89821a1cced9bd4610e91cf0f4e35ce"
+    },
+    {
+      "path": "runtime/ui/post-update-stopped.json",
+      "bytes": 90,
+      "sha256": "816700f4d00dae61cd109a37a69672d7071132e75c4d134a9d0b740080ce178c"
+    },
+    {
+      "path": "runtime/ui/post-update-stopped.png",
+      "bytes": 179302,
+      "sha256": "60782128e38bdd789593e48f8134b01292541724c048205c48cdb9e3ef25cd1a"
+    },
+    {
+      "path": "runtime/ui/post-update-updated.ax.txt.gz",
+      "bytes": 1764,
+      "sha256": "0263d552fab6a08be4fbda47e1c669971bd587ac29c8a7def367c8e5513ab2f5"
+    },
+    {
+      "path": "runtime/ui/post-update-updated.json",
+      "bytes": 90,
+      "sha256": "3995017b8807ea71d5b70cc5d3994b13544be0fd57a94e3a2ce7ca244ae3ea08"
+    },
+    {
+      "path": "runtime/ui/post-update-updated.png",
+      "bytes": 180054,
+      "sha256": "b52554f5a5116a617f45e233401b8cab5149298895e184c201a1ac5295bc0541"
+    },
+    {
+      "path": "runtime/unprivileged-verified-receipt.json",
+      "bytes": 314,
+      "sha256": "f6e0e298cf4352fa65127c4dfeaffa16ea92626c79d63e6707cbb53ea56b1d3d"
+    },
+    {
+      "path": "runtime/v2-api-preflight.log.gz",
+      "bytes": 91,
+      "sha256": "53df75d61c88d13caf460bc867eae40711e9b6616eaec79b0dad9db6b06f1c9f"
+    },
+    {
+      "path": "runtime/v2-profile-composition-green.log.gz",
+      "bytes": 280,
+      "sha256": "cb75ff55735add72f64ed0f743125dfa325cd5eceeac71cf9f8066bc34d7894a"
+    },
+    {
+      "path": "runtime/v2-profile-composition-red.log.gz",
+      "bytes": 472,
+      "sha256": "c1b5fc511fc24a418a531315c48759f4bde8da45b9e28c7a92be186ca75e67d4"
+    },
+    {
+      "path": "runtime/v2-profile-expanded.log.gz",
+      "bytes": 813,
+      "sha256": "c921da3840ed46afb4b03152d5b2380fee38e20d944a1ad745c9ca94477a4080"
+    },
+    {
+      "path": "runtime/vm-before.json",
+      "bytes": 2798,
+      "sha256": "c7852b7edbd989275dc9a4cca420fbf20efa5c5118bc17ed939d90cf923b18d1"
+    },
+    {
+      "path": "runtime/waiting-candidate-cleanup.json",
+      "bytes": 427,
+      "sha256": "9eda41d7ec4e431bbfbf854fd49d1c2317faf1336ac862e412fecca6578bf978"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/accept_t52_runtime_ui.cua.mjs",
+      "bytes": 3152,
+      "sha256": "a47dec69acd49967ff6ce939dae3fcdb67ef700975b06dca0c006724ff181087"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/apply_t52_binding_ui.cua.mjs",
+      "bytes": 2415,
+      "sha256": "facbb554782bb5554a4dfa9baca5c8d08afb30e528711f04941102c6e95c9b1f"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/archive_t52_real_evidence.py",
+      "bytes": 4871,
+      "sha256": "1600aad67bee01cd386cd78a782c97ea3fdfd33f8bdcbb859b7bab7654f504a2"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/build_t52_launchpad_env_fix.py",
+      "bytes": 1828,
+      "sha256": "a24b9d0a4931d4dd698c71a64b2af9ec9afcf1b8ee348623ab6fe7586a41a458"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/capture_t52_vm_metadata.py",
+      "bytes": 1113,
+      "sha256": "5843b04529511dfbaf62333ba75058e0564d2085eb8e51a9f8ee563da8f52d3e"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/monitor_t52_real.py",
+      "bytes": 2445,
+      "sha256": "0e9fc4da61a0a0878704aa11ee5393d3a259cbc11c2f950c338bbceadb5e0072"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/read_t52_environment.py",
+      "bytes": 2049,
+      "sha256": "193e31789a60771334f97706d9c16b6a3b32c87a8185971a98d6da0c58bf4aef"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/retry_t52_environment_ui.cua.mjs",
+      "bytes": 2792,
+      "sha256": "8ad9b9bad03c496d84e6f78db36abd5453d62d15fdd16f2f7adba98f10d9cc25"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/verify_t52_environment_acceptance.py",
+      "bytes": 3235,
+      "sha256": "35975531419c081782bc49e2a57a666439fa04bb6bb23c1ba8406a22cfc3905d"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/verify_t52_launchd_signing.py",
+      "bytes": 2503,
+      "sha256": "b819c3e96e49842fd8a3b68ee299d038eaca4df4a5ce13697d4d1af1bda8520f"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/verify_t52_running_guest.py",
+      "bytes": 4367,
+      "sha256": "6c72241e9ca95e32eb92630686d3e861a1b07ab65cdac8ea480f3fa9c74c3681"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/verify_t52_runtime_evidence.py",
+      "bytes": 3281,
+      "sha256": "9bd9e69726233887d69ce286cb9efd8f991ae01240be78da45fa6a3e77c55b51"
+    },
+    {
+      "path": "source/research/upstream_integration_2026-10-15/tools/verify_t52_stopped.py",
+      "bytes": 2510,
+      "sha256": "711d8e0e38de0828c1a21205147af1a40ded508311622c1294c83107165d7a54"
+    },
+    {
+      "path": "source/scripts/build.sh",
+      "bytes": 6386,
+      "sha256": "6a40efbc7caa33c8555e520c36409f0bba3957ed73334704138d5f90412f07d9"
+    },
+    {
+      "path": "source/scripts/check_bundle.py",
+      "bytes": 8240,
+      "sha256": "39d282b8fa24a60619b36c4afcee6cc5f32460d6b8c70b05f9ec5a733851c9da"
+    },
+    {
+      "path": "source/scripts/lib/cfw_common.sh",
+      "bytes": 6641,
+      "sha256": "25efc670d9ac8b0031334e0218911743419fcb990ab19b81e1e2630e755a5738"
+    },
+    {
+      "path": "source/scripts/patchers/cfw.py",
+      "bytes": 24732,
+      "sha256": "bc857c2dd28f12b172197d2b3a1b75ec261a15df50d20e2044dc0a465e45acaf"
+    },
+    {
+      "path": "source/scripts/patchers/cfw_daemons.py",
+      "bytes": 4534,
+      "sha256": "a8cc63a8271e488f351c40e4cc9caf4c1a6bc9c5b4b0c7553084eb323e99d620"
+    },
+    {
+      "path": "source/scripts/patchers/component_signatures.py",
+      "bytes": 17050,
+      "sha256": "013b0fd447bc4d0835be8e7d24c44e6f7e273db23e5b77f5ead5988e5e0722cd"
+    },
+    {
+      "path": "source/scripts/patchers/guest_write.py",
+      "bytes": 27232,
+      "sha256": "3d3ad01636ce94498049b941dc7984d1ed431ff382a7888452df5bd183abd29b"
+    },
+    {
+      "path": "source/sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+      "bytes": 12056,
+      "sha256": "dede0815c66e79f54855690cee042f6c14b744e8f3ca4ef95abbf5e884fb6985"
+    },
+    {
+      "path": "source/sources/vphone-cli/VPhoneAPIProxyOptions.swift",
+      "bytes": 1444,
+      "sha256": "a1c34dcc73737501ee92ff0b6e4bb8abefcaf5c6a5179c30abdf7537c4923720"
+    },
+    {
+      "path": "source/sources/vphone-cli/VPhoneAppDelegate.swift",
+      "bytes": 24949,
+      "sha256": "686e998d89240554a6fe30bc68053faae2ddb630e2b12e9b1ad67b7e02ca7aa2"
+    },
+    {
+      "path": "source/sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift",
+      "bytes": 17698,
+      "sha256": "b2d7e67abba24c651c716428390d7d5399660dbac2a7bf662dfa20f938ea8096"
+    },
+    {
+      "path": "source/sources/vphone-cli/VPhoneVMLaunchCLI.swift",
+      "bytes": 13017,
+      "sha256": "1c00286c37902525d27351e35a251d05c559560088cbd5d9b02789f5e0b1b68f"
+    },
+    {
+      "path": "source/sources/vphone-cli/VPhoneVirtualMachine.swift",
+      "bytes": 16565,
+      "sha256": "b5ba089096c294ccf4d32c4c8cab4c89412d335161d31a5e4c66243117e10503"
+    },
+    {
+      "path": "source/tests/VPhoneCLITests/EnvironmentBindingTests.swift",
+      "bytes": 3388,
+      "sha256": "e33fbae451d444c932151e5bce254464ad926a6ba32b32a56dbb65a7d4aa3c03"
+    },
+    {
+      "path": "source/tests/VPhoneLaunchpadKitTests/ChildEnvironmentTests.swift",
+      "bytes": 1165,
+      "sha256": "9bbe53ee5d67dd8d5ce1b1c9f6afd941441c7a6007616e6d75fc1feafc6f7723"
+    },
+    {
+      "path": "source/tests/test_bundle_validation.py",
+      "bytes": 5564,
+      "sha256": "9be44b1254029b68b5ab02c3088e0fbd4c2fb024d00cd1bb8e145a3f16bf4b9a"
+    },
+    {
+      "path": "source/tests/test_component_signatures.py",
+      "bytes": 12878,
+      "sha256": "b57909a0972dcdbbedfc76ad675aa50e8a9183d86af869b0c33751069e540cbd"
+    },
+    {
+      "path": "source/tests/test_guest_api_cohort.py",
+      "bytes": 5983,
+      "sha256": "29be5000065ae9df862614bedbda9169d2ae1d1631da4eb73f2e41f194ba877f"
+    },
+    {
+      "path": "source/tests/test_patch_plan_gate.py",
+      "bytes": 76881,
+      "sha256": "a8bc02e3288c48c86f7013b90ab34d44de4109c8338db9cabfea9e140c42bfe4"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T143743Z-jXK1Nkwo/guest-changes.jsonl",
+      "bytes": 1844099,
+      "sha256": "ea054960fc3d88a1c45432deaae46d0fe0c9670930f1e46ccc7f8ceb3d480a02"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T143743Z-jXK1Nkwo/transaction.json",
+      "bytes": 1632,
+      "sha256": "79f2e21f210bb9cdd35b79929c1f43ee0e7920d0077358aba4f65d8623d7e125"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T150033Z-LgvNNC6B/guest-changes.jsonl",
+      "bytes": 1895951,
+      "sha256": "eb55739480457265d965818e92270997138feb9eb444f4301e855fd58dc5e08f"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T150033Z-LgvNNC6B/guest-environment-install.json",
+      "bytes": 8046,
+      "sha256": "8234abb76eabb5a14b7810f959baa5eb43cc55df708530547652dcb8f75b2fde"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T150033Z-LgvNNC6B/transaction.json",
+      "bytes": 1632,
+      "sha256": "2e324d0446f6e15d73595ba0d9a3d6341cc3cf3af52e17f6a294bf98d1602385"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T152829Z-J0vIUUED/guest-changes.jsonl",
+      "bytes": 1905682,
+      "sha256": "086ba448d35641e638b53ab5516ec6c41eb6f802da75d9e24a7b8a9297e13ea6"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T152829Z-J0vIUUED/guest-environment-install.json",
+      "bytes": 16705,
+      "sha256": "85885e26f1aeda8ff078c5b205ff0beb93c830450c615ac7c1f1a99a1940b1a4"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T152829Z-J0vIUUED/transaction.json",
+      "bytes": 1632,
+      "sha256": "cf6b929efd131277bf28052f716f65c705280cd442d4139f180b9a747b427c15"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T155253Z-FJPcRQW7/guest-changes.jsonl",
+      "bytes": 1897906,
+      "sha256": "d54f4dc8d34006b741c2e023f6443ab8fd02df0bad8c6f01df5b74aa72035a89"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T155253Z-FJPcRQW7/guest-environment-install.json",
+      "bytes": 16644,
+      "sha256": "2daee62de0ad4a9ef918a0df3773372b1d64ac3a829c814f94735efb147400dc"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T155253Z-FJPcRQW7/transaction.json",
+      "bytes": 2913,
+      "sha256": "8f58e5ca83fe226f235a0d6c778245eda80faf066647d0a716b95ccc02bc5843"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T163833Z-aCYGC037/environment-update.json",
+      "bytes": 16193,
+      "sha256": "ee23c1d2f807ce36bd8ec9fca0fd36cf379645eb786086bd43ffb29772b5f369"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T163833Z-aCYGC037/guest-changes.jsonl",
+      "bytes": 7047,
+      "sha256": "a6e5690bbf8d32ed0c76fe7e1661a53b5212044501e04544127af7ac21ae43eb"
+    },
+    {
+      "path": "vm/.cfw-history/20261021T163833Z-aCYGC037/transaction.json",
+      "bytes": 2228,
+      "sha256": "813f270119987a0e020497ddc35da03a432d578cdbb0686f0fe6a84ced966cc2"
+    },
+    {
+      "path": "vm/.create-checkpoint/checkpoint.json",
+      "bytes": 22475,
+      "sha256": "1685747b679979206a80712c613718091935baf6beded8ff2bd85a36ef479586"
+    },
+    {
+      "path": "vm/.firmware-component-receipts.json",
+      "bytes": 39971,
+      "sha256": "769c4d112bd393a80b2f6b2015a48626a8af0de8728bbd42a23e93146cd06ee2"
+    },
+    {
+      "path": "vm/.firmware-desired-plan.json",
+      "bytes": 64319,
+      "sha256": "295059dbdabe9a446cd11cc273cb55209e400bd6dc1ec56651ccd0867ef2935f"
+    },
+    {
+      "path": "vm/config.plist",
+      "bytes": 1154,
+      "sha256": "68e90735897287161de3d084e8ab1053c8733dd9b36ad31f76d9f6b6bf1b143a"
+    },
+    {
+      "path": "vm/launchpad.json",
+      "bytes": 37,
+      "sha256": "a1052a1068b815ee862b89cc7843bd1091d6ec1c0567aaacdec6b8e4ddfd1ba1"
+    },
+    {
+      "path": "vm/restore-info.json",
+      "bytes": 215,
+      "sha256": "5278ed29d2facd953a0d1208ac5de78aba2a67e2c457c01e440a34891f59e282"
+    },
+    {
+      "path": "vm/udid-prediction.txt.gz",
+      "bytes": 94,
+      "sha256": "5f2de8f1cc18997df79f3b1a53572888c1800a7cbdaa0cfcbd76cc372aad1e8d"
+    }
+  ]
+}

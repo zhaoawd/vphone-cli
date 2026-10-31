@@ -1,0 +1,16 @@
+{
+  "status": "failed",
+  "symptom": "VM entry lock is invalid @vm_entry_lock.c:168",
+  "panicked_pid": 518,
+  "panicked_process": "procexp",
+  "kernel": "xnu-12377.100.591.502.1 RELEASE_ARM64_VRESEARCH1",
+  "kernel_root_cause": "not determined",
+  "log_sha256": "fb6108b7dc4809d49f87be6f7fa0b4c0fe4d130607a46f78ed1ee423d9bc7b8c",
+  "vm_stopped": true,
+  "installation_started": false,
+  "hypotheses": [
+    "old procexp calling convention or implementation incompatibility",
+    "vm_region_recurse_64 query path failure",
+    "third-party region queries generally affected"
+  ]
+}

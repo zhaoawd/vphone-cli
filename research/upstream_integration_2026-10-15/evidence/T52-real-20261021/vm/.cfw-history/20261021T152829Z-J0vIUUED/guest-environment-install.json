@@ -1,0 +1,406 @@
+{
+  "assessment_after": {
+    "activation": {
+      "automatic_restart": false,
+      "next_step": "none",
+      "reasons": [],
+      "respring": "not requested: SpringBoard starts during the next boot; a running guest is not touched (process activation is T17)",
+      "respring_requested": false
+    },
+    "bootstrap": {
+      "classic_alias_present": false,
+      "kind": "v2",
+      "launchd_custom_loads": [
+        "/vh"
+      ],
+      "v2_alias_present": true
+    },
+    "candidates": {
+      "available": true,
+      "stage": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components"
+    },
+    "checked_at": "2026-10-21T15:41:51Z",
+    "classification": "already_current",
+    "daemon": {
+      "launchd_key": "/System/Library/LaunchDaemons/vphoned-api.plist",
+      "launchd_key_present": true,
+      "path": "/usr/bin/vphoned-api",
+      "sha256": "9b60814f8ded00608571fdcbfd53475ed2d6280955046a79fe45dc604efff101"
+    },
+    "guest_environment_records": {
+      "checkpoint": "v2",
+      "restore_info": null
+    },
+    "libraries": [
+      {
+        "actual_sha256": "bcc35b49a94afba6c6851f8b4045f008392fa6d088e6f9a593be68271ab4c302",
+        "expected_sha256": "bcc35b49a94afba6c6851f8b4045f008392fa6d088e6f9a593be68271ab4c302",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/launchhook/launchdhook-vphone.dylib",
+        "guest_path": "/usr/lib/launchdhook-vphone.dylib",
+        "loaded_by": "launchd, through its /vh load command, once per guest boot",
+        "mode": "0755",
+        "name": "launchdhook-vphone.dylib",
+        "present": true,
+        "scope": "local",
+        "state": "current"
+      },
+      {
+        "actual_sha256": "aa4a8a9ac945409619042b01bd53d382a2a63d3309e64ed4bb44b8c4103f9032",
+        "expected_sha256": "aa4a8a9ac945409619042b01bd53d382a2a63d3309e64ed4bb44b8c4103f9032",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/systemhook/SystemHook-vphone.dylib",
+        "guest_path": "/usr/lib/SystemHook-vphone.dylib",
+        "loaded_by": "processes spawned by launchd after launchdhook-vphone inserts it",
+        "mode": "0755",
+        "name": "SystemHook-vphone.dylib",
+        "present": true,
+        "scope": "local",
+        "state": "current"
+      },
+      {
+        "actual_sha256": "5c3c61d476d079437e7d04bd5e6ea59da655346b176487dbac1240087e9aec16",
+        "expected_sha256": "5c3c61d476d079437e7d04bd5e6ea59da655346b176487dbac1240087e9aec16",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/vcamcaptured/libvcamcaptured.dylib",
+        "guest_path": "/usr/lib/libvcamcaptured.dylib",
+        "loaded_by": "cameracaptured when it starts (SystemHook loads it)",
+        "mode": "0755",
+        "name": "libvcamcaptured.dylib",
+        "present": true,
+        "scope": "local",
+        "state": "current"
+      },
+      {
+        "actual_sha256": "15399f4c24c27fa0235a091c89d611622ecd076a48ab01ebd815e12d0c5dbf8a",
+        "expected_sha256": "15399f4c24c27fa0235a091c89d611622ecd076a48ab01ebd815e12d0c5dbf8a",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/camfix/libcamfix.dylib",
+        "guest_path": "/usr/lib/libcamfix.dylib",
+        "loaded_by": "camera client apps when they start (SystemHook loads it)",
+        "mode": "0755",
+        "name": "libcamfix.dylib",
+        "present": true,
+        "scope": "local",
+        "state": "current"
+      },
+      {
+        "actual_sha256": "4dc1ee2500c2d054df4e4c5aebe473e2c3ae72446731527334d5244fd7b4b8d1",
+        "expected_sha256": "4dc1ee2500c2d054df4e4c5aebe473e2c3ae72446731527334d5244fd7b4b8d1",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/locationfix/libvlocation.dylib",
+        "guest_path": "/usr/lib/libvlocation.dylib",
+        "loaded_by": "app processes when they start (SystemHook loads it); kept locally, see research/t20_location_2026-10-01.md",
+        "mode": "0755",
+        "name": "libvlocation.dylib",
+        "present": true,
+        "scope": "local",
+        "state": "current"
+      },
+      {
+        "actual_sha256": null,
+        "guest_path": "/usr/lib/libmisfix.dylib",
+        "managed": false,
+        "name": "libmisfix.dylib",
+        "present": false,
+        "scope": "upstream_only",
+        "state": "upstream_only_absent",
+        "task": "T18"
+      }
+    ],
+    "load_paths": [
+      {
+        "expected": "regular file written by the first CFW install",
+        "id": "cfw_install_marker",
+        "ok": true,
+        "path": "/System/Library/xpc/launchd.plist.bak"
+      },
+      {
+        "actual": "/usr/lib/launchdhook-vphone.dylib",
+        "expected": "symbolic link to /usr/lib/launchdhook-vphone.dylib",
+        "id": "launchd_hook_alias",
+        "ok": true,
+        "path": "/vh"
+      },
+      {
+        "actual": [
+          "/vh"
+        ],
+        "expected": "load command for /vh",
+        "id": "launchd_load_command",
+        "ok": true,
+        "path": "/sbin/launchd"
+      }
+    ],
+    "manifest": {
+      "path": "/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/VPhone.bundle/Contents/Resources/scripts/guest_environment.json",
+      "sha256": "e63467d474c679a44c32f66076b12a2e2175f2371d91b14eee7450c151bb8fad"
+    },
+    "notes": [
+      "libmisfix.dylib: upstream 2.2.3 environment library, not built or installed locally (T18); absent; not part of this check or replacement"
+    ],
+    "reasons": [],
+    "replace": [],
+    "schema": "vphone.guest-environment-eligibility/1",
+    "variant_records": {
+      "checkpoint": "regular",
+      "restore_info": null
+    },
+    "vm": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-v2"
+  },
+  "assessment_before": {
+    "bootstrap": {
+      "classic_alias_present": false,
+      "kind": "none",
+      "launchd_custom_loads": [],
+      "v2_alias_present": false
+    },
+    "candidates": {
+      "available": true,
+      "stage": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components"
+    },
+    "checked_at": "2026-10-21T15:41:49Z",
+    "classification": "full_migration_required",
+    "daemon": {
+      "launchd_key": "/System/Library/LaunchDaemons/vphoned-api.plist",
+      "launchd_key_present": true,
+      "path": "/usr/bin/vphoned-api",
+      "sha256": null
+    },
+    "guest_environment_records": {
+      "checkpoint": "v2",
+      "restore_info": null
+    },
+    "libraries": [
+      {
+        "actual_sha256": null,
+        "expected_sha256": "bcc35b49a94afba6c6851f8b4045f008392fa6d088e6f9a593be68271ab4c302",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/launchhook/launchdhook-vphone.dylib",
+        "guest_path": "/usr/lib/launchdhook-vphone.dylib",
+        "loaded_by": "launchd, through its /vh load command, once per guest boot",
+        "name": "launchdhook-vphone.dylib",
+        "present": false,
+        "scope": "local",
+        "state": "missing"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "aa4a8a9ac945409619042b01bd53d382a2a63d3309e64ed4bb44b8c4103f9032",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/systemhook/SystemHook-vphone.dylib",
+        "guest_path": "/usr/lib/SystemHook-vphone.dylib",
+        "loaded_by": "processes spawned by launchd after launchdhook-vphone inserts it",
+        "name": "SystemHook-vphone.dylib",
+        "present": false,
+        "scope": "local",
+        "state": "missing"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "5c3c61d476d079437e7d04bd5e6ea59da655346b176487dbac1240087e9aec16",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/vcamcaptured/libvcamcaptured.dylib",
+        "guest_path": "/usr/lib/libvcamcaptured.dylib",
+        "loaded_by": "cameracaptured when it starts (SystemHook loads it)",
+        "name": "libvcamcaptured.dylib",
+        "present": false,
+        "scope": "local",
+        "state": "missing"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "15399f4c24c27fa0235a091c89d611622ecd076a48ab01ebd815e12d0c5dbf8a",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/camfix/libcamfix.dylib",
+        "guest_path": "/usr/lib/libcamfix.dylib",
+        "loaded_by": "camera client apps when they start (SystemHook loads it)",
+        "name": "libcamfix.dylib",
+        "present": false,
+        "scope": "local",
+        "state": "missing"
+      },
+      {
+        "actual_sha256": null,
+        "expected_sha256": "4dc1ee2500c2d054df4e4c5aebe473e2c3ae72446731527334d5244fd7b4b8d1",
+        "expected_source": "/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/GuestInputs/components/locationfix/libvlocation.dylib",
+        "guest_path": "/usr/lib/libvlocation.dylib",
+        "loaded_by": "app processes when they start (SystemHook loads it); kept locally, see research/t20_location_2026-10-01.md",
+        "name": "libvlocation.dylib",
+        "present": false,
+        "scope": "local",
+        "state": "missing"
+      },
+      {
+        "actual_sha256": null,
+        "guest_path": "/usr/lib/libmisfix.dylib",
+        "managed": false,
+        "name": "libmisfix.dylib",
+        "present": false,
+        "scope": "upstream_only",
+        "state": "upstream_only_absent",
+        "task": "T18"
+      }
+    ],
+    "load_paths": [
+      {
+        "expected": "regular file written by the first CFW install",
+        "id": "cfw_install_marker",
+        "ok": true,
+        "path": "/System/Library/xpc/launchd.plist.bak"
+      },
+      {
+        "actual": null,
+        "expected": "symbolic link to /usr/lib/launchdhook-vphone.dylib",
+        "id": "launchd_hook_alias",
+        "ok": false,
+        "path": "/vh"
+      },
+      {
+        "actual": [],
+        "expected": "load command for /vh",
+        "id": "launchd_load_command",
+        "ok": false,
+        "path": "/sbin/launchd"
+      }
+    ],
+    "manifest": {
+      "path": "/private/var/folders/kb/fl4_kf695qz76pxnqq14n_zh0000gn/T/vphone-create-toolchains-501/7fdab9b6-0fab-4ed1-b7a3-6f8da080b7b7/VPhone.bundle/Contents/Resources/scripts/guest_environment.json",
+      "sha256": "e63467d474c679a44c32f66076b12a2e2175f2371d91b14eee7450c151bb8fad"
+    },
+    "migration": "A stopped-VM replacement only swaps libraries that already exist. Create a new VM with vm create <name> --variant regular --guest-environment v2 and validate it as a separate copy; this VM is left unchanged.",
+    "notes": [
+      "API daemon binary or launchd.plist entry is missing; library replacement does not install it",
+      "libmisfix.dylib: upstream 2.2.3 environment library, not built or installed locally (T18); absent; not part of this check or replacement"
+    ],
+    "reasons": [
+      "launchd has no environment load command (classic install without the v2 environment)",
+      "recorded guest environment v2 does not match disk bootstrap none",
+      "/usr/lib/launchdhook-vphone.dylib is missing",
+      "/usr/lib/SystemHook-vphone.dylib is missing",
+      "/usr/lib/libvcamcaptured.dylib is missing",
+      "/usr/lib/libcamfix.dylib is missing",
+      "/usr/lib/libvlocation.dylib is missing"
+    ],
+    "replace": [],
+    "schema": "vphone.guest-environment-eligibility/1",
+    "variant_records": {
+      "checkpoint": "regular",
+      "restore_info": null
+    },
+    "vm": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-v2"
+  },
+  "components_manifest_sha256": "383c1be7f5470dba0151cdbcc97f5fd671fcc8f73504d74175cb213a58bb8655",
+  "daemon_manifest_sha256": "8c23390bfe03a9c8597dc72b33e48313755379fc1078f054a2a9c2a6f0d0c509",
+  "files": [
+    {
+      "after_sha256": "bcc35b49a94afba6c6851f8b4045f008392fa6d088e6f9a593be68271ab4c302",
+      "before": null,
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/usr/lib/launchdhook-vphone.dylib"
+    },
+    {
+      "after_sha256": "aa4a8a9ac945409619042b01bd53d382a2a63d3309e64ed4bb44b8c4103f9032",
+      "before": null,
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/usr/lib/SystemHook-vphone.dylib"
+    },
+    {
+      "after_sha256": "5c3c61d476d079437e7d04bd5e6ea59da655346b176487dbac1240087e9aec16",
+      "before": null,
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/usr/lib/libvcamcaptured.dylib"
+    },
+    {
+      "after_sha256": "15399f4c24c27fa0235a091c89d611622ecd076a48ab01ebd815e12d0c5dbf8a",
+      "before": null,
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/usr/lib/libcamfix.dylib"
+    },
+    {
+      "after_sha256": "4dc1ee2500c2d054df4e4c5aebe473e2c3ae72446731527334d5244fd7b4b8d1",
+      "before": null,
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/usr/lib/libvlocation.dylib"
+    },
+    {
+      "after_sha256": "411d730c95d99a088e94b673eff3fa73d6d3cc778b24b476cd0b7866cd037443",
+      "before": null,
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/sbin/launchd.bak"
+    },
+    {
+      "after_sha256": "b3a61b22de3cb4efc4fd8046a3c0c346ff5b1e452622166bde1b459da024920a",
+      "before": "411d730c95d99a088e94b673eff3fa73d6d3cc778b24b476cd0b7866cd037443",
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/sbin/launchd"
+    },
+    {
+      "after_sha256": "9b60814f8ded00608571fdcbfd53475ed2d6280955046a79fe45dc604efff101",
+      "before": null,
+      "mode": "0755",
+      "owner": "0:0",
+      "path": "/usr/bin/vphoned-api"
+    },
+    {
+      "after_sha256": "3fd911765d4a65a7ae22fdf170fe1dc2f607926255eb05900057ce0b0d74e159",
+      "before": "7b29eecc1e08106437688bcfbd2efecdab5fd091a23fd917a1fcd8e47c89e8c9",
+      "mode": "0644",
+      "owner": "0:0",
+      "path": "/System/Library/LaunchDaemons/vphoned-api.plist"
+    },
+    {
+      "after_sha256": "1200220855de9736026692eaad0beb8cf8a2a43d39ab1168c6b002e3044102d8",
+      "before": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+      "mode": "0644",
+      "owner": "0:0",
+      "path": "/System/Library/xpc/launchd.plist"
+    }
+  ],
+  "finished_at": "2026-10-21T15:41:51Z",
+  "launchd": {
+    "after_sha256": "b3a61b22de3cb4efc4fd8046a3c0c346ff5b1e452622166bde1b459da024920a",
+    "before_sha256": "411d730c95d99a088e94b673eff3fa73d6d3cc778b24b476cd0b7866cd037443",
+    "entitlements_sha256_after": "932a121493f5510c20aeb9ffbd167451ede5ce2393aff76d824e8c9b894152e3",
+    "entitlements_sha256_before": "932a121493f5510c20aeb9ffbd167451ede5ce2393aff76d824e8c9b894152e3",
+    "load_commands_after": [
+      "/usr/lib/libSystem.B.dylib",
+      "/usr/lib/libobjc.A.dylib",
+      "/usr/lib/libsandbox.1.dylib",
+      "/vh"
+    ],
+    "load_commands_before": [
+      "/usr/lib/libSystem.B.dylib",
+      "/usr/lib/libobjc.A.dylib",
+      "/usr/lib/libsandbox.1.dylib"
+    ],
+    "result": "injected"
+  },
+  "launchd_plist": {
+    "after_sha256": "1200220855de9736026692eaad0beb8cf8a2a43d39ab1168c6b002e3044102d8",
+    "before_sha256": "ec3fcd92d32ad13273db3732e95e005c8759230ac22367cae45afdab8fe9f186",
+    "key": "/System/Library/LaunchDaemons/vphoned-api.plist"
+  },
+  "manifest_sha256": "e63467d474c679a44c32f66076b12a2e2175f2371d91b14eee7450c151bb8fad",
+  "profile": "v2",
+  "reserved": [
+    {
+      "guest": "usr/lib/libmisfix.dylib",
+      "mode": "0755",
+      "name": "libmisfix.dylib",
+      "state": "reserved_absent",
+      "task": "T18"
+    },
+    {
+      "guest": "usr/lib/libmisfix.plist",
+      "mode": "0644",
+      "name": "libmisfix.plist",
+      "preserve_existing": true,
+      "state": "reserved_absent",
+      "task": "T18"
+    }
+  ],
+  "result": "installed",
+  "schema": "vphone.guest-environment-install/1",
+  "started_at": "2026-10-21T15:41:49Z",
+  "transaction_id": "20261021T152829Z-J0vIUUED",
+  "variant": "regular"
+}

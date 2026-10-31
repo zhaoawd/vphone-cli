@@ -1,0 +1,44 @@
+{
+  "source": "same pinned sources",
+  "baselineCompilerOptimization": "-O0",
+  "targetCompilerOptimization": "-Os",
+  "libraries": {
+    "launchdhook-vphone.dylib": {
+      "baselineSHA256": "bcc35b49a94afba6c6851f8b4045f008392fa6d088e6f9a593be68271ab4c302",
+      "targetSHA256": "0bce0431b8968a97346a32670d7598172cda05e0c694bc1873a4cb131378a995",
+      "different": true
+    },
+    "SystemHook-vphone.dylib": {
+      "baselineSHA256": "aa4a8a9ac945409619042b01bd53d382a2a63d3309e64ed4bb44b8c4103f9032",
+      "targetSHA256": "ea97b6f5b1af8c349f877ba40ca267f1d0f676d725f39e087f39e1b7deb71acb",
+      "different": true
+    },
+    "libvcamcaptured.dylib": {
+      "baselineSHA256": "5c3c61d476d079437e7d04bd5e6ea59da655346b176487dbac1240087e9aec16",
+      "targetSHA256": "2e94e0d035a717dfd82f91f8547a789aa82f2978569a488289be95c9ede17e97",
+      "different": true
+    },
+    "libcamfix.dylib": {
+      "baselineSHA256": "15399f4c24c27fa0235a091c89d611622ecd076a48ab01ebd815e12d0c5dbf8a",
+      "targetSHA256": "fbf94136a3d47d0222e455248afc0362d1dfa2b2265f7bd05ab0ef2970ab3fea",
+      "different": true
+    },
+    "libvlocation.dylib": {
+      "baselineSHA256": "4dc1ee2500c2d054df4e4c5aebe473e2c3ae72446731527334d5244fd7b4b8d1",
+      "targetSHA256": "fe0ad525a4d65542481c34715d4279d33d4879328662cdc043d842ee8ab627df",
+      "different": true
+    }
+  },
+  "sealedComponentRecords": [
+    "Resources/.build/guest-components-v2/stage/camfix/libcamfix.dylib",
+    "Resources/.build/guest-components-v2/stage/camfix/libcamfix.plist",
+    "Resources/.build/guest-components-v2/stage/gpu/README.md",
+    "Resources/.build/guest-components-v2/stage/gpu/libAppleParavirtCompilerPluginIOGPUFamily.dylib",
+    "Resources/.build/guest-components-v2/stage/launchhook/launchdhook-vphone.dylib",
+    "Resources/.build/guest-components-v2/stage/locationfix/libvlocation.dylib",
+    "Resources/.build/guest-components-v2/stage/manifest.json",
+    "Resources/.build/guest-components-v2/stage/systemhook/SystemHook-vphone.dylib",
+    "Resources/.build/guest-components-v2/stage/vcamcaptured/libvcamcaptured.dylib",
+    "Resources/.build/guest-components-v2/stage/vcamcaptured/libvcamcaptured.plist"
+  ]
+}

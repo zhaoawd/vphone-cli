@@ -67,6 +67,15 @@ struct ResourcesTests {
         #expect(r.managedVenvDir.path.hasSuffix("/.vphone/venv"))
     }
 
+    @Test func existingRuntimeSelectionNeverBootstraps() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let resources = VPhoneResources(base: root.appendingPathComponent("missing-resources"),
+            environment: ["VPHONE_ROOT": root.path, "VPHONE_HOST_PYTHON": "/usr/bin/false"])
+        #expect(throws: VPhoneResourcesError.self) { try resources.pythonExecutable(allowBootstrap: false) }
+        #expect(!FileManager.default.fileExists(atPath: root.path))
+    }
+
     @Test func userCacheDirHonorsVPHONERoot() {
         let r = VPhoneResources(base: URL(fileURLWithPath: "/x"),
                                 environment: ["VPHONE_ROOT": "/tmp/vphone-test-root"])

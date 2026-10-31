@@ -3,6 +3,7 @@ import Foundation
 import FirmwarePatcher
 import CryptoKit
 import VPhoneCore
+import Darwin
 
 // MARK: - restore
 
@@ -119,7 +120,9 @@ struct VPhoneCFWCommand: ParsableCommand {
         commandName: "cfw",
         abstract: "Custom-firmware install (host-mount; VM must be off; re-execs sudo)",
         subcommands: [VPhoneCFWInstallCommand.self, VPhoneCFWUndoCommand.self, VPhoneCFWReceiptsCommand.self,
-                      VPhoneCFWUpdateEnvironmentCommand.self, VPhoneCFWVerifyPlanCommand.self])
+                      VPhoneCFWVerifyEffectsCommand.self,
+                      VPhoneCFWUpdateEnvironmentCommand.self, VPhoneCFWVerifyPlanCommand.self,
+                      VPhoneCFWVerifyOriginSourceCommand.self, VPhoneCFWRecoverOriginCommand.self])
 }
 
 struct VPhoneCFWInstallCommand: ParsableCommand {
@@ -133,8 +136,12 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     var guestEnvironment: VPhoneGuestEnvironmentProfile = .classic
     @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?
     @Flag(name: .customLong("root-popup"), help: "Elevate via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
+    @Option(name: .customLong("work-parent"), help: "Root-owned private or sticky mount workspace parent; disk staging stays on the VM volume")
+    var workParent: String?
     @Flag(name: .customLong("keep-artifacts"), help: "Keep the extracted CFW input dirs (cfw_input/, cfw_jb_input/) after install (default: removed to save space)") var keepArtifacts = false
     @Flag(name: .customLong("reinstall-cryptex"), help: "Replace existing Cryptex trees from bound original firmware (regular/classic only)") var reinstallCryptex = false
+    @Flag(name: .customLong("qualify-origin"), help: "Require the live selected Core Bundle producer and publish Guest origin with the disk transaction")
+    var qualifyOrigin = false
     @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
     var projectRoot: String?
     @Flag(name: .customShort("v"), help: "Increase verbosity: -v tool detail, -vv guest serial, -vvv internal trace")
@@ -152,10 +159,11 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     }
 
     static func arguments(script: URL, directory: URL, variant: String,
-                          guestEnvironment: VPhoneGuestEnvironmentProfile, reinstallCryptex: Bool) -> [String] {
+                          guestEnvironment: VPhoneGuestEnvironmentProfile, reinstallCryptex: Bool, workParent: String? = nil) -> [String] {
         var args = [script.path, "--variant", variant]
         if guestEnvironment == .v2 { args += ["--guest-environment", "v2"] }
         if reinstallCryptex { args.append("--reinstall-cryptex") }
+        if let workParent { args += ["--work-parent", workParent] }
         return args + [directory.path]
     }
 
@@ -166,17 +174,52 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     }
 
     func run() throws {
-        let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
         try Self.validateRecordedEnvironment(requested: guestEnvironment, recorded: VPhoneRestoreInfo.load(fromBundle: bundle)?.effectiveGuestEnvironment ?? .classic)
+        if qualifyOrigin {
+            try VPhoneCFWTrustedProducer.requireDefaultResources(projectRoot: projectRoot,
+                environment: ProcessInfo.processInfo.environment)
+            if geteuid() != 0 {
+                var args = ["cfw", "install", name, "--library-root", lib.library.root.path,
+                    "--qualify-origin", "--guest-environment", guestEnvironment.rawValue]
+                if let variant { args += ["--variant", variant] }
+                if let spoofBuild { args += ["--spoof-build", spoofBuild] }
+                if let workParent { args += ["--work-parent", workParent] }
+                if keepArtifacts { args.append("--keep-artifacts") }
+                if reinstallCryptex { args.append("--reinstall-cryptex") }
+                args += Array(repeating: "-v", count: verboseCount)
+                let executable = VPhoneResources.runningExecutable()
+                var environment = VPhoneInvoker.environment()
+                environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
+                let code: Int32
+                if rootPopup {
+                    code = try VPhoneProcessRunner.runWithAdminPrivileges(executable, args, env: environment)
+                } else {
+                    code = try VPhoneProcessRunner.runStreaming(URL(fileURLWithPath: "/usr/bin/sudo"),
+                        ["-E", executable.path] + args, env: environment)
+                }
+                throw ExitCode(code)
+            }
+            let code = try VPhoneCFWTrustedProducer.withLease(machine: bundle.url) { environment, input in
+                try install(bundle: bundle, sourceEnvironment: environment, input: input)
+            }
+            throw ExitCode(code)
+        }
+        throw ExitCode(try install(bundle: bundle))
+    }
+
+    func install(bundle: VPhoneBundle, sourceEnvironment: [String: String] = [:], input: FileHandle? = nil) throws -> Int32 {
+        let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
+        let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
+        // Qualified producers must not provision an unplanned root runtime.
+        let python = try resources.pythonExecutable(allowBootstrap: input == nil)
         let frozen = try VPhoneBundleGuard.withBundleLock(directory: bundle.url, operation: VPhoneVMOperation.cfwRecord) { _ in
             try VPhoneCFWFrozenContext.prepare(in: bundle.url, requestedVariant: self.variant,
                 guestEnvironment: guestEnvironment.rawValue, spoofBuild: spoofBuild ?? "")
         }
         let variant = frozen.variant
         try Self.validateCryptexReinstall(reinstallCryptex, variant: variant, guestEnvironment: guestEnvironment)
-        let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
 
         // Env the bundled scripts read: rides along via `sudo -E` by default;
         // --root-popup forwards it inline (do shell script's bare env).
@@ -184,7 +227,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.debsCacheDir, withIntermediateDirectories: true)
         var scriptEnv: [String: String] = [
-            "VPHONE_PYTHON": try resources.pythonExecutable().path,
+            "VPHONE_PYTHON": python.path,
             "VPHONE_FROZEN_PLAN": bundle.url.appendingPathComponent(FirmwareDesiredPlanStore.filename).path,
             "VPHONE_FROZEN_PLAN_SHA256": frozen.rawSHA256,
             "VPHONE_FROZEN_CONTEXT": try frozen.json,
@@ -204,11 +247,18 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
             scriptEnv["VPHONE_API_DAEMON"] = ProcessInfo.processInfo.environment["VPHONE_API_DAEMON"] ?? resources.daemonAPICandidate.path
         }
         let args = Self.arguments(script: resources.cfwInstallHostScript, directory: bundle.url,
-            variant: variant, guestEnvironment: guestEnvironment, reinstallCryptex: reinstallCryptex)
+            variant: variant, guestEnvironment: guestEnvironment, reinstallCryptex: reinstallCryptex, workParent: workParent)
         // Both paths carry VPHONE_INVOKER_UID/GID so the driver returns the
         // artifacts it creates as root (the popup sets no SUDO_UID).
-        let invocation = VPhoneCreateOrchestrator.cfwInvocation(
-            scriptEnv: scriptEnv, sudoEnvExtras: [:], rootPopup: rootPopup)
+        scriptEnv.merge(sourceEnvironment) { _, source in source }
+        var invoker = VPhoneInvoker.environment()
+        if input != nil, let uid = ProcessInfo.processInfo.environment[VPhoneInvoker.uidKey] {
+            invoker[VPhoneInvoker.uidKey] = uid
+            invoker[VPhoneInvoker.gidKey] = ProcessInfo.processInfo.environment[VPhoneInvoker.gidKey]
+        }
+        var invocation = VPhoneCreateOrchestrator.cfwInvocation(
+            scriptEnv: scriptEnv, sudoEnvExtras: [:], rootPopup: rootPopup && input == nil, invoker: invoker)
+        if input == nil { invocation.env.removeValue(forKey: "VPHONE_CFW_ORIGIN_SOURCE") }
         let code: Int32
         if invocation.usePopup {
             code = try VPhoneProcessRunner.runWithAdminPrivileges(
@@ -218,7 +268,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
                 print("[trace] spawning: /bin/zsh \(args.joined(separator: " ")) (env keys: VPHONE_PYTHON, IPSW_DIR, VPHONE_SEAL_DIR, \(VPhoneInvoker.uidKey), \(VPhoneInvoker.gidKey))")
             }
             code = try VPhoneProcessRunner.runStreaming(
-                URL(fileURLWithPath: "/bin/zsh"), args, env: invocation.env, echo: v.showsToolDetail)
+                URL(fileURLWithPath: "/bin/zsh"), args, env: invocation.env, echo: v.showsToolDetail, input: input)
         }
         if code == 0 {
             // The CFW install script released its own lock when it exited, so a
@@ -243,7 +293,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
                     "[cfw] Warning: skipped variant recording — the VM is busy (bundle lock held)\n".utf8))
             }
         }
-        throw ExitCode(code)
+        return code
     }
 }
 

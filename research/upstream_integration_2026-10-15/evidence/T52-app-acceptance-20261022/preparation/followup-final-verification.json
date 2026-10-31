@@ -1,0 +1,30 @@
+{
+  "observedAt": 1792643088.46115,
+  "observationAndSerialTests": {
+    "command": ".venv/bin/python -B -m unittest discover -s research/upstream_integration_2026-10-15/tools -p 'test_t52_*'",
+    "passed": 10,
+    "exitCode": 0,
+    "scope": "Synthetic observation and log assertions; no runtime acceptance implied"
+  },
+  "toolSyntax": {
+    "parsed": 4,
+    "passed": true
+  },
+  "rollupConsistencyPassed": true,
+  "diffWhitespaceCheckPassed": true,
+  "processCheck": {
+    "command": "ps -p 33355,69035,66498 -o pid=,command=",
+    "originalVMPID": 33355,
+    "targetVMPID": 69035,
+    "helperPID": 66498,
+    "observedPIDs": [
+      33355,
+      69035
+    ],
+    "helperAbsent": true,
+    "sandboxAttemptDenied": true,
+    "readOnlyEscalatedCheckPassed": true
+  },
+  "applicationBehaviorVerified": false,
+  "accepted": false
+}

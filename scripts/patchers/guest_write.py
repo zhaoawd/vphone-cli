@@ -106,6 +106,65 @@ def state(path):
     return gate.snapshot(path)
 
 
+def staged_target(plan, path, declaration):
+    """Inherit a target from this transaction's observed guest-to-stage copy."""
+    from . import component_effects as effects
+    gate.require_write_context(plan)
+    path = gate.private_path(plan, path)
+    if Path(plan.context['vmDirectory']) / '.cfw_temp' not in path.parents:
+        raise ValueError('target binding requires private CFW staging')
+    rows = [json.loads(line) for line in gate.strict_bytes(
+        Path(os.environ['VPHONE_GUEST_EVIDENCE'])).splitlines() if line]
+    rows = [row for row in rows if row.get('path') == str(path)]
+    anchors = [index for index, row in enumerate(rows)
+               if row.get('effect', {}).get('operation') == 'copy']
+    if not anchors:
+        raise ValueError('staged patch has no observed guest copy')
+    rows = rows[anchors[-1]:]
+    target = rows[0].get('target')
+    gate.authorize(plan, declaration, target)
+    previous = None
+    for row in rows:
+        if (row.get('schemaVersion') != 1 or row.get('phase') != 'staging'
+                or row.get('planDigest') != plan.record['planSHA256']
+                or row.get('desiredSHA256') != plan.raw_sha256
+                or row.get('generationID') != plan.record['generationID']
+                or row.get('declarationID') != declaration or row.get('target') != target):
+            raise ValueError('staged target binding differs from current plan/target')
+        proof = row.get('effect')
+        effects.validate_proof(proof)
+        for field in ('before', 'after'):
+            observed = proof[field]
+            if observed['kind'] == 'file':
+                digest = observed['sha256']
+                if row.get(field + 'Metadata') != {k: observed[k] for k in ('mode', 'uid', 'gid')}:
+                    raise ValueError('staged binding metadata differs from effect')
+            elif observed['kind'] == 'missing':
+                digest = gate.sha(gate.canonical({'state': 'missing'}))
+            else:
+                raise ValueError('staged binding requires ordinary files')
+            if row.get(field + 'SHA256') != digest:
+                raise ValueError('staged binding bytes differ from effect')
+        if proof['after']['kind'] != 'file':
+            raise ValueError('staged binding has no regular output')
+        if previous is None:
+            source = Path(proof.get('sourcePath', ''))
+            if (proof.get('command') != 'cp' or not source.is_absolute()
+                    or logical(source) != target or proof.get('sourceTarget') != target):
+                raise ValueError('staged copy source differs from target')
+            no_link_parents(source)
+            if (proof['source']['kind'] != 'file'
+                    or effects.state(source, False) != proof['source']
+                    or effects.content(proof['source']) != effects.content(proof['after'])):
+                raise ValueError('staged copy source changed or differs from output')
+        elif proof['before'] != previous:
+            raise ValueError('staged patch chain is discontinuous')
+        previous = proof['after']
+    if effects.state(path, False) != previous:
+        raise ValueError('staged file changed after its recorded operation')
+    return target
+
+
 def archive_targets(path, destination):
     """Reject any new/changed archive member name/type/link before extraction."""
     table, _ = target_table()
@@ -346,8 +405,17 @@ def sign(plan, argv, *, execute=None):
     if len(ent_paths)>1: raise ValueError('ambiguous signing entitlements')
     ent_state=effects.capture_input(ent_paths[0],store) if ent_paths else None
     if ent_paths and effects.plist(ent_paths[0]) is None: raise ValueError('invalid signing entitlements')
+    from . import signature_reuse
+    signing_inputs=None;reused=None
+    if plan.context['variant']!='less':
+        try:signing_inputs=signature_reuse.inputs(plan,argv,before)
+        except FileNotFoundError:
+            if execute is None:raise
+        if signing_inputs is not None:
+            reused=signature_reuse.candidate(plan,store.parent,declaration,target,signing_inputs)
     gate.recheck(plan)
-    if execute is None: subprocess.run(argv,check=True)
+    if reused is not None:signature_reuse.restore(source,reused[0],before)
+    elif execute is None: subprocess.run(argv,check=True)
     else: execute(argv)
     gate.private_path(plan,source) if plan.context['variant']!='less' else less_target(plan,source)
     if is_v2 and v2_signing_rule(plan,source) is None:
@@ -361,6 +429,12 @@ def sign(plan, argv, *, execute=None):
             raise ValueError('signer embedded entitlements differ from source')
     proof={'schemaVersion':1,'operation':'sign','before':before,'after':after,
            'projection':{'kind':'signature'},'signerArguments':argv[1:]}
+    if signing_inputs is not None:
+        if signature_reuse.inputs(plan,argv,before)!=signing_inputs:raise ValueError('Signing configuration changed during production')
+        proof['signingInputs']=signing_inputs
+    if reused is not None:
+        if after['sha256']!=reused[1]['outputSHA256']:raise ValueError('Reused signing output differs')
+        proof['signatureReuse']=reused[1]
     if ent_paths: proof['entitlementsSource']={'path':str(ent_paths[0]),'state':ent_state}
     gate.append_evidence(plan,declaration,target,source,snapshot,gate.snapshot(source),effect=proof)
 
@@ -402,7 +476,7 @@ def signing_transaction(plan, transaction_id):
     work=gate.private_path(plan,Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent)
     raw=gate.strict_bytes(work/'transaction.json');record=json.loads(raw)
     if (not isinstance(transaction_id,str) or not transaction_id or record.get('id')!=transaction_id
-            or record.get('version') not in (2,3,4) or record.get('provenanceMode')!='required' or record.get('status')!='staged'
+            or record.get('version') not in (2,3,4,5) or record.get('provenanceMode')!='required' or record.get('status')!='staged'
             or record.get('vm')!=plan.context['vmDirectory']):
         raise ValueError('signing requires the current staged transaction')
     fd=os.open(Path(plan.context['vmDirectory'])/'Disk.img',os.O_RDONLY|os.O_NOFOLLOW)
@@ -478,6 +552,8 @@ def inject_v2(plan, source, *, execute=None):
         argv=dylib_command(source,'/vh')
         if execute is None: subprocess.run(argv,check=True)
         else: execute(argv)
+        from .component_signatures import reserve_signature_command
+        reserve_signature_command(source)
     finally:
         if v2_signing_rule(plan,source) is None:
             raise ValueError('v2 injection source lost registered work root')

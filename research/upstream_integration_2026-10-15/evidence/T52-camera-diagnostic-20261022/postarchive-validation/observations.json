@@ -1,0 +1,21 @@
+{
+  "observedAt": 1792663861.2706969,
+  "sandboxRun": {
+    "command": ".venv/bin/python -m unittest discover -s research/upstream_integration_2026-10-15/tools -p 'test_t52_*.py'",
+    "tests": 18,
+    "errors": 1,
+    "failedTest": "test_launcher_waits_for_delayed_socket_without_starting_another_vm",
+    "exception": "RuntimeError: Diagnostic VM did not become ready"
+  },
+  "independentSandboxSocketBind": {
+    "errno": 1,
+    "error": "[Errno 1] Operation not permitted"
+  },
+  "outsideSandboxRerun": {
+    "sameCommand": true,
+    "tests": 18,
+    "passed": true,
+    "assertionsChanged": false
+  },
+  "accepted": false
+}

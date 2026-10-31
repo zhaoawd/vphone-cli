@@ -60,6 +60,28 @@ enum VPhoneNativeTransfer {
         }
     }
 
+    /// Socket payloads are runtime endpoints. Escape exact physical paths so
+    /// a socket named with glob characters cannot exclude an ordinary file.
+    static func socketExclusions(in root: URL, excluding patterns: [String]) throws -> [String] {
+        var result: [String] = []
+        func literal(_ value: String) -> String {
+            value.reduce("") { $0 + ("\\*?[".contains($1) ? "\\" : "") + String($1) }
+        }
+        func visit(_ directory: URL, depth: Int) throws {
+            guard depth <= 128 else { throw VPhoneBundleOpsError.badArchive("VM directory nesting exceeds 128") }
+            for name in try FileManager.default.contentsOfDirectory(atPath: directory.path) {
+                let url = directory.appendingPathComponent(name)
+                let relative = String(url.path.dropFirst(root.path.count + 1))
+                if patterns.contains(where: { fnmatch($0, relative, 0) == 0 || fnmatch($0, name, 0) == 0 }) { continue }
+                if fileType(at: url) == S_IFSOCK {
+                    result += [literal(relative), literal(root.lastPathComponent + "/" + relative)]
+                } else if fileType(at: url) == S_IFDIR { try visit(url, depth: depth + 1) }
+            }
+        }
+        try visit(root, depth: 0)
+        return result
+    }
+
     /// Match the native writer's exclusions and count hardlinked payload only once.
     static func logicalSize(of root: URL, excluding patterns: [String]) -> Int64 {
         guard let entries = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else { return 0 }

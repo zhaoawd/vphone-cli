@@ -40,6 +40,7 @@ VARIANT="${VPHONE_CFW_VARIANT:-}"
 MODE=install
 GUEST_ENVIRONMENT=classic
 GUEST_ENVIRONMENT_GIVEN=0
+WORK_PARENT=""
 REPORT=""
 UNDO_GENERATION=""
 UNDO_DECLARATIONS=()
@@ -48,6 +49,9 @@ VM_DIR="$PROJ/vm"
 while (( $# )); do
   case "$1" in
     --variant) VARIANT="$2"; shift 2 ;;
+    --work-parent)
+      (( $# >= 2 )) || { echo "[-] --work-parent needs an absolute directory" >&2; exit 1; }
+      WORK_PARENT="$2"; [[ "$WORK_PARENT" == /* ]] || { echo "[-] --work-parent must be absolute" >&2; exit 1; }; shift 2 ;;
     --reinstall-cryptex) REINSTALL_CRYPTEX=1; shift ;;
     --guest-environment)
       (( $# >= 2 )) || { echo "[-] --guest-environment needs classic|v2" >&2; exit 1; }
@@ -113,6 +117,8 @@ else
   [[ "$GUEST_ENVIRONMENT" == classic ]] || MODE_ARGS+=(--guest-environment "$GUEST_ENVIRONMENT")
   (( ! REINSTALL_CRYPTEX )) || MODE_ARGS+=(--reinstall-cryptex)
 fi
+
+[[ -z "$WORK_PARENT" ]] || MODE_ARGS+=(--work-parent "$WORK_PARENT")
 
 # The canonical restore-info writer uses this literal JSON field. Refuse a
 # classic reinstall before elevation or disk tools can remove the API entry.
@@ -250,7 +256,7 @@ assert_no_vm_mounts
 restore_invoker_ownership() {
   local target="$1"
   find -x "$target" \( -type d ! -user 0 ! -user "$INVOKER_UID" -prune \) -o \
-    \( \( -type d -o \( -type f -links 1 \) \) \( -user 0 -o -user "$INVOKER_UID" \) \
+    \( \( -type d -o \( -type f -links 1 ! -name guest-origin-attestation.json \) \) \( -user 0 -o -user "$INVOKER_UID" \) \
        -exec chown -h "$INVOKER_OWNER" {} + \)
 }
 
@@ -285,6 +291,7 @@ hand_back_artifacts() {
   local artifacts=(.vphoned.signed .cfw_temp cfw_input cfw_jb_input .cfw-history)
   [[ "$MODE" != undo ]] || artifacts=(.cfw-history "${CFW_DISK_WORK:t}")
   for artifact in "${artifacts[@]}"; do
+    [[ -n "$artifact" ]] || continue
     [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
     restore_invoker_ownership "$VM_DIR/$artifact" || failed=1
   done
@@ -305,10 +312,8 @@ hand_back_artifacts() {
 # original is never opened for writing: CFW goes to the staged copy, which is
 # published by an exchange rename after every step succeeded. Long-running
 # children (hdiutil attach, installers) do not inherit the descriptor.
-exec {DISK_FD}<"$IMG"
-CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
+CFW_DISK_WORK=""
 CFW_STAGED_IMG=""
-export VPHONE_GUEST_EVIDENCE="$CFW_DISK_WORK/guest-changes.jsonl"
 TXN_STATE=none
 txn() {
   local command="$1"; shift
@@ -323,9 +328,19 @@ txn_abort() {
   return 0
 }
 
-# One private directory per invocation, including temporary Cryptex mounts.
-# Keep it beneath the VM directory so installer path checks remain applicable.
-CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
+# Disk staging stays inside the VM for same-volume atomic publication.
+# An explicit scratch parent changes only the private mount workspace.
+make_mount_directory() {
+  if [[ -z "$WORK_PARENT" ]]; then
+    mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX"
+  else
+    "$PY" -c 'import sys; sys.path.insert(0,sys.argv[1]); from cfw_disk_txn import make_mount_directory; print(make_mount_directory(sys.argv[2]))' "$SCRIPT_DIR" "$WORK_PARENT"
+  fi
+}
+# Check both volumes before creating any disk copy. statvfs is also available
+# on external volumes that have no Foundation important-usage capacity value.
+"$PY" -c 'import sys; sys.path.insert(0,sys.argv[1]); from cfw_disk_txn import require_free_space; require_free_space(sys.argv[2:])' "$SCRIPT_DIR" "$VM_DIR" "${WORK_PARENT:-$VM_DIR}"
+CFW_HOST_MNT=$(make_mount_directory)
 export CFW_HOST_MNT
 BASEDISK=""
 CLEANUP_DONE=0
@@ -422,6 +437,12 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 trap 'exit 129' HUP
 
+# Preflight workspace failures must not leave an empty pending transaction.
+# The cleanup trap already owns the mount root before disk staging starts.
+exec {DISK_FD}<"$IMG"
+CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
+export VPHONE_GUEST_EVIDENCE="$CFW_DISK_WORK/guest-changes.jsonl"
+
 if [[ "$MODE" == environment ]]; then
   echo "[*] host-mode guest environment update: vm=$VM_DIR candidates=$GUEST_COMPONENTS mounts=$CFW_HOST_MNT staging=$CFW_DISK_WORK"
 else
@@ -431,6 +452,8 @@ fi
 # every failing txn call exits explicitly at top level.
 if [[ "$MODE" == environment ]]; then
   CFW_STAGED_IMG=$(txn stage) || exit $?
+elif [[ "$MODE" == install ]]; then
+  CFW_STAGED_IMG=$(txn stage --guest-evidence --invalidate-guest-origin) || exit $?
 else
   CFW_STAGED_IMG=$(txn stage --guest-evidence) || exit $?
 fi
@@ -440,6 +463,10 @@ if [[ "$MODE" == undo ]]; then
   UNDO_ARGS=(--generation "$UNDO_GENERATION")
   for declaration in "${UNDO_DECLARATIONS[@]}"; do UNDO_ARGS+=(--declaration "$declaration"); done
   txn prepare-undo "${UNDO_ARGS[@]}" || exit $?
+fi
+if [[ "$MODE" == install ]]; then
+  echo "[*] capturing generation-backed file originals from readonly source images..."
+  ( exec {DISK_FD}<&-; "$PY" "$SCRIPT_DIR/patchers/file_originals.py" prepare "$CFW_DISK_WORK" ) || exit $?
 fi
 txn check --phase pre-mount || exit $?
 hdiutil attach -plist -nomount -imagekey diskimage-class=CRawDiskImage "$CFW_STAGED_IMG" > "$CFW_HOST_MNT/attach.log" {DISK_FD}<&-
@@ -459,7 +486,7 @@ if [[ "$MODE" == environment ]]; then
   ( exec {DISK_FD}<&-; "$PY" "$SCRIPT_DIR/cfw_env_update.py" apply --device "/dev/$SYS" \
       --mount "$CFW_HOST_MNT/mnt1" --components "$GUEST_COMPONENTS" --report "$ENV_REPORT" "$VM_DIR" ) || exit $?
 elif [[ "$MODE" == undo ]]; then
-  echo "[*] restoring qualified DSC snapshots on the staged System volume..."
+  echo "[*] restoring qualified component originals on the staged volumes..."
   txn apply-undo || exit $?
 else
   echo "[*] running $INSTALLER (files placed on host mounts)..."
@@ -499,9 +526,10 @@ fi
 if [[ "$MODE" != environment ]]; then
   # Verify the actual post-snapshot image. Its final attachment and all volume
   # mounts are read-only; no writer runs after this boundary.
-  CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
+  CFW_HOST_MNT=$(make_mount_directory)
   export CFW_HOST_MNT
   CLEANUP_DONE=0
+  txn bind-mount || exit $?
   hdiutil attach -plist -nomount -readonly -imagekey diskimage-class=CRawDiskImage "$CFW_STAGED_IMG" > "$CFW_HOST_MNT/attach.log" {DISK_FD}<&-
   BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || { echo "[-] cannot identify final read-only attachment" >&2; BASEDISK=""; exit 1; }
   echo "[*] verifying final guest effects after snapshot modification..."
@@ -555,7 +583,7 @@ if [[ "$MODE" == environment ]]; then
     exit "$IDENTITY_STATUS"
   fi
 elif [[ "$MODE" == undo ]]; then
-  echo "[+] guest DSC Undo published with component receipts; guest origin is unknown. Evidence: $VM_DIR/.cfw-history"
+  echo "[+] guest component Undo published with component receipts; guest origin is unknown. Evidence: $VM_DIR/.cfw-history"
 else
   echo "[+] host-mode CFW install complete. Boot with: make boot"
 fi

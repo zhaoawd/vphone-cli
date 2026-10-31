@@ -18,3 +18,17 @@ extension NSSavePanel {
         }
     }
 }
+
+extension NSOpenPanel {
+    func presentSelection(_ choose: @escaping @MainActor ([URL]) -> Void) {
+        guard let window = NSApp.keyWindow ?? NSApp.mainWindow else {
+            if runModal() == .OK { choose(urls) }
+            return
+        }
+        beginSheetModal(for: window) { [self] response in
+            if response == .OK {
+                MainActor.assumeIsolated { choose(urls) }
+            }
+        }
+    }
+}

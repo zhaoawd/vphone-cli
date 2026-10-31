@@ -1,10 +1,12 @@
 #include "../Shared/InjectionEnvironment.h"
 #include "../Shared/RootHideLoaderLinks.h"
+#include "../Shared/VPhoneSimulationAccess.h"
 #include <ctype.h>
 #include <dirent.h>
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <pwd.h>
 #include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -86,10 +88,23 @@ static int vpSpawnWith(VPSpawnFunction spawn, pid_t *restrict pid, const char *r
         return status;
     }
     VPInjectionEnvironment injected = vpInsertHook(envp, vpBootRoot);
-    int status = spawn(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
+    char *const *baseEnvironment = injected.values ? injected.values : envp;
+    const char *label = argv && argv[0] && argv[1] ? argv[1] : NULL;
+    unsigned access = vpSimulationProgramAccess(path, label);
+    VPSimulationIssue issue = NULL;
+    if (getpid() == 1 && geteuid() == 0 && access) {
+        struct passwd *mobile = getpwnam("mobile");
+        if (mobile && vpSimulationPrepare(mobile->pw_uid, mobile->pw_gid) == 0)
+            issue = (VPSimulationIssue)dlsym(RTLD_DEFAULT, "sandbox_extension_issue_file");
+    }
+    VPSimulationEnvironment simulation = vpSimulationEnvironment(baseEnvironment, NULL, access, issue);
+    int status = spawn(pid, path, actions, attributes, argv,
+                       simulation.values ? simulation.values : baseEnvironment);
     vpLogInjection(injected.values ? "inserted" : "unchanged", path, status);
     vpLogSpawn(injected.values ? "inserted" : "unchanged", path, status == 0 && pid ? *pid : -1,
                status);
+    if (access) vpLogInjection("simulation-access", path, (int)simulation.granted);
+    vpSimulationFreeEnvironment(&simulation);
     vpFreeEnvironment(&injected);
     return status;
 }

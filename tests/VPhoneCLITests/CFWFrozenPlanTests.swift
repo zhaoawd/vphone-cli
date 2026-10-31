@@ -10,8 +10,36 @@ import VPhoneCore
 private final class CFWFrozenTestBundle: NSObject {}
 
 @Suite struct CFWFrozenPlanTests {
-    @Test(arguments: ["valid", "checkpoint", "disk", "machine", "retained", "postimage", "postimage-replaced", "runtime-resized"])
-    func committedCFWSwapPreservesActualSwiftGenerationQualification(change: String) throws {
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_PLAN_COST_FIXTURE"] != nil))
+    func prepareIsolatedPlanCostFixture() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let path = URL(fileURLWithPath: try #require(ProcessInfo.processInfo.environment["VPHONE_PLAN_COST_FIXTURE"]))
+        try #require(!FileManager.default.fileExists(atPath: path.path), "benchmark fixture must be new")
+        let vm = try fixture(profile: false, variant: .exp, directory: path)
+        let sizeMiB = try #require(UInt64(ProcessInfo.processInfo.environment["VPHONE_PLAN_COST_POSTIMAGE_MIB"] ?? "64"))
+        try #require([64, 256, 1024, 4096].contains(sizeMiB), "bounded synthetic postimage size required")
+        let disk = try FileHandle(forWritingTo: vm.appendingPathComponent("Disk.img"))
+        try disk.truncate(atOffset: sizeMiB << 20)
+        try disk.close()
+        let context = try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: nil, guestEnvironment: "classic", spoofBuild: "")
+        let verifier = try executable()
+        var object = try #require(JSONSerialization.jsonObject(with: Data(context.json.utf8)) as? [String: Any])
+        object["verifierPath"] = verifier.path
+        object["verifierSHA256"] = SHA256.hash(data: try Data(contentsOf: verifier)).map { String(format: "%02x", $0) }.joined()
+        var env = ProcessInfo.processInfo.environment.merging(try context.environment) { _, new in new }
+        env["VPHONE_FROZEN_CONTEXT"] = String(decoding: try JSONSerialization.data(withJSONObject: object,
+            options: [.sortedKeys, .withoutEscapingSlashes]), as: UTF8.self)
+        let python = root.appendingPathComponent(".venv/bin/python3")
+        let result = try VPhoneProcessRunner.runCapturing(python, [root.appendingPathComponent("scripts/vm_lock.py").path,
+            vm.path, "cfw-record", "--", python.path, root.appendingPathComponent("tests/cfw_identity_bridge_fixture.py").path, vm.path], env: env)
+        try #require(result.succeeded, Comment(rawValue: result.stdout + result.stderr))
+        guard case .ready = try FirmwareDesiredPlanStore.read(in: vm) else { Issue.record("benchmark plan invalid"); return }
+        try JSONSerialization.data(withJSONObject: ["schema": "vphone.synthetic-plan-cost.v1", "postimageMiB": sizeMiB,
+            "generationID": context.generationID], options: [.sortedKeys]).write(to: vm.appendingPathComponent("plan-cost-fixture.json"))
+        print("[plan-cost-fixture] retained isolated \(sizeMiB)MiB fixture with two CFW publications and Undo at \(vm.path)")
+    }
+    @Test(arguments: [4, 5], ["valid", "checkpoint", "disk", "machine", "retained", "postimage", "postimage-replaced", "runtime-resized"])
+    func committedCFWSwapPreservesActualSwiftGenerationQualification(journalVersion: Int, change: String) throws {
         let vm = try fixture(profile: false, variant: .exp)
         defer { try? FileManager.default.removeItem(at: vm) }
         let context = try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: nil, guestEnvironment: "classic", spoofBuild: "")
@@ -21,6 +49,7 @@ private final class CFWFrozenTestBundle: NSObject {}
         object["verifierPath"] = verifier.path
         object["verifierSHA256"] = SHA256.hash(data: try Data(contentsOf: verifier)).map { String(format: "%02x", $0) }.joined()
         var env = ProcessInfo.processInfo.environment.merging(try context.environment) { _, new in new }
+        env["VPHONE_TEST_CFW_JOURNAL_VERSION"] = String(journalVersion)
         env["VPHONE_FROZEN_CONTEXT"] = String(decoding: try JSONSerialization.data(withJSONObject: object,
             options: [.sortedKeys,.withoutEscapingSlashes]), as: UTF8.self)
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
@@ -31,6 +60,10 @@ private final class CFWFrozenTestBundle: NSObject {}
         #expect(try VPhoneFirmwareIdentity.read(in: vm) != original)
         #expect(try FirmwareGeneration.loadVerified(in: vm,id:context.generationID).content.identity == original)
         #expect(try VPhoneCFWFrozenContext.prepare(in: vm,requestedVariant:nil,guestEnvironment:"classic",spoofBuild:"").generationID == context.generationID)
+        guard case .ready(let saved) = try FirmwareDesiredPlanStore.read(in: vm) else {
+            Issue.record("committed fixture did not validate through desired-plan read"); return
+        }
+        #expect(saved.generationID == context.generationID)
         if change == "valid" { return }
         let archive = try #require(FileManager.default.contentsOfDirectory(at: vm.appendingPathComponent(".cfw-history"),
             includingPropertiesForKeys: nil).first(where: { $0.lastPathComponent.hasSuffix("identity2") }))
@@ -62,9 +95,40 @@ private final class CFWFrozenTestBundle: NSObject {}
         default: Issue.record("Unknown identity fixture")
         }
         #expect(throws: (any Error).self) { try FirmwareGeneration.loadVerified(in:vm,id:context.generationID) }
+        #expect(throws: FirmwareDesiredPlanStore.Failure.identityMismatch) { try FirmwareDesiredPlanStore.read(in: vm) }
     }
-    private func fixture(profile: Bool, variant: FirmwarePipeline.Variant = .regular) throws -> URL {
-        let path = FileManager.default.temporaryDirectory.appendingPathComponent("cfw-frozen-" + UUID().uuidString)
+    @Test(arguments: ["valid", "receipt", "originals"])
+    func completeFileUndoWithNoRetainedRowsPreservesSwiftIdentity(change: String) throws {
+        let vm = try fixture(profile: false, variant: .exp)
+        defer { try? FileManager.default.removeItem(at: vm) }
+        let context = try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: nil, guestEnvironment: "classic", spoofBuild: "")
+        let verifier = try executable()
+        var object = try #require(JSONSerialization.jsonObject(with: Data(context.json.utf8)) as? [String: Any])
+        object["verifierPath"] = verifier.path
+        object["verifierSHA256"] = SHA256.hash(data: try Data(contentsOf: verifier)).map { String(format: "%02x", $0) }.joined()
+        var env = ProcessInfo.processInfo.environment.merging(try context.environment) { _, new in new }
+        env["VPHONE_FROZEN_CONTEXT"] = String(decoding: try JSONSerialization.data(withJSONObject: object,
+            options: [.sortedKeys, .withoutEscapingSlashes]), as: UTF8.self)
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let python = root.appendingPathComponent(".venv/bin/python3")
+        let result = try VPhoneProcessRunner.runCapturing(python, [root.appendingPathComponent("scripts/vm_lock.py").path,
+            vm.path, "cfw-record", "--", python.path, root.appendingPathComponent("tests/cfw_file_identity_bridge_fixture.py").path, vm.path], env: env)
+        try #require(result.succeeded, Comment(rawValue: result.stdout + result.stderr))
+        guard case .ready(let record) = try FirmwareDesiredPlanStore.read(in: vm) else {
+            Issue.record("complete-file Undo lost the generation binding"); return
+        }
+        #expect(record.generationID == context.generationID)
+        if change == "valid" { return }
+        let histories = try FileManager.default.contentsOfDirectory(at: vm.appendingPathComponent(".cfw-history"), includingPropertiesForKeys: nil)
+        let suffix = change == "receipt" ? "fileidentity1" : "fileidentity2"
+        let archive = try #require(histories.first { $0.lastPathComponent.hasSuffix(suffix) })
+        let name = change == "receipt" ? "guest-install-receipts.json" : "guest-file-originals.json"
+        try Data("changed sealed evidence".utf8).write(to: archive.appendingPathComponent(name))
+        #expect(throws: FirmwareDesiredPlanStore.Failure.identityMismatch) { try FirmwareDesiredPlanStore.read(in: vm) }
+    }
+
+    private func fixture(profile: Bool, variant: FirmwarePipeline.Variant = .regular, directory: URL? = nil) throws -> URL {
+        let path = directory ?? FileManager.default.temporaryDirectory.appendingPathComponent("cfw-frozen-" + UUID().uuidString)
         try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
         let vm = path.standardizedFileURL.resolvingSymlinksInPath()
         try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: true)
@@ -75,7 +139,9 @@ private final class CFWFrozenTestBundle: NSObject {}
         try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
             "diskImage": "Disk.img"], format: .xml, options: 0).write(to: vm.appendingPathComponent("config.plist"))
         for name in ["iPhone-BuildManifest.plist", "BuildManifest.plist"] {
-            try PropertyListSerialization.data(fromPropertyList: ["ProductVersion": "26.1", "ProductBuildVersion": "23B85"],
+            try PropertyListSerialization.data(fromPropertyList: ["ProductVersion": "26.1", "ProductBuildVersion": "23B85",
+                "BuildIdentities": [["Info": ["Variant": "Customer Erase Install (IPSW)"],
+                                     "Manifest": ["OS": ["Info": ["Path": "SystemOS.dmg"]]]]]],
                 format: .xml, options: 0).write(to: restore.appendingPathComponent(name))
         }
         try Data("generation SystemOS fixture".utf8).write(to: restore.appendingPathComponent("SystemOS.dmg"))
@@ -148,6 +214,8 @@ private final class CFWFrozenTestBundle: NSObject {}
         root=Path(os.environ['SCRIPT_DIR']).parent;sys.path.insert(0,str(root))
         from tests.test_component_signatures import signed_macho
         vm=Path(os.environ['VM_DIR']);unsigned=bytearray(signed_macho()[:4096])
+        (vm/'cfw_input').mkdir(exist_ok=True)
+        (vm/'cfw_input/signcert.p12').write_bytes(b'fixture signing key')
         unsigned[16:24]=b'\0'*8;unsigned[32:48]=b'\0'*16
         (vm/'.cfw_temp/seputil').write_bytes(unsigned)
         (vm/'signed.fixture').write_bytes(signed_macho(entitlements={'fixture':True}))

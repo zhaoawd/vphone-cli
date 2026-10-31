@@ -1,0 +1,648 @@
+{
+  "schemaVersion": 1,
+  "scope": "Runtime before separately approved camera-daemon restart",
+  "accepted": false,
+  "locationPassed": true,
+  "cameraReceiptPassed": true,
+  "QRConsumerPassed": false,
+  "cameraRestartExecuted": false,
+  "count": 106,
+  "files": [
+    {
+      "origin": ".build/t52-consumer-fix-20261022/amended-approval-record.json",
+      "path": "files/.build/t52-consumer-fix-20261022/amended-approval-record.json",
+      "bytes": 255,
+      "sha256": "8a117bdc8f49ad3c9bb140f9bd8a5ca645cf9ea61651ab4b6fb6716ff63732d6"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/amended-deployment-plan.json",
+      "path": "files/.build/t52-consumer-fix-20261022/amended-deployment-plan.json",
+      "bytes": 5891,
+      "sha256": "50671e42a53ec8e1d2b1cc4feb42aa77643f44d885201044cd14078b0d62146e"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-readonly-inputs.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-readonly-inputs.json",
+      "bytes": 1048,
+      "sha256": "c192dc7313f52703b993e6e71aeeaf17f93909460f5c57b5531d44fc67146c33"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/amfid-service-state.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/amfid-service-state.json",
+      "bytes": 443,
+      "sha256": "ff946d6c3cff3b302a9621cd72ee6b8ca6da8ad769043835ad8fd061011e31dd"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/authorization-window.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/authorization-window.json",
+      "bytes": 117,
+      "sha256": "ce1f0bbcb3565f74f3c95bc0fa188d6ece3d626cd17841ff6d130458f42ae5a4"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/helper-state.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/helper-state.json",
+      "bytes": 280,
+      "sha256": "8345d78f69578466615ecd69ee834daaa7c2174c24c42d417e4f72c120f4d3a0"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/obsolete-resume-request-cancelled.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/obsolete-resume-request-cancelled.json",
+      "bytes": 209,
+      "sha256": "d4fa31b7ff36573a4531ac079da7016df46687a204b46b7c329df291e83b3fa0"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/policy-after-old-amfid-exit.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/policy-after-old-amfid-exit.json",
+      "bytes": 162,
+      "sha256": "080583256e5197f91f9018fb74a68781c1aa659e0ee2d2140df4325df0a6b64e"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/pre-attachment-probe.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/pre-attachment-probe.json",
+      "bytes": 66,
+      "sha256": "4fc16f98a68f82e9e385838c62f57104564a583b49c5345a1c9a0d543a7317bc"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/scoped-amfidont.log",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/scoped-amfidont.log",
+      "bytes": 340,
+      "sha256": "6665ab85b1006affb6ce85f66a28dd4661ca0468fe5253a9a64078d06819b40e"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/scoped-amfidont.py",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/scoped-amfidont.py",
+      "bytes": 5784,
+      "sha256": "162341567168a3b8aee793d3431592ba652f6a3b52112ca6520f6879598f30e1"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/stop-authorized-helper",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/stop-authorized-helper",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/stop-verification-initial.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/stop-verification-initial.json",
+      "bytes": 295,
+      "sha256": "ecf208ce5bcda5f5ba557a532e9ec06b8c1486f9f9d21b4fe11b6154a2fe9ec5"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/stop-verification.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/stop-verification.json",
+      "bytes": 964,
+      "sha256": "ee882a34a4a99ca12b12cf0c9b36a9678069dfba894f28cb9b1d79a70dd22b87"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/boot-window/supervisor-stop.json",
+      "path": "files/.build/t52-consumer-fix-20261022/boot-window/supervisor-stop.json",
+      "bytes": 322,
+      "sha256": "6e1c1c6c3fd42a4a30e6b8bc2334785de57127143de5b419be5483dbc6f52335"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-auth-preflight-current.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-auth-preflight-current.json",
+      "bytes": 1249,
+      "sha256": "c1a83e42ddcdb5bbd94099ff6942bdd1310b52553f29f16536893d8d54106fe7"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-auth-request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-auth-request.json",
+      "bytes": 80,
+      "sha256": "25e8bfc5488700385ffd3acb95d9c5d3051afdd86d154947694da93418dee32f"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r1/a-request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r1/a-request.json",
+      "bytes": 75,
+      "sha256": "0df35c3a2af38c6fa1c63f120b17864f5ecac980a4411e23e37ef51e3d408a73"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r1/a-startup.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r1/a-startup.json",
+      "bytes": 1141,
+      "sha256": "5774a1f5989b3730968b5fec4df78f42397211ff20f372642bd3a20d003cb5b9"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r1/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r1/requests.jsonl",
+      "bytes": 131301,
+      "sha256": "98d07f210af45955a2dd59ce08d19761d32caa97174889db4abab259ef343208"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r1/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r1/result.json",
+      "bytes": 2296,
+      "sha256": "3a97f740123d09e094eb6ef7432da1c9399c3feb5af1cd1df102f1a311c0ce75"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r1.log",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r1.log",
+      "bytes": 2092,
+      "sha256": "454a1b83b2fc88a9e09fb64e824e016548a23c2f91acdce768a3d6ccca904d9e"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/a-request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/a-request.json",
+      "bytes": 75,
+      "sha256": "6ca6649b95f5cd229f06346cdcfd0e5edee12ddcbe3e7c8bf52ea555ce2e447c"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/a-startup.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/a-startup.json",
+      "bytes": 1244,
+      "sha256": "d9e64201f6fa77eb4682192f234e1585da9bcf0f02b0fc4d956a068784e1029c"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/requests.jsonl",
+      "bytes": 131308,
+      "sha256": "6ded1a4c6fc95f1127ff6c85e65a2224cd5d06d648683dd0461b310d05333240"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r2-authorized/result.json",
+      "bytes": 2375,
+      "sha256": "7c2070ced5954a36404448507340fe89737c31b098f9eb16245eb3eb5f069fdf"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-consumer-r2-authorized.log",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-consumer-r2-authorized.log",
+      "bytes": 2171,
+      "sha256": "bdbc21834602bbc3cfa2fac2e88bab2a9fb0dd2a6b6842d2ce4d3ee73b3d703e"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-log-read-requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-log-read-requests.jsonl",
+      "bytes": 616,
+      "sha256": "8bc3263df9ed9dc2897826836b74fd703f2ff4ef3c8d9a3032284443006a42ba"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/camera-restart-plan.json",
+      "path": "files/.build/t52-consumer-fix-20261022/camera-restart-plan.json",
+      "bytes": 1100,
+      "sha256": "c5b875422a887078653c4a4fb20c6498e83d01ad42d5b1628c9a53b579140814"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/component-mappings-during-consumer.json",
+      "path": "files/.build/t52-consumer-fix-20261022/component-mappings-during-consumer.json",
+      "bytes": 1361,
+      "sha256": "90f015054015d35c92a50823e3b68566de911dcf2f9faaee480450e90a23a85b"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-analysis-r1/annotated.asm",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-analysis-r1/annotated.asm",
+      "bytes": 287930,
+      "sha256": "b8a70955265bbc575827777a8f998b873bd2f924ffe2667f5441586514e1fb07"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-analysis-r1/instructions.asm",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-analysis-r1/instructions.asm",
+      "bytes": 280547,
+      "sha256": "8ed586e96ce8f6a1a775db6c1cf744fbee70b1a1e9177e5fcab0389f5eac9c20"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-analysis-r1/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-analysis-r1/result.json",
+      "bytes": 565,
+      "sha256": "f831044e9a3ff4fbd2aa80127a7f3169dce084e6b61a1b835e6dadf3a9d25363"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-analysis-r1/selectors.json",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-analysis-r1/selectors.json",
+      "bytes": 503879,
+      "sha256": "996a4bdb212a6edaf3f6daf012e8d6f4aecae52ce7dd7f91c902937ece610591"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/annotated.asm",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/annotated.asm",
+      "bytes": 287930,
+      "sha256": "b8a70955265bbc575827777a8f998b873bd2f924ffe2667f5441586514e1fb07"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/record.json",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/record.json",
+      "bytes": 2165736,
+      "sha256": "fdaf58438926514e7e72e673a1ea1f696883cc84605dd328194298cef0e22998"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/recovery-requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/recovery-requests.jsonl",
+      "bytes": 442,
+      "sha256": "8215ccf92ae966a0862db69117ed034fbf87bf903ab507b3e2ffd40c6d411f92"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/request.json",
+      "bytes": 77,
+      "sha256": "bfef9ba28b9b6472b58830ec817deff24c1ce0df206789776cda031a026991f3"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/requests.jsonl",
+      "bytes": 3041,
+      "sha256": "7aeca8c3cda8fc8d21f0b8ab40b8b03293245c507730dba5ea19bea4cb1b30bf"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/restoration-recovery/before",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/restoration-recovery/before",
+      "bytes": 132640,
+      "sha256": "168f8403ed47ea46e853fec8f4a25b8f822daba4f079afc21e0e5a66126af9b9"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/restoration-recovery/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/restoration-recovery/requests.jsonl",
+      "bytes": 259443,
+      "sha256": "c1b0f9cfcccd6bd4a9252450c9b23ecb3c8dcfb2385bf662b1b4dc9ffebefba0"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/restoration-recovery/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/restoration-recovery/result.json",
+      "bytes": 428,
+      "sha256": "d8cfeb00999524bf846e4e91501e2872b661eb1047f3f8eda6b0e2e1df2992ee"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/dispatch-readonly-r1/selectors.json",
+      "path": "files/.build/t52-consumer-fix-20261022/dispatch-readonly-r1/selectors.json",
+      "bytes": 503879,
+      "sha256": "996a4bdb212a6edaf3f6daf012e8d6f4aecae52ce7dd7f91c902937ece610591"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r1/record.json",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r1/record.json",
+      "bytes": 1145,
+      "sha256": "488d62cb71dbf9edc3715e516926eb7dc2584442e23d605040a034f061d30109"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r1/request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r1/request.json",
+      "bytes": 80,
+      "sha256": "292a75c7c03c6b747e25041a56b149b8330cf735e2764bed341f9e56b95f5657"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r1/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r1/requests.jsonl",
+      "bytes": 256763,
+      "sha256": "51ae7c1e232b3b29e226aab6e17dfba084d7b36e1fd470c45360f18f1de4db48"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r1/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r1/result.json",
+      "bytes": 1761,
+      "sha256": "c7ffcaadf1c62df082c0682eb803ee85b6d15f2cb83422d1949113b0fc2e9ebd"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r2/record.json",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r2/record.json",
+      "bytes": 1141,
+      "sha256": "cf548db3a848e305edd2c85ea12509fe84eaf0dcb4c44ade5907a525add0de7b"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r2/request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r2/request.json",
+      "bytes": 80,
+      "sha256": "76260b0e5dafec574458b347c58a76e115f459ec7b673a24f163b5faab61960b"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r2/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r2/requests.jsonl",
+      "bytes": 290738,
+      "sha256": "8fd420053f5065904bc42fdf930a412ff7c0edafee3b66c9d8e74c2168a9b081"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/enumeration-live-r2/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/enumeration-live-r2/result.json",
+      "bytes": 42927,
+      "sha256": "14a268b5776d3de679cbab1f257820d36c9e2beb45c3690cfe76e3b6623a2c9a"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/location-consumer-r1/point-0-record.json",
+      "path": "files/.build/t52-consumer-fix-20261022/location-consumer-r1/point-0-record.json",
+      "bytes": 2480,
+      "sha256": "8a01dfb6458500174501689753fb4bd644496dc8931743044a0d4f59a1d7152e"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/location-consumer-r1/point-0-request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/location-consumer-r1/point-0-request.json",
+      "bytes": 79,
+      "sha256": "59a6d322fbaff5e5b4ce042033f40f4ce53e025c9dfbc38ed6496e70bcc2ffb7"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/location-consumer-r1/point-1-record.json",
+      "path": "files/.build/t52-consumer-fix-20261022/location-consumer-r1/point-1-record.json",
+      "bytes": 2493,
+      "sha256": "c57d2863567ec3defbc8c3a2c92e5478e5ff992766c29cd904dfd54db8de7403"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/location-consumer-r1/point-1-request.json",
+      "path": "files/.build/t52-consumer-fix-20261022/location-consumer-r1/point-1-request.json",
+      "bytes": 79,
+      "sha256": "8bdcd64cbf1385020f52cb3fd0145e3b91bcf747498f7cc64256021945a0ad0f"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/location-consumer-r1/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/location-consumer-r1/requests.jsonl",
+      "bytes": 259664,
+      "sha256": "fdfab3919ed4f1d06c3ac0228bd72243332fa9061741d24518dff03ad918e9c7"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/location-consumer-r1/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/location-consumer-r1/result.json",
+      "bytes": 1362,
+      "sha256": "ce67bf3cf4cf6bb48e24d79c7504b39224730b840fd4c6c9f39b6ab43d695006"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/location-consumer-r1.log",
+      "path": "files/.build/t52-consumer-fix-20261022/location-consumer-r1.log",
+      "bytes": 1048,
+      "sha256": "6352d68e323a5ec0871918edb2faf571946325d957aa3c16b1eddd5d1838cf24"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth/T52Acceptance.app/Info.plist",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth/T52Acceptance.app/Info.plist",
+      "bytes": 1241,
+      "sha256": "c92676aad1fe13b74f8256ea93e5f9984176e05960b7c01b65c01a2506e672db"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth/T52Acceptance.app/T52Acceptance",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth/T52Acceptance.app/T52Acceptance",
+      "bytes": 114656,
+      "sha256": "34f92fb8bf042e728446ad7bb232d09c4af60e7860c8c4cda9ebb80e7ee402a7"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth/T52Acceptance.app/_CodeSignature/CodeResources",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth/T52Acceptance.app/_CodeSignature/CodeResources",
+      "bytes": 1798,
+      "sha256": "10fb1be44948df206fd7223d664b867e8b940fbf78930ce4e4a06d2d2baeb638"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth/entitlements.plist",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth/entitlements.plist",
+      "bytes": 595,
+      "sha256": "806b9dea95b651d77b148959a595ce88d065b80e715cb4102e6ef8793c184740"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth-build.log",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth-build.log",
+      "bytes": 373,
+      "sha256": "f5537106d87556babbe5d5508ae81f058fcf93fa8c0ac1b954367e35bec4d005"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth-deployment/before",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth-deployment/before",
+      "bytes": 113856,
+      "sha256": "042d920c82b06a9167f95e2a19a92d7fc7db4c9692854d8b4fa497c0161e7e8f"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth-deployment/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth-deployment/requests.jsonl",
+      "bytes": 257109,
+      "sha256": "1d759cf7bd9e1abac5859675210f7ac25e80c75f292d5728f75fe38b4c2faadd"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth-deployment/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth-deployment/result.json",
+      "bytes": 428,
+      "sha256": "29526b81dd044022842b8aa2e78615b51de398f241fb0bc7832e56344c8ff9fa"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-camera-auth-deployment.log",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-camera-auth-deployment.log",
+      "bytes": 412,
+      "sha256": "b5d9b43e441126fe9666ba70690529bc83a795ca88eb44588c4cd658839f7596"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-deployment-r1/before",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-deployment-r1/before",
+      "bytes": 113856,
+      "sha256": "02795c7a8bf30799bd309832f1bad6f70200fcc5b2bdc04cc417c773108faaee"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-deployment-r1/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-deployment-r1/requests.jsonl",
+      "bytes": 254344,
+      "sha256": "9ceecd41f18d058b7cfdedd6a2dcb62b24b6105b3f78d6533a3ffb7024d6475c"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-deployment-r1/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-deployment-r1/result.json",
+      "bytes": 428,
+      "sha256": "491273316f8fa24ee8c2f14182e05ed3a7ca08afcdfa8035ef126a15311cb475"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-dispatch-deployment/before",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-dispatch-deployment/before",
+      "bytes": 114656,
+      "sha256": "34f92fb8bf042e728446ad7bb232d09c4af60e7860c8c4cda9ebb80e7ee402a7"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-dispatch-deployment/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-dispatch-deployment/requests.jsonl",
+      "bytes": 259526,
+      "sha256": "041a77659e4dd04caa6a261cadd7a945ea436ce1f86f917bb52317ffe3c5b2de"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-dispatch-deployment/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-dispatch-deployment/result.json",
+      "bytes": 428,
+      "sha256": "a3d2142de96c41923efebcc6ae753ceb9900ea459432d8962caf319947deb609"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-dispatch-readonly/T52Acceptance.app/Info.plist",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-dispatch-readonly/T52Acceptance.app/Info.plist",
+      "bytes": 1241,
+      "sha256": "c92676aad1fe13b74f8256ea93e5f9984176e05960b7c01b65c01a2506e672db"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-dispatch-readonly/T52Acceptance.app/T52Acceptance",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-dispatch-readonly/T52Acceptance.app/T52Acceptance",
+      "bytes": 132640,
+      "sha256": "168f8403ed47ea46e853fec8f4a25b8f822daba4f079afc21e0e5a66126af9b9"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-dispatch-readonly/T52Acceptance.app/_CodeSignature/CodeResources",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-dispatch-readonly/T52Acceptance.app/_CodeSignature/CodeResources",
+      "bytes": 1798,
+      "sha256": "10fb1be44948df206fd7223d664b867e8b940fbf78930ce4e4a06d2d2baeb638"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/probe-dispatch-readonly/entitlements.plist",
+      "path": "files/.build/t52-consumer-fix-20261022/probe-dispatch-readonly/entitlements.plist",
+      "bytes": 595,
+      "sha256": "806b9dea95b651d77b148959a595ce88d065b80e715cb4102e6ef8793c184740"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/publisher-transition-r1/cache-transition.json",
+      "path": "files/.build/t52-consumer-fix-20261022/publisher-transition-r1/cache-transition.json",
+      "bytes": 242,
+      "sha256": "306379b9bdd73d306cd321c1c8ec68bdebfaa831028c05011af5c316692cbcf6"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/publisher-transition-r1/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/publisher-transition-r1/requests.jsonl",
+      "bytes": 186918,
+      "sha256": "0c30deb62b982a31ac13e4dab0d5ca793da22e74adb736ccc82dad15220a34f1"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/publisher-transition-r1/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/publisher-transition-r1/result.json",
+      "bytes": 346,
+      "sha256": "757840c48d0c97af08c31014c5725953231b14acb9b08dc7c775abf10e13082b"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/publisher-transition-r1.log",
+      "path": "files/.build/t52-consumer-fix-20261022/publisher-transition-r1.log",
+      "bytes": 330,
+      "sha256": "edea47f568215b3a8d99d28e7d4ce1d7059fb4cfd6ed38f329815c2227769f5f"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/readonly-historical-log-attempt.json",
+      "path": "files/.build/t52-consumer-fix-20261022/readonly-historical-log-attempt.json",
+      "bytes": 302,
+      "sha256": "8ffa783b8732c04412a86e56a537bda34ecf3f7e3b7c656c53a7934b0f8fc659"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/root-reports-handed-back.json",
+      "path": "files/.build/t52-consumer-fix-20261022/root-reports-handed-back.json",
+      "bytes": 212,
+      "sha256": "e60f7ad4b80766df7cbc1a91739fc1874d2c3782de9fb9560154c533590f40e9"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/runtime-verification-r1/requests.jsonl",
+      "path": "files/.build/t52-consumer-fix-20261022/runtime-verification-r1/requests.jsonl",
+      "bytes": 130700,
+      "sha256": "a26b1b444598ac9fc7305e0b5f23c7964cdd9274f3a1ae8003de621275947580"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/runtime-verification-r1/result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/runtime-verification-r1/result.json",
+      "bytes": 12056,
+      "sha256": "10db01abfdf86f9a8d35e52f2edca7d94e43137d32d0d6e03db76be51d4ffd41"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/system-maintenance-plan.json",
+      "path": "files/.build/t52-consumer-fix-20261022/system-maintenance-plan.json",
+      "bytes": 2777,
+      "sha256": "c19afda5da0647cbc661585687cf694a4801785f0a8a6c9d5fbf16b0778f92df"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/system-maintenance-result.json",
+      "path": "files/.build/t52-consumer-fix-20261022/system-maintenance-result.json",
+      "bytes": 3215,
+      "sha256": "49d18cdc84b42c1beb72b634d3140f0c67be1306e0b5f86bf872a7f29e78b92c"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/system-postcheck.json",
+      "path": "files/.build/t52-consumer-fix-20261022/system-postcheck.json",
+      "bytes": 5973,
+      "sha256": "51ccffd76e056320242881627e557a3f38f4fc3b0138f1209acc19b95c8a0dd1"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/tools-final-regression-outside.log",
+      "path": "files/.build/t52-consumer-fix-20261022/tools-final-regression-outside.log",
+      "bytes": 121,
+      "sha256": "45291d784e3ad53bbe05c9ffa342c5a7333f66af388a2d08024f02de38a68839"
+    },
+    {
+      "origin": ".build/t52-consumer-fix-20261022/tools-final-regression.log",
+      "path": "files/.build/t52-consumer-fix-20261022/tools-final-regression.log",
+      "bytes": 1078,
+      "sha256": "2fc6ce71a5aa413b404c327b8c8c9cd7120d315d3e0a5b0fbd5b0d0a2bdbb19d"
+    },
+    {
+      "origin": "TASKS.md",
+      "path": "files/TASKS.md",
+      "bytes": 87138,
+      "sha256": "03f8d7b852417a76d1fb8f93125b9d90a074b783630bc7ed9c5c8b0bc2a0acf7"
+    },
+    {
+      "origin": "research/0_binary_patch_comparison.md",
+      "path": "files/research/0_binary_patch_comparison.md",
+      "bytes": 255943,
+      "sha256": "8af1024c8b30be075b57601a1033c28343f5c755745221e97b64f1a751d4ebe2"
+    },
+    {
+      "origin": "research/probes/build_t52_application_probe.zsh",
+      "path": "files/research/probes/build_t52_application_probe.zsh",
+      "bytes": 2520,
+      "sha256": "7aec9781b76f397042a12108c4cbf1c89a9c2998fbb512028053ef809ff1ba21"
+    },
+    {
+      "origin": "research/probes/t52_application_probe.m",
+      "path": "files/research/probes/t52_application_probe.m",
+      "bytes": 15903,
+      "sha256": "48edbe1990e5e8f37f7087fa13f3e0592f2b3ad756091c01d40505ba58e775f4"
+    },
+    {
+      "origin": "research/probes/t52_capture_source_diagnostic.inc",
+      "path": "files/research/probes/t52_capture_source_diagnostic.inc",
+      "bytes": 7781,
+      "sha256": "c28b999e0b2052ac6a4411aabe936dc0e5973d7a40b4d296edd8c72fb466721d"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/T52_consumer_fix_20261022.md",
+      "path": "files/research/upstream_integration_2026-10-15/T52_consumer_fix_20261022.md",
+      "bytes": 10948,
+      "sha256": "1692ed3c64d4ed4d33841132079fd97de4cd0a4fc1a65283a5babe615f91df77"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "path": "files/research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "bytes": 288950,
+      "sha256": "71344a3a866c436b1c79d0d9958e9ff34f9ac5a40abbdbfa5b61184ed398ec2f"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/progress.md",
+      "path": "files/research/upstream_integration_2026-10-15/progress.md",
+      "bytes": 90701,
+      "sha256": "f420b6b5f139f380ae5dbeb44687d03f6a2158ed2e14e94afda130abde2fbcc1"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tasks.json",
+      "path": "files/research/upstream_integration_2026-10-15/tasks.json",
+      "bytes": 344261,
+      "sha256": "5b0c3888f51528a9ae424097d41bf5160528855679a06f7d48f118b3837774b8"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tools/archive_t52_consumer_runtime.py",
+      "path": "files/research/upstream_integration_2026-10-15/tools/archive_t52_consumer_runtime.py",
+      "bytes": 4462,
+      "sha256": "4cf34b133a792e2fe40139ebaf53f6bc7a77d62534f7e9475d937dd8b4fec0ca"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tools/capture_t52_camera_enumeration.py",
+      "path": "files/research/upstream_integration_2026-10-15/tools/capture_t52_camera_enumeration.py",
+      "bytes": 4440,
+      "sha256": "4ce958d149399c777ad1f6aae9af777064dc0bf43b9659f209378148fb15e834"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tools/capture_t52_camera_restart.py",
+      "path": "files/research/upstream_integration_2026-10-15/tools/capture_t52_camera_restart.py",
+      "bytes": 5875,
+      "sha256": "34de841ad78dbf1ac7717d02d8fa77a6e8d1eda3805365760469b8490831714a"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tools/disassemble_t52_capture_source.py",
+      "path": "files/research/upstream_integration_2026-10-15/tools/disassemble_t52_capture_source.py",
+      "bytes": 3915,
+      "sha256": "09998d03879ad7b094f80591bef1d549f912379a50b3c33d759cd53409d1f709"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tools/run_t52_capture_source_diagnostic.py",
+      "path": "files/research/upstream_integration_2026-10-15/tools/run_t52_capture_source_diagnostic.py",
+      "bytes": 4989,
+      "sha256": "3b2a4a0f1d009cb9743e239bba795123960ecde192ae1724ca5c499e52b5357b"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tools/test_t52_camera_restart.py",
+      "path": "files/research/upstream_integration_2026-10-15/tools/test_t52_camera_restart.py",
+      "bytes": 981,
+      "sha256": "69999f51c1a297f5241b9f70263fc478d6f11f04e4789fa85490d6a834f5f490"
+    },
+    {
+      "origin": "research/upstream_integration_2026-10-15/tools/test_t52_capture_source_cleanup.py",
+      "path": "files/research/upstream_integration_2026-10-15/tools/test_t52_capture_source_cleanup.py",
+      "bytes": 4097,
+      "sha256": "9e0c193f00252e258fe75f0ff477a785a6ffefb48d2b65539c56f82a7e49d9ea"
+    }
+  ]
+}

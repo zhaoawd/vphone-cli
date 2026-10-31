@@ -22,7 +22,10 @@ class LaunchHookSpawnTests(unittest.TestCase):
         unit = cls.directory / 'harness.c'
         unit.write_text('#define posix_spawn vpTestPosixSpawn\n#define posix_spawnp vpTestPosixSpawnP\n' + source + '\n' + fixture)
         cls.binary = cls.directory / 'harness'
-        result = subprocess.run(['xcrun', 'clang', '-Wno-deprecated-declarations', str(unit), str(ROOT / 'sources/VPhoneGuestComponents/Shared/RootHideLoaderLinks.c'), '-o', str(cls.binary)],
+        result = subprocess.run(['xcrun', 'clang', '-Wno-deprecated-declarations', str(unit),
+                                 str(ROOT / 'sources/VPhoneGuestComponents/Shared/RootHideLoaderLinks.c'),
+                                 str(ROOT / 'sources/VPhoneGuestComponents/Shared/VPhoneSimulationAccess.c'),
+                                 '-o', str(cls.binary)],
                                 capture_output=True, text=True)
         if result.returncode:
             raise RuntimeError(result.stderr)

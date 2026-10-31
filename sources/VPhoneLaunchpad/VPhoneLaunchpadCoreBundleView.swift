@@ -56,7 +56,7 @@ struct VPhoneLaunchpadCoreBundleView: View {
         } header: {
             Text("Embedded toolchain")
         } footer: {
-            Text("Every command runs this vphone-cli. Launchpad does not switch to an installed Core Bundle.")
+            Text("Library commands use the embedded CLI. Bound execution and supported component updates use the verified selected Core Bundle.")
                 .foregroundStyle(.secondary)
         }
     }

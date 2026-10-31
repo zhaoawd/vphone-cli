@@ -3,16 +3,15 @@
 #import <objc/runtime.h>
 
 #include <math.h>
+#include "../Shared/VPhoneLocationState.inc"
+#include "../Shared/VPhoneSimulationAccess.h"
 
-// vphoned replaces this file atomically. An absent file means native location.
-static NSString *const VPhoneLocationPath = @"/var/mobile/Library/Caches/vphone-location.json";
 static char VPhoneLocationTimerKey;
 
 static CLLocation *vphoneLocation(void) {
-    NSData *data = [NSData dataWithContentsOfFile:VPhoneLocationPath];
-    if (!data || data.length > 4096) return nil;
-    NSDictionary *state = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    if (![state isKindOfClass:NSDictionary.class]) return nil;
+    vpSimulationConsumeTokens(VP_SIM_LOCATION_READ);
+    NSDictionary *state = vphoneReadLocationState();
+    if (!state) return nil;
 
     NSNumber *latitude = state[@"latitude"];
     NSNumber *longitude = state[@"longitude"];

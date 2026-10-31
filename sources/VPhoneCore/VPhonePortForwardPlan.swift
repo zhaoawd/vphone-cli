@@ -2,8 +2,8 @@ import Foundation
 
 /// A host-side forwarding plan. Parsing and validation open no listener and
 /// change no VM/guest configuration; the network runtime must realize it.
-public struct VPhonePortForwardPlan: Codable, Equatable, Sendable, CustomStringConvertible {
-    public enum TransportProtocol: String, Codable, Sendable { case tcp, udp }
+public struct VPhonePortForwardPlan: Codable, Equatable, Hashable, Sendable, CustomStringConvertible {
+    public enum TransportProtocol: String, Codable, Sendable, CaseIterable { case tcp, udp }
     public enum Error: Swift.Error, Equatable {
         case invalidInput(String)
         case duplicateListener(String)
@@ -18,6 +18,13 @@ public struct VPhonePortForwardPlan: Codable, Equatable, Sendable, CustomStringC
     private enum CodingKeys: String, CodingKey {
         case transport = "protocol"
         case hostAddress, hostPort, guestPort
+    }
+
+    public init(transport: TransportProtocol = .tcp, hostAddress: String? = nil, hostPort: Int, guestPort: Int) {
+        self.transport = transport
+        self.hostAddress = hostAddress
+        self.hostPort = hostPort
+        self.guestPort = guestPort
     }
 
     public var listenAddress: String { hostAddress ?? "127.0.0.1" }

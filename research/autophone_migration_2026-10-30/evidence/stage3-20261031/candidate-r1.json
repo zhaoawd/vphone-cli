@@ -1,0 +1,302 @@
+{
+  "phase": 3,
+  "accepted": false,
+  "install_and_marker_verified": true,
+  "business_ui_verified": false,
+  "reason": "Selected SDK 27.1 IPA lacks scene lifecycle and crashes at launch",
+  "pending_decision": "Whether to generate a separately identified iOS 27-compatible build",
+  "autophone_phase3_changed_files": [
+    "CHANGELOG.md",
+    "TASKS.md",
+    "autophone/device/session.py",
+    "autophone/device/springboard_residue.py",
+    "autophone/device/transfer.py",
+    "autophone/device/uds.py",
+    "autophone/device/upstream_install.py",
+    "autophone/device/upstream_wire.py",
+    "autophone/packages/store.py",
+    "tests/test_proc_regions.py",
+    "tests/test_upstream_install.py",
+    "tools/guest/README.md",
+    "tools/guest/build_proc_regions.sh",
+    "tools/guest/proc_regions.c",
+    "tools/phase1/upstream_app.py"
+  ],
+  "source_manifest": "autophone-source-r1.json",
+  "cumulative_patch": "autophone-stage3-r1.patch",
+  "pytest_passed": 333,
+  "ruff_passed": true,
+  "closeout_passed": true,
+  "artifacts": [
+    {
+      "path": "FoodAIVerification-2026-10-31-125544.ips",
+      "size": 19834,
+      "sha256": "50265b4f5af649717f2cba133e6324964d3c30472d0f5e51dc5a96b27da68c61"
+    },
+    {
+      "path": "FoodAIVerification-2026-10-31-125623.ips",
+      "size": 25254,
+      "sha256": "1ff1b7f7fc687bbd55ac3423de688d6d96e0815a67ad9abd2913e1d80c514e03"
+    },
+    {
+      "path": "app-diagnosis-r1.jpg",
+      "size": 37962,
+      "sha256": "b6ac3c4ed848ff228311de7a0503c40a440120051e27860492dd0ce481e7636e"
+    },
+    {
+      "path": "app-diagnosis-r1.json",
+      "size": 55957,
+      "sha256": "231566928d4a1176b89488556f58741116f8b8b85ca2ff6dd4dc492cbbe17340"
+    },
+    {
+      "path": "app-diagnosis-r1.log",
+      "size": 54745,
+      "sha256": "cc779fd94333170863994039130c093fdbc2fd2d3079370e9047a3009620adcf"
+    },
+    {
+      "path": "app-launch-analysis-r1.json",
+      "size": 3011,
+      "sha256": "f0256fef65a12295d68fc98c4bf86b7992abd50af9e6e0855824f5d61cbedc82"
+    },
+    {
+      "path": "app-live-r1/installed-marker.json",
+      "size": 342,
+      "sha256": "13351cc72ddebe42696b2fefa6af9b6f3de7d9c3d9f1331924dc47f41e4c9a68"
+    },
+    {
+      "path": "app-live-r1/result.json",
+      "size": 5791,
+      "sha256": "acc20a5b1b73996910694291520555cf516e981bbb2c3e4768cabff1f566dc47"
+    },
+    {
+      "path": "app-live-r1/screen.jpg",
+      "size": 37886,
+      "sha256": "6d8748be6aab481490eedbab67aa67520f4d868806473339036dcd47602236bb"
+    },
+    {
+      "path": "app-live-r1.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "app-probe-r1.log",
+      "size": 1144,
+      "sha256": "7ae57e4bf5ef4588037faa69b3c2f2a421afd5ad0f4bd86e58ac426ebbcac719"
+    },
+    {
+      "path": "app-probe-r2.log",
+      "size": 4143,
+      "sha256": "0a93fe3b1d2ab7ebc31659327a35d3d249af6b52aa52efa5c404f598a1c5ce2e"
+    },
+    {
+      "path": "app-probe-r3.log",
+      "size": 529,
+      "sha256": "c1206d759edc33d8ca40311375de0e5c48a4681d40ff4ecf885bbb5dd7eec5ca"
+    },
+    {
+      "path": "app-probe-r4.log",
+      "size": 11199,
+      "sha256": "2df99bd54b128e155366d103a3f53f222f116fdff99738165b0db7befd811094"
+    },
+    {
+      "path": "autophone-source-r1.json",
+      "size": 5043,
+      "sha256": "ed3a80b9c57b302b4b93bc5894e7a4e224abac674ed3c35ba538e3824cea3fdd"
+    },
+    {
+      "path": "autophone-stage3-r1.patch",
+      "size": 140830,
+      "sha256": "85088b74b234ad21897b4d412e67e4c83d20e4263bc26494b92dd4c5c161c2b3"
+    },
+    {
+      "path": "expected-build-marker.json",
+      "size": 342,
+      "sha256": "13351cc72ddebe42696b2fefa6af9b6f3de7d9c3d9f1331924dc47f41e4c9a68"
+    },
+    {
+      "path": "helper-live-r5.log",
+      "size": 809,
+      "sha256": "9c33412c16ac895b0eed68bcbaa5964bc92441da8b551357ddf953dd33bd9d8c"
+    },
+    {
+      "path": "independent-closeout-r1.json",
+      "size": 4084,
+      "sha256": "f6f97afd8788df426250f40f96950a3bf0d139078bb1d9b74950b29864dd716a"
+    },
+    {
+      "path": "install-helper-regression-r2.log",
+      "size": 99,
+      "sha256": "d77969beb615e7d0ba40b71d3817295adc200b67d8aca373742b1b198c124d06"
+    },
+    {
+      "path": "install-helper-regression-r3.log",
+      "size": 99,
+      "sha256": "8a672022c1d22978ce5f932a30909c180155e116818fc920c4ca0c0129c22fa7"
+    },
+    {
+      "path": "install-helper-regression-r4.log",
+      "size": 99,
+      "sha256": "ffc087815fa58ca8caab661686cc2135f3709850a3379ea4b74bab9553cda6a6"
+    },
+    {
+      "path": "install-regression-r1.log",
+      "size": 99,
+      "sha256": "fbd4a434ac33afea99abe2716f51a257280d1b0be37cb42ccdddd32dcd0ebbff"
+    },
+    {
+      "path": "install-reproduction-r1.log",
+      "size": 6990,
+      "sha256": "b3f060fca5f586f3864364ec58ba377dfcd00aeb471878ab6bda564694220765"
+    },
+    {
+      "path": "install-route-r1.json",
+      "size": 1298,
+      "sha256": "dd6a427719cbe6be2f66bee9486f2a07bb54a73d65b2c4a6021735c0b43a4b0d"
+    },
+    {
+      "path": "installed-build-marker-r3.json",
+      "size": 342,
+      "sha256": "13351cc72ddebe42696b2fefa6af9b6f3de7d9c3d9f1331924dc47f41e4c9a68"
+    },
+    {
+      "path": "installed-build-marker-r4.json",
+      "size": 342,
+      "sha256": "13351cc72ddebe42696b2fefa6af9b6f3de7d9c3d9f1331924dc47f41e4c9a68"
+    },
+    {
+      "path": "libproc-gap-query-r3.json",
+      "size": 512,
+      "sha256": "ad840fbc05ab618e89c14989e0464d2c6c2352addda026bfaf2c5b659f4757f3"
+    },
+    {
+      "path": "libproc-guest-r1.json",
+      "size": 660,
+      "sha256": "802d2e9bcc92d81c10d87f64a110ff4669675c5420eeb404a902f6b4096a7ce9"
+    },
+    {
+      "path": "libproc-overlap-r2.json",
+      "size": 414,
+      "sha256": "de0b87d99a0ebed39e93d8ce5fbb12badf2a5c2ac672caf0fca204c27a1beea2"
+    },
+    {
+      "path": "libproc-positive-regions-r4.txt",
+      "size": 4141,
+      "sha256": "3fdcf6413dce172957aa1381b9d3a8d1191933d0c072e9ee5057fadb34432d97"
+    },
+    {
+      "path": "libproc-positive-regions-r5.txt",
+      "size": 4003,
+      "sha256": "ddb933eae3ab7bc4dd2c72d897641d29917ac321dc649a36d103e6102da5e692"
+    },
+    {
+      "path": "libproc-regions-incomplete-r2.txt",
+      "size": 5634,
+      "sha256": "25fa49e937fcac324764aac919a94b1571cfe040e175e730bfd00a7bc2c21146"
+    },
+    {
+      "path": "libproc-springboard-regions-r3.txt",
+      "size": 52475,
+      "sha256": "ae45db91663b02a0386b899db4945430b5f6308940320523b92af6b731c65fea"
+    },
+    {
+      "path": "libproc-validation-r4.json",
+      "size": 808,
+      "sha256": "0036be1ea0ed30e4cdb35e6d0995810ef78de95c94f7f0205af6429afbbe91f3"
+    },
+    {
+      "path": "libproc-validation-r5.json",
+      "size": 809,
+      "sha256": "9c33412c16ac895b0eed68bcbaa5964bc92441da8b551357ddf953dd33bd9d8c"
+    },
+    {
+      "path": "package-import-r1.log",
+      "size": 1511,
+      "sha256": "ac861eeec0b5174af7d6b6057a84789712adde8daba83399e8739a307bba2711"
+    },
+    {
+      "path": "package-install-r1.log",
+      "size": 4153,
+      "sha256": "c7226b9d9845147fb309b3ebd815e25eb2fe3402904b2e2e877490e8273fe214"
+    },
+    {
+      "path": "pre-provisioning-r2.json",
+      "size": 530,
+      "sha256": "a87290b357260e96e1cbcec81b1acbdf8fa007973d531d1e08a887ca06f55cbe"
+    },
+    {
+      "path": "pre-provisioning-r3.json",
+      "size": 1680,
+      "sha256": "9f75b864aa9007df990bfafa809ba69bfdd0b2bf24bdb95d0f0c127d0317af38"
+    },
+    {
+      "path": "pre-provisioning-r4.json",
+      "size": 1680,
+      "sha256": "1bd978ef7b8a86e7465a6ea71630aa003b3c99ea6fc7acd96e38a2fa7557c50c"
+    },
+    {
+      "path": "procexp-failure-r1.json",
+      "size": 581,
+      "sha256": "b903794d3e899d3ffd702141f28f1efef18cec63dfc8ad8aef16572817b03609"
+    },
+    {
+      "path": "procexp-source-r1.json",
+      "size": 324,
+      "sha256": "43cbbede2c96539a679181f8fd846e806958c739f6f56c73bb871049b54cc447"
+    },
+    {
+      "path": "procexp-timeout-diagnosis-r1.json",
+      "size": 2125,
+      "sha256": "cd9b44cd2e2346cd0e2478bb124c7384ceba3de4ef851c9d3d5c6fcd8690ad9f"
+    },
+    {
+      "path": "provisioning-readback-r3.json",
+      "size": 2164,
+      "sha256": "c261d0992eba0db8e01f7d88009daa4a55cee6fc1c8d2a3a06ffbe07cc7c1218"
+    },
+    {
+      "path": "provisioning-readback-r4.json",
+      "size": 2164,
+      "sha256": "c261d0992eba0db8e01f7d88009daa4a55cee6fc1c8d2a3a06ffbe07cc7c1218"
+    },
+    {
+      "path": "regression-r1.log",
+      "size": 905,
+      "sha256": "d90a5166e319fb1c30de410b7c3e2d945a3be04ab5e598ed188df8476541209c"
+    },
+    {
+      "path": "regression-r2.log",
+      "size": 905,
+      "sha256": "ac9804b379c171f1341dc59d3ea90afb8a45de7b7f0ee483694892db73af8d73"
+    },
+    {
+      "path": "ruff-r1.log",
+      "size": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "selected-build-r1.json",
+      "size": 1585,
+      "sha256": "51a49b9ca9c74a2c47a255218d135a2d9343366b74c61a74d9633b951be3d984"
+    },
+    {
+      "path": "start-after-panic-r2.log",
+      "size": 157,
+      "sha256": "284b910ca98303a74420e6e787ff7b27d2b1cc1115ea04956c712b30db982848"
+    },
+    {
+      "path": "stop-after-panic-r1.log",
+      "size": 161,
+      "sha256": "6a59e5eeaf412d09ce3b24d2bbe0032d16501d702d57dd4ec17c2a9fe21d37eb"
+    },
+    {
+      "path": "stop-r1.log",
+      "size": 161,
+      "sha256": "2a220a580086fdc51d38b618c045056bfb47b9be3c2de026b88f30f44925d065"
+    },
+    {
+      "path": "vphone-panic-r1.log",
+      "size": 96790,
+      "sha256": "fb6108b7dc4809d49f87be6f7fa0b4c0fe4d130607a46f78ed1ee423d9bc7b8c"
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "status": "icli086_adaptation_and_isolated_candidates_validated_guest_acceptance_pending",
+  "date": "2026-10-21",
+  "head": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "upstream": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "dependency": {
+    "identity": "icli",
+    "oldRevision": "815ef234df5461b8eb9455931d38cb1c37992fe6",
+    "revision": "651ce0d0aed59d2601c35595f1a2ba7e29bb4169",
+    "version": "0.8.6",
+    "otherSixPinsUnchanged": true,
+    "JPEGSourceAndOverlayContentUnchanged": true
+  },
+  "validation": {
+    "pythonFull": {
+      "tests": 949,
+      "seconds": 250.597,
+      "skippedClasses": 1,
+      "exitCode": 0,
+      "sourceBoundary": "Before isolated SourcePackages support was added to pipe ownership fixture."
+    },
+    "nioPipeSupplement": {
+      "tests": 2,
+      "seconds": 15.725,
+      "exitCode": 0,
+      "configuredSourcePackages": ".build/daemon-api-icli086-20261021/Xcode/SourcePackages",
+      "pinnedRevisionChecked": true
+    },
+    "pinOverlay": {
+      "tests": 16,
+      "exitCode": 0
+    },
+    "icliHost": {
+      "tests": 3,
+      "seconds": 4.071,
+      "exitCode": 0,
+      "skipped": 0
+    },
+    "iOSRelease": {
+      "exitCode": 0,
+      "Xcode": "27.1 / 27A9269",
+      "SDK": "iPhoneOS27.1",
+      "profiles": [
+        "classic",
+        "v2"
+      ],
+      "installed": false,
+      "activated": false,
+      "runtimeValidated": false
+    },
+    "finalLedgerUniqueIDs": 66,
+    "finalDependencyDAG": true,
+    "evidenceAndSourceDigests": true,
+    "frozenApplicationDigests": true
+  },
+  "sourceSHA256": {
+    "dependencies/daemon-api-pins.json": "6238a568e0ebd09a4a729806eb89595d22d64bf2fd6ccb7ef54c3d444cb3fce2",
+    "dependencies/daemon-api-overlays/manifest.json": "ed1e69967679847152d2ac33966c12b1ab2b4f204dd0c11f944506d1494e3e32",
+    "dependencies/daemon-api-overlays/icli-jpeg-copy.patch": "8f53ea89f5a93a10b4d871da4fe422c84f4e66e99b3073e8a5ef3aa489ccbbae",
+    "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj": "0f23db73e7318e2fa327c7b3d08734304003545875643e2699eb71ff74be12b5",
+    "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "3e6ca6713694c62635b46c38dc4b3b22f22f4e008f266978c59b8a6b581c2a3b",
+    "scripts/build_daemon_api.sh": "5bea5609741ae323a633f2c927212a2e1cb757cb178f8b5c58d0ee3cee1c1c8d",
+    "scripts/check_daemon_api.py": "d9ded24186cf243194c0904ed4d9df060240e51cf605f40f58e9529228d9e1ba",
+    "scripts/daemon_api_overlays.py": "dc793006b248063773ddfa939d748e30be5a5c7ae1a83b05b607c9f68b7794df",
+    "tests/test_daemon_api_build.py": "135fed59124990cabc13ed72013ca42366d6bc425f4bc23505d23e5de553542a",
+    "tests/test_daemon_api_icli.py": "699d829f0c74ad14db612c4bf193206af152eac88076a3d9c8b021ba090f28be",
+    "tests/test_daemon_pipe_ownership.py": "505f7b5fe25418e002dee8b5c090a56e377735e13b5f9604e4be95dde0b5f3b0",
+    "scripts/python_environment.py": "e043c6185a428de6ea8f4d5ef38b009bcd706c218bcbfeaa0f4a2f158393a1e9",
+    "scripts/check_python_runtime.py": "7fc8dfcda28adbd54e7fc4417f06e892efd43e1baf0e09f0116a96bf48c333cb",
+    "dependencies/python-darwin-arm64-3.14.lock": "d7947c972be97f2ffb71bd4c339fae0ebb2df73dec000b4977aa3a48752e793b",
+    "requirements.txt": "fec8a19e8016b6b851af57458d04979181f459b8e94e73a7ba66673828a007ea"
+  },
+  "files": {
+    "before.json": {
+      "bytes": 1188,
+      "sha256": "27184b86aaa34914343dc1feebc430af545bb837f82a3c2fc774fc1c6aa8c6e4"
+    },
+    "archive-recipe.py.txt": {
+      "bytes": 5184,
+      "sha256": "95fabb4f1a1447bcb13daee583287ccab9b497d844ba163e81a39e02481acbbd"
+    },
+    "pins-overlays-tests.log.gz": {
+      "bytes": 589,
+      "sha256": "3679f74776fd245896c3612b661122e909eaac01acaf09f40720a62a893e58b4"
+    },
+    "candidate-v2-manifest.json": {
+      "bytes": 7811,
+      "sha256": "8c23390bfe03a9c8597dc72b33e48313755379fc1078f054a2a9c2a6f0d0c509"
+    },
+    "daemon-build.log.gz": {
+      "bytes": 2576,
+      "sha256": "9d49a0af1f886796d1af4e8c875fa46f2e190d33b97f7634ac0ef4dc58e692b5"
+    },
+    "nio-pipe-tests.log.gz": {
+      "bytes": 10634,
+      "sha256": "c5b85776cd0de5c9386c29b955fe90397803c8cb47f5d4c0ccae9a6fd9f2f62c"
+    },
+    "python-full.log.gz": {
+      "bytes": 25898,
+      "sha256": "bfda24d5ee5b1b735d516d28e0c79bc3442f98e0b82e4f3960cf16638c31c086"
+    },
+    "frozen-applications.json": {
+      "bytes": 338,
+      "sha256": "93afdc6cfdf74df8db2da84530a58c4cdb2a05183a00f597ada33e3949274cf6"
+    },
+    "python-environment.json": {
+      "bytes": 3264,
+      "sha256": "8029551b13186bd3b442ca2dfb9418972abce44ba8ae3c0327013138cbf014b6"
+    },
+    "setup-venv.log.gz": {
+      "bytes": 546,
+      "sha256": "79aa9a8e0155e657a370c1f780ac5fc3e3c427d23894fd7f38a1a435d8b2612e"
+    },
+    "python-runtime.json": {
+      "bytes": 2803,
+      "sha256": "9ab5a3c4226630960d57fb6d1c3d8f14e7630033ca47acb95dff49bd39887c9e"
+    },
+    "candidate-manifest.json": {
+      "bytes": 7807,
+      "sha256": "b21974847fb4d48bde569a7597fcd27649bf3c2147842922950746346e2a41ac"
+    },
+    "dependency-contract.json": {
+      "bytes": 665,
+      "sha256": "b2b9f6234bcad549335bb7d999c78147b4e666f575fe5f0bbfa4d4cc104f97c3"
+    },
+    "validation.json": {
+      "bytes": 809,
+      "sha256": "5bd8d243b3cad3b774305efce361e73eaf3573996113d5f363c5de4230339000"
+    },
+    "icli-host-tests.log.gz": {
+      "bytes": 237,
+      "sha256": "904b91d0b4ec2e98f9ecf1b70609f061ec4fdb900a222b2e5b396e6eec0ab231"
+    },
+    "dependency.diff": {
+      "bytes": 8162,
+      "sha256": "be05234b9e5bee28955fba00ef381cf96e0bfaab0db3d9b6103a1e65113c25f7"
+    },
+    "setup-venv-retry.log.gz": {
+      "bytes": 4524,
+      "sha256": "6835d74e2dbc13b5cc3a87b5714bead21d4aad935a534a694aac87e9940a15a9"
+    },
+    "daemon-build-retry.log.gz": {
+      "bytes": 79703,
+      "sha256": "268e04c9c0aae1accc1666a3b4f567962d53078f473d6c9e8772304a8fdde31b"
+    }
+  },
+  "limitations": [
+    "No candidate deployment, restore, boot or guest RPC acceptance.",
+    "Foreground UID guard verified with the dependency host stand-in, not real tvOS.",
+    "No new screenshot memory acceptance; existing JPEG overlay implementation preserved.",
+    "No full Core Bundle upgrade; previous frozen CLI/VM binaries preserved.",
+    "Formal full Python run skipped one hardcoded-path class; its two tests passed after fixture path support was corrected.",
+    "No root Swift full suite or firmware tests; actual iOS compile/link and Python checks cover this dependency change."
+  ],
+  "failuresPreserved": [
+    "Initial setup and Xcode resolve sandbox network failures; authorized retries passed.",
+    "Manual overlay check used a parent without an icli subdirectory and was rejected before source writes."
+  ],
+  "accepted": false,
+  "committed": false,
+  "pushed": false,
+  "documentsSHA256": {
+    "research/upstream_integration_2026-10-15/T08_icli086_20261021.md": "7939a0fcf2ba8e4e3d653eeddc739634ec09294c3f2d5c860bdaaac6562d073b",
+    "research/upstream_integration_2026-10-15/tasks.json": "0d9905ecee8474038ec4a548bd9d687d18d05aba4889648a1a5b73de6926fa58",
+    "research/upstream_integration_2026-10-15/local_reconciliation.json": "211f771ba7bae080ae1fa3a453b841a4904a553d29471079c0ad1802092c4239",
+    "research/upstream_integration_2026-10-15/plan.md": "617939b1d2175bcc9a280d9f3333993ea547d9442a6740feaefd670bbebd4bef",
+    "research/upstream_integration_2026-10-15/progress.md": "06b094ce3aa269774cab12faee8de082ed0ee18522c056156812654571b4864d",
+    "TASKS.md": "29448c5460ef7bcb77241805ad95719ce092c992e5333dcc6de2334f376cf8dd",
+    "research/0_binary_patch_comparison.md": "fe04cb9ba91749b5066248deb21edd4f718319a3de60b8576d67bcc5985377be"
+  }
+}

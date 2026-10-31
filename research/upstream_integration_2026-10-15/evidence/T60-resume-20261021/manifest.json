@@ -1,0 +1,238 @@
+{
+  "recordedAt": "2026-10-21T04:31:54.869447+00:00",
+  "sourceBase": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "status": "actual_gui_and_default_real_vm_roundtrip_passed_native_large_vm_pending_space",
+  "accepted": false,
+  "candidate": "/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app",
+  "products": {
+    "vphone-cli": {
+      "path": ".build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "b7a52cd94e96a326ddb1cea0a0ecdb037a815f90b6c694d14a6405604d3f1caa",
+      "cdhash": "f59dba5ea9ca4fb3710c59ae75bbec18b5f9766e"
+    },
+    "vphone-vm": {
+      "path": ".build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+      "cdhash": "89b70a253cad2adea133b3e875519afaf72c5d17"
+    }
+  },
+  "candidateProductionBytesUnchangedSincePriorMatrix": true,
+  "validation": {
+    "actualGUICancel": {
+      "importWaiting": true,
+      "importActive": true,
+      "exportWaiting": true,
+      "exportActive": true
+    },
+    "actualAppKitQuit": {
+      "transferTimeoutCancel": true,
+      "transferDrainAndExit": true,
+      "ownedAppPID": 89079,
+      "processCheckBeforeRebinding": true
+    },
+    "actualFinder": {
+      "cold": true,
+      "warm": true,
+      "published": [
+        "ui-first",
+        "ui-second"
+      ],
+      "full16GiBDiskDigestsMatch": true,
+      "archiveDigestsUnchanged": true
+    },
+    "newSignedCLI": {
+      "tests": 9,
+      "suites": 4,
+      "seconds": 31.013,
+      "exitCode": 0
+    },
+    "legacySignedCLI": {
+      "tests": 9,
+      "suites": 4,
+      "seconds": 18.575,
+      "exitCode": 0
+    },
+    "LaunchpadKit": {
+      "reported": 228,
+      "configuredSkipped": 11,
+      "suites": 52,
+      "seconds": 10.741,
+      "exitCode": 0
+    },
+    "nativeSparseAndHardlinks": {
+      "logicalBytes": 1073741824,
+      "sourceAllocatedBytes": 16384,
+      "targetAllocatedBytes": 16384,
+      "fullDiskDigestMatches": true,
+      "hardlinksShareInode": true
+    },
+    "priorUnchangedProductValidation": "Core441/Python62+7/archiveCLI2 and signed resource/dependency/signature checks in prior manifest; not repeated without production changes"
+  },
+  "realVM": {
+    "defaultSystemTar": "passed",
+    "logicalDiskBytes": 68719476736,
+    "persistentFilesCompared": 8,
+    "sourceAndArchiveUnchanged": true,
+    "stagingRemaining": 0,
+    "bootValidated": false,
+    "result": "result-system-tar.json",
+    "native": "two cancelled130 attempts; no publication; capacity bound retained",
+    "nativeLargeCapacityRequiredFreeBytes": 73766043199,
+    "allocationCause": "unresolved; all attempted small/minimised probes passed source/target allocation checks; no production fix based on hypotheses"
+  },
+  "pending": [
+    "user approval to delete only generated real-vm-r3/import-system-tar/restored copy for native capacity",
+    "real native64GiB import/full digest comparison",
+    "actual create/restore Quit and broader historical combinations"
+  ],
+  "scope": "local test libraries only; original vm-new and DSC VM not booted or written; no commit/push/publication",
+  "frozenInputsSHA256": {
+    ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli": "4b4462290673f7bae7eb04d5820b4de70914fc1663ebadcf9da29174247a132f",
+    ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-vm": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125"
+  },
+  "sourceSHA256": {
+    "tests/VPhoneLaunchpadKitTests/RealCLISparseTests.swift": "0a1eaf79c0af087f22509cd44930117560b3b1c8e8f7b92e5bc94006f41c5f42",
+    "scripts/run_launchpad_cli_tests.sh": "c6e3c92800a3cc4009c5c016f0d25036dc9e3d5ae886f7e58632ca526d0c2a62",
+    "research/upstream_integration_2026-10-15/tools/accept_t60_real_vm_archive.py": "af48c7811a8b301abb3b05020d44791a6776e99630adb6b9907881f7f48f6d9a",
+    "research/upstream_integration_2026-10-15/tools/pause_t60_import.py": "b40ff22c4fc0b4d6a9a3a0301e1491ffd15d0e3d10130a7f9217c569d61d18bf"
+  },
+  "diagnosticRecord": "T60_archive_allocation_20261021.md; first16KiB-stride allocation assertion had an invalid fixture premise and is not claimed as reproduction; diagnostic methods preserved outside normal suite",
+  "files": {
+    "dense-sparse-red.log.gz": {
+      "bytes": 8864,
+      "sha256": "306b82af2daae16aed66d751c47c161d5a6a651f6a64afd43611a9aef7076ad4"
+    },
+    "gui-resume-digests.json": {
+      "bytes": 783,
+      "sha256": "193589025370af4e77af2dbb12714723e2aa8ebadd2770b7d5dbefee86072725"
+    },
+    "gui-resume-observations.json": {
+      "bytes": 3062,
+      "sha256": "d0313d2a7467b5382d63c45b17830d86b221e72c43e54d5f86e2944cecd57ecc"
+    },
+    "import-native.metrics.jsonl": {
+      "bytes": 18667,
+      "sha256": "6b76f52db0fe1b435e1e16c3d00ea057842dff845fc2db591ff9d94d357d5f65"
+    },
+    "import-system-tar.metrics.jsonl": {
+      "bytes": 21931,
+      "sha256": "fe9f175faa5786f2d10882416af94ce9c48fc6c54f9c64eddb78190a80aad98a"
+    },
+    "inspect-archive-header.py": {
+      "bytes": 700,
+      "sha256": "9ca5f1f5e52d7ce5264200a004a9ce899c085ef8c93a12c7befd39366593888e"
+    },
+    "interleaved-sparse-matrix.log.gz": {
+      "bytes": 3013,
+      "sha256": "58efb245bcc465dc647c3f34de64910911d58036dd4fbfc539ed21885e2bb11c"
+    },
+    "interleaved-sparse-red.log.gz": {
+      "bytes": 3078,
+      "sha256": "00019f95cd178c42857c1569a61fbc9f7887c23fc2385803fee523b47383bfbd"
+    },
+    "kit-resume-final.log.gz": {
+      "bytes": 12643,
+      "sha256": "12d600607f76f124685843f9e66f9464628766d1beff58fb9f5c2a897a5ebc9b"
+    },
+    "large-sparse-probe.log.gz": {
+      "bytes": 2998,
+      "sha256": "bc738cb62ce65fb8b265c2f9a09115c9863fd8c852b37f8a92d506a8f197b2e3"
+    },
+    "native-allocation-observations.json": {
+      "bytes": 340,
+      "sha256": "16b1b0980c811f2e8ca01695bf80693a877a1e3e6a69f105b171e328bd46feab"
+    },
+    "native-resume-capacity.json": {
+      "bytes": 192,
+      "sha256": "6876fdbe9246082c9999f3465e11e71066efaf40b0c1077a13b4fda6a90a6e3f"
+    },
+    "pause-cancel-resume-paused.json": {
+      "bytes": 438,
+      "sha256": "3ebf59487d6976e546df547169612f46844b1ccf34c1d6e3484515b5aef37278"
+    },
+    "pause-cancel-resume-result.json": {
+      "bytes": 439,
+      "sha256": "a0fc86646c60ae2ba1a1517dbf36255b72d10760c938bba4df2fe4fafb0318a0"
+    },
+    "pause-export-paused.json": {
+      "bytes": 462,
+      "sha256": "89ddd65c09c3f3106a40f57e4f4ede57ab5ad2c25c22681f9f9a8a5eec1a217f"
+    },
+    "pause-export-result.json": {
+      "bytes": 463,
+      "sha256": "eea3764d8735902c2771f11260bac36b1224af2bf439f468cbbc3b4128571d77"
+    },
+    "pause-quit-drain-2-paused.json": {
+      "bytes": 438,
+      "sha256": "c25d6717ba6551e019cc9582a5264aa106d895d711fcc94ede9b3b0a0b735630"
+    },
+    "pause-quit-drain-2-result.json": {
+      "bytes": 439,
+      "sha256": "8ae9b048a9a4507cb548aa370928382b8442d5ef34e1a719201457469fcccd50"
+    },
+    "pause-quit-drain-paused.json": {
+      "bytes": 438,
+      "sha256": "cf8661dae0af8dde8d996087f9a7c7227864b95b1e985d1773c65a5df5782812"
+    },
+    "pause-quit-drain-result.json": {
+      "bytes": 439,
+      "sha256": "ee296782fbc42010e1cdc89883e8e53547fef9f954e7d62768c4cc9fe82d242f"
+    },
+    "pause-quit-resume-paused.json": {
+      "bytes": 438,
+      "sha256": "b9d997fee38f43efcfac50158eb1b737aecb5d748ef0f163249cb73149a7d5b0"
+    },
+    "pause-quit-resume-result.json": {
+      "bytes": 439,
+      "sha256": "b1a48449712f68259c35bbd62e6b79df82a314fd3e64020bca332a0f87bcb45f"
+    },
+    "prefix-sparse-probe.log.gz": {
+      "bytes": 3007,
+      "sha256": "ce7f034397d66345cc4db48764eeba7977476c6fed7720a1f2cf157668e2e510"
+    },
+    "prefix-tail-sparse-probe.log.gz": {
+      "bytes": 2992,
+      "sha256": "5d17acf3ae6554e893afb6d4ec315498df53fa4ed3012996efe34e28a929ba62"
+    },
+    "probe-sealed-cli-sparse.py": {
+      "bytes": 1199,
+      "sha256": "8b9bc75f3ff0170073737ab20c3098f8696dfcfc8ec9f75789c627ff2d6a3ffb"
+    },
+    "real-archive-header.json": {
+      "bytes": 89,
+      "sha256": "27b3b4f2115289a1c4792944cc5f7764bd8dea4feb844b05b0d7900a3ea450b2"
+    },
+    "real-cli-legacy-resume-final.log.gz": {
+      "bytes": 4611,
+      "sha256": "07e6468c62bc69cfd939b0b1e8437856889d152c069f17afe464200037d16f4f"
+    },
+    "real-cli-resume-final.log.gz": {
+      "bytes": 4674,
+      "sha256": "013e04800fdb5bf730239b121b96ba63ae841fef614e39c268904a2c43cc0a1d"
+    },
+    "real-vm-import-resume-2.log.gz": {
+      "bytes": 456,
+      "sha256": "193e9425f75730669dfb4da714738bb7934d0618f97a2670e61ebbb3fca9e3f2"
+    },
+    "real-vm-import-resume.log.gz": {
+      "bytes": 455,
+      "sha256": "065f9fe2183cecf48c7be3383eaf73bb03512aeffca848f718e7a48349cafa4a"
+    },
+    "real-vm-import-system-tar.log.gz": {
+      "bytes": 775,
+      "sha256": "5a3bce5abb65743512c6395c13e65ffc32683190e2dc4c99164c2a1462751195"
+    },
+    "result-system-tar.json": {
+      "bytes": 2014,
+      "sha256": "b9ed8a049a0f33b0cc475676d72efedbdd8a28869bf1cd2dcc3ef92fc57fbdb9"
+    },
+    "sealed-sparse-probe.log.gz": {
+      "bytes": 94,
+      "sha256": "3346c626a8e68cd7beb0357b4b2fb598a30ea12e6e9272229f38e498f7a392f1"
+    },
+    "sparse-diagnostic-probes.swift.txt": {
+      "bytes": 23831,
+      "sha256": "6676d10637d26dd1f0f7b8a481cdad9509d502af70cb27386cdcba6dfacde3ab"
+    }
+  }
+}

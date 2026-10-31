@@ -44,6 +44,7 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
     init(
         executable: URL,
         arguments: [String],
+        environment: [String: String]? = nil,
         logFile: URL? = nil,
         appendingToLog: Bool = false,
         preamble: String? = nil,
@@ -52,6 +53,7 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
     ) throws {
         process.executableURL = executable
         process.arguments = arguments
+        if let environment { process.environment = environment }
         process.standardInput = FileHandle.nullDevice
 
         if let logFile {

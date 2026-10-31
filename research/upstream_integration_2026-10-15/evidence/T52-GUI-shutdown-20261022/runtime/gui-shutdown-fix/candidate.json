@@ -1,0 +1,44 @@
+{
+  "state": "prepared_not_installed",
+  "version": "2.6.2-local.af333c78ac3b",
+  "archive": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/gui-shutdown-fix/2.6.2-local.af333c78ac3b.tar",
+  "archiveSHA256": "fae9fc55a7342b80279f878f3df0e379dc6e9e787010e8b5c1d97570dc2fa912",
+  "archiveBytes": 185110016,
+  "bundle": "/Users/kolar/github/vphone-cli/.build/t52-real-20261021/gui-shutdown-fix/package-2/VPhone.bundle",
+  "storeDestination": "/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.af333c78ac3b",
+  "cliSHA256": "e297ce7989dba9bb2f810d398ddbc2c572f58f27d0213f7a75ea96e3de3f5a54",
+  "vmSHA256": "af333c78ac3b603a9b30871f9482b9a8471191c262d090535468d3a9ddc34dbb",
+  "signatures": {
+    "vphone-cli": "96dbdfaf5c40a23683b444c3265c772917253c11",
+    "vphone-vm": "87b5a726726ab5b133613a8a1f26bfe3e047e271"
+  },
+  "changedPaths": [
+    "Contents/MacOS/vphone-cli",
+    "Contents/MacOS/vphone-vm",
+    "Contents/Resources/build-dependencies.json",
+    "Contents/Resources/host-shutdown-fix-provenance.json",
+    "Contents/_CodeSignature/CodeResources"
+  ],
+  "guestResourcesUnchanged": true,
+  "frameworkLibrariesUnchanged": true,
+  "provenance": {
+    "baseBundle": "2.6.2-local.cd529f26a150",
+    "scope": "Host-only direct VSOCK shutdown; no default host HTTP listener",
+    "guestAssets": "Copied unchanged from the previously installed and verified candidate",
+    "head": "4b5117d6634a0ccf84a63408a73de3ad7b6dcb9a",
+    "sourceSHA256": {
+      "sources/vphone-cli/VPhoneAppDelegate.swift": "0bb4fca47096e4de391c1fa9a26db4a053a01e85adc46f2160ff08c22cb2bce5",
+      "sources/VPhoneAPIKit/VPhoneAPIGuestShutdown.swift": "8c0ea4aee5744b1e08161eb05a6a6be6fad6d36e59f6b0867e4002d992761f5f",
+      "sources/VPhoneCore/VPhoneShutdownPolicy.swift": "dec4c63a5e76e573229347350544c172daf45f90ba30785143d3450078b0b0fd",
+      "tests/VPhoneCLITests/GuestShutdownTests.swift": "f6a9c7be34c3107635c691f993046ac0b668deefc31f4b087eb6d87a29e57006",
+      "tests/VPhoneAPIKitTests/APIGuestShutdownTests.swift": "5608008665533cda868949fd6577ea70d463f3909d006f3f444df04b0a32d377"
+    },
+    "releaseBuilds": [
+      "swift build --disable-sandbox --cache-path .build/test-cache -c release --force-resolved-versions --product vphone-cli",
+      "swift build --disable-sandbox --cache-path .build/test-cache -c release --force-resolved-versions --product vphone-vm"
+    ]
+  },
+  "realDefaultGUIAcceptance": "not_run",
+  "AMFI": "not_started",
+  "installed": false
+}

@@ -262,16 +262,8 @@ public extension VPhoneLaunchpadCommandLine {
         _ command: VPhoneLaunchpadCreateCommand, logFile: URL, appendingToLog: Bool,
         onLine: @escaping @Sendable (String) -> Void
     ) throws -> VPhoneLaunchpadChildProcess {
-        let entry = history.record(command.display)
-        let child = try VPhoneLaunchpadChildProcess(
-            executable: executable, arguments: command.arguments, logFile: logFile,
-            appendingToLog: appendingToLog, onLine: onLine)
-        let history = history
-        Task {
-            let completion = await child.waitForCompletion()
-            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
-        }
-        return child
+        try startCreation(command.arguments, display: command.display, logFile: logFile,
+                          appendingToLog: appendingToLog, onLine: onLine)
     }
 }
 

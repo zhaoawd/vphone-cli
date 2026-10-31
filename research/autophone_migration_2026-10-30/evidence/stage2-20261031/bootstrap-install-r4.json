@@ -1,0 +1,100 @@
+{
+  "inspect": {
+    "result": {
+      "installed": true,
+      "roots": [
+        "/var/jb"
+      ]
+    },
+    "ok": true
+  },
+  "status": {
+    "result": {
+      "error": "Invalid staged Irisin package path",
+      "phase": "failed",
+      "layout": "rootless"
+    },
+    "ok": true
+  },
+  "upload": {
+    "size": 5314108,
+    "local": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/wiki.qaq.irisin_5.1.4_iphoneos-arm64.deb",
+    "path": "/var/root/Library/Caches/vphoned-irisin-6E0A5B52-455A-49A6-9ECA-0EA823366DCC.deb",
+    "ok": true
+  },
+  "install": {
+    "result": {
+      "tag": "local",
+      "app_path": "/var/jb/Applications/irisin.app",
+      "version": "5.1.4",
+      "service_start": {
+        "action": "start",
+        "domain": "user",
+        "message": "Undefined error: 0",
+        "label": "wiki.qaq.irisind",
+        "launchd_status": 0,
+        "accepted": true,
+        "unchanged": false
+      },
+      "maintainer_scripts_executed": false,
+      "architecture": "iphoneos-arm64",
+      "service_status": {
+        "loaded": true,
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "running": true,
+        "override": false,
+        "program": "/var/jb/usr/libexec/irisind",
+        "label": "wiki.qaq.irisind",
+        "last_exit_status": 0,
+        "pid": 518
+      },
+      "service_load": {
+        "errors": {},
+        "paths": [
+          "/var/jb/Library/LaunchDaemons/wiki.qaq.irisind.plist"
+        ],
+        "services": [
+          {
+            "loaded": true,
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "running": false,
+            "override": false,
+            "program": "/var/jb/usr/libexec/irisind",
+            "label": "wiki.qaq.irisind",
+            "path": "/var/jb/Library/LaunchDaemons/wiki.qaq.irisind.plist",
+            "last_exit_status": 0,
+            "pid": 0
+          }
+        ],
+        "loaded": true,
+        "verified": true
+      },
+      "jbroot": "/var/jb",
+      "firmware_version": "27.0.1",
+      "registration": {
+        "build": "212",
+        "group_containers": {},
+        "bundle_id": "wiki.qaq.irisin",
+        "signer": "Apple iPhone OS Application Signing",
+        "type": "System",
+        "registered": true,
+        "version": "5.1.4",
+        "path": "/var/jb/Applications/irisin.app",
+        "bundle_path": "/private/var/jb/Applications/irisin.app",
+        "name": "Irisin",
+        "plugins": []
+      },
+      "layout": "rootless",
+      "dpkg_database_updated": true
+    },
+    "ok": true
+  }
+}

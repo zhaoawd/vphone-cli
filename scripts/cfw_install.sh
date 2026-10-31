@@ -122,7 +122,9 @@ echo "[1/7] Installing Cryptex (SystemOS + AppOS)..."
 echo "  Mounting rootfs rw..."
 mount_vol s1 "$MNT1"
 
-# Check if Cryptexes already exist on the volume (skip the slow copy if so).
+# EXP needs a fresh source copy before its staged guest DSC patches, even
+# when the installed Cryptex directories already contain files.
+# Other variants retain the existing installed-Cryptex fast path.
 # ls only runs when the dir exists, so its failure can't trip set -e/pipefail
 # (on a fresh install these dirs don't exist yet → counts stay 0).
 CRYPTEX_OS_COUNT=0
@@ -130,7 +132,7 @@ CRYPTEX_APP_COUNT=0
 [[ -d "$MNT1/System/Cryptexes/OS" ]]  && CRYPTEX_OS_COUNT=$(/bin/ls "$MNT1/System/Cryptexes/OS/"  | /usr/bin/wc -l | tr -d ' ')
 [[ -d "$MNT1/System/Cryptexes/App" ]] && CRYPTEX_APP_COUNT=$(/bin/ls "$MNT1/System/Cryptexes/App/" | /usr/bin/wc -l | tr -d ' ')
 
-if [[ "${VPHONE_REINSTALL_CRYPTEX:-0}" == 0 && "${CRYPTEX_OS_COUNT:-0}" -gt 0 && "${CRYPTEX_APP_COUNT:-0}" -gt 0 ]]; then
+if [[ "${VPHONE_CFW_VARIANT:-}" != exp && "${VPHONE_REINSTALL_CRYPTEX:-0}" == 0 && "${CRYPTEX_OS_COUNT:-0}" -gt 0 && "${CRYPTEX_APP_COUNT:-0}" -gt 0 ]]; then
     echo "  [*] Cryptexes already installed (OS=${CRYPTEX_OS_COUNT} entries, App=${CRYPTEX_APP_COUNT} entries), skipping"
 
     # Still ensure dyld symlinks exist
@@ -188,6 +190,18 @@ else
     safe_detach "$MNT_APPOS"
 
     echo "  [+] Cryptex installed"
+fi
+
+# EXP patches the installed copy inside the staged guest transaction. Keep
+# source Cryptex images readonly and preserve hv_vmm -> camera -> IOMFB order.
+if [[ "${VPHONE_CFW_VARIANT:-}" == "exp" ]]; then
+    EXP_DSC_DIR="$MNT1/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld"
+    EXP_DSC_HEADER="$EXP_DSC_DIR/dyld_shared_cache_arm64e"
+    [[ -d "$EXP_DSC_DIR" && -f "$EXP_DSC_HEADER" ]] || die "EXP dyld cache missing: $EXP_DSC_HEADER"
+    echo "  [*] Patching EXP hv_vmm consumers in the staged guest DSC..."
+    "$SCRIPT_DIR/patch_hv_vmm_userland.sh" dsc "$EXP_DSC_DIR"
+    echo "  [*] Patching EXP camera consumers in the staged guest DSC..."
+    "$SCRIPT_DIR/patch_camera_userland.sh" dsc "$EXP_DSC_DIR" "$EXP_DSC_HEADER"
 fi
 
 # Some userland versions send an IOMobileFramebuffer SwapEnd state whose size

@@ -1,0 +1,98 @@
+{
+  "after_swap": {
+    "previous_is_original": true,
+    "published_is_staged": true
+  },
+  "checks": [
+    {
+      "at": "2026-10-20T07:07:35Z",
+      "phase": "stage",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-20T07:07:35Z",
+      "phase": "pre-mount",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-20T07:07:37Z",
+      "phase": "pre-install",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-20T11:51:12Z",
+      "phase": "pre-publish",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-20T11:56:24Z",
+      "phase": "pre-publish",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-20T12:05:22Z",
+      "phase": "pre-publish",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-20T12:14:43Z",
+      "phase": "pre-publish-qualified",
+      "result": "passed"
+    }
+  ],
+  "clone_error": null,
+  "copy": null,
+  "exit_code": 0,
+  "failure": null,
+  "finished_at": "2026-10-20T12:16:09Z",
+  "guestEvidenceRequired": true,
+  "guestEvidenceSHA256": "e2c573779ac0a1a44f80a2cd5a1999fe2f753eb592caf5dec0bcf246a0311207",
+  "id": "20261020T070734Z-tjhO0rSZ",
+  "location": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018/.cfw-history/20261020T070734Z-tjhO0rSZ",
+  "method": "clone",
+  "original": {
+    "blocks": 28398008,
+    "dev": 16777231,
+    "gid": 20,
+    "ino": 247084001,
+    "mode": 420,
+    "mtime_ns": 1792408052355107733,
+    "sample": {
+      "kind": "sampled:66",
+      "sha256": "6715076b65c9b03b5313ab5f62c0a5e69dd352072cb63e5f8fe5e56543b35108"
+    },
+    "size": 68719476736,
+    "uid": 501
+  },
+  "original_check": {
+    "checked_at": "2026-10-20T12:16:09Z",
+    "detail": "dev/inode/size/mtime equal; sampled:66 SHA-256 equal",
+    "unchanged": true
+  },
+  "previous_disk": "Disk.img",
+  "provenanceMode": "required",
+  "publish_method": "renamex_np RENAME_SWAP",
+  "published_at": "2026-10-20T12:14:43Z",
+  "runtimeImageEvidenceRequired": true,
+  "sealed_at": "2026-10-20T12:00:11Z",
+  "staged": {
+    "blocks": 28398008,
+    "dev": 16777231,
+    "gid": 20,
+    "ino": 247493721,
+    "mode": 420,
+    "mtime_ns": 1792408052355107733,
+    "size": 68719476736,
+    "uid": 501
+  },
+  "staged_retained": false,
+  "started_at": "2026-10-20T07:07:34Z",
+  "status": "published",
+  "undoProvenance": {
+    "finalProofSHA256": "a80a359f35d128a2911ee08b3d3b2952db795b9348157a9d6aff6fcd7ed929cc",
+    "indexSHA256": "1715c5bd4834a1a302433e557c94b2a9b29a7b2cce4eacac1110f82c4895dc47",
+    "operationsSHA256": "a5cd7b2b0d34c0fceefb7970ca8ae0a039210232e4d8192896b73d513fee4719"
+  },
+  "version": 4,
+  "vm": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018"
+}

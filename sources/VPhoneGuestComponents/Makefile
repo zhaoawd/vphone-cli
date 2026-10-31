@@ -10,17 +10,18 @@ COMMON_FLAGS := $(GUEST_C_FLAGS) -fobjc-arc
 
 CAMFIX := $(STAGE)/camfix/libcamfix.dylib
 CAMFIX_SOURCES := $(wildcard CamFix/*.m)
-CAMFIX_INCLUDES := $(wildcard CamFix/*.h CamFix/*.inc VCamCaptured/*.h)
+CAMFIX_INCLUDES := $(wildcard CamFix/*.h CamFix/*.inc VCamCaptured/*.h Shared/VPhoneCameraFrame.h Shared/VPhoneSimulationAccess.h)
 LOCATIONFIX := $(STAGE)/locationfix/libvlocation.dylib
 LOCATIONFIX_SOURCES := $(wildcard LocationFix/*.m)
+LOCATIONFIX_INCLUDES := $(wildcard Shared/VPhoneLocationState.* Shared/VPhoneSimulationAccess.h)
 VCAMCAPTURED := $(STAGE)/vcamcaptured/libvcamcaptured.dylib
 VCAMCAPTURED_SOURCES := $(wildcard VCamCaptured/*.m)
-VCAMCAPTURED_INCLUDES := $(wildcard VCamCaptured/*.h VCamCaptured/*.inc)
+VCAMCAPTURED_INCLUDES := $(wildcard VCamCaptured/*.h VCamCaptured/*.inc Shared/VPhoneCameraFrame.h Shared/VPhoneSimulationAccess.h)
 LAUNCHHOOK := $(STAGE)/launchhook/launchdhook-vphone.dylib
-LAUNCHHOOK_SOURCES := $(wildcard LaunchHook/*.c) Shared/RootHideLoaderLinks.c
+LAUNCHHOOK_SOURCES := $(wildcard LaunchHook/*.c) Shared/RootHideLoaderLinks.c Shared/VPhoneSimulationAccess.c
 LAUNCHHOOK_INCLUDES := $(wildcard LaunchHook/*.h LaunchHook/*.inc Shared/*.h)
 SYSTEMHOOK := $(STAGE)/systemhook/SystemHook-vphone.dylib
-SYSTEMHOOK_SOURCES := $(wildcard SystemHook/*.c) Shared/RootHideLoaderLinks.c
+SYSTEMHOOK_SOURCES := $(wildcard SystemHook/*.c) Shared/RootHideLoaderLinks.c Shared/VPhoneSimulationAccess.c
 SYSTEMHOOK_INCLUDES := $(wildcard SystemHook/*.h SystemHook/*.inc Shared/*.h)
 GPU_PLUGIN := $(STAGE)/gpu/libAppleParavirtCompilerPluginIOGPUFamily.dylib
 GPU_PLUGIN_SOURCES := $(wildcard GraphicLoader/*.mm)
@@ -110,12 +111,12 @@ $(CAMFIX): $(CAMFIX_SOURCES) $(CAMFIX_INCLUDES) CamFix VCamCaptured | $(STAGE)/c
 	$(CLANG) $(COMMON_FLAGS) -dynamiclib \
 		-install_name @rpath/libcamfix.dylib \
 		-o $@ $(CAMFIX_SOURCES) \
-		-framework Foundation -framework AVFoundation -framework ImageIO \
+		-framework Foundation -framework AVFoundation -framework CoreImage -framework ImageIO \
 		-framework IOSurface -framework CoreMedia -framework CoreVideo \
 		-framework CoreGraphics -framework QuartzCore
 	@codesign --force --sign - $@
 
-$(LOCATIONFIX): $(LOCATIONFIX_SOURCES) LocationFix | $(STAGE)/locationfix
+$(LOCATIONFIX): $(LOCATIONFIX_SOURCES) $(LOCATIONFIX_INCLUDES) LocationFix | $(STAGE)/locationfix
 	$(CLANG) $(COMMON_FLAGS) -dynamiclib \
 		-install_name /usr/lib/libvlocation.dylib \
 		-o $@ $(LOCATIONFIX_SOURCES) \

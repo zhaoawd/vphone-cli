@@ -2,7 +2,9 @@
 # run_launchpad_cli_tests.sh — Launchpad tests against the embedded vphone-cli
 # (T26 B6, `make test_launchpad_cli`).
 #
-# Runs RealCLIEditTests (B3: vm new/config/rename/clone/export/import/delete
+# Runs RealCLIImportQueueTests (FIFO/transfer shutdown), RealCLISparseTests
+# (native sparse disk/hardlink round trip),
+# RealCLIEditTests (B3: vm new/config/rename/clone/export/import/delete
 # on fixtures) and RealCLICreateTests (B4: fw catalog --json, vm create --help,
 # vm create-status --json) with the vphone-cli embedded in
 # .build/vphone-launchpad.app, verified as the app verifies it. Every command
@@ -20,8 +22,8 @@ SCRIPT_DIR="${0:A:h}"
 PROJECT_ROOT="${SCRIPT_DIR:h}"
 cd "$PROJECT_ROOT"
 
-APP="${PROJECT_ROOT}/.build/vphone-launchpad.app"
-SUITES=(RealCLIEditTests RealCLICreateTests)
+APP="${VPHONE_LAUNCHPAD_APP:-${PROJECT_ROOT}/.build/vphone-launchpad.app}"
+SUITES=(RealCLIEditTests RealCLICreateTests RealCLIImportQueueTests RealCLISparseTests)
 
 if [[ ! -d "$APP" ]]; then
   print -u2 -- "Missing ${APP}; run make launchpad first."

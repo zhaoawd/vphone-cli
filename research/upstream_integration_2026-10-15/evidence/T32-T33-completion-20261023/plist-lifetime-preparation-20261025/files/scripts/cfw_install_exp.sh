@@ -1,0 +1,717 @@
+#!/bin/zsh
+# cfw_install_exp.sh — Install base CFW + JB extensions + EXP experimental
+# patches on vphone. Files are placed directly on the VM's Disk.img volumes,
+# which cfw_install_host.sh attaches and mounts on the host; the VM must be off.
+#
+# Runs the base CFW installer first (phases 1-7), the JB-specific
+# modifications (launchd jetsam patch, dylib injection, procursus bootstrap,
+# BaseBin hook deployment, JB-1..JB-5), and additionally the experimental
+# phases — labeled `EXP-JB-N` to make their EXP-only scope obvious:
+#   - Base DSC step : byte-5 mangle of kern.hv_vmm_present in the staged guest
+#                     DSC, paired with KernelEXPPatcher's kernel-side rename.
+#   - EXP-JB-3.5    : surgical 2-insn patch of watchdogd's hv_vmm cache +
+#                     slot re-attest of the standalone Mach-O.
+#   - EXP-JB-6      : post-restore DT identity rewrite (root model /
+#                     target-type / compatible[0]) inside
+#                     $MNT5/.../devicetree.img4.
+#   - EXP-JB-7      : optional ProductBuildVersion rewrite in
+#                     SystemVersion.plist (gated on the SPOOF_BUILD env var).
+#
+# Stages JB-1..JB-5 remain genuine jailbreak phases (inherited from the JB
+# pipeline). Stages prefixed EXP-JB-* are EXP-exclusive — they do NOT run
+# when the JB or DEV install scripts are used. JB and DEV remain on their
+# pre-experimental baseline.
+#
+# Prerequisites (in addition to cfw_install.sh requirements):
+#   - cfw_jb_input/ or resources/cfw_jb_input.tar.zst present
+#   - zstd (for bootstrap decompression)
+#
+# Usage: make cfw_install_exp
+set -euo pipefail
+
+# ── Restore caller's PATH — Nix /etc/zshenv resets PATH on zsh startup ─
+[[ -n "${_VPHONE_PATH:-}" ]] && export PATH="$_VPHONE_PATH"
+VM_DIR="${1:-.}"
+SCRIPT_DIR="${0:a:h}"
+
+# Validate the current Swift-bound plan before runtime hooks, mounts or writes.
+"${VPHONE_PYTHON:-${SCRIPT_DIR:h}/.venv/bin/python3}" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
+
+source "$SCRIPT_DIR/lib/cfw_common.sh"
+cfw_require_runtime_and_lock
+
+# Prepare the dev payload before the base installer records the archive's
+# effects. Installing a different archive later would overwrite those effects.
+apply_dev_overlay() {
+    local dev_bin
+    for search_dir in "$SCRIPT_DIR/resources/cfw_dev" "$SCRIPT_DIR/cfw_dev"; do
+        dev_bin="$search_dir/rpcserver_ios"
+        if [[ -f "$dev_bin" ]]; then
+            echo "  Applying dev overlay (rpcserver_ios)..."
+            local iosbinpack="$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar"
+            "$PYTHON3" "$SCRIPT_DIR/patchers/dev_overlay.py" "$iosbinpack" "$dev_bin"
+            return
+        fi
+    done
+    die "Dev overlay not found (cfw_dev/rpcserver_ios)"
+}
+
+CFW_INPUT="cfw_input"
+TAR="$(command -v gtar 2>/dev/null || echo /opt/homebrew/bin/gtar)"
+cfw_extract_input "$CFW_INPUT" "cfw_input.tar.zst" "CFW input resources not found" "$TAR"
+apply_dev_overlay
+
+# ════════════════════════════════════════════════════════════════
+# Step 1: Run base CFW install (skip halt — we continue with JB phases)
+# ════════════════════════════════════════════════════════════════
+echo "[*] cfw_install_exp.sh — Installing CFW + JB extensions + EXP experimental patches..."
+echo ""
+
+# The base installer copies readonly Cryptex sources, then applies the EXP
+# DSC patches to the staged guest before IOMFB and the remaining base stages.
+zsh "$SCRIPT_DIR/cfw_install.sh" "$VM_DIR"
+
+# ════════════════════════════════════════════════════════════════
+# Step 2: JB-specific phases
+# ════════════════════════════════════════════════════════════════
+
+# Resolve absolute paths (same as base script)
+VM_DIR="$(cd "${VM_DIR}" && pwd)"
+
+# ── Configuration ───────────────────────────────────────────────
+CFW_JB_INPUT="cfw_jb_input"
+CFW_JB_ARCHIVE="cfw_jb_input.tar.zst"
+TEMP_DIR="$VM_DIR/.cfw_temp"
+DISABLE_LAUNCHD_HOOK="${DISABLE_LAUNCHD_HOOK:-0}"
+
+# ── Helpers ─────────────────────────────────────────────────────
+
+check_prerequisites() {
+    local missing=()
+    command -v ldid &>/dev/null || missing+=("ldid (brew install ldid-procursus)")
+    command -v xcrun &>/dev/null || missing+=("xcrun (Xcode command line tools)")
+    if ((${#missing[@]} > 0)); then
+        die "Missing required tools: ${missing[*]}. Run: make setup_tools"
+    fi
+}
+
+
+ldid_sign_ent() {
+    local file="$1" entitlements_plist="$2" bundle_id="${3:-}"
+    local args=("-S$entitlements_plist" "-K$VM_DIR/$CFW_INPUT/signcert.p12")
+    [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
+    cfw_guest_sign "${args[@]}" "$file"
+}
+
+build_tweakloader() {
+    local src="$SCRIPT_DIR/tweakloader/TweakLoader.m"
+    local out="$TEMP_DIR/TweakLoader.dylib"
+    local sdk cc
+
+    [[ -f "$src" ]] || die "Missing tweak loader source at $src"
+
+    sdk="$(xcrun --sdk iphoneos --show-sdk-path)"
+    cc="$(xcrun --sdk iphoneos -f clang)"
+
+    "$cc" -isysroot "$sdk" \
+        -arch arm64 -arch arm64e \
+        -miphoneos-version-min=15.0 \
+        -dynamiclib \
+        -fobjc-arc -O3 \
+        -framework Foundation \
+        -o "$out" \
+        "$src"
+
+    ldid_sign "$out"
+    echo "$out"
+}
+
+# Build vpregister — registers JB apps via the containerized LaunchServices API on
+# iOS 27, where -[LSApplicationWorkspace registerApplicationDictionary:] (uicache -a)
+# is a deprecated no-op stub. Needs the lsd embedded-reg gate patch
+# (cfw_patch_lsd_embedded_reg, applied by cfw_install.sh). Deployed to /cores and
+# invoked by vphone_jb_setup.sh at first boot.
+build_vpregister() {
+    local src="$SCRIPT_DIR/vpregister/vpregister.m"
+    local out="$TEMP_DIR/vpregister"
+    local sdk cc
+
+    [[ -f "$src" ]] || die "Missing vpregister source at $src"
+
+    sdk="$(xcrun --sdk iphoneos --show-sdk-path)"
+    cc="$(xcrun --sdk iphoneos -f clang)"
+
+    "$cc" -isysroot "$sdk" \
+        -arch arm64e \
+        -miphoneos-version-min=15.0 \
+        -fobjc-arc -Os \
+        -framework Foundation \
+        -Wl,-undefined,dynamic_lookup \
+        -o "$out" \
+        "$src"
+
+    ldid_sign_ent "$out" "$SCRIPT_DIR/vphoned/entitlements.plist"
+    echo "$out"
+}
+
+# Builds the libvcamcaptured.dylib injected into /usr/libexec/cameracaptured
+# via the TweakLoader allowlist. Output goes to TEMP_DIR; caller copies the
+# binary + companion plist to procursus/Library/MobileSubstrate/DynamicLibraries.
+build_libvcamcaptured() {
+    local src="$SCRIPT_DIR/vcamcaptured/libvcamcaptured.m"
+    local out="$TEMP_DIR/libvcamcaptured.dylib"
+    local sdk cc
+
+    [[ -f "$src" ]] || die "Missing libvcamcaptured source at $src"
+
+    sdk="$(xcrun --sdk iphoneos --show-sdk-path)"
+    cc="$(xcrun --sdk iphoneos -f clang)"
+
+    "$cc" -isysroot "$sdk" \
+        -arch arm64e \
+        -miphoneos-version-min=15.0 \
+        -dynamiclib \
+        -fobjc-arc -Os \
+        -install_name /var/jb/usr/lib/libvcamcaptured.dylib \
+        -framework CoreMedia \
+        -framework CoreVideo \
+        -framework Foundation \
+        -o "$out" \
+        "$src"
+
+    ldid_sign "$out"
+    echo "$out"
+}
+
+# Builds the libcamfix.dylib substrate plugin. Its companion plist keeps the
+# deployment allowlist explicit (Camera + the certified KFCKnight scanner),
+# while the dylib's dyld callback still waits for AVFCapture before installing
+# hooks. Implements photo, preview, state and QR metadata delivery for vcam.
+build_libcamfix() {
+    local src="$SCRIPT_DIR/camfix/libcamfix.m"
+    local out="$TEMP_DIR/libcamfix.dylib"
+    local sdk cc
+
+    [[ -f "$src" ]] || die "Missing libcamfix source at $src"
+
+    sdk="$(xcrun --sdk iphoneos --show-sdk-path)"
+    cc="$(xcrun --sdk iphoneos -f clang)"
+
+    "$cc" -isysroot "$sdk" \
+        -arch arm64e \
+        -miphoneos-version-min=15.0 \
+        -dynamiclib \
+        -fobjc-arc -Os \
+        -install_name /var/jb/Library/MobileSubstrate/DynamicLibraries/libcamfix.dylib \
+        -framework AVFoundation \
+        -framework CoreImage \
+        -framework CoreGraphics \
+        -framework CoreMedia \
+        -framework CoreVideo \
+        -framework Foundation \
+        -framework ImageIO \
+        -framework IOSurface \
+        -framework MobileCoreServices \
+        -framework Photos \
+        -framework QuartzCore \
+        -framework UIKit \
+        -o "$out" \
+        "$src"
+
+    ldid_sign "$out"
+    echo "$out"
+}
+
+get_boot_manifest_hash() {
+    /bin/ls $MNT5 2>/dev/null | awk 'length($0)==96{print; exit}'
+}
+
+# ── Setup JB input resources ──────────────────────────────────
+setup_cfw_jb_input() {
+    cfw_extract_input "$CFW_JB_INPUT" "$CFW_JB_ARCHIVE" "JB mode: neither $CFW_JB_INPUT/ nor $CFW_JB_ARCHIVE found" tar --zstd
+}
+
+# The VM's Disk.img is attached on the host by cfw_install_host.sh; its APFS
+# volumes are mounted here and every file is placed with plain cp/chmod/etc.
+# (the VM is off — nothing runs "on the device").
+cfw_init_mounts
+
+# ── Check JB prerequisites ────────────────────────────────────
+command -v zstd >/dev/null 2>&1 || die "'zstd' not found (required for JB bootstrap phase)"
+
+setup_cfw_jb_input
+JB_INPUT_DIR="$VM_DIR/$CFW_JB_INPUT"
+echo ""
+echo "[+] JB input resources: $JB_INPUT_DIR"
+check_prerequisites
+
+cfw_guest_write mkdir -p "$TEMP_DIR"
+
+# Mount the image's System volume (may already be mounted from base install)
+mount_vol s1 "$MNT1"
+
+# ═══════════ JB-1 PATCH LAUNCHD (JETSAM + DYLIB INJECTION) ════
+echo ""
+echo "[JB-1] Patching launchd (jetsam guard + hook injection)..."
+
+if ! [[ -e "$MNT1/sbin/launchd.bak" ]]; then
+    echo "  Creating backup..."
+    cfw_guest_write /bin/cp $MNT1/sbin/launchd $MNT1/sbin/launchd.bak
+fi
+
+cfw_guest_write cp "$MNT1/sbin/launchd.bak" "$TEMP_DIR/launchd"
+
+# Extract original entitlements before patching (must preserve for spawn permissions)
+echo "  Extracting original entitlements..."
+ldid -e "$TEMP_DIR/launchd" > "$TEMP_DIR/launchd.entitlements" 2>/dev/null || true
+if [[ -s "$TEMP_DIR/launchd.entitlements" ]]; then
+    echo "  [+] Preserved launchd entitlements"
+else
+    echo "  [!] No entitlements found on original launchd"
+fi
+
+# Injecting launchdhook into pid 1 is on by default. This boot-critical hook
+# path has produced boot-analysis failures; set DISABLE_LAUNCHD_HOOK=1 to keep
+# BaseBin deployed without loading /b from launchd.
+if [[ "$DISABLE_LAUNCHD_HOOK" == "1" ]]; then
+    echo "  [*] Skipping launchdhook dylib injection (DISABLE_LAUNCHD_HOOK=1)"
+elif [[ -d "$JB_INPUT_DIR/basebin" ]]; then
+    echo "  Injecting weak dylib load for /b (short launchdhook alias)..."
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-dylib "$TEMP_DIR/launchd" "/b"
+else
+    echo "  [!] BaseBin is missing; skipping launchdhook injection"
+fi
+
+"$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-launchd-jetsam "$TEMP_DIR/launchd"
+
+# Re-sign with original entitlements to avoid "operation not permitted" on spawn
+if [[ -s "$TEMP_DIR/launchd.entitlements" ]]; then
+    cfw_guest_sign -S"$TEMP_DIR/launchd.entitlements" -M "-K$VM_DIR/$CFW_INPUT/signcert.p12" "$TEMP_DIR/launchd"
+else
+    ldid_sign "$TEMP_DIR/launchd"
+fi
+cfw_guest_write cp -R "$TEMP_DIR/launchd" "$MNT1/sbin/launchd"
+cfw_guest_write /bin/chmod 0755 $MNT1/sbin/launchd
+
+echo "  [+] launchd patched"
+
+# ═══════════ JB-2 INSTALL IOSBINPACK64 ════════════════════════
+echo ""
+echo "[JB-2] iosbinpack64 dev overlay installed by base CFW"
+
+# ═══════════ JB-3 PATCH debugserver entitlements ════
+echo ""
+echo "[JB-3] Patching debugserver entitlements..."
+
+cfw_guest_write cp "$MNT1/usr/libexec/debugserver" "$TEMP_DIR/debugserver"
+ldid -e "$TEMP_DIR/debugserver" > "$TEMP_DIR/debugserver-entitlements.plist"
+plutil -remove seatbelt-profiles "$TEMP_DIR/debugserver-entitlements.plist" || true
+plutil -insert task_for_pid-allow -bool YES "$TEMP_DIR/debugserver-entitlements.plist" || true
+ldid_sign_ent "$TEMP_DIR/debugserver" "$TEMP_DIR/debugserver-entitlements.plist"
+cfw_guest_write cp -R "$TEMP_DIR/debugserver" "$MNT1/usr/libexec/debugserver"
+cfw_guest_write /bin/chmod 0755 $MNT1/usr/libexec/debugserver
+
+echo "  [+] debugserver entitlements patched"
+
+
+# ═══════════ JB-3b CAMPO SANDBOX FIX (iOS 27 only) ════════════
+# Grant Campo the backboard/frontboard mach-lookups the 26.4 temporary-sandbox denies (see 0_binary_patch_comparison.md #14).
+# 27-gated on the mounted rootfs SystemVersion.plist: 26.x userlands don't need it and Campo.app exists there too.
+CAMPO_BIN="$MNT1/Applications/Campo.app/Campo"
+CAMPO_BASE_IOS=$(/usr/bin/plutil -extract ProductVersion raw -o - "$MNT1/System/Library/CoreServices/SystemVersion.plist" 2>/dev/null || true)
+case "$CAMPO_BASE_IOS" in
+27.*)
+    if [[ -f "$CAMPO_BIN" ]]; then
+        echo ""
+        echo "[JB-3b] Granting Campo backboard/frontboard mach-lookup exceptions (iOS $CAMPO_BASE_IOS)..."
+        cfw_guest_write cp "$CAMPO_BIN" "$TEMP_DIR/Campo"
+        ldid -e "$TEMP_DIR/Campo" > "$TEMP_DIR/Campo.entitlements" 2>/dev/null || true
+        if [[ -s "$TEMP_DIR/Campo.entitlements" ]]; then
+            "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-campo-entitlements "$TEMP_DIR/Campo.entitlements"
+            ldid_sign_ent "$TEMP_DIR/Campo" "$TEMP_DIR/Campo.entitlements"
+            cfw_guest_write cp -R "$TEMP_DIR/Campo" "$CAMPO_BIN"
+            cfw_guest_write /bin/chmod 0755 "$CAMPO_BIN"
+            echo "  [+] Campo re-signed with backboard/frontboard mach-lookup exceptions"
+        else
+            echo "  [!] Could not read Campo entitlements; skipping Campo sandbox fix"
+        fi
+    else
+        echo "[JB-3b] Campo.app not present in this OS image; skipping Campo sandbox fix"
+    fi
+    ;;
+*)
+    echo "[JB-3b] skip Campo sandbox fix (base iOS ${CAMPO_BASE_IOS:-unknown} — 27-only)"
+    ;;
+esac
+
+
+# ═══════════ EXP-JB-3.5 PATCH watchdogd hv_vmm_present cache ══
+#
+# Background: the kernel-side OID rename (KernelEXPPatchHvVmmRename)
+# makes sysctlbyname("kern.hv_vmm_present", ...) return ENOENT on this
+# image. watchdogd caches that answer at startup and uses it to decide
+# whether to look for the IOWatchdog kext. The unpatched flow takes
+# the "not on a VM" branch on ENOENT, fails to find the kext (it
+# doesn't exist on the VM), calls _os_crash -> brk #1, and launchd's
+# `_PanicOnCrash` knob in com.apple.watchdogd.plist escalates the
+# resulting SIGTRAP to a kernel panic.
+#
+# Patch shape: two-instruction surgical edit at every site in
+# watchdogd that has the canonical
+#   adrp/add(kern.hv_vmm_present) -> bl _sysctlbyname -> cbnz w0,skip
+#       -> cset wN,ne -> strb wN,[global]
+# shape. The edit forces the cached byte to 1 regardless of the
+# sysctl result, so the downstream branch at +0x58e0 takes watchdogd's
+# pre-existing "detected virtual machine environment" clean-exit path.
+# The patcher also recomputes the affected CodeDirectory slot hashes
+# (cfw_macho_codesign) so TXM still accepts the modified pages on
+# demand-page-in. We deliberately do NOT re-sign with ldid — the
+# Apple-issued code-signing identifier ("com.apple.watchdogd") must be
+# preserved for launchd boot-task identity validation.
+echo ""
+echo "[EXP-JB-3.5] Patching watchdogd hv_vmm_present cache..."
+
+cfw_guest_write cp "$MNT1/usr/libexec/watchdogd" "$TEMP_DIR/watchdogd"
+"$SCRIPT_DIR/patch_hv_vmm_userland.sh" watchdogd "$TEMP_DIR/watchdogd"
+cfw_guest_write cp -R "$TEMP_DIR/watchdogd" "$MNT1/usr/libexec/watchdogd"
+cfw_guest_write /bin/chmod 0755 $MNT1/usr/libexec/watchdogd
+
+echo "  [+] watchdogd patched"
+
+
+# ═══════════ JB-4 INSTALL PROCURSUS BOOTSTRAP ══════════════════
+echo ""
+echo "[JB-4] Installing procursus bootstrap..."
+
+mount_vol s5 "$MNT5"
+BOOT_HASH="$(get_boot_manifest_hash)"
+[[ -n "$BOOT_HASH" ]] || die "Could not find 96-char boot manifest hash in $MNT5"
+echo "  Boot manifest hash: $BOOT_HASH"
+
+BOOTSTRAP_ZST="$JB_INPUT_DIR/jb/bootstrap-iphoneos-arm64.tar.zst"
+SILEO_DEB="$JB_INPUT_DIR/jb/org.coolstar.sileo_2.5.1_iphoneos-arm64.deb"
+[[ -f "$BOOTSTRAP_ZST" ]] || die "Missing $BOOTSTRAP_ZST"
+
+BOOTSTRAP_TAR="$TEMP_DIR/bootstrap-iphoneos-arm64.tar"
+zstd -d -f "$BOOTSTRAP_ZST" -o "$BOOTSTRAP_TAR"
+
+cfw_guest_write cp -R "$BOOTSTRAP_TAR" "$MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar"
+if [[ -f "$SILEO_DEB" ]]; then
+    cfw_guest_write cp -R "$SILEO_DEB" "$MNT5/$BOOT_HASH/org.coolstar.sileo_2.5.1_iphoneos-arm64.deb"
+fi
+
+# ── Extra debs: download from manifest, then stage the whole cache ──────
+echo "  Fetching extra debs..."
+zsh "$SCRIPT_DIR/fetch_debs.sh" || true
+DEBS_CACHE="${VPHONE_DEBS_DIR:-${SCRIPT_DIR:h}/debs}"
+DEBS_DEST="$MNT5/$BOOT_HASH/debs"
+cfw_guest_write /bin/rm -rf "$DEBS_DEST"
+deb_count=0
+for deb in "$DEBS_CACHE"/*.deb(N); do
+    (( deb_count == 0 )) && cfw_guest_write /bin/mkdir -p "$DEBS_DEST"
+    cfw_guest_write cp -R "$deb" "$DEBS_DEST/"
+    deb_count=$((deb_count + 1))
+done
+if (( deb_count > 0 )); then
+    echo "  [+] Staged $deb_count extra deb(s) for first-boot install"
+else
+    echo "  [=] No extra debs to stage"
+fi
+
+JB_DIR_NAME="jb-vphone"
+cfw_guest_write /bin/rm -rf $MNT5/$BOOT_HASH/jb
+cfw_guest_write /bin/rm -rf $MNT5/$BOOT_HASH/$JB_DIR_NAME
+cfw_guest_write /bin/mkdir -p $MNT5/$BOOT_HASH/$JB_DIR_NAME
+cfw_guest_write /bin/chmod 0755 $MNT5/$BOOT_HASH/$JB_DIR_NAME
+cfw_guest_write /usr/sbin/chown 0:0 $MNT5/$BOOT_HASH/$JB_DIR_NAME
+cfw_guest_write "$TAR" --preserve-permissions -xf $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar \
+    -C $MNT5/$BOOT_HASH/$JB_DIR_NAME/
+cfw_guest_write /bin/mv $MNT5/$BOOT_HASH/$JB_DIR_NAME/var $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus
+# Preserve declared dotfiles and stop before container removal if a move fails.
+cfw_guest_write mv "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb"/*(DN) "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus"
+cfw_guest_write /bin/rm -rf $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb
+cfw_guest_write /bin/rm -f $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar
+cfw_guest_write rm -f "$BOOTSTRAP_TAR"
+
+# NOTE: /var/jb symlink is created on first normal boot by vphone_jb_setup.sh
+# (Data volume is encrypted and not mountable at install time).
+
+echo "  [+] procursus bootstrap installed"
+
+# ═══════════ JB-4 DEPLOY BASEBIN HOOKS ═════════════════════════
+BASEBIN_DIR="$JB_INPUT_DIR/basebin"
+
+if [[ -d "$BASEBIN_DIR" ]]; then
+    echo ""
+    echo "[JB-4] Deploying BaseBin hooks to /cores/..."
+
+    # Clean previous dylibs before re-uploading
+    echo "  Cleaning old /cores/ dylibs..."
+    cfw_guest_write /bin/rm -rf $MNT1/cores
+    cfw_guest_write /bin/mkdir -p $MNT1/cores
+    cfw_guest_write /bin/chmod 0755 $MNT1/cores
+
+    # Install all pre-built dylibs from basebin payload
+    for dylib in "$BASEBIN_DIR"/*.dylib; do
+        [[ -f "$dylib" ]] || continue
+        dylib_name="$(basename "$dylib")"
+        echo "  Installing $dylib_name..."
+        ldid_sign "$dylib"
+        cfw_guest_write cp -R "$dylib" "$MNT1/cores/$dylib_name"
+        cfw_guest_write /bin/chmod 0755 $MNT1/cores/$dylib_name
+    done
+
+    # Short alias for launchdhook (header space is tight)
+    if [[ -f "$BASEBIN_DIR/launchdhook.dylib" ]]; then
+        echo "  Installing short launchdhook alias at /b..."
+        cfw_guest_write cp "$BASEBIN_DIR/launchdhook.dylib" "$TEMP_DIR/b"
+        ldid_sign "$TEMP_DIR/b"
+        cfw_guest_write /bin/rm -f $MNT1/b
+        cfw_guest_write cp -R "$TEMP_DIR/b" "$MNT1/b"
+        cfw_guest_write /bin/chmod 0755 $MNT1/b
+    fi
+
+    echo "  [+] BaseBin hooks deployed"
+fi
+
+# ═══════════ JB-4 INSTALL TWEAKLOADER ════════════════════════════
+echo ""
+echo "[JB-4] Building and installing TweakLoader..."
+
+TWEAKLOADER_OUT="$(build_tweakloader)"
+cfw_guest_write /bin/mkdir -p $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib
+cfw_guest_write cp -R "$TWEAKLOADER_OUT" "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib"
+cfw_guest_write /usr/sbin/chown 0:0 $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib
+cfw_guest_write /bin/chmod 0755 $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib
+
+echo "  [+] TweakLoader installed to procursus/usr/lib/TweakLoader.dylib"
+
+# ═══════════ JB-4.1 INSTALL libvcamcaptured ═════════════════════════
+# Inject dylib loaded into /usr/libexec/cameracaptured (via TweakLoader
+# allowlist in TweakLoader.m's kVPhoneAllowedDaemonPaths). Hosts the
+# synthetic FigCaptureSource + shm-frame reader paired with vphoned's
+# vsock 1338 listener on the guest side.
+echo ""
+echo "[JB-4.1] Building and installing libvcamcaptured..."
+LIBVCAM_OUT="$(build_libvcamcaptured)"
+LIBVCAM_DIR="$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/Library/MobileSubstrate/DynamicLibraries"
+cfw_guest_write /bin/mkdir -p $LIBVCAM_DIR
+cfw_guest_write cp -R "$LIBVCAM_OUT" "$LIBVCAM_DIR/libvcamcaptured.dylib"
+cfw_guest_write /usr/sbin/chown 0:0 $LIBVCAM_DIR/libvcamcaptured.dylib
+cfw_guest_write /bin/chmod 0755 $LIBVCAM_DIR/libvcamcaptured.dylib
+
+# The plist tells TweakLoader to load the dylib only inside cameracaptured
+# (Filter.Executables = ["cameracaptured"]); keep it next to the dylib.
+LIBVCAM_PLIST="$SCRIPT_DIR/vcamcaptured/libvcamcaptured.plist"
+if [[ -f "$LIBVCAM_PLIST" ]]; then
+    cfw_guest_write cp -R "$LIBVCAM_PLIST" "$LIBVCAM_DIR/libvcamcaptured.plist"
+    cfw_guest_write /bin/chmod 0644 $LIBVCAM_DIR/libvcamcaptured.plist
+fi
+echo "  [+] libvcamcaptured installed to procursus/Library/MobileSubstrate/DynamicLibraries/"
+
+# ═══════════ JB-4.2 INSTALL libcamfix ═══════════════════════════════
+# Compatibility plugin loaded by TweakLoader only into the executable
+# allowlist in libcamfix.plist (Camera + KFCKnight). The dylib itself defers
+# hook installation until AVFCapture appears, so early app startup does not
+# race private-class registration.
+echo ""
+echo "[JB-4.2] Building and installing libcamfix..."
+LIBCAMFIX_OUT="$(build_libcamfix)"
+cfw_guest_write cp -R "$LIBCAMFIX_OUT" "$LIBVCAM_DIR/libcamfix.dylib"
+cfw_guest_write /usr/sbin/chown 0:0 $LIBVCAM_DIR/libcamfix.dylib
+cfw_guest_write /bin/chmod 0755 $LIBVCAM_DIR/libcamfix.dylib
+
+LIBCAMFIX_PLIST="$SCRIPT_DIR/camfix/libcamfix.plist"
+if [[ -f "$LIBCAMFIX_PLIST" ]]; then
+    cfw_guest_write cp -R "$LIBCAMFIX_PLIST" "$LIBVCAM_DIR/libcamfix.plist"
+    cfw_guest_write /bin/chmod 0644 $LIBVCAM_DIR/libcamfix.plist
+fi
+echo "  [+] libcamfix installed to procursus/Library/MobileSubstrate/DynamicLibraries/"
+
+# ═══════════ JB-5 DEPLOY FIRST-BOOT SETUP ══════════════════════
+echo ""
+echo "[JB-5] Deploying first-boot setup..."
+
+# Deploy first-boot JB setup script + LaunchDaemon
+# The base installer cleans its temporary files before EXP starts. Use an
+# EXP-specific path so the two observed staging lifetimes remain distinct.
+JB_LAUNCHD_PLIST="$TEMP_DIR/jb_launchd.plist"
+SETUP_SCRIPT="$SCRIPT_DIR/vphone_jb_setup.sh"
+SETUP_PLIST="$SCRIPT_DIR/vphone_jb_setup.plist"
+if [[ -f "$SETUP_SCRIPT" ]]; then
+    cfw_guest_write cp -R "$SETUP_SCRIPT" "$MNT1/cores/vphone_jb_setup.sh"
+    cfw_guest_write /bin/chmod 0755 $MNT1/cores/vphone_jb_setup.sh
+    echo "  [+] vphone_jb_setup.sh -> /cores/"
+fi
+# vpregister: registers JB apps via the containerized LS API at first boot (uicache -a's
+# registerApplicationDictionary is a deprecated no-op on iOS 27). Deployed ONLY on a 27
+# base — it needs the 27-only lsd embedded-reg gate, and on 26.x/18.x uicache registers
+# apps normally. Its /cores presence IS the runtime gate in vphone_jb_setup.sh (that
+# script must NOT version-check on guest sw_vers — the hybrid guest does not reliably
+# report the 27 userland version at first boot). Version read from the mounted rootfs
+# SystemVersion.plist, the same source cfw_install.sh gates its 27 patches on.
+JB_BASE_IOS=$(/usr/bin/plutil -extract ProductVersion raw -o - "$MNT1/System/Library/CoreServices/SystemVersion.plist" 2>/dev/null || true)
+case "$JB_BASE_IOS" in
+    27.*)
+        VPREGISTER="$(build_vpregister)"
+        if [[ -f "$VPREGISTER" ]]; then
+            cfw_guest_write cp -R "$VPREGISTER" "$MNT1/cores/vpregister"
+            cfw_guest_write /bin/chmod 0755 $MNT1/cores/vpregister
+            echo "  [+] vpregister -> /cores/ (iOS $JB_BASE_IOS)"
+        fi
+        ;;
+    *)
+        echo "  [skip] vpregister (base iOS ${JB_BASE_IOS:-unknown} — 27-only; uicache registers apps on older bases)"
+        ;;
+esac
+if [[ -f "$SETUP_PLIST" ]]; then
+    cfw_guest_write cp -R "$SETUP_PLIST" "$MNT1/System/Library/LaunchDaemons/com.vphone.jb-setup.plist"
+    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/com.vphone.jb-setup.plist
+
+    # Inject into launchd.plist so launchd starts it at boot
+    echo "  Injecting com.vphone.jb-setup into launchd.plist..."
+    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$JB_LAUNCHD_PLIST"
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$JB_LAUNCHD_PLIST" "$SETUP_PLIST" \
+        "/System/Library/LaunchDaemons/com.vphone.jb-setup.plist"
+    cfw_guest_write cp -R "$JB_LAUNCHD_PLIST" "$MNT1/System/Library/xpc/launchd.plist"
+    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
+    echo "  [+] com.vphone.jb-setup.plist injected into launchd.plist"
+fi
+
+# Deploy persistent sshd bring-up script + LaunchDaemon (every boot).
+# EXP is a JB superset, so it gets the same in-VM sshd-on-:22 as cfw_install_jb.
+# Self-heals host keys and runs OpenSSH sshd on :22 — replaces host-side ssh_bringup.
+SSHD_SCRIPT="$SCRIPT_DIR/vphone_sshd.sh"
+SSHD_PLIST="$SCRIPT_DIR/vphone_sshd.plist"
+if [[ -f "$SSHD_SCRIPT" ]]; then
+    cfw_guest_write cp -R "$SSHD_SCRIPT" "$MNT1/cores/vphone_sshd.sh"
+    cfw_guest_write /bin/chmod 0755 $MNT1/cores/vphone_sshd.sh
+    echo "  [+] vphone_sshd.sh -> /cores/"
+fi
+if [[ -f "$SSHD_PLIST" ]]; then
+    cfw_guest_write cp -R "$SSHD_PLIST" "$MNT1/System/Library/LaunchDaemons/com.vphone.sshd.plist"
+    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/com.vphone.sshd.plist
+
+    # Inject into launchd.plist so launchd starts it at boot
+    echo "  Injecting com.vphone.sshd into launchd.plist..."
+    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$JB_LAUNCHD_PLIST"
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$JB_LAUNCHD_PLIST" "$SSHD_PLIST" \
+        "/System/Library/LaunchDaemons/com.vphone.sshd.plist"
+    cfw_guest_write cp -R "$JB_LAUNCHD_PLIST" "$MNT1/System/Library/xpc/launchd.plist"
+    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
+    echo "  [+] com.vphone.sshd.plist injected into launchd.plist"
+
+    # Host-side marker: tells `make boot` (SSH_FORWARD=auto) this VM runs guest
+    # sshd on :22, so the 2222->22 usbmux forward is safe to auto-start.
+    : > "$VM_DIR/.ssh_forward"
+    echo "  [+] wrote $VM_DIR/.ssh_forward (enables auto SSH forward on boot)"
+fi
+
+# ═══════════ EXP-JB-6 POST-RESTORE DT IDENTITY REWRITE ════════
+#
+# Apply the three restore-unsafe DT property edits that broke earlier
+# attempts when applied at fw_patch time:
+#   root/model        iPhone99,11 -> iPhone17,3
+#   root/target-type  VPHONE600   -> D47
+#   root/compatible   reordered to [D47AP, VPHONE600AP, AppleVirtualPlatformARM]
+#
+# These are restore-time-fatal (restored_external / iBoot's restore mode
+# cross-checks model+target-type against the BuildManifest's signed
+# identity) but NOT boot-time-fatal — the existing iBSS/iBEC/LLB
+# image4_validate_property_callback bypass patches accept any IM4P
+# contents on subsequent boots.
+#
+# $MNT5 is still mounted at this point in the install flow (the umount
+# happens in the CLEANUP block below). We copy the live devicetree.img4
+# out, patch it on the host, copy it back. Next boot, iBoot loads the
+# modified DT, kernel populates machine_info from the new values, and
+# sysctl hw.machine / hw.product / hw.model flip to iPhone17,3 / D47 /
+# (whatever IOPlatformExpert resolves from compatible[0]=D47AP).
+echo ""
+echo "[EXP-JB-6] Post-restore DT identity rewrite..."
+
+if [[ -z "$BOOT_HASH" ]]; then
+    BOOT_HASH="$(get_boot_manifest_hash)"
+fi
+if [[ -z "$BOOT_HASH" ]]; then
+    echo "  [-] BOOT_HASH not discoverable, skipping EXP-JB-6"
+else
+    JB6_DT_REMOTE="$MNT5/$BOOT_HASH/usr/standalone/firmware/devicetree.img4"
+    JB6_DT_LOCAL="$TEMP_DIR/devicetree.img4"
+    if [[ -e "$JB6_DT_REMOTE" ]]; then
+        cfw_guest_write cp "$JB6_DT_REMOTE" "$JB6_DT_LOCAL"
+        "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-post-restore-dt "$JB6_DT_LOCAL"
+        cfw_guest_write cp -R "$JB6_DT_LOCAL" "$JB6_DT_REMOTE"
+        cfw_guest_write /usr/sbin/chown 0:0 $JB6_DT_REMOTE
+        cfw_guest_write /bin/chmod 0644 $JB6_DT_REMOTE
+        echo "  [+] devicetree.img4 rewritten in place"
+    else
+        echo "  [-] $JB6_DT_REMOTE not found, skipping EXP-JB-6"
+    fi
+fi
+
+# ═══════════ EXP-JB-7 BUILD-VERSION REWRITE (SystemVersion.plist) ══
+#
+# OPT-IN. Only runs when SPOOF_BUILD is set in the environment (e.g.
+# `make setup_machine JB=1 SPOOF_BUILD=23F77` or `make cfw_install_jb
+# SPOOF_BUILD=23F77`). When SPOOF_BUILD is unset/empty the step is
+# skipped entirely and the build identifier stays at whatever the IPSW
+# shipped.
+#
+# Update existing SystemVersion.plist inputs on System and, when present,
+# Preboot. Match the upstream System/Cryptexes copy as well as the rootfs copy:
+#   /System/Library/CoreServices/SystemVersion.plist
+#   /System/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist
+#   /private/preboot/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist
+#
+# Both are plain plist files (no Apple signature on individual plists),
+# so no image4 / cdHash / TXM concerns. Both volumes are writable at
+# install time:
+#   $MNT1 (rootfs)  — writable before the install-time seal is established
+#   $MNT5 (preboot) — apfs writable
+#
+# Settings and MGCopyAnswer consumption require separate runtime validation.
+# `sysctl kern.osversion` still reports the kernel image's own build
+# (e.g. 23B78 from the PCC vphone600/vresearch101 kernel) — that comes
+# from a kernel global populated at boot from boot args, not from this
+# plist.
+if [[ -n "${SPOOF_BUILD:-}" ]]; then
+    echo ""
+    echo "[EXP-JB-7] Rewriting ProductBuildVersion to $SPOOF_BUILD in SystemVersion plists..."
+
+    for jb7_remote in \
+        "$MNT1/System/Library/CoreServices/SystemVersion.plist" \
+        "$MNT1/System/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist" \
+        "$MNT5/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist"
+    do
+        if [[ -e "$jb7_remote" ]]; then
+            jb7_local="$TEMP_DIR/$(echo "$jb7_remote" | tr '/' '_').plist"
+            cfw_guest_write cp "$jb7_remote" "$jb7_local"
+            "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-build-version \
+                "$jb7_local" "$SPOOF_BUILD"
+            cfw_guest_write cp -R "$jb7_local" "$jb7_remote"
+        else
+            echo "  [-] $jb7_remote not found, skipping"
+        fi
+    done
+else
+    echo ""
+    echo "[EXP-JB-7] Skipped — SPOOF_BUILD not set (pass SPOOF_BUILD=<id> to enable)"
+fi
+
+# ═══════════ CLEANUP ═════════════════════════════════════════
+echo ""
+echo "[*] Unmounting image volumes..."
+/sbin/umount $MNT1 2>/dev/null || true
+/sbin/umount $MNT3 2>/dev/null || true
+/sbin/umount $MNT5 2>/dev/null || true
+
+echo "[*] Cleaning up temp..."
+cfw_guest_write rm -rf "$TEMP_DIR"
+
+echo ""
+echo "[+] CFW + JB + EXP installation complete!"
+echo "    Boot to apply changes."
+echo "    Guest sshd runs on :22 (com.vphone.sshd). After installing openssh-server"
+echo "    from Sileo, 'make boot' auto-forwards localhost:2222 -> guest:22."
+echo "    Connect: ssh -p 2222 root@127.0.0.1 (password: alpine)"

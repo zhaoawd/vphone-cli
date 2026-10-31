@@ -188,9 +188,11 @@ public struct VPhoneResources: Sendable {
     /// Script and Swift callers use the same capabilities and platform lock.
     func pythonIsUsable(_ python: URL) -> Bool {
         guard FileManager.default.isExecutableFile(atPath: python.path) else { return false }
+        var probeEnvironment = environment
+        probeEnvironment["PYTHONDONTWRITEBYTECODE"] = "1"
         return (try? VPhoneProcessRunner.runCapturing(python,
             [pythonRuntimeCheckScript.path, "--locked", "--json"],
-            env: environment))?.succeeded == true
+            env: probeEnvironment))?.succeeded == true
     }
 
     public enum PythonSource: String, Sendable {
@@ -212,7 +214,7 @@ public struct VPhoneResources: Sendable {
 
     public var pythonRuntimeCheckScript: URL { scriptsDir.appendingPathComponent("check_python_runtime.py") }
 
-    public func pythonExecutable(forceManaged: Bool = false) throws -> URL {
+    public func pythonExecutable(forceManaged: Bool = false, allowBootstrap: Bool = true) throws -> URL {
         if !forceManaged {
             for candidate in pythonCandidates {
                 if pythonIsUsable(candidate.url) { return candidate.url }
@@ -221,6 +223,9 @@ public struct VPhoneResources: Sendable {
                         "VPHONE_PYTHON failed locked runtime verification: \(candidate.url.path)")
                 }
             }
+        }
+        guard allowBootstrap else {
+            throw VPhoneResourcesError.pythonNotFound("No existing locked Python runtime; provision it separately before qualified Guest installation or recovery")
         }
         return try bootstrapManagedVenv(force: forceManaged)
     }

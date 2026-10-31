@@ -40,7 +40,10 @@ def render():
     for declaration in ['dyld-exp-hv_vmm','dyld-cfw-camera','dyld-boot-iomfb_swapend','dyld-boot-iomfb_force_kern','dyld-boot-maxslide','dyld-boot-lsd_embedded_reg','dyld-boot-xpc_lwcr','dyld-boot-lockdown_mode']:
         add(declaration, 'dsc:/<chunk>')
     add('preboot-exp-devicetree_identity','preboot:/<boot-hash>/usr/standalone/firmware/devicetree.img4')
-    add('system-systemversion-cfw-build_version','system:/System/Library/CoreServices/SystemVersion.plist','preboot:/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist')
+    add('system-systemversion-cfw-build_version',
+        'system:/System/Library/CoreServices/SystemVersion.plist',
+        'system:/System/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist',
+        'preboot:/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist')
     add('preboot-jb-bootstrap-install', *('preboot:/<boot-hash>/'+s for s in ['bootstrap-iphoneos-arm64.tar','org.coolstar.sileo_2.5.1_iphoneos-arm64.deb','jb','jb-vphone','debs']))
     add('preboot-jb-tweakloader-install','preboot:/<boot-hash>/jb-vphone/procursus/usr/lib/TweakLoader.dylib')
     add('preboot-exp-vcam-install', *('preboot:/<boot-hash>/jb-vphone/procursus/Library/MobileSubstrate/DynamicLibraries/'+s for s in ['libvcamcaptured.dylib','libvcamcaptured.plist','libcamfix.dylib','libcamfix.plist']))

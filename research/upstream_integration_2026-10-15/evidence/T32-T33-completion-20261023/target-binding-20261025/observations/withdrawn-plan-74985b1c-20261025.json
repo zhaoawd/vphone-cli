@@ -1,0 +1,23 @@
+{
+  "state": "withdrawn-not-executable",
+  "planSHA256": "74985b1c614eb7686564992acff1f885a75fbf955019670b1a9bfc16a3ec40e7",
+  "approved": false,
+  "executed": false,
+  "reason": "Preboot target absent; upstream System/Cryptexes target missing; staged target binding and target rules changed",
+  "knownFrozenInputMismatches": [
+    {
+      "kind": "executor",
+      "path": "/Users/kolar/github/vphone-cli/scripts/patchers/cfw.py",
+      "expected": "cc48eb6880dad34cc331aa9a98d6644ae2ca52c90c44e1f8c359c270d2c326cf",
+      "actual": "56c45804f1071ed07ba3554b25fe915744fa3f1f21d7961cbdbca51a15182ed9"
+    },
+    {
+      "kind": "executor",
+      "path": "/Users/kolar/github/vphone-cli/scripts/patchers/guest_write.py",
+      "expected": "a01afdc7f229911b7cfa4c1099709765d2d55b60f90d98be996dcf12ed48eebf",
+      "actual": "cd3f816ee50aa70efda86bd6f6c2cce316a0bd10652a4c048c3b17a812f4408e"
+    }
+  ],
+  "planPreservedUnchanged": true,
+  "replacementPlanPrepared": false
+}

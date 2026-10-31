@@ -1,0 +1,113 @@
+{
+  "after_swap": {
+    "previous_is_original": true,
+    "published_is_staged": true
+  },
+  "checks": [
+    {
+      "at": "2026-10-24T08:19:08Z",
+      "phase": "stage",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-24T08:23:04Z",
+      "phase": "pre-mount",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-24T08:23:06Z",
+      "phase": "pre-install",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-24T12:28:51Z",
+      "phase": "pre-publish",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-24T12:33:50Z",
+      "phase": "pre-publish",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-24T12:38:16Z",
+      "phase": "pre-publish",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-24T12:45:41Z",
+      "phase": "pre-publish",
+      "result": "passed"
+    },
+    {
+      "at": "2026-10-24T12:54:10Z",
+      "phase": "pre-publish-qualified",
+      "result": "passed"
+    }
+  ],
+  "clone_error": null,
+  "copy": null,
+  "exit_code": 0,
+  "failure": null,
+  "fileOriginalsSHA256": "c48baa991619637c18727e2c1d3a94e7eb8d3c7357f8504e93a1fe2914a70d25",
+  "finished_at": "2026-10-24T12:55:53Z",
+  "guestEvidenceRequired": true,
+  "guestEvidenceSHA256": "7dffba99dbb4f2a5bf3264edfcde6e55f18953ae93c8ad34198561887852e4ab",
+  "guestOriginAttestationSHA256": "962dcda5c8f380bc81663fb046fc1a2b748b731099f779a7c4677519e7d9831a",
+  "guestOriginSourceSHA256": "e674c303ce60271252d16e2344a8de818e6db3b1ac3bea15d1dacd7dcb4481db",
+  "guestOriginTransitionSHA256": "2668e367b92b7a7b5f127cb4374cebad0dc8e2a73bf55ab6f4f8f6ebd2e057a5",
+  "id": "20261024T081630Z-kbuBz8Io",
+  "location": "/Users/kolar/github/vphone-cli/.build/t32q-20261024/.cfw-history/20261024T081630Z-kbuBz8Io",
+  "method": "clone",
+  "mountRoot": {
+    "dev": 16777231,
+    "ino": 250768241,
+    "path": "/private/tmp/.cfw_mount.a14373206744254b50e81f1a",
+    "uid": 0
+  },
+  "original": {
+    "blocks": 36198024,
+    "dev": 16777231,
+    "gid": 20,
+    "ino": 250557970,
+    "mode": 420,
+    "mtime_ns": 1792825704481599678,
+    "sample": {
+      "kind": "sampled:66",
+      "sha256": "63a75edb1beb8898447de35bece14b1a8eb7fefa27048190ac8f0db87343971a"
+    },
+    "size": 68719476736,
+    "uid": 501
+  },
+  "original_check": {
+    "checked_at": "2026-10-24T12:55:49Z",
+    "detail": "dev/inode/size/mtime equal; sampled:66 SHA-256 equal",
+    "unchanged": true
+  },
+  "previous_disk": "Disk.img",
+  "provenanceMode": "required",
+  "publish_method": "renamex_np RENAME_SWAP",
+  "published_at": "2026-10-24T12:54:19Z",
+  "runtimeImageEvidenceRequired": true,
+  "sealed_at": "2026-10-24T12:41:07Z",
+  "staged": {
+    "blocks": 36198024,
+    "dev": 16777231,
+    "gid": 20,
+    "ino": 250582318,
+    "mode": 420,
+    "mtime_ns": 1792825704481599678,
+    "size": 68719476736,
+    "uid": 501
+  },
+  "staged_retained": false,
+  "started_at": "2026-10-24T08:16:30Z",
+  "status": "published",
+  "undoProvenance": {
+    "finalProofSHA256": "e4e578ef7bc7363b3daa0f7940769a4e0df70f2b70fb0f460a0de8decabce1f1",
+    "indexSHA256": "5c860aa805bd1a5bf5917be0ac3618e6b9be2517117ebbd53b9fff2b17a4b2a2",
+    "operationsSHA256": "a15cc7fddd62d445d907c2cdf39e57ac55a723b71eb53bc989b5aeed429d7179"
+  },
+  "version": 5,
+  "vm": "/Users/kolar/github/vphone-cli/.build/t32q-20261024"
+}

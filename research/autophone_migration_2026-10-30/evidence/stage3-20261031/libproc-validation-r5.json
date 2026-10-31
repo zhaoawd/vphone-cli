@@ -1,0 +1,31 @@
+{
+  "helper_sha256": "c7dc2775f3fdc7dd4c492fbc3a6eb922f593e3a2fae17a531fe154ad6313a92a",
+  "positive_control": [
+    0,
+    "{\"complete\":true,\"regions\":57,\"tag255_control_seen\":true}\n"
+  ],
+  "positive_regions": {
+    "count": 57,
+    "tag255_count": 1
+  },
+  "residue_check": {
+    "schema": "autophone.springboard-residue-check/v2",
+    "verdict": "clean",
+    "code": null,
+    "detail": "no Frida residue region",
+    "criterion": {
+      "tag": "Tag: 255",
+      "match": "any_region"
+    },
+    "command": "/var/jb/usr/local/bin/autophone-proc-regions 37 regions",
+    "springboard": {
+      "pid": 37,
+      "started": "Sat Oct 31 01:24:32 2026"
+    },
+    "regions_parsed": 1059,
+    "tag255_regions": [],
+    "residue_regions": [],
+    "detached_agent_regions": 0,
+    "elapsed_ms": 119
+  }
+}

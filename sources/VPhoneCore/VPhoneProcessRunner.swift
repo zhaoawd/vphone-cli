@@ -201,7 +201,15 @@ public enum VPhoneProcessRunner {
 
         let group = DispatchGroup()
 
+        let resources = VPhoneResources.resolve()
+        let compressors = resources.base.appendingPathComponent(".tools/bin")
+        var tarEnvironment = resources.processEnvironment
+        if FileManager.default.isExecutableFile(atPath: compressors.appendingPathComponent("zstd").path),
+           FileManager.default.isExecutableFile(atPath: compressors.appendingPathComponent("xz").path) {
+            tarEnvironment["PATH"] = compressors.path + ":/usr/bin:/bin:/usr/sbin:/sbin"
+        }
         let consumer = Process()
+        consumer.environment = tarEnvironment
         consumer.executableURL = tar
         consumer.arguments = consumerArgs
         let cIn = Pipe()
@@ -222,6 +230,7 @@ public enum VPhoneProcessRunner {
         let pErrBox = DataBox()
         if let producerArgs {
             let p = Process()
+            p.environment = tarEnvironment
             p.executableURL = tar
             p.arguments = producerArgs
             let pOut = Pipe()
@@ -300,13 +309,15 @@ public enum VPhoneProcessRunner {
         _ args: [String],
         cwd: URL? = nil,
         env: [String: String]? = nil,
-        echo: Bool = true
+        echo: Bool = true,
+        input: FileHandle? = nil
     ) throws -> Int32 {
         let process = Process()
         process.executableURL = executable
         process.arguments = args
         if let cwd { process.currentDirectoryURL = cwd }
         if let env { process.environment = env }
+        if let input { process.standardInput = input }
 
         if !echo {
             let devNull = FileHandle.nullDevice

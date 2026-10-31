@@ -1,0 +1,573 @@
+{
+  "schema_version": "ui-actual-observation/v1",
+  "stability": {
+    "state_revision": 1,
+    "mutation_epoch": 0,
+    "layout_epoch": 35,
+    "snapshot_hash": "fnv1a32:a49acdde"
+  },
+  "elements": [
+    {
+      "stable_id": "home.ai_prompt",
+      "role": "group",
+      "visible": true,
+      "text": "想吃热乎的、微辣、别太油 →",
+      "resolved_style": {
+        "height": 44,
+        "marginTop": 8,
+        "flexDirection": "row",
+        "alignItems": "center",
+        "paddingLeft": 16,
+        "paddingRight": 4,
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E8DCD3",
+        "borderWidth": 1,
+        "borderRadius": 16
+      },
+      "frame": {
+        "x": 21,
+        "y": 194,
+        "width": 388,
+        "height": 44
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.ai_prompt.input",
+      "role": "textbox",
+      "visible": true,
+      "text": "想吃热乎的、微辣、别太油",
+      "resolved_style": {
+        "height": 20,
+        "flex": 1
+      },
+      "frame": {
+        "x": 38,
+        "y": 206,
+        "width": 330.3333435058594,
+        "height": 20
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.ai_prompt.submit",
+      "role": "button",
+      "visible": true,
+      "text": "→",
+      "resolved_style": {
+        "width": 35.7969,
+        "height": 36,
+        "backgroundColor": "#E6472F",
+        "borderRadius": 18,
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "frame": {
+        "x": 368.3333435058594,
+        "y": 198,
+        "width": 35.666656494140625,
+        "height": 36
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.brand.wordmark",
+      "role": "text",
+      "visible": true,
+      "text": "Food AI",
+      "resolved_style": {
+        "color": "#E6472F",
+        "fontSize": 26,
+        "fontWeight": "800",
+        "lineHeight": 34,
+        "height": 34,
+        "letterSpacing": 0
+      },
+      "frame": {
+        "x": 21,
+        "y": 103,
+        "width": 120,
+        "height": 34
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.header.cart",
+      "role": "button",
+      "visible": true,
+      "text": "袋 2",
+      "resolved_style": {
+        "width": 38,
+        "height": 38,
+        "borderRadius": 19,
+        "backgroundColor": "#FFFFFF",
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "frame": {
+        "x": 374,
+        "y": 62,
+        "width": 38,
+        "height": 38
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.header.cart_badge",
+      "role": "text",
+      "visible": true,
+      "text": "2",
+      "resolved_style": {
+        "width": 20,
+        "height": 20,
+        "borderRadius": 10,
+        "backgroundColor": "#E6472F",
+        "position": "absolute",
+        "top": 0,
+        "right": 0
+      },
+      "frame": {
+        "x": 392,
+        "y": 62,
+        "width": 20,
+        "height": 20
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.header.location",
+      "role": "button",
+      "visible": true,
+      "text": "送至 · 望京",
+      "resolved_style": {
+        "width": 120,
+        "height": 21,
+        "marginTop": 0
+      },
+      "frame": {
+        "x": 18,
+        "y": 70.6666669845581,
+        "width": 120,
+        "height": 21
+      },
+      "source_ref": {
+        "file": "store/address.store.ts",
+        "symbol": "addresses"
+      }
+    },
+    {
+      "stable_id": "home.hero.headline",
+      "role": "text",
+      "visible": true,
+      "text": "今晚，好好吃一顿",
+      "resolved_style": {
+        "color": "#241713",
+        "fontSize": 32,
+        "fontWeight": "800",
+        "lineHeight": 46,
+        "letterSpacing": 0
+      },
+      "frame": {
+        "x": 21,
+        "y": 140,
+        "width": 360,
+        "height": 46
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.navigation",
+      "role": "tablist",
+      "visible": true,
+      "text": "首页 发现 订单 我的",
+      "resolved_style": {
+        "height": 70,
+        "flexDirection": "row",
+        "paddingHorizontal": 9,
+        "paddingTop": 5,
+        "paddingBottom": 14,
+        "borderTopColor": "#E8DCD3",
+        "borderTopWidth": 1,
+        "backgroundColor": "#FFFFFF"
+      },
+      "frame": {
+        "x": 0,
+        "y": 862,
+        "width": 430,
+        "height": 70
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.navigation.discover",
+      "role": "tab",
+      "visible": true,
+      "text": "发现",
+      "resolved_style": {
+        "flex": 1,
+        "height": 50,
+        "backgroundColor": "#FFFFFF",
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "frame": {
+        "x": 112,
+        "y": 868,
+        "width": 103,
+        "height": 50
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.navigation.home",
+      "role": "tab",
+      "visible": true,
+      "text": "首页",
+      "resolved_style": {
+        "flex": 1,
+        "height": 50,
+        "backgroundColor": "#F7D7B5",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "borderRadius": 16
+      },
+      "frame": {
+        "x": 9,
+        "y": 868,
+        "width": 103,
+        "height": 50
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.navigation.orders",
+      "role": "tab",
+      "visible": true,
+      "text": "订单",
+      "resolved_style": {
+        "flex": 1,
+        "height": 50,
+        "backgroundColor": "#FFFFFF",
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "frame": {
+        "x": 215,
+        "y": 868,
+        "width": 103,
+        "height": 50
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.navigation.profile",
+      "role": "tab",
+      "visible": true,
+      "text": "我的",
+      "resolved_style": {
+        "flex": 1,
+        "height": 50,
+        "backgroundColor": "#FFFFFF",
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "frame": {
+        "x": 318,
+        "y": 868,
+        "width": 103,
+        "height": 50
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.attributes",
+      "role": "text",
+      "visible": true,
+      "text": "热乎、微辣，预计 30 分钟送达",
+      "resolved_style": {
+        "height": 20,
+        "width": 386,
+        "marginTop": 6
+      },
+      "frame": {
+        "x": 22,
+        "y": 674,
+        "width": 386,
+        "height": 20
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.card",
+      "role": "group",
+      "visible": true,
+      "text": "匹配度 96% 炙烤牛肉拌饭 热乎、微辣，预计 30 分钟送达 1 / 4 ¥32 25–35 分钟 · 预计送达 立即下单 换个口味",
+      "resolved_style": {
+        "flex": 1,
+        "backgroundColor": "#FFFFFF",
+        "overflow": "hidden"
+      },
+      "frame": {
+        "x": 0,
+        "y": 254,
+        "width": 430,
+        "height": 608
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.eta",
+      "role": "text",
+      "visible": true,
+      "text": "25–35 分钟 · 预计送达",
+      "resolved_style": {
+        "width": 163,
+        "height": 18,
+        "marginLeft": 167
+      },
+      "frame": {
+        "x": 245,
+        "y": 743,
+        "width": 163,
+        "height": 18
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.image",
+      "role": "image",
+      "visible": true,
+      "text": null,
+      "resolved_style": {
+        "position": "absolute",
+        "top": 0,
+        "left": 0,
+        "right": 0,
+        "bottom": 261,
+        "backgroundColor": "#7E3825",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "overflow": "hidden"
+      },
+      "frame": {
+        "x": 0,
+        "y": 254,
+        "width": 430,
+        "height": 347
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.match_score",
+      "role": "text",
+      "visible": true,
+      "text": "匹配度 96%",
+      "resolved_style": {
+        "height": 20,
+        "width": 100,
+        "backgroundColor": "#F7D7B5",
+        "borderRadius": 10,
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "frame": {
+        "x": 22,
+        "y": 611,
+        "width": 100,
+        "height": 20
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.next_action",
+      "role": "button",
+      "visible": true,
+      "text": "换个口味",
+      "resolved_style": {
+        "height": 28,
+        "width": 386,
+        "marginTop": 6,
+        "backgroundColor": "#FFFFFF",
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "frame": {
+        "x": 22,
+        "y": 826,
+        "width": 386,
+        "height": 28
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.pagination",
+      "role": "text",
+      "visible": true,
+      "text": "1 / 4",
+      "resolved_style": {
+        "height": 14,
+        "width": 50,
+        "marginTop": 6
+      },
+      "frame": {
+        "x": 22,
+        "y": 700,
+        "width": 50,
+        "height": 14
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.price",
+      "role": "text",
+      "visible": true,
+      "text": "¥32",
+      "resolved_style": {
+        "color": "#E6472F",
+        "fontSize": 23,
+        "fontWeight": "800",
+        "lineHeight": 29,
+        "width": 56,
+        "height": 29,
+        "letterSpacing": 0
+      },
+      "frame": {
+        "x": 22,
+        "y": 737.6666666269302,
+        "width": 56,
+        "height": 29
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.primary_action",
+      "role": "button",
+      "visible": true,
+      "text": "立即下单",
+      "resolved_style": {
+        "height": 46,
+        "marginTop": 6,
+        "borderRadius": 16,
+        "alignItems": "center",
+        "justifyContent": "center",
+        "backgroundColor": "#E6472F"
+      },
+      "frame": {
+        "x": 22,
+        "y": 774,
+        "width": 386,
+        "height": 46
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.scrim",
+      "role": "decoration",
+      "visible": true,
+      "text": null,
+      "resolved_style": {
+        "position": "absolute",
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "frame": {
+        "x": 0,
+        "y": 254,
+        "width": 430,
+        "height": 347
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    },
+    {
+      "stable_id": "home.recommendation.title",
+      "role": "text",
+      "visible": true,
+      "text": "炙烤牛肉拌饭",
+      "resolved_style": {
+        "color": "#241713",
+        "fontSize": 24,
+        "fontWeight": "800",
+        "lineHeight": 31,
+        "letterSpacing": 0
+      },
+      "frame": {
+        "x": 22,
+        "y": 637,
+        "width": 386,
+        "height": 31
+      },
+      "source_ref": {
+        "file": "app/(tabs)/index.tsx",
+        "symbol": "Index"
+      }
+    }
+  ]
+}

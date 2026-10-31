@@ -1,0 +1,165 @@
+{
+  "scope": "readonly interrupted transaction metadata",
+  "VMStarts": 0,
+  "CFWRetries": 0,
+  "transactionWrites": 0,
+  "uid": 0,
+  "pending": [
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/t33t-20261025/.cfw_disk.W7aZSh3x",
+      "identity": {
+        "dev": 16777234,
+        "ino": 251811932,
+        "bytes": 480,
+        "mtime_ns": 1792941406652028260,
+        "mode": 448,
+        "uid": 0,
+        "gid": 20
+      },
+      "record": {
+        "checks": [
+          {
+            "at": "2026-10-25T14:41:39Z",
+            "phase": "stage",
+            "result": "passed"
+          },
+          {
+            "at": "2026-10-25T14:41:39Z",
+            "phase": "pre-install",
+            "result": "passed"
+          },
+          {
+            "at": "2026-10-25T14:52:46Z",
+            "phase": "pre-mount",
+            "result": "passed"
+          },
+          {
+            "at": "2026-10-25T14:52:47Z",
+            "phase": "pre-install",
+            "result": "passed"
+          },
+          {
+            "at": "2026-10-25T14:52:48Z",
+            "phase": "pre-install",
+            "result": "passed"
+          },
+          {
+            "at": "2026-10-25T14:58:59Z",
+            "phase": "pre-install",
+            "result": "passed"
+          },
+          {
+            "at": "2026-10-25T15:04:17Z",
+            "phase": "pre-publish",
+            "result": "passed"
+          },
+          {
+            "at": "2026-10-25T15:09:44Z",
+            "phase": "pre-publish",
+            "result": "passed"
+          }
+        ],
+        "clone_error": null,
+        "copy": null,
+        "failure": null,
+        "fileOriginalsSHA256": "2863ccfab23f409dfe2c2c925cc71c0b8cbf7ada63447f301f6f00b380273e1b",
+        "guestEvidenceRequired": true,
+        "guestUndoRequestSHA256": "e54634f9fa57629e076f8c17d569a0ae98eb8ef2256a3157b647586b0e017e24",
+        "id": "20261025T144138Z-W7aZSh3x",
+        "method": "clone",
+        "mountRoot": {
+          "dev": 16777231,
+          "ino": 251829333,
+          "path": "/Users/kolar/github/vphone-cli/.build/t33t-20261025/.cfw_mount.kDBJGdJa",
+          "uid": 0
+        },
+        "operation": "guest-component-undo-v2",
+        "original": {
+          "blocks": 36083272,
+          "dev": 16777231,
+          "gid": 20,
+          "ino": 251754611,
+          "mode": 420,
+          "mtime_ns": 1792937139360740265,
+          "sample": {
+            "kind": "sampled:66",
+            "sha256": "7a683e8bdc465c37cf6772f9d7e3a454c1e6d112ee5bd7112e957a3e8c85143d"
+          },
+          "size": 68719476736,
+          "uid": 501
+        },
+        "provenanceMode": "required",
+        "runtimeImageEvidenceRequired": true,
+        "staged": {
+          "blocks": 36083272,
+          "dev": 16777231,
+          "gid": 20,
+          "ino": 251811935,
+          "mode": 420,
+          "mtime_ns": 1792937139360740265,
+          "size": 68719476736,
+          "uid": 501
+        },
+        "started_at": "2026-10-25T14:41:38Z",
+        "status": "staged",
+        "undoProvenance": {
+          "finalProofSHA256": "0294f9e99048df71a1a8b6ab8c07cdf051a6e5ae4fe8120d73199e576df557de",
+          "indexSHA256": "831e105cc21ad48dc5edce660521a1784d5869496c8da7be755b946616c2e4a5",
+          "operationsSHA256": "b0dff17394b64e32c1763834912703082612e361212287951d2e5cd99860c442"
+        },
+        "version": 5,
+        "vm": "/Users/kolar/github/vphone-cli/.build/t33t-20261025"
+      },
+      "recordSHA256": "9f98451c4be8c4d4d71c8677d36759bac78ad4d1e27467f5de915024b6296c27",
+      "files": {
+        "Disk.img": {
+          "dev": 16777234,
+          "ino": 251811935,
+          "bytes": 68719476736,
+          "mtime_ns": 1792940656309090779,
+          "mode": 420,
+          "uid": 501,
+          "gid": 20
+        },
+        "guest-undo-request.json": {
+          "dev": 16777234,
+          "ino": 251820103,
+          "bytes": 4036,
+          "mtime_ns": 1792939862926794499,
+          "mode": 384,
+          "uid": 0,
+          "gid": 20
+        }
+      },
+      "members": [
+        "transaction.json",
+        "guest-plan.json",
+        "Disk.img",
+        "guest-postimage.img",
+        "guest-file-originals.json",
+        "guest-changes.jsonl",
+        "guest-effects-final.json",
+        "guest-undo-applied.json",
+        "guest-undo-request.json",
+        "guest-component-receipts.json",
+        "guest-undo-provenance.json",
+        "guest-context.json",
+        "effect-blobs"
+      ]
+    }
+  ],
+  "currentDisk": {
+    "dev": 16777234,
+    "ino": 251754611,
+    "bytes": 68719476736,
+    "mtime_ns": 1792937139360740265,
+    "mode": 420,
+    "uid": 501,
+    "gid": 20
+  },
+  "binding": {
+    "bundle": "2.6.2-local.f43043c4c559",
+    "guestEnvironment": "2.6.2-local.f43043c4c559"
+  },
+  "processes": ""
+}

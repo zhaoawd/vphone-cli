@@ -1,0 +1,188 @@
+{
+  "accepted": false,
+  "target": {
+    "host_id": "migration-local",
+    "rig_id": "migration-stage3-fresh",
+    "rig_generation": 6,
+    "cli_dir": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/upstream",
+    "vm_dir": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer",
+    "socket": "/Users/kolar/github/vphone-cli/.build/am31/machines/isolation-peer/vphone.sock",
+    "expected_usb_udid": "0000FE01-32F7B33D02134DC5",
+    "ssh_host": "127.0.0.1",
+    "ssh_port": 22243,
+    "frida_host": "127.0.0.1",
+    "frida_port": 37043,
+    "frida_guest_port": 27042,
+    "log_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/logs",
+    "temp_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/tmp",
+    "package_cache": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/packages",
+    "runtime_dir": "/Users/kolar/github/vphone-cli/.build/am31/stage3-fresh/runtime",
+    "protocol": "upstream_v1",
+    "core_bundle": "/Users/kolar/github/vphone-cli/.build/autophone-stage2/DerivedData/Build/Products/Debug/VPhone.bundle"
+  },
+  "build_id": "bld-d871c966fc4e7b4f7fe61ee0b701c9c5970752e3382b4717618c1d69a41c34b4",
+  "checks": [
+    {
+      "name": "formal_cli_install",
+      "passed": true,
+      "value": {
+        "returncode": 0
+      }
+    },
+    {
+      "name": "provisioning_readback",
+      "passed": true,
+      "value": {
+        "status": "passed",
+        "changed": false,
+        "installed_build": {
+          "slot": "001",
+          "label": "food-coupons-ios27-scene-r3",
+          "file": "blobs/97b696879c5641ae3e833133af990ace0541cf177679fff74febfc38e26da9f0.ipa",
+          "bundle_id": "com.autophone.foodorderingdemo.v2",
+          "version": "1.0.0",
+          "release_like": true,
+          "release_evidence": "embedded_js_bundle:Payload/FoodAIVerification.app/main.jsbundle",
+          "sha256": "97b696879c5641ae3e833133af990ace0541cf177679fff74febfc38e26da9f0",
+          "size": 9955656,
+          "added_at": "2026-10-31T14:31:52+08:00",
+          "app": "food_ordering_v2",
+          "short_version": "1.0.0",
+          "build_id": "bld-d871c966fc4e7b4f7fe61ee0b701c9c5970752e3382b4717618c1d69a41c34b4",
+          "build_version": "1",
+          "source_revision": {
+            "kind": "source_tree",
+            "state": "generated",
+            "tree_sha256": "a49bcceae843b2ed58c3d21d9e4be30a6f4dce4da3ffd824010f3983c449aed7",
+            "base_commit_sha": "f6a72613482ec50b639829d39884868828798e76"
+          },
+          "artifact_sha256": "97b696879c5641ae3e833133af990ace0541cf177679fff74febfc38e26da9f0",
+          "resolution_source": "slot_build_id",
+          "verified": true,
+          "installed_at": "2026-10-31T14:32:04+08:00",
+          "installer": "vphone_native"
+        },
+        "detail": "desired build already observed",
+        "build_ref": {
+          "app": "food_ordering_v2",
+          "slot": "001",
+          "short_version": "1.0.0",
+          "build_id": "bld-d871c966fc4e7b4f7fe61ee0b701c9c5970752e3382b4717618c1d69a41c34b4",
+          "build_version": "1",
+          "source_revision": {
+            "kind": "source_tree",
+            "state": "generated",
+            "tree_sha256": "a49bcceae843b2ed58c3d21d9e4be30a6f4dce4da3ffd824010f3983c449aed7",
+            "base_commit_sha": "f6a72613482ec50b639829d39884868828798e76"
+          },
+          "artifact_sha256": "97b696879c5641ae3e833133af990ace0541cf177679fff74febfc38e26da9f0",
+          "resolution_source": "build_id"
+        },
+        "install_receipt": null,
+        "readback": {
+          "app": "food_ordering_v2",
+          "bundle_id": "com.autophone.foodorderingdemo.v2",
+          "short_version": "1.0.0",
+          "build_version": "1",
+          "slot": null,
+          "sha256": null,
+          "build_id": null
+        },
+        "build_marker": {
+          "state": "present",
+          "expected_sha256": "fa54461c6f056d3de03d444b83847ceec8988a480a18403549f3e2c40dc3f4bf",
+          "readback_sha256": "fa54461c6f056d3de03d444b83847ceec8988a480a18403549f3e2c40dc3f4bf",
+          "readback_error": null
+        }
+      }
+    },
+    {
+      "name": "launch_acknowledgement",
+      "passed": true,
+      "value": {
+        "bundle_id": "com.autophone.foodorderingdemo.v2"
+      }
+    }
+  ],
+  "ui_events": [],
+  "failed_observations": [
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    },
+    {
+      "identifier": "home.recommendation.title",
+      "matches": []
+    }
+  ],
+  "error": "RuntimeError: UI assertion deadline: home.recommendation.title",
+  "screen_lock_released": true
+}

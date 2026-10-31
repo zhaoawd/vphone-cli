@@ -1,0 +1,89 @@
+{
+  "scope": "readonly retained cache; source algorithms only",
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "CFWInstalled": false,
+  "steps": {
+    "hv-vmm": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/exp-cryptex-links-package-20261024-r3/VPhone.bundle/Contents/Resources/scripts/patchers/cfw.py",
+        "patch-hv-vmm-dsc",
+        "/private/tmp/t33-ro-preflight-i4g8cklj/System/Library/Caches/com.apple.dyld",
+        "--dry-run"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.1705200420692563,
+      "deadlineSeconds": 45,
+      "timedOut": false,
+      "signalsToOwnedDiagnosticGroup": [],
+      "plannedCStringChanges": 20
+    },
+    "camera": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/exp-cryptex-links-package-20261024-r3/VPhone.bundle/Contents/Resources/scripts/patchers/cfw.py",
+        "patch-camera-dsc",
+        "/private/tmp/t33-ro-preflight-i4g8cklj/System/Library/Caches/com.apple.dyld",
+        "/private/tmp/t33-ro-preflight-i4g8cklj/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e",
+        "--dry-run"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.8308413340710104,
+      "deadlineSeconds": 45,
+      "timedOut": false,
+      "signalsToOwnedDiagnosticGroup": []
+    },
+    "swapend": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/exp-cryptex-links-package-20261024-r3/VPhone.bundle/Contents/Resources/scripts/patchers/cfw.py",
+        "patch-iomfb-swapend",
+        "/private/tmp/t33-ro-preflight-i4g8cklj/System/Library/Caches/com.apple.dyld",
+        "--target-size",
+        "0x560",
+        "--dry-run"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.37237445916980505,
+      "deadlineSeconds": 45,
+      "timedOut": false,
+      "signalsToOwnedDiagnosticGroup": []
+    },
+    "build-plist": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/exp-cryptex-links-package-20261024-r3/VPhone.bundle/Contents/Resources/scripts/patchers/cfw.py",
+        "patch-build-version",
+        "/private/tmp/t33-ro-preflight-i4g8cklj/System/Library/CoreServices/SystemVersion.plist",
+        "23Z999999",
+        "--dry-run"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.08742687525227666,
+      "deadlineSeconds": 45,
+      "timedOut": false,
+      "signalsToOwnedDiagnosticGroup": []
+    }
+  },
+  "passed": true,
+  "tree": {
+    "entries": 2931,
+    "sha256": "8ca9292d96e176cc957bde0a5f775f8bc765f320ebe0395430b6a0a5efa4c02c",
+    "elapsedSeconds": 4.955152416601777
+  },
+  "treeUnchanged": true,
+  "finalTreeReadSeconds": 2.170590499881655,
+  "normalDetach": {
+    "device": "/dev/disk17",
+    "exitCode": 0,
+    "stdout": "\"disk16\" ejected.\n",
+    "stderr": "hdiutil: WARNING: 'hdiutil detach ...' is deprecated. Please use 'diskutil eject ...' instead.\n"
+  },
+  "cacheSHA256After": "d1c44f7b90eea06a0a217517758f171a35e51b0859afa38f212f6203b238ad78",
+  "cacheBytesUnchanged": true
+}

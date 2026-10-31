@@ -1,0 +1,130 @@
+{
+  "observedAt": "2026-10-24T20:33:52.959752+08:00",
+  "scope": "read-only historical request order and current source; not an EPERM cause proof",
+  "observations": [
+    {
+      "observation": "display-runtime-outcome",
+      "sources": [
+        {
+          "path": "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/display-runtime-outcome/files/.build/t32-t33-completion-20261023/display-runtime/runtime-observation/requests.jsonl",
+          "sha256": "273b7f6958a1f8c3be21e4ccc1bed1a106d568a28344ca4d625c0234e9d612ea",
+          "bytes": 86047
+        },
+        {
+          "path": "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/display-runtime-outcome/files/.build/t32-t33-completion-20261023/display-runtime/runtime-observation/serial.log",
+          "sha256": "3a43612dcd0ce80a3fedfb5bceb85d54b70048c1e93c1f3d7ae28d3a4df94d41",
+          "bytes": 83843
+        }
+      ],
+      "requestOrder": [
+        {
+          "index": 27,
+          "t": "rpc",
+          "method": "device.snapshot",
+          "path": null,
+          "ok": true,
+          "error": null
+        },
+        {
+          "index": 28,
+          "t": "file_get",
+          "method": null,
+          "path": "/private/xarts/AA.gl",
+          "ok": false,
+          "error": "open failed: Operation not permitted"
+        },
+        {
+          "index": 29,
+          "t": "rpc",
+          "method": "screen.unlock",
+          "path": null,
+          "ok": false,
+          "error": "api_timeout"
+        },
+        {
+          "index": 30,
+          "t": "rpc",
+          "method": "apps.terminate",
+          "path": null,
+          "ok": true,
+          "error": null
+        },
+        {
+          "index": 31,
+          "t": "screenshot",
+          "method": null,
+          "path": "/Users/kolar/github/vphone-cli/.build/t32-t33-completion-20261023/display-runtime/runtime-observation/before-settings.png",
+          "ok": true,
+          "error": null
+        },
+        {
+          "index": 32,
+          "t": "rpc",
+          "method": "apps.launch",
+          "path": null,
+          "ok": false,
+          "error": "api_timeout"
+        },
+        {
+          "index": 33,
+          "t": "rpc",
+          "method": "apps.terminate",
+          "path": null,
+          "ok": true,
+          "error": null
+        }
+      ],
+      "serialEUIDLogMatches": 0
+    },
+    {
+      "observation": "short-runtime-outcome",
+      "sources": [
+        {
+          "path": "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/short-runtime-outcome/files/.build/t32-t33-completion-20261023/short-runtime/runtime-observation/requests.jsonl",
+          "sha256": "d7ec6755ed850c0a3be67087e32a4c3dc95908761b093c8ec5f80f5cd8b5eb69",
+          "bytes": 85018
+        },
+        {
+          "path": "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/short-runtime-outcome/files/.build/t32-t33-completion-20261023/short-runtime/runtime-observation/serial.log",
+          "sha256": "9fee108f06e028dbb1f91f289575901a8ee8b427516faeec1b5a990283a93185",
+          "bytes": 82266
+        }
+      ],
+      "requestOrder": [
+        {
+          "index": 27,
+          "t": "rpc",
+          "method": "device.snapshot",
+          "path": null,
+          "ok": true,
+          "error": null
+        },
+        {
+          "index": 28,
+          "t": "file_get",
+          "method": null,
+          "path": "/private/xarts/AA.gl",
+          "ok": false,
+          "error": "open failed: Operation not permitted"
+        },
+        {
+          "index": 29,
+          "t": "rpc",
+          "method": "screen.unlock",
+          "path": null,
+          "ok": false,
+          "error": "api_timeout"
+        },
+        {
+          "index": 30,
+          "t": "rpc",
+          "method": "apps.terminate",
+          "path": null,
+          "ok": true,
+          "error": null
+        }
+      ],
+      "serialEUIDLogMatches": 0
+    }
+  ]
+}

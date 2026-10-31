@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import VPhoneCore
 
 // MARK: - Errors
 
@@ -135,6 +136,7 @@ public struct VPhoneLaunchpadCommandLine {
     private let activity = VPhoneLaunchpadCommandActivity()
 
     public var hasActiveCommands: Bool { activity.hasActiveCommands }
+    var acceptsNewCommands: Bool { activity.acceptsNewCommands }
 
     /// Synchronously closes the ordinary-command gate and interrupts owned
     /// children. False if a termination request has already begun. The caller
@@ -187,21 +189,33 @@ public struct VPhoneLaunchpadCommandLine {
         recordInHistory: Bool = true,
         machine: URL? = nil,
         warningStatuses: Set<Int32> = [],
-        onLine: (@Sendable (String) -> Void)? = nil
+        onLine: (@Sendable (String) -> Void)? = nil,
+        onStart: (@MainActor () -> Void)? = nil,
+        expectedBindingSHA256: String? = nil,
+        transferDirection: VPhoneTransferProgress.Direction? = nil,
+        onTransferProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil
     ) async throws -> VPhoneLaunchpadCommandResult {
         let operation = try activity.begin()
         var drained = false
         defer { activity.finish(operation, outputDrained: drained) }
         let writer = try recordInHistory ? logsDirectory.map { try VPhoneLaunchpadLogWriter(url: $0.appendingPathComponent("command-\(UUID().uuidString).log")) } : nil
         let entry = recordInHistory ? history.record(Self.display(arguments), warningStatuses: warningStatuses) : nil
+        let progress = (onTransferProgress == nil ? nil : transferDirection).flatMap { direction in
+            logsDirectory.flatMap { try? VPhoneTransferProgressChannel(parent: $0, direction: direction) }
+        }
+        defer { progress?.close() }
         let collector = VPhoneLaunchpadLineCollector()
         let child: VPhoneLaunchpadChildProcess
         do {
             let route = try machine.map { try VPhoneLaunchpadLaunchRoute.resolve(embedded: executable, launcher: launcher, machine: $0, arguments: arguments) }
+            if let expectedBindingSHA256, route?.snapshot?.sha256 != expectedBindingSHA256 {
+                throw VPhoneLaunchpadError("VM binding changed before command start.")
+            }
             if let snapshot = route?.snapshot, let machine, !snapshot.matches(machine) {
                 throw VPhoneLaunchpadError("VM binding changed before command start.")
             }
-            child = try VPhoneLaunchpadChildProcess(executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments) { line in
+            child = try VPhoneLaunchpadChildProcess(executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments,
+                environment: progress?.environment) { line in
                 writer?.write(line)
                 collector.append(line)
                 onLine?(line)
@@ -212,11 +226,22 @@ public struct VPhoneLaunchpadCommandLine {
             throw error
         }
         activity.attach(child, to: operation)
+        onStart?()
+        let progressPoll = progress.map { channel in
+            Task { @MainActor in
+                while !Task.isCancelled {
+                    if let value = channel.read() { onTransferProgress?(value) }
+                    try? await Task.sleep(for: .milliseconds(100))
+                }
+            }
+        }
+        defer { progressPoll?.cancel() }
         let completion = await withTaskCancellationHandler {
             await child.waitForCompletion()
         } onCancel: {
             child.interrupt()
         }
+        if let value = progress?.read() { onTransferProgress?(value) }
         drained = completion.outputDrained
         do { try await writer?.finish() }
         catch { drained = false; collector.append("Log persistence failed: \(error.localizedDescription)") }
@@ -226,6 +251,30 @@ public struct VPhoneLaunchpadCommandLine {
         let output = collector.snapshot
         return VPhoneLaunchpadCommandResult(status: completion.status, lines: output.lines,
             outputDrained: drained, omittedLineCount: output.omitted)
+    }
+
+    /// Creation is detached for its console log, but Quit must still own its
+    /// process group and wait for its reader/history completion.
+    func startCreation(_ arguments: [String], display: String, logFile: URL, appendingToLog: Bool,
+                       onLine: @escaping @Sendable (String) -> Void) throws -> VPhoneLaunchpadChildProcess {
+        let operation = try activity.begin()
+        let entry = history.record(display)
+        let child: VPhoneLaunchpadChildProcess
+        do {
+            child = try VPhoneLaunchpadChildProcess(executable: executable, arguments: arguments,
+                logFile: logFile, appendingToLog: appendingToLog, onLine: onLine)
+        } catch {
+            history.finish(entry, status: -1, outputDrained: false)
+            activity.finish(operation, outputDrained: false)
+            throw error
+        }
+        activity.attach(child, to: operation, interruptGroup: true)
+        Task {
+            let completion = await child.waitForCompletion()
+            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
+            activity.finish(operation, outputDrained: completion.outputDrained)
+        }
+        return child
     }
 
     /// Runs a stopped kernel update through the VM's selected verified source.
@@ -278,16 +327,17 @@ public enum VPhoneLaunchpadCommandTermination: Equatable, Sendable {
 }
 
 /// Shared by every copy of one CommandLine, including the monitoring and
-/// panel callers. Detached launch/create children retain their own lifecycle.
+/// panel callers. VM launches retain their independent lifecycle; creates join the drain.
 @MainActor
 private final class VPhoneLaunchpadCommandActivity {
     private enum Phase { case accepting, draining, waiting, sealed }
-    private struct Operation { var child: VPhoneLaunchpadChildProcess? }
+    private struct Operation { var child: VPhoneLaunchpadChildProcess?; var interruptGroup = false }
     private var operations: [UUID: Operation] = [:]
     private var phase = Phase.accepting
     private var failedDrain = false
 
     var hasActiveCommands: Bool { !operations.isEmpty }
+    var acceptsNewCommands: Bool { phase == .accepting }
 
     func begin() throws -> UUID {
         guard phase == .accepting else { throw VPhoneLaunchpadError("Application is waiting for command output before quitting.") }
@@ -296,8 +346,9 @@ private final class VPhoneLaunchpadCommandActivity {
         return id
     }
 
-    func attach(_ child: VPhoneLaunchpadChildProcess, to id: UUID) {
+    func attach(_ child: VPhoneLaunchpadChildProcess, to id: UUID, interruptGroup: Bool = false) {
         operations[id]?.child = child
+        operations[id]?.interruptGroup = interruptGroup
     }
 
     func finish(_ id: UUID, outputDrained: Bool) {
@@ -309,7 +360,10 @@ private final class VPhoneLaunchpadCommandActivity {
         guard phase == .accepting else { return false }
         phase = .draining
         failedDrain = false
-        for operation in operations.values { operation.child?.interrupt() }
+        for operation in operations.values {
+            if operation.interruptGroup { operation.child?.interruptGroup() }
+            else { operation.child?.interrupt() }
+        }
         return true
     }
 

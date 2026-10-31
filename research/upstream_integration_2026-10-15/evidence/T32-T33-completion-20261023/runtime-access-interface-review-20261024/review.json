@@ -1,0 +1,17 @@
+{
+  "observedAt": "2026-10-24T16:52:57.336545+08:00",
+  "scope": "repository source interface review only",
+  "interfaces": {
+    "processes.list": "uid, ppid and start_time added from sysctl kinfo_proc; read failure may omit a row",
+    "files.list": "explicit size, perm and mtime enrichment; underlying row fields not fully examined",
+    "files.read": "binary and limit accepted; lower-level result schema not examined",
+    "device.snapshot": "existing observer already records a snapshot; lock snapshot has startup caveats",
+    "host shell": "existing dispatcher route; not executed or added to any plan"
+  },
+  "AAglCause": "unconfirmed",
+  "candidateRuntimeSupportVerified": false,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "automaticPrivilegeChanges": false,
+  "collectionPlanCreated": false
+}

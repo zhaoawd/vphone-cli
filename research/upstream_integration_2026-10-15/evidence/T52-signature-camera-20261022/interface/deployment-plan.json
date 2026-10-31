@@ -1,0 +1,38 @@
+{
+  "state": "explicitly_approved",
+  "targetVM": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-v2",
+  "version": "2.6.2-local.93805a71796d",
+  "archive": "/Users/kolar/github/vphone-cli/.build/t52-camera-interface-20261022/2.6.2-local.93805a71796d.tar",
+  "archiveSHA256": "b1dfdce323225be681a02fac2589c5658efa90285ea538d608b01b61b265e48c",
+  "currentBinding": "2.6.2-local.266810c8ae29",
+  "newBinding": "2.6.2-local.93805a71796d",
+  "systemStore": "/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.93805a71796d",
+  "libraryTargets": [
+    "/usr/lib/libcamfix.dylib",
+    "/usr/lib/libvcamcaptured.dylib"
+  ],
+  "publisherCache": "/var/root/Library/Caches/vphoned",
+  "publisherSHA256": "0c3c906aabd670968fe4947bbf68c1130f9af0c5c93216dad8ec8c80ed9332b8",
+  "preserve": [
+    "existing probe files and data",
+    "previous guest libraries and disk",
+    "original vm-2607 and protected copies",
+    "previous Core Bundles"
+  ],
+  "cleanup": "only newly created staging files required by the standard transaction",
+  "VMStopAndRestart": true,
+  "hostAMFI": {
+    "cdhash": "89cb8ee4c9f47b15a1c63bd73c99b53a0d43a541",
+    "maxSeconds": 900,
+    "maxAttachments": 1,
+    "persistentAllowlist": false,
+    "script": "/Users/kolar/github/vphone-cli/.build/t52-camera-interface-20261022/boot-window/scoped-amfidont.py",
+    "scriptSHA256": "1f273d5be51a0af00a89fc30890eceead6c2ed3a93cf0e5c7af7f7f7c06f5632"
+  },
+  "newFirmwareInstructionPatches": false,
+  "targetLibrarySHA256": {
+    "libcamfix.dylib": "f387ff64ff4e8859f228fb42b0aa038cda0f16a040584048d55bbc2eff658a7d",
+    "libvcamcaptured.dylib": "eb2e366d0abd1184b1407e7e0c42799d4f7a95b10811239f756887d327904a3b"
+  },
+  "authorization": "User approved the exact version, target VM stop/rebind, two-library transaction and matching publisher, new-staging cleanup, and 900-second one-attachment single-CDHash window in this chat."
+}

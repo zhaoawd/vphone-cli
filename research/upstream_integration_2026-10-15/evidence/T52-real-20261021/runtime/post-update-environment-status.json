@@ -1,0 +1,120 @@
+{
+  "worker_idle": true,
+  "activation": {
+    "basis": "mappings",
+    "root_read_only": true,
+    "actions": [],
+    "note": "reboot_required=false only means the daemon saw no reason to reboot; it does not mean that running processes loaded the new files",
+    "automatic_restart": false,
+    "daemon_reboot_required": null,
+    "executed": []
+  },
+  "ok": true,
+  "transactions": [],
+  "application": {
+    "note": "not verified: this command checks files and mapped copies only; camera and location behavior need their own acceptance",
+    "state": "not_verified"
+  },
+  "root_read_only": true,
+  "eligibility": {
+    "eligible": false,
+    "mode": "unknown",
+    "reasons": [
+      "launchd Mach-O is unreadable or malformed"
+    ]
+  },
+  "load": {
+    "complete": true,
+    "libraries": [
+      {
+        "state": "current",
+        "current_pids": [
+          1
+        ],
+        "name": "launchdhook-vphone.dylib",
+        "stale": []
+      },
+      {
+        "state": "current",
+        "current_pids": [
+          252,
+          171,
+          63,
+          83,
+          70
+        ],
+        "stale": [],
+        "name": "SystemHook-vphone.dylib"
+      },
+      {
+        "current_pids": [
+          70
+        ],
+        "stale": [],
+        "state": "current",
+        "name": "libvcamcaptured.dylib"
+      },
+      {
+        "current_pids": [
+          171,
+          63,
+          83
+        ],
+        "name": "libcamfix.dylib",
+        "state": "current",
+        "stale": []
+      },
+      {
+        "stale": [],
+        "name": "libvlocation.dylib",
+        "state": "current",
+        "current_pids": [
+          252,
+          171,
+          63,
+          83
+        ]
+      }
+    ],
+    "uninspected": [],
+    "source": "environment.loaded",
+    "scanned": 264
+  },
+  "assessment": {
+    "state": "already_current"
+  },
+  "files": {
+    "libraries": [
+      {
+        "candidate": "0bce0431b8968a97346a32670d7598172cda05e0c694bc1873a4cb131378a995",
+        "guest": "0bce0431b8968a97346a32670d7598172cda05e0c694bc1873a4cb131378a995",
+        "name": "launchdhook-vphone.dylib",
+        "matches_candidate": true
+      },
+      {
+        "guest": "ea97b6f5b1af8c349f877ba40ca267f1d0f676d725f39e087f39e1b7deb71acb",
+        "matches_candidate": true,
+        "name": "SystemHook-vphone.dylib",
+        "candidate": "ea97b6f5b1af8c349f877ba40ca267f1d0f676d725f39e087f39e1b7deb71acb"
+      },
+      {
+        "matches_candidate": true,
+        "name": "libvcamcaptured.dylib",
+        "candidate": "2e94e0d035a717dfd82f91f8547a789aa82f2978569a488289be95c9ede17e97",
+        "guest": "2e94e0d035a717dfd82f91f8547a789aa82f2978569a488289be95c9ede17e97"
+      },
+      {
+        "guest": "fbf94136a3d47d0222e455248afc0362d1dfa2b2265f7bd05ab0ef2970ab3fea",
+        "name": "libcamfix.dylib",
+        "candidate": "fbf94136a3d47d0222e455248afc0362d1dfa2b2265f7bd05ab0ef2970ab3fea",
+        "matches_candidate": true
+      },
+      {
+        "guest": "fe0ad525a4d65542481c34715d4279d33d4879328662cdc043d842ee8ab627df",
+        "name": "libvlocation.dylib",
+        "candidate": "fe0ad525a4d65542481c34715d4279d33d4879328662cdc043d842ee8ab627df",
+        "matches_candidate": true
+      }
+    ]
+  }
+}

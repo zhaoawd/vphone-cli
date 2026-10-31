@@ -1,4 +1,4 @@
-"""Publish two real v4 journals and Undo using the actual Swift plan verifier.
+"""Publish two real v4/v5 journals and Undo using the actual Swift plan verifier.
 
 APFS queries, the DSC patch output and raw-image flush use fixtures. Disk inode
 swaps, plan validation, source indexes, checkpoints and archives run real code.
@@ -24,6 +24,13 @@ from tests.test_undo_provenance import cache
 vm = Path(sys.argv[1])
 
 
+def set_version(work):
+    version=int(os.environ.get('VPHONE_TEST_CFW_JOURNAL_VERSION','5'))
+    if version not in (4,5):raise ValueError('Explicit v4/v5 identity fixture only')
+    if version==4:
+        record=txn.load_record(work);record['version']=4;txn.save_record(work,record)
+
+
 def publish(index):
     work = vm/f'.cfw_disk.identity{index}'; work.mkdir(mode=0o700)
     mount = vm/f'.cfw_mount.identity{index}'; (mount/'mnt1').mkdir(parents=True)
@@ -43,6 +50,7 @@ def publish(index):
     try:
         with patch.object(txn,'holders',return_value=[]), contextlib.redirect_stdout(io.StringIO()):
             txn.stage(args)
+            set_version(work)
             plan = gate.from_environment()
             stage = vm/'.cfw_temp'; stage.mkdir(exist_ok=True)
             source = stage/'dropbear.plist'; source.write_bytes(plistlib.dumps({'ProgramArguments':['dropbear']}))
@@ -72,7 +80,7 @@ def publish(index):
                 guest_write.run(plan,['cp','-R',str(source_mount)+'/.',str(destination)])
             installed = destination/guest_undo.undo.DSC_MEMBER/'dyld_shared_cache_arm64e'
             with patch.object(sys,'argv',['cfw.py','patch-camera-dsc',str(installed.parent),str(installed)]), \
-                 patch.object(cfw,'_dispatch',side_effect=lambda:installed.write_bytes(cache(b'changed'))):
+                 patch.object(cfw,'_dispatch',side_effect=lambda *,guest_environment:installed.write_bytes(cache(b'changed'))):
                 cfw.main()
             with patch.object(final_guest.subprocess,'check_output',side_effect=query), patch.object(sys,'argv',['plan_gate.py','verify-final']):
                 gate.main()
@@ -105,7 +113,7 @@ def undo_query(argv):
     return plistlib.dumps({'ReadOnlyVolume':readonly,'DeviceIdentifier':'disk42s1','MountPoint':root})
 try:
     with patch.object(txn,'holders',return_value=[]),contextlib.redirect_stdout(io.StringIO()):
-        txn.stage(args); guest_undo.prepare(args)
+        txn.stage(args); set_version(work); guest_undo.prepare(args)
         with patch.object(final_guest.subprocess,'check_output',side_effect=undo_query): guest_undo.apply(args)
         target = mount/'mnt1/System/Cryptexes/OS'/guest_undo.undo.DSC_MEMBER/'dyld_shared_cache_arm64e'
         assert target.read_bytes() == cache(b'initial')

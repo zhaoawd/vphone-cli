@@ -12,7 +12,9 @@ extension VPhoneMachineBinding {
         try VPhoneBundleGuard.withBundleLock(directory: machine, operation: VPhoneVMOperation.bindCoreBundle) { _ in
             let manifest = try VPhoneVirtualMachineManifest.load(from: machine.appendingPathComponent("config.plist"))
             let holders = try VPhoneLsof.holders(of: machine.appendingPathComponent(manifest.diskImage))
-            guard holders.isEmpty else { throw VPhoneMachineBindingError("VM disk is still open; binding and backup were not changed") }
+            if let refusal = VPhoneProcessHolder.diskRefusal(holders.map { VPhoneProcessHolder(pid: $0) }, rerun: "change the Core Bundle again") {
+                throw VPhoneMachineBindingError(refusal + " Binding and backup were not changed.")
+            }
             let current = try snapshot(machine)
             guard current == expected else { throw VPhoneMachineBindingError("VM binding changed; inspect it before retrying") }
             let next: Self

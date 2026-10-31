@@ -32,6 +32,7 @@ report = {
 for path in sorted(resources.rglob('*')):
     if path.is_file() and path.name != 'build-dependencies.json':
         report['files_sha256'][str(path.relative_to(resources))] = hashlib.sha256(path.read_bytes()).hexdigest()
-for path in [resources / '.tools/bin/trustcache', resources / '.tools/bin/insert_dylib', bundle / 'Contents/MacOS/ldid']:
+for path in [resources / '.tools/bin/trustcache', resources / '.tools/bin/insert_dylib',
+             resources / '.tools/bin/zstd', resources / '.tools/bin/xz', bundle / 'Contents/MacOS/ldid']:
     report['host_tool_libraries'][str(path.relative_to(bundle))] = output('otool', '-L', str(path))
 (resources / 'build-dependencies.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')

@@ -1,0 +1,400 @@
+[
+  {
+    "tasks": [
+      "T08"
+    ],
+    "source": "upstream",
+    "path": "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+    "sha256": "3debeda2243f7e838e934b382c0af2db333e6d0772be36d0384237a2b847a681",
+    "matches": [
+      {
+        "line": 27,
+        "text": "\"revision\" : \"651ce0d0aed59d2601c35595f1a2ba7e29bb4169\","
+      },
+      {
+        "line": 28,
+        "text": "\"version\" : \"0.8.6\""
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T08"
+    ],
+    "source": "local",
+    "path": "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+    "sha256": "bff82889840f9089e7df33f891f26b55030403fae066c6cc20fa4fdf0ad61a67",
+    "matches": [
+      {
+        "line": 9,
+        "text": "\"revision\" : \"815ef234df5461b8eb9455931d38cb1c37992fe6\","
+      },
+      {
+        "line": 10,
+        "text": "\"version\" : \"0.8.5\""
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T15",
+      "T52"
+    ],
+    "source": "local",
+    "path": "scripts/cfw_disk_txn.py",
+    "sha256": "6a835e1599492a33372cb138d8d5f44026d78d21f61c6a0439be071c16d5dff2",
+    "matches": [
+      {
+        "line": 371,
+        "text": "def stage_copy(args, record, held, destination):"
+      },
+      {
+        "line": 376,
+        "text": "volume = os.statvfs(args.work)"
+      },
+      {
+        "line": 377,
+        "text": "available = volume.f_bavail * volume.f_frsize"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T15",
+      "T52"
+    ],
+    "source": "upstream",
+    "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+    "sha256": "88ca5a63f532033b58ecbf1d86f358c9281322385519a5846584ebae8c9447cf",
+    "matches": [
+      {
+        "line": 984,
+        "text": "try URL(fileURLWithPath: path).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])"
+      },
+      {
+        "line": 985,
+        "text": ".volumeAvailableCapacityForImportantUsage ?? 0"
+      },
+      {
+        "line": 986,
+        "text": "// Fallback: Some external volumes return 0 for volumeAvailableCapacityForImportantUsageKey."
+      },
+      {
+        "line": 990,
+        "text": "if statfs(path, &fs) == 0 {"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T61"
+    ],
+    "source": "local",
+    "path": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+    "sha256": "c49077380d87bbb51b8408e83467c1b663c2f1ef6020a1dd983169dea7d0ebb0",
+    "matches": [
+      {
+        "line": 33,
+        "text": "package var romSource: URL { directory.appendingPathComponent(\"ROMs/AVPBooter.vresearch1.bin\") }"
+      },
+      {
+        "line": 121,
+        "text": "roots += [(romSource, \"ROMs/AVPBooter.vresearch1.bin\"),"
+      },
+      {
+        "line": 34,
+        "text": "package var sepromSource: URL { directory.appendingPathComponent(\"ROMs/AVPSEPBooter.vresearch1.bin\") }"
+      },
+      {
+        "line": 122,
+        "text": "(sepromSource, \"ROMs/AVPSEPBooter.vresearch1.bin\")]"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T62"
+    ],
+    "source": "local",
+    "path": "sources/vphone-cli/VPhoneHostScreenAdapter.swift",
+    "sha256": "2a79080d3ab556ca4613ac0072bcb319418e372a2dab1edb736a9279972451a4",
+    "matches": [
+      {
+        "line": 51,
+        "text": "func captureCompactScreenshot(color: Bool = false) async -> String? {"
+      },
+      {
+        "line": 23,
+        "text": "func saveScreenshot(to url: URL) async throws -> URL {"
+      },
+      {
+        "line": 27,
+        "text": "return try await recorder.saveScreenshot(view: view, to: url)"
+      },
+      {
+        "line": 105,
+        "text": "// Use the public saveScreenshot path but intercept before encoding."
+      },
+      {
+        "line": 107,
+        "text": "// going through saveScreenshot to a temp file, then reading back."
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T62"
+    ],
+    "source": "upstream",
+    "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneHostScreenService.swift",
+    "sha256": "c59ced399b446c8f1c1e9d2dbbd45ea4a9bd97d029737738eb2330fd062235f9",
+    "matches": [
+      {
+        "line": 15,
+        "text": "final class VPhoneHostScreenService {"
+      },
+      {
+        "line": 153,
+        "text": "private let service: VPhoneHostScreenService"
+      },
+      {
+        "line": 162,
+        "text": "init(service: VPhoneHostScreenService) {"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T63"
+    ],
+    "source": "local",
+    "path": "sources/VPhoneAPIKit/VPhoneAPIClient.swift",
+    "sha256": "91b0c26b13830ed4e82cfaf34465d51933190ff93177ae7a92bf15280433a0f6",
+    "matches": [
+      {
+        "line": 59,
+        "text": "(0...64 * 1024 * 1024).contains(maximumBytes), stagingDirectory.isFileURL,"
+      },
+      {
+        "line": 54,
+        "text": "public func downloadFile(path: String, instanceID: String, binaryHash: String,"
+      },
+      {
+        "line": 79,
+        "text": "instanceID: String, binaryHash: String, timeout: TimeInterval = 120) async throws {"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T63"
+    ],
+    "source": "local",
+    "path": "sources/VPhoneAPIKit/VPhoneAPISession.swift",
+    "sha256": "86fbfa3fb359e5ad3a74e07fac7a74df9ff803c84bb45d156bc1559f7f4adb0c",
+    "matches": [
+      {
+        "line": 81,
+        "text": "guard snapshot.state == .ready, snapshot.generation == generation else { throw Self.error(\"stale_session\") }"
+      },
+      {
+        "line": 104,
+        "text": "guard snapshot.state == .ready, snapshot.generation == generation else { throw Self.error(\"stale_session\") }"
+      },
+      {
+        "line": 121,
+        "text": "guard snapshot.state == .ready, snapshot.generation == generation else { throw Self.error(\"stale_session\") }"
+      },
+      {
+        "line": 181,
+        "text": "guard runID == id else { throw Self.error(\"stale_session\") }"
+      },
+      {
+        "line": 110,
+        "text": "guard health.capabilities.isSuperset(of: [\"files\", \"file_upload_identity\"]), let fileClient else { throw Self.error(\"unsupported_capability\") }"
+      },
+      {
+        "line": 92,
+        "text": "guard downloads.count < 4 else { throw Self.error(\"busy\") }"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T63"
+    ],
+    "source": "local",
+    "path": "sources/vphone-cli/VPhoneHostAPICommands.swift",
+    "sha256": "8ed6a1916a33df6da32dedc717808a955e60b148bc68fbc9140ee5675f6d5d60",
+    "matches": [
+      {
+        "line": 105,
+        "text": "try file.publish(to: destination)"
+      },
+      {
+        "line": 96,
+        "text": "let file = try await session.downloadFile(path: path,"
+      },
+      {
+        "line": 79,
+        "text": "try await session.uploadFile(source, path: path, permissions: permissions)"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T63"
+    ],
+    "source": "local",
+    "path": "sources/vphone-cli/VPhoneFileBrowserModel.swift",
+    "sha256": "18485e75d560355880b60fb0fe891ddaf9ad1f6391081493fff507cad7791bdc",
+    "matches": [
+      {
+        "line": 222,
+        "text": "guard let data = try? Data(contentsOf: url) else {"
+      },
+      {
+        "line": 126,
+        "text": "let data = try await control.downloadFile(path: file.path)"
+      },
+      {
+        "line": 178,
+        "text": "let data = try await control.downloadFile(path: remotePath)"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T63"
+    ],
+    "source": "upstream",
+    "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift",
+    "sha256": "63d5eef9b444b4b8b915cd4bef9582344761ce43adfe52abd1f6e89875980c5e",
+    "matches": [
+      {
+        "line": 591,
+        "text": "func pushFile(from localURL: URL, to path: String, permissions: String) async throws -> Int64 {"
+      },
+      {
+        "line": 608,
+        "text": "func pullFile(_ path: String, to localURL: URL) async throws -> Int64 {"
+      },
+      {
+        "line": 1021,
+        "text": "guard let chunk = try source.read(upToCount: Int(min(1 << 20, bodyLength - sent))), !chunk.isEmpty"
+      },
+      {
+        "line": 625,
+        "text": "guard rename(temporary.path, localURL.path) == 0 else {"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T24"
+    ],
+    "source": "upstream",
+    "path": "VPhoneExecutable/VPhoneEscalator/VPhoneEscalator/Commands.c",
+    "sha256": "bfe686c4a5451c588a0b2fe64e15a8c101aa9e430ff4a603da1aad7a9229a837",
+    "matches": [
+      {
+        "line": 78,
+        "text": "static bool holds_requirement(uintptr_t req, CFDataRef wanted) {"
+      },
+      {
+        "line": 125,
+        "text": "if (holds_requirement(restricted, wanted)) {"
+      },
+      {
+        "line": 61,
+        "text": "CFDataRef wanted = copy_requirement_data(preference);"
+      },
+      {
+        "line": 78,
+        "text": "static bool holds_requirement(uintptr_t req, CFDataRef wanted) {"
+      },
+      {
+        "line": 89,
+        "text": "CFDataRef wanted = copy_requirement_data(requirement);"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T64"
+    ],
+    "source": "local",
+    "path": "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+    "sha256": "a1e7bdd5974bb5879d099d6edfc7f5cd053902ab536f0a11bb9e228c64302dc0",
+    "matches": [
+      {
+        "line": 99,
+        "text": "for name in try FileManager.default.contentsOfDirectory(atPath: parent).sorted() where roothideName(name) {"
+      },
+      {
+        "line": 609,
+        "text": "let names = try FileManager.default.contentsOfDirectory(atPath: parent)"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T65"
+    ],
+    "source": "upstream",
+    "path": ".github/workflows/build.yml",
+    "sha256": "a54a0bef785a250a1f9fe074c32e1fb7d6e5e5b4bcdef992f1b858bf86f2fcff",
+    "matches": [
+      {
+        "line": 14,
+        "text": "runs-on: xcode-27"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T09",
+      "T10"
+    ],
+    "source": "upstream",
+    "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+    "sha256": "45fd97cbf32f85248fb40b836f333b1ee852a7d45d563ad1688d2b15a64b8489",
+    "matches": [
+      {
+        "line": 239,
+        "text": "let hashType = try RestoreRamDiskSealPatcher.systemVolumeHashType(in: restoreDir)"
+      },
+      {
+        "line": 238,
+        "text": "guard variant != .less, sealSelected else { return }"
+      }
+    ]
+  },
+  {
+    "tasks": [
+      "T49",
+      "T50"
+    ],
+    "source": "upstream",
+    "path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneTemplateSetupBoot.swift",
+    "sha256": "a7be47899ab7c501f4c8b0039d04ad899aff538c913271199cf20f1fda46afca",
+    "matches": [
+      {
+        "line": 520,
+        "text": "+ (outcome.settleReboots > 0 ? \" of the reboot that was to resume it\" : \"\")"
+      },
+      {
+        "line": 535,
+        "text": "guard let quiet = watch.observe(signals, at: clock.now()), outcome.settleReboots == 0 else { continue }"
+      },
+      {
+        "line": 541,
+        "text": "outcome.settleReboots += 1"
+      },
+      {
+        "line": 539,
+        "text": "log(\"  rebooting the guest once to resume first-boot work\")"
+      }
+    ]
+  }
+]

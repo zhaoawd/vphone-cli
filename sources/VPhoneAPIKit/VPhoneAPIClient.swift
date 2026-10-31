@@ -7,13 +7,17 @@ public struct VPhoneAPIClient: Sendable {
     private let token: String?
     private let session: URLSession
     private let timeout: TimeInterval
+    private let rpcTimeout: TimeInterval
 
+    /// Health probes use `timeout`. RPCs may use a separate bounded deadline;
+    /// omitting it preserves the caller's single-deadline configuration.
     public init(baseURL: URL, token: String? = nil, session: URLSession = .shared,
-                timeout: TimeInterval = 30) throws {
+                timeout: TimeInterval = 30, rpcTimeout: TimeInterval? = nil) throws {
         guard let url = URLComponents(url: baseURL, resolvingAgainstBaseURL: false),
               ["http", "https"].contains(url.scheme), url.host?.isEmpty == false,
               url.user == nil, url.password == nil, url.query == nil, url.fragment == nil,
-              timeout.isFinite, timeout > 0, timeout <= 130 else {
+              timeout.isFinite, timeout > 0, timeout <= 130,
+              rpcTimeout.map({ $0.isFinite && $0 > 0 && $0 <= 130 }) ?? true else {
             throw VPhoneAPIError(code: "configuration", message: "Invalid API endpoint or timeout")
         }
         if let token {
@@ -28,6 +32,7 @@ public struct VPhoneAPIClient: Sendable {
         self.token = token
         self.session = session
         self.timeout = timeout
+        self.rpcTimeout = rpcTimeout ?? timeout
     }
 
     public func health(requiredCapabilities: Set<String> = [], expectedBinaryHash: String? = nil) async throws -> VPhoneAPIHealth {
@@ -39,10 +44,11 @@ public struct VPhoneAPIClient: Sendable {
     public func call(_ method: String, params: [String: VPhoneJSONValue] = [:]) async throws -> VPhoneJSONValue {
         let id = UUID().uuidString
         var request = request(path: "v1/rpc")
+        request.timeoutInterval = rpcTimeout
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try VPhoneAPIWire.request(method, params: params, id: id)
-        let (data, status) = try await exchange(request)
+        let (data, status) = try await exchange(request, timeout: rpcTimeout)
         guard case let .response(response) = try VPhoneAPIWire.message(data), response.id == .string(id) else {
             throw VPhoneAPIWire.invalidEnvelope()
         }
@@ -115,11 +121,12 @@ public struct VPhoneAPIClient: Sendable {
         task.maximumMessageSize = VPhoneAPIWire.maximumResponseBytes
         task.delegate = VPhoneAPINoRedirect.shared
         task.resume()
-        return VPhoneAPIWebSocket(transport: VPhoneURLSessionWebSocket(task: task), timeout: timeout)
+        return VPhoneAPIWebSocket(transport: VPhoneURLSessionWebSocket(task: task), timeout: rpcTimeout)
     }
 
     func webSocketRequest() -> URLRequest {
         var request = request(path: "v1/events")
+        request.timeoutInterval = rpcTimeout
         var url = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!
         url.scheme = url.scheme == "https" ? "wss" : "ws"
         request.url = url.url!
@@ -135,8 +142,8 @@ public struct VPhoneAPIClient: Sendable {
         return request
     }
 
-    private func exchange(_ request: URLRequest) async throws -> (Data, Int) {
-        let result = try await VPhoneAPIHTTPExchange().run(request, session: session, timeout: timeout)
+    private func exchange(_ request: URLRequest, timeout: TimeInterval? = nil) async throws -> (Data, Int) {
+        let result = try await VPhoneAPIHTTPExchange().run(request, session: session, timeout: timeout ?? self.timeout)
         return (result.data, result.status)
     }
 

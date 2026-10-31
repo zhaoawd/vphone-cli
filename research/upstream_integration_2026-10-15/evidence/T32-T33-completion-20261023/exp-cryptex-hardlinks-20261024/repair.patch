@@ -1,0 +1,74 @@
+--- before/cryptex_source.py
++++ after/scripts/patchers/cryptex_source.py
+@@ -5,6 +5,7 @@
+ from pathlib import Path
+ import plistlib
+ import shutil
++import stat
+ import subprocess
+ from . import plan_gate as gate
+ 
+@@ -166,13 +167,58 @@
+     stamp.write_bytes(gate.canonical(binding))
+ 
+ 
++def _member_identity(info):
++    return tuple(getattr(info,key) for key in (
++        'st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns','st_nlink','st_mode','st_uid','st_gid'))
++
++
++def _contained_member_sha(path, aliases, identities):
++    """Read a closed hard-link group without authorizing a patch write."""
++    from . import component_effects as effects
++    fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
++    try:
++        before=os.fstat(fd)
++        if (not stat.S_ISREG(before.st_mode) or before.st_nlink!=len(aliases)
++                or _member_identity(before)!=_member_identity(identities[path])):
++            raise ValueError('Cryptex hard-link group changed before read')
++        digest=hashlib.sha256()
++        while block:=os.read(fd,effects.CHUNK): digest.update(block)
++        if (_member_identity(os.fstat(fd))!=_member_identity(before)
++                or any(_member_identity(alias.lstat())!=_member_identity(identities[alias])
++                       for alias in aliases)):
++            raise ValueError('Cryptex hard-link group changed during read')
++        return digest.hexdigest()
++    finally: os.close(fd)
++
++
+ def tree(path, *, readonly_source=False):
+     from .guest_write import walk
+-    root=Path(path);result={}
+-    for entry in walk(root):
++    root=Path(path);result={};entries=list(walk(root))
++    identities={entry:entry.lstat() for entry in entries}
++    groups={}
++    for entry,info in identities.items():
++        if stat.S_ISREG(info.st_mode) and info.st_nlink>1:
++            groups.setdefault((info.st_dev,info.st_ino),[]).append(entry)
++    if not readonly_source:
++        for (device,_),aliases in groups.items():
++            if device!=identities[root].st_dev or any(identities[p].st_nlink!=len(aliases) for p in aliases):
++                raise ValueError('Cryptex hard-link group extends outside observed tree')
++    linked_digests={}
++    for entry in entries:
+         relative=str(entry.relative_to(root))
+-        if entry.is_symlink(): result[relative]={'kind':'link','link':os.readlink(entry)}
+-        elif entry.is_dir(): result[relative]={'kind':'directory'}
+-        elif entry.is_file(): result[relative]={'kind':'file','sha256':file_sha(entry,readonly_source=readonly_source)}
++        info=identities[entry]
++        if stat.S_ISLNK(info.st_mode): result[relative]={'kind':'link','link':os.readlink(entry)}
++        elif stat.S_ISDIR(info.st_mode): result[relative]={'kind':'directory'}
++        elif stat.S_ISREG(info.st_mode):
++            if info.st_nlink>1 and not readonly_source:
++                key=(info.st_dev,info.st_ino)
++                if key not in linked_digests:
++                    linked_digests[key]=_contained_member_sha(entry,groups[key],identities)
++                digest=linked_digests[key]
++            else: digest=file_sha(entry,readonly_source=readonly_source)
++            result[relative]={'kind':'file','sha256':digest}
+         else: raise ValueError('unsupported Cryptex source member')
++    if (entries!=list(walk(root)) or any(_member_identity(entry.lstat())!=_member_identity(info)
++                                       for entry,info in identities.items())):
++        raise ValueError('Cryptex tree changed during read')
+     return result

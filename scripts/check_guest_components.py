@@ -57,7 +57,8 @@ def inspect(stage, pins):
         "schema_version": 1, "role": "isolated-guest-components-candidate",
         "upstream_revision": pins["upstream_revision"], "architecture": "arm64e",
         "activated": False, "runtime_validated": False,
-        "camera_header_bytes": 64, "compatible_with_classic_camera": False,
+        "camera_header_bytes": 256, "compatible_with_classic_camera": False,
+        "classic_publisher_layout": "v2", "camera_receipt_version": 3,
         "deployment_targets": ARTIFACTS, "files_sha256": hashes,
     }
 

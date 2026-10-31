@@ -1,0 +1,41 @@
+{
+  "state": "failed",
+  "vmInstanceID": "55A25B78-4CAD-4053-9C3E-9CFCD3E75F64",
+  "phases": [],
+  "error": "Consumer initialization failed: {'startedAt': 1792659930.571251, 'schemaVersion': 1, 'applicationState': 1, 'mode': 'camera', 'pid': 577, 'runID': 't52-camera-ff775b66512e4abbaad1ae2f2ab799ae', 'events': [{'type': 'started', 'time': 1792659930.5712628}, {'type': 'camera_device', 'uniqueID': '', 'time': 1792659930.579022}, {'message': 'no usable input', 'type': 'camera_error', 'time': 1792659930.5812712}], 'locationServicesEnabled': True, 'updatedAt': 1792659930.581273, 'authorization': 0, 'bundleID': 'org.vphone.acceptance.t52.20261022'}",
+  "neutralCleanup": {
+    "role": "neutral",
+    "source": "image",
+    "generation": "42A001A7-9161-4527-91D0-86BCA523CEF8",
+    "connected": true,
+    "error": "neutral transport receipt unavailable",
+    "host_scheduled_frame_index": 9,
+    "host_published_frame_index": 9,
+    "ok": false,
+    "protocol_version": 3,
+    "streaming": true,
+    "matches_requested": true,
+    "host_frame_index_semantics": "scheduled_tick",
+    "stop_policy": "neutral",
+    "neutral_generation": "42A001A7-9161-4527-91D0-86BCA523CEF8",
+    "presentation_id": "14E477CC-78FD-476F-89EF-F82E63BD37CF"
+  },
+  "sourceStop": {
+    "guest_frame_cleared": false,
+    "stop_policy": "keep_last",
+    "ok": true,
+    "streaming": false
+  },
+  "cleanupError": "Camera source cleanup did not complete",
+  "probeStop": {
+    "method": "apps.terminate",
+    "ok": true,
+    "result": {
+      "killed": "org.vphone.acceptance.t52.20261022",
+      "pids": [
+        577
+      ],
+      "already_stopped": false
+    }
+  }
+}

@@ -6,8 +6,8 @@ import VPhoneArchiveKit
 
 @Suite(.serialized)
 struct NativeTransferTests {
-    private func withFixture(_ body: (URL, VPhoneLibrary, VPhoneBundle) throws -> Void) throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("native-transfer-\(UUID())")
+    private func withFixture(short: Bool = false, _ body: (URL, VPhoneLibrary, VPhoneBundle) throws -> Void) throws {
+        let root = (short ? URL(fileURLWithPath: "/tmp") : FileManager.default.temporaryDirectory).appendingPathComponent("nt-\(UUID())")
         let directory = root.appendingPathComponent("library/source")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
@@ -182,6 +182,131 @@ struct NativeTransferTests {
             else { #expect(try Data(contentsOf: destination) == Data("competitor".utf8)) }
             let remaining = try FileManager.default.contentsOfDirectory(atPath: root.path)
             #expect(!remaining.contains { $0.hasPrefix(".vphone-export-") })
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases, ["rewrite", "replace", "add", "symlink"])
+    func changedExportSourceIsNotPublished(backend: VPhoneBundleOps.ArchiveBackend, change: String) throws {
+        try withFixture { root, library, source in
+            let destination = root.appendingPathComponent("changed.tzst")
+            let disk = source.url.appendingPathComponent("Disk.img")
+            let before = try FileManager.default.attributesOfItem(atPath: disk.path)
+            var changed = false
+            #expect(throws: (any Error).self) {
+                try VPhoneBundleOps.export(bundleNamed: "source", to: destination, includeIPSW: false,
+                    in: library, backend: backend, progress: { _, _ in
+                        guard !changed else { return }
+                        changed = true
+                        do {
+                            switch change {
+                            case "rewrite":
+                                let handle = try FileHandle(forWritingTo: disk)
+                                try handle.write(contentsOf: Data("X".utf8))
+                                try handle.close()
+                                // Same size and mtime; ctime must still detect the write.
+                                try FileManager.default.setAttributes([.modificationDate: before[.modificationDate]!], ofItemAtPath: disk.path)
+                            case "replace":
+                                let replacement = source.url.appendingPathComponent("replacement")
+                                try Data(contentsOf: disk).write(to: replacement)
+                                try FileManager.default.removeItem(at: disk)
+                                try FileManager.default.moveItem(at: replacement, to: disk)
+                            case "add": try Data([1]).write(to: source.url.appendingPathComponent("new-member"))
+                            default:
+                                let link = source.url.appendingPathComponent("relative-link")
+                                try FileManager.default.removeItem(at: link)
+                                try FileManager.default.createSymbolicLink(atPath: link.path, withDestinationPath: "boot.bin")
+                            }
+                        } catch { Issue.record("could not change source: \(error)") }
+                    })
+            }
+            #expect(changed)
+            #expect(!FileManager.default.fileExists(atPath: destination.path))
+            #expect(!(try FileManager.default.contentsOfDirectory(atPath: root.path)).contains { $0.hasPrefix(".vphone-export-") })
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases, [false, true])
+    func changedImportArchiveIsNotPublished(backend: VPhoneBundleOps.ArchiveBackend, replace: Bool) throws {
+        try withFixture { root, library, source in
+            let archive = root.appendingPathComponent("input.tzst")
+            try VPhoneBundleOps.export(bundleNamed: "source", to: archive, includeIPSW: false, in: library, backend: backend)
+            let destination = VPhoneLibrary(root: root.appendingPathComponent("destination"))
+            var changed = false
+            #expect(throws: (any Error).self) {
+                try VPhoneBundleOps.importArchive(from: archive, name: "copy", in: destination,
+                    backend: backend, progress: { _, _ in
+                        guard !changed else { return }
+                        changed = true
+                        do {
+                            let data = try Data(contentsOf: archive)
+                            if replace { try data.write(to: archive, options: .atomic) }
+                            else {
+                                let handle = try FileHandle(forWritingTo: archive)
+                                try handle.seekToEnd()
+                                try handle.write(contentsOf: Data([0]))
+                                try handle.close()
+                            }
+                        } catch { Issue.record("could not change input archive: \(error)") }
+                    })
+            }
+            #expect(changed)
+            #expect(!FileManager.default.fileExists(atPath: destination.url(forName: "copy").path))
+            #expect(try FileManager.default.contentsOfDirectory(atPath: destination.root.path).isEmpty)
+            #expect(try Data(contentsOf: source.url.appendingPathComponent("Disk.img")) == Data("Disk.img contents".utf8))
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func importRechecksArchiveImmediatelyBeforePublicationAndAcceptsStableAlias(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture { root, library, _ in
+            let archive = root.appendingPathComponent("input.tzst")
+            try VPhoneBundleOps.export(bundleNamed: "source", to: archive, includeIPSW: false, in: library, backend: backend)
+            let alias = root.appendingPathComponent("alias.tzst")
+            try FileManager.default.createSymbolicLink(atPath: alias.path, withDestinationPath: archive.path)
+            let destination = VPhoneLibrary(root: root.appendingPathComponent("destination"))
+            let restored = try VPhoneBundleOps.importArchive(from: alias, name: "stable", in: destination, backend: backend)
+            #expect(restored.name == "stable")
+            #expect(throws: (any Error).self) {
+                try VPhoneBundleOps.importArchive(from: alias, name: "changed", in: destination,
+                    backend: backend, progress: nil, afterNameCheck: {
+                        let handle = try FileHandle(forWritingTo: archive)
+                        try handle.seekToEnd()
+                        try handle.write(contentsOf: Data([0]))
+                        try handle.close()
+                    })
+            }
+            #expect(try FileManager.default.contentsOfDirectory(atPath: destination.root.path) == ["stable"])
+        }
+    }
+
+    @Test(arguments: VPhoneBundleOps.ArchiveBackend.allCases)
+    func runtimeSocketsAreExcludedWithoutTreatingTheirNamesAsGlobs(backend: VPhoneBundleOps.ArchiveBackend) throws {
+        try withFixture(short: true) { root, library, source in
+            let fd = socket(AF_UNIX, SOCK_STREAM, 0)
+            try #require(fd >= 0)
+            defer { Darwin.close(fd) }
+            let path = source.url.appendingPathComponent("control[1]").path
+            var address = sockaddr_un()
+            address.sun_family = sa_family_t(AF_UNIX)
+            address.sun_len = UInt8(MemoryLayout<sockaddr_un>.size)
+            let bytes = Array(path.utf8CString)
+            try #require(bytes.count <= MemoryLayout.size(ofValue: address.sun_path))
+            withUnsafeMutableBytes(of: &address.sun_path) { target in
+                bytes.withUnsafeBytes { target.copyBytes(from: $0) }
+            }
+            let result = withUnsafePointer(to: &address) { pointer in
+                pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) { Darwin.bind(fd, $0, socklen_t(MemoryLayout<sockaddr_un>.size)) }
+            }
+            try #require(result == 0, "socket bind errno=\(errno)")
+            try Data("ordinary file".utf8).write(to: source.url.appendingPathComponent("control1"))
+            let archive = root.appendingPathComponent("sockets.tzst")
+            try VPhoneBundleOps.export(bundleNamed: "source", to: archive, includeIPSW: false, in: library, backend: backend)
+            let entries = try VPhoneArchiveReader.entries(of: archive).map(\.path)
+            #expect(!entries.contains { $0.contains("control[1]") })
+            #expect(entries.contains { $0.hasSuffix("/control1") })
+            #expect(VPhoneNativeTransfer.fileType(at: URL(fileURLWithPath: path)) == S_IFSOCK)
+            let imported = try VPhoneBundleOps.importArchive(from: archive, name: "copy", in: library, backend: backend)
+            #expect(try String(contentsOf: imported.url.appendingPathComponent("control1"), encoding: .utf8) == "ordinary file")
         }
     }
 

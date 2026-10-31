@@ -1,0 +1,42 @@
+{
+  "updatedAt": "2026-10-24T23:49:04.802532+08:00",
+  "state": "bounded-preflight-found-preboot-target-unavailable-awaiting-readonly-layout-auth",
+  "VMStarts": 0,
+  "CFWWrites": 0,
+  "securityWindows": 0,
+  "candidateInstalled": false,
+  "regularAcceptedBaselinePreserved": true,
+  "cacheAlgorithmChecksPassed": [
+    "hv-vmm",
+    "camera",
+    "swapend",
+    "build-plist"
+  ],
+  "flowContractTests": 11,
+  "isolatedActualFileChecks": [
+    "system:/System/Library/CoreServices/SystemVersion.plist",
+    "preboot:/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist",
+    "launchd",
+    "watchdogd",
+    "debugserver"
+  ],
+  "nativeUndoExecuted": false,
+  "regularPlanReadSeconds": 222.81149416603148,
+  "regularFileHashCalls": 1503,
+  "regularReadBytes": 305562711354,
+  "regularPostimageHashCalls": 4,
+  "regularPostimageHashBytes": 274877906944,
+  "regularPostimageHashSeconds": 200.603468875,
+  "expPlanReadSeconds": 7.802840000018477,
+  "expOriginalReadBytes": 11239736890,
+  "singlePythonPostimageDigestSeconds": 27.435139916837215,
+  "sourceDiskIdentityChecks": {
+    "/Users/kolar/github/vphone-cli/.build/t32q-20261024": true,
+    "/Users/kolar/github/vphone-cli/.build/t33q-20261024": true
+  },
+  "attachmentsAfterCompletedChecks": [],
+  "blocker": "Preboot requested target did not yield a regular file; missing versus symlink and actual location unconfirmed",
+  "pendingAuthenticationSession": 64090,
+  "layoutRootCommandStarted": false,
+  "deploymentRecommendation": "do not execute plan 74985b1c until actual path and producer coverage are confirmed"
+}

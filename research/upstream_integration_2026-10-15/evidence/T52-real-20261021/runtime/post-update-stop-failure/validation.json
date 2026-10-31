@@ -1,0 +1,15 @@
+{
+  "argv": [
+    ".venv/bin/python3",
+    "-B",
+    "research/upstream_integration_2026-10-15/tools/verify_t52_stopped.py",
+    "--serial",
+    ".build/t52-real-20261021/post-update-stop-failure/serial.log",
+    "--runtime",
+    ".build/t52-real-20261021/post-update-stop-failure/post-update-runtime.json",
+    "--output",
+    ".build/t52-real-20261021/post-update-stop-failure/unexpected-pass.json"
+  ],
+  "exitCode": 1,
+  "expectedRejection": true
+}

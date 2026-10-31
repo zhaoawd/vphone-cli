@@ -1,0 +1,464 @@
+{
+  "capturedAt": "2026-10-21T05:11:15.099752+00:00",
+  "head": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "branch": "codex/upstream-2d21d21-integration",
+  "files": [
+    {
+      "path": "README.md",
+      "status": " M",
+      "bytes": 26715,
+      "sha256": "789a2b48881b2ef3ce15e8df3727699717d5e73535f536f82a1861cfe2895c57"
+    },
+    {
+      "path": "TASKS.md",
+      "status": " M",
+      "bytes": 50295,
+      "sha256": "aace50ba453c7dc0999e2af1458328dc628ec96c79395b8b14a3c2e172404d77"
+    },
+    {
+      "path": "research/0_binary_patch_comparison.md",
+      "status": " M",
+      "bytes": 241948,
+      "sha256": "df0e61e2a7cdd92be650e19333100377c80fb14c1d93fa7063de8b67f10e2723"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/T32_T33_new_vm_20261018.md",
+      "status": " M",
+      "bytes": 40555,
+      "sha256": "f317fd80a363a382ba8d6362c92f6849cbe1cb91f82a7c3468c2c0d279a6b5a8"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "status": " M",
+      "bytes": 261416,
+      "sha256": "2f50355f01ed6f6cd93fd012866e71e411bd4063e3584d7d5fecf4e19ef31128"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/progress.md",
+      "status": " M",
+      "bytes": 70354,
+      "sha256": "edb922c1a7d6d64100eea9b038e31320398b8ad10e28e7927adbb65408fbfe8a"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/tasks.json",
+      "status": " M",
+      "bytes": 306569,
+      "sha256": "376641e0cf8b5321c5cca381878092787fede2462f5ec8386ba5529095384a9f"
+    },
+    {
+      "path": "scripts/build.sh",
+      "status": " M",
+      "bytes": 6139,
+      "sha256": "35515d1eeebb4fa20434a02de1c4219c1ef733fbcaf7a52cd65665a2581383a7"
+    },
+    {
+      "path": "scripts/build_native_dependencies.py",
+      "status": " M",
+      "bytes": 11218,
+      "sha256": "c21578bae1d165f54885debaf8dc2952c22f34fbb84411e7bb1b4e057dfbc1e9"
+    },
+    {
+      "path": "scripts/check_bundle.py",
+      "status": " M",
+      "bytes": 6599,
+      "sha256": "e01a57db171916e2152e84c693e3817baedbcdec5ce94162e02be02fb6782395"
+    },
+    {
+      "path": "scripts/record_build_dependencies.py",
+      "status": " M",
+      "bytes": 1609,
+      "sha256": "f5baae064a2a5047e6bc11bf886c12f4aa776b225c08a4d279a07825e9c90b2a"
+    },
+    {
+      "path": "scripts/run_launchpad_cli_tests.sh",
+      "status": " M",
+      "bytes": 2628,
+      "sha256": "c6e3c92800a3cc4009c5c016f0d25036dc9e3d5ae886f7e58632ca526d0c2a62"
+    },
+    {
+      "path": "scripts/setup_tools.sh",
+      "status": " M",
+      "bytes": 3225,
+      "sha256": "5ef4808fddb4f8136de33c8b3f14e8ce1b8eaac53c42f92d67fc6a7cb4e67403"
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift",
+      "status": " M",
+      "bytes": 16085,
+      "sha256": "40b3e503c99beac1472585425d9933138201b1bf886827c3cb7c9c8eb10eb08d"
+    },
+    {
+      "path": "sources/Info.plist",
+      "status": " M",
+      "bytes": 1356,
+      "sha256": "8fbd7994de986ec70ac14b100bc0abbca2005f5e1b37c3ba20319ee2bee290b7"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneBundleOps.swift",
+      "status": " M",
+      "bytes": 29661,
+      "sha256": "fde86a800a669dc92a6cd61003c4dabea7d2941defa64bc47d6028212aa9b776"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneNativeTransfer.swift",
+      "status": " M",
+      "bytes": 5372,
+      "sha256": "cabcbc6142558da7b30e3e3c40e7dff4894e6ed95dce884092d05501f8ca965e"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneProcessRunner.swift",
+      "status": " M",
+      "bytes": 20619,
+      "sha256": "015e8b2dd7d3be86105ca25a6613b488c4e9511db18e2d1c55a7216c5fa52fbf"
+    },
+    {
+      "path": "sources/VPhoneLaunchpad-Info.plist",
+      "status": " M",
+      "bytes": 2403,
+      "sha256": "9cfc485e5248ac3d6f2f1eaced7e40a6a2e35250bd0015d1366228f8ef3001a4"
+    },
+    {
+      "path": "sources/VPhoneLaunchpad/Localizable.xcstrings",
+      "status": " M",
+      "bytes": 110010,
+      "sha256": "b3a728ac86edfdf4d120eff9c10669497ed93af5e0d47aefc4b9819715bee94e"
+    },
+    {
+      "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift",
+      "status": " M",
+      "bytes": 7969,
+      "sha256": "209cd3f075a0400ce25a95951bfaafb7140b753cc43984c9ab0b7cb5d5280edf"
+    },
+    {
+      "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift",
+      "status": " M",
+      "bytes": 1113,
+      "sha256": "eae6134859a8b9eafbecff89fcd5801b2b18c2ebbac703e7a23395406f2eca83"
+    },
+    {
+      "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+      "status": " M",
+      "bytes": 11338,
+      "sha256": "2da1ae55d5a849c833b76e375d5a6ee05c19a7cd503568ef21552fcf08a456ab"
+    },
+    {
+      "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+      "status": " M",
+      "bytes": 23325,
+      "sha256": "1fd7420d0654054c6a8cdd0139b55d919e954e84d61a601ef94a03cc606ed21d"
+    },
+    {
+      "path": "sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift",
+      "status": " M",
+      "bytes": 4200,
+      "sha256": "ada8aec140af1f0bd0a435dcf1f53d871e2280fcf2bc2a6b708f77edf8ffc2a9"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+      "status": " M",
+      "bytes": 12033,
+      "sha256": "f3037334968774a312f595e6701112f688835aaa82a265a248f9b0248e71d926"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+      "status": " M",
+      "bytes": 16816,
+      "sha256": "9954505f477abe1bd68355d7adf97af074fda838bf5743957958aee73e8ca3c5"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift",
+      "status": " M",
+      "bytes": 12007,
+      "sha256": "54f16823246191d5530d68001ff3b2be02ff6d8cd48a325972b67982823fc6be"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift",
+      "status": " M",
+      "bytes": 18079,
+      "sha256": "345c4924097513c0267120023bc86b5af1cff4be2ca6c466a845044fe4f87c42"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift",
+      "status": " M",
+      "bytes": 9313,
+      "sha256": "0e7ea648bbdc5a57b40fde3d105c3f869ffc02b66821353cd8bd071becb596c1"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+      "status": " M",
+      "bytes": 28431,
+      "sha256": "b3b397491c09f37d0b37c8a4eb8697b71da60b957598f7cb6e6796cfbe891bd1"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift",
+      "status": " M",
+      "bytes": 8286,
+      "sha256": "312841d728d8db3e507b6bce5d03b8432deb8f207cf940a24ad76d4ea01cbb96"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMTransferCLI.swift",
+      "status": " M",
+      "bytes": 5557,
+      "sha256": "17a7598b30e641a7a85723d28ef89517e3a71962d7a1a1d5bbf82f0d47002b0a"
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift",
+      "status": " M",
+      "bytes": 15714,
+      "sha256": "f7e3b2e3cc264cbe99fd2326bfd400e6807270abbe9c4c0d946520acb8106e86"
+    },
+    {
+      "path": "tests/VPhoneCLITests/CFWFrozenPlanTests.swift",
+      "status": " M",
+      "bytes": 21747,
+      "sha256": "bb8b0b63836c13c83f3a2c89c2d7dc2ffaf6f08ac3f5065835dbb2cfcbe12028"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/NativeTransferTests.swift",
+      "status": " M",
+      "bytes": 33149,
+      "sha256": "6eac784611809dcc90123aaf448a25b7c469c9c44988c28cc37081aaac0033b2"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/EditTests.swift",
+      "status": " M",
+      "bytes": 25781,
+      "sha256": "34f5f333c334ee762e83c28566c2cfd3e6ad008e3bb8bab25a97222f57314d9a"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/LibraryTests.swift",
+      "status": " M",
+      "bytes": 10197,
+      "sha256": "91141a76cb78d36ce1ffae24e756c7237e6cfa2e8aa2f5e6efd944d11ada21fa"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift",
+      "status": " M",
+      "bytes": 14455,
+      "sha256": "1dd843b92ec2769ea14118bb5b5aade448ab9986e02ef5c8bb88a748bd687489"
+    },
+    {
+      "path": "tests/test_bundle_validation.py",
+      "status": " M",
+      "bytes": 4226,
+      "sha256": "3b7380775e11830d830851d4c1616de6845fefcf348f9b25cb92af049b425c69"
+    },
+    {
+      "path": "tests/test_launchpad_bundle.py",
+      "status": " M",
+      "bytes": 22981,
+      "sha256": "bea7befef14916af07f5d09fdee468e44903eea6d8601ced03feb597a289c193"
+    },
+    {
+      "path": "tests/test_progress_pipe.py",
+      "status": " M",
+      "bytes": 4213,
+      "sha256": "fc36bcc64368abb2d43fc26c1eda4912f7f62a269aec0b42759c75fd9968eab2"
+    },
+    {
+      "path": "vendor/libcapstone-spm",
+      "status": " M",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/T32_T33_plan_verification_performance.md",
+      "status": "??",
+      "bytes": 7424,
+      "sha256": "6676ed153ad9cb082c3d3ea512c2546a3ae2f81a225afddfa626aef7c2a9b12b"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/T60_archive_allocation_20261021.md",
+      "status": "??",
+      "bytes": 5441,
+      "sha256": "8523dbbee9d751953ac8b820b76fb74f0b115edf72dd8880c0a92958274357c3"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/T60_import_queue.md",
+      "status": "??",
+      "bytes": 22975,
+      "sha256": "5521a02e63ff0aa524cffc420962afbc3c82884a11b3cde226e1adca49fa9d08"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-new-vm-20261018/dsc-on-off-on-20261020-resume/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-plan-verification-closeout-20261021/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-plan-verification-cost-20261020/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T32-T33-resume-20261020/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T60-closeout-20261021/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T60-final-20261021/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T60-import-queue-20261020/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T60-import-state-20261020/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T60-real-import-termination-20261020/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T60-remaining-20261021/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/evidence/T60-resume-20261021/",
+      "status": "??",
+      "directory": true
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/tools/accept_t60_real_vm_archive.py",
+      "status": "??",
+      "bytes": 7932,
+      "sha256": "af48c7811a8b301abb3b05020d44791a6776e99630adb6b9907881f7f48f6d9a"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/tools/benchmark_desired_plan.py",
+      "status": "??",
+      "bytes": 5387,
+      "sha256": "5f22166d22c882754de7719ff836470846f636e272f6b3bf68985250ebf2087f"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/tools/check_desired_plan_cost.py",
+      "status": "??",
+      "bytes": 2467,
+      "sha256": "54a8ea78264a20804c752c8c8770a2dd773b62455b7997ed47d6290f8c874920"
+    },
+    {
+      "path": "research/upstream_integration_2026-10-15/tools/pause_t60_import.py",
+      "status": "??",
+      "bytes": 3315,
+      "sha256": "b40ff22c4fc0b4d6a9a3a0301e1491ffd15d0e3d10130a7f9217c569d61d18bf"
+    },
+    {
+      "path": "scripts/licenses/LZ4.txt",
+      "status": "??",
+      "bytes": 1611,
+      "sha256": "16b057d298a246790b01603b0f9ff588fcf3eb82e18999bde47a85e7072e53f8"
+    },
+    {
+      "path": "scripts/licenses/xz-0BSD.txt",
+      "status": "??",
+      "bytes": 607,
+      "sha256": "0b01625d853911cd0e2e088dcfb743261034a091bb379246cb25a14cc4c74bf1"
+    },
+    {
+      "path": "scripts/licenses/xz-GPLv2.txt",
+      "status": "??",
+      "bytes": 17984,
+      "sha256": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6"
+    },
+    {
+      "path": "scripts/licenses/xz-LGPLv2.1.txt",
+      "status": "??",
+      "bytes": 26419,
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95"
+    },
+    {
+      "path": "scripts/licenses/xz.txt",
+      "status": "??",
+      "bytes": 3119,
+      "sha256": "616a3ad264ce29b8f1cb97e53037b139d406899ca8d1f799651e17bfa09830b8"
+    },
+    {
+      "path": "scripts/licenses/zstd.txt",
+      "status": "??",
+      "bytes": 1549,
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneTransferProgress.swift",
+      "status": "??",
+      "bytes": 5292,
+      "sha256": "7a6e60cc5d5249765464e70fa6598727b28e2c42874d22be5641fb6000d6d78a"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneTransferSource.swift",
+      "status": "??",
+      "bytes": 2242,
+      "sha256": "f9faf74fb5e3ace0bc0527449020ed95be2c4e43ff49e67fcc3ff83a22b7862d"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadArchiveOpenQueue.swift",
+      "status": "??",
+      "bytes": 1526,
+      "sha256": "22c4e14ad86d4274c5fddcafd91d360ff43de8c03f136cbc5be268208a870587"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/TransferProgressTests.swift",
+      "status": "??",
+      "bytes": 3920,
+      "sha256": "7a8a76d5f6a41087d75d1fba720818663053db08c211408826da919313b65826"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/ArchiveOpenQueueTests.swift",
+      "status": "??",
+      "bytes": 1378,
+      "sha256": "51135cc7f37fad02c8fbd088606bafc99ded195b1807cc36729adeb995b300fc"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/CreateTerminationTests.swift",
+      "status": "??",
+      "bytes": 2992,
+      "sha256": "4ba167d8f92a870ce869924ef281f598b71bad1d2ec63be897bf46884a27c3f5"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/ExportQueueTests.swift",
+      "status": "??",
+      "bytes": 4408,
+      "sha256": "9aad4b71f7c1b8c5d57fed22ee903ac56b91bf885df3c43686867a0dcae81087"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/ImportQueueTests.swift",
+      "status": "??",
+      "bytes": 15211,
+      "sha256": "96cfd4f16d7557d5716368ea4bafebbd605caf6bc8c29d65036e2238de1509b8"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/RealCLIImportQueueTests.swift",
+      "status": "??",
+      "bytes": 12016,
+      "sha256": "3c896f94289ca8df0f4681f65242b517dc27a84ef37f987ccf97473c23baf055"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/RealCLISparseTests.swift",
+      "status": "??",
+      "bytes": 3529,
+      "sha256": "0a1eaf79c0af087f22509cd44930117560b3b1c8e8f7b92e5bc94006f41c5f42"
+    }
+  ],
+  "limits": [
+    "Tracked diff excludes root TODO.md; directory entries record status only; untracked files remain in the workspace. This is an evidence snapshot, not a full backup."
+  ],
+  "venv": {
+    "symlink": "/Users/kolar/github/vphone-cli/..venv.generations/env-pereh1d9",
+    "targetExists": false
+  }
+}

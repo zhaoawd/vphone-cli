@@ -169,9 +169,13 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
 
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
+    @Option(help: .hidden) var expectedBindingSha256: String?
+    @Option(help: .hidden) var expectedCoreBundle: String?
     @Flag(name: .long, help: "Only print the read-only eligibility report (JSON); the check runs as root (sudo, or --root-popup)") var check = false
     @Option(name: .long, help: "Candidate stage (default: <resource base>/.build/guest-components-v2/stage)")
     var components: String?
+    @Option(name: .customLong("work-parent"), help: "Root-owned private or sticky mount workspace parent for replacement")
+    var workParent: String?
     @Flag(name: .customLong("root-popup"), help: "Elevate the check (--check) or the replacement via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
     @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
     var projectRoot: String?
@@ -182,13 +186,17 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
         let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
+        let bindingEnvironment = try Self.bindingEnvironment(machine: bundle.url,
+            expectedSHA256: expectedBindingSha256, expectedBundle: expectedCoreBundle)
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
         let python = try resources.pythonExecutable()
-        let stage = components.map { URL(fileURLWithPath: $0).standardizedFileURL } ?? resources.guestComponentsStage
+        let stage = try Self.componentStage(resources: resources, components: components,
+            projectRoot: projectRoot, bound: expectedCoreBundle != nil)
         var scriptEnv = [
             "VPHONE_PYTHON": python.path,
             "VPHONE_GUEST_COMPONENTS": stage.path,
         ]
+        scriptEnv.merge(bindingEnvironment) { _, frozen in frozen }
 
         if check && geteuid() != 0 {
             try runElevatedCheck(resources: resources, bundle: bundle.url, scriptEnv: scriptEnv)
@@ -228,11 +236,13 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
         }
 
         let frozen = try VPhoneBundleGuard.withBundleLock(directory: bundle.url, operation: VPhoneVMOperation.cfwRecord) { _ in
-            try VPhoneCFWFrozenContext.prepare(in: bundle.url, requestedVariant: nil,
+            _ = try Self.bindingEnvironment(machine: bundle.url,
+                expectedSHA256: expectedBindingSha256, expectedBundle: expectedCoreBundle)
+            return try VPhoneCFWFrozenContext.prepare(in: bundle.url, requestedVariant: nil,
                 guestEnvironment: "v2", spoofBuild: "")
         }
         scriptEnv.merge(try frozen.environment) { _, bound in bound }
-        let args = Self.driverArguments(resources: resources, bundle: bundle.url)
+        let args = Self.driverArguments(resources: resources, bundle: bundle.url, workParent: workParent)
         let invocation = VPhoneCreateOrchestrator.cfwInvocation(
             scriptEnv: scriptEnv, sudoEnvExtras: [:], rootPopup: rootPopup)
         let code: Int32
@@ -246,6 +256,28 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
         // The recorded variant is deliberately not rewritten: the update
         // changes no patch, and `cfw install` alone records a variant.
         throw ExitCode(code)
+    }
+
+    static func bindingEnvironment(machine: URL, expectedSHA256: String?, expectedBundle: String?) throws -> [String: String] {
+        guard expectedSHA256 != nil || expectedBundle != nil else { return [:] }
+        guard let hash = expectedSHA256, hash.count == 64,
+              hash.allSatisfy({ "0123456789abcdef".contains($0) }), let version = expectedBundle,
+              let binding = try VPhoneMachineBinding.snapshot(machine),
+              binding.sha256 == hash, binding.binding.bundle == version else {
+            throw ValidationError("VM binding changed before environment update")
+        }
+        return ["VPHONE_EXPECTED_BINDING_SHA256": hash, "VPHONE_EXPECTED_CORE_BUNDLE": version]
+    }
+
+    static func componentStage(resources: VPhoneResources, components: String?, projectRoot: String?, bound: Bool) throws -> URL {
+        if bound {
+            guard components == nil, projectRoot == nil else {
+                throw ValidationError("Bound environment updates cannot override their Core Bundle resources")
+            }
+            // Inherited VPHONE_GUEST_COMPONENTS cannot replace the sealed producer inputs.
+            return resources.base.appendingPathComponent(".build/guest-components-v2/stage")
+        }
+        return components.map { URL(fileURLWithPath: $0).standardizedFileURL } ?? resources.guestComponentsStage
     }
 
     /// `--check` for a non-root caller: the check runs as root and its
@@ -272,7 +304,9 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
         throw ExitCode(outcome.exitCode)
     }
 
-    static func driverArguments(resources: VPhoneResources, bundle: URL) -> [String] {
-        [resources.cfwInstallHostScript.path, "--update-environment", bundle.path]
+    static func driverArguments(resources: VPhoneResources, bundle: URL, workParent: String? = nil) -> [String] {
+        var args = [resources.cfwInstallHostScript.path, "--update-environment"]
+        if let workParent { args += ["--work-parent", workParent] }
+        return args + [bundle.path]
     }
 }

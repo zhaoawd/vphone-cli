@@ -1,0 +1,147 @@
+{
+  "vmInstanceID": "372C906F-9315-4ED3-B596-94670EEA9AAA",
+  "libraries": {
+    "libcamfix.dylib": "e4d026ce6942b4d75ff1a123c0360143e8c6b4a9fd3d862523e61e98676a3747",
+    "libvcamcaptured.dylib": "a41d3f8438f9841de0751322bf87eece6b19a2e56e1123952a20aa1860f70c71"
+  },
+  "captures": {
+    "cameracaptured-initialization": {
+      "entries": 475,
+      "errors": []
+    },
+    "probe-initialization": {
+      "entries": 210,
+      "errors": []
+    }
+  },
+  "accepted": false,
+  "loaded": {
+    "libraries": [
+      {
+        "name": "launchdhook-vphone.dylib",
+        "device": 16777222,
+        "inode": 1.1529215003123884e+18
+      },
+      {
+        "name": "SystemHook-vphone.dylib",
+        "device": 16777222,
+        "inode": 1.1529215003123884e+18
+      },
+      {
+        "inode": 1.1529215003123884e+18,
+        "name": "libvcamcaptured.dylib",
+        "device": 16777222
+      },
+      {
+        "name": "libcamfix.dylib",
+        "device": 16777222,
+        "inode": 1.1529215003123884e+18
+      },
+      {
+        "name": "libvlocation.dylib",
+        "device": 16777222,
+        "inode": 1.1529215003123884e+18
+      }
+    ],
+    "scanned": 2,
+    "uninspected": [],
+    "processes": [
+      {
+        "pid": 469,
+        "name": "T52Acceptance",
+        "mappings": [
+          {
+            "path": "/usr/lib/SystemHook-vphone.dylib",
+            "inode": 1.1529215003123884e+18,
+            "state": "current",
+            "device": 16777222,
+            "library": "SystemHook-vphone.dylib"
+          },
+          {
+            "path": "/usr/lib/libvlocation.dylib",
+            "inode": 1.1529215003123884e+18,
+            "device": 16777222,
+            "state": "current",
+            "library": "libvlocation.dylib"
+          },
+          {
+            "path": "/usr/lib/libcamfix.dylib",
+            "inode": 1.1529215003123884e+18,
+            "state": "current",
+            "device": 16777222,
+            "library": "libcamfix.dylib"
+          }
+        ]
+      },
+      {
+        "pid": 464,
+        "name": "cameracaptured",
+        "mappings": [
+          {
+            "path": "/usr/lib/SystemHook-vphone.dylib",
+            "inode": 1.1529215003123884e+18,
+            "state": "current",
+            "device": 16777222,
+            "library": "SystemHook-vphone.dylib"
+          },
+          {
+            "path": "/usr/lib/libvcamcaptured.dylib",
+            "inode": 1.1529215003123884e+18,
+            "device": 16777222,
+            "state": "current",
+            "library": "libvcamcaptured.dylib"
+          }
+        ]
+      }
+    ]
+  },
+  "processes": [
+    {
+      "bundle_id": "org.vphone.acceptance.t52.20261022",
+      "jetsam_limit_mb": 2147483647,
+      "uid": 501,
+      "executable": "/private/var/containers/Bundle/Application/FE3CFC90-BF86-41D6-8123-31520D687DEA/T52Acceptance.app/T52Acceptance",
+      "ppid": 1,
+      "start_time": 1792660121.848787,
+      "jetsam_priority": 100,
+      "resident_bytes": 48824320,
+      "footprint_bytes": 6832608,
+      "pid": 469,
+      "cpu_seconds": 0.084,
+      "name": "T52Acceptance"
+    },
+    {
+      "footprint_bytes": 6128072,
+      "uid": 501,
+      "ppid": 1,
+      "name": "cameracaptured",
+      "jetsam_priority": 30,
+      "resident_bytes": 27049984,
+      "start_time": 1792660099.038944,
+      "executable": "/usr/libexec/cameracaptured",
+      "cpu_seconds": 0.21092516666666666,
+      "jetsam_limit_mb": -1,
+      "pid": 464
+    },
+    {
+      "footprint_bytes": 1900928,
+      "jetsam_limit_mb": -1,
+      "ppid": 1,
+      "jetsam_priority": 180,
+      "resident_bytes": 16990208,
+      "start_time": 1792662566.004011,
+      "uid": 0,
+      "executable": "/private/var/root/Library/Caches/vphoned",
+      "cpu_seconds": 0.058138333333333334,
+      "name": "vphoned",
+      "pid": 65
+    }
+  ],
+  "probeStop": {
+    "killed": "org.vphone.acceptance.t52.20261022",
+    "pids": [
+      469
+    ],
+    "already_stopped": false
+  }
+}

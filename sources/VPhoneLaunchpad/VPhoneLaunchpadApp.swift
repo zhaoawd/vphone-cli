@@ -47,6 +47,7 @@ private struct VPhoneLaunchpadMainWindowContent: View {
             .environment(model)
             .onAppear {
                 delegate.model = model
+                model.connectArchiveOpens(delegate.archiveOpens)
                 delegate.openWindow = openWindow
             }
     }
@@ -63,6 +64,7 @@ private struct VPhoneLaunchpadMainWindowContent: View {
 @MainActor
 final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
     weak var model: VPhoneLaunchpadModel?
+    let archiveOpens = VPhoneLaunchpadArchiveOpenQueue()
     /// The window scene's open action, kept for the smoke check's reopen.
     var openWindow: OpenWindowAction?
     private let dockPolicy = VPhoneLaunchpadDockPolicy()
@@ -76,6 +78,10 @@ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         dockPolicy.start()
         runSmokeWindowSteps()
+    }
+
+    func application(_: NSApplication, open urls: [URL]) {
+        if !archiveOpens.enqueue(urls) { model?.machines.actionError = archiveOpens.error }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
@@ -96,10 +102,12 @@ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
             }
             VPhoneLaunchpadQuit.confirmed(library)
         }
-        guard let commandLine = model?.commandLine, commandLine.hasActiveCommands else {
+        guard let commandLine = model?.commandLine,
+              commandLine.hasActiveCommands || model?.machines.hasActiveTransfers == true else {
             return .terminateNow
         }
         guard commandLine.beginTermination() else { return .terminateCancel }
+        model?.machines.cancelTransfers()
         terminationPending = true
         Task { @MainActor in
             let result = await commandLine.waitForTermination()

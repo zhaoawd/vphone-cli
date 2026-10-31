@@ -12,9 +12,17 @@ public enum VPhoneLaunchpadIdentity {
     public static let bundleIdentifier = "com.vphone.cli.launchpad"
     public static let dataDirectoryName = "vphone-cli-launchpad"
 
-    /// `~/Library/Logs/vphone-cli-launchpad`. B1 computes the path only.
+    /// Signed test bundles may isolate diagnostics with an absolute directory
+    /// in Info.plist. Normal bundles use `~/Library/Logs/vphone-cli-launchpad`.
     public static func logsDirectory(home: URL = FileManager.default.homeDirectoryForCurrentUser) -> URL {
-        home.appendingPathComponent("Library/Logs", isDirectory: true)
+        logsDirectory(home: home, override: Bundle.main.object(forInfoDictionaryKey: "VPhoneLaunchpadDiagnosticsDirectory") as? String)
+    }
+
+    static func logsDirectory(home: URL, override: String?) -> URL {
+        if let path = override, path.hasPrefix("/"), !path.contains("\0") {
+            return URL(fileURLWithPath: path, isDirectory: true)
+        }
+        return home.appendingPathComponent("Library/Logs", isDirectory: true)
             .appendingPathComponent(dataDirectoryName, isDirectory: true)
     }
 

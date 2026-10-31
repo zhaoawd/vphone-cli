@@ -4,7 +4,7 @@ import VPhoneCore
 
 struct VPhoneCFWUndoCommand: ParsableCommand {
     static let configuration = CommandConfiguration(commandName: "undo",
-        abstract: "Restore qualified trailing DSC operations on a staged disk; guest origin becomes unknown")
+        abstract: "Restore qualified DSC suffixes or complete authenticated files on a staged disk; guest origin becomes unknown")
 
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
@@ -86,9 +86,63 @@ struct VPhoneCFWReceiptsCommand: ParsableCommand {
         else {
             print("guest component evidence: \(state)")
             if let receipts = report["componentReceipts"] as? [String: Any] {
-                print("  removed declarations: \((receipts["removedDeclarations"] as? [String] ?? []).joined(separator: ", "))")
-                print("  guest origin: unknown")
+                if let declarations = receipts["declarations"] as? [[String: Any]] {
+                    for entry in declarations {
+                        if let id = entry["declarationID"] as? String, let state = entry["state"] as? String {
+                            print("  \(id): \(state)")
+                        }
+                    }
+                } else {
+                    print("  removed declarations: \((receipts["removedDeclarations"] as? [String] ?? []).joined(separator: ", "))")
+                }
+                if report["originQualified"] as? Bool == true,
+                   let producer = receipts["qualifiedProducer"] as? [String: Any],
+                   let version = producer["version"] as? String {
+                    print("  guest origin: verified Core Bundle \(version)")
+                } else {
+                    print("  guest origin: unknown")
+                }
             }
         }
+    }
+}
+
+struct VPhoneCFWVerifyEffectsCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(commandName: "verify-effects",
+        abstract: "Read current installed targets on a stopped readonly disk; report Undo eligibility without write authority")
+    @OptionGroup var lib: VPhoneLibraryOption
+    @Argument(help: "VM name") var name: String?
+    @Option(name: .customLong("work-parent"), help: "Existing directory for this invocation's private readonly mounts")
+    var workParent: String
+    @Option(help: "Write the complete observation to a new JSON file; required with --root-popup")
+    var report: String?
+    @Flag(name: .customLong("root-popup"), help: "Authenticate readonly mounts with the macOS dialog")
+    var rootPopup = false
+
+    func validate() throws {
+        if rootPopup && report == nil {
+            throw ValidationError("--root-popup requires --report so a failed audit remains available")
+        }
+    }
+
+    func run() throws {
+        let selected = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
+        let bundle = try lib.library.bundle(named: selected)
+        let resources = VPhoneResources.resolve()
+        let python = try resources.pythonExecutable()
+        var arguments = [resources.scriptsDir.appendingPathComponent("cfw_verify_effects.py").path,
+                         bundle.url.path, "--work-parent", URL(fileURLWithPath: workParent).standardizedFileURL.path]
+        if let report {
+            arguments += ["--report", URL(fileURLWithPath: report).standardizedFileURL.path,
+                          "--owner", "\(getuid()):\(getgid())"]
+        }
+        let environment = ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "PYTHONDONTWRITEBYTECODE": "1"]
+        let code: Int32
+        if rootPopup {
+            code = try VPhoneProcessRunner.runWithAdminPrivileges(python, arguments, env: environment, echo: true)
+        } else {
+            code = try VPhoneProcessRunner.runStreaming(python, arguments, env: environment, echo: true)
+        }
+        throw ExitCode(code)
     }
 }

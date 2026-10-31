@@ -1,0 +1,35 @@
+{
+  "state": "offline-continuation-finalized",
+  "nativeState": "failed",
+  "offlineAcceptancePassed": false,
+  "accepted": false,
+  "runtimeValidated": false,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "planSHA256": "b98e0a565583ebd57380c5984be62ff0ed491fe499e7357c4d111c8fe5f87230",
+  "preservation": {
+    "sourceBaseline": {
+      "files": 10,
+      "fullReadbackPassed": true
+    },
+    "frozenInputsVerified": 571,
+    "executionInputsVerified": 94,
+    "unrelatedDiskIdentitiesVerified": 12,
+    "targetAttachments": [],
+    "preWriteBackupScope": "native root full readback; private backup is not independently mounted or read by finalizer"
+  },
+  "phaseTransactions": {
+    "regular": {
+      "on": "20261024T044848Z-v8ovSVP3",
+      "off": "20261024T064924Z-hG5gtVTI",
+      "reapplied": "20261024T081630Z-kbuBz8Io"
+    },
+    "exp": {}
+  },
+  "nativeError": "Command '['/Library/Application Support/vphone-launchpad/Bundles/2.6.2-local.a84f5889b159/VPhone.bundle/Contents/MacOS/vphone-cli', 'cfw', 'install', 't33q-20261024', '--library-root', '/Users/kolar/github/vphone-cli/.build', '--variant', 'exp', '--qualify-origin', '--keep-artifacts', '--work-parent', '/private/tmp', '--spoof-build', '23Z999999']' returned non-zero exit status 1.",
+  "archive": "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/continuation-outcome-20261024",
+  "verificationLimits": [
+    "No VM runtime, display, AA.gl or application consumption acceptance",
+    "Private pre-write backup final readback is reported by native root executor"
+  ]
+}

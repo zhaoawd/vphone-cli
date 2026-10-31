@@ -36,6 +36,8 @@ static NSObject *vp_location_state_lock(void) {
     return lock;
 }
 
+#include "vphoned_location_bridge.inc"
+
 static void vp_location_reset_owner(void) {
     gOwnedGeneration = nil;
     gLastDeliverySequence = -1;
@@ -137,11 +139,11 @@ BOOL vp_location_load(void) {
 }
 
 BOOL vp_location_available(void) {
-    return gLocationLoaded;
+    return gLocationLoaded && vp_location_layout() >= 0;
 }
 
 BOOL vp_location_owned_available(void) {
-    if (!gLocationLoaded || !gSimManager || !gSetLocationSel || !gClearLocationsSel)
+    if (!vp_location_available() || !gSimManager || !gSetLocationSel || !gClearLocationsSel)
         return NO;
     SEL stopSelector = NSSelectorFromString(@"stopLocationSimulation");
     return gClearLocationsSel != stopSelector || gStartSimSel != nil;
@@ -241,11 +243,12 @@ static BOOL vp_location_restart_if_needed(void) {
 }
 
 VPLocationProtocolResult vp_location_begin(NSString *generation) {
-    if (!gLocationLoaded) return VPLocationProtocolUnavailable;
+    if (!vp_location_available()) return VPLocationProtocolUnavailable;
     if (![generation isKindOfClass:[NSString class]] || generation.length == 0)
         return VPLocationProtocolInvalid;
     @synchronized(vp_location_state_lock()) {
         if (!vp_location_clear_raw()) return VPLocationProtocolUnavailable;
+        if (vp_location_layout() == 1 && !vp_location_bridge_clear(nil)) return VPLocationProtocolUnavailable;
         if (!vp_location_restart_if_needed())
             return VPLocationProtocolUnavailable;
         gOwnedGeneration = [generation copy];
@@ -264,9 +267,11 @@ VPLocationProtocolResult vp_location_simulate_owned(
     double speed, double course, double timestamp,
     BOOL *idempotent) {
     if (idempotent) *idempotent = NO;
-    if (!gLocationLoaded) return VPLocationProtocolUnavailable;
+    if (!vp_location_available()) return VPLocationProtocolUnavailable;
     if (![generation isKindOfClass:[NSString class]] || generation.length == 0 ||
-        deliverySequence < 0)
+        deliverySequence < 0 || !isfinite(lat) || fabs(lat) > 90 || !isfinite(lon) || fabs(lon) > 180 ||
+        !isfinite(alt) || !isfinite(hacc) || hacc < 0 || !isfinite(vacc) || (vacc < 0 && vacc != -1) ||
+        !isfinite(speed) || !isfinite(course) || !isfinite(timestamp))
         return VPLocationProtocolInvalid;
 
     VPLocationFrame frame = {
@@ -286,6 +291,8 @@ VPLocationProtocolResult vp_location_simulate_owned(
                 return VPLocationProtocolSequenceConflict;
         }
         if (!vp_location_simulate_raw(lat, lon, alt, hacc, vacc, speed, course))
+            return VPLocationProtocolUnavailable;
+        if (vp_location_layout() == 1 && !vp_location_bridge_set(generation, deliverySequence, frame))
             return VPLocationProtocolUnavailable;
         gLastOwnedFrame = frame;
         gLastDeliverySequence = deliverySequence;
@@ -311,6 +318,7 @@ VPLocationProtocolResult vp_location_clear_owned(
         if (![gOwnedGeneration isEqualToString:generation])
             return VPLocationProtocolGenerationConflict;
         if (!vp_location_clear_raw()) return VPLocationProtocolUnavailable;
+        if (vp_location_layout() == 1 && !vp_location_bridge_clear(generation)) return VPLocationProtocolUnavailable;
         gLastClearedGeneration = [generation copy];
         vp_location_reset_owner();
         return VPLocationProtocolOK;
@@ -321,16 +329,20 @@ BOOL vp_location_simulate(double lat, double lon, double alt,
                           double hacc, double vacc,
                           double speed, double course) {
     @synchronized(vp_location_state_lock()) {
+        if (!vp_location_available()) return NO;
         vp_location_reset_owner();
         gLastClearedGeneration = nil;
-        return vp_location_simulate_raw(lat, lon, alt, hacc, vacc, speed, course);
+        if (!vp_location_simulate_raw(lat, lon, alt, hacc, vacc, speed, course)) return NO;
+        VPLocationFrame frame = {lat, lon, alt, hacc, vacc, speed, course, 0};
+        return vp_location_layout() != 1 || vp_location_bridge_set(@"legacy", 0, frame);
     }
 }
 
 BOOL vp_location_clear(void) {
     @synchronized(vp_location_state_lock()) {
+        if (!vp_location_available()) return NO;
         vp_location_reset_owner();
         gLastClearedGeneration = nil;
-        return vp_location_clear_raw();
+        return vp_location_clear_raw() && (vp_location_layout() != 1 || vp_location_bridge_clear(nil));
     }
 }

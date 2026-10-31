@@ -7,27 +7,34 @@ import VPhoneLaunchpadKit
 /// A machine's run state as the table and the inspector show it. An
 /// activity Launchpad runs on the machine (`Stopping…`, `Exporting…`) takes
 /// the place of the state; a panic line in the console turns the icon
-/// amber. `indeterminate` draws an indeterminate bar beside the activity:
-/// `vm export` prints no progress lines to a pipe.
+/// amber. Transfers use a known fraction when available and an indeterminate
+/// bar for older CLIs or a backend whose total is unknown.
 struct VPhoneLaunchpadMachineStateLabel: View {
     let state: VPhoneLaunchpadRunState
     var activity: String?
     var panicked = false
     var indeterminate = false
+    var fraction: Double?
+    var bytes: Int64?
 
     var body: some View {
         if indeterminate, let activity {
             HStack(spacing: VPhoneLaunchpadTheme.unit) {
-                ProgressView()
+                ProgressView(value: fraction)
                     .progressViewStyle(.linear)
                     .controlSize(.small)
                     .frame(width: 48)
-                Text(verbatim: activity).lineLimit(1)
+                Text(verbatim: progressText(activity)).lineLimit(1)
             }
-            .help(Text(verbatim: activity))
+            .help(Text(verbatim: progressText(activity)))
         } else {
             label
         }
+    }
+
+    private func progressText(_ activity: String) -> String {
+        guard let bytes else { return activity }
+        return activity + " " + ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
     }
 
     @ViewBuilder
@@ -78,7 +85,9 @@ struct VPhoneLaunchpadMachineInspector: View {
                         state: library.state(of: machine.path),
                         activity: library.activity(of: machine.path),
                         panicked: library.panicked.contains(machine.path),
-                        indeterminate: library.isExporting(machine.path)
+                        indeterminate: library.isExporting(machine.path),
+                        fraction: library.exports[machine.path]?.progress?.fraction,
+                        bytes: library.exports[machine.path]?.progress?.bytes
                     )
                 }
                 if let export = library.exports[machine.path] {

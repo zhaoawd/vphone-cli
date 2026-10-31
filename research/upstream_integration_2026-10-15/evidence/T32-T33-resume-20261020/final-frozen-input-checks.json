@@ -1,0 +1,55 @@
+{
+  "recordedAt": "2026-10-21T01:05:17.501222+00:00",
+  "inputs": {
+    ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli": {
+      "expectedSHA256": "4b4462290673f7bae7eb04d5820b4de70914fc1663ebadcf9da29174247a132f",
+      "actualSHA256": "4b4462290673f7bae7eb04d5820b4de70914fc1663ebadcf9da29174247a132f",
+      "matches": true
+    },
+    ".build/t32-dsc-companions-final.app/Contents/MacOS/vphone-vm": {
+      "expectedSHA256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+      "actualSHA256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+      "matches": true
+    },
+    ".build/t32-resume-acceptance-20261020/run-acceptance.py": {
+      "expectedSHA256": "c6647bf5b29a3e40d873f7a1bc7d6c6ab525aeec471681f53ab93aafe95006f3",
+      "actualSHA256": "c6647bf5b29a3e40d873f7a1bc7d6c6ab525aeec471681f53ab93aafe95006f3",
+      "matches": true
+    },
+    "research/upstream_integration_2026-10-15/tools/verify_post_boot_cfw.py": {
+      "expectedSHA256": "9122d3e6b46c36633ef1747db5d9260dadd59a62c8bf9804a6b849d93cabca28",
+      "actualSHA256": "9122d3e6b46c36633ef1747db5d9260dadd59a62c8bf9804a6b849d93cabca28",
+      "matches": true
+    }
+  },
+  "codesignChecks": [
+    {
+      "command": "codesign --verify --deep --strict .build/t32-cryptex-symlink-final.app",
+      "exitCode": 0
+    },
+    {
+      "command": "codesign --verify --deep --strict .build/t32-dsc-companions-final.app",
+      "exitCode": 0
+    }
+  ],
+  "scopedProcessInspection": {
+    "command": "ps -p 93069,82196,80317,22832,80729,55934,11968,12127 -o user=,pid=,ppid=,etime=,state=,command=",
+    "exitCode": 0,
+    "absentPIDs": [
+      80729,
+      55934,
+      11968,
+      12127
+    ],
+    "runningPIDs": [
+      22832,
+      80317,
+      82196,
+      93069
+    ],
+    "note": "Snapshot observed at09:03CST. Former helper and both reapplied VM children were absent; no process was signalled."
+  },
+  "vmExecutableInode": 246999022,
+  "vmApprovedCDHash": "89b70a253cad2adea133b3e875519afaf72c5d17",
+  "acceptanceCompletionEstablished": false
+}

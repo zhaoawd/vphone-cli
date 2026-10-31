@@ -1,0 +1,59 @@
+{
+  "method": "environment.status",
+  "result": {
+    "root_read_only": true,
+    "eligibility": {
+      "reasons": [
+        "launchd Mach-O is unreadable or malformed"
+      ],
+      "mode": "unknown",
+      "eligible": false
+    },
+    "daemon_instance": "EA91B9F6-E75E-48DF-AA54-7C6D97948E72",
+    "libraries": [
+      {
+        "inode": 1.1529215003123884e+18,
+        "device": 16777219,
+        "name": "launchdhook-vphone.dylib",
+        "staged_sha256": null,
+        "sha256": "0bce0431b8968a97346a32670d7598172cda05e0c694bc1873a4cb131378a995"
+      },
+      {
+        "inode": 1.1529215003123884e+18,
+        "device": 16777219,
+        "name": "SystemHook-vphone.dylib",
+        "staged_sha256": null,
+        "sha256": "ea97b6f5b1af8c349f877ba40ca267f1d0f676d725f39e087f39e1b7deb71acb"
+      },
+      {
+        "inode": 1.1529215003123884e+18,
+        "device": 16777219,
+        "name": "libvcamcaptured.dylib",
+        "staged_sha256": null,
+        "sha256": "2e94e0d035a717dfd82f91f8547a789aa82f2978569a488289be95c9ede17e97"
+      },
+      {
+        "inode": 1.1529215003123884e+18,
+        "device": 16777219,
+        "name": "libcamfix.dylib",
+        "staged_sha256": null,
+        "sha256": "fbf94136a3d47d0222e455248afc0362d1dfa2b2265f7bd05ab0ef2970ab3fea"
+      },
+      {
+        "inode": 1.1529215003123884e+18,
+        "device": 16777219,
+        "name": "libvlocation.dylib",
+        "staged_sha256": null,
+        "sha256": "fe0ad525a4d65542481c34715d4279d33d4879328662cdc043d842ee8ab627df"
+      }
+    ],
+    "load_alias": {
+      "target": "/usr/lib/launchdhook-vphone.dylib",
+      "path": "/vh"
+    },
+    "transactions": [],
+    "staging": "/var/root/Library/Caches/vphone-environment",
+    "worker_idle": true
+  },
+  "ok": true
+}

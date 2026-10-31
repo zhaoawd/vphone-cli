@@ -1,5 +1,7 @@
 """Incomplete, empty and external bundle assets must fail distribution checks."""
 import plistlib
+import hashlib
+import json
 import importlib.util
 from pathlib import Path
 import tempfile
@@ -11,6 +13,26 @@ spec.loader.exec_module(module)
 
 
 class BundleValidationTests(unittest.TestCase):
+    def test_declared_environment_protocol_requires_its_sealed_components(self):
+        info = self.bundle / 'Contents/Info.plist'
+        info.write_bytes(plistlib.dumps({'VPhoneEnvironmentUpdateProtocol': 'vphone.environment-update.v1'}))
+        with self.assertRaisesRegex(ValueError, 'component manifest'):
+            module.check_environment_update_resources(self.bundle)
+        stage = self.resources / '.build/guest-components-v2/stage'
+        component = stage / 'launchhook/launchdhook-vphone.dylib'
+        component.parent.mkdir(parents=True)
+        component.write_bytes(b'signed-candidate-fixture')
+        (stage / 'manifest.json').write_text(json.dumps({'files_sha256': {
+            'launchhook/launchdhook-vphone.dylib': hashlib.sha256(component.read_bytes()).hexdigest()}}))
+        (self.resources / 'scripts/guest_environment.json').write_text(json.dumps({'libraries': [
+            {'stage': 'launchhook/launchdhook-vphone.dylib'}]}))
+        module.check_environment_update_resources(self.bundle)
+        component.write_bytes(b'changed')
+        with self.assertRaisesRegex(ValueError, 'digest mismatch'):
+            module.check_environment_update_resources(self.bundle)
+        info.write_bytes(plistlib.dumps({}))
+        module.check_environment_update_resources(self.bundle)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -54,6 +76,21 @@ class BundleValidationTests(unittest.TestCase):
         (self.resources / '.tools/bin/trustcache').chmod(0o644)
         with self.assertRaisesRegex(ValueError, 'not executable'):
             module.check_resources(self.bundle)
+
+    def test_compression_tools_are_required_and_executable(self):
+        for name in ('zstd', 'xz'):
+            with self.subTest(tool=name):
+                path = self.resources / '.tools/bin' / name
+                path.chmod(0o644)
+                with self.assertRaisesRegex(ValueError, 'not executable'):
+                    module.check_resources(self.bundle)
+                path.chmod(0o755)
+                original = path.read_bytes()
+                path.unlink()
+                with self.assertRaisesRegex(ValueError, 'Missing or empty bundle resource: .tools/bin/' + name):
+                    module.check_resources(self.bundle)
+                path.write_bytes(original)
+                path.chmod(0o755)
 
     def test_kernel_update_protocol_requires_exact_marker(self):
         info = self.bundle / 'Contents/Info.plist'

@@ -181,7 +181,10 @@ public enum FirmwareDesiredPlanStore {
               try record.catalogSHA256 == FirmwarePlanBinding.catalogDigest(),
               try record.planSHA256 == FirmwareGeneration.planDigest(record.plan) else { throw Failure.invalidPlan }
         try FirmwarePlanBinding.validateCurrentPlan(record.plan)
-        let originals = try FirmwareGeneration.originalURLs(in: directory, id: record.generationID)
+        // This request has just verified this manifest, its originals and disk
+        // ancestry. Resolve paths from that result without loading it again.
+        let originalsRoot = directory.appendingPathComponent(".firmware-generations/\(generation.id)/originals")
+        let originals = generation.content.originals.map { originalsRoot.appendingPathComponent($0.name) }
         guard let restore = originals.first(where: { $0.lastPathComponent.contains("Restore") }),
               let variant = FirmwarePipeline.Variant(rawValue: record.plan.variant) else { throw Failure.invalidPlan }
         let versions = try FirmwareVersionInputs.read(in: restore)

@@ -9,6 +9,28 @@ public enum VPhoneLaunchpadBundleChange: Equatable, Sendable {
     case boundButNotUpdated
     case refused([VPhoneProcessHolder])
 
+    public static func bindingArguments(_ machine: VPhoneLaunchpadMachinePath, version: String, backup: URL?, expectedSHA256: String? = nil) -> [String]? {
+        guard VPhoneLaunchpadMachineName.isPassable(machine.name),
+              machine.libraryRoot.hasPrefix("/"), !machine.libraryRoot.contains("\0"),
+              VPhoneCoreBundleVersion.supportsTargetFeatures(version),
+              expectedSHA256.map({ $0 == "missing" || ($0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) }) }) ?? true,
+              backup.map({ $0.isFileURL && $0.path.hasPrefix("/") && !$0.path.contains("\0") }) ?? true else { return nil }
+        var args = ["vm", "bind-core-bundle", machine.name, "--version", version] + machine.libraryArguments
+        if let backup { args += ["--backup", backup.path] }
+        if let expectedSHA256 { args += ["--expected-binding-sha256", expectedSHA256] }
+        return args
+    }
+
+    public static func environmentArguments(_ machine: VPhoneLaunchpadMachinePath, workParent: URL? = nil) -> [String]? {
+        guard VPhoneLaunchpadMachineName.isPassable(machine.name),
+              machine.libraryRoot.hasPrefix("/"), !machine.libraryRoot.contains("\0"),
+              workParent.map({ $0.isFileURL && $0.path.hasPrefix("/") && !$0.path.contains("\0") }) ?? true else { return nil }
+        var args = ["cfw", "update-environment", machine.name] + machine.libraryArguments
+        args.append("--root-popup")
+        if let workParent { args += ["--work-parent", workParent.path] }
+        return args
+    }
+
     @MainActor
     static func perform(
         updatesEnvironment: Bool,
@@ -16,12 +38,15 @@ public enum VPhoneLaunchpadBundleChange: Equatable, Sendable {
         bind: () async throws -> Void,
         updateEnvironment: () async throws -> Bool
     ) async throws -> Self {
+        try Task.checkCancellation()
         if updatesEnvironment {
             let holders = try await diskHolders()
             guard holders.isEmpty else { return .refused(holders) }
         }
+        try Task.checkCancellation()
         try await bind()
         guard updatesEnvironment else { return .bound }
+        try Task.checkCancellation()
         return try await updateEnvironment() ? .updated : .boundButNotUpdated
     }
 }

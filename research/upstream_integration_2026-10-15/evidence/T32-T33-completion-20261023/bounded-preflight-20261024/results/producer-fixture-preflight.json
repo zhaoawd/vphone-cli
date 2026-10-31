@@ -1,0 +1,46 @@
+{
+  "scope": "actual captured bytes; isolated fixture copies only",
+  "VMStarts": 0,
+  "CFWWrites": 0,
+  "nativeUndoExecuted": false,
+  "checks": {
+    "system:/System/Library/CoreServices/SystemVersion.plist": {
+      "passed": true,
+      "sourceSHA256": "2b4802c09fc596b7f24c185846743b43a242d78adbe84b29ccf235fbea7551c3",
+      "firstAndReappliedSHA256": "e533abab16857c8fa7f1cb62283d39b299df0eb27d17874f552ae0bc10769665",
+      "onlyExpectedKeyChanged": true,
+      "idempotentNoRewrite": true,
+      "restoreScope": "exact original bytes on fixture; native Undo still pending"
+    },
+    "preboot:/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist": {
+      "passed": true,
+      "sourceSHA256": "1fc51cba9f36744b9e7bf170d6e013b2644bfa68d85ebf99df2f87170d6ccf22",
+      "firstAndReappliedSHA256": "567b9ea8787441eea8903cede7b9ac5dd17d3623f1c0dd7085fcd8cee1068f7d",
+      "onlyExpectedKeyChanged": true,
+      "idempotentNoRewrite": true,
+      "restoreScope": "exact original bytes on fixture; native Undo still pending"
+    },
+    "launchd": {
+      "passed": true,
+      "nonSignatureBytesPreservedBySigning": true,
+      "originalEntitlementsPreserved": true,
+      "verifiedCodePages": 139,
+      "cmsIntegrityPassed": true
+    },
+    "watchdogd": {
+      "passed": true,
+      "patchedSites": 2,
+      "verifiedCodePages": 46,
+      "signatureScope": "code pages only, matching producer; CMS not re-signed or asserted"
+    },
+    "debugserver": {
+      "passed": true,
+      "effectiveEntitlementsMatchProducer": true,
+      "verifiedCodePages": 137,
+      "cmsIntegrityPassed": true,
+      "executableNeverLaunched": true
+    }
+  },
+  "passed": true,
+  "elapsedSeconds": 0.3845937908627093
+}

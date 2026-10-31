@@ -130,7 +130,9 @@ def build(plan, rows, outputs, store):
                 binding_sha = row['sourceImageProof']['bindingSHA256']
                 if binding_sha not in qualified_sources:
                     actual = qualify_source(plan,binding['source'])
-                    if actual != baseline['generationSource'] or actual['source']['sha256'] != binding['sourceSHA256']:
+                    from cfw_source_identity import matches_qualified_source
+                    if (not matches_qualified_source(plan,binding['source'],actual,baseline['generationSource'])
+                            or actual['source']['sha256'] != binding['sourceSHA256']):
                         raise ValueError('Undo source no longer matches original observation')
                     qualified_sources[binding_sha] = actual
                 if row['sourceImageProof']['image'] != baseline['image'] or baseline['image']['sha256'] != binding['cacheSHA256']:
@@ -175,10 +177,17 @@ def build(plan, rows, outputs, store):
         if expected != node['current']['sha256']: raise ValueError('Undo chain final digest differs')
         entries.append({key:value for key,value in node.items() if key != 'current'} |
                        {'finalSHA256':expected, 'size':original.stat().st_size})
-    return {'schemaVersion':1, 'state':'qualified-preimages-not-migration-authority',
+    result = {'schemaVersion':1, 'state':'qualified-preimages-not-migration-authority',
             'generationID':plan.context['generationID'], 'planSHA256':plan.record['planSHA256'],
             'desiredSHA256':plan.raw_sha256, 'entries':sorted(entries,key=lambda item:item['target']),
             'unqualifiedTargets':sorted(unavailable)}
+    from . import file_originals,file_undo
+    catalog=file_originals.load(plan,store)
+    if catalog is not None:
+        result['schemaVersion']=2
+        result['fileOriginalsSHA256']=effects.digest(Path(store).parent/file_originals.FILENAME)
+        result['entries']=sorted(entries+file_undo.build(plan,rows,outputs,store,catalog),key=lambda item:item['target'])
+    return result
 
 
 def recheck_sources(plan, rows, store):
@@ -188,8 +197,11 @@ def recheck_sources(plan, rows, store):
         baseline = binding.get('originalDSC')
         if baseline is None or binding['source'] in seen: continue
         seen.add(binding['source'])
-        if qualify_source(plan,binding['source']) != baseline['generationSource']:
+        from cfw_source_identity import matches_qualified_source
+        if not matches_qualified_source(plan,binding['source'],qualify_source(plan,binding['source']),baseline['generationSource']):
             raise ValueError('Undo generation source changed during qualification')
+    from . import file_originals
+    file_originals.load(plan,store)
 
 
 def persist(plan, rows, outputs, work):
@@ -216,7 +228,7 @@ def seal(work, proof):
 
 
 def verify_publication(work, record):
-    if record.get('version') not in (2, 3, 4) or record.get('provenanceMode') != 'required':
+    if record.get('version') not in (2, 3, 4, 5) or record.get('provenanceMode') != 'required':
         raise ValueError('publication requires a new provenance-qualified transaction; old records permit recovery only')
     anchor = record.get('undoProvenance')
     if anchor is None:

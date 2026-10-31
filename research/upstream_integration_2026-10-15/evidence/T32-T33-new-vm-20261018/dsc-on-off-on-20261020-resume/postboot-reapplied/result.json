@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "vm": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018",
+  "scope": "post-API-two-boot journal readability",
+  "runtimeEffectsValidated": false,
+  "state": "passed",
+  "commands": [
+    {
+      "name": "receipts",
+      "argv": [
+        "/Users/kolar/github/vphone-cli/.build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli",
+        "cfw",
+        "receipts",
+        "vm-t32-t33-dsc-20261018",
+        "--library-root",
+        "/Users/kolar/github/vphone-cli",
+        "--json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "verify-plan",
+      "argv": [
+        "/Users/kolar/github/vphone-cli/.build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli",
+        "cfw",
+        "verify-plan",
+        "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018",
+        "--expected-sha256",
+        "bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "imageIdentity": {
+    "dev": 16777231,
+    "ino": 247627587,
+    "size": 68719476736,
+    "mtime_ns": 1792544462757738167
+  },
+  "transactionID": "20261020T145635Z-QBLOIoqy",
+  "publicationIdentity": {
+    "dev": 16777231,
+    "ino": 247627587,
+    "mtime_ns": 1792540509550826699,
+    "size": 68719476736
+  },
+  "identityChangedSincePublication": true,
+  "runtimeImageChanged": true,
+  "currentImageSHA256": "c7bb43708c40cb9f48b86f7b8413904e4a0135d73aa3cfe1db3d0e8eb4ad5c59"
+}

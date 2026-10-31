@@ -319,9 +319,10 @@ public final class VPhoneLaunchpadCreation {
         await onFinish?()
     }
 
-    /// SIGINT to the run's process group. `vm create` has no SIGINT handler
-    /// and ends; the stage it was running stays `running` in the checkpoint,
-    /// which then reads `interrupted`. False when nothing was sent.
+    /// SIGINT to the run's process group. `vm create` forwards cancellation to
+    /// its owned stage children and waits for them; the running stage remains
+    /// `running` in the checkpoint, which then reads `interrupted`.
+    /// False when nothing was sent.
     @discardableResult
     public func cancel() -> Bool {
         guard let child, child.isRunning else {
@@ -433,7 +434,7 @@ public enum VPhoneLaunchpadQuit {
     public static func decision(_ library: VPhoneLaunchpadMachineLibrary) -> Decision {
         let running = library.creations.values.filter(\.isRunning).map(\.machine.name).sorted()
         if !running.isEmpty { return .confirm(machines: running) }
-        return library.currentCommandLine?.hasActiveCommands == true ? .drainCommands : .quit
+        return library.currentCommandLine?.hasActiveCommands == true || library.hasActiveTransfers ? .drainCommands : .quit
     }
 
     /// The user confirmed: SIGINT to every create run's process group.

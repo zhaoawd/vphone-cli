@@ -1,0 +1,32 @@
+{
+  "createdAt": "2026-10-24T21:45:56.012120+08:00",
+  "diagnosis": "EXP baseline tree reader applied single-link mutation-target policy to contained hard-linked ordinary files",
+  "hypothesesRanked": [
+    "ordinary hard links in cache",
+    "file type changed between enumeration and open",
+    "unlinked open file due concurrent mutation"
+  ],
+  "confirmedHypothesis": "ordinary hard links in retained cache",
+  "firstRejectedMember": "System/Library/Accounts/DataclassOwners/Bookmarks.bundle/_CodeSignature/CodeResources",
+  "firstMemberLinkCount": 38,
+  "hardlinkedPaths": 327,
+  "hardlinkGroups": 34,
+  "allGroupsContained": true,
+  "minimalReproCommand": ".venv/bin/python3 -B -m unittest -v tests.test_cryptex_member_links",
+  "minimalOriginalRedRuns": 2,
+  "fixtureExpectedRootCorrection": "initial fixture omitted the root-directory entry; corrected before stable red/control runs",
+  "targetedTests": 9,
+  "fullPythonTests": 1093,
+  "fullPythonSkipped": 4,
+  "fullPythonSeconds": 314.103,
+  "executorTests": 7,
+  "actualCacheTreeEntries": 2931,
+  "actualReadonlyReferenceDigest": "8ca9292d96e176cc957bde0a5f775f8bc765f320ebe0395430b6a0a5efa4c02c",
+  "normalDetachPassed": true,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "repairCandidateInstalled": false,
+  "newPlanApproved": false,
+  "planSHA256": "74985b1c614eb7686564992acff1f885a75fbf955019670b1a9bfc16a3ec40e7",
+  "verificationLimit": "Actual retained cache was read only; no repaired EXP install/undo/reapply or application acceptance yet"
+}

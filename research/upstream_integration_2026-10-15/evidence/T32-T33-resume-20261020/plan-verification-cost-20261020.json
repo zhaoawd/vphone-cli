@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-10-20T11:39:38.375577+00:00",
+  "question": "why current installation is slow",
+  "observed": [
+    "Each sampled small write/sign waits in a separate Swift cfw verify-plan process",
+    "Observed individual verifier lifetime reaches3m20s with3m05s CPU and92percent CPU",
+    "Installer advanced from launchd.plist chmod to guarded temporary-directory cleanup"
+  ],
+  "sourceConfirmed": [
+    "plan_gate.main invokes from_environment and load_plan for every command; load_plan launches Swift verify-plan",
+    "verify-plan calls FirmwareDesiredPlanStore.read, whose validate calls FirmwareGeneration.loadVerified",
+    "validate then calls FirmwareGeneration.originalURLs, which calls loadVerified again",
+    "loadVerified verifies identity continuity and original firmware content",
+    "after a CFW inode swap, identity continuity verifies sealed postimage SHA256 and every checkpoint blob along publication ancestry"
+  ],
+  "inference": "Repeated complete generation/publication verification before small writes is the main identified performance problem; per-category time shares remain unmeasured",
+  "sampling": {
+    "pid": 35070,
+    "durationSeconds": 1,
+    "exitCode": 255,
+    "result": "OS denied sampling root process as ordinary user; no additional elevation requested"
+  },
+  "productionChanged": false,
+  "activeAcceptanceInterrupted": false,
+  "optimizationStatus": "not implemented; must preserve tamper, identity, publication and read-stability guards"
+}

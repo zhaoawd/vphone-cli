@@ -1,0 +1,162 @@
+{
+  "bootstrap": {
+    "classic_alias_present": true,
+    "kind": "classic",
+    "launchd_custom_loads": [
+      "/b"
+    ],
+    "v2_alias_present": false
+  },
+  "candidates": {
+    "available": true,
+    "stage": ".build/guest-components-v2/stage"
+  },
+  "checked_at": "2026-10-21T12:48:55Z",
+  "classification": "full_migration_required",
+  "daemon": {
+    "launchd_key": "/System/Library/LaunchDaemons/vphoned-api.plist",
+    "launchd_key_present": false,
+    "path": "/usr/bin/vphoned-api",
+    "sha256": null
+  },
+  "disk": {
+    "attach": "read-only",
+    "inode": 248385514,
+    "mtime_ns": 1792582547673083234,
+    "path": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-environment/Disk.img",
+    "sample": {
+      "kind": "sampled:66",
+      "sha256": "797e29bc67a051eacfc199b8e649888074baf1b0760e76488b43d7c904cd905b"
+    },
+    "size": 68719476736,
+    "unchanged": true
+  },
+  "disk_read": true,
+  "guest_environment_records": {
+    "checkpoint": null,
+    "restore_info": null
+  },
+  "identity": {
+    "810905AFE300C3AE.shsh": "159daba204bfe0effdacc73a41c18517b479bd024816b4931713335c5300d650",
+    "SEPStorage": "8b21c6c9e221f2b70599bddd612d1146f5b135e1e1428dddf3c59fe96a192a0b",
+    "config.plist": "db424e7fe079ebc9561078dd954bcb775b7e83b0eb03168c8a888821f7f18c93",
+    "nvram.bin": "021e11f298b0491d5e73b88b0161f86d634b9744a2906abc12dfaefc11249e84",
+    "udid-prediction.txt": "bdf134c7cffb477f72c7ad43c1493acb97224d05f9cf274abb5e0ade613a307d"
+  },
+  "libraries": [
+    {
+      "actual_sha256": null,
+      "expected_sha256": "0bce0431b8968a97346a32670d7598172cda05e0c694bc1873a4cb131378a995",
+      "expected_source": ".build/guest-components-v2/stage/launchhook/launchdhook-vphone.dylib",
+      "guest_path": "/usr/lib/launchdhook-vphone.dylib",
+      "loaded_by": "launchd, through its /vh load command, once per guest boot",
+      "name": "launchdhook-vphone.dylib",
+      "present": false,
+      "scope": "local",
+      "state": "missing"
+    },
+    {
+      "actual_sha256": null,
+      "expected_sha256": "ea97b6f5b1af8c349f877ba40ca267f1d0f676d725f39e087f39e1b7deb71acb",
+      "expected_source": ".build/guest-components-v2/stage/systemhook/SystemHook-vphone.dylib",
+      "guest_path": "/usr/lib/SystemHook-vphone.dylib",
+      "loaded_by": "processes spawned by launchd after launchdhook-vphone inserts it",
+      "name": "SystemHook-vphone.dylib",
+      "present": false,
+      "scope": "local",
+      "state": "missing"
+    },
+    {
+      "actual_sha256": null,
+      "expected_sha256": "2e94e0d035a717dfd82f91f8547a789aa82f2978569a488289be95c9ede17e97",
+      "expected_source": ".build/guest-components-v2/stage/vcamcaptured/libvcamcaptured.dylib",
+      "guest_path": "/usr/lib/libvcamcaptured.dylib",
+      "loaded_by": "cameracaptured when it starts (SystemHook loads it)",
+      "name": "libvcamcaptured.dylib",
+      "present": false,
+      "scope": "local",
+      "state": "missing"
+    },
+    {
+      "actual_sha256": null,
+      "expected_sha256": "fbf94136a3d47d0222e455248afc0362d1dfa2b2265f7bd05ab0ef2970ab3fea",
+      "expected_source": ".build/guest-components-v2/stage/camfix/libcamfix.dylib",
+      "guest_path": "/usr/lib/libcamfix.dylib",
+      "loaded_by": "camera client apps when they start (SystemHook loads it)",
+      "name": "libcamfix.dylib",
+      "present": false,
+      "scope": "local",
+      "state": "missing"
+    },
+    {
+      "actual_sha256": null,
+      "expected_sha256": "fe0ad525a4d65542481c34715d4279d33d4879328662cdc043d842ee8ab627df",
+      "expected_source": ".build/guest-components-v2/stage/locationfix/libvlocation.dylib",
+      "guest_path": "/usr/lib/libvlocation.dylib",
+      "loaded_by": "app processes when they start (SystemHook loads it); kept locally, see research/t20_location_2026-10-01.md",
+      "name": "libvlocation.dylib",
+      "present": false,
+      "scope": "local",
+      "state": "missing"
+    },
+    {
+      "actual_sha256": null,
+      "guest_path": "/usr/lib/libmisfix.dylib",
+      "managed": false,
+      "name": "libmisfix.dylib",
+      "present": false,
+      "scope": "upstream_only",
+      "state": "upstream_only_absent",
+      "task": "T18"
+    }
+  ],
+  "load_paths": [
+    {
+      "expected": "regular file written by the first CFW install",
+      "id": "cfw_install_marker",
+      "ok": true,
+      "path": "/System/Library/xpc/launchd.plist.bak"
+    },
+    {
+      "actual": null,
+      "expected": "symbolic link to /usr/lib/launchdhook-vphone.dylib",
+      "id": "launchd_hook_alias",
+      "ok": false,
+      "path": "/vh"
+    },
+    {
+      "actual": [
+        "/b"
+      ],
+      "expected": "load command for /vh",
+      "id": "launchd_load_command",
+      "ok": false,
+      "path": "/sbin/launchd"
+    }
+  ],
+  "manifest": {
+    "path": "/Users/kolar/github/vphone-cli/scripts/guest_environment.json",
+    "sha256": "e63467d474c679a44c32f66076b12a2e2175f2371d91b14eee7450c151bb8fad"
+  },
+  "migration": "A stopped-VM replacement only swaps libraries that already exist. Create a new VM with vm create <name> --variant regular --guest-environment v2 and validate it as a separate copy; this VM is left unchanged.",
+  "notes": [
+    "API daemon binary or launchd.plist entry is missing; library replacement does not install it",
+    "libmisfix.dylib: upstream 2.2.3 environment library, not built or installed locally (T18); absent; not part of this check or replacement"
+  ],
+  "reasons": [
+    "classic bootstrap: launchd loads /b (BaseBin launchdhook); the local environment loads launchdhook-vphone through /vh",
+    "/usr/lib/launchdhook-vphone.dylib is missing",
+    "/usr/lib/SystemHook-vphone.dylib is missing",
+    "/usr/lib/libvcamcaptured.dylib is missing",
+    "/usr/lib/libcamfix.dylib is missing",
+    "/usr/lib/libvlocation.dylib is missing"
+  ],
+  "replace": [],
+  "schema": "vphone.guest-environment-eligibility/1",
+  "system_volume": "/dev/disk17s1",
+  "variant_records": {
+    "checkpoint": null,
+    "restore_info": null
+  },
+  "vm": "/Users/kolar/github/vphone-cli/.build/t51rt/lib/t52-environment"
+}

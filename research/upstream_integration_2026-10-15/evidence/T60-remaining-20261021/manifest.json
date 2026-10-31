@@ -1,0 +1,375 @@
+{
+  "recordedAt": "2026-10-21T00:50:21.341200+00:00",
+  "sourceBase": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "sourceState": "uncommitted WIP; embedded historical BuildInfo is not source provenance",
+  "status": "implementation_and_offline_matrix_passed_gui_locked_real_vm_import_capacity_blocked",
+  "accepted": false,
+  "candidate": "/Users/kolar/github/vphone-cli/.build/t60-remaining-r3-20261021.app",
+  "products": {
+    "vphone-cli": {
+      "path": ".build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "b7a52cd94e96a326ddb1cea0a0ecdb037a815f90b6c694d14a6405604d3f1caa",
+      "cdhash": "f59dba5ea9ca4fb3710c59ae75bbec18b5f9766e"
+    },
+    "vphone-vm": {
+      "path": ".build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "a25bfd3af55c5a2af4aab1a84541be8328a430b5d8bd267be2704ba72ca54125",
+      "cdhash": "89b70a253cad2adea133b3e875519afaf72c5d17"
+    }
+  },
+  "launchpad": {
+    "path": ".build/t60-remaining-r3-20261021.app/Contents/MacOS/vphone-launchpad",
+    "sha256": "98279daa955d6370128bc9176bea3b90065e0eec2bcfe429192a435e31037fd1",
+    "cdhash": "f18563edd63aa05dde238334e09fa439b9e3b4cd"
+  },
+  "tools": {
+    "zstd": {
+      "path": ".build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/Resources/.tools/bin/zstd",
+      "sha256": "340bd3c1b213f193d12450a8ecd1c2786f528e3bc2640419e18506d16f814566",
+      "cdhash": "6fe1f55a8c690016651e5e859da178da5c156815"
+    },
+    "xz": {
+      "path": ".build/t60-remaining-r3-20261021.app/Contents/Helpers/vphone-cli.app/Contents/Resources/.tools/bin/xz",
+      "sha256": "e69d5b6302edd9dd8252dae3eefd3471f962e26a8d0abc7d11e1f7cd521d72ed",
+      "cdhash": "4b9f2fa85b67f8e7879218487985c65717f55cbe"
+    }
+  },
+  "validation": {
+    "LaunchpadKit": {
+      "reportedTests": 227,
+      "configuredSkipped": 10,
+      "suites": 51,
+      "seconds": 10.501,
+      "exitCode": 0
+    },
+    "Core": {
+      "reportedTests": 441,
+      "configuredSkipped": 1,
+      "suites": 48,
+      "seconds": 14.477,
+      "exitCode": 0
+    },
+    "archiveCLI": {
+      "testFunctions": 2,
+      "seconds": 0.02,
+      "exitCode": 0
+    },
+    "PythonBundle": {
+      "tests": 62,
+      "seconds": 10.712,
+      "exitCode": 0
+    },
+    "PythonProgressPipe": {
+      "tests": 7,
+      "seconds": 3.692,
+      "exitCode": 0
+    },
+    "finalSignedCLI": {
+      "reportedTests": 8,
+      "suites": 3,
+      "seconds": 28.648,
+      "exitCode": 0,
+      "minimalPATHBothCodecs": true,
+      "versionedProgress": true
+    },
+    "legacySignedCLI": {
+      "reportedTests": 8,
+      "suites": 3,
+      "seconds": 16.972,
+      "exitCode": 0,
+      "minimalPATHCapabilityNotClaimed": true,
+      "versionedProgress": false
+    },
+    "signalCancellation": {
+      "importScenarios": 4,
+      "exportScenarios": 4,
+      "backends": [
+        "native",
+        "system-tar"
+      ],
+      "signals": [
+        "SIGINT",
+        "SIGTERM"
+      ],
+      "statuses": [
+        130,
+        143
+      ],
+      "staging": 0,
+      "published": false,
+      "survivingTarChildren": 0,
+      "preservedSourcesAndExistingTargets": true
+    },
+    "bundleAndNestedSignatures": "passed; final VM cdhash 89b70a253cad2adea133b3e875519afaf72c5d17 unchanged"
+  },
+  "realVM": {
+    "source": "vm-new",
+    "sourceUse": "stopped source read/hash/lock and APFS clone; export on clone only",
+    "export": "passed",
+    "archiveBytes": 15564157664,
+    "import": "blocked before staging by free-space preflight",
+    "requiredFreeBytes": 30044004352,
+    "bootValidated": false
+  },
+  "gui": "see ui-validation-status.json; actual idle Quit passed on earlier candidate, final active Cancel/Quit/Finder verification pending manual unlock",
+  "failuresPreserved": [
+    "create Quit original RED: 2 tests/6 issues",
+    "GUI minimal PATH missing zstd; reproduced with signed CLI then fixed packaged compressors",
+    "sandbox socket bind denied; same regression passes unsandboxed with real socket",
+    "Python new test expected lowercase missing; corrected to exact Missing message",
+    "r2 initial unresolved relative zstd rpath; fixed staging search and final no external dependencies check",
+    "r3 resource changes required resealing before dependency recorder; final helper cdhash recorded and matched",
+    "real VM bounded export attempts interrupted at 8GiB/12GiB with cleanup before successful 14.5GiB export",
+    "real VM import capacity preflight rejection; no imported VM published"
+  ],
+  "sourceSHA256": {
+    "README.md": "789a2b48881b2ef3ce15e8df3727699717d5e73535f536f82a1861cfe2895c57",
+    "research/upstream_integration_2026-10-15/tools/accept_t60_real_vm_archive.py": "a9ac0b6e894bafd38de684891a5f7ec496583a488efc9968ea462969fb556e78",
+    "research/upstream_integration_2026-10-15/tools/pause_t60_import.py": "25ba59c8794546007d1b106e4fd3237b7954ae1bff8523447e9d1d70706c9603",
+    "scripts/build.sh": "35515d1eeebb4fa20434a02de1c4219c1ef733fbcaf7a52cd65665a2581383a7",
+    "scripts/build_native_dependencies.py": "c21578bae1d165f54885debaf8dc2952c22f34fbb84411e7bb1b4e057dfbc1e9",
+    "scripts/check_bundle.py": "e01a57db171916e2152e84c693e3817baedbcdec5ce94162e02be02fb6782395",
+    "scripts/licenses/LZ4.txt": "16b057d298a246790b01603b0f9ff588fcf3eb82e18999bde47a85e7072e53f8",
+    "scripts/licenses/xz-0BSD.txt": "0b01625d853911cd0e2e088dcfb743261034a091bb379246cb25a14cc4c74bf1",
+    "scripts/licenses/xz-GPLv2.txt": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
+    "scripts/licenses/xz-LGPLv2.1.txt": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+    "scripts/licenses/xz.txt": "616a3ad264ce29b8f1cb97e53037b139d406899ca8d1f799651e17bfa09830b8",
+    "scripts/licenses/zstd.txt": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+    "scripts/record_build_dependencies.py": "f5baae064a2a5047e6bc11bf886c12f4aa776b225c08a4d279a07825e9c90b2a",
+    "scripts/run_launchpad_cli_tests.sh": "9992be9cf0e2dedc94d8582a26fee090ef9916d2a0e7b469bcc33100ecae81cb",
+    "scripts/setup_tools.sh": "5ef4808fddb4f8136de33c8b3f14e8ce1b8eaac53c42f92d67fc6a7cb4e67403",
+    "sources/FirmwarePatcher/Pipeline/FirmwareDesiredPlanStore.swift": "40b3e503c99beac1472585425d9933138201b1bf886827c3cb7c9c8eb10eb08d",
+    "sources/Info.plist": "8fbd7994de986ec70ac14b100bc0abbca2005f5e1b37c3ba20319ee2bee290b7",
+    "sources/VPhoneCore/VPhoneBundleOps.swift": "fde86a800a669dc92a6cd61003c4dabea7d2941defa64bc47d6028212aa9b776",
+    "sources/VPhoneCore/VPhoneNativeTransfer.swift": "cabcbc6142558da7b30e3e3c40e7dff4894e6ed95dce884092d05501f8ca965e",
+    "sources/VPhoneCore/VPhoneProcessRunner.swift": "015e8b2dd7d3be86105ca25a6613b488c4e9511db18e2d1c55a7216c5fa52fbf",
+    "sources/VPhoneCore/VPhoneTransferProgress.swift": "7a6e60cc5d5249765464e70fa6598727b28e2c42874d22be5641fb6000d6d78a",
+    "sources/VPhoneCore/VPhoneTransferSource.swift": "f9faf74fb5e3ace0bc0527449020ed95be2c4e43ff49e67fcc3ff83a22b7862d",
+    "sources/VPhoneLaunchpad-Info.plist": "9cfc485e5248ac3d6f2f1eaced7e40a6a2e35250bd0015d1366228f8ef3001a4",
+    "sources/VPhoneLaunchpad/Localizable.xcstrings": "b3a728ac86edfdf4d120eff9c10669497ed93af5e0d47aefc4b9819715bee94e",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift": "209cd3f075a0400ce25a95951bfaafb7140b753cc43984c9ab0b7cb5d5280edf",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift": "eae6134859a8b9eafbecff89fcd5801b2b18c2ebbac703e7a23395406f2eca83",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift": "2da1ae55d5a849c833b76e375d5a6ee05c19a7cd503568ef21552fcf08a456ab",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift": "1fd7420d0654054c6a8cdd0139b55d919e954e84d61a601ef94a03cc606ed21d",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift": "ada8aec140af1f0bd0a435dcf1f53d871e2280fcf2bc2a6b708f77edf8ffc2a9",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadArchiveOpenQueue.swift": "22c4e14ad86d4274c5fddcafd91d360ff43de8c03f136cbc5be268208a870587",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift": "f3037334968774a312f595e6701112f688835aaa82a265a248f9b0248e71d926",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "9954505f477abe1bd68355d7adf97af074fda838bf5743957958aee73e8ca3c5",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift": "54f16823246191d5530d68001ff3b2be02ff6d8cd48a325972b67982823fc6be",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift": "f169eaf78c0732fe7691491c0f7a584fd5758620f5b3125eaecbc3b97c428741",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift": "0e7ea648bbdc5a57b40fde3d105c3f869ffc02b66821353cd8bd071becb596c1",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "b3b397491c09f37d0b37c8a4eb8697b71da60b957598f7cb6e6796cfbe891bd1",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift": "312841d728d8db3e507b6bce5d03b8432deb8f207cf940a24ad76d4ea01cbb96",
+    "sources/vphone-cli/VPhoneVMTransferCLI.swift": "17a7598b30e641a7a85723d28ef89517e3a71962d7a1a1d5bbf82f0d47002b0a",
+    "tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift": "f7e3b2e3cc264cbe99fd2326bfd400e6807270abbe9c4c0d946520acb8106e86",
+    "tests/VPhoneCLITests/CFWFrozenPlanTests.swift": "bb8b0b63836c13c83f3a2c89c2d7dc2ffaf6f08ac3f5065835dbb2cfcbe12028",
+    "tests/VPhoneCoreTests/NativeTransferTests.swift": "6eac784611809dcc90123aaf448a25b7c469c9c44988c28cc37081aaac0033b2",
+    "tests/VPhoneCoreTests/TransferProgressTests.swift": "7a8a76d5f6a41087d75d1fba720818663053db08c211408826da919313b65826",
+    "tests/VPhoneLaunchpadKitTests/ArchiveOpenQueueTests.swift": "51135cc7f37fad02c8fbd088606bafc99ded195b1807cc36729adeb995b300fc",
+    "tests/VPhoneLaunchpadKitTests/CreateTerminationTests.swift": "4ba167d8f92a870ce869924ef281f598b71bad1d2ec63be897bf46884a27c3f5",
+    "tests/VPhoneLaunchpadKitTests/EditTests.swift": "34f5f333c334ee762e83c28566c2cfd3e6ad008e3bb8bab25a97222f57314d9a",
+    "tests/VPhoneLaunchpadKitTests/ExportQueueTests.swift": "9aad4b71f7c1b8c5d57fed22ee903ac56b91bf885df3c43686867a0dcae81087",
+    "tests/VPhoneLaunchpadKitTests/ImportQueueTests.swift": "96cfd4f16d7557d5716368ea4bafebbd605caf6bc8c29d65036e2238de1509b8",
+    "tests/VPhoneLaunchpadKitTests/LibraryTests.swift": "91141a76cb78d36ce1ffae24e756c7237e6cfa2e8aa2f5e6efd944d11ada21fa",
+    "tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift": "1dd843b92ec2769ea14118bb5b5aade448ab9986e02ef5c8bb88a748bd687489",
+    "tests/VPhoneLaunchpadKitTests/RealCLIImportQueueTests.swift": "3c896f94289ca8df0f4681f65242b517dc27a84ef37f987ccf97473c23baf055",
+    "tests/test_bundle_validation.py": "3b7380775e11830d830851d4c1616de6845fefcf348f9b25cb92af049b425c69",
+    "tests/test_launchpad_bundle.py": "bea7befef14916af07f5d09fdee468e44903eea6d8601ced03feb597a289c193",
+    "tests/test_progress_pipe.py": "fc36bcc64368abb2d43fc26c1eda4912f7f62a269aec0b42759c75fd9968eab2"
+  },
+  "limitations": [
+    "actual GUI active/waiting cancellation, transfer Quit/timeout and Finder cold-open not reverified due locked Mac",
+    "real full VM import/full disk equality and post-import boot not validated",
+    "create process-group/drain verified with saved stand-in, not real restore/create workflow",
+    "two selected signed CLI versions tested; no universal historical Bundle compatibility claim",
+    "default remains system-tar; unknown export total stays indeterminate",
+    "source checks are identity/metadata/member-set checks, not an atomic snapshot or adversarial content proof",
+    "no commit/push/publication; frozen DSC inputs unchanged"
+  ],
+  "files": {
+    "actual-idle-quit.json": {
+      "bytes": 159,
+      "sha256": "db203e7f7e7abb879ac81f81ed6cd71431998efacbfd6d0430d6f74733467c7d"
+    },
+    "archive-cli-final.log.gz": {
+      "bytes": 2941,
+      "sha256": "474087c859ae0c56617720c4e1ee5bde79d56d7bde6951de3a4e17c6812a1ae9"
+    },
+    "archive-final-unsandboxed.log.gz": {
+      "bytes": 8559,
+      "sha256": "4a7333bd668cb14b8603986ee9e3b59b1b3e2302503b64f81b8f97a126b3a1b7"
+    },
+    "archive-final.log.gz": {
+      "bytes": 5721,
+      "sha256": "1aec047cfc63c760fd9f9ffe9a83484a68b35b444580aa5caf179a68f901f141"
+    },
+    "build-candidate-r2.log.gz": {
+      "bytes": 4365,
+      "sha256": "27035bb24bbb9e3454c8a02a900e687cc665f7a7e903eff2a91eaa02e372af53"
+    },
+    "build-candidate-r2.zsh": {
+      "bytes": 6623,
+      "sha256": "c3f8ef7eead6aca19bcc409952523fece00670ae74ac816c6ad471666e33d7cb"
+    },
+    "build-candidate.log.gz": {
+      "bytes": 5465,
+      "sha256": "100cf8ce7e10117b412e1fb5d4b0221d9482ef398e86d6032580f7dfab007262"
+    },
+    "build-candidate.zsh": {
+      "bytes": 6326,
+      "sha256": "613c9b720a0188e03f4ae882b0d2bac641df70b78f4174c6a60228271ae84aaa"
+    },
+    "candidate-build-dependencies.json": {
+      "bytes": 39155,
+      "sha256": "1d210ac4a9974ab767755ec83506ee06efdd3ab2da84005879431331f88f0fec"
+    },
+    "create-quit-green.log.gz": {
+      "bytes": 4100,
+      "sha256": "59ddfe7a38745a3b7850482d995040d53e8ad0ac93f290c5d52cc7c7ea07b3e5"
+    },
+    "create-quit-red.log.gz": {
+      "bytes": 4813,
+      "sha256": "7811ae86f8e8339e715fcedbeceef3cf4a7b4827ea02d394e67dece55bb5d4a4"
+    },
+    "finalize-seal-r3.log.gz": {
+      "bytes": 517,
+      "sha256": "d508b6e479e8cbd4b08a2f5e0b12800bec5ff32ae7df0a14b01227a4b55509a7"
+    },
+    "finalize-seal-r3.zsh": {
+      "bytes": 848,
+      "sha256": "b21e4eebc86221e4fdf7e80a9bcb41559ad064432214b336c31dad4f1af75fe5"
+    },
+    "frozen-inputs-final.json": {
+      "bytes": 323,
+      "sha256": "fe5119760c85a4e6ce3e9c1d011db44b0bb129f757ac550e3ce5f57b35be47bc"
+    },
+    "full-final.log.gz": {
+      "bytes": 34223,
+      "sha256": "6069575169bf5636d46a6f4acfcc91c45b133e6a07852517c4ebc00de95d0ea2"
+    },
+    "full-related.log.gz": {
+      "bytes": 34492,
+      "sha256": "8547c2cdf6487f9f4e557fbdd2127d5fc1ca4b87eefc8ba19ca4c0c483d9e04b"
+    },
+    "minimal-path-red.log.gz": {
+      "bytes": 120,
+      "sha256": "1e09c702ef30955a331e38cd63ac429e0f8427b2d31b9e48382300e1814bea18"
+    },
+    "pause-cancel.log.gz": {
+      "bytes": 241,
+      "sha256": "8b5fc34932ad543814d722dae7a3c1909679059bf5c11a6da511a33d31648a47"
+    },
+    "progress-focused-retry.log.gz": {
+      "bytes": 7259,
+      "sha256": "8d2a42fff481e25fbff5a36fd4bddb5dd5773491e3cc1b6fa0247a0ac6f469d2"
+    },
+    "progress-focused.log.gz": {
+      "bytes": 2820,
+      "sha256": "1e30ab771ebaf9fbb1cd4889bea49726d5a1d6e4e8494c196a3f0e3859800037"
+    },
+    "progress-pipe-final.log.gz": {
+      "bytes": 274,
+      "sha256": "7e8d55666a1c4f82ac7c577d95a2bccf7ff1a78993b41e49953e4f71f9b1ce91"
+    },
+    "python-bundle-final-green.log.gz": {
+      "bytes": 57,
+      "sha256": "d750d59c07c2fdea2d0ec21fce6403bdabb53c020a595a8c01e7e5a0323dce40"
+    },
+    "python-bundle-final-r2.log.gz": {
+      "bytes": 431,
+      "sha256": "7576d31e0c6f88d61a14221a017c1d650e4a214cf2a0a83574f3ee795ee2ec8e"
+    },
+    "python-bundle-final.log.gz": {
+      "bytes": 52,
+      "sha256": "397eb6586b7e52877b3eb295e0515d8646ed1599209088f46b132b212cadae3e"
+    },
+    "python-contract-final.log.gz": {
+      "bytes": 52,
+      "sha256": "ea0a7ad4616e8fcf4d4dec7b343856896c63ba7120fce5a8dd31caed9861a469"
+    },
+    "python-contract.log.gz": {
+      "bytes": 394,
+      "sha256": "14fd4024accddbe3adf4e8fd0a96003c4975cd66ec82934afa0f7931f4f0a604"
+    },
+    "real-cli-current-final.log.gz": {
+      "bytes": 4429,
+      "sha256": "0613ed291c90f357dd211e5a80f7168a1ed31c438e4b92b3f0a897fd27f25a73"
+    },
+    "real-cli-current-r2.log.gz": {
+      "bytes": 8279,
+      "sha256": "5fcfdc6d863d34b08dfbd0deedc538c85c263e2a1a67089d473f021520d9bfee"
+    },
+    "real-cli-current.log.gz": {
+      "bytes": 4455,
+      "sha256": "bcaeada8beba8299d5e921fb7517ab49f7f7c6fe2944a8f4e3aa0d6d2c7f8397"
+    },
+    "real-cli-legacy-final.log.gz": {
+      "bytes": 4461,
+      "sha256": "89d9483c987e906bd406bd4428861aa28498a5bee8c7b80fea40f75a9a25ff84"
+    },
+    "real-vm-capacity.json": {
+      "bytes": 2702430,
+      "sha256": "9957177d3b9aad5252a5711264a7a2ac6f21970bd8bb4b24576dc5686510ea1d"
+    },
+    "real-vm-export.log": {
+      "bytes": 113,
+      "sha256": "30f482f96dd77a93b7f2f1d9c336c36c9a2e3057970c842a2232b07ab89c4e0a"
+    },
+    "real-vm-exported.json": {
+      "bytes": 1077,
+      "sha256": "b7af1c92ddd3d1807824a763ce22494902ecf0536d323cd3f348d28d19cbd22b"
+    },
+    "real-vm-import-r3.log.gz": {
+      "bytes": 303,
+      "sha256": "9275236c2efa694cffc8aef9ec687a8dcee7fa0a59817e6b49aff99944f18156"
+    },
+    "real-vm-prepare-r2.log.gz": {
+      "bytes": 442,
+      "sha256": "4b1a599529b2a7de25d18069294990085552dce01bf270b7d629a2103c0b0967"
+    },
+    "real-vm-prepare-r3.log.gz": {
+      "bytes": 670,
+      "sha256": "e1032b05c66a117db36049ed8f199b1406760ee159ec509d7dd6119434facbd8"
+    },
+    "real-vm-prepare.log.gz": {
+      "bytes": 440,
+      "sha256": "aa1e5dfaf6d10de2de73f4cbd7a81fa77d6f6850eca0bb186676b7949e169fe5"
+    },
+    "resume-candidate-r2.log.gz": {
+      "bytes": 2198,
+      "sha256": "5bc866c8f968875aa770754fe21af2cce749353b45a846f628e558a5843b1e70"
+    },
+    "resume-candidate-r2.zsh": {
+      "bytes": 6117,
+      "sha256": "fcee58655aa8c127e5c206f9b7d60e1855ab0421d3499f4fe765a941841c9acd"
+    },
+    "resume-seal-r3.log.gz": {
+      "bytes": 790,
+      "sha256": "5ae1c3e1c63a2e4d7b7834d44c710f9b108893a3400733679c38ff30f4c940a6"
+    },
+    "resume-seal-r3.zsh": {
+      "bytes": 1151,
+      "sha256": "f61c80c3900e3688e6749aa5276fce8aab62d97edf5b1d780dbf2aa0d7b525c6"
+    },
+    "seal-candidate-r3.log.gz": {
+      "bytes": 503,
+      "sha256": "a9db85d3817a44f71975888f3aa38d56a38b1c8f940af3a1a6587fef1c4c5056"
+    },
+    "seal-candidate-r3.zsh": {
+      "bytes": 1373,
+      "sha256": "7eebe5a9177d33749afdb0a3b4d78486e4de8f4b25d3fa1c271e48a4748b12a5"
+    },
+    "signal-export-final.log.gz": {
+      "bytes": 327,
+      "sha256": "23c8e630f68f0d04238ee4900440bcd2f5991dfbee5bc099c286adcc9014dd94"
+    },
+    "signal-import-final.log.gz": {
+      "bytes": 248,
+      "sha256": "53d6cdcfc7433fa8f89a015dc1de1c2f59c3739762943f8fd3aba0949732319f"
+    },
+    "ui-validation-status.json": {
+      "bytes": 1186,
+      "sha256": "ade4a673f4061fa25f62e98492e006a55a59070fdb4cf91e4a321c74f75a7982"
+    }
+  }
+}

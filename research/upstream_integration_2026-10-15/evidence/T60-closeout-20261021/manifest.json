@@ -1,0 +1,154 @@
+{
+  "recordedAt": "2026-10-20T23:47:53.185139+00:00",
+  "sourceBase": "9e1c31bd856c4433e0058b0564471821dd851db1",
+  "status": "offline_closeout_passed_actual_multiselection_passed_ui_cancel_quit_unverified",
+  "tests": {
+    "launchpadKit": 221,
+    "core": 436,
+    "pythonBundleAndStrings": 37,
+    "previousSignedCLI": {
+      "tests": 6,
+      "seconds": 17.181,
+      "exitCode": 0
+    },
+    "currentSignedCLI": {
+      "tests": 6,
+      "seconds": 15.812,
+      "exitCode": 0
+    },
+    "launchpadKitConfiguredSkipped": 8,
+    "coreConfiguredSkipped": 1
+  },
+  "signedCandidate": "/Users/kolar/github/vphone-cli/.build/t60-closeout-20261021.app",
+  "sourceSHA256": {
+    "sources/VPhoneCore/VPhoneTransferSource.swift": "f9faf74fb5e3ace0bc0527449020ed95be2c4e43ff49e67fcc3ff83a22b7862d",
+    "sources/VPhoneCore/VPhoneBundleOps.swift": "325499c097e7e8d933f23e6bf42f6737344a40d2d537e46ad7c53f4b920f45fc",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "68c993edb97980cd2256825a97d307390b65c1a41ef5e394e69197d139ceb5c7",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift": "312841d728d8db3e507b6bce5d03b8432deb8f207cf940a24ad76d4ea01cbb96",
+    "tests/VPhoneCoreTests/NativeTransferTests.swift": "6e24fba1658338ceb7a893e17238e40f3142cdc6bacf52cc3a516bee3c8a38c7",
+    "tests/VPhoneLaunchpadKitTests/ExportQueueTests.swift": "9aad4b71f7c1b8c5d57fed22ee903ac56b91bf885df3c43686867a0dcae81087",
+    "tests/VPhoneLaunchpadKitTests/RealCLIEditTests.swift": "1dd843b92ec2769ea14118bb5b5aade448ab9986e02ef5c8bb88a748bd687489",
+    "scripts/run_launchpad_cli_tests.sh": "9992be9cf0e2dedc94d8582a26fee090ef9916d2a0e7b469bcc33100ecae81cb"
+  },
+  "gui": {
+    "actualOpenPanelMultiselection": true,
+    "published": [
+      "ui-first",
+      "ui-second"
+    ],
+    "diskBytes": 17179869184,
+    "fullDiskDigestsMatch": true,
+    "uiCancelVerified": false,
+    "appKitQuitVerified": false,
+    "blocker": "Computer Use timeoutReached after submitting selection; AX/screenshot/rebind/session reset failed. One-second sample shows main thread in normal event loop; timeout cause unknown."
+  },
+  "sourceChangeContract": "held cooperative VM lock plus pre/post identity/metadata/member-set checks; ctime catches same-size writes with restored mtime; not an atomic snapshot or adversarial content immutability proof",
+  "limitations": [
+    "No real VM boot/migration acceptance",
+    "Two actual signed CLI versions tested; not every historical Bundle/create/termination combination",
+    "Piped byte progress protocol absent; indeterminate progress retained",
+    "Actual UI Cancel/Quit not verified",
+    "No new release/commit/push; existing WIP and frozen DSC programs retained"
+  ],
+  "failuresPreserved": [
+    "export queue RED: 2 tests / 4 issues",
+    "source drift RED: 2 parameterized functions / 25 issues",
+    "sandbox local-server/process/capacity failures",
+    "intermediate debug linker expected old public method after signature change; public signature retained and full final passed",
+    "initial candidate script edited while running ended with unmatched quote after successful checks; saved script zsh -n and separate final signature/resource checks pass"
+  ],
+  "files": {
+    "build-candidate.log.gz": {
+      "bytes": 5286,
+      "sha256": "e74983a64c8be0cf883326e1cd5fae1883aaf09e848a9b6eef2a3671f8c9cfd2"
+    },
+    "build-candidate.zsh": {
+      "bytes": 6318,
+      "sha256": "4c9582b43aff1589eae7d5e66a80f3070cb0690e6add3a67ccafd8b0a3d1638a"
+    },
+    "build-source-metadata.json": {
+      "bytes": 390,
+      "sha256": "b7e4e8eb2fc08fb728665e70081091ead87856a4bf4d8dada1f282331a296ac9"
+    },
+    "commands.txt": {
+      "bytes": 723,
+      "sha256": "3f3f9785133ad579ff24eb48f12dae4b82433a51acb62051b7792a9c87bebba5"
+    },
+    "export-queue-red.log.gz": {
+      "bytes": 7141,
+      "sha256": "afa5fefa6a1b6373d6b80a588a9ecdd7ea7873b546b6e1a9fadfbcdbecfa39e4"
+    },
+    "focused-green.log.gz": {
+      "bytes": 8043,
+      "sha256": "7db343339fb55600b7cb7e9e7f5a01afbd54e8c52ccf92ca826e4861a837c666"
+    },
+    "frozen-inputs-after.json": {
+      "bytes": 317,
+      "sha256": "683b98d2fc59ad9c93b64ac3f71d3c0c634747570cb2e6be77809298cdbe120e"
+    },
+    "frozen-inputs-before.json": {
+      "bytes": 348,
+      "sha256": "50967756a39f7c01799b3e1b61fba84e98d2135beb7830178a61aa2b1abb1ac4"
+    },
+    "full-related-final.log.gz": {
+      "bytes": 37214,
+      "sha256": "94a70c0f548734fe7a98ad5be81d36e6a19d101bf4371e786370f3501c869655"
+    },
+    "full-related-unsandboxed.log.gz": {
+      "bytes": 2134,
+      "sha256": "f5d63a84a38308a8787f3732d53451d60a04afb784064d5233e4164df8878791"
+    },
+    "full-related.log.gz": {
+      "bytes": 36208,
+      "sha256": "410e140e9200cd48935058e8c08ca8f02cd702c34684d3ac47867b01d589cebc"
+    },
+    "gui-import-result.json": {
+      "bytes": 912,
+      "sha256": "4cb8e11fafa7901c0e78cba5e993ea5a18cc079f4d8c5fd2801df2d00ca7f627"
+    },
+    "python-contract-final.log.gz": {
+      "bytes": 52,
+      "sha256": "794032d2262b6d826c9fa2ef4caaf03d5a75f219187b84b412aa0a480b521df9"
+    },
+    "python-contract.log.gz": {
+      "bytes": 411,
+      "sha256": "a019a6336f72504949c29ec03a9479996d27540dc2f7b7b6ad815b5e46a257e5"
+    },
+    "real-cli-current.log.gz": {
+      "bytes": 4342,
+      "sha256": "1613b67b1212f1d6849ed9b7f0bbafdb5dcaf41fc77686ca4d4433704f8eea34"
+    },
+    "real-cli-previous.log.gz": {
+      "bytes": 4435,
+      "sha256": "eb371a1317298d7871decc82a51a634339ebe8b311ddb1702befb34d2e66b551"
+    },
+    "release-cli.log.gz": {
+      "bytes": 4186,
+      "sha256": "f383b4588b9b873253580be4096d82f00d4386fb0b5b66d953bdd86162cefd05"
+    },
+    "signed-candidate-final.log.gz": {
+      "bytes": 449,
+      "sha256": "430544ba07ffed2ef69b5016673cc83fa7e9af730e1f1dd55638ba8e9814ba26"
+    },
+    "source-change-red.log.gz": {
+      "bytes": 4568,
+      "sha256": "5ce0285e198e0cc92f204eb2235db6c73a63480c12daf71b1d9c1a6d9b07bcbb"
+    },
+    "ui-archive-sha256.json": {
+      "bytes": 202,
+      "sha256": "2b4e9c7c1a38df823ceb37ff4f2cffb5976633e4d6994b12b84588385556b5a2"
+    },
+    "ui-fixture.log.gz": {
+      "bytes": 152,
+      "sha256": "49a34ff3bab129659ff564cc8eedfbaff76e394c8c6e8760649d62941d7c03e3"
+    },
+    "ui-process-sample.txt.gz": {
+      "bytes": 74644,
+      "sha256": "7b094ed44e7557684a151d7af133db5957b5aa962f82f0f04b8b8c601b2d33cf"
+    },
+    "ui-sample-command.log.gz": {
+      "bytes": 167,
+      "sha256": "2b9813b71657805c74e5a1b167623ac3e2b6edcb83b4c5dcd4cd34f79468df97"
+    }
+  }
+}

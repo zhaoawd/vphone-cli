@@ -115,8 +115,9 @@ class LaunchpadBundleCheckTests(unittest.TestCase):
 
 
 class LaunchpadB1BoundaryTests(unittest.TestCase):
-    """B1-B5 boundaries: list, launch, stop, the offline edits and vm create through
-    the embedded toolchain only (T26 design 4, 5.1-5.3, 9, 11.1)."""
+    """B1-B5 plus T47/T51/T52: explicit CLI operations and read-only measurement.
+    Privilege, process, file-removal and control-socket boundaries remain confined.
+    """
 
     FORBIDDEN = {
         r'VPhoneVMLockProbe\.': 'lock probe',
@@ -161,9 +162,11 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
     LOCATIONS = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift'
     SOCKET_LENGTH = '.appendingPathComponent("vphone.sock").path\n        return path.utf8CString.count <= ' \
                     'MemoryLayout.size(ofValue: sockaddr_un().sun_path)'
-
+    # Exact additions only: all other lsof, bundle guard and CFW calls remain forbidden.
     SOURCE_EXCEPTIONS = {
-        ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift': ['"/usr/sbin/lsof"', 'try await bind()'],
+        EDIT_FILE: ['["vm", "snapshot", "create", name, snapshot]'],
+        ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift': ['"/usr/sbin/lsof"', 'try await bind()',
+            '["cfw", "update-environment", machine.name]', '"--root-popup"'],
         ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadDiskUsage.swift': [
             'VPhoneBundleGuard.withMeasurementLock(', 'flock(lease, LOCK_SH | LOCK_NB)'],
     }
@@ -178,7 +181,7 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
                 code = code.replace(self.SOCKET_LENGTH, '')
             for allowed in self.SOURCE_EXCEPTIONS.get(path, []):
                 self.assertEqual(code.count(allowed), 1, (path, allowed))
-                code = code.replace(allowed, "")
+                code = code.replace(allowed, '')
             for pattern, what in self.FORBIDDEN.items():
                 self.assertIsNone(re.search(pattern, code), f'{what} in {path.relative_to(ROOT)}')
             if path != self.WHITELIST:
@@ -202,14 +205,22 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         self.assertEqual(built, [
             ('vm', 'clone'), ('vm', 'config'), ('vm', 'delete', '--force'), ('vm', 'export', '--out'),
             ('vm', 'import', '--library-root'), ('vm', 'rename'),
+            ('vm', 'snapshot', 'create'), ('vm', 'snapshot', 'delete', '--force'),
+            ('vm', 'snapshot', 'list', '--json'), ('vm', 'snapshot', 'revert', '--force'),
         ])
-        # `--force` only skips the CLI's stdin prompt, and only for delete.
+        # `--force` skips the CLI prompt only for delete and explicit snapshot operations.
         self.assertEqual(re.findall(r'\[[^\]]*"--force"[^\]]*\]', code),
-                         ['["vm", "delete", machine.name, "--force"]'])
+                         ['["vm", "delete", machine.name, "--force"]',
+                          '["vm", "snapshot", "revert", name, snapshot, "--force"]',
+                          '["vm", "snapshot", "delete", name, snapshot, "--force"]'])
         # Every machine command carries its library root.
-        for verb in ('config', 'rename', 'clone', 'delete', 'export'):
+        for verb in ('config', 'rename', 'delete', 'export'):
             self.assertRegex(code, rf'\["vm", "{verb}"[^\]]*\] \+ machine\.libraryArguments')
+        self.assertIn('return Self(.clone, machine.cloneArguments(as: newName, newIdentity: newIdentity))', code)
+        self.assertIn('["vm", "clone", name, newName] + (newIdentity ? ["--new-identity"] : []) + libraryArguments', code)
         self.assertIn('["vm", "import", archive.path, "--library-root", libraryRoot]', code)
+        for verb in ('list', 'revert', 'delete'):
+            self.assertRegex(code, rf'\["vm", "snapshot", "{verb}"[^\]]*\] \+ libraryArguments')
         # The value exists only through the factories.
         self.assertIn('private init(_ kind: Kind, _ arguments: [String])', code)
 
@@ -282,12 +293,12 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         self.assertNotIn('VPhoneLaunchpadCreate', refresh)
         self.assertNotIn('Checkpoint', refresh)
 
-    def test_only_vm_list_stop_and_launch_are_run(self):
+    def test_only_declared_cli_operations_are_run(self):
         runs, starts, typed, catalog = [], [], [], []
         for path, text in launchpad_swift().items():
             runs += re.findall(r'\.run\(\s*\[([^\]]*)\]', text)
             starts += re.findall(r'commandLine\.start\(\s*(\w+)', text)
-            typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*\)', text)
+            typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*(?:,\s*onProgress:\s*onProgress\s*)?\)', text)
             catalog += re.findall(r'commandLine\.run\(\s*VPhoneLaunchpadCreateCommand\.(\w+)', text)
         self.assertEqual(sorted(re.findall(r'"([^"]+)"', arguments)[:3] for arguments in runs),
                          [['vm', 'list', '--json'], ['vm', 'stop']])
@@ -295,10 +306,24 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         self.assertEqual(sorted(starts), ['arguments', 'command'])
         # B3/B5: everything else runs a whitelisted command value; B4 adds the
         # one create-status after a create run and the firmware catalog.
-        self.assertEqual(sorted(typed), ['command', 'command', 'command', 'status'])
+        self.assertEqual(sorted(typed), ['bindingArguments', 'command', 'command', 'command', 'status'])
         self.assertEqual(catalog, ['catalog'])
         library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
         self.assertIn('var arguments = ["vm", "launch", machine.name] + machine.libraryArguments', library)
+        change = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift').read_text()
+        self.assertIn('["vm", "bind-core-bundle", machine.name, "--version", version] + machine.libraryArguments', change)
+        self.assertEqual(library.count('commandLine.run(bindingArguments)'), 1)
+        self.assertIn('expectedBindingSHA256: selected.sha256', library)
+
+    def test_finder_archive_types_are_alternate_viewers_only(self):
+        info = plistlib.loads((ROOT / 'sources/VPhoneLaunchpad-Info.plist').read_bytes())
+        documents = info['CFBundleDocumentTypes']
+        self.assertEqual(len(documents), 1)
+        self.assertEqual(documents[0]['CFBundleTypeRole'], 'Viewer')
+        self.assertEqual(documents[0]['LSHandlerRank'], 'Alternate')
+        types = info['UTExportedTypeDeclarations']
+        self.assertEqual(documents[0]['LSItemContentTypes'], [types[0]['UTTypeIdentifier']])
+        self.assertEqual(types[0]['UTTypeTagSpecification']['public.filename-extension'], ['tzst', 'txz'])
 
     def test_executable_comes_only_from_the_embedded_app(self):
         toolchain = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadToolchain.swift').read_text()

@@ -158,7 +158,8 @@ def prepare(work, record, plan, image_sha256):
     rows = [json.loads(line) for line in raw.splitlines() if line]
     final_raw = read(work / FINAL)
     final = json.loads(final_raw)
-    if not rows or final.get('schemaVersion') != 1 or final.get('transactionID') != record['id'] or not final.get('outputs'):
+    empty_file_undo=record['version']==5 and record.get('operation')=='guest-component-undo-v2'
+    if (not rows and not empty_file_undo) or final.get('schemaVersion') != 1 or final.get('transactionID') != record['id'] or not final.get('outputs'):
         raise ValueError('missing final guest effect verification')
     context, desired = plan.context, plan.record
     qualification = {'generationID': context['generationID'], 'planDigest': desired['planSHA256'],
@@ -177,17 +178,39 @@ def prepare(work, record, plan, image_sha256):
     extra = ()
     if record.get('operation') is not None:
         from patchers import guest_undo
-        if record['operation'] != guest_undo.OPERATION: raise ValueError('unknown guest journal operation')
+        if record['operation'] not in guest_undo.OPERATIONS: raise ValueError('unknown guest journal operation')
         write_new(work / guest_undo.RECEIPTS, canonical(guest_undo.receipts(work, record, final, image_sha256)))
         extra = guest_undo.FILES
+    if record['version'] == 5 and record.get('operation') is None:
+        from patchers import guest_receipts
+        from patchers import guest_origin
+        origin=guest_origin.verify(work,record,qualification,require_attestation=False)
+        write_new(work / guest_receipts.FILENAME, canonical(guest_receipts.build(record, final, rows, image_sha256,
+            source=origin[0] if origin else None)))
+        extra = (guest_receipts.FILENAME,)
+        if record.get('guestOriginInvalidationSHA256') is not None:
+            guest_origin.verify_invalidation(work,record,before=True)
+            extra=extra+(guest_origin.INVALIDATION,)
+        if origin is not None:
+            guest_origin.attest(work,record,dict(qualification,imageSHA256=image_sha256))
+            extra=extra+(guest_origin.SOURCE,guest_origin.TRANSITION,guest_origin.ATTESTATION)
+    if record.get('fileOriginalsSHA256') is not None:
+        from patchers.file_originals import FILENAME
+        if digest(work/FILENAME)!=record['fileOriginalsSHA256']:raise ValueError('File originals differ from journal')
+        extra=extra+(FILENAME,)
+    if record.get('operation') is not None:
+        from patchers import guest_undo
+        observed = json.loads(read(work / guest_undo.APPLIED))
+        if observed.get('schemaVersion') == 2 and observed['recoverySource']['sourceImageSHA256'] != image_sha256:
+            raise ValueError('Recovered disk differs from the preserved complete Undo image')
     files = {name: digest(work / name) for name in (PLAN, CONTEXT, OPERATIONS, FINAL, UNDO) + extra}
     verify_undo_binding(record, final, files)
     if files[PLAN] != plan.raw_sha256: raise ValueError('preserved desired plan digest differs')
     blobs = blob_index(work, rows)
     checkpoint = dict(schemaVersion=1, transactionID=record['id'], vmDirectory=record['vm'],
         **qualification, imageIdentity=actual, imageSHA256=image_sha256, files=files, blobs=blobs)
-    if record['version'] == 4:
-        checkpoint.update(schemaVersion=2, runtimeIdentity=runtime_identity(image.lstat()),
+    if record['version'] in (4, 5):
+        checkpoint.update(schemaVersion=3 if record['version'] == 5 else 2, runtimeIdentity=runtime_identity(image.lstat()),
                           postimageIdentity=preserve_postimage(work, image, image_sha256))
     write_new(work / CHECKPOINT, canonical(checkpoint))
     return digest(work / CHECKPOINT)
@@ -201,35 +224,59 @@ def verify(work, record, image, image_sha256, *, check_operation=True, allow_run
     if hashlib.sha256(raw).hexdigest() != expected: raise ValueError('guest checkpoint differs from journal')
     value = json.loads(raw)
     version = record['version']
-    if (value.get('schemaVersion') != (2 if version == 4 else 1) or value.get('transactionID') != record['id']
+    if (value.get('schemaVersion') != (3 if version == 5 else 2 if version == 4 else 1) or value.get('transactionID') != record['id']
             or value.get('vmDirectory') != record['vm']):
         raise ValueError('guest checkpoint image or transaction differs')
-    if version == 4:
+    from cfw_reboot_identity import matches_historical
+    if version in (4, 5):
         continuity = value.get('runtimeIdentity', {})
-        if (continuity != runtime_identity(image.lstat()) or
+        if (not matches_historical(image, runtime_identity(image.lstat()), continuity) or
                 any(continuity.get(k) != value.get('imageIdentity', {}).get(k) for k in ('dev', 'ino', 'size'))):
             raise ValueError('guest runtime image identity differs')
         post = work / POSTIMAGE
         import cfw_disk_txn as transaction
-        if (value.get('postimageIdentity') != image_identity(post.lstat())
+        if (not matches_historical(post, image_identity(post.lstat()), value.get('postimageIdentity'))
                 or transaction.checked_image_digest(post) != value['imageSHA256']):
             raise ValueError('sealed guest postimage differs')
-    if not (allow_runtime and version == 4):
-        if value.get('imageIdentity') != image_identity(image.lstat()) or value.get('imageSHA256') != image_sha256:
+    if not (allow_runtime and version in (4, 5)):
+        if not matches_historical(image, image_identity(image.lstat()), value.get('imageIdentity')) or value.get('imageSHA256') != image_sha256:
             raise ValueError('guest checkpoint image or transaction differs')
     if any(value['imageIdentity'][k] != record.get('staged', {}).get(k) for k in ('dev', 'ino')):
         raise ValueError('guest checkpoint does not describe the journal staged inode')
     expected_files = {PLAN, CONTEXT, OPERATIONS, FINAL, UNDO}
     if record.get('operation') is not None:
         from patchers import guest_undo
-        if record['operation'] != guest_undo.OPERATION: raise ValueError('unknown guest journal operation')
+        if record['operation'] not in guest_undo.OPERATIONS: raise ValueError('unknown guest journal operation')
         expected_files.update(guest_undo.FILES)
+    if version == 5 and record.get('operation') is None:
+        from patchers import guest_receipts
+        expected_files.add(guest_receipts.FILENAME)
+        if record.get('guestOriginInvalidationSHA256') is not None:
+            from patchers import guest_origin
+            guest_origin.verify_invalidation(work,record)
+            expected_files.add(guest_origin.INVALIDATION)
+        if any(key in record for key in ('guestOriginSourceSHA256','guestOriginTransitionSHA256')):
+            from patchers import guest_origin
+            expected_files.update((guest_origin.SOURCE,guest_origin.TRANSITION,guest_origin.ATTESTATION))
+    if record.get('fileOriginalsSHA256') is not None:
+        from patchers.file_originals import FILENAME
+        expected_files.add(FILENAME)
+        if value.get('files',{}).get(FILENAME)!=record['fileOriginalsSHA256']:
+            raise ValueError('File originals differ from sealed journal')
     if set(value.get('files', {})) != expected_files:
         raise ValueError('guest checkpoint file set differs')
     for name, wanted in value['files'].items():
         if digest(work / name) != wanted: raise ValueError('sealed guest evidence changed: ' + name)
     plan, context, final = [json.loads(read(work / name)) for name in (PLAN, CONTEXT, FINAL)]
     verify_undo_binding(record, final, value['files'])
+    if version == 5 and record.get('operation') is None:
+        from patchers import guest_receipts
+        from patchers import guest_origin
+        origin=guest_origin.verify(work,record,value)
+        receipt_rows = [json.loads(line) for line in read(work / OPERATIONS).splitlines() if line]
+        receipt = guest_receipts.build(record, final, receipt_rows, value['imageSHA256'],source=origin[0] if origin else None)
+        if read(work / guest_receipts.FILENAME) != canonical(receipt):
+            raise ValueError('guest component receipt differs from sealed effects')
     if (value.get('desiredSHA256') != value['files'][PLAN] or
             any(plan.get(k) != value.get(v) or context.get(k) != value.get(v)
                 for k, v in [('generationID', 'generationID'), ('planSHA256', 'planDigest')]) or
@@ -244,7 +291,12 @@ def verify(work, record, image, image_sha256, *, check_operation=True, allow_run
         receipt = json.loads(read(work / guest_undo.RECEIPTS))
         if receipt != guest_undo.receipts(work, record, final, value['imageSHA256']):
             raise ValueError('guest receipt differs from actual committed effects')
-    if allow_runtime and version == 4:
+    if record.get('operation') is not None:
+        from patchers import guest_undo
+        observed = json.loads(read(work / guest_undo.APPLIED))
+        if observed.get('schemaVersion') == 2 and observed['recoverySource']['sourceImageSHA256'] != value['imageSHA256']:
+            raise ValueError('Recovered checkpoint differs from its complete source image')
+    if allow_runtime and version in (4, 5):
         value = dict(value, currentImageSHA256=image_sha256, runtimeImageChanged=image_sha256 != value['imageSHA256'])
     return value
 

@@ -1,0 +1,49 @@
+{
+  "recordedAt": "2026-10-21T00:13:02.686063+00:00",
+  "directVerifyFinalCalls": [
+    {
+      "pid": 64818,
+      "parentPID": 17578,
+      "firstObservedAt": "2026-10-21T00:02:30.834595+00:00",
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/patchers/plan_gate.py verify-final",
+      "lastObservedAt": "2026-10-21T00:10:32.142341+00:00"
+    },
+    {
+      "pid": 68801,
+      "parentPID": 17578,
+      "firstObservedAt": "2026-10-21T00:11:02.234420+00:00",
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/patchers/plan_gate.py verify-final",
+      "lastObservedAt": "2026-10-21T00:13:02.574578+00:00"
+    }
+  ],
+  "frozenHostInstallerSHA256": "61c8ff34e36f7bfa3599eda98033b70a92678085d5d1bff30142f29712400e65",
+  "sourceControlFlow": "The install branch calls verify-final, cleanup, apfs_snap_rename, then a second read-only verify-final; failures exit before the next call.",
+  "result": "Both direct final checks and snapshot processing reached seal; seal is still running. Publication and later proofs remain pending.",
+  "updatedAt": "2026-10-21T00:36:49.710755+00:00",
+  "sealProcessObservations": [
+    {
+      "pid": 74327,
+      "parentPID": 17578,
+      "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python .build/t32-cryptex-symlink-final.app/Contents/Resources/scripts/cfw_disk_txn.py seal --fd 11 --owner-pid 17578 vm-t32-t33-dsc-20261018 vm-t32-t33-dsc-20261018/.cfw_disk.QBLOIoqy",
+      "firstObservedAt": "2026-10-21T00:19:33.761922+00:00",
+      "lastObservedAt": "2026-10-21T00:36:06.761862+00:00",
+      "cpuTime": "2:31.58"
+    },
+    {
+      "pid": 74344,
+      "parentPID": 74327,
+      "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw verify-plan vm-t32-t33-dsc-20261018 --expected-sha256 bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "firstObservedAt": "2026-10-21T00:19:33.761922+00:00",
+      "lastObservedAt": "2026-10-21T00:26:35.035477+00:00",
+      "cpuTime": "6:31.16"
+    },
+    {
+      "pid": 83091,
+      "parentPID": 74327,
+      "command": ".build/t32-cryptex-symlink-final.app/Contents/MacOS/vphone-cli cfw verify-plan vm-t32-t33-dsc-20261018 --expected-sha256 bab39e803e3b777237b53e627dd4af70b8a3a5104a84291db577ae7aae61ff2c",
+      "firstObservedAt": "2026-10-21T00:28:05.290155+00:00",
+      "lastObservedAt": "2026-10-21T00:34:36.513144+00:00",
+      "cpuTime": "6:21.15"
+    }
+  ]
+}

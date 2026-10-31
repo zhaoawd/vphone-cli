@@ -12,7 +12,7 @@ IOS_DEPLOYMENT_TARGET ?= 15.0
 
 all: $(OUT)
 
-$(OUT): $(SRCS) $(wildcard *.h)
+$(OUT): $(SRCS) $(wildcard *.h *.inc) ../../sources/VPhoneGuestComponents/Shared/VPhoneCameraFrame.h ../../sources/VPhoneGuestComponents/Shared/VPhoneLocationState.h
 	@echo "=== Building vphoned (arm64, iphoneos) ==="
 	xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=$(IOS_DEPLOYMENT_TARGET) -Os -fobjc-arc $(EXTRA_CFLAGS) \
 		-I. \

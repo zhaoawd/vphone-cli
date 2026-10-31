@@ -25,7 +25,7 @@ class ProgressPipeTests(unittest.TestCase):
             str(ROOT / 'sources/vphone-cli/VPhoneProgressBar.swift'),
             *[str(ROOT / 'sources/VPhoneCore' / name) for name in (
                 'VPhoneProcessRunner.swift', 'VPhoneChildCancellation.swift',
-                'VPhoneProcessIdentity.swift', 'VPhoneShutdownPolicy.swift')],
+                'VPhoneProcessIdentity.swift', 'VPhoneShutdownPolicy.swift', 'VPhoneResources.swift')],
             str(ROOT / 'tests/fixtures/progress_pipe/main.swift'), '-o', str(cls.binary),
         ], capture_output=True, text=True, timeout=90)
         if result.returncode:

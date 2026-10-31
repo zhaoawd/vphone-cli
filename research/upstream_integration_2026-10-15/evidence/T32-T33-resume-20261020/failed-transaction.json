@@ -1,0 +1,84 @@
+{
+  "transaction": "20261020T000756Z-iTDO2qSV",
+  "files": [
+    {
+      "name": "effect-blobs",
+      "bytes": 2720
+    },
+    {
+      "name": "guest-changes.jsonl",
+      "bytes": 1738025
+    },
+    {
+      "name": "transaction.json",
+      "bytes": 1636
+    }
+  ],
+  "records": {
+    "transaction.json": {
+      "checks": [
+        {
+          "at": "2026-10-20T00:07:56Z",
+          "phase": "stage",
+          "result": "passed"
+        },
+        {
+          "at": "2026-10-20T00:07:57Z",
+          "phase": "pre-mount",
+          "result": "passed"
+        },
+        {
+          "at": "2026-10-20T00:07:58Z",
+          "phase": "pre-install",
+          "result": "passed"
+        }
+      ],
+      "clone_error": null,
+      "copy": null,
+      "exit_code": 141,
+      "failure": "install step exited with status 141",
+      "finished_at": "2026-10-20T02:17:43Z",
+      "guestEvidenceRequired": true,
+      "id": "20261020T000756Z-iTDO2qSV",
+      "location": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018/.cfw-history/20261020T000756Z-iTDO2qSV",
+      "method": "clone",
+      "original": {
+        "blocks": 28398008,
+        "dev": 16777231,
+        "gid": 20,
+        "ino": 247084001,
+        "mode": 420,
+        "mtime_ns": 1792408052355107733,
+        "sample": {
+          "kind": "sampled:66",
+          "sha256": "6715076b65c9b03b5313ab5f62c0a5e69dd352072cb63e5f8fe5e56543b35108"
+        },
+        "size": 68719476736,
+        "uid": 501
+      },
+      "original_check": {
+        "checked_at": "2026-10-20T02:17:41Z",
+        "detail": "dev/inode/size/mtime equal; sampled:66 SHA-256 equal",
+        "unchanged": true
+      },
+      "provenanceMode": "required",
+      "runtimeImageEvidenceRequired": true,
+      "staged": {
+        "blocks": 28398008,
+        "dev": 16777231,
+        "gid": 20,
+        "ino": 247360351,
+        "mode": 420,
+        "mtime_ns": 1792408052355107733,
+        "size": 68719476736,
+        "uid": 501
+      },
+      "staged_removed": true,
+      "staged_retained": false,
+      "started_at": "2026-10-20T00:07:56Z",
+      "status": "failed",
+      "version": 4,
+      "vm": "/Users/kolar/github/vphone-cli/vm-t32-t33-dsc-20261018"
+    }
+  }
+}

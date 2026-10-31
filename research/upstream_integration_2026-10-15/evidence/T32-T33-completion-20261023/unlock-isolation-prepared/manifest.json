@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "scope": "Unlock failure isolation and unapproved display continuation",
+  "accepted": false,
+  "runtimeValidated": false,
+  "patchCausalityValidated": false,
+  "correctionExecutedInVM": false,
+  "observerAndSocketTests": 8,
+  "unlockIsolationTests": 3,
+  "redReproductionPreserved": true,
+  "preparedPlanSHA256": "2f85665429b501a7502f9941f1eef95ab8c9f5f19ede503d02b8d4576c5e4ee1",
+  "frozenToolsVerified": 376,
+  "VMStarts": 0,
+  "securityWindows": 0,
+  "approvalGranted": false,
+  "priorArchivesVerified": [
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/cms-qualified/manifest.json",
+      "sha256": "21e549fc50a0e3bf45ed23e9c837b80368d8deb94030faa5d0baaa19a16dd5a4",
+      "files": 28
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/external-mount-fix-prepared/manifest.json",
+      "sha256": "47ef8289da8bac0b455e6524b29382ced520c1de813d17b6b1d93a5b1d036593",
+      "files": 21
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/fresh-offline/manifest.json",
+      "sha256": "78773c155edf1a94e6833b2c431afcfc4bf511c6fc946f99ddf16b36b771a96d",
+      "files": 27
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/gui-socket-failure/manifest.json",
+      "sha256": "e0cb6aa1aa5d777911ac99e5be7fcf97199e22172ea1371511bf0a0334709150",
+      "files": 34
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/offline-refusal/manifest.json",
+      "sha256": "308bdb205b0b53de8fedac47e682686df48721fb78aa57cda42ca14a9bcf5bc7",
+      "files": 40
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/prepared/manifest.json",
+      "sha256": "73e212fe983b42bb50614b348c492b40467041f595b2cd6abb3c6ed127e97725",
+      "files": 119
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/resumed-offline/manifest.json",
+      "sha256": "9dd8de00fad24fe36c4cd8d9db82ba228dc008de0fa74794bc9eec664010a589",
+      "files": 66
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/short-runtime-outcome/manifest.json",
+      "sha256": "ccb1bc0aadad1ed8dbe47022c699731ea6f9471ed827ad734cceebb7bc3a6df7",
+      "files": 54
+    },
+    {
+      "manifest": "research/upstream_integration_2026-10-15/evidence/T32-T33-completion-20261023/short-runtime-prepared/manifest.json",
+      "sha256": "1f9bac1b164d46c9995c23cadb27b4fd677156a08889a843485328bec84d2d18",
+      "files": 24
+    }
+  ],
+  "count": 31,
+  "files": [
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/boot-window/scoped-amfidont.py",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/boot-window/scoped-amfidont.py",
+      "bytes": 7107,
+      "sha256": "e3d9d424d0187412fec3a03522da55e7716800c0180aafb55eda07dc81fc8ca0"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/execute-approved-runtime.py",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/execute-approved-runtime.py",
+      "bytes": 2588,
+      "sha256": "05392ec44263ba4145aea20ae0050862daa49fdf93a0bd439413b88e2f4d8aa4"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/observe_t32_runtime.py",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/observe_t32_runtime.py",
+      "bytes": 460,
+      "sha256": "660fe6b890a54029261fa683eefc63a8bdb0f6a07fb26f6b5b8d955b31f5c108"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/pre-approval-draft-revision.json",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/pre-approval-draft-revision.json",
+      "bytes": 365,
+      "sha256": "84267341a69ac11b8a6f2e5d588eb66a6834087586e3e14401de137787dd1ec2"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/pre-approval-verification.json",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/pre-approval-verification.json",
+      "bytes": 292,
+      "sha256": "b382fa3b5d499de6d9a19bd5beed136352b2f25843dbbcda97fcfe18a878c002"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/runtime-backup.json",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/runtime-backup.json",
+      "bytes": 3769,
+      "sha256": "abe352c88e9a4a2a1534dbebcca27a2d33f429bf96ce0ae7b93f741e9d6ff7c4"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/runtime-plan.json",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/runtime-plan.json",
+      "bytes": 81634,
+      "sha256": "2f85665429b501a7502f9941f1eef95ab8c9f5f19ede503d02b8d4576c5e4ee1"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/start_t32_observation_window.py",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/start_t32_observation_window.py",
+      "bytes": 478,
+      "sha256": "cf133046680e89a0c24f1f17d329c37c0ab24dcdf7ed494f246d131f32f3de8e"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/unapproved-execution-final-refusal.log",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/unapproved-execution-final-refusal.log",
+      "bytes": 1267,
+      "sha256": "69233fa8b096695dd6232bde494d2282eef40c9230554df6ef7b93efb03536c7"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/unapproved-execution-refusal.log",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/unapproved-execution-refusal.log",
+      "bytes": 584,
+      "sha256": "80aab10096493e488a1e0795eb146459a969d8b06b8fb4c1bbd9e1c2028e78e7"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime/unapproved-plan-refusal.log",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime/unapproved-plan-refusal.log",
+      "bytes": 1267,
+      "sha256": "a467256b70b1883c2a34ba75a85dc9c00bf6df7bc5b5c105fda2e150a3dd8dec"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/display-runtime-preparation.log",
+      "origin": ".build/t32-t33-completion-20261023/display-runtime-preparation.log",
+      "bytes": 755,
+      "sha256": "e5c182dc727607000e621f0345f3c1591760df11063263c12e7f1d12e6a04aaa"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/runtime-observer-final.log",
+      "origin": ".build/t32-t33-completion-20261023/runtime-observer-final.log",
+      "bytes": 1386,
+      "sha256": "1d8eda557edf2b7a873ff33f80039ae65de77a059766e253a5eb6d5ccb644325"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/unlock-isolation-green.log",
+      "origin": ".build/t32-t33-completion-20261023/unlock-isolation-green.log",
+      "bytes": 624,
+      "sha256": "c8b5016b0e4be00ebfc962315e669b21dca0b4d1016d803576997744fe1714f8"
+    },
+    {
+      "path": "files/.build/t32-t33-completion-20261023/unlock-isolation-red.log",
+      "origin": ".build/t32-t33-completion-20261023/unlock-isolation-red.log",
+      "bytes": 1033,
+      "sha256": "7cc2d53018fb122ec9518d938d01878e82586be4b6a961bc5a5fae01f13d1467"
+    },
+    {
+      "path": "files/TASKS.md",
+      "origin": "TASKS.md",
+      "bytes": 112595,
+      "sha256": "d6772349aafd9f68a1a65e0d8edff3e01e0ec19852ac95d15f860665dd63a0cc"
+    },
+    {
+      "path": "files/research/0_binary_patch_comparison.md",
+      "origin": "research/0_binary_patch_comparison.md",
+      "bytes": 266293,
+      "sha256": "e3f5bd4a42fc6670edc19774ae1f4dbd092fae8157c8658b6f62617d248efd52"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/T32_T33_completion_20261023.md",
+      "origin": "research/upstream_integration_2026-10-15/T32_T33_completion_20261023.md",
+      "bytes": 24833,
+      "sha256": "df73479b453dbca0bea620a0b30df5b0f09cca2f93fa746aebdc567143cc420d"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "origin": "research/upstream_integration_2026-10-15/local_reconciliation.json",
+      "bytes": 310111,
+      "sha256": "9dba865f0bd38a27c8e685fbe75502da837c587aa2934eded4e5ee779967f59b"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/local_reconciliation.md",
+      "origin": "research/upstream_integration_2026-10-15/local_reconciliation.md",
+      "bytes": 11125,
+      "sha256": "3e75f375786d4c23634b4db7d97f5b90d3e97d68d938e25b913632cc0e81f858"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/progress.md",
+      "origin": "research/upstream_integration_2026-10-15/progress.md",
+      "bytes": 105818,
+      "sha256": "5f3924ba1d9c680ffebd5c0454c30fa022f4c61d3cb0256bf53cf4d1de18e5c9"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tasks.json",
+      "origin": "research/upstream_integration_2026-10-15/tasks.json",
+      "bytes": 365960,
+      "sha256": "cc5fdebdee6d5ebc017361cb3de561241d355e2e4dadf58b6d54ab2ad58e0403"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/archive_t32_short_runtime.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/archive_t32_short_runtime.py",
+      "bytes": 3871,
+      "sha256": "2b6d3b94b5bbf4e61017006f4a8e7a53e5a7932784ee39c92303d92651b87e4e"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/archive_t32_unlock_isolation.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/archive_t32_unlock_isolation.py",
+      "bytes": 4217,
+      "sha256": "c1a992f42db45f0e18b7b6c8e22fcce023eb8d5272422f762adb50430d14b8b3"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/observe_t32_runtime.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/observe_t32_runtime.py",
+      "bytes": 9915,
+      "sha256": "161d9c0ce62818cdb8495d9f1606ba9210a638fc727889672bdacae3cd939d69"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/prepare_t32_display_runtime.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/prepare_t32_display_runtime.py",
+      "bytes": 7574,
+      "sha256": "bfb582a3dfae7ffe4f8978b9351ff639161d95608216979478829f2127609683"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/t32_runtime_preflight.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/t32_runtime_preflight.py",
+      "bytes": 622,
+      "sha256": "849f12d138554c2b1a19381ea0e18ac1eb58bec08bd97932e51a2f052e3acd12"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/test_t32_runtime_observation.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/test_t32_runtime_observation.py",
+      "bytes": 6123,
+      "sha256": "7e6f96ee3c6b010c35b2c46951acecb2eaf8b94a8fd495a4a39652e732d5d503"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/test_t32_runtime_preflight.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/test_t32_runtime_preflight.py",
+      "bytes": 2646,
+      "sha256": "dbf5f4ba97987532fb0d23c3de39a50286e82f34281d8c24a684a5f77d86848c"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/test_t32_unlock_isolation.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/test_t32_unlock_isolation.py",
+      "bytes": 3400,
+      "sha256": "8ebe8626e10628f4857b7b6a171623d84c60efa2ec533738052abfe2b06c6c0d"
+    },
+    {
+      "path": "files/research/upstream_integration_2026-10-15/tools/verify_t32_completed_runtime.py",
+      "origin": "research/upstream_integration_2026-10-15/tools/verify_t32_completed_runtime.py",
+      "bytes": 4848,
+      "sha256": "203a747a77d10ec48f323a609a089c2ec923a5a6faa453ef54d01d7dc3bd5f06"
+    }
+  ]
+}

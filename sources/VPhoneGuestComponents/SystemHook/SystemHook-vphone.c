@@ -1,5 +1,6 @@
 #include "../Shared/InjectionEnvironment.h"
 #include "../Shared/RootHideLoaderLinks.h"
+#include "../Shared/VPhoneSimulationAccess.h"
 #include <crt_externs.h>
 #include <dlfcn.h>
 #include <errno.h>
@@ -95,8 +96,12 @@ static int vpSpawnP(pid_t *restrict pid, const char *restrict path, const posix_
         return posix_spawnp(pid, path, actions, attributes, argv, envp);
     }
     VPInjectionEnvironment injected = vpInsertHook(envp, getenv("VPHONE_JB_ROOT"));
+    VPSimulationEnvironment simulation = vpSimulationEnvironment(injected.values ? injected.values : envp,
+        *_NSGetEnviron(), vpSimulationProgramAccess(path, NULL), NULL);
     vpLogSpawn(path, injected.values ? "inserted" : "unchanged");
-    int status = posix_spawnp(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
+    int status = posix_spawnp(pid, path, actions, attributes, argv,
+                             simulation.values ? simulation.values : injected.values ? injected.values : envp);
+    vpSimulationFreeEnvironment(&simulation);
     vpFreeEnvironment(&injected);
     return status;
 }
@@ -112,8 +117,12 @@ static int vpSpawn(pid_t *restrict pid, const char *restrict path, const posix_s
         return posix_spawn(pid, path, actions, attributes, argv, envp);
     }
     VPInjectionEnvironment injected = vpInsertHook(envp, getenv("VPHONE_JB_ROOT"));
+    VPSimulationEnvironment simulation = vpSimulationEnvironment(injected.values ? injected.values : envp,
+        *_NSGetEnviron(), vpSimulationProgramAccess(path, NULL), NULL);
     vpLogSpawn(path, injected.values ? "inserted" : "unchanged");
-    int status = posix_spawn(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
+    int status = posix_spawn(pid, path, actions, attributes, argv,
+                            simulation.values ? simulation.values : injected.values ? injected.values : envp);
+    vpSimulationFreeEnvironment(&simulation);
     vpFreeEnvironment(&injected);
     return status;
 }
@@ -127,9 +136,12 @@ static int vpExecve(const char *path, char *const argv[], char *const envp[]) {
         return execve(path, argv, envp);
     }
     VPInjectionEnvironment injected = vpInsertHook(envp, getenv("VPHONE_JB_ROOT"));
+    VPSimulationEnvironment simulation = vpSimulationEnvironment(injected.values ? injected.values : envp,
+        *_NSGetEnviron(), vpSimulationProgramAccess(path, NULL), NULL);
     vpLogSpawn(path, injected.values ? "exec-inserted" : "exec-unchanged");
-    int status = execve(path, argv, injected.values ? injected.values : envp);
+    int status = execve(path, argv, simulation.values ? simulation.values : injected.values ? injected.values : envp);
     int savedErrno = errno;
+    vpSimulationFreeEnvironment(&simulation);
     vpFreeEnvironment(&injected);
     errno = savedErrno;
     return status;
@@ -185,6 +197,8 @@ __attribute__((constructor)) static void vpLogProcess(void) {
 
     if (vpInXPCProxy || getpid() == 1 || vpInjectionDisabled(*_NSGetEnviron()))
         return;
+    unsigned access = vpSimulationProgramAccess(path, NULL);
+    vpSimulationFilterTokens(access);
     const char *name = strrchr(path, '/');
     name = name ? name + 1 : path;
     if (strcmp(name, "vphoned") == 0 || strcmp(name, "logd") == 0 ||

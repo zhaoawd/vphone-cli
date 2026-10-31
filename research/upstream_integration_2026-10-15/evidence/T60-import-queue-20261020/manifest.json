@@ -1,0 +1,64 @@
+{
+  "recordedAt": "2026-10-20T07:21:09.565166+00:00",
+  "sourceBase": "d968d02f5c69615b9f2f3bd45805b60e10540bfc",
+  "upstreamTarget": "8a75092013eda87a4e30ed029b72028cb9279ac4",
+  "status": "import_queue_implemented_related_validation_passed_broader_T60_pending",
+  "red": {
+    "tests": 2,
+    "issues": 4,
+    "scope": "second/third concurrent import request discarded by existing global activity guard"
+  },
+  "focused": {
+    "tests": 26,
+    "suites": 4,
+    "exitCode": 0
+  },
+  "full": {
+    "tests": 210,
+    "suites": 47,
+    "configuredSkippedTests": 6,
+    "exitCode": 0,
+    "environment": "unsandboxed process/volume/child fixture access",
+    "durationSeconds": 9.063
+  },
+  "sandboxedFull": {
+    "tests": 210,
+    "issues": 4,
+    "scope": "process list, volume capacity and child process denied; same built tests passed outside sandbox"
+  },
+  "sources": {
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift": "c629e23120f0311b212eb4740a01585466eb4e9e09c350d1be538fcfb29f13b6",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "a2f3ba00b6065ca67c06b25fe10e8996ff6c2a22fdcb65c80834e6640a561017",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadFilePanel.swift": "eae6134859a8b9eafbecff89fcd5801b2b18c2ebbac703e7a23395406f2eca83",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift": "a6245fb0196f24d734edfbd6d31d4d277375bc08dbd27ca60e670c571d7b58ea",
+    "sources/VPhoneLaunchpad/Localizable.xcstrings": "86c5c30ba12ff5bcbf14c29f6dd1533a16edb52230f10c82b15c3c8065a31e78",
+    "tests/VPhoneLaunchpadKitTests/EditTests.swift": "5b8e91d811d9563fccbf812758b69439b835cd1e28299a590713c8c2a61af204",
+    "tests/VPhoneLaunchpadKitTests/ImportQueueTests.swift": "b4eb7c2618100abda95d7bcbd05f97c28548f53c18d32df81fde75e1ad295974"
+  },
+  "limitations": [
+    "no live NSOpenPanel multi-selection or signed Launchpad acceptance",
+    "no per-archive queue rows/progress/cancel UI",
+    "no full application transfer/create/ordinary-command shutdown matrix",
+    "configured real CLI and UI smoke suites skipped",
+    "does not advance overall T60 acceptance",
+    "separate frozen DSC acceptance remains in progress"
+  ],
+  "files": {
+    "import-queue-red.log.gz": {
+      "bytes": 7446,
+      "sha256": "ea829845bd10cbb5037bc6a52658a5812e6d2cce07ebf1cd97add8ed4fa92198"
+    },
+    "import-queue-green.log.gz": {
+      "bytes": 4313,
+      "sha256": "d9800823d299d774a10ca7098dd794f173017148013d206a32342fb9dfd8d511"
+    },
+    "launchpad-full.log.gz": {
+      "bytes": 12273,
+      "sha256": "9a12c90bb7531dc6a33f8b15d79e7391484f12e8c9451a33d309d231f195a963"
+    },
+    "launchpad-full-unsandboxed.log.gz": {
+      "bytes": 11557,
+      "sha256": "4b835e5568d11818fc6f3a39c92eaae58c07b85804d225d2811d7f1a6b3b4ca6"
+    }
+  }
+}

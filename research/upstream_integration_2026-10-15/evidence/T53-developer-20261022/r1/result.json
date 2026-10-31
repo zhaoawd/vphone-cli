@@ -1,0 +1,322 @@
+{
+  "upstreamTarget": "2a0d3aca9fb79344d939365cc337b915ae9f2f97",
+  "startedAt": 1792638489.874702,
+  "state": "isolated_checks_passed",
+  "VMStarted": false,
+  "guestInstalled": false,
+  "productIntegrated": false,
+  "runtimeValidated": false,
+  "accepted": false,
+  "files": {
+    "LICENSE": {
+      "sha256": "1f4b38df6a142e678a85d84c3a7ec4d1db328a556483241df714156134e81615",
+      "bytes": 1065,
+      "gitBlob": "cfc9ac9ebae5710535a20dcd354a5260ed35fb9c"
+    },
+    "VPhoneGuestComponents/DeviceHubFix/libdevicehubfix.c": {
+      "sha256": "1cccdd9326bc183bbcc6f79b6744af0d14f80cd83f21ccfa1fc838417fd47a47",
+      "bytes": 18376,
+      "gitBlob": "573df52ac66902206f1693e774a7d73bccc9d6af"
+    },
+    "VPhoneGuestComponents/FlutterRemapFix/FlutterRemapPolicy.h": {
+      "sha256": "aeccae528f4a8e61319d63830077990bcfaaf550488353c7d8ba1614c27a1915",
+      "bytes": 1607,
+      "gitBlob": "5c3880861d3385f51ab4f279418725e43364f554"
+    },
+    "VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c": {
+      "sha256": "ad7530f45607cfaa9bbb4c80bab55e376e072e1cad4ad096ca1ed8ba832c7dbd",
+      "bytes": 5383,
+      "gitBlob": "7eab343c36f1bc131c8acdc252baa53fd18f3189"
+    },
+    "VPhoneGuestComponents/LaunchHook/InstallCoordinationPersona.h": {
+      "sha256": "68cfee0f94221cf6014bcbc54c52043f889f68846b79e1d71e469b1bd3505a62",
+      "bytes": 1872,
+      "gitBlob": "89191e5a4347500320ee039257c18be05d7793e5"
+    },
+    "VPhoneGuestComponents/Tests/InstallCoordinationPersonaTests.c": {
+      "sha256": "dccb5b8a64367cec1fb50667155ac3eec257121f6d931e3cebada13c4b34b52e",
+      "bytes": 2679,
+      "gitBlob": "ee764398f32a0bcfc0863e19921a6777b74ba4dc"
+    },
+    "VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c": {
+      "sha256": "947adbb13182d71c64ec2012c65f186a9bfc45061af2669e6663bce7a6827413",
+      "bytes": 2094,
+      "gitBlob": "16a5a11f66ab783141765e328f88b94779d8c064"
+    },
+    "VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c": {
+      "sha256": "0d6d869f0baff80e6f0c8a8743894033587c1bcdf3070865af2fed480f5fe5bd",
+      "bytes": 2965,
+      "gitBlob": "106b106517caf0b8b8e86870f8af79a056fde6c7"
+    },
+    "VPhoneGuestComponents/Makefile": {
+      "sha256": "812dd48cc09c37db29cf12ff35dcb2f973255a6a81596b2a9c8eeb86d9a0609a",
+      "bytes": 21779,
+      "gitBlob": "6e9a00291a5313660f813d52047497b5d17109bb"
+    },
+    "VPhoneGuestComponents/Shared/InjectionEnvironment.h": {
+      "sha256": "4af1d3218984a68912588facc85bd991ad767df6bd57dfd6cf6ebd32fb63b1a2",
+      "bytes": 14827,
+      "gitBlob": "1c27a7b38ee7d4b7325688d8c63c71323f096ed1"
+    },
+    "VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c": {
+      "sha256": "30295821f21e065ba8059ddf38a2691b942b48636973f583b5b78db5c96db07a",
+      "bytes": 10934,
+      "gitBlob": "9aa9fd94a32a031bf70fb935d11d4a40dc327712"
+    },
+    "VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh": {
+      "sha256": "ce53557805150437f586bac17d83e7fde9a26e4454f9b6cb068d786d987a3b2c",
+      "bytes": 10613,
+      "gitBlob": "83071d9e7393214cf9585626f9cc21f2483a0080"
+    },
+    "VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh": {
+      "sha256": "470deebc73d480dc5429491d0a33de21ea25238fd992d28ad77be581dfeefcb0",
+      "bytes": 11986,
+      "gitBlob": "4fd9a509702cbc0f53a234b82a14997cc2ab464e"
+    },
+    "Research/Guest/ios27_xcode_persona_lookup.md": {
+      "sha256": "465cf27fbe61ced99eae8e1d742b6551ffb82a2cc630a5443ee2d574353097e0",
+      "bytes": 4465,
+      "gitBlob": "4a7927b870a13811179b8baf8da24ad80d1b8ce3"
+    },
+    "Research/Guest/flutter_aot_remap_compatibility.md": {
+      "sha256": "961d12925c682829f83da0b3d95d9218d39fe2e15bedb11cde78c1de41e19241",
+      "bytes": 3531,
+      "gitBlob": "be6f92a316a5276ba2c340f2225f4ae3be5dba86"
+    }
+  },
+  "steps": [
+    {
+      "label": "InstallCoordinationPersonaTests-build",
+      "command": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "macosx",
+        "clang",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-o",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/InstallCoordinationPersonaTests",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/upstream/VPhoneGuestComponents/Tests/InstallCoordinationPersonaTests.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "InstallCoordinationPersonaTests-run",
+      "command": [
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/InstallCoordinationPersonaTests"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "FlutterRemapPolicyTests-build",
+      "command": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "macosx",
+        "clang",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-o",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/FlutterRemapPolicyTests",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/upstream/VPhoneGuestComponents/Tests/FlutterRemapPolicyTests.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "FlutterRemapPolicyTests-run",
+      "command": [
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/FlutterRemapPolicyTests"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "FlutterRemapRepairTests-build",
+      "command": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "macosx",
+        "clang",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-function",
+        "-o",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/FlutterRemapRepairTests",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/upstream/VPhoneGuestComponents/Tests/FlutterRemapRepairTests.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "FlutterRemapRepairTests-run",
+      "command": [
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/FlutterRemapRepairTests"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "devicehub-build",
+      "command": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-arch",
+        "arm64e",
+        "-miphoneos-version-min=26.0",
+        "-Os",
+        "-dynamiclib",
+        "-Wl,-not_for_dyld_shared_cache",
+        "-install_name",
+        "/usr/lib/libdevicehubfix.dylib",
+        "-o",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libdevicehubfix.dylib",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/upstream/VPhoneGuestComponents/DeviceHubFix/libdevicehubfix.c",
+        "-Wl,-U,_$s19CoreDeviceUtilities28MediaStreamSupportedFeaturesV7currentACvgZ",
+        "-Wl,-U,_$s19CoreDeviceUtilities07CurrentB0V20isCustomerRestrictedSbvg",
+        "-framework",
+        "CoreFoundation",
+        "-framework",
+        "CoreVideo",
+        "-framework",
+        "IOSurface",
+        "-lMobileGestalt",
+        "-lobjc"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "flutter-build",
+      "command": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-arch",
+        "arm64e",
+        "-miphoneos-version-min=26.0",
+        "-Os",
+        "-dynamiclib",
+        "-Wl,-not_for_dyld_shared_cache",
+        "-install_name",
+        "/usr/lib/libflutterremapfix.dylib",
+        "-o",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libflutterremapfix.dylib",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/upstream/VPhoneGuestComponents/FlutterRemapFix/libflutterremapfix.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libdevicehubfix-sign",
+      "command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libdevicehubfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libdevicehubfix-verify",
+      "command": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libdevicehubfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libdevicehubfix-architecture",
+      "command": [
+        "/usr/bin/lipo",
+        "-archs",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libdevicehubfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libdevicehubfix-platform",
+      "command": [
+        "/usr/bin/xcrun",
+        "vtool",
+        "-show-build",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libdevicehubfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libdevicehubfix-imports",
+      "command": [
+        "/usr/bin/otool",
+        "-L",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libdevicehubfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libflutterremapfix-sign",
+      "command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libflutterremapfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libflutterremapfix-verify",
+      "command": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libflutterremapfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libflutterremapfix-architecture",
+      "command": [
+        "/usr/bin/lipo",
+        "-archs",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libflutterremapfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libflutterremapfix-platform",
+      "command": [
+        "/usr/bin/xcrun",
+        "vtool",
+        "-show-build",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libflutterremapfix.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "libflutterremapfix-imports",
+      "command": [
+        "/usr/bin/otool",
+        "-L",
+        "/Users/kolar/github/vphone-cli/.build/t53-developer-20261022/products/libflutterremapfix.dylib"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "products": {
+    "libdevicehubfix.dylib": {
+      "sha256": "3d5a9726ec3b0dadb38bd2cf7bba1c3fc186f1dc0d7c821581c60c0becf51b36",
+      "bytes": 86032
+    },
+    "libflutterremapfix.dylib": {
+      "sha256": "9eb51c0d7132aaf19b21c92e96bd4e385382d7c436d9e6201833ec36d42fce1e",
+      "bytes": 100576
+    }
+  },
+  "failures": [],
+  "finishedAt": 1792638492.057141,
+  "architecturePlatformAndDeploymentTargetVerified": true
+}

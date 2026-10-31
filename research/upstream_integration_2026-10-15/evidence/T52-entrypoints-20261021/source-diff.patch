@@ -1,0 +1,1977 @@
+diff --git a/scripts/cfw_disk_txn.py b/scripts/cfw_disk_txn.py
+index 3c407ee3..03ddddb6 100644
+--- a/scripts/cfw_disk_txn.py
++++ b/scripts/cfw_disk_txn.py
+@@ -308,6 +308,81 @@ def run_checks(phase, args, record):
+     save_record(work, record)
+ 
+ 
++# MARK: - Private mount workspace
++
++def make_mount_directory(parent):
++    """Create scratch beneath a root-owned private or sticky directory.
++
++    The caller is root in the host driver. Tests use the invoking uid and
++    disposable parents; no ownership is changed by this function.
++    """
++    parent = Path(parent)
++    if not parent.is_absolute() or parent.is_symlink():
++        raise Refused('CFW work parent must be an absolute directory without a symlink')
++    fd = os.open(parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
++    try:
++        info = os.fstat(fd)
++        mode = stat.S_IMODE(info.st_mode)
++        if info.st_uid != os.geteuid() or not (mode & 0o077 == 0 or mode & 0o1777 == 0o1777):
++            raise Refused('CFW work parent must be owned by the effective uid and private or sticky')
++        # mkdirat keeps creation on the checked parent, even if its name moves.
++        import secrets
++        name = '.cfw_mount.' + secrets.token_hex(12)
++        os.mkdir(name, 0o700, dir_fd=fd)
++        created = Path(os.path.realpath(parent)) / name
++        actual, named = os.stat(name, dir_fd=fd, follow_symlinks=False), os.lstat(created)
++        if (actual.st_dev, actual.st_ino) != (named.st_dev, named.st_ino):
++            raise Refused('CFW work parent changed during directory creation')
++        return created
++    finally:
++        os.close(fd)
++
++
++def mount_identity(root):
++    root = Path(root)
++    info = os.lstat(root)
++    if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o077:
++        raise Refused('CFW mount root must be a private directory owned by the effective uid')
++    if root != root.resolve(strict=True):
++        raise Refused('CFW mount root contains a symlink')
++    return {'path': str(root), 'dev': info.st_dev, 'ino': info.st_ino, 'uid': info.st_uid}
++
++
++def require_mount_root(vm, work, root):
++    """Only the journal-bound external root may extend private_path's scope."""
++    if work.parent != vm or not work.name.startswith('.cfw_disk.') or work.is_symlink():
++        raise Refused('CFW mount evidence is outside this VM transaction')
++    record = load_record(work)
++    if not record or record.get('vm') != str(vm) or record.get('mountRoot') != mount_identity(root):
++        raise Refused('CFW mount root differs from the transaction journal')
++    return root
++
++
++def require_free_space(paths, minimum=50 << 30):
++    """statvfs works on external volumes without Foundation capacity metadata."""
++    seen = set()
++    for path in paths:
++        try:
++            device = os.stat(path).st_dev
++            if device in seen:
++                continue
++            seen.add(device)
++            volume = os.statvfs(path)
++            available = volume.f_bavail * volume.f_frsize
++        except OSError as error:
++            raise Refused(f'CFW free space is unverified at {path}: {describe(error)}') from error
++        if available < minimum:
++            raise Refused(f'CFW workspace at {path}: {available} bytes free, {minimum} required')
++
++
++def bind_mount(args):
++    record = staged_record(args.work)
++    run_checks('pre-publish', args, record)
++    record['mountRoot'] = mount_identity(Path(os.environ['CFW_HOST_MNT']))
++    save_record(args.work, record)
++    return 0
++
++
+ # MARK: - Commands
+ 
+ def stage(args):
+@@ -318,7 +393,7 @@ def stage(args):
+             or (named.st_dev, named.st_ino) != (held.st_dev, held.st_ino):
+         raise Refused(f'{vm / DISK} is not the regular file held by this operation')
+     work_info = os.lstat(work)
+-    if not stat.S_ISDIR(work_info.st_mode) or work.parent != vm or os.listdir(work):
++    if not stat.S_ISDIR(work_info.st_mode) or work.parent != vm or work_info.st_dev != held.st_dev or os.listdir(work):
+         raise Refused(f'work directory {work} must be an empty directory inside {vm}')
+     record = {'version': 2, 'provenanceMode': 'required', 'id': f'{datetime.datetime.now(datetime.timezone.utc):%Y%m%dT%H%M%SZ}-{work.name.rsplit(".", 1)[-1]}',
+               'vm': str(vm), 'started_at': now(), 'status': 'staging',
+@@ -326,6 +401,12 @@ def stage(args):
+               'staged': None, 'checks': [], 'failure': None}
+     if getattr(args, 'guest_evidence', False):
+         record.update(version=4, guestEvidenceRequired=True, runtimeImageEvidenceRequired=True)
++    if os.environ.get('CFW_HOST_MNT'):
++        mount = Path(os.environ['CFW_HOST_MNT'])
++        # Existing VM-local roots retain their original path policy. Only an
++        # external root extends that policy and needs a journal identity.
++        if mount.resolve(strict=True).parent != vm.resolve(strict=True):
++            record['mountRoot'] = mount_identity(mount)
+     record['original']['sample'] = sample_digest(fd, held.st_size)
+     save_record(work, record)
+     destination = work / DISK
+@@ -805,7 +886,7 @@ def recover(args):
+ 
+ def main(argv):
+     parser = argparse.ArgumentParser(prog='cfw_disk_txn.py')
+-    parser.add_argument('command', choices=('stage', 'check', 'seal', 'publish', 'finish', 'inspect', 'preview-undo', 'prepare-undo', 'apply-undo', 'recover'))
++    parser.add_argument('command', choices=('stage', 'bind-mount', 'check', 'seal', 'publish', 'finish', 'inspect', 'preview-undo', 'prepare-undo', 'apply-undo', 'recover'))
+     parser.add_argument('--fd', type=int)
+     parser.add_argument('--owner-pid', type=int)
+     parser.add_argument('--phase', choices=('pre-mount', 'pre-install'))
+@@ -845,7 +926,7 @@ def main(argv):
+         if args.command == 'recover':
+             args.owner_pid = os.getpid()
+             return recover(args)
+-        return {'stage': stage, 'check': check, 'seal': seal, 'publish': publish, 'finish': finish,
++        return {'stage': stage, 'bind-mount': bind_mount, 'check': check, 'seal': seal, 'publish': publish, 'finish': finish,
+                 'prepare-undo': prepare_guest_undo, 'apply-undo': apply_guest_undo}[args.command](args)
+     except (Refused, OSError, ValueError, KeyError) as error:
+         print(f'[-] CFW disk {args.command}: {describe(error)}', file=sys.stderr)
+diff --git a/scripts/cfw_install_host.sh b/scripts/cfw_install_host.sh
+index 8922e1b5..81121a03 100755
+--- a/scripts/cfw_install_host.sh
++++ b/scripts/cfw_install_host.sh
+@@ -40,6 +40,7 @@ VARIANT="${VPHONE_CFW_VARIANT:-}"
+ MODE=install
+ GUEST_ENVIRONMENT=classic
+ GUEST_ENVIRONMENT_GIVEN=0
++WORK_PARENT=""
+ REPORT=""
+ UNDO_GENERATION=""
+ UNDO_DECLARATIONS=()
+@@ -48,6 +49,9 @@ VM_DIR="$PROJ/vm"
+ while (( $# )); do
+   case "$1" in
+     --variant) VARIANT="$2"; shift 2 ;;
++    --work-parent)
++      (( $# >= 2 )) || { echo "[-] --work-parent needs an absolute directory" >&2; exit 1; }
++      WORK_PARENT="$2"; [[ "$WORK_PARENT" == /* ]] || { echo "[-] --work-parent must be absolute" >&2; exit 1; }; shift 2 ;;
+     --reinstall-cryptex) REINSTALL_CRYPTEX=1; shift ;;
+     --guest-environment)
+       (( $# >= 2 )) || { echo "[-] --guest-environment needs classic|v2" >&2; exit 1; }
+@@ -114,6 +118,8 @@ else
+   (( ! REINSTALL_CRYPTEX )) || MODE_ARGS+=(--reinstall-cryptex)
+ fi
+ 
++[[ -z "$WORK_PARENT" ]] || MODE_ARGS+=(--work-parent "$WORK_PARENT")
++
+ # The canonical restore-info writer uses this literal JSON field. Refuse a
+ # classic reinstall before elevation or disk tools can remove the API entry.
+ V2_RECORD_PATTERN='"guest_environment"[[:space:]]*:[[:space:]]*"v2"'
+@@ -285,6 +291,7 @@ hand_back_artifacts() {
+   local artifacts=(.vphoned.signed .cfw_temp cfw_input cfw_jb_input .cfw-history)
+   [[ "$MODE" != undo ]] || artifacts=(.cfw-history "${CFW_DISK_WORK:t}")
+   for artifact in "${artifacts[@]}"; do
++    [[ -n "$artifact" ]] || continue
+     [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
+     restore_invoker_ownership "$VM_DIR/$artifact" || failed=1
+   done
+@@ -305,10 +312,8 @@ hand_back_artifacts() {
+ # original is never opened for writing: CFW goes to the staged copy, which is
+ # published by an exchange rename after every step succeeded. Long-running
+ # children (hdiutil attach, installers) do not inherit the descriptor.
+-exec {DISK_FD}<"$IMG"
+-CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
++CFW_DISK_WORK=""
+ CFW_STAGED_IMG=""
+-export VPHONE_GUEST_EVIDENCE="$CFW_DISK_WORK/guest-changes.jsonl"
+ TXN_STATE=none
+ txn() {
+   local command="$1"; shift
+@@ -323,9 +328,19 @@ txn_abort() {
+   return 0
+ }
+ 
+-# One private directory per invocation, including temporary Cryptex mounts.
+-# Keep it beneath the VM directory so installer path checks remain applicable.
+-CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
++# Disk staging stays inside the VM for same-volume atomic publication.
++# An explicit scratch parent changes only the private mount workspace.
++make_mount_directory() {
++  if [[ -z "$WORK_PARENT" ]]; then
++    mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX"
++  else
++    "$PY" -c 'import sys; sys.path.insert(0,sys.argv[1]); from cfw_disk_txn import make_mount_directory; print(make_mount_directory(sys.argv[2]))' "$SCRIPT_DIR" "$WORK_PARENT"
++  fi
++}
++# Check both volumes before creating any disk copy. statvfs is also available
++# on external volumes that have no Foundation important-usage capacity value.
++"$PY" -c 'import sys; sys.path.insert(0,sys.argv[1]); from cfw_disk_txn import require_free_space; require_free_space(sys.argv[2:])' "$SCRIPT_DIR" "$VM_DIR" "${WORK_PARENT:-$VM_DIR}"
++CFW_HOST_MNT=$(make_mount_directory)
+ export CFW_HOST_MNT
+ BASEDISK=""
+ CLEANUP_DONE=0
+@@ -422,6 +437,12 @@ trap 'exit 130' INT
+ trap 'exit 143' TERM
+ trap 'exit 129' HUP
+ 
++# Preflight workspace failures must not leave an empty pending transaction.
++# The cleanup trap already owns the mount root before disk staging starts.
++exec {DISK_FD}<"$IMG"
++CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
++export VPHONE_GUEST_EVIDENCE="$CFW_DISK_WORK/guest-changes.jsonl"
++
+ if [[ "$MODE" == environment ]]; then
+   echo "[*] host-mode guest environment update: vm=$VM_DIR candidates=$GUEST_COMPONENTS mounts=$CFW_HOST_MNT staging=$CFW_DISK_WORK"
+ else
+@@ -499,9 +520,10 @@ fi
+ if [[ "$MODE" != environment ]]; then
+   # Verify the actual post-snapshot image. Its final attachment and all volume
+   # mounts are read-only; no writer runs after this boundary.
+-  CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
++  CFW_HOST_MNT=$(make_mount_directory)
+   export CFW_HOST_MNT
+   CLEANUP_DONE=0
++  txn bind-mount || exit $?
+   hdiutil attach -plist -nomount -readonly -imagekey diskimage-class=CRawDiskImage "$CFW_STAGED_IMG" > "$CFW_HOST_MNT/attach.log" {DISK_FD}<&-
+   BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || { echo "[-] cannot identify final read-only attachment" >&2; BASEDISK=""; exit 1; }
+   echo "[*] verifying final guest effects after snapshot modification..."
+diff --git a/scripts/patchers/plan_gate.py b/scripts/patchers/plan_gate.py
+index 61473c1d..084b8e6f 100644
+--- a/scripts/patchers/plan_gate.py
++++ b/scripts/patchers/plan_gate.py
+@@ -134,6 +134,7 @@ def from_environment():
+     try:
+         plan = load_plan(os.environ['VPHONE_FROZEN_PLAN'], os.environ['VPHONE_FROZEN_PLAN_SHA256'],
+                          json.loads(os.environ['VPHONE_FROZEN_CONTEXT']))
++        verify_expected_binding(plan.path.parent)
+         require_supported_implementations(plan)
+         return plan
+     except (KeyError, OSError, json.JSONDecodeError) as error:
+@@ -164,18 +165,49 @@ def require_supported_implementations(plan, *, command=None):
+ 
+ 
+ def recheck(plan):
++    verify_expected_binding(plan.path.parent)
+     if sha(strict_bytes(plan.path)) != plan.raw_sha256:
+         raise ValueError('frozen plan changed before write')
+     if (plan.path.parent / '.firmware-desired-pending.json').exists():
+         raise ValueError('desired plan publication uncertain')
+ 
+ 
++def verify_expected_binding(vm):
++    digest = os.environ.get('VPHONE_EXPECTED_BINDING_SHA256')
++    version = os.environ.get('VPHONE_EXPECTED_CORE_BUNDLE')
++    if digest is None and version is None:
++        return
++    if not isinstance(digest, str) or not DIGEST.fullmatch(digest) or not version:
++        raise ValueError('incomplete expected Core Bundle binding')
++    raw = strict_bytes(Path(vm) / 'launchpad.json')
++    record = json.loads(raw)
++    if sha(raw) != digest or not isinstance(record, dict) or record.get('bundle') != version:
++        raise ValueError('Core Bundle binding changed before environment write')
++
++
+ def private_path(plan, path):
+     """Validate invocation-local staging without granting guest ownership."""
+     vm = Path(plan.context['vmDirectory'])
+     path = Path(os.path.abspath(path))
+-    if path == vm or vm not in path.parents:
++    if path == vm:
+         raise ValueError('private staging outside bound VM')
++    if vm not in path.parents:
++        # External mount roots are explicit journal members. Disk staging,
++        # evidence and publication remain inside the VM on its own volume.
++        from cfw_disk_txn import require_mount_root, Refused
++        root = Path(os.environ.get('CFW_HOST_MNT', ''))
++        sink = Path(os.environ.get('VPHONE_GUEST_EVIDENCE', ''))
++        try:
++            require_mount_root(vm, sink.parent, root)
++            if path != root and root not in path.parents:
++                raise ValueError('private staging outside bound mount root')
++            current = path
++            while current != root:
++                if current.is_symlink(): raise ValueError('linked private staging path')
++                current = current.parent
++            return path
++        except (Refused, OSError) as error:
++            raise ValueError(str(error)) from error
+     relative = path.relative_to(vm)
+     first = relative.parts[0]
+     if first not in {'.cfw_temp', '.iosbinpack_tmp', '.vphoned.signed', 'cfw_input', 'cfw_jb_input'} and not first.startswith(('.cfw_mount.', '.cfw_disk.')):
+@@ -192,6 +224,7 @@ def require_write_context(plan):
+     require_supported_implementations(plan)
+     from vm_lock import check_inherited
+     vm = Path(plan.context['vmDirectory'])
++    verify_expected_binding(vm)
+     if plan.context['variant'] == 'less':
+         import fcntl
+         transaction = Path(plan.context['filesystemTransaction'])
+@@ -214,7 +247,7 @@ def require_write_context(plan):
+         return
+     check_inherited(vm)
+     root = private_path(plan, os.environ['CFW_HOST_MNT'])
+-    if root.parent != vm or not root.name.startswith('.cfw_mount.') or not root.is_dir():
++    if not root.name.startswith('.cfw_mount.') or not root.is_dir():
+         raise ValueError('guest mount root differs from bound invocation')
+     destination = private_path(plan, os.environ['VPHONE_GUEST_EVIDENCE'])
+     if destination.parent.parent != vm or not destination.parent.name.startswith('.cfw_disk.') or destination.name != 'guest-changes.jsonl':
+diff --git a/sources/Info.plist b/sources/Info.plist
+index 0f9094be..beb478b2 100644
+--- a/sources/Info.plist
++++ b/sources/Info.plist
+@@ -16,6 +16,8 @@
+ 	<string>1.0</string>
+ 	<key>VPhoneBoundLaunchProtocol</key>
+ 	<string>vphone.local-bound-launch.v1</string>
++	<key>VPhoneEnvironmentUpdateProtocol</key>
++	<string>vphone.environment-update.v1</string>
+ 	<key>VPhoneKernelRollbackProtocol</key>
+ 	<string>vphone.kernel-rollback.v1</string>
+ 	<key>VPhoneKernelUpdateProtocol</key>
+@@ -30,5 +32,7 @@
+ 	<string>vphone-cli forwards your location to the guest VM for location simulation.</string>
+ 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+ 	<string>vphone-cli forwards your location to the guest VM for location simulation.</string>
++	<key>VPhoneTransferProgressVersion</key>
++	<integer>1</integer>
+ </dict>
+ </plist>
+diff --git a/sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift b/sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift
+index 067e3718..5372f59f 100644
+--- a/sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift
++++ b/sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift
+@@ -18,11 +18,14 @@ public struct VPhoneLaunchpadLauncherRequest: Sendable {
+         }
+         let version = String(executable.dropFirst(prefix.count).dropLast(suffix.count))
+         try VPhoneBundleVersion.require(version)
+-        guard arguments.count >= 3, arguments[0] == "vm", ["launch", "update-kernel", "rollback-kernel"].contains(arguments[1]),
++        guard arguments.count >= 3,
++              (arguments[0] == "vm" && ["launch", "update-kernel", "rollback-kernel"].contains(arguments[1]))
++                || (arguments[0] == "cfw" && arguments[1] == "update-environment"),
+               !arguments[2].isEmpty, !arguments[2].hasPrefix("-"),
+               arguments.allSatisfy({ !$0.utf8.contains(0) }) else {
+-            throw VPhoneBundleStoreError("Launcher permits only vm launch, vm update-kernel or vm rollback-kernel <machine> [options]")
++            throw VPhoneBundleStoreError("Launcher permits vm launch/update-kernel/rollback-kernel or cfw update-environment <machine> [options]")
+         }
++        if arguments[0] == "cfw" { try Self.validateEnvironmentArguments(arguments) }
+         self.version = version
+         self.executable = executable
+         self.arguments = arguments
+@@ -32,6 +35,41 @@ public struct VPhoneLaunchpadLauncherRequest: Sendable {
+ 
+     public var isKernelRollback: Bool { arguments[1] == "rollback-kernel" }
+ 
++    public var isEnvironmentUpdate: Bool { arguments[0] == "cfw" && arguments[1] == "update-environment" }
++
++    /// Environment replacement cannot redirect its resource/component source.
++    private static func validateEnvironmentArguments(_ arguments: [String]) throws {
++        guard ![".", ".."].contains(arguments[2]), !arguments[2].contains("/") else {
++            throw VPhoneBundleStoreError("Environment update requires a VM name")
++        }
++        var index = 3
++        var seen = Set<String>()
++        while index < arguments.count {
++            let option = arguments[index]
++            guard seen.insert(option).inserted else { throw VPhoneBundleStoreError("Duplicate environment option") }
++            if ["--root-popup", "--check"].contains(option) { index += 1; continue }
++            guard ["--library-root", "--work-parent", "--expected-binding-sha256"].contains(option),
++                  index + 1 < arguments.count else { throw VPhoneBundleStoreError("Unsupported environment option") }
++            let value = arguments[index + 1]
++            if option == "--expected-binding-sha256" {
++                guard value.count == 64, value.allSatisfy({ "0123456789abcdef".contains($0) }) else {
++                    throw VPhoneBundleStoreError("Invalid binding digest")
++                }
++            } else if !value.hasPrefix("/") {
++                throw VPhoneBundleStoreError("Environment paths must be absolute")
++            }
++            index += 2
++        }
++    }
++
++    public static func validateEnvironmentUpdateProtocol(executable: URL) throws {
++        let info = executable.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Info.plist")
++        let fields = try PropertyListSerialization.propertyList(from: Data(contentsOf: info), format: nil) as? [String: Any]
++        guard fields?["VPhoneEnvironmentUpdateProtocol"] as? String == "vphone.environment-update.v1" else {
++            throw VPhoneBundleStoreError("Selected Core Bundle does not declare the bound environment update protocol")
++        }
++    }
++
+     public static func validateKernelRollbackProtocol(executable: URL) throws {
+         let info = executable.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Info.plist")
+         let fields = try PropertyListSerialization.propertyList(from: Data(contentsOf: info), format: nil) as? [String: Any]
+diff --git a/sources/VPhoneCore/VPhoneMachineBindingPersistence.swift b/sources/VPhoneCore/VPhoneMachineBindingPersistence.swift
+index 3ce9e284..1b281fd4 100644
+--- a/sources/VPhoneCore/VPhoneMachineBindingPersistence.swift
++++ b/sources/VPhoneCore/VPhoneMachineBindingPersistence.swift
+@@ -12,7 +12,9 @@ extension VPhoneMachineBinding {
+         try VPhoneBundleGuard.withBundleLock(directory: machine, operation: VPhoneVMOperation.bindCoreBundle) { _ in
+             let manifest = try VPhoneVirtualMachineManifest.load(from: machine.appendingPathComponent("config.plist"))
+             let holders = try VPhoneLsof.holders(of: machine.appendingPathComponent(manifest.diskImage))
+-            guard holders.isEmpty else { throw VPhoneMachineBindingError("VM disk is still open; binding and backup were not changed") }
++            if let refusal = VPhoneProcessHolder.diskRefusal(holders.map { VPhoneProcessHolder(pid: $0) }, rerun: "change the Core Bundle again") {
++                throw VPhoneMachineBindingError(refusal + " Binding and backup were not changed.")
++            }
+             let current = try snapshot(machine)
+             guard current == expected else { throw VPhoneMachineBindingError("VM binding changed; inspect it before retrying") }
+             let next: Self
+diff --git a/sources/VPhoneLaunchpad/Localizable.xcstrings b/sources/VPhoneLaunchpad/Localizable.xcstrings
+index 85574ea3..619dccdc 100644
+--- a/sources/VPhoneLaunchpad/Localizable.xcstrings
++++ b/sources/VPhoneLaunchpad/Localizable.xcstrings
+@@ -289,6 +289,23 @@
+         }
+       }
+     },
++    "Apply": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Apply"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "应用"
++          }
++        }
++      }
++    },
+     "Attempts": {
+       "localizations": {
+         "en": {
+@@ -481,6 +498,22 @@
+         }
+       }
+     },
++    "Cancelling…": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Cancelling…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "正在取消…"
++          }
++        }
++      }
++    },
+     "Cannot read the volume of %@": {
+       "localizations": {
+         "en": {
+@@ -513,6 +546,56 @@
+         }
+       }
+     },
++    "Change Core Bundle…": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Change Core Bundle…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "更改 Core Bundle…"
++          }
++        }
++      }
++    },
++    "Changing Core Bundle…": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Changing Core Bundle…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "正在更改 Core Bundle…"
++          }
++        }
++      }
++    },
++    "Changing the host binding preserves recorded component origins. If the environment update fails or is cancelled after binding, the new host binding remains.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Changing the host binding preserves recorded component origins. If the environment update fails or is cancelled after binding, the new host binding remains."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "更改宿主绑定会保留记录的组件来源。绑定后环境更新失败或取消时，新宿主绑定会保留。"
++          }
++        }
++      }
++    },
+     "Check Again": {
+       "localizations": {
+         "en": {
+@@ -641,6 +724,23 @@
+         }
+       }
+     },
++    "Choose Backup Parent…": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Choose Backup Parent…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "选择备份父目录…"
++          }
++        }
++      }
++    },
+     "Choose Location…": {
+       "localizations": {
+         "en": {
+@@ -673,18 +773,34 @@
+         }
+       }
+     },
+-    "Choose an exported machine archive (.tzst or .txz). It is imported into %@.": {
++    "Choose local .tzst or .txz archives.": {
+       "localizations": {
+         "en": {
+           "stringUnit": {
+             "state": "translated",
+-            "value": "Choose an exported machine archive (.tzst or .txz). It is imported into %@."
++            "value": "Choose local .tzst or .txz archives."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "请选择本地 .tzst 或 .txz 归档。"
++          }
++        }
++      }
++    },
++    "Choose one or more exported machine archives (.tzst or .txz). They are imported in order into %@.": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Choose one or more exported machine archives (.tzst or .txz). They are imported in order into %@."
+           }
+         },
+         "zh-Hans": {
+           "stringUnit": {
+             "state": "needs_review",
+-            "value": "选择导出的虚拟机归档（.tzst 或 .txz）。归档会导入到 %@。"
++            "value": "选择一个或多个导出的虚拟机归档（.tzst 或 .txz）。归档将依次导入到 %@。"
+           }
+         }
+       }
+@@ -1361,18 +1477,19 @@
+         }
+       }
+     },
+-    "Every command runs this vphone-cli. Launchpad does not switch to an installed Core Bundle.": {
++    "Environment replacement requires the selected Bundle protocol and administrator authentication. Unsupported or incompatible environments are refused.": {
++      "extractionState": "manual",
+       "localizations": {
+         "en": {
+           "stringUnit": {
+             "state": "translated",
+-            "value": "Every command runs this vphone-cli. Launchpad does not switch to an installed Core Bundle."
++            "value": "Environment replacement requires the selected Bundle protocol and administrator authentication. Unsupported or incompatible environments are refused."
+           }
+         },
+         "zh-Hans": {
+           "stringUnit": {
+-            "state": "needs_review",
+-            "value": "所有命令均运行此 vphone-cli。Launchpad 不切换到已安装的核心 Bundle。"
++            "state": "translated",
++            "value": "环境替换要求所选 Bundle 支持对应协议，并完成管理员认证。不支持或不兼容的环境会被拒绝。"
+           }
+         }
+       }
+@@ -1905,6 +2022,22 @@
+         }
+       }
+     },
++    "Importing…": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Importing…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "正在导入…"
++          }
++        }
++      }
++    },
+     "Import…": {
+       "localizations": {
+         "en": {
+@@ -2209,6 +2342,23 @@
+         }
+       }
+     },
++    "Library commands use the embedded CLI. Bound execution and supported component updates use the verified selected Core Bundle.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Library commands use the embedded CLI. Bound execution and supported component updates use the verified selected Core Bundle."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "库操作使用内嵌 CLI。已绑定的执行和受支持的组件更新使用经过验证的所选 Core Bundle。"
++          }
++        }
++      }
++    },
+     "List the store and run vphone-cli core-bundle verify again": {
+       "localizations": {
+         "en": {
+@@ -2465,6 +2615,23 @@
+         }
+       }
+     },
++    "New Backup Directory": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "New Backup Directory"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "新备份目录"
++          }
++        }
++      }
++    },
+     "New Machine": {
+       "localizations": {
+         "en": {
+@@ -2625,6 +2792,23 @@
+         }
+       }
+     },
++    "No verified compatible Core Bundle is installed.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "No verified compatible Core Bundle is installed."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "未安装已验证且兼容的 Core Bundle。"
++          }
++        }
++      }
++    },
+     "None": {
+       "localizations": {
+         "en": {
+@@ -3057,6 +3241,23 @@
+         }
+       }
+     },
++    "Refresh Verified Bundles": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Refresh Verified Bundles"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "刷新已验证的 Bundle"
++          }
++        }
++      }
++    },
+     "Regular Firmware": {
+       "localizations": {
+         "en": {
+@@ -3905,6 +4106,23 @@
+         }
+       }
+     },
++    "The first binding requires a complete verified backup outside the machine directory.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "The first binding requires a complete verified backup outside the machine directory."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "首次绑定要求在虚拟机目录外建立经过完整校验的备份。"
++          }
++        }
++      }
++    },
+     "The machine is created in a folder with its name inside the folder you choose.": {
+       "localizations": {
+         "en": {
+@@ -4017,6 +4235,23 @@
+         }
+       }
+     },
++    "This machine has no recorded Core Bundle binding.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "This machine has no recorded Core Bundle binding."
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "此虚拟机没有记录 Core Bundle 绑定。"
++          }
++        }
++      }
++    },
+     "Toolchain manifest": {
+       "localizations": {
+         "en": {
+@@ -4145,6 +4380,22 @@
+         }
+       }
+     },
++    "Unable to Import Archives": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Unable to Import Archives"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "无法导入归档"
++          }
++        }
++      }
++    },
+     "Unable to Rename %@": {
+       "localizations": {
+         "en": {
+@@ -4289,6 +4540,23 @@
+         }
+       }
+     },
++    "Update Guest Environment After Binding": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Update Guest Environment After Binding"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "绑定后更新客户机环境"
++          }
++        }
++      }
++    },
+     "Updated": {
+       "localizations": {
+         "en": {
+@@ -4305,6 +4573,23 @@
+         }
+       }
+     },
++    "Updating Guest Environment…": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Updating Guest Environment…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "正在更新客户机环境…"
++          }
++        }
++      }
++    },
+     "Use letters, numbers, periods, hyphens, and underscores.": {
+       "localizations": {
+         "en": {
+@@ -4401,6 +4686,39 @@
+         }
+       }
+     },
++    "Waiting to import…": {
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Waiting to import…"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "等待导入…"
++          }
++        }
++      }
++    },
++    "Work Parent (optional)": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Work Parent (optional)"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "工作父目录（可选）"
++          }
++        }
++      }
++    },
+     "You cannot write to %@.": {
+       "localizations": {
+         "en": {
+@@ -4592,6 +4910,23 @@
+           }
+         }
+       }
++    },
++    "Core Bundle Binding": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Core Bundle Binding"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Core Bundle 绑定"
++          }
++        }
++      }
+     }
+   },
+   "version": "1.0"
+diff --git a/sources/VPhoneLaunchpad/VPhoneLaunchpadCoreBundleView.swift b/sources/VPhoneLaunchpad/VPhoneLaunchpadCoreBundleView.swift
+index 5b108669..ed4fb247 100644
+--- a/sources/VPhoneLaunchpad/VPhoneLaunchpadCoreBundleView.swift
++++ b/sources/VPhoneLaunchpad/VPhoneLaunchpadCoreBundleView.swift
+@@ -56,7 +56,7 @@ struct VPhoneLaunchpadCoreBundleView: View {
+         } header: {
+             Text("Embedded toolchain")
+         } footer: {
+-            Text("Every command runs this vphone-cli. Launchpad does not switch to an installed Core Bundle.")
++            Text("Library commands use the embedded CLI. Bound execution and supported component updates use the verified selected Core Bundle.")
+                 .foregroundStyle(.secondary)
+         }
+     }
+diff --git a/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift b/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift
+index d505bb79..77e0acff 100644
+--- a/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift
++++ b/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift
+@@ -14,6 +14,7 @@ struct VPhoneLaunchpadMachinesView: View {
+ 
+     enum Sheet: Identifiable {
+         case settings([VPhoneLaunchpadMachine])
++        case bundleChange(MachinePath)
+         case rename(MachinePath)
+         case clone(MachinePath)
+         case export([MachinePath])
+@@ -24,6 +25,7 @@ struct VPhoneLaunchpadMachinesView: View {
+ 
+         var id: String {
+             switch self {
++            case let .bundleChange(machine): "bundle-change-\(machine.url.path)"
+             case let .settings(machines): "settings-\(machines.map(\.path.url.path).joined(separator: "|"))"
+             case let .rename(machine): "rename-\(machine.url.path)"
+             case let .clone(machine): "clone-\(machine.url.path)"
+@@ -68,13 +70,19 @@ struct VPhoneLaunchpadMachinesView: View {
+ 
+     var body: some View {
+         @Bindable var library = library
+-        Group {
+-            if library.machines.isEmpty {
+-                emptyState
+-            } else if rows.isEmpty {
+-                ContentUnavailableView.search(text: filter)
+-            } else {
+-                table(selection: $library.selection)
++        VStack(spacing: 0) {
++            if !library.imports.isEmpty {
++                importQueue
++                Rectangle().fill(VPhoneLaunchpadTheme.border).frame(height: 1)
++            }
++            Group {
++                if library.machines.isEmpty {
++                    emptyState
++                } else if rows.isEmpty {
++                    ContentUnavailableView.search(text: filter)
++                } else {
++                    table(selection: $library.selection)
++                }
+             }
+         }
+         // At least as wide as the columns (B2: with the inspector open the
+@@ -134,6 +142,41 @@ struct VPhoneLaunchpadMachinesView: View {
+ 
+     // MARK: - Toolbar
+ 
++    private var importQueue: some View {
++        ScrollView {
++            VStack(spacing: VPhoneLaunchpadTheme.unit) {
++                ForEach(library.imports) { item in
++                    HStack(spacing: VPhoneLaunchpadTheme.padding) {
++                        if item.state == .waiting {
++                            Image(systemName: "clock").foregroundStyle(.secondary)
++                        } else {
++                            ProgressView(value: item.progress?.fraction).controlSize(.small).frame(width: 56)
++                        }
++                        Text(verbatim: item.archive.lastPathComponent)
++                            .lineLimit(1).truncationMode(.middle)
++                            .help(item.archive.path)
++                        Spacer()
++                        if let progress = item.progress {
++                            Text(verbatim: ByteCountFormatter.string(fromByteCount: progress.bytes, countStyle: .file))
++                                .foregroundStyle(.secondary).monospacedDigit()
++                        }
++                        switch item.state {
++                        case .waiting: Text("Waiting to import…").foregroundStyle(.secondary)
++                        case .running: Text("Importing…")
++                        case .cancelling: Text("Cancelling…").foregroundStyle(.secondary)
++                        }
++                        Button("Cancel") { library.cancelImport(item.id) }
++                            .disabled(item.state == .cancelling)
++                    }
++                    .frame(height: 28)
++                }
++            }
++            .padding(VPhoneLaunchpadTheme.padding)
++        }
++        .frame(height: CGFloat(min(library.imports.count, 4)) * 36 + 16)
++        .fontDesign(.monospaced)
++    }
++
+     @ToolbarContentBuilder
+     private var toolbar: some ToolbarContent {
+         ToolbarItem(placement: .automatic) {
+@@ -164,7 +207,6 @@ struct VPhoneLaunchpadMachinesView: View {
+                 Label("Import…", systemImage: "square.and.arrow.down")
+             }
+             .help("Import a machine archive into the default library")
+-            .disabled(library.globalActivity != nil)
+         }
+         ToolbarItem(placement: .automatic) {
+             VPhoneLaunchpadSearchField(text: $filter, prompt: String(localized: "Search machines"))
+@@ -267,6 +309,8 @@ struct VPhoneLaunchpadMachinesView: View {
+         Button("Settings…") { sheet = .settings(machines) }
+             .disabled(!editable)
+         if machines.count == 1, let machine = machines.first {
++            Button("Change Core Bundle…") { sheet = .bundleChange(machine.path) }
++                .disabled(!editable)
+             Button("Rename…") { sheet = .rename(machine.path) }
+                 .disabled(!editable)
+             Button("Clone…") { sheet = .clone(machine.path) }
+@@ -318,7 +362,9 @@ struct VPhoneLaunchpadMachinesView: View {
+                     state: library.state(of: machine.path),
+                     activity: library.activity(of: machine.path),
+                     panicked: library.panicked.contains(machine.path),
+-                    indeterminate: library.isExporting(machine.path)
++                    indeterminate: library.isExporting(machine.path),
++                    fraction: library.exports[machine.path]?.progress?.fraction,
++                    bytes: library.exports[machine.path]?.progress?.bytes
+                 )
+             }
+             .width(min: 120, ideal: Column.state)
+@@ -364,7 +410,6 @@ struct VPhoneLaunchpadMachinesView: View {
+             } actions: {
+                 Button("New Machine…") { sheet = .newMachine }
+                 Button("Import…") { chooseImport() }
+-                    .disabled(library.globalActivity != nil)
+             }
+         }
+     }
+@@ -374,6 +419,8 @@ struct VPhoneLaunchpadMachinesView: View {
+     @ViewBuilder
+     private func sheetContent(_ sheet: Sheet) -> some View {
+         switch sheet {
++        case let .bundleChange(path):
++            VPhoneLaunchpadBundleChangeView(machine: path)
+         case let .settings(machines):
+             VPhoneLaunchpadMachineSettingsView(machines: machines)
+         case let .rename(path):
+@@ -411,11 +458,11 @@ struct VPhoneLaunchpadMachinesView: View {
+         let library = library
+         let panel = NSOpenPanel()
+         panel.title = String(localized: "Import Machine")
+-        panel.message = String(localized: "Choose an exported machine archive (.tzst or .txz). It is imported into \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))).")
++        panel.message = String(localized: "Choose one or more exported machine archives (.tzst or .txz). They are imported in order into \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))).")
+         panel.canChooseDirectories = false
+-        panel.allowsMultipleSelection = false
+-        panel.present { url in
+-            Task { await library.importArchive(url) }
++        panel.allowsMultipleSelection = true
++        panel.presentSelection { urls in
++            Task { await library.importArchives(urls) }
+         }
+     }
+ 
+@@ -441,6 +488,7 @@ struct VPhoneLaunchpadMachinesView: View {
+         }
+         let all = library.machines
+         switch name {
++        case "bundleChangeSheet": sheet = .bundleChange(first.path)
+         case "settingsSheet": sheet = .settings([first])
+         case "renameSheet": sheet = .rename(first.path)
+         case "cloneSheet": sheet = .clone(first.path)
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift
+index 16708f94..1110a789 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift
+@@ -9,6 +9,28 @@ public enum VPhoneLaunchpadBundleChange: Equatable, Sendable {
+     case boundButNotUpdated
+     case refused([VPhoneProcessHolder])
+ 
++    public static func bindingArguments(_ machine: VPhoneLaunchpadMachinePath, version: String, backup: URL?, expectedSHA256: String? = nil) -> [String]? {
++        guard VPhoneLaunchpadMachineName.isPassable(machine.name),
++              machine.libraryRoot.hasPrefix("/"), !machine.libraryRoot.contains("\0"),
++              VPhoneCoreBundleVersion.supportsTargetFeatures(version),
++              expectedSHA256.map({ $0 == "missing" || ($0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) }) }) ?? true,
++              backup.map({ $0.isFileURL && $0.path.hasPrefix("/") && !$0.path.contains("\0") }) ?? true else { return nil }
++        var args = ["vm", "bind-core-bundle", machine.name, "--version", version] + machine.libraryArguments
++        if let backup { args += ["--backup", backup.path] }
++        if let expectedSHA256 { args += ["--expected-binding-sha256", expectedSHA256] }
++        return args
++    }
++
++    public static func environmentArguments(_ machine: VPhoneLaunchpadMachinePath, workParent: URL? = nil) -> [String]? {
++        guard VPhoneLaunchpadMachineName.isPassable(machine.name),
++              machine.libraryRoot.hasPrefix("/"), !machine.libraryRoot.contains("\0"),
++              workParent.map({ $0.isFileURL && $0.path.hasPrefix("/") && !$0.path.contains("\0") }) ?? true else { return nil }
++        var args = ["cfw", "update-environment", machine.name] + machine.libraryArguments
++        args.append("--root-popup")
++        if let workParent { args += ["--work-parent", workParent.path] }
++        return args
++    }
++
+     @MainActor
+     static func perform(
+         updatesEnvironment: Bool,
+@@ -16,12 +38,15 @@ public enum VPhoneLaunchpadBundleChange: Equatable, Sendable {
+         bind: () async throws -> Void,
+         updateEnvironment: () async throws -> Bool
+     ) async throws -> Self {
++        try Task.checkCancellation()
+         if updatesEnvironment {
+             let holders = try await diskHolders()
+             guard holders.isEmpty else { return .refused(holders) }
+         }
++        try Task.checkCancellation()
+         try await bind()
+         guard updatesEnvironment else { return .bound }
++        try Task.checkCancellation()
+         return try await updateEnvironment() ? .updated : .boundButNotUpdated
+     }
+ }
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift
+index c72254aa..cf246327 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift
+@@ -1,5 +1,6 @@
+ import Foundation
+ import Observation
++import VPhoneCore
+ 
+ // MARK: - Errors
+ 
+@@ -135,6 +136,7 @@ public struct VPhoneLaunchpadCommandLine {
+     private let activity = VPhoneLaunchpadCommandActivity()
+ 
+     public var hasActiveCommands: Bool { activity.hasActiveCommands }
++    var acceptsNewCommands: Bool { activity.acceptsNewCommands }
+ 
+     /// Synchronously closes the ordinary-command gate and interrupts owned
+     /// children. False if a termination request has already begun. The caller
+@@ -187,21 +189,33 @@ public struct VPhoneLaunchpadCommandLine {
+         recordInHistory: Bool = true,
+         machine: URL? = nil,
+         warningStatuses: Set<Int32> = [],
+-        onLine: (@Sendable (String) -> Void)? = nil
++        onLine: (@Sendable (String) -> Void)? = nil,
++        onStart: (@MainActor () -> Void)? = nil,
++        expectedBindingSHA256: String? = nil,
++        transferDirection: VPhoneTransferProgress.Direction? = nil,
++        onTransferProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil
+     ) async throws -> VPhoneLaunchpadCommandResult {
+         let operation = try activity.begin()
+         var drained = false
+         defer { activity.finish(operation, outputDrained: drained) }
+         let writer = try recordInHistory ? logsDirectory.map { try VPhoneLaunchpadLogWriter(url: $0.appendingPathComponent("command-\(UUID().uuidString).log")) } : nil
+         let entry = recordInHistory ? history.record(Self.display(arguments), warningStatuses: warningStatuses) : nil
++        let progress = (onTransferProgress == nil ? nil : transferDirection).flatMap { direction in
++            logsDirectory.flatMap { try? VPhoneTransferProgressChannel(parent: $0, direction: direction) }
++        }
++        defer { progress?.close() }
+         let collector = VPhoneLaunchpadLineCollector()
+         let child: VPhoneLaunchpadChildProcess
+         do {
+             let route = try machine.map { try VPhoneLaunchpadLaunchRoute.resolve(embedded: executable, launcher: launcher, machine: $0, arguments: arguments) }
++            if let expectedBindingSHA256, route?.snapshot?.sha256 != expectedBindingSHA256 {
++                throw VPhoneLaunchpadError("VM binding changed before command start.")
++            }
+             if let snapshot = route?.snapshot, let machine, !snapshot.matches(machine) {
+                 throw VPhoneLaunchpadError("VM binding changed before command start.")
+             }
+-            child = try VPhoneLaunchpadChildProcess(executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments) { line in
++            child = try VPhoneLaunchpadChildProcess(executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments,
++                environment: progress?.environment) { line in
+                 writer?.write(line)
+                 collector.append(line)
+                 onLine?(line)
+@@ -212,11 +226,22 @@ public struct VPhoneLaunchpadCommandLine {
+             throw error
+         }
+         activity.attach(child, to: operation)
++        onStart?()
++        let progressPoll = progress.map { channel in
++            Task { @MainActor in
++                while !Task.isCancelled {
++                    if let value = channel.read() { onTransferProgress?(value) }
++                    try? await Task.sleep(for: .milliseconds(100))
++                }
++            }
++        }
++        defer { progressPoll?.cancel() }
+         let completion = await withTaskCancellationHandler {
+             await child.waitForCompletion()
+         } onCancel: {
+             child.interrupt()
+         }
++        if let value = progress?.read() { onTransferProgress?(value) }
+         drained = completion.outputDrained
+         do { try await writer?.finish() }
+         catch { drained = false; collector.append("Log persistence failed: \(error.localizedDescription)") }
+@@ -228,6 +253,30 @@ public struct VPhoneLaunchpadCommandLine {
+             outputDrained: drained, omittedLineCount: output.omitted)
+     }
+ 
++    /// Creation is detached for its console log, but Quit must still own its
++    /// process group and wait for its reader/history completion.
++    func startCreation(_ arguments: [String], display: String, logFile: URL, appendingToLog: Bool,
++                       onLine: @escaping @Sendable (String) -> Void) throws -> VPhoneLaunchpadChildProcess {
++        let operation = try activity.begin()
++        let entry = history.record(display)
++        let child: VPhoneLaunchpadChildProcess
++        do {
++            child = try VPhoneLaunchpadChildProcess(executable: executable, arguments: arguments,
++                logFile: logFile, appendingToLog: appendingToLog, onLine: onLine)
++        } catch {
++            history.finish(entry, status: -1, outputDrained: false)
++            activity.finish(operation, outputDrained: false)
++            throw error
++        }
++        activity.attach(child, to: operation, interruptGroup: true)
++        Task {
++            let completion = await child.waitForCompletion()
++            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
++            activity.finish(operation, outputDrained: completion.outputDrained)
++        }
++        return child
++    }
++
+     /// Runs a stopped kernel update through the VM's selected verified source.
+     public func updateKernel(name: String, libraryRoot: URL, machine: URL, recover: Bool = false) async throws -> VPhoneLaunchpadCommandResult {
+         var arguments = ["vm", "update-kernel", name, "--library-root", libraryRoot.path]
+@@ -278,16 +327,17 @@ public enum VPhoneLaunchpadCommandTermination: Equatable, Sendable {
+ }
+ 
+ /// Shared by every copy of one CommandLine, including the monitoring and
+-/// panel callers. Detached launch/create children retain their own lifecycle.
++/// panel callers. VM launches retain their independent lifecycle; creates join the drain.
+ @MainActor
+ private final class VPhoneLaunchpadCommandActivity {
+     private enum Phase { case accepting, draining, waiting, sealed }
+-    private struct Operation { var child: VPhoneLaunchpadChildProcess? }
++    private struct Operation { var child: VPhoneLaunchpadChildProcess?; var interruptGroup = false }
+     private var operations: [UUID: Operation] = [:]
+     private var phase = Phase.accepting
+     private var failedDrain = false
+ 
+     var hasActiveCommands: Bool { !operations.isEmpty }
++    var acceptsNewCommands: Bool { phase == .accepting }
+ 
+     func begin() throws -> UUID {
+         guard phase == .accepting else { throw VPhoneLaunchpadError("Application is waiting for command output before quitting.") }
+@@ -296,8 +346,9 @@ private final class VPhoneLaunchpadCommandActivity {
+         return id
+     }
+ 
+-    func attach(_ child: VPhoneLaunchpadChildProcess, to id: UUID) {
++    func attach(_ child: VPhoneLaunchpadChildProcess, to id: UUID, interruptGroup: Bool = false) {
+         operations[id]?.child = child
++        operations[id]?.interruptGroup = interruptGroup
+     }
+ 
+     func finish(_ id: UUID, outputDrained: Bool) {
+@@ -309,7 +360,10 @@ private final class VPhoneLaunchpadCommandActivity {
+         guard phase == .accepting else { return false }
+         phase = .draining
+         failedDrain = false
+-        for operation in operations.values { operation.child?.interrupt() }
++        for operation in operations.values {
++            if operation.interruptGroup { operation.child?.interruptGroup() }
++            else { operation.child?.interrupt() }
++        }
+         return true
+     }
+ 
+diff --git a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift
+index 6c74dbd0..4f4d76d3 100644
+--- a/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift
++++ b/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift
+@@ -141,8 +141,7 @@ public final class VPhoneLaunchpadMachineLibrary {
+         return nil
+     }
+ 
+-    /// True while `vm export` runs for `machine`. The CLI prints no progress
+-    /// lines to a pipe, so progress is shown as indeterminate.
++    /// True while `vm export` runs. Older CLIs retain indeterminate progress.
+     public func isExporting(_ machine: Path) -> Bool {
+         exports[machine]?.isRunning == true
+     }
+@@ -258,7 +257,7 @@ public final class VPhoneLaunchpadMachineLibrary {
+             isLaunched: launched[machine]?.isRunning == true,
+             isHeld: runStates[machine] != .stopped,
+             isBusy: activities[machine] != nil || exports[machine] != nil || creations[machine]?.isRunning == true,
+-            isLibraryBusy: globalActivity != nil || listError != nil
++            isLibraryBusy: !imports.isEmpty || globalActivity != nil || listError != nil
+         ).mayOpen
+     }
+ 
+@@ -411,9 +410,9 @@ public final class VPhoneLaunchpadMachineLibrary {
+         }
+     }
+ 
+-    public func clone(_ machine: Path, as newName: String) async {
++    public func clone(_ machine: Path, as newName: String, newIdentity: Bool = false) async {
+         let cloned = await perform(String(localized: "Cloning…"), on: machine,
+-                                   VPhoneLaunchpadEditCommand.clone(machine, as: newName),
++                                   VPhoneLaunchpadEditCommand.clone(machine, as: newName, newIdentity: newIdentity),
+                                    failure: String(localized: "Unable to Clone \(machine.name)"))
+         if cloned {
+             selection = [Path(libraryRoot: machine.libraryRoot, name: newName)]
+@@ -430,11 +429,140 @@ public final class VPhoneLaunchpadMachineLibrary {
+         }
+     }
+ 
++    /// Rebind through the embedded CLI, which owns verification, backup and
++    /// the stopped VM lock. Environment replacement uses the new binding.
++    @discardableResult
++    public func setBundle(
++        _ machine: Path, version: String, backup: URL? = nil,
++        updateEnvironment: Bool = false,
++        workParent: URL? = nil,
++        expectedBindingSHA256: String? = nil,
++        willUpdate: (@MainActor () -> Void)? = nil
++    ) async -> VPhoneLaunchpadBundleChange? {
++        guard let commandLine, commandLine.acceptsNewCommands, canEdit(machine),
++              let bindingArguments = VPhoneLaunchpadBundleChange.bindingArguments(machine, version: version, backup: backup, expectedSHA256: expectedBindingSHA256),
++              let environmentArguments = VPhoneLaunchpadBundleChange.environmentArguments(machine, workParent: workParent) else { return nil }
++        activities[machine] = String(localized: "Changing Core Bundle…")
++        defer { activities[machine] = nil }
++        var didBind = false
++        do {
++            let result = try await VPhoneLaunchpadBundleChange.perform(
++                updatesEnvironment: updateEnvironment,
++                diskHolders: {
++                    let manifest = try VPhoneVirtualMachineManifest.load(from: machine.configURL)
++                    let disk = machine.url.appendingPathComponent(manifest.diskImage)
++                    return try await Task.detached { try VPhoneLaunchpadDiskHolders.read(disk) }.value
++                },
++                bind: {
++                    let bound = try await commandLine.run(bindingArguments)
++                    guard bound.succeeded else { throw VPhoneLaunchpadError("Core Bundle change refused", detail: bound.tail) }
++                    didBind = true
++                },
++                updateEnvironment: {
++                    guard let selected = try VPhoneMachineBinding.snapshot(machine.url), selected.binding.bundle == version else {
++                        throw VPhoneLaunchpadError("VM binding changed after publication; inspect it before retrying")
++                    }
++                    let updated = try await commandLine.run(
++                        environmentArguments,
++                        machine: machine.url, onStart: willUpdate, expectedBindingSHA256: selected.sha256)
++                    if !updated.succeeded {
++                        actionError = VPhoneLaunchpadError("Unable to Update Guest Environment", detail:
++                            "\(machine.name): host binding was saved as \(version), but its guest environment update did not complete.\n" + updated.tail)
++                    }
++                    return updated.succeeded
++                })
++            if case let .refused(holders) = result {
++                actionError = VPhoneLaunchpadError("Core Bundle Change Refused", detail:
++                    VPhoneProcessHolder.diskRefusal(holders, rerun: "change the Core Bundle again"))
++            }
++            await refresh()
++            return result
++        } catch {
++            let prefix = didBind ? "\(machine.name): host binding was saved as \(version), but its guest environment update did not complete.\n" : ""
++            let cause = (error as? VPhoneLaunchpadError)?.detail ?? error.localizedDescription
++            actionError = VPhoneLaunchpadError("Unable to Change Core Bundle", detail: prefix + cause)
++            await refresh()
++            return didBind ? .boundButNotUpdated : nil
++        }
++    }
++
++    // MARK: - Import
++
++    public struct Import: Identifiable, Sendable {
++        public enum State: Sendable {
++            case waiting, running, cancelling
++        }
++
++        public let id = UUID()
++        public let archive: URL
++        public fileprivate(set) var progress: VPhoneTransferProgress?
++        public fileprivate(set) var state = State.waiting
++        fileprivate let selectionID: UUID
++    }
++
++    private let importQueue = VPhoneLaunchpadTransferQueue()
++    private var importTasks: [UUID: Task<Bool, Never>] = [:]
++    public private(set) var imports: [Import] = []
++
+     /// Imports an archive into the default library under its own name.
+     public func importArchive(_ archive: URL) async {
+-        await perform(String(localized: "Importing \(archive.lastPathComponent)…"), on: nil,
+-                      VPhoneLaunchpadEditCommand.importArchive(archive, into: libraryRoot),
+-                      failure: String(localized: "Unable to Import \(archive.lastPathComponent)"))
++        await importArchives([archive])
++    }
++
++    /// Each selection runs in arrival order. Failure or caller cancellation
++    /// stops its selection; cancelling one row skips only that item.
++    public func importArchives(_ archives: [URL]) async {
++        guard !archives.isEmpty, !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++        let id = UUID()
++        let items = archives.map { Import(archive: $0, selectionID: id) }
++        imports += items
++        defer { imports.removeAll { $0.selectionID == id } }
++        await withTaskCancellationHandler {
++            await runImports(items, selectionID: id)
++        } onCancel: {
++            Task { @MainActor [weak self] in
++                for item in items { self?.cancelImport(item.id) }
++            }
++        }
++    }
++
++    private func runImports(_ items: [Import], selectionID: UUID) async {
++        guard let id = await importQueue.acquire(selectionID) else { return }
++        defer { importQueue.release(id) }
++        for item in items {
++            guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++            guard let index = imports.firstIndex(where: { $0.id == item.id }) else { continue }
++            imports[index].state = .running
++            let task = Task {
++                guard !Task.isCancelled else { return false }
++                return await perform(String(localized: "Importing \(item.archive.lastPathComponent)…"), on: nil,
++                                     VPhoneLaunchpadEditCommand.importArchive(item.archive, into: libraryRoot),
++                                     failure: String(localized: "Unable to Import \(item.archive.lastPathComponent)"), onProgress: { [weak self] progress in
++                                         guard let self, let index = self.imports.firstIndex(where: { $0.id == item.id }) else { return }
++                                         self.imports[index].progress = progress
++                                     })
++            }
++            importTasks[item.id] = task
++            let succeeded = await task.value
++            importTasks[item.id] = nil
++            imports.removeAll { $0.id == item.id }
++            // A per-item cancel skips that item; a caller cancellation or
++            // failure still stops the rest of its selection.
++            guard succeeded || task.isCancelled else { return }
++        }
++    }
++
++    public func cancelImport(_ id: UUID) {
++        guard let index = imports.firstIndex(where: { $0.id == id }) else { return }
++        if let task = importTasks[id] {
++            imports[index].state = .cancelling
++            task.cancel()
++        } else {
++            let selectionID = imports.remove(at: index).selectionID
++            if !imports.contains(where: { $0.selectionID == selectionID }) {
++                importQueue.cancelWaiting(selectionID)
++            }
++        }
+     }
+ 
+     // MARK: - Export
+@@ -442,6 +570,8 @@ public final class VPhoneLaunchpadMachineLibrary {
+     /// An export queued or under way. `task` is nil while it waits its turn.
+     public struct Export {
+         public let destination: URL
++        public fileprivate(set) var progress: VPhoneTransferProgress?
++        fileprivate let selectionID: UUID
+         public fileprivate(set) var startedAt: Date?
+         fileprivate var task: Task<Void, Never>?
+ 
+@@ -455,6 +585,7 @@ public final class VPhoneLaunchpadMachineLibrary {
+     }
+ 
+     public private(set) var exports: [Path: Export] = [:]
++    private let exportQueue = VPhoneLaunchpadTransferQueue()
+ 
+     /// Exports each machine to its destination file, one at a time: each
+     /// export reads a whole disk image. Existing destinations are refused,
+@@ -463,6 +594,8 @@ public final class VPhoneLaunchpadMachineLibrary {
+     public func export(
+         _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing _: Bool
+     ) async {
++        guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++        let selectionID = UUID()
+         var queued: [(machine: Path, destination: URL)] = []
+         for item in items where exports[item.machine] == nil {
+             if VPhoneLaunchpadExportOutput.exists(item.destination) {
+@@ -471,21 +604,34 @@ public final class VPhoneLaunchpadMachineLibrary {
+                     detail: String(localized: "\(item.destination.path) already exists."))
+                 continue
+             }
+-            exports[item.machine] = Export(destination: item.destination)
++            exports[item.machine] = Export(destination: item.destination, selectionID: selectionID)
+             queued.append(item)
+         }
+-        for item in queued {
+-            // Cancelled while it waited.
+-            guard exports[item.machine] != nil else {
+-                continue
++        guard !queued.isEmpty else { return }
++        let selection = queued
++        defer { exports = exports.filter { $0.value.selectionID != selectionID } }
++        await withTaskCancellationHandler {
++            guard let token = await exportQueue.acquire(selectionID) else { return }
++            defer { exportQueue.release(token) }
++            for item in selection {
++                guard !Task.isCancelled, commandLine?.acceptsNewCommands == true else { return }
++                // Per-item cancellation skips this item while keeping its selection.
++                guard exports[item.machine]?.selectionID == selectionID else { continue }
++                let task = Task {
++                    guard !Task.isCancelled else { return }
++                    await runExport(item.machine, to: item.destination, densest: densest, includeIPSW: includeIPSW)
++                }
++                exports[item.machine]?.task = task
++                exports[item.machine]?.startedAt = Date()
++                await task.value
++                exports[item.machine] = nil
+             }
+-            let task = Task {
+-                await runExport(item.machine, to: item.destination, densest: densest, includeIPSW: includeIPSW)
++        } onCancel: {
++            Task { @MainActor [weak self] in
++                for item in selection where self?.exports[item.machine]?.selectionID == selectionID {
++                    self?.cancelExport(item.machine)
++                }
+             }
+-            exports[item.machine]?.task = task
+-            exports[item.machine]?.startedAt = Date()
+-            await task.value
+-            exports[item.machine] = nil
+         }
+     }
+ 
+@@ -499,13 +645,27 @@ public final class VPhoneLaunchpadMachineLibrary {
+             task.cancel()
+         } else {
+             exports[machine] = nil
++            if !exports.values.contains(where: { $0.selectionID == export.selectionID }) {
++                exportQueue.cancelWaiting(export.selectionID)
++            }
+         }
+     }
+ 
++    public var hasActiveTransfers: Bool { !imports.isEmpty || !exports.isEmpty }
++
++    /// Call after closing the command gate. Waiting items disappear without
++    /// starting children; active tasks retain their rows until output drains.
++    public func cancelTransfers() {
++        for item in imports { cancelImport(item.id) }
++        for machine in Array(exports.keys) { cancelExport(machine) }
++    }
++
+     private func runExport(_ machine: Path, to destination: URL, densest: Bool, includeIPSW: Bool) async {
+         await perform(String(localized: "Exporting…"), on: machine,
+                       VPhoneLaunchpadEditCommand.export(machine, to: destination, densest: densest, includeIPSW: includeIPSW),
+-                      failure: String(localized: "Unable to Export \(machine.name)"))
++                      failure: String(localized: "Unable to Export \(machine.name)"), onProgress: { [weak self] progress in
++                          self?.exports[machine]?.progress = progress
++                      })
+         // The CLI owns its private staging cleanup. A final-path file may be
+         // committed output or another writer's file; cancellation proves neither
+         // ownership nor incompleteness. Keep legacy CLI leftovers as well.
+@@ -523,7 +683,8 @@ public final class VPhoneLaunchpadMachineLibrary {
+     /// not reported. False unless the command ran and exited 0.
+     @discardableResult
+     private func perform(
+-        _ activity: String, on machine: Path?, _ command: VPhoneLaunchpadEditCommand?, failure: String
++        _ activity: String, on machine: Path?, _ command: VPhoneLaunchpadEditCommand?, failure: String,
++        onProgress: (@MainActor (VPhoneTransferProgress) -> Void)? = nil
+     ) async -> Bool {
+         guard let commandLine else {
+             return false
+@@ -548,7 +709,7 @@ public final class VPhoneLaunchpadMachineLibrary {
+         }
+         var succeeded = false
+         do {
+-            let result = try await commandLine.run(command)
++            let result = try await commandLine.run(command, onProgress: onProgress)
+             succeeded = result.succeeded && !Task.isCancelled
+             if !result.succeeded, !Task.isCancelled {
+                 actionError = VPhoneLaunchpadError(failure, detail: result.tail)
+@@ -572,3 +733,45 @@ public final class VPhoneLaunchpadMachineLibrary {
+         FileHandle.standardOutput.write(Data("[launchpad] \(text)\n".utf8))
+     }
+ }
++
++/// FIFO ownership spans a complete selection and the active child's output drain.
++@MainActor
++private final class VPhoneLaunchpadTransferQueue {
++    private struct Waiter {
++        let id: UUID
++        let continuation: CheckedContinuation<UUID?, Never>
++    }
++    private var active: UUID?
++    private var waiting: [Waiter] = []
++
++    func acquire(_ id: UUID) async -> UUID? {
++        await withTaskCancellationHandler {
++            await withCheckedContinuation { continuation in
++                guard !Task.isCancelled else { continuation.resume(returning: nil); return }
++                if active == nil {
++                    active = id
++                    continuation.resume(returning: id)
++                } else {
++                    waiting.append(Waiter(id: id, continuation: continuation))
++                }
++            }
++        } onCancel: {
++            Task { @MainActor [weak self] in self?.cancelWaiting(id) }
++        }
++    }
++
++    func cancelWaiting(_ id: UUID) {
++        guard let index = waiting.firstIndex(where: { $0.id == id }) else { return }
++        waiting.remove(at: index).continuation.resume(returning: nil)
++    }
++
++    func release(_ id: UUID) {
++        guard active == id else { return }
++        active = nil
++        if !waiting.isEmpty {
++            let next = waiting.removeFirst()
++            active = next.id
++            next.continuation.resume(returning: next.id)
++        }
++    }
++}
+diff --git a/sources/VPhoneLaunchpadLauncherEntry/main.swift b/sources/VPhoneLaunchpadLauncherEntry/main.swift
+index 3be751ff..c01a9432 100644
+--- a/sources/VPhoneLaunchpadLauncherEntry/main.swift
++++ b/sources/VPhoneLaunchpadLauncherEntry/main.swift
+@@ -31,7 +31,8 @@ do {
+         // protocols refuse before starting a child; ordinary launch stays local.
+         if request.isKernelUpdate { try VPhoneLaunchpadLauncherRequest.validateKernelUpdateProtocol(executable: verified) }
+         if request.isKernelRollback { try VPhoneLaunchpadLauncherRequest.validateKernelRollbackProtocol(executable: verified) }
+-        let executable = request.isKernelUpdate || request.isKernelRollback ? verified : toolchain.executable
++        if request.isEnvironmentUpdate { try VPhoneLaunchpadLauncherRequest.validateEnvironmentUpdateProtocol(executable: verified) }
++        let executable = request.isKernelUpdate || request.isKernelRollback || request.isEnvironmentUpdate ? verified : toolchain.executable
+         return try VPhoneLaunchpadLauncherProcess.run(path: executable.path,
+             argv: [executable.path] + request.arguments + ["--expected-core-bundle", request.version])
+     }
+diff --git a/sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift b/sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift
+index 869557d6..00f29260 100644
+--- a/sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift
++++ b/sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift
+@@ -169,9 +169,13 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
+ 
+     @OptionGroup var lib: VPhoneLibraryOption
+     @Argument(help: "VM name") var name: String?
++    @Option(help: .hidden) var expectedBindingSha256: String?
++    @Option(help: .hidden) var expectedCoreBundle: String?
+     @Flag(name: .long, help: "Only print the read-only eligibility report (JSON); the check runs as root (sudo, or --root-popup)") var check = false
+     @Option(name: .long, help: "Candidate stage (default: <resource base>/.build/guest-components-v2/stage)")
+     var components: String?
++    @Option(name: .customLong("work-parent"), help: "Root-owned private or sticky mount workspace parent for replacement")
++    var workParent: String?
+     @Flag(name: .customLong("root-popup"), help: "Elevate the check (--check) or the replacement via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
+     @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
+     var projectRoot: String?
+@@ -182,6 +186,8 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
+         let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
+         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
+         let bundle = try lib.library.bundle(named: name)
++        let bindingEnvironment = try Self.bindingEnvironment(machine: bundle.url,
++            expectedSHA256: expectedBindingSha256, expectedBundle: expectedCoreBundle)
+         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
+         let python = try resources.pythonExecutable()
+         let stage = components.map { URL(fileURLWithPath: $0).standardizedFileURL } ?? resources.guestComponentsStage
+@@ -189,6 +195,7 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
+             "VPHONE_PYTHON": python.path,
+             "VPHONE_GUEST_COMPONENTS": stage.path,
+         ]
++        scriptEnv.merge(bindingEnvironment) { _, frozen in frozen }
+ 
+         if check && geteuid() != 0 {
+             try runElevatedCheck(resources: resources, bundle: bundle.url, scriptEnv: scriptEnv)
+@@ -228,11 +235,13 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
+         }
+ 
+         let frozen = try VPhoneBundleGuard.withBundleLock(directory: bundle.url, operation: VPhoneVMOperation.cfwRecord) { _ in
+-            try VPhoneCFWFrozenContext.prepare(in: bundle.url, requestedVariant: nil,
++            _ = try Self.bindingEnvironment(machine: bundle.url,
++                expectedSHA256: expectedBindingSha256, expectedBundle: expectedCoreBundle)
++            return try VPhoneCFWFrozenContext.prepare(in: bundle.url, requestedVariant: nil,
+                 guestEnvironment: "v2", spoofBuild: "")
+         }
+         scriptEnv.merge(try frozen.environment) { _, bound in bound }
+-        let args = Self.driverArguments(resources: resources, bundle: bundle.url)
++        let args = Self.driverArguments(resources: resources, bundle: bundle.url, workParent: workParent)
+         let invocation = VPhoneCreateOrchestrator.cfwInvocation(
+             scriptEnv: scriptEnv, sudoEnvExtras: [:], rootPopup: rootPopup)
+         let code: Int32
+@@ -248,6 +257,17 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
+         throw ExitCode(code)
+     }
+ 
++    static func bindingEnvironment(machine: URL, expectedSHA256: String?, expectedBundle: String?) throws -> [String: String] {
++        guard expectedSHA256 != nil || expectedBundle != nil else { return [:] }
++        guard let hash = expectedSHA256, hash.count == 64,
++              hash.allSatisfy({ "0123456789abcdef".contains($0) }), let version = expectedBundle,
++              let binding = try VPhoneMachineBinding.snapshot(machine),
++              binding.sha256 == hash, binding.binding.bundle == version else {
++            throw ValidationError("VM binding changed before environment update")
++        }
++        return ["VPHONE_EXPECTED_BINDING_SHA256": hash, "VPHONE_EXPECTED_CORE_BUNDLE": version]
++    }
++
+     /// `--check` for a non-root caller: the check runs as root and its
+     /// report (or failure) is printed here. Always ends with ExitCode.
+     func runElevatedCheck(resources: VPhoneResources, bundle: URL, scriptEnv: [String: String]) throws -> Never {
+@@ -272,7 +292,9 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
+         throw ExitCode(outcome.exitCode)
+     }
+ 
+-    static func driverArguments(resources: VPhoneResources, bundle: URL) -> [String] {
+-        [resources.cfwInstallHostScript.path, "--update-environment", bundle.path]
++    static func driverArguments(resources: VPhoneResources, bundle: URL, workParent: String? = nil) -> [String] {
++        var args = [resources.cfwInstallHostScript.path, "--update-environment"]
++        if let workParent { args += ["--work-parent", workParent] }
++        return args + [bundle.path]
+     }
+ }
+diff --git a/sources/vphone-cli/VPhoneVMBindingCLI.swift b/sources/vphone-cli/VPhoneVMBindingCLI.swift
+index 510d828f..c3337e4a 100644
+--- a/sources/vphone-cli/VPhoneVMBindingCLI.swift
++++ b/sources/vphone-cli/VPhoneVMBindingCLI.swift
+@@ -9,6 +9,7 @@ struct VPhoneVMBindCoreBundleCommand: ParsableCommand {
+     @OptionGroup var lib: VPhoneLibraryOption
+     @Argument var name: String?
+     @Option var version: String
++    @Option(help: .hidden) var expectedBindingSha256: String?
+     @Option(help: "New complete backup directory, required for first legacy binding") var backup: String?
+ 
+     func run() throws {
+@@ -16,6 +17,7 @@ struct VPhoneVMBindCoreBundleCommand: ParsableCommand {
+         _ = try lib.library.bundle(named: name)
+         let machine = try lib.library.bundle(named: name).url
+         let expected = try VPhoneMachineBinding.snapshot(machine)
++        try Self.validateExpectedBinding(expectedBindingSha256, snapshot: expected)
+         guard VPhoneCoreBundleVersion.supportsTargetFeatures(version) else {
+             throw ValidationError("Bound execution requires Core Bundle 2.6.0 or later")
+         }
+@@ -25,4 +27,11 @@ struct VPhoneVMBindCoreBundleCommand: ParsableCommand {
+         }
+         print("\(name): host Core Bundle bound to \(version); guest, kernel and boot-chain origins preserved")
+     }
++
++    static func validateExpectedBinding(_ expected: String?, snapshot: VPhoneMachineBinding.Snapshot?) throws {
++        guard let expected else { return }
++        guard expected == (snapshot?.sha256 ?? "missing") else {
++            throw ValidationError("VM binding changed after selection; inspect it before retrying")
++        }
++    }
+ }
+diff --git a/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift b/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift
+index 8e7b4a28..d00903ff 100644
+--- a/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift
++++ b/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift
+@@ -3,6 +3,33 @@ import Testing
+ @testable import VPhoneBundleStore
+ 
+ struct LauncherPolicyTests {
++    @Test func environmentReplacementRequiresItsOwnProtocol() throws {
++        let request = try VPhoneLaunchpadLauncherRequest(executable: target,
++            arguments: ["cfw", "update-environment", "machine", "--library-root", "/vm library", "--root-popup", "--work-parent", "/private/tmp"])
++        #expect(request.isEnvironmentUpdate && !request.isKernelUpdate && !request.isKernelRollback)
++        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
++        let executable = root.appendingPathComponent("Contents/MacOS/vphone-cli")
++        try FileManager.default.createDirectory(at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
++        defer { try? FileManager.default.removeItem(at: root) }
++        for value in ["", "vphone.environment-update.v0", "vphone.environment-update.v1"] {
++            try PropertyListSerialization.data(fromPropertyList: ["VPhoneEnvironmentUpdateProtocol": value], format: .xml, options: 0)
++                .write(to: root.appendingPathComponent("Contents/Info.plist"))
++            if value == "vphone.environment-update.v1" {
++                try VPhoneLaunchpadLauncherRequest.validateEnvironmentUpdateProtocol(executable: executable)
++            } else {
++                #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest.validateEnvironmentUpdateProtocol(executable: executable) }
++            }
++        }
++    }
++
++    @Test(arguments: [["--components", "/tmp/unverified"], ["--project-root", "/tmp"], ["--work-parent", "relative"],
++                       ["--root-popup", "--root-popup"], ["--expected-binding-sha256", "bad"], ["--library-root"]])
++    func environmentRejectsResourceOverridesAndMalformedOptions(options: [String]) {
++        #expect(throws: (any Error).self) {
++            try VPhoneLaunchpadLauncherRequest(executable: target, arguments: ["cfw", "update-environment", "machine"] + options)
++        }
++    }
++
+     let target = "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli"
+ 
+     @Test func permitsExplicitCommittedKernelRollbackRoute() throws {
+diff --git a/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift b/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift
+index f8322c92..9653658e 100644
+--- a/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift
++++ b/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift
+@@ -4,6 +4,18 @@ import VPhoneCore
+ @testable import VPhoneLaunchpadKit
+ 
+ struct LaunchRouteTests {
++    @Test func environmentUpdateUsesTheNewBoundProducer() throws {
++        let temp = try LaunchpadTemporaryDirectory()
++        try JSONEncoder().encode(VPhoneMachineBinding(bundle: "2.6.2"))
++            .write(to: temp.url.appendingPathComponent("launchpad.json"))
++        let arguments = ["cfw", "update-environment", "machine", "--library-root", temp.url.path, "--root-popup"]
++        let route = try VPhoneLaunchpadLaunchRoute.resolve(embedded: embedded, launcher: launcher,
++            machine: temp.url, arguments: arguments)
++        #expect(route.executable == launcher)
++        #expect(route.arguments.first?.contains("/2.6.2/VPhone.bundle/") == true)
++        #expect(Array(route.arguments.dropFirst()) == arguments + ["--expected-binding-sha256", route.snapshot!.sha256])
++    }
++
+     let embedded = URL(fileURLWithPath: "/tmp/embedded-cli")
+     let launcher = URL(fileURLWithPath: "/tmp/launcher")
+     @Test func missingBindingKeepsEmbeddedDevelopmentToolchain() throws {
+diff --git a/tests/test_launchpad_bundle.py b/tests/test_launchpad_bundle.py
+index ad087101..a4e0372a 100644
+--- a/tests/test_launchpad_bundle.py
++++ b/tests/test_launchpad_bundle.py
+@@ -115,8 +115,9 @@ class LaunchpadBundleCheckTests(unittest.TestCase):
+ 
+ 
+ class LaunchpadB1BoundaryTests(unittest.TestCase):
+-    """B1-B5 boundaries: list, launch, stop, the offline edits and vm create through
+-    the embedded toolchain only (T26 design 4, 5.1-5.3, 9, 11.1)."""
++    """B1-B5 plus T47/T51/T52: explicit CLI operations and read-only measurement.
++    Privilege, process, file-removal and control-socket boundaries remain confined.
++    """
+ 
+     FORBIDDEN = {
+         r'VPhoneVMLockProbe\.': 'lock probe',
+@@ -161,9 +162,11 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
+     LOCATIONS = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift'
+     SOCKET_LENGTH = '.appendingPathComponent("vphone.sock").path\n        return path.utf8CString.count <= ' \
+                     'MemoryLayout.size(ofValue: sockaddr_un().sun_path)'
+-
++    # Exact additions only: all other lsof, bundle guard and CFW calls remain forbidden.
+     SOURCE_EXCEPTIONS = {
+-        ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift': ['"/usr/sbin/lsof"', 'try await bind()'],
++        EDIT_FILE: ['["vm", "snapshot", "create", name, snapshot]'],
++        ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift': ['"/usr/sbin/lsof"', 'try await bind()',
++            '["cfw", "update-environment", machine.name]', '"--root-popup"'],
+         ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadDiskUsage.swift': [
+             'VPhoneBundleGuard.withMeasurementLock(', 'flock(lease, LOCK_SH | LOCK_NB)'],
+     }
+@@ -178,7 +181,7 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
+                 code = code.replace(self.SOCKET_LENGTH, '')
+             for allowed in self.SOURCE_EXCEPTIONS.get(path, []):
+                 self.assertEqual(code.count(allowed), 1, (path, allowed))
+-                code = code.replace(allowed, "")
++                code = code.replace(allowed, '')
+             for pattern, what in self.FORBIDDEN.items():
+                 self.assertIsNone(re.search(pattern, code), f'{what} in {path.relative_to(ROOT)}')
+             if path != self.WHITELIST:
+@@ -202,14 +205,22 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
+         self.assertEqual(built, [
+             ('vm', 'clone'), ('vm', 'config'), ('vm', 'delete', '--force'), ('vm', 'export', '--out'),
+             ('vm', 'import', '--library-root'), ('vm', 'rename'),
++            ('vm', 'snapshot', 'create'), ('vm', 'snapshot', 'delete', '--force'),
++            ('vm', 'snapshot', 'list', '--json'), ('vm', 'snapshot', 'revert', '--force'),
+         ])
+-        # `--force` only skips the CLI's stdin prompt, and only for delete.
++        # `--force` skips the CLI prompt only for delete and explicit snapshot operations.
+         self.assertEqual(re.findall(r'\[[^\]]*"--force"[^\]]*\]', code),
+-                         ['["vm", "delete", machine.name, "--force"]'])
++                         ['["vm", "delete", machine.name, "--force"]',
++                          '["vm", "snapshot", "revert", name, snapshot, "--force"]',
++                          '["vm", "snapshot", "delete", name, snapshot, "--force"]'])
+         # Every machine command carries its library root.
+-        for verb in ('config', 'rename', 'clone', 'delete', 'export'):
++        for verb in ('config', 'rename', 'delete', 'export'):
+             self.assertRegex(code, rf'\["vm", "{verb}"[^\]]*\] \+ machine\.libraryArguments')
++        self.assertIn('return Self(.clone, machine.cloneArguments(as: newName, newIdentity: newIdentity))', code)
++        self.assertIn('["vm", "clone", name, newName] + (newIdentity ? ["--new-identity"] : []) + libraryArguments', code)
+         self.assertIn('["vm", "import", archive.path, "--library-root", libraryRoot]', code)
++        for verb in ('list', 'revert', 'delete'):
++            self.assertRegex(code, rf'\["vm", "snapshot", "{verb}"[^\]]*\] \+ libraryArguments')
+         # The value exists only through the factories.
+         self.assertIn('private init(_ kind: Kind, _ arguments: [String])', code)
+ 
+@@ -282,12 +293,12 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
+         self.assertNotIn('VPhoneLaunchpadCreate', refresh)
+         self.assertNotIn('Checkpoint', refresh)
+ 
+-    def test_only_vm_list_stop_and_launch_are_run(self):
++    def test_only_declared_cli_operations_are_run(self):
+         runs, starts, typed, catalog = [], [], [], []
+         for path, text in launchpad_swift().items():
+             runs += re.findall(r'\.run\(\s*\[([^\]]*)\]', text)
+             starts += re.findall(r'commandLine\.start\(\s*(\w+)', text)
+-            typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*\)', text)
++            typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*(?:,\s*onProgress:\s*onProgress\s*)?\)', text)
+             catalog += re.findall(r'commandLine\.run\(\s*VPhoneLaunchpadCreateCommand\.(\w+)', text)
+         self.assertEqual(sorted(re.findall(r'"([^"]+)"', arguments)[:3] for arguments in runs),
+                          [['vm', 'list', '--json'], ['vm', 'stop']])
+@@ -295,10 +306,24 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
+         self.assertEqual(sorted(starts), ['arguments', 'command'])
+         # B3/B5: everything else runs a whitelisted command value; B4 adds the
+         # one create-status after a create run and the firmware catalog.
+-        self.assertEqual(sorted(typed), ['command', 'command', 'command', 'status'])
++        self.assertEqual(sorted(typed), ['bindingArguments', 'command', 'command', 'command', 'status'])
+         self.assertEqual(catalog, ['catalog'])
+         library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
+         self.assertIn('var arguments = ["vm", "launch", machine.name] + machine.libraryArguments', library)
++        change = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadBundleChange.swift').read_text()
++        self.assertIn('["vm", "bind-core-bundle", machine.name, "--version", version] + machine.libraryArguments', change)
++        self.assertEqual(library.count('commandLine.run(bindingArguments)'), 1)
++        self.assertIn('expectedBindingSHA256: selected.sha256', library)
++
++    def test_finder_archive_types_are_alternate_viewers_only(self):
++        info = plistlib.loads((ROOT / 'sources/VPhoneLaunchpad-Info.plist').read_bytes())
++        documents = info['CFBundleDocumentTypes']
++        self.assertEqual(len(documents), 1)
++        self.assertEqual(documents[0]['CFBundleTypeRole'], 'Viewer')
++        self.assertEqual(documents[0]['LSHandlerRank'], 'Alternate')
++        types = info['UTExportedTypeDeclarations']
++        self.assertEqual(documents[0]['LSItemContentTypes'], [types[0]['UTTypeIdentifier']])
++        self.assertEqual(types[0]['UTTypeTagSpecification']['public.filename-extension'], ['tzst', 'txz'])
+ 
+     def test_executable_comes_only_from_the_embedded_app(self):
+         toolchain = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadToolchain.swift').read_text()
+diff --git a/tests/test_patch_plan_gate.py b/tests/test_patch_plan_gate.py
+index 70df20b1..08d8b1eb 100644
+--- a/tests/test_patch_plan_gate.py
++++ b/tests/test_patch_plan_gate.py
+@@ -113,6 +113,28 @@ class FrozenGateTests(unittest.TestCase):
+     def load(self):
+         return gate.load_plan(self.path,self.digest,self.context)
+ 
++    def test_binding_drift_refuses_entry_and_the_actual_guarded_writer(self):
++        binding = self.vm / 'launchpad.json'
++        raw = json.dumps({'bundle': '2.6.2'}).encode()
++        binding.write_bytes(raw)
++        expected = {'VPHONE_EXPECTED_BINDING_SHA256': hashlib.sha256(raw).hexdigest(),
++                    'VPHONE_EXPECTED_CORE_BUNDLE': '2.6.2'}
++        target = self.mount / 'mnt1/System/Library/LaunchDaemons/dropbear.plist'
++        target.parent.mkdir(parents=True)
++        target.write_bytes(b'preserve-target')
++        source = self.stage / 'dropbear.plist'
++        source.write_bytes(b'replacement')
++        with patch.dict(os.environ, expected):
++            plan = gate.from_environment()
++            gate.recheck(plan)
++            binding.write_text(json.dumps({'bundle': '2.6.3'}))
++            with self.assertRaisesRegex(ValueError, 'binding changed'):
++                gate.from_environment()
++            with self.assertRaisesRegex(ValueError, 'binding changed'):
++                guest_write.run(plan, ['cp', str(source), str(target)])
++        self.assertEqual(target.read_bytes(), b'preserve-target')
++        self.assertFalse(self.evidence.exists())
++
+     def test_obsolete_implementation_refused_before_real_entrypoint_side_effects(self):
+         self.plan['gates']['iosBaseIs27'] = True
+         identifier = 'dyld-boot-iomfb_force_kern'
+@@ -1020,3 +1042,32 @@ class FrozenGateTests(unittest.TestCase):
+         target=self.mount/'mnt1/System/Library/xpc/launchd.plist';target.parent.mkdir(parents=True);target.write_bytes(b'preserve')
+         with self.assertRaises(ValueError): guest_write.run(self.load(),['cp',str(source),str(target)])
+         self.assertEqual(target.read_bytes(),b'preserve')
++
++
++class ExpectedCoreBindingTests(unittest.TestCase):
++    def test_expected_binding_is_rechecked_before_writes(self):
++        with tempfile.TemporaryDirectory() as directory:
++            vm = Path(directory)
++            binding = vm / 'launchpad.json'
++            raw = json.dumps({'bundle': '2.6.2', 'guestEnvironment': '2.6.1'}).encode()
++            binding.write_bytes(raw)
++            expected = {'VPHONE_EXPECTED_BINDING_SHA256': hashlib.sha256(raw).hexdigest(),
++                        'VPHONE_EXPECTED_CORE_BUNDLE': '2.6.2'}
++            with patch.dict(os.environ, expected):
++                gate.verify_expected_binding(vm)
++                binding.write_text(json.dumps({'bundle': '2.6.3'}))
++                with self.assertRaisesRegex(ValueError, 'binding changed'):
++                    gate.verify_expected_binding(vm)
++            binding.write_bytes(raw)
++            with patch.dict(os.environ, {**expected, 'VPHONE_EXPECTED_CORE_BUNDLE': ''}):
++                with self.assertRaisesRegex(ValueError, 'incomplete'):
++                    gate.verify_expected_binding(vm)
++            with patch.dict(os.environ, {**expected, 'VPHONE_EXPECTED_BINDING_SHA256': 'bad'}):
++                with self.assertRaisesRegex(ValueError, 'incomplete'):
++                    gate.verify_expected_binding(vm)
++            binding.unlink()
++            binding.symlink_to(vm / 'untrusted')
++            (vm / 'untrusted').write_bytes(raw)
++            with patch.dict(os.environ, expected):
++                with self.assertRaises(OSError):
++                    gate.verify_expected_binding(vm)
