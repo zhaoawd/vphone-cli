@@ -504,8 +504,13 @@
 > evidence only; the planner discovers sites. On the pulled stock image the
 > planner lowered 66 instructions, re-attested 3 slots, left zero unvisited
 > candidates, turned `0xc58` into `pacibsp`, and a second pass was
-> byte-identical. Catalogue and X1 suites passed (40 tests). Guest
-> environment update and app relaunch with accessibility on: pending.
+> byte-identical. Catalogue and X1 suites passed (40 tests). On
+> `duo-candidate-20261030` (candidate `72b83eb2`) `cfw update-environment`
+> lowered 78 accessibility bundle executables and kept each `.bak`; in the
+> guest `0xc58` reads `pacibsp` with no X1 instruction left. With
+> `ApplicationAccessibilityEnabled` and `AutomationEnabled` on, KFC stayed
+> frontmost 30 s and through an accessibility walk with no report (2026-10-31).
+> Loading of that bundle into KFC was not separately logged in this run.
 > See `Research/Integration/duo_m5_20261030/F6.md`.
 
 > **CIBarcode standalone X1 lowering (2026-10-29, local validation):**
