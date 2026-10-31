@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <spawn.h>
 #include <sys/types.h>
+#include "VPhoneShellExec.h"
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
 #endif

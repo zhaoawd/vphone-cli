@@ -153,6 +153,7 @@ enum GuestAPI {
                 "motion_gyroscope_toggle",
                 "motion_attitude",
             ] + pointerCapabilities() + scriptCapabilities() + GuestHomePodDisplay.capabilities
+                + (GuestShellCommands.program == nil ? [] : ["shell_exec"])
                 + GuestHomePodDebug.capabilities,
         ]
     }
@@ -165,6 +166,16 @@ enum GuestAPI {
 
     static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
         switch method {
+        case "shell.exec":
+            return try GuestShellCommands.shared.execute(params)
+        case "shell.cancel":
+            let identifier = try string(params, "request_id")
+            guard UUID(uuidString: identifier) != nil else { throw GuestAPIError.invalidRequest("request_id must be a UUID") }
+            return ["cancelled": GuestShellCommands.shared.cancel(identifier)]
+        case "agent.health":
+            var result = health()
+            result["shell_exec_available"] = GuestShellCommands.program != nil
+            return result
         case "device.snapshot":
             var snapshot = try collectDeviceSnapshot()
             snapshot["jailbreak"] = jailbreakInfo()

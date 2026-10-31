@@ -310,6 +310,11 @@ private final class HTTPJob: @unchecked Sendable {
         self.channel = channel
         self.request = request
         self.hub = hub
+        if request.method == "shell.exec", let identifier = request.params["request_id"] as? String {
+            channel.closeFuture.whenComplete { _ in
+                GuestShellCommands.shared.cancel(identifier)
+            }
+        }
     }
 
     func run() {

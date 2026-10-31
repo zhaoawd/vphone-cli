@@ -88,6 +88,7 @@ class VPhoneHostAutomationServer {
     /// Matches vphoned's JSON body limit, so an `rpc` line is never refused
     /// here that the guest would accept.
     private nonisolated static let maximumRequestLength = 1 << 20
+    private nonisolated static let connections = DispatchSemaphore(value: 64)
 
     /// Screen pixel dimensions for coordinate mapping.
     private var screenWidth: Int = 1290
@@ -154,6 +155,10 @@ class VPhoneHostAutomationServer {
             return
         }
 
+        guard chmod(socketPath, 0o600) == 0 else {
+            close(fd)
+            return
+        }
         guard listen(fd, SOMAXCONN) == 0 else {
             print("[hostctl] listen failed: \(String(cString: strerror(errno)))")
             close(fd)
@@ -196,22 +201,51 @@ class VPhoneHostAutomationServer {
 
         do {
             switch type {
+            case "capabilities":
+                let connected = control?.isConnected == true
+                let guest = Set(connected ? (control?.guestCapabilities ?? []) : [])
+                let screen = connected && (windowedView != nil || guest.contains("screenshot"))
+                let touch = connected && (windowedView != nil || guest.contains("touch"))
+                let commands: [String: Bool] = [
+                    "capabilities": true, "ping": connected, "rpc": connected, "screenshot": screen,
+                    "tap": touch, "swipe": touch, "key": connected && guest.contains("hid"),
+                    "type": connected && guest.contains("clipboard"),
+                    "app_list": connected && guest.contains("apps"),
+                    "app_foreground": connected && guest.contains("apps"),
+                    "app_launch": connected && guest.contains("apps"),
+                    "app_terminate": connected && guest.contains("apps"),
+                    "file_get": connected && guest.contains("files"),
+                    "file_put": connected && guest.contains("files"),
+                    "shell": connected && guest.contains("shell_exec"),
+                ]
+                let object: [String: Any] = ["ok": true, "protocol": "upstream_v1",
+                    "guest_connected": connected, "commands": commands,
+                    "guest_capabilities": Array(guest).sorted(),
+                    "headless": windowedView == nil,
+                    "screen": ["width": screenWidth, "height": screenHeight, "scale": Self.compactScale],
+                    "shell": ["single_stream_limit": 65536, "timeout_ms_max": 120000,
+                              "available": commands["shell"] == true]]
+                return try JSONSerialization.data(withJSONObject: object) + [0x0A]
             case "ping":
                 try await connectedControl().sendPing()
                 return Self.reply(ok: true)
 
             case "screenshot":
                 let image = try await automationScreenshot()
-                let url = if let outputPath = json["path"] as? String {
-                    try screenRecorder.saveScreenshot(jpegData: image, to: URL(fileURLWithPath: outputPath))
-                } else {
-                    try screenRecorder.saveScreenshot(jpegData: image)
+                var outputPath: String?
+                if json["save"] as? Bool != false {
+                    let url = if let path = json["path"] as? String {
+                        try screenRecorder.saveScreenshot(jpegData: image, to: URL(fileURLWithPath: path))
+                    } else {
+                        try screenRecorder.saveScreenshot(jpegData: image)
+                    }
+                    outputPath = url.path
                 }
                 // Always include compact image for screenshot command, from the same capture
                 let compact = CGImageSourceCreateWithData(image as CFData, nil)
                     .flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) }
                     .flatMap(compactJPEG)
-                return Self.reply(ok: true, path: url.path, image: compact)
+                return Self.reply(ok: true, path: outputPath, image: compact)
 
             case "display.geometry":
                 var result: [String: Any] = [
@@ -557,6 +591,13 @@ class VPhoneHostAutomationServer {
                 close(clientFD)
                 continue
             }
+            var uid: uid_t = 0
+            var gid: gid_t = 0
+            guard getpeereid(clientFD, &uid, &gid) == 0, uid == geteuid(),
+                  connections.wait(timeout: .now()) == .success else {
+                close(clientFD)
+                continue
+            }
             clientQueue.async {
                 serveClient(clientFD, controller: controller)
             }
@@ -566,23 +607,75 @@ class VPhoneHostAutomationServer {
     /// Socket reads and writes block, so they stay on `clientQueue`; only the
     /// command itself runs on the main actor, where it awaits without
     /// holding a thread.
+    private final class ClientState: @unchecked Sendable {
+        private let lock = NSLock()
+        private var finished = false
+        let descriptor: Int32
+        init(_ descriptor: Int32) { self.descriptor = descriptor }
+        func finish() { lock.lock(); finished = true; lock.unlock() }
+        func disconnected() -> Bool? {
+            lock.lock()
+            defer { lock.unlock() }
+            if finished { return nil }
+            var byte: UInt8 = 0
+            let count = recv(descriptor, &byte, 1, MSG_PEEK | MSG_DONTWAIT)
+            if count == 0 || count > 0 { return true }
+            return errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR
+        }
+    }
+
     private nonisolated static func serveClient(_ fd: Int32, controller: VPhoneHostAutomationServer?) {
         guard let (line, typedAhead) = readCommand(from: fd) else {
-            close(fd)
-            return
+            close(fd); connections.signal(); return
         }
-        // A shell has no reply: the connection becomes the terminal, so it
-        // leaves the one-line protocol here and never comes back to it.
         if let request = shellRequest(in: line) {
             relayShell(fd, request: request, typedAhead: typedAhead, controller: controller)
+            connections.signal()
             return
         }
+        guard typedAhead.isEmpty else {
+            write(reply(ok: false, error: "one request per connection"), to: fd)
+            close(fd); connections.signal(); return
+        }
+        var command = line
+        var shellID: String?
+        if let data = line.data(using: .utf8),
+           var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           object["t"] as? String == "rpc", object["method"] as? String == "shell.exec" {
+            shellID = UUID().uuidString
+            var params = object["params"] as? [String: Any] ?? [:]
+            params["request_id"] = shellID
+            object["params"] = params
+            if let wire = try? JSONSerialization.data(withJSONObject: object), wire.count < maximumRequestLength {
+                command = String(decoding: wire, as: UTF8.self)
+            } else {
+                write(reply(ok: false, error: "shell.exec request exceeds 1 MiB"), to: fd)
+                close(fd); connections.signal(); return
+            }
+        }
+        let state = ClientState(fd)
+        if let shellID {
+            clientQueue.async {
+                while let disconnected = state.disconnected() {
+                    if disconnected {
+                        Task { @MainActor in
+                            _ = try? await controller?.control?.rpcAfterQueuedInput("shell.cancel", params: ["request_id": shellID])
+                        }
+                        break
+                    }
+                    usleep(25000)
+                }
+            }
+        }
+        let admittedCommand = command
         Task { @MainActor in
-            let response = await controller?.respond(to: line)
+            let response = await controller?.respond(to: admittedCommand)
                 ?? reply(ok: false, error: "host control stopped")
             clientQueue.async {
+                state.finish()
                 write(response, to: fd)
                 close(fd)
+                connections.signal()
             }
         }
     }
@@ -593,24 +686,7 @@ class VPhoneHostAutomationServer {
     /// anything behind it: its client starts typing without waiting for a
     /// reply, and those keystrokes are already the session's input.
     private nonisolated static func readCommand(from fd: Int32) -> (line: String, rest: Data)? {
-        var buffer = [UInt8](repeating: 0, count: 4096)
-        var accumulated = Data()
-
-        while accumulated.count < maximumRequestLength {
-            let n = read(fd, &buffer, buffer.count)
-            guard n > 0 else { break }
-            accumulated.append(contentsOf: buffer[..<n])
-            if buffer[..<n].contains(0x0A) {
-                break
-            }
-        }
-
-        if let nlRange = accumulated.firstIndex(of: 0x0A) {
-            guard let line = String(data: accumulated[..<nlRange], encoding: .utf8) else { return nil }
-            return (line, Data(accumulated[accumulated.index(after: nlRange)...]))
-        }
-        guard !accumulated.isEmpty, let line = String(data: accumulated, encoding: .utf8) else { return nil }
-        return (line, Data())
+        VPhoneHostAutomationIO.readCommand(from: fd)
     }
 
     // MARK: - Interactive Shell
@@ -705,19 +781,6 @@ class VPhoneHostAutomationServer {
     }
 
     private nonisolated static func write(_ data: Data, to fd: Int32) {
-        data.withUnsafeBytes { raw in
-            guard let base = raw.baseAddress else { return }
-            var offset = 0
-            while offset < raw.count {
-                let written = Darwin.write(fd, base.advanced(by: offset), raw.count - offset)
-                if written < 0, errno == EINTR {
-                    continue
-                }
-                if written <= 0 {
-                    break
-                }
-                offset += written
-            }
-        }
+        VPhoneHostAutomationIO.write(data, to: fd)
     }
 }
