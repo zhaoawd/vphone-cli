@@ -26,6 +26,7 @@ modification is authorized.
 - [x] Windowed A/B: F3 touch and edge gestures, F5 transition frames, F4 power during close (`WINDOWED.md`).
 - [x] Windowed A/B: keyboard modes across folds and window frame restore (`WINDOWED.md`).
 - [x] F6 on the candidate: 5 cold boots, full 64 GB export/import with imported boots, snapshot round trip, 120-minute locked idle (`F6.md`).
+- [x] Host restart: 2/2 candidate cold boots pass after re-running `vphone-escalator allow` (AMFI heap patch does not survive a restart; `F6.md`).
 - [x] Static outer/inner and cutout on/off/on (`Regression/display-matrix.zsh`, `F6.md`): P1–P7 pass; P5 (cutout off) loses all inner taps as documented.
 - [x] Move the foldable board-tree precondition before disk work in `cfw update-environment` (`db111457`; `F6.md`): root check refuses in 3 s with no disk attach. Candidate rebuilt at `ea05ba81` with it (only `vphone-cli` changed; previous bundle kept at `.build/XcodeDuo-a71f2360`).
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
