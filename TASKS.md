@@ -19,7 +19,8 @@ modification is authorized.
 - [x] Reproduce and repair sparse archive round-trip behavior using isolated test data; 103 archive tests pass.
 - [x] Build the integrated bundle and run affected firmware-free tests; existing firmware-fixture failures match baseline.
 - [x] Prepare VM A/B commands and create/verify isolated seed, baseline, and candidate copies after authorized shutdown.
-- [ ] Run authorized VM acceptance; distinguish historic evidence from new runs.
+- [x] Run authorized VM acceptance; distinguish historic evidence from new runs.
+      Closed by the user 2026-10-31. Not run, accepted as uncovered: safe-area/navigation-bar assessment, F6 on the baseline bundle, a `--max` transfer, and a constrained-free-space import (`F6.md`, Not covered).
 - [x] Complete isolated baseline/candidate headless smoke and native probe checks;
       preserve new diagnostic reports and remaining windowed/transfer checks.
 - [x] Triage new diagnostic reports against baseline, source history and repeats.
