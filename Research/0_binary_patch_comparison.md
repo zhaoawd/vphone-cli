@@ -480,6 +480,34 @@
 > reached, because the manager's construction needs haptics hardware a
 > VM does not have). See the full section below.
 
+> **Accessibility bundles standalone X1 lowering (2026-10-31, offline
+> validation):** `system-accessibilitybundles-cfw-arm64e_x1` applies the
+> existing static X1 planner to every on-disk `arm64e.x1` executable under
+> `/System/Library/AccessibilityBundles`, outside the shared cache. It is
+> gated to iOS 27.1, enabled in `standard`, and blocked in the TV and HomePod
+> presets. Reveal: the installer reads each bundle's `CFBundleExecutable`,
+> keeps those present on the System volume whose header is a thin 64-bit
+> arm64e Mach-O with subtype 12 (or that already have a `.bak`), then stages
+> each from `.bak` through `cfw patch-arm64e-x1 --patch-id
+> system-accessibilitybundles-cfw-arm64e_x1`, re-signs it ad hoc with its
+> entitlements, and re-seals the bundle; deselection restores every backup.
+> Bundles with no executable on disk are shared-cache images, already covered
+> by `dyld-cfw-arm64e_x1_cache`. On iPhone19,4 27.1 (24A94425), 78 of 517
+> entries carry an on-disk executable, all X1. Why: UIKit loads these bundles
+> into every app while app accessibility is on, and an app that installs its
+> own Mach exception ports (KFC 6.39.0's `YUMCCrash`) never reaches launchd's
+> on-demand lowering. Its first X1 instruction then kills the app, reported
+> as `EXC_GUARD` `MOD_REFS` from the app's own handler. Measured fault:
+> `SpringBoardHomePopAccessibility` (UUID
+> `BA1A37E2-D388-3876-A68E-89FDB4145618`) at offset `0xc58`, `pacibsppc`
+> (`0xDAC1A7FE`) in `+[AXSpringBoardHomePopGlue initialize]`. That offset is
+> evidence only; the planner discovers sites. On the pulled stock image the
+> planner lowered 66 instructions, re-attested 3 slots, left zero unvisited
+> candidates, turned `0xc58` into `pacibsp`, and a second pass was
+> byte-identical. Catalogue and X1 suites passed (40 tests). Guest
+> environment update and app relaunch with accessibility on: pending.
+> See `Research/Integration/duo_m5_20261030/F6.md`.
+
 > **CIBarcode standalone X1 lowering (2026-10-29, local validation):**
 > `system-cibarcode-cfw-arm64e_x1` applies the existing static X1 planner to
 > `/System/Library/CoreImage/CIBarcode.cifilter/CIBarcode`, outside the shared

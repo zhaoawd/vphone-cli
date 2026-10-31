@@ -44,6 +44,8 @@ public enum FirmwareGuestSystemPatchSet {
     public static let arm64eX1CIBarcode = "system-cibarcode-cfw-arm64e_x1"
     public static let ciBarcodeBundlePath = "System/Library/CoreImage/CIBarcode.cifilter"
     public static let ciBarcodeExecutablePath = ciBarcodeBundlePath + "/CIBarcode"
+    public static let arm64eX1AccessibilityBundles = "system-accessibilitybundles-cfw-arm64e_x1"
+    public static let accessibilityBundlesPath = "System/Library/AccessibilityBundles"
 
     public static let paravirtGPUIndexOffset = "system-paravirt_gpu-cfw-heap_index_offset"
     public static let paravirtGPUDriverPath =
@@ -326,6 +328,18 @@ public enum FirmwareGuestSystemPatchSet {
                 its remaining X1 instruction faults.
                 """,
                 target: .guestExecutable(path: "/" + ciBarcodeExecutablePath),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 1)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: arm64eX1AccessibilityBundles,
+                title: "ARM64E_X1 accessibility bundles",
+                summary: """
+                Lowers the X1 executables of the accessibility bundles kept on disk, outside the \
+                shared cache. UIKit loads them into every app while app accessibility is on, and \
+                an app that installs its own Mach exception handler never reaches the on-demand \
+                lowering service, so their first X1 instruction kills it.
+                """,
+                target: .guestExecutable(path: "/" + accessibilityBundlesPath),
                 applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 1)),
             ),
 

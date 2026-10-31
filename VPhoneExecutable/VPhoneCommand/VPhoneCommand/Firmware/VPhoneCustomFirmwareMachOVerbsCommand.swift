@@ -47,14 +47,26 @@ struct VPhoneCustomFirmwarePatchArm64eX1Command: ParsableCommand {
         commandName: "patch-arm64e-x1",
         abstract: "Lower X1 instructions in a supported standalone executable",
         discussion: """
-        Supports dyld, launchd, fsck, mount and CIBarcode. Other standalone userland \
+        Supports dyld, launchd, fsck, mount and CIBarcode by file name, and the \
+        accessibility bundles' executables with --patch-id. Other standalone userland \
         instructions are handled on demand. Re-attests modified code pages.
         """,
     )
+    /// For targets a file name cannot identify: the installer stages each
+    /// accessibility bundle's executable under its own name.
+    @Option(name: .customLong("patch-id"), help: "Record identifier; only \(FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles)")
+    var patchID: String?
     @Argument(transform: URL.init(fileURLWithPath:)) var binary: URL
     func run() throws {
         try requireUntruncatedMachO(at: binary)
         let identifier: String
+        if let patchID {
+            guard patchID == FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles else {
+                throw ValidationError("--patch-id supports only \(FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles)")
+            }
+            try CustomFirmwareArm64eX1.patch(fileAt: binary, identifier: patchID, log: machOVerbLog)
+            return
+        }
         switch binary.lastPathComponent {
         case "dyld": identifier = FirmwareGuestSystemPatchSet.arm64eX1DyldBootstrap
         case "launchd": identifier = FirmwareGuestSystemPatchSet.arm64eX1LaunchdBootstrap

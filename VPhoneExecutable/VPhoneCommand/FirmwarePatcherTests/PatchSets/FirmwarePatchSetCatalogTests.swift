@@ -33,8 +33,8 @@ struct FirmwarePatchSetCatalogTests {
         }
     }
 
-    @Test func `CIBarcode lowering is scoped to the measured base and can be disabled`() throws {
-        let identifier = FirmwareGuestSystemPatchSet.arm64eX1CIBarcode
+    @Test(arguments: [FirmwareGuestSystemPatchSet.arm64eX1CIBarcode, FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles])
+    func `Standalone X1 lowering is scoped to the measured base and can be disabled`(identifier: String) throws {
         for base in ["26.4", "27.0.1", "27.1", "27.1.1", "27.2", "28.0"] {
             for blocked in [false, true] {
                 var preset = FirmwarePatchSetCatalog.standardPreset

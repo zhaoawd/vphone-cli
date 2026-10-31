@@ -1470,6 +1470,46 @@ struct VPhoneCustomFirmwareInstaller {
             )
         }
 
+        // UIKit loads accessibility bundles into every app while app
+        // accessibility is on. Most are in the shared cache, which the cache
+        // lowering covers; the rest are standalone X1 executables, and an app
+        // with its own Mach exception handler dies on their first X1
+        // instruction instead of reaching the on-demand service. Each is
+        // lowered from its backup and its bundle re-sealed, as CIBarcode is;
+        // deselection restores every backup.
+        if version.hasPrefix("27.1.") || version == "27.1"
+            || priorGuest.contains(FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles)
+        {
+            let identifier = FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles
+            isolate([identifier]) {
+                let bundles = try accessibilityX1Executables(system: system)
+                if on(identifier) {
+                    for (bundle, executable) in bundles {
+                        try patchMachO(
+                            system: system, work: work, path: executable, verbs: ["patch-arm64e-x1"],
+                            verbArguments: ["--patch-id", identifier], preserveEntitlements: true,
+                        )
+                        try sealGuestBundle(system: system, bundle: bundle)
+                    }
+                    print("  [+] \(identifier): lowered \(bundles.count) accessibility bundle executables")
+                    live.insert(identifier)
+                } else {
+                    var restored = 0
+                    for (bundle, executable) in bundles {
+                        if try revertMachO(system: system, work: work, path: executable, bundle: bundle) {
+                            restored += 1
+                        }
+                    }
+                    if restored > 0 {
+                        print("  [+] \(identifier): restored \(restored) accessibility bundle executables from backup")
+                    } else if priorGuest.contains(identifier) {
+                        print("  [!] \(identifier): off now but no backup to revert; leaving the patched bundles (not revertible)")
+                        live.insert(identifier)
+                    }
+                }
+            }
+        }
+
         // 0. A cache whose span alone overruns the guest kernel's shared region
         //    maps at no slide, and the guest panics on first boot. Refuse before
         //    the redeploy and the cache patches. A header this check cannot read
@@ -3791,12 +3831,14 @@ struct VPhoneCustomFirmwareInstaller {
     /// `verbs` runs in order against the one staged copy — the staging starts
     /// from the pristine backup, so two calls would not compose. Empty: a
     /// binary that only needs a library injected — as installd does for
-    /// libmisfix — has no bytes of its own to change.
+    /// libmisfix — has no bytes of its own to change. `verbArguments` go to
+    /// every verb ahead of the staged file.
     private func patchMachO(
         system: VPhoneConfinedDirectory,
         work: WorkDirectory,
         path: String,
         verbs: [String] = [],
+        verbArguments: [String] = [],
         identifier: String? = nil,
         preserveEntitlements: Bool = false,
         injectedDylibPath: String? = nil,
@@ -3821,7 +3863,7 @@ struct VPhoneCustomFirmwareInstaller {
                 ? try VPhoneSigner.entitlements(ofFileAt: staged).first(where: { !$0.isEmpty })
                 : nil
         for verb in verbs {
-            try patch(verb, [staged.path])
+            try patch(verb, verbArguments + [staged.path])
         }
         if let injectedDylibPath {
             try patch("inject-dylib", [staged.path, injectedDylibPath])
@@ -3914,6 +3956,39 @@ struct VPhoneCustomFirmwareInstaller {
 
     /// Re-seal a code-signed bundle on the mounted guest system volume.
     ///
+    /// The accessibility bundles whose executable is on the system volume and
+    /// is arm64e.x1 (cpusubtype 12), or keeps a backup from an earlier run.
+    /// A bundle with no executable here has its code in the shared cache.
+    private func accessibilityX1Executables(system: VPhoneConfinedDirectory) throws -> [(bundle: String, executable: String)] {
+        let root = FirmwareGuestSystemPatchSet.accessibilityBundlesPath
+        guard try system.isDirectory(root) else { return [] }
+        var found: [(bundle: String, executable: String)] = []
+        for name in try system.directory(root).entries().sorted() {
+            let bundle = root + "/" + name
+            guard try system.isDirectory(bundle),
+                  let info = try? system.readData(bundle + "/Info.plist"),
+                  let plist = (try? PropertyListSerialization.propertyList(from: info, format: nil)) as? [String: Any],
+                  let executableName = plist["CFBundleExecutable"] as? String,
+                  !executableName.isEmpty, !executableName.contains("/")
+            else { continue }
+            let executable = bundle + "/" + executableName
+            guard try system.isRegularFile(executable) else { continue }
+            if try system.exists(executable + ".bak") || Self.isArm64eX1(try system.readData(executable)) {
+                found.append((bundle, executable))
+            }
+        }
+        return found
+    }
+
+    /// A thin 64-bit arm64e Mach-O whose subtype is X1.
+    static func isArm64eX1(_ data: Data) -> Bool {
+        guard data.count >= 12 else { return false }
+        func word(_ offset: Int) -> UInt32 {
+            data.withUnsafeBytes { UInt32(littleEndian: $0.loadUnaligned(fromByteOffset: offset, as: UInt32.self)) }
+        }
+        return word(0) == 0xFEED_FACF && word(4) == 0x0100_000C && word(8) & 0x00FF_FFFF == 12
+    }
+
     /// `patchMachO` re-signs the Mach-O it replaces, but a bundle's outer
     /// `_CodeSignature/CodeResources` seals the whole directory, and a guest
     /// built with the code-signing monitor kills the process that loads a
