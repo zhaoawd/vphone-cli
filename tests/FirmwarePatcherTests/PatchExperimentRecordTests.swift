@@ -1,7 +1,6 @@
 import Darwin
 import Foundation
 import Testing
-import Virtualization
 @testable import FirmwarePatcher
 
 /// C5 no-VM record tests: synthetic VM directories, a pass-through loader and injected
@@ -32,11 +31,8 @@ import Virtualization
                 try Data(repeating: 0x41, count: 256).write(to: url)
             }
             try Data(repeating: 0x42, count: 128).write(to: vm.appendingPathComponent("AVPBooter.vresearch1.bin"))
-            try Data("disk".utf8).write(to: vm.appendingPathComponent("Disk.img"))
-            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation, "diskImage": "Disk.img"], format: .xml, options: 0).write(to: vm.appendingPathComponent("config.plist"))
             try manifest(["ProductVersion": "26.1", "ProductBuildVersion": "23B85"], "iPhone-BuildManifest.plist")
             try manifest(["ProductVersion": "26.1", "ProductBuildVersion": "23B5046f"], "BuildManifest.plist")
-            try saveSyntheticDesiredPlan(FirmwarePipeline(vmDirectory: vm, verbose: false))
         }
         deinit { try? fm.removeItem(at: root) }
 
@@ -55,7 +51,7 @@ import Virtualization
 
         @discardableResult
         func run(variant: FirmwarePipeline.Variant = .regular, forceExcGuard: Bool = false,
-                 ablate: [String] = PatchExperimentRecordTests.allComponents, allowOutput: Bool = false,
+                 ablate: [String] = PatchExperimentRecordTests.allComponents, allowOutput: Bool = true,
                  loader: any FirmwarePipeline.FirmwareLoader = PassThroughLoader(),
                  hook: @escaping (URL, PatchExperimentRecord.WriteStep) throws -> Void = { _, _ in },
                  diagnostics: @escaping (String) -> Void = { _ in }) throws -> PatchRunReport {
@@ -93,8 +89,8 @@ import Virtualization
         try a.run(); try b.run()
         let left = try a.record(), right = try b.record()
         #expect(left.status == .succeeded)
-        #expect(left.transaction.state == "none")
-        #expect(left.outputs.availability == "unavailable")
+        #expect(left.transaction.state == "committed")
+        #expect(left.outputs.availability == "available")
         #expect(left.conditions.firmware.iPhone.buildVersion.value == "23B85")
         #expect(left.conditions.firmware.cloudOS.buildVersion.value == "23B5046f")
         #expect(left.conditions.firmware.origin.value == nil && left.conditions.firmware.origin.reason != nil)
@@ -102,8 +98,8 @@ import Virtualization
         let comparison = try PatchExperimentRecord.compare(left, right)
         #expect(comparison.conditions.result == .same)
         #expect(comparison.patchResults.result == .same)
-        #expect(comparison.artifacts.result == .undetermined)
-        #expect(!comparison.allSame)
+        #expect(comparison.artifacts.result == .same)
+        #expect(comparison.allSame)
         #expect(left.conditionDigest == right.conditionDigest)
         let excluded = comparison.excluded.map(\.path)
         #expect(excluded.contains("runID"))
@@ -140,7 +136,7 @@ import Virtualization
             #expect(paths.contains("conditions.inputs.files[\(kernelPath)].digest"))
             #expect(paths.contains("conditions.inputs.roots[\(Self.restoreName)].digest"))
             #expect(paths.allSatisfy { $0.hasPrefix("conditions.inputs.") })
-            #expect(comparison.artifacts.result == .undetermined)
+            #expect(comparison.artifacts.result == .different)
         }
     }
 
@@ -148,7 +144,7 @@ import Virtualization
 
     @Test func requiredFailureAfterPartialSuccessKeepsCompletedParts() throws {
         let f = try Fixture()
-        let report = try f.run(ablate: ["avpbooter"], allowOutput: true)
+        let report = try f.run(ablate: ["avpbooter"])
         #expect(!report.failedRequired.isEmpty)
         let record = try f.record()
         #expect(record.status == .failed)
@@ -167,7 +163,7 @@ import Virtualization
     @Test func cancellationAfterPartialSuccessKeepsOriginalError() throws {
         let f = try Fixture()
         #expect(throws: CancellationError.self) {
-            try f.run(allowOutput: true, loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"))
+            try f.run(loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"))
         }
         let record = try f.record()
         #expect(record.status == .cancelled)
@@ -204,7 +200,7 @@ import Virtualization
             if counter.records == 2, current == step { throw POSIXError(code) }
         }
         #expect(throws: CancellationError.self) {
-            try f.run(allowOutput: true, loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"), hook: hook,
+            try f.run(loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"), hook: hook,
                       diagnostics: { messages.append($0) })
         }
         #expect(messages.count == 1)
@@ -341,7 +337,7 @@ import Virtualization
         #expect(summary == record.summary())
         #expect(summary.contains("status:     succeeded"))
         #expect(summary.contains("23B85"))
-        #expect(summary.contains("transaction: none"))
+        #expect(summary.contains("transaction: committed"))
         #expect(PatchExperimentRecord.summaryURL(for: URL(fileURLWithPath: "/x/run.json")).lastPathComponent == "run.summary.txt")
     }
 

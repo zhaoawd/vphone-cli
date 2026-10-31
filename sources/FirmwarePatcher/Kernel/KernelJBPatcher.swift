@@ -26,8 +26,6 @@ public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
     /// Opt-in Frida Stalker kernel relaxations (exposed as `--frida`). Baseline
     /// JB/EXP firmware is byte-identical when false.
     public var applyFrida = false
-    /// Restricts both execution interfaces to the existing mount step.
-    public var mountOnly = false
 
     private var didPrepare = false
 
@@ -43,11 +41,6 @@ public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
 
     public func findAll() throws -> [PatchRecord] {
         ensurePrepared()
-
-        if mountOnly {
-            _ = buildSteps()[0].run()
-            return patches
-        }
 
         // Group A
         patchAmfiCdhashInTrustcache()
@@ -130,8 +123,7 @@ public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
     // MARK: - StructuredPatcher
 
     public func buildSteps() -> [PatchStep] {
-        if mountOnly { return [step("patchMacMount", run: patchMacMount)] }
-        return [
+        [
             step("patchAmfiCdhashInTrustcache", run: patchAmfiCdhashInTrustcache),
             step("patchTaskConversionEvalInternal", run: patchTaskConversionEvalInternal),
             step("patchSandboxHooksExtended", run: patchSandboxHooksExtended),

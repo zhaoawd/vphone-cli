@@ -105,21 +105,7 @@ public enum StructuredExecution {
                 outcome: outcome.kind,
                 reason: outcome.reason,
                 recordIndices: Array(before ..< after),
-                gates: gates,
-                declarationEvidence: (before..<after).flatMap { index in
-                    let record = patcher.emittedRecords[index]
-                    let owners = (PatchDeclarationCatalog.declarationsByStep[step.id.description] ?? [])
-                        .filter { ($0.recordRules ?? []).contains { $0.matches(record) } }
-                    let start = record.fileOffset
-                    let verified = outcome.kind == .alreadyApplied && !record.patchedBytes.isEmpty
-                        && start >= 0 && start <= fallback.count
-                        && record.patchedBytes.count <= fallback.count - start
-                        && fallback.subdata(in: start..<(start + record.patchedBytes.count)) == record.patchedBytes
-                    return owners.map { DeclarationExecutionEvidence(declarationID: $0.id, recordIndex: index,
-                        component: record.component, fileOffset: record.fileOffset, byteCount: record.patchedBytes.count,
-                        verifiedPayloadSHA256: verified ? DeclarationExecutionEvidence.digest(fallback) : nil,
-                        verifiedOutputSHA256: verified ? DeclarationExecutionEvidence.digest(record.patchedBytes) : nil) }
-                }
+                gates: gates
             ))
         }
 

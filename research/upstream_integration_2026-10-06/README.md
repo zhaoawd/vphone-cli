@@ -1,7 +1,5 @@
 # 固定上游整合执行记录（2026-10-06）
 
-**2026-10-15 修订入口：** 固定目标已更新为 `8a75092013eda87a4e30ed029b72028cb9279ac4`。执行范围、增量要求与顺序见[当前合入计划](../upstream_integration_2026-10-15/plan.md)，当前候选核对见[新台账](../upstream_integration_2026-10-15/tasks.json)。本目录 tasks.json、输入及 B01–B38 记录保留旧目标历史状态；10 月 12–14 日的后续进展另见[五任务完成计划](../../docs/superpowers/plans/2026-10-12-five-task-completion.md)。
-
 本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`。历史批次使用已经附加的隔离工作树；B33 在本机 `/Users/kolar/github/vphone-cli` 继续，B37起开发位于 `/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli`。当前结果见末尾 B38 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。

@@ -39,7 +39,6 @@ struct StopRefusalTests {
         library.startMonitoring(with: VPhoneLaunchpadCommandLine(executable: script, history: history))
         library.stopMonitoring()
         let machine = VPhoneLaunchpadMachinePath(libraryRoot: temp.url.path, name: "sample")
-        try FileManager.default.createDirectory(at: machine.url, withIntermediateDirectories: false)
         library.start(machine)
         let child = try #require(library.launchedProcess(machine))
         // Failure cleanup uses the retained, identity-guarded child handle;

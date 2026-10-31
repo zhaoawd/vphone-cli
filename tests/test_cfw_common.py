@@ -28,9 +28,6 @@ class CommonCFWTests(unittest.TestCase):
 SCRIPT_DIR="$CFW_TEST_SCRIPTS"
 VM_DIR="$CFW_TEST_VM"
 source "$CFW_TEST_COMMON"
-# Unit tests of cache/cleanup helpers; real gate chain has separate integration tests.
-cfw_guest_write() { "$@"; }
-cfw_cache_appos() { [[ -f "$2" ]] || cp "$1" "$2"; }
 ''' + body], capture_output=True, text=True, env=dict(self.env, **env), timeout=20)
 
     def test_archive_search_order_and_existing_input_reuse(self):

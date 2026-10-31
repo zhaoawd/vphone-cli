@@ -2,45 +2,6 @@ import Testing
 @testable import FirmwarePatcher
 
 @Suite struct PatchSelectionMigrationTests {
-    @Test(arguments: [true, false])
-    func proMotionRenamePreservesExplicitIntent(enabled: Bool) throws {
-        let old = "kernel-exp-display_refresh_120hz"
-        let current = "kernel-cfw-display_promotion"
-        let preview = try PatchSelectionMigration.preview(
-            select: enabled ? [old] : [], block: enabled ? [] : [old])
-        #expect(preview.selected == (enabled ? [current] : []))
-        #expect(preview.blocked == (enabled ? [] : [current]))
-        #expect(preview.renames == [.init(from: old, to: current, enabled: enabled)])
-        let repeated = try PatchSelectionMigration.preview(select: preview.selected, block: preview.blocked)
-        #expect(repeated.selected == preview.selected)
-        #expect(repeated.blocked == preview.blocked)
-        #expect(repeated.renames.isEmpty)
-    }
-
-    @Test func proMotionRenameCannotDiscardConflictingIntent() {
-        #expect(throws: PatchSelectionMigration.MigrationError.contradictoryID("kernel-cfw-display_promotion")) {
-            try PatchSelectionMigration.preview(
-                select: ["kernel-cfw-display_promotion"], block: ["kernel-exp-display_refresh_120hz"])
-        }
-        #expect(throws: PatchSelectionMigration.MigrationError.duplicateTarget("kernel-cfw-display_promotion")) {
-            try PatchSelectionMigration.preview(
-                select: [], block: ["kernel-cfw-display_promotion", "kernel-exp-display_refresh_120hz"])
-        }
-    }
-
-    @Test(arguments: ["regular", "dev", "jb", "exp", "less"])
-    func proMotionRemainsDisabledWithoutAnImplementation(variant: String) throws {
-        let mode = try #require(FirmwarePipeline.Variant(rawValue: variant))
-        let plan = try VariantPlanResolver.resolve(variant: mode, gates: DeclarationGateTests.gates(variant))
-        let id = "kernel-cfw-display_promotion"
-        #expect(!plan.selected.contains { $0.id == id })
-        #expect(PatchDeclarationCatalog.byID[id]?.coverage == .notImplemented)
-        #expect(throws: PatchDeclarationCatalog.CatalogError.notImplementedSelected(id: id)) {
-            _ = try VariantPlanResolver.resolve(
-                variant: mode, gates: DeclarationGateTests.gates(variant), select: [id])
-        }
-    }
-
     @Test func oldDottedIDsPreserveExplicitEnableAndDisable() throws {
         let result = try PatchSelectionMigration.preview(select: ["ibss.serial_label"], block: ["avpbooter.dgst_bypass"])
         #expect(result.selected == ["ibss-cfw-serial_label"])
@@ -54,8 +15,7 @@ import Testing
     @Test func intermediateParavirtDisableSurvivesDefaultChange() throws {
         let result = try PatchSelectionMigration.preview(select: [], block: ["kernel-exp-paravirt_user_clients"])
         #expect(result.blocked == ["kernel-cfw-paravirt_user_clients"])
-        #expect(result.notDeclaredLocally.isEmpty)
-        #expect(PatchDeclarationCatalog.byID["kernel-cfw-paravirt_user_clients"]?.coverage == .notImplemented)
+        #expect(result.notDeclaredLocally == ["kernel-cfw-paravirt_user_clients"])
         #expect(result.selected.isEmpty)
     }
 
@@ -114,8 +74,8 @@ import Testing
 
     @Test func newDeclarationDoesNotGainLocalExecutionCoverage() throws {
         let result = try PatchSelectionMigration.preview(select: ["kernel-boot-shared_region_size"], block: [])
-        #expect(result.notDeclaredLocally.isEmpty)
-        #expect(PatchDeclarationCatalog.byID["kernel-boot-shared_region_size"]?.coverage == .notImplemented)
+        #expect(result.notDeclaredLocally == ["kernel-boot-shared_region_size"])
+        #expect(PatchDeclarationCatalog.byID["kernel-boot-shared_region_size"] == nil)
     }
 
     @Test func bundledExtendedPresetMigratesWithoutRewritingModes() throws {

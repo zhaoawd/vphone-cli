@@ -61,7 +61,7 @@ public enum PatchDeclarationCatalog {
     /// binding declaration's variant set contains `variant` and its version rule holds.
     public static func status(ofStep step: String, variant: String, gates: PatchGateSnapshot) -> StepStatus {
         guard let declarations = declarationsByStep[step] else { return .undeclared }
-        let forVariant = declarations.filter { applies($0, variant: variant, gates: gates) }
+        let forVariant = declarations.filter { $0.variants.contains(variant) }
         guard !forVariant.isEmpty else { return .excludedByVariant }
         if let enabled = forVariant.first(where: { ruleHolds($0, gates) }) {
             return .enabled(declaration: enabled.id)
@@ -87,12 +87,6 @@ public enum PatchDeclarationCatalog {
     static func ruleHolds(_ declaration: PatchDeclaration, _ gates: PatchGateSnapshot) -> Bool {
         guard let rule = declaration.versionRule else { return false }
         return rule.evaluate(gates)
-    }
-
-    static func applies(_ declaration: PatchDeclaration, variant: String, gates: PatchGateSnapshot) -> Bool {
-        declaration.variants.contains(variant)
-            || (variant == "regular" && gates.experimentalV2RootRemount == true
-                && declaration.id == "kernel-boot-mac_mount")
     }
 
     // MARK: - Integrity checks (T11)
@@ -134,7 +128,7 @@ public enum PatchDeclarationCatalog {
             case let .notImplementedSelected(id):
                 "declaration \(id) is not implemented locally and cannot be selected"
             case let .versionIndeterminate(id, rule):
-                "declaration \(id) needs version rule \(rule.rawValue), but the \(rule == .cloudOSFridaCapable || rule == .cloudOSIs26_4OrNewer ? "cloudOS" : "base") version is unknown"
+                "declaration \(id) needs version rule \(rule.rawValue), but the \(rule == .cloudOSFridaCapable ? "cloudOS" : "base") version is unknown"
             case let .requiredMissing(variant, id):
                 "required declaration \(id) is not enabled for variant \(variant)"
             case let .contradictorySelection(id):

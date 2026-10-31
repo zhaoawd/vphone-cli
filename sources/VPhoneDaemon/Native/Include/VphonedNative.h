@@ -15,8 +15,6 @@ void vp_native_confirm_cached_binary(void);
 int vp_native_process_mode(void);
 int vp_native_run_proxy(void);
 int vp_native_watch_proxy(void);
-/// Only VPHONED_VCAM=off suppresses the API daemon's camera listener.
-bool vp_native_vcam_enabled(void);
 void vp_vcam_start(void);
 const char *vp_daemon_source_overlay(void);
 int vp_native_api_open(void);

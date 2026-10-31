@@ -25,7 +25,7 @@ ldid_sign() {
     local file="$1" bundle_id="${2:-}"
     local args=(-S -M "-K$VM_DIR/$CFW_INPUT/signcert.p12")
     [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    cfw_guest_sign "${args[@]}" "$file"
+    ldid "${args[@]}" "$file"
 }
 
 host_hdiutil() {
@@ -66,7 +66,7 @@ find_restore_dir() {
 
 mount_vol() {  # mount_vol <slice, e.g. s1> <mountpoint> [opts]
     local dev="/dev/${CFW_HOST_CONTAINER}$1" mnt="$2" opts="${3:-rw}"
-    cfw_guest_write /bin/mkdir -p "$mnt"
+    /bin/mkdir -p "$mnt"
     /sbin/mount | /usr/bin/grep -Fq " on $mnt " && return 0
     /sbin/mount_apfs -o "$opts" "$dev" "$mnt" 2>/dev/null || true
     /sbin/mount | /usr/bin/grep -Fq " on $mnt " || die "mount failed: $dev -> $mnt"
@@ -94,7 +94,7 @@ cfw_init_mounts() {
     MNT3="$HOST_MNT/mnt3"
     MNT5="$HOST_MNT/mnt5"
     TAR="$(command -v gtar 2>/dev/null || echo /opt/homebrew/bin/gtar)"
-    cfw_guest_write mkdir -p "$HOST_MNT"
+    mkdir -p "$HOST_MNT"
 }
 
 # Keep each entrypoint's tar executable/options explicit.
@@ -115,11 +115,15 @@ cfw_extract_input() {
 }
 
 cfw_cache_systemos() {
-    "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" cache systemos "$1" "$2"
+    "$PYTHON3" "$SCRIPT_DIR/cache_systemos.py" "$1" "$2"
 }
 
 cfw_cache_appos() {
-    "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" cache appos "$1" "$2"
+    if [[ ! -f "$2" ]]; then
+        cp "$1" "$2"
+    else
+        echo "  Using cached AppOS DMG"
+    fi
 }
 
 # Base uses host_hdiutil's fallback; DEV retains its explicit sudo policy.
@@ -157,10 +161,10 @@ cfw_guest_resources() {
 
 cfw_stage_vphoned() {
     local guest="$1"
-    cfw_guest_write cp "$guest/vphoned" "$TEMP_DIR/vphoned"
-    cfw_guest_write cp "$TEMP_DIR/vphoned" "$MNT1/usr/bin/vphoned"
-    cfw_guest_write /bin/chmod 0755 "$MNT1/usr/bin/vphoned"
-    cfw_guest_write cp "$TEMP_DIR/vphoned" "$VM_DIR/.vphoned.signed"
+    cp "$guest/vphoned" "$TEMP_DIR/vphoned"
+    cp "$TEMP_DIR/vphoned" "$MNT1/usr/bin/vphoned"
+    /bin/chmod 0755 "$MNT1/usr/bin/vphoned"
+    cp "$TEMP_DIR/vphoned" "$VM_DIR/.vphoned.signed"
 }
 
 
@@ -169,19 +173,9 @@ cfw_stage_api() {
     local guest="$1" python
     python="${VPHONE_PYTHON:-${PYTHON3:-python3}}"
     "$python" "$SCRIPT_DIR/check_guest_api.py" "$guest"
-    cfw_guest_write /bin/mkdir -p "$MNT1/usr/libexec" "$MNT1/System/Library/LaunchDaemons"
-    cfw_guest_write cp "$guest/api/vphoned" "$MNT1/usr/libexec/vphoned-api"
-    cfw_guest_write /bin/chmod 0755 "$MNT1/usr/libexec/vphoned-api"
-    cfw_guest_write cp "$guest/api/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/vphoned-api.plist"
-    cfw_guest_write /bin/chmod 0644 "$MNT1/System/Library/LaunchDaemons/vphoned-api.plist"
-}
-
-# Run the original command after exact target authorization; record real bytes.
-cfw_guest_write() {
-    "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" write "$@"
-}
-
-# Keep original ldid options while capturing the explicit producer operation.
-cfw_guest_sign() {
-    VPHONE_SIGN_BOOT_HASH="${BOOT_HASH:-}" "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" sign "$(command -v ldid)" "$@"
+    /bin/mkdir -p "$MNT1/usr/libexec" "$MNT1/System/Library/LaunchDaemons"
+    cp "$guest/api/vphoned" "$MNT1/usr/libexec/vphoned-api"
+    /bin/chmod 0755 "$MNT1/usr/libexec/vphoned-api"
+    cp "$guest/api/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/vphoned-api.plist"
+    /bin/chmod 0644 "$MNT1/System/Library/LaunchDaemons/vphoned-api.plist"
 }

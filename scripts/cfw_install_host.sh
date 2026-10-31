@@ -36,30 +36,13 @@ set -euo pipefail
 SCRIPT_DIR="${0:a:h}"
 PROJ="${SCRIPT_DIR:h}"
 
-VARIANT="${VPHONE_CFW_VARIANT:-}"
+VARIANT=exp
 MODE=install
-GUEST_ENVIRONMENT=classic
-GUEST_ENVIRONMENT_GIVEN=0
 REPORT=""
-UNDO_GENERATION=""
-UNDO_DECLARATIONS=()
-REINSTALL_CRYPTEX=0
 VM_DIR="$PROJ/vm"
 while (( $# )); do
   case "$1" in
     --variant) VARIANT="$2"; shift 2 ;;
-    --reinstall-cryptex) REINSTALL_CRYPTEX=1; shift ;;
-    --guest-environment)
-      (( $# >= 2 )) || { echo "[-] --guest-environment needs classic|v2" >&2; exit 1; }
-      GUEST_ENVIRONMENT="$2"; GUEST_ENVIRONMENT_GIVEN=1; shift 2 ;;
-    --install-environment) echo "[-] standalone environment migration is not enabled yet" >&2; exit 1 ;;
-    --undo-declaration)
-      (( $# >= 2 )) || { echo "[-] --undo-declaration needs an ID" >&2; exit 1; }
-      [[ "$MODE" == install || "$MODE" == undo ]] || { echo "[-] Undo cannot be combined with environment modes" >&2; exit 1; }
-      MODE=undo; UNDO_DECLARATIONS+=("$2"); shift 2 ;;
-    --generation)
-      (( $# >= 2 )) || { echo "[-] --generation needs a digest" >&2; exit 1; }
-      UNDO_GENERATION="$2"; shift 2 ;;
     --update-environment|--check-environment)
       [[ "$MODE" == install ]] || { echo "[-] --update-environment and --check-environment are exclusive" >&2; exit 1; }
       [[ "$1" == --update-environment ]] && MODE=environment || MODE=check
@@ -70,29 +53,7 @@ while (( $# )); do
   esac
 done
 
-case "$GUEST_ENVIRONMENT" in
-  classic|v2) ;;
-  *) echo "[-] unknown guest environment: $GUEST_ENVIRONMENT (classic|v2)" >&2; exit 1 ;;
-esac
-if (( GUEST_ENVIRONMENT_GIVEN )) && [[ "$MODE" != install ]]; then
-  echo "[-] --guest-environment is only valid for CFW installation" >&2; exit 1
-fi
-if (( REINSTALL_CRYPTEX )) && [[ "$MODE" != install || "$VARIANT" != regular || "$GUEST_ENVIRONMENT" != classic ]]; then
-  echo "[-] --reinstall-cryptex requires regular/classic CFW installation" >&2; exit 1
-fi
-# B1 profile contract: initial v2 rollout supports regular only.
-if [[ "$GUEST_ENVIRONMENT" == v2 && "$VARIANT" != regular ]]; then
-  echo "[-] guest environment v2 supports only variant regular" >&2; exit 1
-fi
-
-if [[ "$MODE" == undo ]]; then
-  [[ -n "$UNDO_GENERATION" ]] || { echo "[-] Undo requires --generation" >&2; exit 1; }
-  INSTALLER=""
-  MODE_ARGS=(--variant "$VARIANT" --generation "$UNDO_GENERATION")
-  for declaration in "${UNDO_DECLARATIONS[@]}"; do MODE_ARGS+=(--undo-declaration "$declaration"); done
-elif [[ -n "$UNDO_GENERATION" ]]; then
-  echo "[-] --generation requires --undo-declaration" >&2; exit 1
-elif [[ "$MODE" == check ]]; then
+if [[ "$MODE" == check ]]; then
   [[ "$REPORT" == /* ]] || { echo "[-] --check-environment requires --report with an absolute file path" >&2; exit 1; }
   INSTALLER=""
   MODE_ARGS=(--check-environment --report "$REPORT")
@@ -110,22 +71,6 @@ else
     *) echo "[-] unknown variant: $VARIANT (regular|dev|jb|exp)" >&2; exit 1 ;;
   esac
   MODE_ARGS=(--variant "$VARIANT")
-  [[ "$GUEST_ENVIRONMENT" == classic ]] || MODE_ARGS+=(--guest-environment "$GUEST_ENVIRONMENT")
-  (( ! REINSTALL_CRYPTEX )) || MODE_ARGS+=(--reinstall-cryptex)
-fi
-
-# The canonical restore-info writer uses this literal JSON field. Refuse a
-# classic reinstall before elevation or disk tools can remove the API entry.
-V2_RECORD_PATTERN='"guest_environment"[[:space:]]*:[[:space:]]*"v2"'
-if [[ "$MODE" == install && "$GUEST_ENVIRONMENT" == classic && -f "$VM_DIR/restore-info.json" ]] \
-    && [[ "$(<"$VM_DIR/restore-info.json")" =~ $V2_RECORD_PATTERN ]]; then
-  echo "[-] this VM records v2; reinstall with --guest-environment v2" >&2; exit 1
-fi
-
-# A direct script invocation cannot invent defaults or bypass Swift validation.
-if [[ "$MODE" != check ]]; then
-  [[ -n "$VARIANT" && "$VARIANT" == "${VPHONE_CFW_VARIANT:-}" ]] || { echo "[-] variant differs from bound frozen plan" >&2; exit 1; }
-  "${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 fi
 
 # Re-exec as root; owners-honored mounts + chown/cp require it.
@@ -185,8 +130,6 @@ else
 fi
 export PATH="$P"
 PY="${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}"
-# Python imports must not create root-owned files in the app or source resources.
-export PYTHONDONTWRITEBYTECODE=1
 
 # --check-environment: the read-only eligibility check, run as root because a
 # normal user may not mount a VM's System volume (real host, 2026-10-01). It
@@ -217,9 +160,7 @@ if ! "$PY" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR"; then
   export VPHONE_CFW_LOCK_REEXEC=1
   exec "$PY" "$SCRIPT_DIR/vm_lock.py" "$VM_DIR" cfw -- /bin/zsh "$0" "${MODE_ARGS[@]}" "$VM_DIR"
 fi
-"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 GUEST_COMPONENTS="${VPHONE_GUEST_COMPONENTS:-$PROJ/.build/guest-components-v2/stage}"
-API_DAEMON="${VPHONE_API_DAEMON:-$PROJ/.build/daemon-api-v2/candidate-v2}"
 
 # FORCE_DSC_MAXSLIDE (non-27 maxSlide opt-in) is removed (T13a, upstream d930e50).
 # Report it for every variant and keep it from the installers; patch-dsc-maxslide
@@ -282,13 +223,11 @@ hand_back_artifacts() {
     echo "[!] ownership of host-side artifacts NOT restored (mount beneath VM directory); unmount it, then: chown -Rx $INVOKER_OWNER $VM_DIR/{.vphoned.signed,.cfw_temp,cfw_input,cfw_jb_input,.cfw-history}" >&2
     return 0
   fi
-  local artifacts=(.vphoned.signed .cfw_temp cfw_input cfw_jb_input .cfw-history)
-  [[ "$MODE" != undo ]] || artifacts=(.cfw-history "${CFW_DISK_WORK:t}")
-  for artifact in "${artifacts[@]}"; do
+  for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input .cfw-history; do
     [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
     restore_invoker_ownership "$VM_DIR/$artifact" || failed=1
   done
-  if [[ "$MODE" != undo && -f "$PROJ/scripts/vphoned/vphoned" && ! -L "$PROJ/scripts/vphoned/vphoned" ]]; then
+  if [[ -f "$PROJ/scripts/vphoned/vphoned" && ! -L "$PROJ/scripts/vphoned/vphoned" ]]; then
     restore_invoker_ownership "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
   fi
   if (( failed )); then
@@ -308,7 +247,6 @@ hand_back_artifacts() {
 exec {DISK_FD}<"$IMG"
 CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
 CFW_STAGED_IMG=""
-export VPHONE_GUEST_EVIDENCE="$CFW_DISK_WORK/guest-changes.jsonl"
 TXN_STATE=none
 txn() {
   local command="$1"; shift
@@ -429,18 +367,9 @@ else
 fi
 # zsh does not run the EXIT trap when ERR_EXIT fires inside a function, so
 # every failing txn call exits explicitly at top level.
-if [[ "$MODE" == environment ]]; then
-  CFW_STAGED_IMG=$(txn stage) || exit $?
-else
-  CFW_STAGED_IMG=$(txn stage --guest-evidence) || exit $?
-fi
+CFW_STAGED_IMG=$(txn stage) || exit $?
 TXN_STATE=staged
 echo "[*] staged copy: $CFW_STAGED_IMG (the original $IMG is not written)"
-if [[ "$MODE" == undo ]]; then
-  UNDO_ARGS=(--generation "$UNDO_GENERATION")
-  for declaration in "${UNDO_DECLARATIONS[@]}"; do UNDO_ARGS+=(--declaration "$declaration"); done
-  txn prepare-undo "${UNDO_ARGS[@]}" || exit $?
-fi
 txn check --phase pre-mount || exit $?
 hdiutil attach -plist -nomount -imagekey diskimage-class=CRawDiskImage "$CFW_STAGED_IMG" > "$CFW_HOST_MNT/attach.log" {DISK_FD}<&-
 BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || { echo "[-] cannot identify attached disk; retaining attach.log" >&2; BASEDISK=""; exit 1; }
@@ -458,28 +387,14 @@ if [[ "$MODE" == environment ]]; then
   # report is archived with the transaction record in .cfw-history/<id>/.
   ( exec {DISK_FD}<&-; "$PY" "$SCRIPT_DIR/cfw_env_update.py" apply --device "/dev/$SYS" \
       --mount "$CFW_HOST_MNT/mnt1" --components "$GUEST_COMPONENTS" --report "$ENV_REPORT" "$VM_DIR" ) || exit $?
-elif [[ "$MODE" == undo ]]; then
-  echo "[*] restoring qualified DSC snapshots on the staged System volume..."
-  txn apply-undo || exit $?
 else
   echo "[*] running $INSTALLER (files placed on host mounts)..."
   # via env: an expansion-produced ${VAR:+NAME=val} isn't parsed as a shell assignment.
-  ( exec {DISK_FD}<&-; cd "$VM_DIR" && env CFW_HOST_CONTAINER="$CONT" _VPHONE_PATH="$P" VPHONE_REINSTALL_CRYPTEX="$REINSTALL_CRYPTEX" \
+  ( exec {DISK_FD}<&-; cd "$VM_DIR" && env CFW_HOST_CONTAINER="$CONT" _VPHONE_PATH="$P" \
       ${SPOOF_BUILD:+SPOOF_BUILD="$SPOOF_BUILD"} \
       ${VPHONE_FRIDA:+VPHONE_FRIDA="$VPHONE_FRIDA"} \
       zsh "$SCRIPT_DIR/$INSTALLER" . )
-  if [[ "$GUEST_ENVIRONMENT" == v2 ]]; then
-    TRANSACTION_ID=$("$PY" -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$CFW_DISK_WORK/transaction.json")
-    echo "[*] installing v2 guest environment on the staged System volume..."
-    ( exec {DISK_FD}<&-; "$PY" "$SCRIPT_DIR/cfw_env_install.py" install --device "/dev/$SYS" \
-        --mount "$CFW_HOST_MNT/mnt1" --components "$GUEST_COMPONENTS" --daemon "$API_DAEMON" \
-        --variant "$VARIANT" --transaction-id "$TRANSACTION_ID" \
-        --report "$CFW_DISK_WORK/guest-environment-install.json" "$VM_DIR" ) || exit $?
-  fi
 fi
-
-echo "[*] verifying final guest effects on the staged image..."
-"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" verify-final || exit $?
 
 if ! cleanup; then
   CLEANUP_DONE=1
@@ -491,56 +406,28 @@ fi
 CLEANUP_DONE=1
 
 # The snapshot was flipped by the full install an environment update requires.
-if [[ "$MODE" == install ]]; then
+if [[ "$MODE" != environment ]]; then
   echo "[*] flipping boot snapshot offline on the staged copy (com.apple.os.update -> live volume)..."
   "$PY" "$PROJ/tools/apfs_snap_rename.py" "$CFW_STAGED_IMG"
 fi
 
-if [[ "$MODE" != environment ]]; then
-  # Verify the actual post-snapshot image. Its final attachment and all volume
-  # mounts are read-only; no writer runs after this boundary.
-  CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
-  export CFW_HOST_MNT
-  CLEANUP_DONE=0
-  hdiutil attach -plist -nomount -readonly -imagekey diskimage-class=CRawDiskImage "$CFW_STAGED_IMG" > "$CFW_HOST_MNT/attach.log" {DISK_FD}<&-
-  BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || { echo "[-] cannot identify final read-only attachment" >&2; BASEDISK=""; exit 1; }
-  echo "[*] verifying final guest effects after snapshot modification..."
-  "$PY" "$SCRIPT_DIR/patchers/plan_gate.py" verify-final || exit $?
-  if ! cleanup; then
-    CLEANUP_DONE=1
-    CLEANUP_FAILED=1
-    echo "[-] final read-only attachment cleanup failed; nothing published" >&2
-    exit 1
-  fi
-  CLEANUP_DONE=1
-  txn seal || exit $?
-fi
-
 echo "[*] publishing the staged copy as $IMG (exchange rename)..."
-"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 txn publish || exit $?
 TXN_STATE=published
 trap - EXIT INT TERM HUP
 IDENTITY_STATUS=0
-FINALIZE_STATUS=0
 if [[ "$MODE" == environment ]]; then
   # Configuration, device identity and variant records are not written by
   # this run; compare them with the digests taken before replacement.
   "$PY" "$SCRIPT_DIR/cfw_env_update.py" identity --compare "$ENV_REPORT" "$VM_DIR" || IDENTITY_STATUS=$?
 fi
 if ! txn finish --exit-code 0 >/dev/null; then
-  FINALIZE_STATUS=1
   echo "[!] the installed disk is published, but its transaction record or the previous-disk check did not complete; inspect $CFW_DISK_WORK and $VM_DIR/.cfw-history" >&2
 fi
 exec {DISK_FD}<&-
-if (( FINALIZE_STATUS != 0 )); then
-  hand_back_artifacts || true
-  echo "[-] publication finalization is incomplete; inspect retained evidence before starting the VM" >&2
-  exit "$FINALIZE_STATUS"
-fi
 
 # Drop the extracted CFW input dirs (source .tar.zst re-extracts). VPHONE_KEEP_ARTIFACTS opts out.
-if [[ "$MODE" == install && -z "${VPHONE_KEEP_ARTIFACTS:-}" ]]; then
+if [[ "$MODE" != environment && -z "${VPHONE_KEEP_ARTIFACTS:-}" ]]; then
   rm -rf "${VM_DIR:?}/cfw_input" "${VM_DIR:?}/cfw_jb_input"
 fi
 
@@ -554,8 +441,6 @@ if [[ "$MODE" == environment ]]; then
     echo "[-] identity comparison failed (status $IDENTITY_STATUS); inspect the report before starting the VM" >&2
     exit "$IDENTITY_STATUS"
   fi
-elif [[ "$MODE" == undo ]]; then
-  echo "[+] guest DSC Undo published with component receipts; guest origin is unknown. Evidence: $VM_DIR/.cfw-history"
 else
   echo "[+] host-mode CFW install complete. Boot with: make boot"
 fi

@@ -131,7 +131,7 @@ def make_bundle(vm, variant=None, checkpoint_variant=None):
     (vm / 'restore-info.json').write_text(json.dumps(info))
     if checkpoint_variant:
         (vm / '.create-checkpoint').mkdir(exist_ok=True)
-        (vm / '.create-checkpoint/checkpoint.json').write_text(json.dumps({'effective_options': {'variant': checkpoint_variant}}))
+        (vm / '.create-checkpoint/checkpoint.json').write_text(json.dumps({'variant': checkpoint_variant}))
     return vm
 
 
@@ -250,7 +250,6 @@ class AssessTests(Fixture):
         report = self.assess(system, make_bundle(self.root / 'vm', variant='regular'))
         self.assertEqual(report['classification'], 'full_migration_required')
         self.assertEqual(report['bootstrap']['kind'], 'none')
-        self.assertIn('vm create <name> --variant regular --guest-environment v2', report['migration'])
 
     def test_unknown_bootstrap_requires_full_migration(self):
         system = make_system(self.root / 'sys', self.current_versions(),
@@ -264,46 +263,6 @@ class AssessTests(Fixture):
         report = self.assess(make_system(self.root / 'sys', self.current_versions(), marker=False))
         self.assertEqual(report['classification'], 'full_migration_required')
         self.assertTrue(any('launchd.plist.bak' in reason for reason in report['reasons']))
-
-    def test_v2_record_matches_v2_disk_without_classic_variant_reason(self):
-        system = make_system(self.root / 'sys', self.current_versions())
-        vm = make_bundle(self.root / 'vm', variant='regular')
-        info = json.loads((vm / 'restore-info.json').read_text())
-        info['guest_environment'] = 'v2'
-        (vm / 'restore-info.json').write_text(json.dumps(info))
-        before = tree(vm)
-        report = self.assess(system, vm)
-        self.assertEqual(report['classification'], 'already_current')
-        self.assertEqual(report['guest_environment_records']['restore_info'], 'v2')
-        self.assertEqual(tree(vm), before)
-
-    def test_checkpoint_v2_record_without_bootstrap_reports_mismatch(self):
-        vm = make_bundle(self.root / 'vm', checkpoint_variant='regular')
-        record = vm / '.create-checkpoint/checkpoint.json'
-        record.write_text(json.dumps({'effective_options': {'variant': 'regular', 'guest_environment': 'v2'}}))
-        system = make_system(self.root / 'sys', self.current_versions(), alias=None, launchd_loads=())
-        report = self.assess(system, vm)
-        self.assertEqual(report['classification'], 'full_migration_required')
-        self.assertEqual(report['guest_environment_records']['checkpoint'], 'v2')
-        self.assertTrue(any('recorded guest environment v2' in reason for reason in report['reasons']))
-
-    def test_api_daemon_evidence_does_not_change_environment_classification(self):
-        vm = make_bundle(self.root / 'vm')
-        system = make_system(self.root / 'sys', self.current_versions())
-        absent = self.assess(system, vm)
-        profile = json.loads(MANIFEST.read_text())['profiles']['v2']['api_daemon']
-        binary = system / profile['program'].lstrip('/')
-        binary.write_bytes(b'api-daemon')
-        plist = system / 'System/Library/xpc/launchd.plist'
-        document = plistlib.loads(plist.read_bytes())
-        document['LaunchDaemons'][profile['launchd_key']] = {'Label': profile['label']}
-        plist.write_bytes(plistlib.dumps(document))
-        present = self.assess(system, vm)
-        self.assertEqual(present['classification'], absent['classification'])
-        self.assertEqual(present['daemon']['sha256'], sha(b'api-daemon'))
-        self.assertTrue(present['daemon']['launchd_key_present'])
-        self.assertFalse(absent['daemon']['launchd_key_present'])
-        self.assertTrue(absent['notes'])
 
     def test_classic_variant_record_on_a_v2_disk_requires_full_migration(self):
         system = make_system(self.root / 'sys', self.current_versions())
@@ -741,18 +700,6 @@ class DriverUpdateTests(EnvironmentDriverFixture):
         self.assertIn(f'chown -h {self.sudo_invoker()["SUDO_UID"]}', calls)
         self.assertFalse(list(vm.glob('.cfw_disk.*')))
 
-    def test_final_effect_failure_refuses_environment_publication(self):
-        vm, _ = self.make_vm(self.offline_versions())
-        disk = vm/'Disk.img'; original = (disk.stat().st_ino,sha(disk.read_bytes()))
-        rc, output = self.run_update(vm,FAIL_FINAL_EFFECT='1')
-        self.assertNotEqual(rc,0,output)
-        self.assertEqual((disk.stat().st_ino,sha(disk.read_bytes())),original)
-        calls = (self.root/'calls').read_text()
-        self.assertIn('verify-final',calls)
-        self.assertNotIn('cfw_disk_txn.py publish',calls)
-        record = next((vm/'.cfw-history').iterdir())
-        self.assertEqual(json.loads((record/'transaction.json').read_text())['status'],'failed')
-
     def test_full_migration_is_refused_and_the_disk_is_not_published(self):
         vm, _ = self.make_vm({name: 'v2' for name in LOCAL}, omit=('libcamfix.dylib',))
         disk = vm / 'Disk.img'
@@ -885,18 +832,6 @@ class ElevatedCheckTests(EnvironmentDriverFixture):
         self.assertIn(f'--owner {owner}', self.calls())
         self.assertEqual(os.listdir(self.caller), ['report.json'])
         return json.loads(self.report.read_text())
-
-    def test_check_progress_is_on_stderr_and_stdout_is_empty(self):
-        vm, _ = self.make_vm(self.offline_versions())
-        env = dict(self.env, TMPDIR=str(self.tmpdir), TEST_MOUNTS=str(self.mounts),
-                   VPHONE_GUEST_COMPONENTS=str(self.stage), **self.sudo_invoker())
-        proc = subprocess.run(['/bin/zsh', str(self.driver), '--check-environment',
-                               '--report', str(self.report), str(vm)], env=env,
-                              capture_output=True, text=True, timeout=60)
-        self.assertEqual(proc.returncode, 0, proc.stderr)
-        self.assertEqual(proc.stdout, '')
-        self.assertIn('[*] read-only guest environment check as uid', proc.stderr)
-        self.assertEqual(json.loads(self.report.read_text())['report']['classification'], 'offline_update')
 
     def test_sudo_path_check_is_read_only_and_returns_the_report(self):
         vm, _ = self.make_vm(self.offline_versions())

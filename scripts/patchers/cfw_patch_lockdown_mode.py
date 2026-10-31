@@ -120,14 +120,8 @@ def patch_lockdown_mode(chunks_dir, *, dry_run=False):
 
 
 if __name__ == "__main__":
-    # Real CLI writes share cfw.py's frozen plan gate; imported helpers are
-    # retained for inspection and controlled binary-fixture tests.
-    import os, sys
-    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from patchers.cfw import main as guarded_main
-    args = sys.argv[1:]
-    if "--apply" not in args and "--dry-run" not in args:
-        args.append("--dry-run")
-    args = [arg for arg in args if arg != "--apply"]
-    sys.argv = [sys.argv[0], 'patch-lockdown-mode'] + args
-    guarded_main()
+    import sys
+    dry = "--apply" not in sys.argv
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    d = args[0] if args else "/private/tmp/cryptex27/System/Library/Caches/com.apple.dyld"
+    patch_lockdown_mode(d, dry_run=dry)

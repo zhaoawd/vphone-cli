@@ -35,7 +35,6 @@ for arg in "$@"; do
 done
 
 # --- Build + sign the binary ---
-python3 "$SCRIPT_DIR/prepare_vendor.py"
 echo "=== Building vphone-cli (${GIT_HASH}) ==="
 echo '// Auto-generated — do not edit' > "$BUILD_INFO"
 echo "enum VPhoneBuildInfo { static let commitHash = \"${GIT_HASH}\" }" >> "$BUILD_INFO"

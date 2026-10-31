@@ -1,6 +1,5 @@
 import Darwin
 import Foundation
-import Virtualization
 import VPhoneArchiveKit
 
 public enum VPhoneBundleOpsError: Error, Equatable {
@@ -116,7 +115,6 @@ public enum VPhoneBundleOps {
 
                 // Manifest.
                 let manifest = VPhoneVirtualMachineManifest(
-                    machineIdentifier: VZMacMachineIdentifier().dataRepresentation,
                     cpuCount: spec.cpuCount,
                     memorySize: spec.memoryMB * 1024 * 1024,
                     romImages: .init(avpBooter: "AVPBooter.vresearch1.bin",
@@ -243,7 +241,7 @@ public enum VPhoneBundleOps {
                                    attributes: [.posixPermissions: 0o700])
             defer { try? fm.removeItem(at: staging) }
             let payload = staging.appendingPathComponent("payload")
-            try copyDirectory(src, payload, cloneRootExclusions(in: src))
+            try copyDirectory(src, payload, [VPhoneVMRuntimeState.filename, "vphone.sock", ".cfw-history"])
             let staged = try VPhoneBundle.load(at: payload)
             // As in importArchive, copying happens privately, then name checking
             // and publication use the library lock. Slow copies do not monopolize it.
@@ -263,27 +261,6 @@ public enum VPhoneBundleOps {
                 return VPhoneBundle(url: dst, manifest: staged.manifest)
             }
         }
-    }
-
-    private static let baseCloneExclusions: Set<String> = [
-        VPhoneVMRuntimeState.filename,
-        "vphone.sock",
-        ".cfw-history",
-        ".disk-rebase-history",
-        VPhoneMachineSnapshots.directoryName,
-        ".template.plist",
-    ]
-
-    /// Excludes runtime records, snapshots, revert journals and host-local
-    /// `.firmware-*` plans/receipts/generations that bind to the source VM's path and inode.
-    private static func cloneRootExclusions(in source: URL) -> Set<String> {
-        var excluded = baseCloneExclusions
-        if let entries = try? FileManager.default.contentsOfDirectory(atPath: source.path) {
-            for entry in entries where entry.hasPrefix(".snapshot-revert-") || entry.hasPrefix(".firmware-") || entry.hasPrefix(".rebase-") {
-                excluded.insert(entry)
-            }
-        }
-        return excluded
     }
 
     // MARK: - Export / Import
@@ -321,13 +298,8 @@ public enum VPhoneBundleOps {
     /// `Disk.img`). `.cfw_disk.*` holds an unpublished staged disk copy and
     /// `.cfw-history` the host-local CFW transaction records and the previous
     /// Disk.img kept for rollback (T15). Always excluded.
-    public static let exportExcludePatterns = [
-        "*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*",
-        "*.cfw_disk.*", "*.cfw-history*", "*.vphone-runtime.json", "vphone.sock",
-        VPhoneMachineSnapshots.directoryName, "*.snapshot-revert-*", ".snapshot-revert-*",
-        ".rebase-*", "*.rebase-*", ".disk-rebase-history", "*.disk-rebase-history*",
-    ]
-
+    static let exportExcludePatterns = ["*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*",
+                                        "*.cfw_disk.*", "*.cfw-history*", "*.vphone-runtime.json"]
 
     /// When `to` is an existing directory, the archive is written inside it as
     /// `<name>.<compression.fileExtension>`. Returns the resolved output URL.
@@ -344,20 +316,6 @@ public enum VPhoneBundleOps {
         backend: ArchiveBackend = .systemTar,
         progress: ((Int64, Int64) -> Void)? = nil
     ) throws -> URL {
-        try export(bundleNamed: name, to: outFile, includeIPSW: includeIPSW,
-                   compression: compression, in: library, backend: backend,
-                   isCancelled: nil, progress: progress)
-    }
-
-    @discardableResult
-    public static func export(
-        bundleNamed name: String, to outFile: URL, includeIPSW: Bool,
-        compression: ExportCompression = .fast, in library: VPhoneLibrary,
-        backend: ArchiveBackend = .systemTar,
-        isCancelled: (() -> Bool)?,
-        progress: ((Int64, Int64) -> Void)? = nil
-    ) throws -> URL {
-        if isCancelled?() == true { throw CancellationError() }
         let bundle = try library.bundle(named: name)
         // Exporting a running VM is refused for the same reason as cloning: the
         // archive would contain a `Disk.img` captured mid-write.
@@ -366,57 +324,20 @@ public enum VPhoneBundleOps {
         ) { _ in
             try exportLocked(
                 bundle: bundle, name: name, to: outFile, includeIPSW: includeIPSW,
-                compression: compression, in: library, backend: backend, isCancelled: isCancelled, progress: progress)
+                compression: compression, in: library, backend: backend, progress: progress)
         }
     }
 
     private static func exportLocked(
         bundle: VPhoneBundle, name: String, to outFile: URL, includeIPSW: Bool,
         compression: ExportCompression, in library: VPhoneLibrary, backend: ArchiveBackend,
-        isCancelled: (() -> Bool)?, progress: ((Int64, Int64) -> Void)?
+        progress: ((Int64, Int64) -> Void)?
     ) throws -> URL {
         var isDir: ObjCBool = false
         let outFile = FileManager.default.fileExists(atPath: outFile.path, isDirectory: &isDir) && isDir.boolValue
             ? outFile.appendingPathComponent("\(name).\(compression.fileExtension)")
             : outFile
-        // Resolve parent aliases once, but never follow the destination leaf.
-        let parent = outFile.deletingLastPathComponent().resolvingSymlinksInPath().standardizedFileURL
-        let output = parent.appendingPathComponent(outFile.lastPathComponent)
-        let source = bundle.url.resolvingSymlinksInPath().standardizedFileURL
-        guard output.path != source.path, !output.path.hasPrefix(source.path + "/") else {
-            throw VPhoneArchiveError.writeFailed(path: output.path, reason: "output must be outside the source tree")
-        }
-        var info = stat()
-        guard stat(parent.path, &info) == 0, info.st_mode & S_IFMT == S_IFDIR else {
-            throw VPhoneArchiveError.cannotOpen(path: parent.path, reason: "output parent must be an existing directory")
-        }
-        if lstat(output.path, &info) == 0 {
-            throw VPhoneArchiveError.writeFailed(path: output.path, reason: "destination already exists")
-        }
-        guard errno == ENOENT else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
-        if isCancelled?() == true { throw CancellationError() }
-        let staging = parent.appendingPathComponent(".vphone-export-\(UUID().uuidString)")
-        try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: false,
-                                               attributes: [.posixPermissions: 0o700])
-        defer { try? FileManager.default.removeItem(at: staging) }
-        let temporary = staging.appendingPathComponent("output")
-        try writeExport(bundle: bundle, name: name, to: temporary, includeIPSW: includeIPSW,
-                        compression: compression, in: library, backend: backend,
-                        isCancelled: isCancelled, progress: progress)
-        if isCancelled?() == true { throw CancellationError() }
-        // Publication is the commit point. Never replace a concurrently created
-        // destination, and never roll back a completed publication on a late signal.
-        guard renamex_np(temporary.path, output.path, UInt32(RENAME_EXCL)) == 0 else {
-            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
-        }
-        return output
-    }
 
-    private static func writeExport(
-        bundle: VPhoneBundle, name: String, to outFile: URL, includeIPSW: Bool,
-        compression: ExportCompression, in library: VPhoneLibrary, backend: ArchiveBackend,
-        isCancelled: (() -> Bool)?, progress: ((Int64, Int64) -> Void)?
-    ) throws {
         if backend == .native {
             var excludes = exportExcludePatterns
             if !includeIPSW { excludes.append("*_Restore*") }
@@ -424,9 +345,9 @@ public enum VPhoneBundleOps {
             try VPhoneArchiveWriter.create(
                 archive: outFile, from: bundle.url, topLevel: name, format: .gnutar,
                 compression: compression == .fast ? .zstd(level: 3) : .xz(level: 9),
-                excluding: excludes, bytesPacked: { progress?($0, total) }, isCancelled: isCancelled)
+                excluding: excludes, bytesPacked: { progress?($0, total) })
             progress?(total, total)
-            return
+            return outFile
         }
 
         // gnutar (not the bsdtar-default pax): pax extended headers make the
@@ -442,9 +363,10 @@ public enum VPhoneBundleOps {
             ? archivedLogicalSize(bundleDir: library.url(forName: name), libraryRoot: library.root, includeIPSW: includeIPSW)
             : 0
         let err = try VPhoneProcessRunner.runCountingTarPipe(
-            producerArgs: producer, sourceFile: nil, consumerArgs: consumer,
-            isCancelled: isCancelled, onBytes: { done in progress?(done, total) })
+            producerArgs: producer, sourceFile: nil, consumerArgs: consumer
+        ) { done in progress?(done, total) }
         if let err { throw VPhoneBundleOpsError.tarFailed(err) }
+        return outFile
     }
 
     /// On-disk logical size of the members `export` will archive, mirroring the
@@ -461,12 +383,7 @@ public enum VPhoneBundleOps {
         for case let url as URL in en {
             let rel = String(url.path.dropFirst(prefix))
             if !includeIPSW, rel.contains("_Restore") { en.skipDescendants(); continue }
-            if exportExcludePatterns.contains(where: {
-                fnmatch($0, rel, 0) == 0 || fnmatch($0, url.lastPathComponent, 0) == 0
-            }) {
-                en.skipDescendants()
-                continue
-            }
+            if exportExcludePatterns.contains(where: { fnmatch($0, rel, 0) == 0 }) { continue }
             guard let vals = try? url.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]),
                   vals.isRegularFile == true else { continue }
             total += Int64(vals.fileSize ?? 0)
@@ -484,17 +401,7 @@ public enum VPhoneBundleOps {
         backend: ArchiveBackend = .systemTar,
         progress: ((Int64, Int64) -> Void)? = nil
     ) throws -> VPhoneBundle {
-        try importArchive(from: inFile, name: name, in: library, backend: backend,
-                          isCancelled: nil, progress: progress, afterNameCheck: nil)
-    }
-
-    public static func importArchive(
-        from inFile: URL, name: String?, in library: VPhoneLibrary,
-        backend: ArchiveBackend = .systemTar,
-        isCancelled: (() -> Bool)?,
-        progress: ((Int64, Int64) -> Void)? = nil
-    ) throws -> VPhoneBundle {
-        try importArchive(from: inFile, name: name, in: library, backend: backend, isCancelled: isCancelled, progress: progress, afterNameCheck: nil)
+        try importArchive(from: inFile, name: name, in: library, backend: backend, progress: progress, afterNameCheck: nil)
     }
 
     /// `afterNameCheck` is a testing seam: it runs between the destination-name
@@ -503,20 +410,9 @@ public enum VPhoneBundleOps {
     static func importArchive(
         from inFile: URL, name: String?, in library: VPhoneLibrary,
         backend: ArchiveBackend = .systemTar,
-        isCancelled: (() -> Bool)? = nil,
         progress: ((Int64, Int64) -> Void)?, afterNameCheck: (() throws -> Void)?
     ) throws -> VPhoneBundle {
         let fm = FileManager.default
-        func checkCancellation() throws {
-            if isCancelled?() == true { throw CancellationError() }
-        }
-        try checkCancellation()
-        // Archive paths must be finite files. Opening a FIFO can block before
-        // either extraction backend has a chance to observe cancellation.
-        var archiveInfo = stat()
-        guard stat(inFile.path, &archiveInfo) == 0, archiveInfo.st_mode & S_IFMT == S_IFREG else {
-            throw VPhoneBundleOpsError.badArchive("archive source must be a regular file")
-        }
         // Fail fast when the destination name is already known (explicit rename).
         if let name {
             try requireValidName(name)
@@ -543,16 +439,15 @@ public enum VPhoneBundleOps {
         if backend == .native {
             try VPhoneArchiveExtractor.extract(
                 inFile, into: contents, options: .intoHostDirectory,
-                bytesRead: { progress?(min($0, total), total) }, isCancelled: isCancelled)
+                bytesRead: { progress?(min($0, total), total) })
         } else {
             // Recreate holes from zero blocks, including archives without sparse metadata.
             let err = try VPhoneProcessRunner.runCountingTarPipe(
-                producerArgs: nil, sourceFile: inFile, consumerArgs: ["-xSf", "-", "-C", contents.path],
-                isCancelled: isCancelled, onBytes: { done in progress?(done, total) })
+                producerArgs: nil, sourceFile: inFile, consumerArgs: ["-xSf", "-", "-C", contents.path]
+            ) { done in progress?(done, total) }
             if let err { throw VPhoneBundleOpsError.tarFailed(err) }
         }
 
-        try checkCancellation()
         let entries = try fm.contentsOfDirectory(atPath: contents.path)
         guard entries.count == 1, let archived = entries.first else {
             throw VPhoneBundleOpsError.badArchive(
@@ -576,9 +471,6 @@ public enum VPhoneBundleOps {
         try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
             if try VPhoneCloneCopy.exists(at: dst) { throw VPhoneLibraryError.alreadyExists(name: finalName) }
             try afterNameCheck?()
-            try checkCancellation()
-            // The exclusive rename commits publication. Cancellation observed
-            // after this point does not undo an already imported bundle.
             guard renamex_np(extracted.path, dst.path, UInt32(RENAME_EXCL)) == 0 else {
                 if errno == EEXIST { throw VPhoneLibraryError.alreadyExists(name: finalName) }
                 throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)

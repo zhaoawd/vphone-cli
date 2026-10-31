@@ -5,11 +5,6 @@ import Testing
 struct LauncherPolicyTests {
     let target = "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli"
 
-    @Test func permitsExplicitCommittedKernelRollbackRoute() throws {
-        let args = ["vm", "rollback-kernel", "machine", "--to-transaction", UUID().uuidString.lowercased()]
-        #expect(try VPhoneLaunchpadLauncherRequest(executable: target, arguments: args).arguments == args)
-    }
-
     @Test func permitsOnlyTheStoreCLIAndVMLaunch() throws {
         let request = try VPhoneLaunchpadLauncherRequest(executable: target, arguments: ["vm", "launch", "machine", "--headless"])
         #expect(request.version == "2.6.1")
@@ -34,39 +29,5 @@ struct LauncherPolicyTests {
 
     @Test func refusesLegacyVersionBeforeFilesystemAccess() {
         #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest(executable: target.replacingOccurrences(of: "2.6.1", with: "2.0.8"), arguments: ["vm", "launch", "machine"]) }
-    }
-}
-
-extension LauncherPolicyTests {
-    @Test func kernelUpdateRequiresExplicitBundleProtocol() throws {
-        let request = try VPhoneLaunchpadLauncherRequest(executable: target, arguments: ["vm", "update-kernel", "machine"])
-        #expect(request.isKernelUpdate)
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        let executable = root.appendingPathComponent("Contents/MacOS/vphone-cli")
-        try FileManager.default.createDirectory(at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
-        for value in ["", "vphone.kernel-update.v0", "vphone.kernel-update.v1"] {
-            try PropertyListSerialization.data(fromPropertyList: ["VPhoneKernelUpdateProtocol": value], format: .xml, options: 0)
-                .write(to: root.appendingPathComponent("Contents/Info.plist"))
-            if value == "vphone.kernel-update.v1" { try VPhoneLaunchpadLauncherRequest.validateKernelUpdateProtocol(executable: executable) }
-            else { #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest.validateKernelUpdateProtocol(executable: executable) } }
-        }
-    }
-}
-
-extension LauncherPolicyTests {
-    @Test func rollbackRequiresItsOwnSealedProtocol() throws {
-        let request = try VPhoneLaunchpadLauncherRequest(executable: target, arguments: ["vm", "rollback-kernel", "machine", "--list"])
-        #expect(request.isKernelRollback && !request.isKernelUpdate)
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        let executable = root.appendingPathComponent("Contents/MacOS/vphone-cli")
-        try FileManager.default.createDirectory(at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
-        for value in ["", "vphone.kernel-rollback.v0", "vphone.kernel-rollback.v1"] {
-            try PropertyListSerialization.data(fromPropertyList: ["VPhoneKernelUpdateProtocol": "vphone.kernel-update.v1", "VPhoneKernelRollbackProtocol": value], format: .xml, options: 0)
-                .write(to: root.appendingPathComponent("Contents/Info.plist"))
-            if value == "vphone.kernel-rollback.v1" { try VPhoneLaunchpadLauncherRequest.validateKernelRollbackProtocol(executable: executable) }
-            else { #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest.validateKernelRollbackProtocol(executable: executable) } }
-        }
     }
 }

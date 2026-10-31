@@ -135,8 +135,6 @@ public struct VPhoneCreateOrchestrator {
         public var keepArtifacts: Bool
         public var restoreBackend: VPhoneRestoreBackend
         public var prepareBackend: VPhonePrepareBackend
-        public var guestEnvironment: VPhoneGuestEnvironmentProfile
-        public var experimentalV2RootRemount: Bool
 
         public init(
             name: String,
@@ -154,8 +152,7 @@ public struct VPhoneCreateOrchestrator {
             diskSizeGB: UInt64 = 64,
             verbosity: VPhoneVerbosity = .quiet,
             keepArtifacts: Bool = false, restoreBackend: VPhoneRestoreBackend = .python,
-            prepareBackend: VPhonePrepareBackend = .script, guestEnvironment: VPhoneGuestEnvironmentProfile = .classic,
-            experimentalV2RootRemount: Bool = false
+            prepareBackend: VPhonePrepareBackend = .script
         ) {
             self.name = name
             self.variant = variant
@@ -174,8 +171,6 @@ public struct VPhoneCreateOrchestrator {
             self.keepArtifacts = keepArtifacts
             self.restoreBackend = restoreBackend
             self.prepareBackend = prepareBackend
-            self.guestEnvironment = guestEnvironment
-            self.experimentalV2RootRemount = experimentalV2RootRemount
         }
     }
 
@@ -196,10 +191,6 @@ public struct VPhoneCreateOrchestrator {
     /// every stage through the checkpointed runner.
     public func run(_ options: Options) throws {
         var options = options
-        try options.guestEnvironment.validateVariant(options.variant)
-        if options.experimentalV2RootRemount, options.variant != "regular" || options.guestEnvironment != .v2 {
-            throw VPhoneCreateRunError.optionsChanged(["experimental v2 root remount requires regular-v2"])
-        }
         if options.prepareBackend == .native {
             let sources = try VPhoneNativeFirmwarePreparer.localSources(
                 iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource, isLess: options.variant == "less")
@@ -246,8 +237,7 @@ public struct VPhoneCreateOrchestrator {
             variant: options.variant, iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource,
             spoofBuild: options.spoofBuild, forceDscMaxSlide: options.forceDSCMaxSlide,
             enableFrida: options.enableFrida, cpuCount: options.cpuCount, memoryMb: options.memoryMB,
-            diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend, prepareBackend: options.prepareBackend,
-            guestEnvironment: options.guestEnvironment, experimentalV2RootRemount: options.experimentalV2RootRemount)
+            diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend, prepareBackend: options.prepareBackend)
         let checkpoint: VPhoneCreateCheckpoint
         do {
             checkpoint = try runner.create(
@@ -315,14 +305,6 @@ public struct VPhoneCreateOrchestrator {
         // reloads and validates the checkpoint under its locks.
         let stored = try VPhoneCreateCheckpointStore.load(bundleURL: bundleURL).checkpoint
         let variant = options.overrides.variant ?? stored.effectiveOptions.variant
-        if (options.overrides.experimentalV2RootRemount ?? stored.effectiveOptions.experimentalV2RootRemount) == true,
-           variant != "regular" || (options.overrides.guestEnvironment ?? stored.effectiveOptions.effectiveGuestEnvironment) != .v2 {
-            throw VPhoneCreateRunError.optionsChanged(["experimental v2 root remount requires regular-v2"])
-        }
-        try (options.overrides.guestEnvironment ?? stored.effectiveOptions.effectiveGuestEnvironment).validateVariant(variant)
-        if stored.effectiveOptions.effectiveGuestEnvironment == .v2, options.overrides.guestEnvironment == .classic {
-            throw VPhoneCreateRunError.optionsChanged(["v2 cannot be changed to classic; create a new VM"])
-        }
         var overrides = options.overrides
         let prepareBackend = overrides.prepareBackend ?? stored.effectiveOptions.effectivePrepareBackend
         if prepareBackend == .native, (options.restartFrom ?? stored.nextStage) == .prepare {
@@ -670,27 +652,19 @@ public struct VPhoneCreateOrchestrator {
         }
     }
 
-    @discardableResult
     func runFWPrepare(
         iphoneSource: String?, cloudosSource: String?, isLess: Bool, keepArtifacts: Bool,
         bundleURL: URL, verbosity v: VPhoneVerbosity,
-        backend: VPhonePrepareBackend = .script, preserveExistingRestore: Bool = false,
-        captureGeneration: Bool = false
-    ) throws -> FirmwareGeneration.Source? {
+        backend: VPhonePrepareBackend = .script, preserveExistingRestore: Bool = false
+    ) throws {
         if backend == .native {
             let sources = try VPhoneNativeFirmwarePreparer.localSources(
                 iphoneSource: iphoneSource, cloudosSource: cloudosSource, isLess: isLess)
-            if captureGeneration {
-                guard let resourceSnapshot else { throw VPhoneMachineBindingError("Generation requires captured ROM resources") }
-                return try FirmwarePreparation.prepareWithSource(iPhone: sources.iphone, cloudOS: sources.cloudos,
-                    bundle: bundleURL, bootROMSource: resourceSnapshot.romSource,
-                    preserveExistingRestore: preserveExistingRestore).source
-            }
             let tree = try VPhoneNativeFirmwarePreparer.prepare(
                 iPhone: sources.iphone, cloudOS: sources.cloudos, bundle: bundleURL,
                 preserveExistingRestore: preserveExistingRestore)
             print("[+] Classic restore tree ready: \(tree.path)")
-            return nil
+            return
         }
         try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
@@ -713,23 +687,11 @@ public struct VPhoneCreateOrchestrator {
             echo: true)
         guard code == 0 else { throw VPhoneCreateError.fwPrepareFailed(code) }
         print("[+] Firmware prepared (iPhone + cloudOS merged into bundle).")
-        guard captureGeneration else { return nil }
-        guard let resourceSnapshot else { throw VPhoneMachineBindingError("Generation requires captured ROM resources") }
-        struct Sources: Decodable { let schemaVersion: Int; let iPhoneArchive: String; let cloudOSArchive: String }
-        let record = try JSONDecoder().decode(Sources.self, from: VPhoneCreateDigest.strictFileData(
-            bundleURL.appendingPathComponent(".firmware-prepare-sources.json"), maximumBytes: 1 << 20))
-        guard record.schemaVersion == 1, record.iPhoneArchive.hasPrefix("/"), record.cloudOSArchive.hasPrefix("/") else {
-            throw VPhoneMachineBindingError("Prepare did not record explicit local IPSW sources")
-        }
-        return try FirmwarePreparation.verifyPreparedSource(iPhone: URL(fileURLWithPath: record.iPhoneArchive),
-            cloudOS: URL(fileURLWithPath: record.cloudOSArchive), bundle: bundleURL,
-            bootROMSource: resourceSnapshot.romSource)
     }
 
     @discardableResult
     func runFWPatch(
         variant: PatchFirmwareCLI.VariantOption, isLess: Bool, enableFrida: Bool,
-        experimentalV2RootRemount: Bool = false, generationID: String? = nil,
         bundleURL: URL, verbosity v: VPhoneVerbosity
     ) throws -> Int {
         let lock = try VPhoneVMLock(directory: bundleURL, operation: "fw-patch")
@@ -750,9 +712,9 @@ public struct VPhoneCreateOrchestrator {
         let pipeline = FirmwarePipeline(
             vmDirectory: bundleURL, variant: variant.pipelineVariant, verbose: v.showsToolDetail,
             noBinpack: false, noVphoned: false, forceExcGuard: false,
-            enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount, generationID: generationID)
+            enableFrida: enableFrida)
         let records = try pipeline.patchAll()
-        print("[fw patch] recorded \(records.count) byte records (including verified unchanged outputs) for \(variant.rawValue)")
+        print("[fw patch] applied \(records.count) patches for \(variant.rawValue)")
         return records.count
     }
 
@@ -1021,10 +983,6 @@ public struct VPhoneCreateOrchestrator {
     func runCFWInstall(options: VPhoneCreateEffectiveOptions, runtime: VPhoneCreateRuntime, bundleURL: URL) throws {
         let v = runtime.verbosity
         let sudoEnvExtras = runtime.sudoEnvExtras
-        let frozen = try VPhoneBundleGuard.withBundleLock(directory: bundleURL, operation: VPhoneVMOperation.cfwRecord) { _ in
-            try VPhoneCFWFrozenContext.prepare(in: bundleURL, requestedVariant: options.variant,
-                guestEnvironment: options.effectiveGuestEnvironment.rawValue, spoofBuild: options.spoofBuild ?? "")
-        }
         try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.debsCacheDir, withIntermediateDirectories: true)
@@ -1036,19 +994,12 @@ public struct VPhoneCreateOrchestrator {
             "VPHONE_GUEST_COMPONENTS": resources.guestComponentsStage.path,
             "PYTHONDONTWRITEBYTECODE": "1",
         ]
-        scriptEnv.merge(try frozen.environment) { _, bound in bound }
         if let spoofBuild = options.spoofBuild { scriptEnv["SPOOF_BUILD"] = spoofBuild }
         if options.forceDscMaxSlide { scriptEnv["FORCE_DSC_MAXSLIDE"] = "1" }
         if options.enableFrida { scriptEnv["VPHONE_FRIDA"] = "1" }
         if runtime.keepArtifacts { scriptEnv["VPHONE_KEEP_ARTIFACTS"] = "1" }
 
-        if options.effectiveGuestEnvironment == .v2 {
-            scriptEnv["VPHONE_GUEST_COMPONENTS"] = resources.guestComponentsStage.path
-            scriptEnv["VPHONE_API_DAEMON"] = resources.daemonAPICandidate.path
-        }
-        var args = [resources.cfwInstallHostScript.path, "--variant", options.variant]
-        if options.effectiveGuestEnvironment == .v2 { args += ["--guest-environment", "v2"] }
-        args.append(bundleURL.path)
+        let args = [resources.cfwInstallHostScript.path, "--variant", options.variant, bundleURL.path]
         let invocation = Self.cfwInvocation(
             scriptEnv: scriptEnv, sudoEnvExtras: sudoEnvExtras, rootPopup: runtime.rootPopup,
             processEnvironment: resources.processEnvironment)
@@ -1060,7 +1011,7 @@ public struct VPhoneCreateOrchestrator {
         }
         guard code == 0 else { throw VPhoneCreateError.cfwInstallFailed(code) }
         print("[+] CFW installed (\(options.variant)).")
-        recordCFWVariant(options.variant, guestEnvironment: options.effectiveGuestEnvironment, bundleURL: bundleURL)
+        recordCFWVariant(options.variant, bundleURL: bundleURL)
     }
 
     private func spawnCFWDriver(
@@ -1092,7 +1043,7 @@ public struct VPhoneCreateOrchestrator {
         return code
     }
 
-    private func recordCFWVariant(_ variant: String, guestEnvironment: VPhoneGuestEnvironmentProfile, bundleURL: URL) {
+    private func recordCFWVariant(_ variant: String, bundleURL: URL) {
         // The install script released its lock on exit; take a fresh cfw-record
         // lock to record the variant (see recordVariant's doc). A busy lock only
         // skips the bookkeeping here; the cfw verifier then reports the missing record.
@@ -1100,7 +1051,7 @@ public struct VPhoneCreateOrchestrator {
             try? VPhoneBundleGuard.withBundleLock(
                 directory: bundle.url, operation: VPhoneVMOperation.cfwRecord
             ) { lock in
-                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock, guestEnvironment: guestEnvironment),
+                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock),
                    info.variant != nil {
                     print("[+] Recorded variant \(variant), device \(info.device ?? "?")")
                 }

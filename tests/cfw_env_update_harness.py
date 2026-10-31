@@ -71,12 +71,9 @@ def umount(mountpoint):
 
 
 def load(script):
-    sys.path.insert(0, str(Path(script).parent))
-    sys.path.append(str(Path(__file__).resolve().parents[1] / 'scripts'))
-    name = Path(script).stem
-    spec = importlib.util.spec_from_file_location(name, script)
+    spec = importlib.util.spec_from_file_location('cfw_env_update', script)
     module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
+    sys.modules['cfw_env_update'] = module
     spec.loader.exec_module(module)
     return module
 
@@ -139,44 +136,5 @@ if __name__ == '__main__':
     if sys.argv[1] == 'umount':
         sys.exit(umount(sys.argv[2]))
     module = load(sys.argv[1])
-    # Disk-transaction tests isolate mount/publication with command doubles.
-    # The real Swift -> Python -> zsh capability chain is covered separately.
-    if sys.argv[2] in ('apply', 'install'):
-        from types import SimpleNamespace
-        from patchers import plan_gate
-        plan_gate.from_environment = lambda: SimpleNamespace(context={
-            'vmDirectory': str(Path(sys.argv[-1]).resolve()), 'guestEnvironment':'v2', 'variant':'regular'})
-        plan_gate.validate_entry = lambda *_: None
-        plan_gate.require_write_context = lambda *_: None
-        plan_gate.authorize = lambda *_: None
-        plan_gate.append_evidence = lambda *_, **__: None
-    if Path(sys.argv[1]).stem == 'cfw_env_install':
-        import plistlib
-        import subprocess
-        from test_cfw_env_update import macho, LC_LOAD_DYLIB, LC_LOAD_WEAK_DYLIB
-        install_doubles(module.environment)
-        def signer(args):
-            log('harness install tool ' + ' '.join(args))
-            output = plistlib.dumps({'original-entitlement': True}) if '-e' in args else b''
-            if 'inject-dylib' in args:
-                Path(args[-2]).write_bytes(macho([(LC_LOAD_DYLIB, '/usr/lib/libSystem.B.dylib'),
-                                                (LC_LOAD_WEAK_DYLIB, '/vh')], filetype=2, tag=b'injected'))
-            return subprocess.CompletedProcess(args, 0, output, b'')
-        real_install = module.install_mounted
-        def install(*args, **kwargs):
-            # This tar-backed harness tests disk publication/rollback only.
-            # Frozen producer evidence uses real plans and signers in
-            # test_patch_plan_gate and CFWFrozenPlanTests.
-            kwargs['frozen_plan'] = None
-            return real_install(*args, **kwargs, owner=(os.getuid(), os.getgid()), runner=signer)
-        module.install_mounted = install
-        if 'install-second' in os.environ.get('CFW_ENV_FAULTS', '').split(','):
-            write = module.atomic_write
-            def atomic_write(path, data, mode, owner):
-                if path.name == 'SystemHook-vphone.dylib':
-                    raise OSError(errno.EIO, 'second library write failure')
-                return write(path, data, mode, owner)
-            module.atomic_write = atomic_write
-    else:
-        install_doubles(module)
+    install_doubles(module)
     sys.exit(module.main(sys.argv[2:]))

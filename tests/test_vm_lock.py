@@ -121,32 +121,6 @@ class VMLockTests(unittest.TestCase):
         finally:
             os.close(fd)
 
-    def test_pending_cfw_blocks_new_boot_and_write_but_allows_inspection_recovery(self):
-        (self.vm / '.cfw_disk.interrupted').mkdir()
-        for operation in ('boot', 'dfu', 'cfw', 'fw-patch', 'export', 'delete', 'cfw-record', 'fw-receipts'):
-            result = subprocess.run([sys.executable, str(HELPER), str(self.vm), operation, '--', sys.executable, '-c', 'pass'],
-                capture_output=True, timeout=5)
-            self.assertEqual(result.returncode == 0, operation in ('cfw-record', 'fw-receipts'), (operation, result.stderr))
-        self.assertTrue((self.vm / '.cfw_disk.interrupted').is_dir())
-
-    def test_pending_rebase_blocks_boot_writes_and_inherited_execution(self):
-        pending = self.vm / '.rebase-interrupted'
-        pending.mkdir()
-        (pending / 'RebaseJournal.json').write_text('{}')
-        for operation in ('boot', 'cfw', 'fw-patch', 'snapshot', 'export', 'rebase-recover'):
-            result = subprocess.run([sys.executable, str(HELPER), str(self.vm), operation, '--', '/usr/bin/true'],
-                                    capture_output=True, timeout=5)
-            self.assertNotEqual(result.returncode, 0, operation)
-            self.assertIn(b'pending disk rebase', result.stderr)
-        fd = os.open(self.vm, os.O_RDONLY)
-        try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            result = subprocess.run([sys.executable, str(HELPER), '--check-inherited', str(self.vm)],
-                                    env=dict(os.environ, VPHONE_VM_LOCK_FD=str(fd)), pass_fds=(fd,), capture_output=True)
-            self.assertNotEqual(result.returncode, 0)
-        finally:
-            os.close(fd)
-
 
 if __name__ == '__main__':
     unittest.main()

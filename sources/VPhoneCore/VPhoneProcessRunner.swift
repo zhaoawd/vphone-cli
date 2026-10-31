@@ -183,18 +183,6 @@ public enum VPhoneProcessRunner {
         consumerArgs: [String],
         onBytes: ((Int64) -> Void)? = nil
     ) throws -> String? {
-        try runCountingTarPipe(producerArgs: producerArgs, sourceFile: sourceFile,
-                               consumerArgs: consumerArgs, isCancelled: nil, onBytes: onBytes)
-    }
-
-    public static func runCountingTarPipe(
-        producerArgs: [String]?,
-        sourceFile: URL?,
-        consumerArgs: [String],
-        isCancelled: (() -> Bool)?,
-        onBytes: ((Int64) -> Void)? = nil
-    ) throws -> String? {
-        if isCancelled?() == true { throw CancellationError() }
         let tar = URL(fileURLWithPath: "/usr/bin/tar")
         let prevPIPE = signal(SIGPIPE, SIG_IGN)
         defer { signal(SIGPIPE, prevPIPE) }
@@ -243,43 +231,25 @@ public enum VPhoneProcessRunner {
         }
 
         try consumer.run()
-        let untrackConsumer = track(consumer, consumerArgs)
-        defer { untrackConsumer() }
-        do { try producer?.run() } catch {
-            try? cIn.fileHandleForWriting.close()
-            try? source.close()
-            if consumer.isRunning { consumer.terminate() }
-            consumer.waitUntilExit()
-            cErr.fileHandleForReading.readabilityHandler = nil
-            throw error
-        }
-        let untrackProducer = producer.map { track($0, producerArgs ?? []) }
-        defer { untrackProducer?() }
+        try producer?.run()
 
         let sink = cIn.fileHandleForWriting
         var total: Int64 = 0
         // FileHandle reads can leave autoreleased backing storage alive until
         // the caller's pool drains. Bound its lifetime to one archive chunk.
         while autoreleasepool(invoking: { () -> Bool in
-            guard isCancelled?() != true else { return false }
             guard let chunk = try? source.read(upToCount: 1 << 20), !chunk.isEmpty else { return false }
             do { try sink.write(contentsOf: chunk) } catch { return false }  // consumer died; status below
             total += Int64(chunk.count)
             onBytes?(total)
             return true
         }) {}
-        let cancelled = isCancelled?() == true
-        if cancelled {
-            if let producer, producer.isRunning { producer.terminate() }
-            if consumer.isRunning { consumer.terminate() }
-        }
         try? sink.close()
         try? source.close()
 
         producer?.waitUntilExit()
         consumer.waitUntilExit()
         group.wait()
-        if cancelled || isCancelled?() == true { throw CancellationError() }
 
         if consumer.terminationStatus != 0 {
             return String(decoding: cErrBox.take(), as: UTF8.self)

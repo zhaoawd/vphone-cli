@@ -15,9 +15,6 @@ class DaemonModeTests(unittest.TestCase):
 let cases: [([String: String], Bool, Bool)] = [
     ([:], false, true),
     (["VPHONE_DISABLE_CAMERA": "1"], false, false),
-    (["VPHONED_VCAM": "off"], false, false),
-    (["VPHONED_VCAM": "off", "VPHONE_DISABLE_CAMERA": "0"], false, false),
-    (["VPHONED_VCAM": "on"], false, true),
     (["VPHONE_API_ONLY": "1"], true, false),
     (["VPHONE_API_ONLY": "1", "VPHONE_DISABLE_CAMERA": "0"], true, false),
     (["VPHONE_API_ONLY": "0", "VPHONE_DISABLE_CAMERA": "0"], false, true)]

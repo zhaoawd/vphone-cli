@@ -75,7 +75,7 @@ extension KernelJBPatcher {
 
         if state == "patched" {
             log("  [=] rootauth branch already bypassed at 0x\(String(format: "%X", branchOff))")
-            return emitVerifiedOutput(branchOff, expected: ARM64.nop, patchID: "jb.bsd_init_auth.nop_cbnz", description: "rootvp auth branch")
+            return .idempotent
         }
 
         emit(branchOff, ARM64.nop,

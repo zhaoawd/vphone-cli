@@ -18,21 +18,12 @@ public struct VPhoneRestoreInfo: Codable, Equatable, Sendable {
     public let cloudOS: OSVersion
     public let variant: String?
     public let device: String?
-    public let guestEnvironment: VPhoneGuestEnvironmentProfile?
-    public var effectiveGuestEnvironment: VPhoneGuestEnvironmentProfile { guestEnvironment ?? .classic }
 
-    enum CodingKeys: String, CodingKey {
-        case ios, cloudOS, variant, device
-        case guestEnvironment = "guest_environment"
-    }
-
-    public init(ios: OSVersion, cloudOS: OSVersion, variant: String? = nil, device: String? = nil,
-                guestEnvironment: VPhoneGuestEnvironmentProfile = .classic) {
+    public init(ios: OSVersion, cloudOS: OSVersion, variant: String? = nil, device: String? = nil) {
         self.ios = ios
         self.cloudOS = cloudOS
         self.variant = variant
         self.device = device
-        self.guestEnvironment = guestEnvironment == .classic ? nil : guestEnvironment
     }
 
     static let fileName = "restore-info.json"
@@ -88,14 +79,12 @@ public struct VPhoneRestoreInfo: Codable, Equatable, Sendable {
     /// than a convention.
     @discardableResult
     public static func recordVariant(
-        _ variant: String, toBundle bundle: VPhoneBundle, holding _: VPhoneVMLock,
-        guestEnvironment: VPhoneGuestEnvironmentProfile? = nil
+        _ variant: String, toBundle bundle: VPhoneBundle, holding _: VPhoneVMLock
     ) throws -> VPhoneRestoreInfo? {
         guard let base = load(fromBundle: bundle) else { return nil }
         let merged = VPhoneRestoreInfo(
             ios: base.ios, cloudOS: base.cloudOS,
-            variant: variant, device: device(forVariant: variant),
-            guestEnvironment: guestEnvironment ?? base.effectiveGuestEnvironment)
+            variant: variant, device: device(forVariant: variant))
         try merged.write(toBundle: bundle)
         return merged
     }

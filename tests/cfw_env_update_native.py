@@ -84,7 +84,7 @@ def check(vm, stage):
 def driver_copy(temp):
     scripts = temp / 'scripts'
     scripts.mkdir()
-    for name in ('vm_lock.py', 'cfw_disk_txn.py', 'cfw_guest_evidence.py', 'sparse_file.py', 'cfw_env_update.py',
+    for name in ('vm_lock.py', 'cfw_disk_txn.py', 'sparse_file.py', 'cfw_env_update.py',
                  'guest_environment.json'):
         shutil.copyfile(ROOT / 'scripts' / name, scripts / name)
     driver = (ROOT / 'scripts/cfw_install_host.sh').read_text()

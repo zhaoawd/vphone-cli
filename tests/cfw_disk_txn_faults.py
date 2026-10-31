@@ -10,7 +10,6 @@ script carries no fault hooks; this wrapper replaces its functions.
 """
 import errno
 import importlib.util
-import json
 import os
 from pathlib import Path
 import sys
@@ -20,19 +19,7 @@ spec = importlib.util.spec_from_file_location('cfw_disk_txn', script)
 txn = importlib.util.module_from_spec(spec)
 sys.modules['cfw_disk_txn'] = txn
 spec.loader.exec_module(txn)
-from cfw_guest_publication_fixture import plan_for
-txn.current_guest_plan = lambda: plan_for(Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent)
 faults = set(filter(None, os.environ.get('CFW_TXN_FAULTS', '').split(',')))
-
-# This suite isolates disk copy/swap/cleanup and uses a disposable installer.
-# Actual provenance production and publication are exercised in
-# test_undo_provenance; there is no production bypass flag.
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from patchers import undo_provenance
-def synthetic_provenance(work, record):
-    if record.get('version') not in (2, 3, 4) or record.get('provenanceMode') != 'required':
-        raise ValueError('old records permit recovery only')
-undo_provenance.verify_publication = synthetic_provenance
 
 
 def failing(code):
@@ -71,16 +58,6 @@ if 'excl-publish' in faults:
     txn.move_exclusive = move
 
 status = txn.main(sys.argv[2:])
-if status == 0 and sys.argv[2:3] == ['stage'] and 'legacy-record' in faults:
-    work = Path(sys.argv[-1]); record = txn.load_record(work)
-    record['version'] = 1; record.pop('provenanceMode')
-    record.pop('guestEvidenceRequired', None)
-    record.pop('guestEvidenceSHA256', None)
-    record.pop('runtimeImageEvidenceRequired', None)
-    txn.save_record(work,record)
-if status == 0 and sys.argv[2:3] == ['publish'] and 'corrupt-after-publish' in faults:
-    work = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent
-    (work / 'guest-plan.json').write_bytes(b'corrupted after image swap')
 if status == 0 and sys.argv[2:3] == ['stage'] and 'replace-after-stage' in faults:
     vm = Path(os.environ['TEST_MOUNTS']).parent
     os.rename(vm / 'Disk.img', vm / 'Disk.img.moved')

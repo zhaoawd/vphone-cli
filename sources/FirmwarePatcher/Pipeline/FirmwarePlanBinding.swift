@@ -1,7 +1,6 @@
 import CryptoKit
 import Darwin
 import Foundation
-import VPhoneCore
 
 /// Context of one resolved transaction, stored inside its existing journal.
 /// This is evidence for commit/recovery, not a loadable desired configuration.
@@ -12,8 +11,6 @@ struct FirmwarePlanBinding: Codable, Equatable {
     }
     struct Payload: Codable, Equatable {
         let vmDirectoryId: String
-        var stableIdentity: VPhoneFirmwareIdentity? = nil
-        var generationID: String? = nil
         let configSHA256: String?
         let upstreamTarget: String
         let catalogRevision: String
@@ -34,23 +31,17 @@ struct FirmwarePlanBinding: Codable, Equatable {
         guard options["variant"] == plan.variant, plan.gates.variant == plan.variant else {
             throw FirmwareTransaction.RecordFailure.bindingMismatch("variant")
         }
-        if let id = options["generationID"] {
-            let generation = try FirmwareGeneration.loadVerified(in: directory, id: id)
-            guard generation.content.originals.map({ Source(name: $0.name, originalSHA256: $0.sha256) }) == sources(entries) else {
-                throw FirmwareTransaction.RecordFailure.bindingMismatch("generation original set")
-            }
-        }
-        let payload = Payload(vmDirectoryId: "", stableIdentity: try VPhoneFirmwareIdentity.read(in: directory), generationID: options["generationID"],
-            configSHA256: nil,
-            upstreamTarget: PatchDeclarationCatalog.upstreamTag,
+        let payload = Payload(vmDirectoryId: try directoryIdentity(directory),
+            configSHA256: try configDigest(directory),
+            upstreamTarget: "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
             catalogRevision: PatchDeclarationCatalog.upstreamTag,
             catalogSHA256: try catalogDigest(), plan: plan, versionInputs: versions,
             sources: sources(entries), options: options)
-        return Self(schemaVersion: 2, planSHA256: try digest(plan), contextSHA256: try Self.digest(payload), payload: payload)
+        return Self(schemaVersion: 1, planSHA256: try digest(plan), contextSHA256: try Self.digest(payload), payload: payload)
     }
 
     func validate(journal: FirmwareTransaction.Journal, directory: URL, currentCatalog: Bool) throws {
-        guard schemaVersion == 1 || schemaVersion == 2 else { throw FirmwareTransaction.RecordFailure.unsupportedBinding(schemaVersion) }
+        guard schemaVersion == 1 else { throw FirmwareTransaction.RecordFailure.unsupportedBinding(schemaVersion) }
         guard try Self.digest(payload) == contextSHA256, try Self.digest(payload.plan) == planSHA256,
               payload.plan == journal.plan, payload.versionInputs == journal.versionInputs,
               payload.options == journal.options, payload.sources == Self.sources(journal.entries),
@@ -58,50 +49,16 @@ struct FirmwarePlanBinding: Codable, Equatable {
               payload.plan.gates.variant == payload.plan.variant else {
             throw FirmwareTransaction.RecordFailure.bindingMismatch("record content")
         }
-        if schemaVersion == 1 {
-            guard !currentCatalog else {
-                throw FirmwareTransaction.RecordFailure.bindingMismatch("legacy binding is recovery-only")
-            }
-            guard payload.stableIdentity == nil, payload.generationID == nil,
-                  try Self.directoryIdentity(directory) == payload.vmDirectoryId,
-                  try Self.configDigest(directory) == payload.configSHA256 else {
-                throw FirmwareTransaction.RecordFailure.bindingMismatch("legacy VM identity/configuration")
-            }
-        } else {
-            guard let identity = payload.stableIdentity,
-                  try VPhoneFirmwareIdentity.read(in: directory) == identity else {
-                throw FirmwareTransaction.RecordFailure.bindingMismatch("stable VM identity/disk")
-            }
-        }
-        if schemaVersion == 2 {
-            guard payload.generationID == payload.options["generationID"] else {
-                throw FirmwareTransaction.RecordFailure.bindingMismatch("generation association")
-            }
-            if let id = payload.generationID {
-                let generation = try FirmwareGeneration.loadVerified(in: directory, id: id)
-                guard generation.content.originals.map({ Source(name: $0.name, originalSHA256: $0.sha256) }) == payload.sources else {
-                    throw FirmwareTransaction.RecordFailure.bindingMismatch("generation originals")
-                }
-            }
+        guard try Self.directoryIdentity(directory) == payload.vmDirectoryId,
+              try Self.configDigest(directory) == payload.configSHA256 else {
+            throw FirmwareTransaction.RecordFailure.bindingMismatch("VM identity/configuration")
         }
         if currentCatalog {
-            try Self.validateCurrentPlan(payload.plan)
-            guard payload.upstreamTarget == PatchDeclarationCatalog.upstreamTag,
-                  payload.catalogRevision == PatchDeclarationCatalog.upstreamTag,
+            guard payload.catalogRevision == PatchDeclarationCatalog.upstreamTag,
                   try Self.catalogDigest() == payload.catalogSHA256 else {
                 throw FirmwareTransaction.RecordFailure.bindingMismatch("catalog")
             }
         }
-    }
-
-    /// Legacy nil recordRules are recovery-only; never fill them from today's catalog.
-    static func validateCurrentPlan(_ plan: VariantPlanResolver.VariantPlan) throws {
-        guard let variant = FirmwarePipeline.Variant(rawValue: plan.variant) else {
-            throw FirmwareDesiredPlanStore.Failure.invalidPlan
-        }
-        let blocked = Set(plan.excludedByOptIn.filter { $0.reason == "blocked by request" }.map(\.id))
-        let current = try VariantPlanResolver.resolve(variant: variant, gates: plan.gates, block: blocked)
-        guard current == plan else { throw FirmwareDesiredPlanStore.Failure.invalidPlan }
     }
 
     private static func sources(_ entries: [FirmwareTransaction.Entry]) -> [Source] {

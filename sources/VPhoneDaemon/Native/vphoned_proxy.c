@@ -17,11 +17,6 @@
 
 extern char **environ;
 
-bool vp_native_vcam_enabled(void) {
-    const char *value = getenv("VPHONED_VCAM");
-    return !value || strcmp(value, "off") != 0;
-}
-
 static volatile sig_atomic_t stopping = 0;
 _Static_assert(ATOMIC_INT_LOCK_FREE == 2, "signal cleanup requires lock-free int atomics");
 static _Atomic int watch_write_fd = -1;

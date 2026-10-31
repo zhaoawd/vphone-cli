@@ -3,8 +3,8 @@ import Foundation
 /// Read-only ID migration. The result preserves explicit overrides; it is not an
 /// executable plan. Variant/version/required/guest gates remain the resolver's job.
 public enum PatchSelectionMigration {
-    public static let mappingRevision = "vphone.patch-id-migration/2"
-    public static let upstreamTarget = PatchDeclarationCatalog.upstreamTag
+    public static let mappingRevision = "vphone.patch-id-migration/1"
+    public static let upstreamTarget = "2d21d21fbdd4f51f013616273ceda9b35a3e0789"
 
     public struct Rename: Sendable, Equatable, Codable {
         public let from: String

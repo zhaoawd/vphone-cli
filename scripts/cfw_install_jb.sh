@@ -18,9 +18,6 @@ set -euo pipefail
 VM_DIR="${1:-.}"
 SCRIPT_DIR="${0:a:h}"
 
-# Validate the current Swift-bound plan before runtime hooks, mounts or writes.
-"${VPHONE_PYTHON:-${SCRIPT_DIR:h}/.venv/bin/python3}" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
-
 source "$SCRIPT_DIR/lib/cfw_common.sh"
 cfw_require_runtime_and_lock
 
@@ -61,7 +58,7 @@ ldid_sign_ent() {
     local file="$1" entitlements_plist="$2" bundle_id="${3:-}"
     local args=("-S$entitlements_plist" "-K$VM_DIR/$CFW_INPUT/signcert.p12")
     [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    cfw_guest_sign "${args[@]}" "$file"
+    ldid "${args[@]}" "$file"
 }
 
 build_tweakloader() {
@@ -133,11 +130,11 @@ apply_dev_overlay() {
             echo "  Applying dev overlay (rpcserver_ios)..."
             local iosbinpack="$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar"
             local tmpdir="$VM_DIR/.iosbinpack_tmp"
-            cfw_guest_write mkdir -p "$tmpdir"
-            cfw_guest_write "$TAR" --warning=no-unknown-keyword -xf "$iosbinpack" -C "$tmpdir"
-            cfw_guest_write cp "$dev_bin" "$tmpdir/iosbinpack64/usr/local/bin/rpcserver_ios"
+            mkdir -p "$tmpdir"
+            "$TAR" --warning=no-unknown-keyword -xf "$iosbinpack" -C "$tmpdir"
+            cp "$dev_bin" "$tmpdir/iosbinpack64/usr/local/bin/rpcserver_ios"
             (cd "$tmpdir" && tar -cf "$iosbinpack" iosbinpack64)
-            cfw_guest_write rm -rf "$tmpdir"
+            rm -rf "$tmpdir"
             return
         fi
     done
@@ -158,7 +155,7 @@ echo ""
 echo "[+] JB input resources: $JB_INPUT_DIR"
 check_prerequisites
 
-cfw_guest_write mkdir -p "$TEMP_DIR"
+mkdir -p "$TEMP_DIR"
 
 # Mount the image's System volume (may already be mounted from base install)
 mount_vol s1 "$MNT1"
@@ -169,10 +166,10 @@ echo "[JB-1] Patching launchd (jetsam guard + hook injection)..."
 
 if ! [[ -e "$MNT1/sbin/launchd.bak" ]]; then
     echo "  Creating backup..."
-    cfw_guest_write /bin/cp $MNT1/sbin/launchd $MNT1/sbin/launchd.bak
+    /bin/cp $MNT1/sbin/launchd $MNT1/sbin/launchd.bak
 fi
 
-cfw_guest_write cp "$MNT1/sbin/launchd.bak" "$TEMP_DIR/launchd"
+cp "$MNT1/sbin/launchd.bak" "$TEMP_DIR/launchd"
 
 # Extract original entitlements before patching (must preserve for spawn permissions)
 echo "  Extracting original entitlements..."
@@ -199,12 +196,12 @@ fi
 
 # Re-sign with original entitlements to avoid "operation not permitted" on spawn
 if [[ -s "$TEMP_DIR/launchd.entitlements" ]]; then
-    cfw_guest_sign -S"$TEMP_DIR/launchd.entitlements" -M "-K$VM_DIR/$CFW_INPUT/signcert.p12" "$TEMP_DIR/launchd"
+    ldid -S"$TEMP_DIR/launchd.entitlements" -M "-K$VM_DIR/$CFW_INPUT/signcert.p12" "$TEMP_DIR/launchd"
 else
     ldid_sign "$TEMP_DIR/launchd"
 fi
-cfw_guest_write cp -R "$TEMP_DIR/launchd" "$MNT1/sbin/launchd"
-cfw_guest_write /bin/chmod 0755 $MNT1/sbin/launchd
+cp -R "$TEMP_DIR/launchd" "$MNT1/sbin/launchd"
+/bin/chmod 0755 $MNT1/sbin/launchd
 
 echo "  [+] launchd patched"
 
@@ -213,10 +210,10 @@ echo ""
 echo "[JB-2] Installing iosbinpack64..."
 
 apply_dev_overlay
-cfw_guest_write cp -R "$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar" "$MNT1"
-cfw_guest_write "$TAR" --preserve-permissions --no-overwrite-dir --warning=no-unknown-keyword \
+cp -R "$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar" "$MNT1"
+"$TAR" --preserve-permissions --no-overwrite-dir --warning=no-unknown-keyword \
     -xf $MNT1/iosbinpack64.tar -C $MNT1
-cfw_guest_write /bin/rm -f $MNT1/iosbinpack64.tar
+/bin/rm -f $MNT1/iosbinpack64.tar
 
 echo "  [+] iosbinpack64 installed"
 
@@ -224,13 +221,13 @@ echo "  [+] iosbinpack64 installed"
 echo ""
 echo "[JB-3] Patching debugserver entitlements..."
 
-cfw_guest_write cp "$MNT1/usr/libexec/debugserver" "$TEMP_DIR/debugserver"
+cp "$MNT1/usr/libexec/debugserver" "$TEMP_DIR/debugserver"
 ldid -e "$TEMP_DIR/debugserver" > "$TEMP_DIR/debugserver-entitlements.plist"
 plutil -remove seatbelt-profiles "$TEMP_DIR/debugserver-entitlements.plist" || true
 plutil -insert task_for_pid-allow -bool YES "$TEMP_DIR/debugserver-entitlements.plist" || true
 ldid_sign_ent "$TEMP_DIR/debugserver" "$TEMP_DIR/debugserver-entitlements.plist"
-cfw_guest_write cp -R "$TEMP_DIR/debugserver" "$MNT1/usr/libexec/debugserver"
-cfw_guest_write /bin/chmod 0755 $MNT1/usr/libexec/debugserver
+cp -R "$TEMP_DIR/debugserver" "$MNT1/usr/libexec/debugserver"
+/bin/chmod 0755 $MNT1/usr/libexec/debugserver
 
 echo "  [+] debugserver entitlements patched"
 
@@ -245,13 +242,13 @@ case "$CAMPO_BASE_IOS" in
     if [[ -f "$CAMPO_BIN" ]]; then
         echo ""
         echo "[JB-3b] Granting Campo backboard/frontboard mach-lookup exceptions (iOS $CAMPO_BASE_IOS)..."
-        cfw_guest_write cp "$CAMPO_BIN" "$TEMP_DIR/Campo"
+        cp "$CAMPO_BIN" "$TEMP_DIR/Campo"
         ldid -e "$TEMP_DIR/Campo" > "$TEMP_DIR/Campo.entitlements" 2>/dev/null || true
         if [[ -s "$TEMP_DIR/Campo.entitlements" ]]; then
-            "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-campo-entitlements "$TEMP_DIR/Campo.entitlements"
+            "$PYTHON3" "$SCRIPT_DIR/patchers/campo_mach_lookup_exceptions.py" "$TEMP_DIR/Campo.entitlements"
             ldid_sign_ent "$TEMP_DIR/Campo" "$TEMP_DIR/Campo.entitlements"
-            cfw_guest_write cp -R "$TEMP_DIR/Campo" "$CAMPO_BIN"
-            cfw_guest_write /bin/chmod 0755 "$CAMPO_BIN"
+            cp -R "$TEMP_DIR/Campo" "$CAMPO_BIN"
+            /bin/chmod 0755 "$CAMPO_BIN"
             echo "  [+] Campo re-signed with backboard/frontboard mach-lookup exceptions"
         else
             echo "  [!] Could not read Campo entitlements; skipping Campo sandbox fix"
@@ -282,9 +279,9 @@ SILEO_DEB="$JB_INPUT_DIR/jb/org.coolstar.sileo_2.5.1_iphoneos-arm64.deb"
 BOOTSTRAP_TAR="$TEMP_DIR/bootstrap-iphoneos-arm64.tar"
 zstd -d -f "$BOOTSTRAP_ZST" -o "$BOOTSTRAP_TAR"
 
-cfw_guest_write cp -R "$BOOTSTRAP_TAR" "$MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar"
+cp -R "$BOOTSTRAP_TAR" "$MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar"
 if [[ -f "$SILEO_DEB" ]]; then
-    cfw_guest_write cp -R "$SILEO_DEB" "$MNT5/$BOOT_HASH/org.coolstar.sileo_2.5.1_iphoneos-arm64.deb"
+    cp -R "$SILEO_DEB" "$MNT5/$BOOT_HASH/org.coolstar.sileo_2.5.1_iphoneos-arm64.deb"
 fi
 
 # ── Extra debs: download from manifest, then stage the whole cache ──────
@@ -292,11 +289,11 @@ echo "  Fetching extra debs..."
 zsh "$SCRIPT_DIR/fetch_debs.sh" || true
 DEBS_CACHE="${VPHONE_DEBS_DIR:-${SCRIPT_DIR:h}/debs}"
 DEBS_DEST="$MNT5/$BOOT_HASH/debs"
-cfw_guest_write /bin/rm -rf "$DEBS_DEST"
+/bin/rm -rf "$DEBS_DEST"
 deb_count=0
 for deb in "$DEBS_CACHE"/*.deb(N); do
-    (( deb_count == 0 )) && cfw_guest_write /bin/mkdir -p "$DEBS_DEST"
-    cfw_guest_write cp -R "$deb" "$DEBS_DEST/"
+    (( deb_count == 0 )) && /bin/mkdir -p "$DEBS_DEST"
+    cp -R "$deb" "$DEBS_DEST/"
     deb_count=$((deb_count + 1))
 done
 if (( deb_count > 0 )); then
@@ -306,18 +303,18 @@ else
 fi
 
 JB_DIR_NAME="jb-vphone"
-cfw_guest_write /bin/rm -rf $MNT5/$BOOT_HASH/jb
-cfw_guest_write /bin/rm -rf $MNT5/$BOOT_HASH/$JB_DIR_NAME
-cfw_guest_write /bin/mkdir -p $MNT5/$BOOT_HASH/$JB_DIR_NAME
-cfw_guest_write /bin/chmod 0755 $MNT5/$BOOT_HASH/$JB_DIR_NAME
-cfw_guest_write /usr/sbin/chown 0:0 $MNT5/$BOOT_HASH/$JB_DIR_NAME
-cfw_guest_write "$TAR" --preserve-permissions --warning=no-unknown-keyword -xf $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar \
+/bin/rm -rf $MNT5/$BOOT_HASH/jb
+/bin/rm -rf $MNT5/$BOOT_HASH/$JB_DIR_NAME
+/bin/mkdir -p $MNT5/$BOOT_HASH/$JB_DIR_NAME
+/bin/chmod 0755 $MNT5/$BOOT_HASH/$JB_DIR_NAME
+/usr/sbin/chown 0:0 $MNT5/$BOOT_HASH/$JB_DIR_NAME
+"$TAR" --preserve-permissions --warning=no-unknown-keyword -xf $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar \
     -C $MNT5/$BOOT_HASH/$JB_DIR_NAME/
-cfw_guest_write /bin/mv $MNT5/$BOOT_HASH/$JB_DIR_NAME/var $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus
-cfw_guest_write mv "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb"/*(N) "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus" 2>/dev/null || true
-cfw_guest_write /bin/rm -rf $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb
-cfw_guest_write /bin/rm -f $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar
-cfw_guest_write rm -f "$BOOTSTRAP_TAR"
+/bin/mv $MNT5/$BOOT_HASH/$JB_DIR_NAME/var $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus
+mv "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb"/*(N) "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus" 2>/dev/null || true
+/bin/rm -rf $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/jb
+/bin/rm -f $MNT5/$BOOT_HASH/bootstrap-iphoneos-arm64.tar
+rm -f "$BOOTSTRAP_TAR"
 
 # NOTE: /var/jb symlink is created on first normal boot by vphone_jb_setup.sh
 # (Data volume is encrypted and not mountable at install time).
@@ -333,9 +330,9 @@ if [[ -d "$BASEBIN_DIR" ]]; then
 
     # Clean previous dylibs before re-uploading
     echo "  Cleaning old /cores/ dylibs..."
-    cfw_guest_write /bin/rm -rf $MNT1/cores
-    cfw_guest_write /bin/mkdir -p $MNT1/cores
-    cfw_guest_write /bin/chmod 0755 $MNT1/cores
+    /bin/rm -rf $MNT1/cores
+    /bin/mkdir -p $MNT1/cores
+    /bin/chmod 0755 $MNT1/cores
 
     # Install all pre-built dylibs from basebin payload
     for dylib in "$BASEBIN_DIR"/*.dylib; do
@@ -343,18 +340,18 @@ if [[ -d "$BASEBIN_DIR" ]]; then
         dylib_name="$(basename "$dylib")"
         echo "  Installing $dylib_name..."
         ldid_sign "$dylib"
-        cfw_guest_write cp -R "$dylib" "$MNT1/cores/$dylib_name"
-        cfw_guest_write /bin/chmod 0755 $MNT1/cores/$dylib_name
+        cp -R "$dylib" "$MNT1/cores/$dylib_name"
+        /bin/chmod 0755 $MNT1/cores/$dylib_name
     done
 
     # Short alias for launchdhook (header space is tight)
     if [[ -f "$BASEBIN_DIR/launchdhook.dylib" ]]; then
         echo "  Installing short launchdhook alias at /b..."
-        cfw_guest_write cp "$BASEBIN_DIR/launchdhook.dylib" "$TEMP_DIR/b"
+        cp "$BASEBIN_DIR/launchdhook.dylib" "$TEMP_DIR/b"
         ldid_sign "$TEMP_DIR/b"
-        cfw_guest_write /bin/rm -f $MNT1/b
-        cfw_guest_write cp -R "$TEMP_DIR/b" "$MNT1/b"
-        cfw_guest_write /bin/chmod 0755 $MNT1/b
+        /bin/rm -f $MNT1/b
+        cp -R "$TEMP_DIR/b" "$MNT1/b"
+        /bin/chmod 0755 $MNT1/b
     fi
 
     echo "  [+] BaseBin hooks deployed"
@@ -365,10 +362,10 @@ echo ""
 echo "[JB-4] Building and installing TweakLoader..."
 
 TWEAKLOADER_OUT="$(build_tweakloader)"
-cfw_guest_write /bin/mkdir -p $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib
-cfw_guest_write cp -R "$TWEAKLOADER_OUT" "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib"
-cfw_guest_write /usr/sbin/chown 0:0 $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib
-cfw_guest_write /bin/chmod 0755 $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib
+/bin/mkdir -p $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib
+cp -R "$TWEAKLOADER_OUT" "$MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib"
+/usr/sbin/chown 0:0 $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib
+/bin/chmod 0755 $MNT5/$BOOT_HASH/$JB_DIR_NAME/procursus/usr/lib/TweakLoader.dylib
 
 echo "  [+] TweakLoader installed to procursus/usr/lib/TweakLoader.dylib"
 
@@ -380,8 +377,8 @@ echo "[JB-5] Deploying first-boot setup..."
 SETUP_SCRIPT="$SCRIPT_DIR/vphone_jb_setup.sh"
 SETUP_PLIST="$SCRIPT_DIR/vphone_jb_setup.plist"
 if [[ -f "$SETUP_SCRIPT" ]]; then
-    cfw_guest_write cp -R "$SETUP_SCRIPT" "$MNT1/cores/vphone_jb_setup.sh"
-    cfw_guest_write /bin/chmod 0755 $MNT1/cores/vphone_jb_setup.sh
+    cp -R "$SETUP_SCRIPT" "$MNT1/cores/vphone_jb_setup.sh"
+    /bin/chmod 0755 $MNT1/cores/vphone_jb_setup.sh
     echo "  [+] vphone_jb_setup.sh -> /cores/"
 fi
 # vpregister: registers JB apps via the containerized LS API at first boot (uicache -a's
@@ -396,8 +393,8 @@ case "$JB_BASE_IOS" in
     27.*)
         VPREGISTER="$(build_vpregister)"
         if [[ -f "$VPREGISTER" ]]; then
-            cfw_guest_write cp -R "$VPREGISTER" "$MNT1/cores/vpregister"
-            cfw_guest_write /bin/chmod 0755 $MNT1/cores/vpregister
+            cp -R "$VPREGISTER" "$MNT1/cores/vpregister"
+            /bin/chmod 0755 $MNT1/cores/vpregister
             echo "  [+] vpregister -> /cores/ (iOS $JB_BASE_IOS)"
         fi
         ;;
@@ -406,16 +403,24 @@ case "$JB_BASE_IOS" in
         ;;
 esac
 if [[ -f "$SETUP_PLIST" ]]; then
-    cfw_guest_write cp -R "$SETUP_PLIST" "$MNT1/System/Library/LaunchDaemons/com.vphone.jb-setup.plist"
-    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/com.vphone.jb-setup.plist
+    cp -R "$SETUP_PLIST" "$MNT1/System/Library/LaunchDaemons/com.vphone.jb-setup.plist"
+    /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/com.vphone.jb-setup.plist
 
     # Inject into launchd.plist so launchd starts it at boot
     echo "  Injecting com.vphone.jb-setup into launchd.plist..."
-    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
-    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$TEMP_DIR/launchd.plist" "$SETUP_PLIST" \
-        "/System/Library/LaunchDaemons/com.vphone.jb-setup.plist"
-    cfw_guest_write cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
-    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
+    cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
+    "$PYTHON3" -c "
+import plistlib, sys
+with open(sys.argv[1], 'rb') as f:
+    target = plistlib.load(f)
+with open(sys.argv[2], 'rb') as f:
+    daemon = plistlib.load(f)
+target.setdefault('LaunchDaemons', {})['/System/Library/LaunchDaemons/com.vphone.jb-setup.plist'] = daemon
+with open(sys.argv[1], 'wb') as f:
+    plistlib.dump(target, f, sort_keys=False)
+" "$TEMP_DIR/launchd.plist" "$SETUP_PLIST"
+    cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
+    /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
     echo "  [+] com.vphone.jb-setup.plist injected into launchd.plist"
 fi
 
@@ -424,21 +429,29 @@ fi
 SSHD_SCRIPT="$SCRIPT_DIR/vphone_sshd.sh"
 SSHD_PLIST="$SCRIPT_DIR/vphone_sshd.plist"
 if [[ -f "$SSHD_SCRIPT" ]]; then
-    cfw_guest_write cp -R "$SSHD_SCRIPT" "$MNT1/cores/vphone_sshd.sh"
-    cfw_guest_write /bin/chmod 0755 $MNT1/cores/vphone_sshd.sh
+    cp -R "$SSHD_SCRIPT" "$MNT1/cores/vphone_sshd.sh"
+    /bin/chmod 0755 $MNT1/cores/vphone_sshd.sh
     echo "  [+] vphone_sshd.sh -> /cores/"
 fi
 if [[ -f "$SSHD_PLIST" ]]; then
-    cfw_guest_write cp -R "$SSHD_PLIST" "$MNT1/System/Library/LaunchDaemons/com.vphone.sshd.plist"
-    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/com.vphone.sshd.plist
+    cp -R "$SSHD_PLIST" "$MNT1/System/Library/LaunchDaemons/com.vphone.sshd.plist"
+    /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/com.vphone.sshd.plist
 
     # Inject into launchd.plist so launchd starts it at boot
     echo "  Injecting com.vphone.sshd into launchd.plist..."
-    cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
-    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$TEMP_DIR/launchd.plist" "$SSHD_PLIST" \
-        "/System/Library/LaunchDaemons/com.vphone.sshd.plist"
-    cfw_guest_write cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
-    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
+    cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
+    "$PYTHON3" -c "
+import plistlib, sys
+with open(sys.argv[1], 'rb') as f:
+    target = plistlib.load(f)
+with open(sys.argv[2], 'rb') as f:
+    daemon = plistlib.load(f)
+target.setdefault('LaunchDaemons', {})['/System/Library/LaunchDaemons/com.vphone.sshd.plist'] = daemon
+with open(sys.argv[1], 'wb') as f:
+    plistlib.dump(target, f, sort_keys=False)
+" "$TEMP_DIR/launchd.plist" "$SSHD_PLIST"
+    cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
+    /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
     echo "  [+] com.vphone.sshd.plist injected into launchd.plist"
 
     # Host-side marker: tells `make boot` (SSH_FORWARD=auto) this VM runs guest
@@ -455,7 +468,7 @@ echo "[*] Unmounting image volumes..."
 /sbin/umount $MNT5 2>/dev/null || true
 
 echo "[*] Cleaning up temp..."
-cfw_guest_write rm -rf "$TEMP_DIR"
+rm -rf "$TEMP_DIR"
 
 echo ""
 echo "[+] CFW + JB installation complete!"

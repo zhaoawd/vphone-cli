@@ -86,7 +86,6 @@ public struct VPhoneVMStopper {
     public var diskHolders: () throws -> [pid_t]
     /// Progress sink; see `Event`.
     public var report: (Event) -> Void
-    public var acquireOnlineOperation: () throws -> VPhoneOnlineOperationLock?
 
     public init(
         listTargets: @escaping () -> [pid_t],
@@ -96,8 +95,7 @@ public struct VPhoneVMStopper {
         sleep: @escaping (TimeInterval) -> Void = { Thread.sleep(forTimeInterval: $0) },
         readRecord: @escaping () -> VPhoneVMRuntimeState? = { nil },
         diskHolders: @escaping () throws -> [pid_t] = { [] },
-        report: @escaping (Event) -> Void = { _ in },
-        acquireOnlineOperation: @escaping () throws -> VPhoneOnlineOperationLock? = { nil }
+        report: @escaping (Event) -> Void = { _ in }
     ) {
         self.listTargets = listTargets
         self.identity = identity
@@ -107,7 +105,6 @@ public struct VPhoneVMStopper {
         self.readRecord = readRecord
         self.diskHolders = diskHolders
         self.report = report
-        self.acquireOnlineOperation = acquireOnlineOperation
     }
 
     /// Production wiring for one bundle.
@@ -130,8 +127,7 @@ public struct VPhoneVMStopper {
             lockHeld: { VPhoneVMLockProbe.isLockHeld(directory: bundleDirectory) },
             readRecord: { VPhoneVMRuntimeState.read(in: bundleDirectory) },
             diskHolders: { try VPhoneLsof.holders(of: diskURL) },
-            report: report,
-            acquireOnlineOperation: { try VPhoneOnlineOperationLock(directory: bundleDirectory) })
+            report: report)
     }
 
     // MARK: Sequence
@@ -139,10 +135,6 @@ public struct VPhoneVMStopper {
     /// Runs the whole stop sequence. `timeout` is the graceful wait in seconds;
     /// `force` skips SIGINT and the wait, but not the final confirmation.
     public func stop(timeout: TimeInterval, force: Bool) -> Outcome {
-        let onlineLease: VPhoneOnlineOperationLock?
-        do { onlineLease = try acquireOnlineOperation() }
-        catch { return .failed(survivors: [], reason: String(describing: error)) }
-        defer { withExtendedLifetime(onlineLease) {} }
         guard lockHeld() else {
             do {
                 let holders = try diskHolders()

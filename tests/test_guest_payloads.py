@@ -1,9 +1,4 @@
 import importlib.util
-import json
-import os
-import sys
-from tests import test_patch_plan_gate as frozen_tests
-from patchers import guest_write
 from pathlib import Path
 import subprocess
 import tempfile
@@ -45,9 +40,8 @@ class GuestPayloadTests(unittest.TestCase):
     def run_shell(self, script_dir, vm, body):
         return subprocess.run(['/bin/zsh', '-c',
             'set -euo pipefail; SCRIPT_DIR="$1"; VM_DIR="$2"; source "$3"; ' + body,
-            'test', str(script_dir), str(vm), str(ROOT / 'scripts/lib/cfw_common.sh'), str(ROOT / 'scripts')],
-            cwd='/', capture_output=True, text=True,
-            pass_fds=(int(os.environ['VPHONE_VM_LOCK_FD']),) if 'VPHONE_VM_LOCK_FD' in os.environ else ())
+            'test', str(script_dir), str(vm), str(ROOT / 'scripts/lib/cfw_common.sh')],
+            cwd='/', capture_output=True, text=True)
 
     def test_installer_uses_presigned_payload_from_app_and_development_tree(self):
         for app in (False, True):
@@ -60,21 +54,13 @@ class GuestPayloadTests(unittest.TestCase):
                 content = b'presigned fixture\x00unchanged'
                 (payload / 'vphoned').write_bytes(content); (payload / 'vphoned').chmod(0o755)
                 (payload / 'vphoned.plist').write_text('plist fixture')
-                fixture = frozen_tests.FrozenGateTests(); fixture.setUp()
-                self.addCleanup(fixture.doCleanups)
-                _, digest = guest_write.target_table()
-                fixture.entries.append(dict(id='system-vphoned-boot-install', disposition='guestUncovered',
-                    recordRules=[dict(literal='guest-target-map-v1:'+digest+':system-vphoned-boot-install', hexadecimalOffsetSuffix=False)]))
-                fixture.publish()
-                os.environ.update(VPHONE_FROZEN_PLAN_SHA256=fixture.digest, VPHONE_FROZEN_CONTEXT=json.dumps(fixture.context), PYTHON3=sys.executable)
-                vm = fixture.vm
-                (fixture.mount / 'mnt1/usr/bin').mkdir(parents=True)
+                vm = root / 'vm'; (vm / 'mnt/usr/bin').mkdir(parents=True); (vm / 'temp').mkdir()
                 result = self.run_shell(scripts, vm,
-                    'TEMP_DIR="$VM_DIR/.cfw_temp"; MNT1="$CFW_HOST_MNT/mnt1"; '
-                    'payload="$(cfw_guest_resources)"; SCRIPT_DIR="$4"; cfw_stage_vphoned "$payload"; print -r -- "$payload"')
+                    'TEMP_DIR="$VM_DIR/temp"; MNT1="$VM_DIR/mnt"; '
+                    'payload="$(cfw_guest_resources)"; cfw_stage_vphoned "$payload"; print -r -- "$payload"')
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(Path(result.stdout.strip()).resolve(), payload.resolve())
-                for name in ('.cfw_mount.test/mnt1/usr/bin/vphoned', '.vphoned.signed', '.cfw_temp/vphoned'):
+                for name in ('mnt/usr/bin/vphoned', '.vphoned.signed', 'temp/vphoned'):
                     self.assertEqual((vm / name).read_bytes(), content)
                 self.assertEqual((payload / 'vphoned').read_bytes(), content)
 

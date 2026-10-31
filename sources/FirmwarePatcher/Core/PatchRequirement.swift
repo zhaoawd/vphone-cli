@@ -62,8 +62,6 @@ public enum PatchRule: String, Sendable, Codable, Equatable {
     case iosBaseIs18
     /// iPhone base is iOS 27.x (gates the iOS-27-only JB kernel patches).
     case iosBaseIs27
-    /// cloudOS is 26.4 or newer, independent of Frida opt-in (iBEC bootx gate).
-    case cloudOSIs26_4OrNewer
     /// Frida kernel patches are active (`enableFrida && cloudOSIsFridaCapable`).
     case cloudOSFridaCapable
     /// EXC_GUARD disable is active (`variant == .dev || iosBaseIs18 || forceExcGuard`).
@@ -75,7 +73,6 @@ public enum PatchRule: String, Sendable, Codable, Equatable {
         case .always: true
         case .iosBaseIs18: gates.iosBaseIs18
         case .iosBaseIs27: gates.iosBaseIs27
-        case .cloudOSIs26_4OrNewer: gates.cloudOSIsFridaCapable
         case .cloudOSFridaCapable: gates.applyFrida
         case .excGuardActive: gates.excGuardActive
         }

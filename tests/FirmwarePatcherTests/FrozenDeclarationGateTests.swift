@@ -34,8 +34,9 @@ import Testing
     }
 
     @Test func acceptsMatchingResolvedPlan() throws {
-        let plan = try VariantPlanResolver.resolve(variant: .regular, gates: DeclarationGateTests.gates())
-        let report = RequiredDeclarationEvidenceTests.complete(plan)
+        let report = DeclarationGateTests.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .applied, variant: "regular")
+        let plan = try VariantPlanResolver.resolve(variant: .regular, gates: report.gates)
         try PatchDeclarationGate.enforce(report: report, plan: plan)
         #expect(PatchDeclarationGate.violations(in: report, plan: plan).isEmpty)
     }

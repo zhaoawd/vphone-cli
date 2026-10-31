@@ -185,7 +185,7 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
         let python = try resources.pythonExecutable()
         let stage = components.map { URL(fileURLWithPath: $0).standardizedFileURL } ?? resources.guestComponentsStage
-        var scriptEnv = [
+        let scriptEnv = [
             "VPHONE_PYTHON": python.path,
             "VPHONE_GUEST_COMPONENTS": stage.path,
         ]
@@ -227,11 +227,6 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
             print("[cfw] offline_update: replacing \(libraries.joined(separator: ", ")) on a staged copy")
         }
 
-        let frozen = try VPhoneBundleGuard.withBundleLock(directory: bundle.url, operation: VPhoneVMOperation.cfwRecord) { _ in
-            try VPhoneCFWFrozenContext.prepare(in: bundle.url, requestedVariant: nil,
-                guestEnvironment: "v2", spoofBuild: "")
-        }
-        scriptEnv.merge(try frozen.environment) { _, bound in bound }
         let args = Self.driverArguments(resources: resources, bundle: bundle.url)
         let invocation = VPhoneCreateOrchestrator.cfwInvocation(
             scriptEnv: scriptEnv, sudoEnvExtras: [:], rootPopup: rootPopup)

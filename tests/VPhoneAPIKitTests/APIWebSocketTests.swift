@@ -6,7 +6,7 @@ final class APISocketFixture: VPhoneAPIWebSocketTransport, @unchecked Sendable {
     private let lock = NSLock()
     private var inbox: [Data] = []
     private var waiter: CheckedContinuation<Data, any Error>?
-    private var sent: [(data: Data, time: ContinuousClock.Instant)] = []
+    private var sent: [Data] = []
     private var closed = false
     let stallSend: Bool
 
@@ -14,7 +14,7 @@ final class APISocketFixture: VPhoneAPIWebSocketTransport, @unchecked Sendable {
     func send(_ data: Data) async throws {
         try lock.withLock {
             guard !closed else { throw URLError(.networkConnectionLost) }
-            sent.append((data, .now))
+            sent.append(data)
         }
         if stallSend { try await Task.sleep(for: .seconds(120)) }
     }
@@ -41,14 +41,12 @@ final class APISocketFixture: VPhoneAPIWebSocketTransport, @unchecked Sendable {
             else { inbox.append(data) }
         }
     }
-    func messages(_ count: Int, timeout: Duration = .seconds(30),
-                  poll: () async throws -> Void = { try await Task.sleep(for: .milliseconds(5)) }) async throws -> [[String: VPhoneJSONValue]] {
-        let deadline = ContinuousClock.now + timeout
-        while true {
-            let snapshot = lock.withLock { sent.filter { $0.time <= deadline } }
-            if snapshot.count >= count { return try snapshot.map { try VPhoneAPIWire.object($0.data) } }
-            guard ContinuousClock.now < deadline else { break }
-            try await poll()
+    func messages(_ count: Int) async throws -> [[String: VPhoneJSONValue]] {
+        let deadline = ContinuousClock.now + .seconds(30)
+        while ContinuousClock.now < deadline {
+            let snapshot = lock.withLock { sent }
+            if snapshot.count >= count { return try snapshot.map { try VPhoneAPIWire.object($0) } }
+            try await Task.sleep(for: .milliseconds(5))
         }
         throw URLError(.timedOut)
     }
@@ -58,28 +56,6 @@ final class APISocketFixture: VPhoneAPIWebSocketTransport, @unchecked Sendable {
 }
 
 struct APIWebSocketTests {
-    @Test func fixtureRetainsOnTimeMessageWhenObserverResumesAfterDeadline() async throws {
-        let transport = APISocketFixture()
-        let message = Data(#"{"method":"on-time"}"#.utf8)
-        let received = try await transport.messages(1, timeout: .milliseconds(20)) {
-            try await transport.send(message)
-            try await Task.sleep(for: .milliseconds(40))
-        }
-        #expect(received == [["method": .string("on-time")]])
-    }
-
-    @Test func fixtureRejectsMessageActuallySentAfterDeadline() async throws {
-        let transport = APISocketFixture()
-        do {
-            _ = try await transport.messages(1, timeout: .milliseconds(20)) {
-                try await Task.sleep(for: .milliseconds(40))
-                try await transport.send(Data(#"{"method":"late"}"#.utf8))
-            }
-            Issue.record("late message satisfied the readiness deadline")
-        } catch let error as URLError {
-            #expect(error.code == .timedOut)
-        }
-    }
     @Test func correlatesOutOfOrderRepliesAndInterleavedEvents() async throws {
         let transport = APISocketFixture()
         let socket = VPhoneAPIWebSocket(transport: transport, timeout: 30)

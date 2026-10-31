@@ -76,17 +76,6 @@ class DaemonProxyTests(unittest.TestCase):
             time.sleep(.03)
         self.fail(f'Test worker {pid} still running')
 
-    def test_vcam_off_disables_listener_and_default_remains_enabled(self):
-        for value, expected in ((None, '1'), ('off', '0'), ('on', '1'), ('', '1')):
-            with self.subTest(value=value):
-                env = dict(os.environ, VPHONE_PROXY_TEST_VCAM='1')
-                env.pop('VPHONED_VCAM', None)
-                if value is not None:
-                    env['VPHONED_VCAM'] = value
-                result = subprocess.run([str(self.binary)], env=env, capture_output=True, text=True, timeout=3)
-                self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(result.stdout.strip(), expected)
-
     def test_invalid_worker_arguments_are_rejected(self):
         for args in (['--io'], ['--io', '2'], ['--io', '-1'], ['--io', 'abc'],
                      ['--io', '999999999999999999999'], ['--unknown'], ['--io', '3', 'extra']):

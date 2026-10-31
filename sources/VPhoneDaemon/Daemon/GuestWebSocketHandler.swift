@@ -7,11 +7,9 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
     typealias OutboundOut = WebSocketFrame
 
     private let hub: APIEventHub
-    private let externalProxy: Bool
     private var closing = false
-    init(hub: APIEventHub, externalProxy: Bool) {
+    init(hub: APIEventHub) {
         self.hub = hub
-        self.externalProxy = externalProxy
     }
 
     func handlerAdded(context: ChannelHandlerContext) {
@@ -30,7 +28,7 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
             guard let bytes = buffer.readBytes(length: buffer.readableBytes) else { return }
             do {
                 let request = try APIWire.decode(Data(bytes))
-                let job = WebSocketJob(channel: context.channel, request: request, hub: hub, externalProxy: externalProxy)
+                let job = WebSocketJob(channel: context.channel, request: request, hub: hub)
                 GuestAPI.queue.async { job.run() }
             } catch {
                 let reply = APIReply.json(["type": "response", "id": NSNull(),
@@ -83,18 +81,16 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
 private final class WebSocketJob: @unchecked Sendable {
     let channel: Channel
     let request: APIRequest
-    let externalProxy: Bool
     let hub: APIEventHub
 
-    init(channel: Channel, request: APIRequest, hub: APIEventHub, externalProxy: Bool) {
+    init(channel: Channel, request: APIRequest, hub: APIEventHub) {
         self.channel = channel
         self.request = request
-        self.externalProxy = externalProxy
         self.hub = hub
     }
 
     func run() {
-        let reply = APIWire.execute(request, externalProxy: externalProxy)
+        let reply = APIWire.execute(request)
         GuestWebSocketHandler.send(reply.data, on: channel)
         if reply.status == 200 {
             hub.broadcast(name: "operation.completed", data: ["method": request.method])

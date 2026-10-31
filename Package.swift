@@ -30,15 +30,13 @@ let package = Package(
         .package(path: "vendor/MachOKit"),
     ],
     targets: [
-        .target(name: "VPhoneKernelIOTrace", path: "sources/VPhoneKernelIOTrace"),
-        .testTarget(name: "VPhoneKernelIOTraceTests", dependencies: ["VPhoneKernelIOTrace"], path: "tests/VPhoneKernelIOTraceTests"),
         .target(name: "VPhoneHelperKit", dependencies: ["VPhoneBundleStore", "VPhoneCore"],
                 path: "sources/VPhoneHelperKit", linkerSettings: [.linkedFramework("Security"), .linkedFramework("ServiceManagement")]),
         .executableTarget(name: "VPhoneHelperEntry", dependencies: ["VPhoneHelperKit"], path: "sources/VPhoneHelperEntry"),
         .testTarget(name: "VPhoneHelperKitTests", dependencies: ["VPhoneHelperKit"], path: "tests/VPhoneHelperKitTests"),
         .executableTarget(name: "VPhoneLaunchpadLauncherEntry", dependencies: ["VPhoneBundleStore", "VPhoneLaunchpadKit"], path: "sources/VPhoneLaunchpadLauncherEntry"),
         .target(name: "VPhoneAPIKit", path: "sources/VPhoneAPIKit"),
-        .target(name: "VPhoneBundleStore", dependencies: ["VPhoneArchiveKit", "VPhoneKernelIOTrace"],
+        .target(name: "VPhoneBundleStore", dependencies: ["VPhoneArchiveKit"],
                 path: "sources/VPhoneBundleStore", linkerSettings: [.linkedFramework("Security")]),
         .testTarget(name: "VPhoneBundleStoreTests", dependencies: ["VPhoneBundleStore", "VPhoneArchiveKit"],
                     path: "tests/VPhoneBundleStoreTests"),
@@ -87,7 +85,7 @@ let package = Package(
                 .product(name: "Capstone", package: "libcapstone-spm"),
                 .product(name: "Img4tool", package: "libimg4-spm"),
                 .product(name: "MachOKit", package: "MachOKit"),
-                "VPhoneCore", "VPhoneArchiveKit", "VPhoneBundleStore", "VPhoneKernelIOTrace",
+                "VPhoneCore",
             ],
             path: "sources/FirmwarePatcher"
         ),
@@ -136,7 +134,7 @@ let package = Package(
         ),
         .testTarget(
             name: "VPhoneCLITests",
-            dependencies: ["vphone-cli", "VPhoneDaemonWire"],
+            dependencies: ["vphone-cli"],
             path: "tests/VPhoneCLITests"
         ),
         .testTarget(

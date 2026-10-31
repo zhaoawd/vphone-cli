@@ -198,7 +198,6 @@ public enum VPhoneAPIRequestGate {
                 lines[0] = "\(method) \(path) \(version)"
             }
             for field in fields {
-                if ["x-vphone-proxy-class", "x-vphone-proxy-nonce"].contains(field.name.lowercased()) { continue }
                 if field.name.caseInsensitiveCompare("Authorization") == .orderedSame {
                     continue
                 }

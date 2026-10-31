@@ -1,7 +1,5 @@
 # T17 在线替换与进程激活
 
-2026-10-02 真实验收补充：用户批准在隔离 v2 VM 上执行 R7/T17 单库在线更新。staging 摘要正确；`environment.install` 在 `mount -u -w /` 阶段被拒绝，mount 输出 `Operation not permitted`、退出 77。事务 `18daa2162f7bdba0-f36ab635` 为 aborted，libvcamcaptured 为 not_attempted，5 库摘要未变，root_read_only true。没有执行 cameracaptured 重启，R8 成功回退路径未执行。拒绝的底层原因未查明；本次不新增补丁或改用其他 remount 方式。真实在线替换成功路径仍未通过；详见 [R5–R9 记录](v2_remaining_acceptance_plan_2026-10-02.md)。下文的“未在 VM 上验证”描述保留其 2026-10-01 时间范围。
-
 日期：2026-10-01。基线提交 `f524a0f`。范围：上游整合清单 T17 的代码与无 VM 测试。用户决定的范围：只覆盖本地已有的环境库（`scripts/guest_environment.json` 的 5 项，含本地保留的 `libvlocation.dylib`）；`libmisfix.dylib` 与“更新后重启 MIS 守护进程”留给 T18，本项不实现、不模拟。
 
 本项没有在任何真实 VM 上安装、激活或更新内容；没有读写 `~/.vphone/VMs`、`~/vphone-b4-accept`、`/Volumes/vphone-t03-restore`；没有对 `vm-2607`（pid 15663）、`vm-new`（pid 11275）执行命令或发信号；没有使用 sudo；没有联网；没有发送合成键鼠事件。日志位于 `research/artifacts/t17-online-update-2026-10-01/`（Git 忽略）。

@@ -25,11 +25,8 @@ enum VPhoneExitStatus {
     }
 }
 
-@MainActor
 class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var vmLock: VPhoneVMLock?
-    private(set) var guestWrites = VPhoneGuestWriteCoordinator()
-    private var stopWaitingForWriter = false
     private let cli: VPhoneBootCLI
     private var vm: VPhoneVirtualMachine?
     private var control: VPhoneControl?
@@ -45,7 +42,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var startupUnlock: VPhoneStartupUnlock?
     private let hostInputQueue = VPhoneHostInputQueue()
     private var cameraServer: VPhoneCameraServer?
-    private var shutdownSignals: VPhoneShutdownSignals?
+    private var sigintSource: DispatchSourceSignal?
     private var hostSleepActivity: NSObjectProtocol?
     private var didAttemptAutoInstall = false
     private var shutdownPlan = VPhoneShutdownPlan()
@@ -59,10 +56,14 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         NSApp.setActivationPolicy(cli.noGraphics ? .prohibited : .regular)
 
-        shutdownSignals = VPhoneShutdownSignals { [weak self] number in
-            print("\n[vphone] \(VPhoneChildCancellation.name(of: number)) — shutting down")
+        signal(SIGINT, SIG_IGN)
+        let src = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
+        src.setEventHandler { [weak self] in
+            print("\n[vphone] SIGINT — shutting down")
             self?.handleInterrupt()
         }
+        src.activate()
+        sigintSource = src
 
         Task { @MainActor in
             do {
@@ -90,7 +91,6 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 throw VPhoneMachineBindingError("VM binding differs from the launch selection; no VM was started")
             }
         }
-        guestWrites = VPhoneGuestWriteCoordinator(directory: cli.config.resolvingSymlinksInPath().deletingLastPathComponent())
         FileHandle.standardOutput.write(Data("[vphone] VM lock acquired\n".utf8))
         let options = try cli.resolveOptions()
 
@@ -133,7 +133,6 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
         let control = VPhoneControl(variant: options.variant)
         self.control = control
-        control.guestWrites = guestWrites
         if !cli.dfu {
             if let vphonedURL = cli.autoUpdateGuestBinaryURL, FileManager.default.fileExists(atPath: vphonedURL.path) {
                 control.guestBinaryURL = vphonedURL
@@ -156,7 +155,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                     apiProxy = proxy
                     if let vmLock {
                         let session = VPhoneAPISession(
-                            client: try VPhoneAPIClient(baseURL: url, token: proxy.internalToken, timeout: 5),
+                            client: try VPhoneAPIClient(baseURL: url, token: apiOptions.token, timeout: 5),
                             vmInstanceID: vmLock.state.instanceID)
                         apiSession = session
                         let persistedUnlock = try VPhoneVirtualMachineManifest.load(from: options.configURL).usesStartupUnlock
@@ -169,10 +168,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                             return try result.get()
                         }
                         startupUnlock = unlock
-                        session.onSnapshotChange = { [weak unlock, weak session, weak self] snapshot in
-                            unlock?.observe(snapshot)
-                            if snapshot.state == .ready { Task { await self?.guestWrites.reconcile(session) } }
-                        }
+                        session.onSnapshotChange = { [weak unlock] snapshot in unlock?.observe(snapshot) }
                         session.start()
                     }
                     print("[api] proxy listening on \(url.absoluteString); guest VSOCK 1339; token from VPHONE_API_TOKEN")
@@ -185,7 +181,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         var hostScreen: (any VPhoneHostScreen)?
         if !cli.noGraphics {
             let keyHelper = VPhoneKeyHelper(vm: vm, control: control)
-            let wc = makeWindowController()
+            let wc = VPhoneWindowController()
             wc.showWindow(
                 for: vm.virtualMachine,
                 screenWidth: options.screenWidth,
@@ -229,8 +225,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             }
             if let session = apiSession {
                 let unlock = startupUnlock
-                session.onSnapshotChange = { [weak mc, weak unlock, weak session, weak self] snapshot in
-                    if snapshot.state == .ready { Task { await self?.guestWrites.reconcile(session) } }
+                session.onSnapshotChange = { [weak mc, weak unlock] snapshot in
                     unlock?.observe(snapshot)
                     mc?.manualUnlockItem?.isEnabled = snapshot.state == .ready && snapshot.health?.capabilities.contains("screen_unlock") == true
                 }
@@ -346,7 +341,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         let executor = VPhoneHostCommandExecutor(
             control: control, camera: cameraServer, location: locationProvider,
             screen: hostScreen, apiSession: apiSession, bootMode: cli.dfu ? .dfu : .normal,
-            target: vmLock.map { VPhoneHostTarget(lock: $0.state) }, inputQueue: hostInputQueue, guestWrites: guestWrites, runtime: vmLock)
+            target: vmLock.map { VPhoneHostTarget(lock: $0.state) }, inputQueue: hostInputQueue)
         let hc = VPhoneHostControl(
             socketPath: options.configURL.deletingLastPathComponent()
                 .appendingPathComponent("vphone.sock").path,
@@ -394,41 +389,23 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Shutdown
 
-    func makeWindowController() -> VPhoneWindowController {
-        let controller = VPhoneWindowController()
-        controller.onCloseRequested = { [weak self] in self?.handleInterrupt() }
-        return controller
-    }
-
     @MainActor private var apiCanShutdown: Bool {
         apiSession?.snapshot.state == .ready && apiSession?.snapshot.health?.capabilities.contains("system_shutdown") == true
     }
 
-    /// Ask the guest to power off, wait a bounded time for
+    /// SIGINT: ask the guest to power off, wait a bounded time for
     /// `guestDidStop`, then force-stop the VM through the framework so the
     /// teardown is the framework's and not this process dying.
     @MainActor
     private func handleInterrupt() {
-        guard !stopWaitingForWriter else { return }
-        stopWaitingForWriter = true
-        if guestWrites.pendingRecovery { print("[vphone] Stop waits for pending guest recovery; query guest env status to reconcile") }
-        Task { @MainActor in
-            await guestWrites.sealAndWait()
-            stopWaitingForWriter = false
-            handleDrainedInterrupt()
-        }
-    }
-
-    @MainActor
-    func handleDrainedInterrupt() {
         startupUnlock?.stop()
         guard let vm else {
             NSApp.terminate(nil)
             return
         }
         if shutdownPlan.didStart {
-            // Another shutdown request while waiting skips the remaining wait.
-            print("[vphone] repeated shutdown request — stopping now")
+            // Second SIGINT while waiting — skip the rest of the wait.
+            print("[vphone] second SIGINT — stopping now")
             forceStopAndExit(action: shutdownPlan.abortWait())
             return
         }
@@ -530,7 +507,6 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         }
         // The VM delegate records a failure status before terminating; AppKit
         // would otherwise always exit 0.
-        shutdownSignals = nil
         exit(VPhoneExitStatus.pending)
     }
 

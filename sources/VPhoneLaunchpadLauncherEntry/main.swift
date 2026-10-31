@@ -26,14 +26,9 @@ guard URL(fileURLWithPath: CommandLine.arguments[0]).standardizedFileURL == tool
 }
 let status: Int32
 do {
-    status = try request.withVerifiedExecutable { verified in
-        // Kernel publication must execute the exact Bundle producer. Unknown
-        // protocols refuse before starting a child; ordinary launch stays local.
-        if request.isKernelUpdate { try VPhoneLaunchpadLauncherRequest.validateKernelUpdateProtocol(executable: verified) }
-        if request.isKernelRollback { try VPhoneLaunchpadLauncherRequest.validateKernelRollbackProtocol(executable: verified) }
-        let executable = request.isKernelUpdate || request.isKernelRollback ? verified : toolchain.executable
-        return try VPhoneLaunchpadLauncherProcess.run(path: executable.path,
-            argv: [executable.path] + request.arguments + ["--expected-core-bundle", request.version])
+    status = try request.withVerifiedExecutable { _ in
+        try VPhoneLaunchpadLauncherProcess.run(path: toolchain.executable.path,
+            argv: [toolchain.executable.path] + request.arguments + ["--expected-core-bundle", request.version])
     }
 } catch let error as VPhoneLaunchpadLauncherFailure { fail(71, error.message) }
 catch { fail(77, "refused: \(error.localizedDescription)") }

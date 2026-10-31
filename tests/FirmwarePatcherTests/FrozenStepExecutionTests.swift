@@ -13,7 +13,7 @@ import Testing
         func buildSteps() -> [PatchStep] {
             [PatchStep(id: id, requirement: .optional) {
                 self.runs += 1
-                self.emittedRecords.append(PatchRecord(patchID: "ibss.serial_label", component: self.component,
+                self.emittedRecords.append(PatchRecord(patchID: "serial.fixture", component: self.component,
                     fileOffset: 0, originalBytes: Data([0]), patchedBytes: Data([1]), description: "fixture"))
                 return .matched
             }]
@@ -35,7 +35,7 @@ import Testing
         #expect(output.data == Data([0]))
         #expect(output.report.records.isEmpty)
         #expect(output.report.results.first?.outcome == .notApplicable)
-        let report = PatchRunReport(variant: "regular", gates: gates, components: RequiredDeclarationEvidenceTests.complete(plan).components + [output.report], ablation: [])
+        let report = PatchRunReport(variant: "regular", gates: gates, components: [output.report], ablation: [])
         try PatchDeclarationGate.enforce(report: report, plan: plan)
     }
 
@@ -48,7 +48,7 @@ import Testing
         #expect(patcher.runs == 1)
         #expect(output.data == Data([1]))
         #expect(output.report.records.count == 1)
-        let report = PatchRunReport(variant: "regular", gates: gates, components: RequiredDeclarationEvidenceTests.complete(plan).components + [output.report], ablation: [])
+        let report = PatchRunReport(variant: "regular", gates: gates, components: [output.report], ablation: [])
         try PatchDeclarationGate.enforce(report: report, plan: plan)
     }
 }

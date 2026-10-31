@@ -255,11 +255,18 @@ def patch_camera_in_dsc(chunks_dir, dsc_path=None):
 
 
 if __name__ == "__main__":
-    # Real CLI writes share cfw.py's frozen plan gate; imported helpers are
-    # retained for inspection and controlled binary-fixture tests.
-    import os, sys
-    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from patchers.cfw import main as guarded_main
-    args = sys.argv[1:]
-    sys.argv = [sys.argv[0], 'patch-camera-dsc'] + args
-    guarded_main()
+    import argparse
+    ap = argparse.ArgumentParser(description="Camera DSC patcher")
+    ap.add_argument("chunks_dir", help="directory containing dyld_shared_cache_arm64e.* files")
+    ap.add_argument("dsc_header", help="path to the dyld_shared_cache_arm64e header (no suffix)")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--avf-only", action="store_true",
+                    help="Apply only the AVFCapture authorization gate patch (composition mode)")
+    args = ap.parse_args()
+    if args.avf_only:
+        apply_avf_auth_only(args.chunks_dir, args.dsc_header,
+                            dry_run=args.dry_run, force=args.force)
+    else:
+        apply_all_camera_patches(args.chunks_dir, args.dsc_header,
+                                 dry_run=args.dry_run, force=args.force)

@@ -26,18 +26,11 @@ set -euo pipefail
 VM_DIR="${1:-.}"
 SCRIPT_DIR="${0:a:h}"
 
-# Validate the current Swift-bound plan before runtime hooks, mounts or writes.
-"${VPHONE_PYTHON:-${SCRIPT_DIR:h}/.venv/bin/python3}" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
-
 # Resolve absolute paths
 VM_DIR="$(cd "$VM_DIR" && pwd)"
 
 source "$SCRIPT_DIR/lib/cfw_common.sh"
 cfw_require_runtime_and_lock
-case "${VPHONE_REINSTALL_CRYPTEX:-0}" in
-    0|1) ;;
-    *) die "invalid Cryptex reinstall setting" ;;
-esac
 GUEST_RESOURCES="$(cfw_guest_resources)"
 
 : "${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
@@ -65,7 +58,7 @@ ldid_sign_ent() {
     local file="$1" ent="$2" bundle_id="${3:-}"
     local args=("-S$ent" -M "-K$VM_DIR/$CFW_INPUT/signcert.p12")
     [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    cfw_guest_sign "${args[@]}" "$file"
+    ldid "${args[@]}" "$file"
 }
 
 
@@ -103,7 +96,7 @@ INPUT_DIR="$VM_DIR/$CFW_INPUT"
 echo "[+] Input resources: $INPUT_DIR"
 check_prerequisites
 
-cfw_guest_write mkdir -p "$TEMP_DIR"
+mkdir -p "$TEMP_DIR"
 
 # ── Parse Cryptex paths from BuildManifest ─────────────────────
 echo ""
@@ -130,13 +123,13 @@ CRYPTEX_APP_COUNT=0
 [[ -d "$MNT1/System/Cryptexes/OS" ]]  && CRYPTEX_OS_COUNT=$(/bin/ls "$MNT1/System/Cryptexes/OS/"  | /usr/bin/wc -l | tr -d ' ')
 [[ -d "$MNT1/System/Cryptexes/App" ]] && CRYPTEX_APP_COUNT=$(/bin/ls "$MNT1/System/Cryptexes/App/" | /usr/bin/wc -l | tr -d ' ')
 
-if [[ "${VPHONE_REINSTALL_CRYPTEX:-0}" == 0 && "${CRYPTEX_OS_COUNT:-0}" -gt 0 && "${CRYPTEX_APP_COUNT:-0}" -gt 0 ]]; then
+if [[ "${CRYPTEX_OS_COUNT:-0}" -gt 0 && "${CRYPTEX_APP_COUNT:-0}" -gt 0 ]]; then
     echo "  [*] Cryptexes already installed (OS=${CRYPTEX_OS_COUNT} entries, App=${CRYPTEX_APP_COUNT} entries), skipping"
 
     # Still ensure dyld symlinks exist
-    cfw_guest_write /bin/ln -sfn ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
+    /bin/ln -sf ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
         $MNT1/System/Library/Caches/com.apple.dyld
-    cfw_guest_write /bin/ln -sfn ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
+    /bin/ln -sf ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
         $MNT1/System/DriverKit/System/Library/dyld
 
     echo "  [+] Cryptex skipped (already present)"
@@ -155,31 +148,31 @@ else
     # Detach any leftover mounts from previous runs
     safe_detach "$MNT_SYSOS"
     safe_detach "$MNT_APPOS"
-    cfw_guest_write mkdir -p "$MNT_SYSOS" "$MNT_APPOS"
+    mkdir -p "$MNT_SYSOS" "$MNT_APPOS"
     assert_mount_under_vm "$MNT_SYSOS" "SystemOS mountpoint"
     assert_mount_under_vm "$MNT_APPOS" "AppOS mountpoint"
 
     echo "  Mounting SystemOS..."
-    "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" mount-cryptex "$SYSOS_DMG" "$MNT_SYSOS" \
+    host_hdiutil attach -mountpoint "$MNT_SYSOS" "$SYSOS_DMG" -nobrowse -owners off \
         || die "Failed to mount SystemOS DMG. Run 'sudo -v' in a terminal and retry if hdiutil needs administrator privileges."
     echo "  Mounting AppOS..."
-    "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" mount-cryptex "$APPOS_DMG" "$MNT_APPOS" \
+    host_hdiutil attach -mountpoint "$MNT_APPOS" "$APPOS_DMG" -nobrowse -owners off \
         || die "Failed to mount AppOS DMG. Run 'sudo -v' in a terminal and retry if hdiutil needs administrator privileges."
 
-    cfw_guest_write /bin/rm -rf $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
-    cfw_guest_write /bin/mkdir -p $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
-    cfw_guest_write /bin/chmod 0755 $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
+    /bin/rm -rf $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
+    /bin/mkdir -p $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
+    /bin/chmod 0755 $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
 
     # Copy Cryptex files onto the volume
     echo "  Copying Cryptexes..."
-    cfw_guest_write cp -R "$MNT_SYSOS/." "$MNT1/System/Cryptexes/OS"
-    cfw_guest_write cp -R "$MNT_APPOS/." "$MNT1/System/Cryptexes/App"
+    cp -R "$MNT_SYSOS/." "$MNT1/System/Cryptexes/OS"
+    cp -R "$MNT_APPOS/." "$MNT1/System/Cryptexes/App"
 
-    # Replace dyld symlinks without following existing directory links
+    # Create dyld symlinks (ln -sf is idempotent)
     echo "  Creating dyld symlinks..."
-    cfw_guest_write /bin/ln -sfn ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
+    /bin/ln -sf ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
         $MNT1/System/Library/Caches/com.apple.dyld
-    cfw_guest_write /bin/ln -sfn ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
+    /bin/ln -sf ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
         $MNT1/System/DriverKit/System/Library/dyld
 
     # Unmount Cryptex DMGs
@@ -278,14 +271,14 @@ echo "[2/7] Patching seputil..."
 # Always patch from .bak (original unpatched binary)
 if ! [[ -e "$MNT1/usr/libexec/seputil.bak" ]]; then
     echo "  Creating backup..."
-    cfw_guest_write /bin/cp $MNT1/usr/libexec/seputil $MNT1/usr/libexec/seputil.bak
+    /bin/cp $MNT1/usr/libexec/seputil $MNT1/usr/libexec/seputil.bak
 fi
 
-cfw_guest_write cp "$MNT1/usr/libexec/seputil.bak" "$TEMP_DIR/seputil"
+cp "$MNT1/usr/libexec/seputil.bak" "$TEMP_DIR/seputil"
 "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-seputil "$TEMP_DIR/seputil"
 ldid_sign "$TEMP_DIR/seputil" "com.apple.seputil"
-cfw_guest_write cp -R "$TEMP_DIR/seputil" "$MNT1/usr/libexec/seputil"
-cfw_guest_write /bin/chmod 0755 $MNT1/usr/libexec/seputil
+cp -R "$TEMP_DIR/seputil" "$MNT1/usr/libexec/seputil"
+/bin/chmod 0755 $MNT1/usr/libexec/seputil
 
 # ── DDI (/System/Developer) auto-mount — diskimagesiod (iOS 27 only) ──
 # Force -[DIDiskArb isMountCompleteWithExpectedCount:diskTracker:] → YES so
@@ -301,21 +294,21 @@ case "$IOS_VERSION" in
     27.*)
         echo "  Patching diskimagesiod (DDI auto-mount, iOS $IOS_VERSION)..."
         if ! [[ -e "$MNT1/usr/libexec/diskimagesiod.bak" ]]; then
-            cfw_guest_write /bin/cp "$MNT1/usr/libexec/diskimagesiod" "$MNT1/usr/libexec/diskimagesiod.bak"
+            /bin/cp "$MNT1/usr/libexec/diskimagesiod" "$MNT1/usr/libexec/diskimagesiod.bak"
         fi
         ldid -e "$MNT1/usr/libexec/diskimagesiod.bak" > "$TEMP_DIR/diskimagesiod.ent.plist"
-        cfw_guest_write cp "$MNT1/usr/libexec/diskimagesiod.bak" "$TEMP_DIR/diskimagesiod"
+        cp "$MNT1/usr/libexec/diskimagesiod.bak" "$TEMP_DIR/diskimagesiod"
         "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-diskimagesiod "$TEMP_DIR/diskimagesiod"
         ldid_sign_ent "$TEMP_DIR/diskimagesiod" "$TEMP_DIR/diskimagesiod.ent.plist" "com.apple.diskimagesiod"
-        cfw_guest_write cp -R "$TEMP_DIR/diskimagesiod" "$MNT1/usr/libexec/diskimagesiod"
-        cfw_guest_write /bin/chmod 0755 "$MNT1/usr/libexec/diskimagesiod"
+        cp -R "$TEMP_DIR/diskimagesiod" "$MNT1/usr/libexec/diskimagesiod"
+        /bin/chmod 0755 "$MNT1/usr/libexec/diskimagesiod"
         ;;
 esac
 
 # Rename gigalocker (mv to same name is fine on re-run)
 echo "  Renaming gigalocker..."
 mount_vol s3 "$MNT3"
-cfw_guest_write mv "$MNT3"/*.gl(N) "$MNT3/AA.gl" 2>/dev/null || true
+mv "$MNT3"/*.gl(N) "$MNT3/AA.gl" 2>/dev/null || true
 
 echo "  [+] seputil patched"
 
@@ -323,21 +316,21 @@ echo "  [+] seputil patched"
 echo ""
 echo "[3/7] Installing AppleParavirtGPUMetalIOGPUFamily..."
 
-cfw_guest_write cp -R "$INPUT_DIR/custom/AppleParavirtGPUMetalIOGPUFamily.tar" "$MNT1"
-cfw_guest_write "$TAR" --preserve-permissions --no-overwrite-dir --warning=no-unknown-keyword \
+cp -R "$INPUT_DIR/custom/AppleParavirtGPUMetalIOGPUFamily.tar" "$MNT1"
+"$TAR" --preserve-permissions --no-overwrite-dir --warning=no-unknown-keyword \
     -xf $MNT1/AppleParavirtGPUMetalIOGPUFamily.tar -C $MNT1
 
 BUNDLE="$MNT1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle"
 # Clean macOS resource fork files (._* files from tar xattrs)
-cfw_guest_write find $BUNDLE -name '._*' -delete 2>/dev/null || true
-cfw_guest_write /usr/sbin/chown -R 0:0 $BUNDLE
-cfw_guest_write /bin/chmod 0755 $BUNDLE
-cfw_guest_write /bin/chmod 0755 $BUNDLE/libAppleParavirtCompilerPluginIOGPUFamily.dylib
-cfw_guest_write /bin/chmod 0755 $BUNDLE/AppleParavirtGPUMetalIOGPUFamily
-cfw_guest_write /bin/chmod 0755 $BUNDLE/_CodeSignature
-cfw_guest_write /bin/chmod 0644 $BUNDLE/_CodeSignature/CodeResources
-cfw_guest_write /bin/chmod 0644 $BUNDLE/Info.plist
-cfw_guest_write /bin/rm -f $MNT1/AppleParavirtGPUMetalIOGPUFamily.tar
+find $BUNDLE -name '._*' -delete 2>/dev/null || true
+/usr/sbin/chown -R 0:0 $BUNDLE
+/bin/chmod 0755 $BUNDLE
+/bin/chmod 0755 $BUNDLE/libAppleParavirtCompilerPluginIOGPUFamily.dylib
+/bin/chmod 0755 $BUNDLE/AppleParavirtGPUMetalIOGPUFamily
+/bin/chmod 0755 $BUNDLE/_CodeSignature
+/bin/chmod 0644 $BUNDLE/_CodeSignature/CodeResources
+/bin/chmod 0644 $BUNDLE/Info.plist
+/bin/rm -f $MNT1/AppleParavirtGPUMetalIOGPUFamily.tar
 
 echo "  [+] GPU driver installed"
 
@@ -345,14 +338,14 @@ echo "  [+] GPU driver installed"
 echo ""
 echo "[4/7] Installing iosbinpack64..."
 
-cfw_guest_write cp -R "$INPUT_DIR/jb/iosbinpack64.tar" "$MNT1"
-cfw_guest_write "$TAR" --preserve-permissions --no-overwrite-dir --warning=no-unknown-keyword \
+cp -R "$INPUT_DIR/jb/iosbinpack64.tar" "$MNT1"
+"$TAR" --preserve-permissions --no-overwrite-dir --warning=no-unknown-keyword \
     -xf $MNT1/iosbinpack64.tar -C $MNT1
-cfw_guest_write /bin/rm -f $MNT1/iosbinpack64.tar
+/bin/rm -f $MNT1/iosbinpack64.tar
 
 # dropbear host keys are generated on first boot by dropbear -R; just ensure
 # the key directory exists for it to write into.
-cfw_guest_write /bin/mkdir -p $MNT3/dropbear
+/bin/mkdir -p $MNT3/dropbear
 
 echo "  [+] iosbinpack64 installed"
 
@@ -363,14 +356,14 @@ echo "[5/7] Patching launchd_cache_loader..."
 # Always patch from .bak (original unpatched binary)
 if ! [[ -e "$MNT1/usr/libexec/launchd_cache_loader.bak" ]]; then
     echo "  Creating backup..."
-    cfw_guest_write /bin/cp $MNT1/usr/libexec/launchd_cache_loader $MNT1/usr/libexec/launchd_cache_loader.bak
+    /bin/cp $MNT1/usr/libexec/launchd_cache_loader $MNT1/usr/libexec/launchd_cache_loader.bak
 fi
 
-cfw_guest_write cp "$MNT1/usr/libexec/launchd_cache_loader.bak" "$TEMP_DIR/launchd_cache_loader"
+cp "$MNT1/usr/libexec/launchd_cache_loader.bak" "$TEMP_DIR/launchd_cache_loader"
 "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-launchd-cache-loader "$TEMP_DIR/launchd_cache_loader"
 ldid_sign "$TEMP_DIR/launchd_cache_loader" "com.apple.launchd_cache_loader"
-cfw_guest_write cp -R "$TEMP_DIR/launchd_cache_loader" "$MNT1/usr/libexec/launchd_cache_loader"
-cfw_guest_write /bin/chmod 0755 $MNT1/usr/libexec/launchd_cache_loader
+cp -R "$TEMP_DIR/launchd_cache_loader" "$MNT1/usr/libexec/launchd_cache_loader"
+/bin/chmod 0755 $MNT1/usr/libexec/launchd_cache_loader
 
 echo "  [+] launchd_cache_loader patched"
 
@@ -381,14 +374,14 @@ echo "[6/7] Patching mobileactivationd..."
 # Always patch from .bak (original unpatched binary)
 if ! [[ -e "$MNT1/usr/libexec/mobileactivationd.bak" ]]; then
     echo "  Creating backup..."
-    cfw_guest_write /bin/cp $MNT1/usr/libexec/mobileactivationd $MNT1/usr/libexec/mobileactivationd.bak
+    /bin/cp $MNT1/usr/libexec/mobileactivationd $MNT1/usr/libexec/mobileactivationd.bak
 fi
 
-cfw_guest_write cp "$MNT1/usr/libexec/mobileactivationd.bak" "$TEMP_DIR/mobileactivationd"
+cp "$MNT1/usr/libexec/mobileactivationd.bak" "$TEMP_DIR/mobileactivationd"
 "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-mobileactivationd "$TEMP_DIR/mobileactivationd"
 ldid_sign "$TEMP_DIR/mobileactivationd"
-cfw_guest_write cp -R "$TEMP_DIR/mobileactivationd" "$MNT1/usr/libexec/mobileactivationd"
-cfw_guest_write /bin/chmod 0755 $MNT1/usr/libexec/mobileactivationd
+cp -R "$TEMP_DIR/mobileactivationd" "$MNT1/usr/libexec/mobileactivationd"
+/bin/chmod 0755 $MNT1/usr/libexec/mobileactivationd
 
 echo "  [+] mobileactivationd patched"
 
@@ -406,28 +399,28 @@ for plist in bash.plist dropbear.plist trollvnc.plist rpcserver_ios.plist; do
     plist_src="$INPUT_DIR/jb/LaunchDaemons/$plist"
     if [[ "$plist" == "dropbear.plist" ]]; then
         plist_src="$TEMP_DIR/dropbear.plist"
-        cfw_guest_write cp "$INPUT_DIR/jb/LaunchDaemons/dropbear.plist" "$plist_src"
+        cp "$INPUT_DIR/jb/LaunchDaemons/dropbear.plist" "$plist_src"
         "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-dropbear-plist "$plist_src"
     fi
-    cfw_guest_write cp -R "$plist_src" "$MNT1/System/Library/LaunchDaemons/"
-    cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/$plist
+    cp -R "$plist_src" "$MNT1/System/Library/LaunchDaemons/"
+    /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/$plist
 done
-cfw_guest_write cp -R "$GUEST_RESOURCES/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/"
-cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/vphoned.plist
+cp -R "$GUEST_RESOURCES/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/"
+/bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/vphoned.plist
 
 # Always patch launchd.plist from .bak (original)
 echo "  Patching launchd.plist..."
 if ! [[ -e "$MNT1/System/Library/xpc/launchd.plist.bak" ]]; then
     echo "  Creating backup..."
-    cfw_guest_write /bin/cp $MNT1/System/Library/xpc/launchd.plist $MNT1/System/Library/xpc/launchd.plist.bak
+    /bin/cp $MNT1/System/Library/xpc/launchd.plist $MNT1/System/Library/xpc/launchd.plist.bak
 fi
 
-cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist.bak" "$TEMP_DIR/launchd.plist"
-cfw_guest_write cp "$GUEST_RESOURCES/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/"
-cfw_guest_write cp "$GUEST_RESOURCES/api/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/vphoned-api.plist"
+cp "$MNT1/System/Library/xpc/launchd.plist.bak" "$TEMP_DIR/launchd.plist"
+cp "$GUEST_RESOURCES/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/"
+cp "$GUEST_RESOURCES/api/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/vphoned-api.plist"
 "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-daemons "$TEMP_DIR/launchd.plist" "$INPUT_DIR/jb/LaunchDaemons"
-cfw_guest_write cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
-cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
+cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
+/bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
 
 echo "  [+] LaunchDaemons installed"
 
@@ -438,7 +431,7 @@ echo "[*] Unmounting image volumes..."
 /sbin/umount $MNT3 2>/dev/null || true
 
 echo "[*] Cleaning up temp..."
-cfw_guest_write rm -rf "$TEMP_DIR"
+rm -rf "$TEMP_DIR"
 
 echo ""
 echo "[+] CFW installation complete!"

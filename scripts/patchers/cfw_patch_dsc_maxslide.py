@@ -136,26 +136,6 @@ def patch_dsc_maxslide(chunks_dir, *, kernel_region_size=KERNEL_SHARED_REGION_SI
         print("      [=] maxSlide already 0; no change")
         return 0
 
-    # A recognized CodeDirectory can cover the header page too. Validate its
-    # current hash before changing maxSlide; re-attestation must not legitimize
-    # a pre-existing unknown code mutation.
-    from . import component_signatures as signatures
-    from .cfw_dsc_codesign import reattest_modified_pages
-    signature=signatures.layouts(main)[0]['signature']
-    slots=[];modified_vmas=[];chunks=DSCChunks(chunks_dir)
-    if signature!=(0,0):
-        directories=signatures.directories(main)
-        slots=signatures.changed_slots(main,main,[(OFF_MAX_SLIDE,8)])
-        if slots:
-            if len(directories)!=1 or directories[0]['slot']!=0 or directories[0]['hashType']!=2 or directories[0]['hashSize']!=32:
-                raise ValueError('unsupported maxSlide CodeDirectory re-attestation')
-            signatures.verify_slots(main,slots)
-            mappings=[(start,end,offset) for start,end,offset,_prot,path in chunks.mappings()
-                      if path==main and offset<=OFF_MAX_SLIDE and OFF_MAX_SLIDE+8<=offset+end-start]
-            if len(mappings)!=1: raise ValueError('ambiguous maxSlide header mapping')
-            start,_end,offset=mappings[0]
-            modified_vmas=[start+OFF_MAX_SLIDE-offset]
-
     with open(main, "r+b") as f:
         # Set maxSlide to 0 so the cache maps at slide 0 within the region.
         new_maxslide = 0
@@ -175,9 +155,6 @@ def patch_dsc_maxslide(chunks_dir, *, kernel_region_size=KERNEL_SHARED_REGION_SI
             if back != new_maxslide:
                 raise RuntimeError(f"maxSlide write verify failed: 0x{back:X}")
 
-    if slots and not dry_run:
-        reattest_modified_pages(chunks,modified_vmas)
-        signatures.verify_slots(main,slots)
     print("  [+] DSC maxSlide patch complete")
     return 1
 

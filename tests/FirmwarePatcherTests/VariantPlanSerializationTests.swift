@@ -7,26 +7,6 @@ import Testing
         try VariantPlanResolver.resolve(variant: variant, gates: VariantPlanTests.snapshots(variant)[0])
     }
 
-    @Test func historicalNilProfilePreservesCanonicalEncodingAndDoesNotPromote() throws {
-        let legacy = try plan()
-        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        let bytes = try encoder.encode(legacy)
-        let object = try #require(JSONSerialization.jsonObject(with: bytes) as? [String: Any])
-        let gates = try #require(object["gates"] as? [String: Any])
-        #expect(gates["guestEnvironmentV2"] == nil)
-        let restored = try JSONDecoder().decode(VariantPlanResolver.VariantPlan.self, from: bytes)
-        #expect(restored.gates.guestEnvironmentV2 == nil)
-        #expect(try encoder.encode(restored) == bytes)
-        #expect(try FirmwareGeneration.planDigest(restored) == FirmwareGeneration.planDigest(legacy))
-        #expect(throws: (any Error).self) { try VariantPlanResolver.resolve(variant: .regular, gates: restored.gates, guestEnvironmentV2: true) }
-        let journal = FirmwareTransaction.Journal(id: "historical", vmPath: "/historical", options: [:],
-            plan: legacy, versionInputs: nil, planBinding: nil, entries: [])
-        let journalBytes = try encoder.encode(journal)
-        let readback = try JSONDecoder().decode(FirmwareTransaction.Journal.self, from: journalBytes)
-        #expect(readback.plan?.gates.guestEnvironmentV2 == nil)
-        #expect(try encoder.encode(readback) == journalBytes)
-    }
-
     @Test func encodedStepsHaveStableOrderForEveryVariant() throws {
         for variant in VariantPlanTests.allVariants {
             let plan = try plan(variant)

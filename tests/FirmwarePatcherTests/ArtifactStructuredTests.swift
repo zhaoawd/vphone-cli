@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-import Virtualization
 @testable import FirmwarePatcher
 
 struct ArtifactStructuredTests {
@@ -103,9 +102,6 @@ struct ArtifactStructuredTests {
     @Test func failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: dir.appendingPathComponent("FixtureRestore"), withIntermediateDirectories: true)
-        try Data("disk".utf8).write(to: dir.appendingPathComponent("Disk.img"))
-        try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
-                "diskImage": "Disk.img"], format: .xml, options: 0).write(to: dir.appendingPathComponent("config.plist"))
         defer { try? FileManager.default.removeItem(at: dir) }
         let bytes = Data(repeating: 0, count: 0x400)
         let input = dir.appendingPathComponent("AVPBooter.fixture.bin")
@@ -113,10 +109,8 @@ struct ArtifactStructuredTests {
         let manifest = try PropertyListSerialization.data(
             fromPropertyList: ["ProductVersion": "26.1"], format: .xml, options: 0)
         try manifest.write(to: dir.appendingPathComponent("FixtureRestore/iPhone-BuildManifest.plist"))
-        try manifest.write(to: dir.appendingPathComponent("FixtureRestore/BuildManifest.plist"))
         let pipeline = FirmwarePipeline(vmDirectory: dir, variant: .dev, verbose: false)
         // Later component inputs deliberately do not exist: accessing them would throw.
-        try saveSyntheticDesiredPlan(pipeline)
         let report = try pipeline.patchAllStructured()
         #expect(report.components.count == 1)
         #expect(!report.failedRequired.isEmpty)
@@ -134,24 +128,17 @@ struct ArtifactStructuredTests {
             let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
             let restore = dir.appendingPathComponent("FixtureRestore")
             try FileManager.default.createDirectory(at: restore, withIntermediateDirectories: true)
-            try Data("disk".utf8).write(to: dir.appendingPathComponent("Disk.img"))
-            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
-                "diskImage": "Disk.img"], format: .xml, options: 0).write(to: dir.appendingPathComponent("config.plist"))
             defer { try? FileManager.default.removeItem(at: dir) }
             let manifest = try PropertyListSerialization.data(
                 fromPropertyList: ["ProductVersion": ios18 ? "18.6.2" : "26.1"],
                 format: .xml, options: 0)
             try manifest.write(to: restore.appendingPathComponent("iPhone-BuildManifest.plist"))
-            let cloudManifest = try PropertyListSerialization.data(
-                fromPropertyList: ["ProductVersion": "26.1"], format: .xml, options: 0)
-            try cloudManifest.write(to: restore.appendingPathComponent("BuildManifest.plist"))
             let bytes = Data(repeating: 0, count: 0x400)
             try bytes.write(to: dir.appendingPathComponent("AVPBooter.fixture.bin"))
             let pipeline = FirmwarePipeline(vmDirectory: dir,
                 variant: try #require(FirmwarePipeline.Variant(rawValue: variant)),
                 verbose: false, forceExcGuard: force)
             // The first required failure returns a real prepare() snapshot before later I/O.
-            try saveSyntheticDesiredPlan(pipeline)
             let report = try pipeline.patchAllStructured()
             let active = variant == "dev" || ios18 || force
             #expect(report.gates.iosBaseIs18 == ios18)

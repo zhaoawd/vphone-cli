@@ -78,25 +78,6 @@ LATENCY_TESTS = "|".join((
     "timeoutBoundsPipesInheritedByDescendant",
     "timeoutIncludesBlockedSendAndReleasesPendingSlot",
     "a changed entity or a server without ranges restarts from byte zero",
-    # Loopback readiness and mock sends have producer deadlines; concurrent
-    # signing/process fixtures can prevent their observing tasks from running.
-    "realHTTPRPCHealthAndProtocolErrors",
-    "refusesRedirectAndOversizedResponses",
-    "webSocketRefusesRedirect",
-    "realWebSocketUsesBearerAndCorrelatesConcurrentReplies",
-    "fixtureRetainsTimelyServerWhenObserverResumesLate",
-    "fixtureRejectsServerThatActuallyStartsAfterDeadline",
-    "correlatesOutOfOrderRepliesAndInterleavedEvents",
-    "cancellationAndLateReplyCannotCompleteNextRequest",
-    "disconnectFailsAllAndOldGenerationCannotAffectNewSocket",
-    "boundsPendingRequestsAndCloseCompletesWaiters",
-    "malformedMessageFailsPendingRequests",
-    "eventOverflowClosesConnectionInsteadOfSilentlyDropping",
-    "remoteErrorOnlyFailsItsMatchingRequest",
-    "fixtureRetainsOnTimeMessageWhenObserverResumesAfterDeadline",
-    "fixtureRejectsMessageActuallySentAfterDeadline",
-    "twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply",
-    "escapedPipeWriterTimesOutWithoutLosingTailAndReopensCommandGate",
 ))
 
 
@@ -115,7 +96,6 @@ def run_swift(firmware=False):
     modules.mkdir(parents=True, exist_ok=True)
     env.setdefault("CLANG_MODULE_CACHE_PATH", str(modules))
     env.setdefault("SWIFT_MODULECACHE_PATH", str(modules))
-    run([sys.executable, ROOT / "scripts/prepare_vendor.py"], env=env)
     # Separate targets prevent new fixture tests from leaking into the fast suite.
     command = ["swift", "test", "--disable-sandbox", "--cache-path", cache]
     if firmware:

@@ -172,8 +172,7 @@ wait
 
     /// The CFW driver runs as root; inside `deferring` nothing is forwarded
     /// and no early exit is taken until it returns.
-    @Test(arguments: [0.0, 1.2])
-    func deferredChildIsNotSignalledAndTheForcedExitWaitsForIt(observerDelay: TimeInterval) throws {
+    @Test func deferredChildIsNotSignalledAndTheForcedExitWaitsForIt() throws {
         let recorder = Recorder()
         let cancellation = controller(recorder, forcedExit: 0.2)
         let standIn = try StandIn()
@@ -185,18 +184,13 @@ wait
         echo done > "$out/finished"
         """)
         let run = Background(cancellation) {
-            try cancellation.deferring("the CFW install") {
-                let code = try runBash(script, standIn.directory)
-                // Record child completion while the exit deferral still protects it.
-                return (code, Date())
-            }
+            try cancellation.deferring("the CFW install") { try runBash(script, standIn.directory) }
         }
         _ = try #require(standIn.pid("child.pid"))
         cancellation.request(signal: SIGINT)
         let result = try #require(run.wait(), "the deferred stage did not return")
-        Thread.sleep(forTimeInterval: observerDelay)
-        let (code, finished) = try result.get()
-        #expect(code == 0)
+        let finished = Date()
+        #expect(try result.get() == 0)
         #expect(standIn.exists("finished"))
         #expect(!standIn.exists("got-int"))
         #expect(cancellation.isRequested)

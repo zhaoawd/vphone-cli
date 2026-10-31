@@ -13,7 +13,6 @@ class VPhoneWindowController: NSObject, NSToolbarDelegate, NSWindowDelegate {
     private weak var virtualMachineView: VPhoneVirtualMachineView?
     private(set) var touchIDMonitor: VPhoneTouchIDMonitor?
     private var ecid: String?
-    var onCloseRequested: (() -> Void)?
 
     private static func macClipboardPayload() -> VPhoneControl.ClipboardContent? {
         let board = NSPasteboard.general
@@ -161,13 +160,6 @@ class VPhoneWindowController: NSObject, NSToolbarDelegate, NSWindowDelegate {
 
     func windowDidBecomeKey(_: Notification) { clipboardSync?.focusChanged(key: true) }
     func windowDidResignKey(_: Notification) { shortcutSync?.invalidate(); clipboardSync?.focusChanged(key: false) }
-    func windowShouldClose(_: NSWindow) -> Bool {
-        guard let onCloseRequested else { return true }
-        // Keep the VM view and its resources until the application completes
-        // the same writer drain and shutdown used by the menu and signals.
-        onCloseRequested()
-        return false
-    }
     func windowWillClose(_: Notification) { shortcutSync?.invalidate(); clipboardSync?.stop() }
 
     private func makeSubtitle(ip: String?) -> String {

@@ -1,5 +1,4 @@
 """Incomplete, empty and external bundle assets must fail distribution checks."""
-import plistlib
 import importlib.util
 from pathlib import Path
 import tempfile
@@ -54,23 +53,3 @@ class BundleValidationTests(unittest.TestCase):
         (self.resources / '.tools/bin/trustcache').chmod(0o644)
         with self.assertRaisesRegex(ValueError, 'not executable'):
             module.check_resources(self.bundle)
-
-    def test_kernel_update_protocol_requires_exact_marker(self):
-        info = self.bundle / 'Contents/Info.plist'
-        for value in ('', 'vphone.kernel-update.v0', 'vphone.kernel-update.v1'):
-            info.write_bytes(plistlib.dumps({'VPhoneKernelUpdateProtocol': value}))
-            if value == 'vphone.kernel-update.v1':
-                module.check_kernel_update_protocol(self.bundle)
-            else:
-                with self.assertRaisesRegex(ValueError, 'kernel update protocol'):
-                    module.check_kernel_update_protocol(self.bundle)
-
-    def test_kernel_rollback_protocol_requires_exact_marker(self):
-        info = self.bundle / 'Contents/Info.plist'
-        for value in ('', 'vphone.kernel-rollback.v0', 'vphone.kernel-rollback.v1'):
-            info.write_bytes(plistlib.dumps({'VPhoneKernelRollbackProtocol': value}))
-            if value == 'vphone.kernel-rollback.v1':
-                module.check_kernel_rollback_protocol(self.bundle)
-            else:
-                with self.assertRaisesRegex(ValueError, 'kernel rollback protocol'):
-                    module.check_kernel_rollback_protocol(self.bundle)

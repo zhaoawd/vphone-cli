@@ -185,7 +185,6 @@ public struct VPhoneLaunchpadCommandLine {
     public func run(
         _ arguments: [String],
         recordInHistory: Bool = true,
-        machine: URL? = nil,
         warningStatuses: Set<Int32> = [],
         onLine: (@Sendable (String) -> Void)? = nil
     ) async throws -> VPhoneLaunchpadCommandResult {
@@ -197,11 +196,7 @@ public struct VPhoneLaunchpadCommandLine {
         let collector = VPhoneLaunchpadLineCollector()
         let child: VPhoneLaunchpadChildProcess
         do {
-            let route = try machine.map { try VPhoneLaunchpadLaunchRoute.resolve(embedded: executable, launcher: launcher, machine: $0, arguments: arguments) }
-            if let snapshot = route?.snapshot, let machine, !snapshot.matches(machine) {
-                throw VPhoneLaunchpadError("VM binding changed before command start.")
-            }
-            child = try VPhoneLaunchpadChildProcess(executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments) { line in
+            child = try VPhoneLaunchpadChildProcess(executable: executable, arguments: arguments) { line in
                 writer?.write(line)
                 collector.append(line)
                 onLine?(line)
@@ -226,13 +221,6 @@ public struct VPhoneLaunchpadCommandLine {
         let output = collector.snapshot
         return VPhoneLaunchpadCommandResult(status: completion.status, lines: output.lines,
             outputDrained: drained, omittedLineCount: output.omitted)
-    }
-
-    /// Runs a stopped kernel update through the VM's selected verified source.
-    public func updateKernel(name: String, libraryRoot: URL, machine: URL, recover: Bool = false) async throws -> VPhoneLaunchpadCommandResult {
-        var arguments = ["vm", "update-kernel", name, "--library-root", libraryRoot.path]
-        if recover { arguments.append("--recover") }
-        return try await run(arguments, machine: recover ? nil : machine)
     }
 
     /// Starts a long-running command (`vm launch`) and returns at once. Its

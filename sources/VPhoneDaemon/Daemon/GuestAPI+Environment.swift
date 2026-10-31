@@ -41,10 +41,7 @@ extension GuestAPI {
                 alias["target"] = target
             }
             return [
-                "worker_idle": true,
-                "daemon_instance": APISessionIdentity.instanceID,
                 "libraries": transaction.status(),
-                "eligibility": EnvironmentEligibility(root: URL(fileURLWithPath: "/"), libraries: environmentLibraries).inspect(runningDaemonSHA256: binaryHash),
                 "staging": environmentStaging,
                 "root_read_only": try isRootReadOnly(),
                 "load_alias": alias,
@@ -69,38 +66,26 @@ extension GuestAPI {
         return root.f_flags & UInt32(MNT_RDONLY) != 0
     }
 
-    private static func qualifiedEnvironmentOperation(_ params: [String: Any]) throws -> [String: String] {
-        let context = try EnvironmentOperation.validate(params["context"], daemon: binaryHash, instance: APISessionIdentity.instanceID)
-        guard params["operation"] as? String == context["operation"],
-              EnvironmentEligibility(root: URL(fileURLWithPath: "/"), libraries: environmentLibraries)
-                .inspect(runningDaemonSHA256: binaryHash)["eligible"] as? Bool == true else {
-            throw GuestAPIError.invalidRequest("Actual guest installation does not qualify for this operation")
-        }
-        return context
-    }
-
     private static func installEnvironment(_ params: [String: Any]) throws -> [String: Any] {
-        let context = try qualifiedEnvironmentOperation(params)
         let transaction = environmentTransaction
         let entries: [(name: String, sha256: String)]
         do { entries = try transaction.validate(params["libraries"]) } catch {
             throw GuestAPIError.invalidRequest(String(describing: error))
         }
         var journal: EnvironmentJournal
-        do { journal = try transaction.prepare(entries, operation: context["operation"], context: context) } catch {
+        do { journal = try transaction.prepare(entries) } catch {
             throw GuestAPIError.operationFailed(String(describing: error))
         }
         let rootReadOnly: Bool
         do {
-            rootReadOnly = try withWritableRoot { try transaction.apply(&journal, replace: installLibrary) }
+            rootReadOnly = try withWritableRoot { transaction.apply(&journal, replace: installLibrary) }
         } catch {
             // The writable remount failed before any replacement.
-            if journal.state == "prepared", journal.libraries.allSatisfy({ $0.state == "pending" }) {
-                try transaction.abandon(&journal, reason: String(describing: error))
+            if journal.state == "prepared" {
+                transaction.abandon(&journal, reason: String(describing: error))
             }
             throw GuestAPIError.operationFailed("\(error) (transaction \(journal.id), state \(journal.state))")
         }
-        try transaction.finalize(&journal, rootReadOnly: rootReadOnly)
         let installed = journal.libraries.filter { $0.state == "replaced" }.map(\.name)
         var result = journal.dictionary
         result["complete"] = journal.state == "complete"
@@ -116,15 +101,12 @@ extension GuestAPI {
     }
 
     private static func restoreEnvironment(_ params: [String: Any]) throws -> [String: Any] {
-        let context = try qualifiedEnvironmentOperation(params)
         let transaction = environmentTransaction
         var journal: EnvironmentJournal
         do { journal = try transaction.prepareRestore(id: string(params, "transaction")) } catch {
             throw GuestAPIError.invalidRequest(String(describing: error))
         }
-        try transaction.bindRestore(&journal, context: context)
-        let rootReadOnly = try withWritableRoot { try transaction.applyRestore(&journal, replace: installLibrary) }
-        try transaction.finalize(&journal, rootReadOnly: rootReadOnly)
+        let rootReadOnly = try withWritableRoot { transaction.applyRestore(&journal, replace: installLibrary) }
         let restored = journal.libraries.filter { $0.state == "restored" }.map(\.name)
         var result = journal.dictionary
         result["restored"] = restored

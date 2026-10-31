@@ -53,7 +53,6 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     var rebuiltData: Data?
     var tmpDirectories: [URL] = []
     var transaction: FirmwareTransaction?
-    var guestWriteEnvironment: [String: String]?
     
     // MARK: - Init
     
@@ -87,47 +86,28 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
         )]
     }
     
-    static func finalizeImage(prepare: () throws -> Void, encrypt: () throws -> Void, verify: () throws -> Void) throws {
-        try prepare()
-        try encrypt()
-        try verify()
-    }
-
     @discardableResult
     public func apply() throws -> Int {
         print("Merging Filesystems")
         let (unencryptedImage, aeaImage) = try mergeFilesystems()
+        defer { try? FileManager.default.removeItem(at: unencryptedImage) }
         
-        var artifacts: (trustcache: URL, metadata: URL, rootHash: URL)?
-        try Self.finalizeImage(prepare: {
-            let didEdit = try removeSpecificSystemFiles(filesystem: unencryptedImage)
-            let trustcache = try createTrustcache(filesystem: unencryptedImage)
-            let mtree = try createMtree(filesystem: unencryptedImage)
-            let (digestDb, rootHash) = try createDigestAndHash(filesystem: unencryptedImage, mtree: mtree, remap: didEdit)
-            artifacts = (trustcache, try compressCanonicalMetadata(mtree: mtree, digestDb: digestDb), try wrapRootHash(rootHash))
-            if transaction != nil { try captureFilesystemProof(plaintext: unencryptedImage) }
-        }, encrypt: {
-            let original = restoreDir.appending(path: try getOSFilesystemPath())
-            let metadata = try getAeaMetadata(original)
-            let key = try getAeaKey(original, metadata: metadata)
-            try encryptAeaFile(unencryptedImage, output: aeaImage, key: key, metadata: metadata)
-            try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: aeaImage.path)
-        }, verify: {
-            if let transaction {
-                let evidence = try FirmwareFilesystemEvidence.capture(image: aeaImage, transaction: transaction)
-                try evidence.verify(image: aeaImage, transaction: transaction, environment: guestWriteEnvironment)
-                try evidence.persist(in: transaction)
-            }
-        })
-        guard let artifacts else { throw PatcherError.invalidFormat("Missing finalized filesystem artifacts") }
-        let (trustcachePath, metadataPath, rootHashContainer) = artifacts
-
+        print("Creating Trustcache")
+        let trustcachePath = try createTrustcache(filesystem: unencryptedImage)
+        
+        print("Creating mtree")
+        let didEdit = try removeSpecificSystemFiles(filesystem: unencryptedImage)
+        let mtreePath = try createMtree(filesystem: unencryptedImage)
+        
+        print("Creating DigestDB and Root Hash")
+        let (digestDbPath, rootHashPath) = try createDigestAndHash(filesystem: unencryptedImage, mtree: mtreePath, remap: didEdit)
+        let metadataPath = try compressCanonicalMetadata(mtree: mtreePath, digestDb: digestDbPath)
+        let rootHashContainer = try wrapRootHash(rootHashPath)
+        
         // update trustcache, metadata, root_hash path
         let updatedManifest = try setUpdatedComponentsInManifest(filesystem: aeaImage, trustcache: trustcachePath, metadata: metadataPath, rootHash: rootHashContainer)
         rebuiltData = try serializePayload(updatedManifest)
-        if let transaction { try FirmwareTransaction.checkMounts(transaction.root, detach: false) }
-        // Failed readback or detach retains the plaintext and transaction work.
-        try FileManager.default.removeItem(at: unencryptedImage)
+        
         return 1
     }
     
@@ -213,27 +193,18 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
         try shrinkImage(dmg: targetImagePath)
         try convertToUDRWImage(input: targetImagePath, output: newDmgPath)
         try FileManager.default.removeItem(at: targetImagePath)
+        let metadata = try getAeaMetadata(self.restoreDir.appending(path: osPath))
+        let key = try getAeaKey(self.restoreDir.appending(path: osPath), metadata: metadata)
         let finalFile = newDmgPath.appendingPathExtension("aea")
         let finalDestination = self.restoreDir.appending(path: finalFile.lastPathComponent)
         if FileManager.default.fileExists(atPath: finalDestination.path) {
             try FileManager.default.removeItem(at: finalDestination)
         }
+        try encryptAeaFile(newDmgPath, output: finalFile, key: key, metadata: metadata)
+        try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: finalDestination.path)
         return (newDmgPath, finalDestination)
     }
     
-    private func captureFilesystemProof(plaintext: URL) throws {
-        guard let transaction else { throw PatcherError.invalidFormat("Missing filesystem proof transaction") }
-        let (device, mount) = try attachImage(path: plaintext, readonly: true)
-        do {
-            try FirmwareFilesystemEvidence.runProof("capture", mount: URL(fileURLWithPath: mount),
-                transaction: transaction, environment: guestWriteEnvironment)
-        } catch {
-            try detachImage(deviceNode: device)
-            throw error
-        }
-        try detachImage(deviceNode: device)
-    }
-
     func patchLaunchdCacheLoader(targetMount: String, cfwInput: URL) throws {
         let target = URL.init(filePath: targetMount)
         let launchdCacheLoaderPath = target.appending(path: "/usr/libexec/launchd_cache_loader")
@@ -243,11 +214,10 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
             patcherPath.path, "patch-launchd-cache-loader",
             launchdCacheLoaderPath.path
         ])
-        _ = try runProcess(pythonPath.path, [resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "write", "/bin/chmod", "0755", launchdCacheLoaderPath.path])
+        _ = try runProcess("/bin/chmod", ["0755", launchdCacheLoaderPath.path])
         
         let signingCertificatePath = cfwInput.appending(path: "cfw_input/signcert.p12")
-        _ = try runProcess(pythonPath.path, [
-            resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "sign", "/opt/homebrew/bin/ldid",
+        _ = try runProcess("/opt/homebrew/bin/ldid", [
             "-S", "-M", "-K\(signingCertificatePath.path)",
             "-Icom.apple.launchd_cache_loader",
             launchdCacheLoaderPath.path
@@ -348,11 +318,10 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
             resources.cfwPy.path, "patch-mobileactivationd",
             mobileActivationdPath.path
         ])
-        _ = try runProcess(pythonPath.path, [resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "write", "/bin/chmod", "0755", mobileActivationdPath.path])
+        _ = try runProcess("/bin/chmod", ["0755", mobileActivationdPath.path])
         
         let signingCertificatePath = cfwInput.appending(path: "cfw_input/signcert.p12")
-        _ = try runProcess(pythonPath.path, [
-            resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "sign", "/opt/homebrew/bin/ldid",
+        _ = try runProcess("/opt/homebrew/bin/ldid", [
             "-S", "-M", "-K\(signingCertificatePath.path)",
             mobileActivationdPath.path
         ])
@@ -965,12 +934,7 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     
     // attachImage returns the device and mount point
     func attachImage(path: URL, readonly: Bool = false, forceRW: Bool = false) throws -> (String, String) {
-        var arguments = readonly ? ["attach", "-readonly", "-plist", path.path] : ["attach", "-plist", path.path]
-        if transaction != nil {
-            let mount = try createTmpDir().appendingPathComponent("mount")
-            try FileManager.default.createDirectory(at: mount, withIntermediateDirectories: false)
-            arguments += ["-mountpoint", mount.path]
-        }
+        let arguments = readonly ? ["attach", "-readonly", "-plist", path.path] : ["attach", "-plist", path.path]
         let data = if let transaction {
             try transaction.runTool("/usr/bin/hdiutil", arguments)
         } else {
@@ -1005,11 +969,6 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     func runProcess(_ launchPath: String, _ arguments: [String], sudo: Bool = false, output: URL? = nil) throws -> String {
         if let transaction {
             if sudo && geteuid() != 0 { throw ProcessError.failed(42, "This operation requires root") }
-            if arguments.first == resources.cfwPy.path {
-                guard let guestWriteEnvironment else { throw PatcherError.invalidFormat("Missing frozen less filesystem guest context") }
-                return String(decoding: try transaction.runTool("/usr/bin/env",
-                    guestWriteEnvironment.sorted { $0.key < $1.key }.map { $0.key + "=" + $0.value } + [launchPath] + arguments, output: output), as: UTF8.self)
-            }
             return String(decoding: try transaction.runTool(launchPath, arguments, output: output), as: UTF8.self)
         }
         let process = Process()

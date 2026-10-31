@@ -253,10 +253,7 @@ clean:
 # Build
 # ═══════════════════════════════════════════════════════════════════
 
-.PHONY: build patcher_build bundle prepare_vendor
-
-prepare_vendor:
-	python3 $(SCRIPTS)/prepare_vendor.py
+.PHONY: build patcher_build bundle
 
 build: bundle
 
@@ -266,7 +263,7 @@ helper_candidate:
 
 patcher_build: $(PATCHER_BINARY)
 
-$(PATCHER_BINARY): $(SWIFT_SOURCES) Package.swift scripts/prepare_vendor.py dependencies/capstone-overlays/manifest.json dependencies/capstone-overlays/arm64-detail.patch | prepare_vendor
+$(PATCHER_BINARY): $(SWIFT_SOURCES) Package.swift
 	@echo "=== Building vphone-cli patcher ($(GIT_HASH)) ==="
 	@echo '// Auto-generated — do not edit' > $(BUILD_INFO)
 	@echo 'enum VPhoneBuildInfo { static let commitHash = "$(GIT_HASH)" }' >> $(BUILD_INFO)

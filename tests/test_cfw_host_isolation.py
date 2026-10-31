@@ -1,6 +1,5 @@
 """Run the host driver with disposable installers and disk-command doubles."""
 import os
-import hashlib
 import plistlib
 import re
 from pathlib import Path
@@ -25,7 +24,7 @@ class HostDriverFixture(unittest.TestCase):
         scripts = self.root / 'scripts'
         scripts.mkdir()
         shutil.copyfile(ROOT / "scripts/vm_lock.py", scripts / "vm_lock.py")
-        for name in ("cfw_disk_txn.py", "cfw_guest_evidence.py", "sparse_file.py"):
+        for name in ("cfw_disk_txn.py", "sparse_file.py"):
             if (ROOT / "scripts" / name).exists():
                 shutil.copyfile(ROOT / "scripts" / name, scripts / name)
         driver = (ROOT / 'scripts/cfw_install_host.sh').read_text()
@@ -47,10 +46,6 @@ case "${0:t}:$1" in
  hdiutil:detach|diskutil:eject) [[ ${FAIL_CLEANUP:-0} == 1 ]] && exit 1; if [[ -f "$TEST_MOUNTS" ]]; then "$TEST_PYTHON" -c 'import os,pathlib,sys; p=pathlib.Path(os.environ["TEST_MOUNTS"]); p.write_text("".join(l for l in p.read_text().splitlines(True) if " on "+sys.argv[1]+" (" not in l))' "$2"; fi; exit 0;;
  python:*) if [[ "$1" == */vm_lock.py || "$1" == -c ]]; then exec "$TEST_PYTHON" "$@"; fi
    if [[ "$1" == */cfw_disk_txn.py ]]; then exec "$TEST_PYTHON" "$TEST_TXN_HARNESS" "$@"; fi
-   if [[ "$1" == */patchers/plan_gate.py && "$2" == verify-final ]]; then
-     [[ ${FAIL_FINAL_EFFECT:-0} == 0 ]] || exit "$FAIL_FINAL_EFFECT"
-     exec "$TEST_PYTHON" "$TEST_GUEST_FIXTURE"
-   fi
    if [[ "$1" == */apfs_snap_rename.py ]]; then [[ ${FAIL_SNAP:-0} == 1 ]] && exit 5; exec "$TEST_PYTHON" -c 'import sys; f=open(sys.argv[1],"r+b"); f.seek(1024); f.write(b"SNAPSHOT-FLIPPED")' "$2"; fi
    exit 0;;
 esac
@@ -60,9 +55,8 @@ exit 0
         for name in ('lsof', 'hdiutil', 'diskutil', 'umount', 'python', 'chown'):
             (bins / name).symlink_to(stub)
         self.env = dict(os.environ, TEST_LOG=str(self.root / 'calls'),
-                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_CFW_VARIANT='regular', VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable,
+                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable,
                         TEST_TXN_HARNESS=str(ROOT / 'tests/cfw_disk_txn_faults.py'))
-        self.env['TEST_GUEST_FIXTURE'] = str(ROOT / 'tests/cfw_guest_publication_fixture.py')
         for name in ('REAL_LSOF', 'FAIL_SNAP', 'CFW_TXN_FAULTS', 'VPHONE_VM_LOCK_FD', 'VPHONE_CFW_LOCK_REEXEC'):
             self.env.pop(name, None)
         self.env.pop('SUDO_USER', None)
@@ -79,7 +73,6 @@ exit 0
             (scripts / f'cfw_install{variant}.sh').write_text('''#!/bin/zsh
 print -r -- "${CFW_HOST_MNT:-missing}" > "$PWD/run-dir"
 print -r -- "${0:t} ${FORCE_DSC_MAXSLIDE-<unset>}" > "$PWD/installer-env"
-print -r -- "${VPHONE_REINSTALL_CRYPTEX-<unset>}" > "$PWD/cryptex-reinstall-env"
 [[ -n ${CFW_HOST_MNT:-} && -d $CFW_HOST_MNT ]] || exit 72
 mkdir -p "$CFW_HOST_MNT/mnt1" "$CFW_HOST_MNT/mnt_sysos_hv_vmm"
 print -r -- "/dev/disk92s1 on $CFW_HOST_MNT/mnt1 (apfs, local)" > "$TEST_MOUNTS"
@@ -111,7 +104,7 @@ exit ${INSTALL_EXIT:-0}
     # Variables the doubles and the driver need on the authentication-dialog
     # path, where vphone-cli passes every variable inline (see bare_env).
     INLINE_KEYS = ('TEST_LOG', 'VPHONE_PYTHON', 'VPHONE_KEEP_ARTIFACTS', 'TEST_PYTHON', 'TEST_TXN_HARNESS',
-                   'TEST_ATTACH_PLIST', 'ZDOTDIR', 'VPHONE_CFW_VARIANT', 'TEST_GUEST_FIXTURE')
+                   'TEST_ATTACH_PLIST', 'ZDOTDIR')
 
     def bare_env(self):
         """Environment of `do shell script ... with administrator privileges`.
@@ -131,7 +124,7 @@ exit ${INSTALL_EXIT:-0}
             (vm / 'Disk.img').touch()
         base = self.bare_env() if bare else self.env
         proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', variant, str(vm)],
-                                    env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **dict(env, VPHONE_CFW_VARIANT=variant)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+                                    env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         def stop():
             try:
                 os.killpg(proc.pid, signal.SIGKILL)
@@ -175,9 +168,7 @@ class HostIsolationTests(HostDriverFixture):
         rc, output = self.finish(second)
         self.assertNotEqual(rc, 0, output)
         self.assertEqual(self.finish(first)[0], 0)
-        attachments = [line for line in self.calls().splitlines() if line.startswith('hdiutil attach')]
-        self.assertEqual(len(attachments), 2)
-        self.assertEqual(sum('-readonly' in line for line in attachments), 1)
+        self.assertEqual((self.root / 'calls').read_text().count('hdiutil attach'), 1)
 
     def test_transient_unmount_failure_retries_before_snapshot_edit(self):
         vm, proc = self.start(TRANSIENT_UMOUNT='1')
@@ -269,14 +260,6 @@ class HostIsolationTests(HostDriverFixture):
         if published:
             # T15: the previous Disk.img is kept in the record directory.
             paths.append(f'{history}/{record}/Disk.img')
-            # V2 publication preserves its exact plan, final proof, operation
-            # rows and the two observed marker blobs from the APFS test double.
-            for name in ('.fixture-readbacks', 'guest-plan.json', 'guest-context.json', 'guest-changes.jsonl',
-                         'guest-effects-final.json', 'guest-undo-provenance.json', 'guest-publication.json',
-                         'guest-postimage.img', 'effect-blobs'):
-                paths.append(f'{history}/{record}/{name}')
-            for data in (b'prior-state', b'CFW-PATCHED'):
-                paths.append(f'{history}/{record}/effect-blobs/{hashlib.sha256(data).hexdigest()}')
         return sorted(paths)
 
     def test_ownership_restoration_never_recurses_over_bundle(self):
@@ -440,16 +423,6 @@ class HostIsolationTests(HostDriverFixture):
         rc, _ = self.finish(p)
         self.assertNotEqual(rc, 0)
         self.assertNotIn('apfs_snap_rename.py', (self.root / 'calls').read_text())
-
-    def test_final_effect_failure_prevents_snapshot_and_publish(self):
-        _, process = self.start(FAIL_FINAL_EFFECT='43')
-        rc, output = self.finish(process)
-        self.assertEqual(rc, 43, output)
-        calls = (self.root / 'calls').read_text()
-        self.assertIn('verify-final', calls)
-        self.assertNotIn('apfs_snap_rename.py', calls)
-        self.assertNotIn(' publish ', calls)
-        self.assertIn('hdiutil detach /dev/disk91', calls)
 
     def test_installer_failure_survives_cleanup_failure(self):
         _, p = self.start(INSTALL_EXIT='37', FAIL_CLEANUP='1')

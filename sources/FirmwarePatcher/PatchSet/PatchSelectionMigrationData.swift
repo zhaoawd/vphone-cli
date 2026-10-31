@@ -1,8 +1,7 @@
 // Generated from the source-backed T09 maps. ID recognition does not authorize execution.
 // Sources: research/t09_patch_id_mapping_2026-10-01.json and
-// research/upstream_integration_2026-10-15/T09_declaration_delta.json.
-// Canonical IDs also require reviewed T09_target_applicability.json decisions.
-// The less and guest installation IDs remain local. Recognition alone never enables execution.
+// research/upstream_integration_2026-10-06/T09_declaration_delta.json.
+// The two less IDs remain local. This table does not alter PatchDeclarationCatalog.
 
 extension PatchSelectionMigration {
     static let aliases: [String: String] = [
@@ -73,7 +72,6 @@ extension PatchSelectionMigration {
         "jb.proc_pidinfo": "kernel-cfw-proc_pidinfo",
         "jb.proc_security_policy": "kernel-boot-proc_security_policy",
         "jb.syscallmask": "kernel-boot-syscallmask",
-        "kernel-exp-display_refresh_120hz": "kernel-cfw-display_promotion",
         "kernel-exp-paravirt_user_clients": "kernel-cfw-paravirt_user_clients",
         "kernel.apfs_mount_upgrade_checks": "kernel-boot-apfs_mount_upgrade_checks",
         "kernel.apfs_root_snapshot": "kernel-boot-apfs_root_snapshot",
@@ -168,7 +166,6 @@ extension PatchSelectionMigration {
         "dyld-cfw-camera",
         "dyld-exp-hv_vmm",
         "dyld-exp-mis_trust_auth",
-        "dyld-exp-settings_software_update_row",
         "filesystem-less-cryptex_merge",
         "ibec-boot-boot_args",
         "ibec-boot-bootx_precondition",
@@ -221,7 +218,6 @@ extension PatchSelectionMigration {
         "kernel-boot-vm_fault_enter_prepare",
         "kernel-boot-vm_map_protect",
         "kernel-cfw-debugger",
-        "kernel-cfw-display_promotion",
         "kernel-cfw-nvram_verify_permission",
         "kernel-cfw-paravirt_user_clients",
         "kernel-cfw-proc_pidinfo",
@@ -229,6 +225,7 @@ extension PatchSelectionMigration {
         "kernel-cfw-sandbox_mount_check_umount",
         "kernel-cfw-sandbox_vnode_check_rename",
         "kernel-cfw-task_for_pid",
+        "kernel-exp-display_refresh_120hz",
         "kernel-exp-frida_thread_set_state_entitlement_flag",
         "kernel-exp-frida_vm_map_delete_immutable_code",
         "kernel-exp-hv_vmm",
@@ -244,30 +241,15 @@ extension PatchSelectionMigration {
         "preboot-cfw-devicetree_iphone_product",
         "preboot-cfw-devicetree_microphone_array",
         "preboot-exp-devicetree_identity",
-        "preboot-exp-vcam-install",
-        "preboot-jb-bootstrap-install",
-        "preboot-jb-tweakloader-install",
-        "system-apps-cfw-attitude",
-        "system-backboardd-cfw-gyroscope",
         "system-campo-cfw-entitlements",
-        "system-cryptex-boot-install",
         "system-debugserver-cfw-install",
         "system-diskimagesiod-cfw-is_mount_complete",
         "system-extensions-boot-gpu_bundle",
         "system-gigalocker-boot-rename",
-        "system-installcoordination_proxy-cfw-persona_lookup",
-        "system-iosbinpack-boot-install",
-        "system-jb-basebin-install",
-        "system-jb-firstboot-install",
-        "system-jetsamproperties-cfw-disable_allowed",
         "system-launchd-boot-jetsam_panic_guard_bypass",
-        "system-launchd-jb-hook",
         "system-launchd_cache_loader-boot-unsecure_cache_gate",
         "system-launchdaemons-boot-environment",
-        "system-launchdaemons-boot-install",
-        "system-locationd-cfw-disable_auto_cohort",
         "system-mobileactivationd-boot-should_hactivate",
-        "system-preferences-exp-root_rows",
         "system-seputil-boot-gigalocker_uuid",
         "system-systemversion-cfw-build_version",
         "system-virtiosound-cfw-hal_plugin",

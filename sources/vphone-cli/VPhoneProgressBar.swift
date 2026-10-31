@@ -30,7 +30,7 @@ final class VPhoneProgressBar {
     func finish() {
         guard enabled else { return }
         render(done: total, now: Date())
-        write("\n")
+        FileHandle.standardError.write(Data("\n".utf8))
     }
 
     private func render(done: Int64, now: Date) {
@@ -45,17 +45,7 @@ final class VPhoneProgressBar {
         if rate > 0 { line += "  \(Self.bytes(Int64(rate)))/s" }
         if total > 0, rate > 0, done < total { line += "  eta \(Self.clock(Double(total - done) / rate))" }
         line += "\u{1B}[K"  // clear to end of line
-        write(line)
-    }
-
-    /// Progress output is best effort; a disconnected reader must not abort
-    /// the transfer through FileHandle's Objective-C exception path.
-    private func write(_ text: String) {
-        // Preserve the TTY-only contract if stderr was redirected since init.
-        // In particular, do not write to a pipe after the tar runner restores
-        // the default SIGPIPE handler before finish().
-        guard isatty(FileHandle.standardError.fileDescriptor) != 0 else { return }
-        try? FileHandle.standardError.write(contentsOf: Data(text.utf8))
+        FileHandle.standardError.write(Data(line.utf8))
     }
 
     static func bytes(_ n: Int64) -> String {

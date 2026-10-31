@@ -174,7 +174,7 @@ struct KernelJBStructuredTests {
 }
 
 extension KernelJBStructuredTests {
-    private func postValidationFixture() throws -> KernelJBPatcher {
+    @Test func postValidationRecognizesIdempotenceWithoutEmitting() throws {
         let patcher = KernelJBPatcher(data: Data(repeating: 0, count: 0x1000), verbose: false)
         patcher.codeRanges = [(0x100, 0x244)]
         patcher.buffer.writeBytes(at: 0x800, bytes: Data("AMFI: code signature validation failed\0".utf8))
@@ -190,62 +190,12 @@ extension KernelJBStructuredTests {
         let ready = KernelJBPatcher(data: patcher.buffer.data, verbose: false)
         ready.codeRanges = patcher.codeRanges
         ready.buildADRPIndex()
-        return ready
-    }
-
-    @Test func postValidationRecognizesIdempotenceWithVerifiedOutputWithoutWriting() throws {
-        let ready = try postValidationFixture()
-        let original = ready.buffer.data
         #expect(ready.patchPostValidationAdditional() == .matched)
         #expect(ready.emittedRecords.count == 1)
-        let write = try #require(ready.emittedRecords.first)
-        #expect(write.fileOffset == 0x208)
-        #expect(write.patchID == "jb.post_validation.cmp_w0_w0")
-        #expect(write.originalBytes == original.subdata(in: 0x208..<0x20C))
-        #expect(write.originalBytes != write.patchedBytes)
-        #expect(write.patchedBytes == ARM64.cmpW0W0)
         let output = ready.buffer.data
-        let recordCount = ready.emittedRecords.count
         #expect(ready.patchPostValidationAdditional() == .idempotent)
-        let observations = Array(ready.emittedRecords.dropFirst(recordCount))
-        #expect(observations.count == 1)
-        let observed = try #require(observations.first)
-        #expect(observed.fileOffset == write.fileOffset)
-        #expect(observed.patchID == write.patchID)
-        #expect(observed.originalBytes == ARM64.cmpW0W0)
-        #expect(observed.patchedBytes == observed.originalBytes)
-        #expect(ready.emittedRecords.filter { $0.originalBytes != $0.patchedBytes }.count == 1)
-        #expect(ready.buffer.data == output)
-    }
-
-    @Test func postValidationAlreadyAppliedBindsEvidenceToCurrentPayload() throws {
-        let original = try postValidationFixture()
-        #expect(original.patchPostValidationAdditional() == .matched)
-        let input = original.buffer.data
-        let ready = KernelJBPatcher(data: input, verbose: false)
-        ready.codeRanges = original.codeRanges
-        ready.buildADRPIndex()
-        let step = "kernelcache.KernelJBPatcher.patchPostValidationAdditional"
-        let execution = StructuredExecution.run(patcher: ready, componentName: "kernelcache",
-            gates: DeclarationGateTests.gates("exp"), ablate: [], fallback: input, enabledSteps: [step])
-        let result = try #require(execution.report.results.first { $0.id.description == step })
-        #expect(result.outcome == .alreadyApplied)
-        #expect(result.recordIndices == [0])
         #expect(ready.emittedRecords.count == 1)
-        let record = try #require(ready.emittedRecords.first)
-        #expect(record.fileOffset == 0x208)
-        #expect(record.originalBytes == ARM64.cmpW0W0)
-        #expect(record.patchedBytes == record.originalBytes)
-        #expect(result.declarationEvidence?.count == 1)
-        let evidence = try #require(result.declarationEvidence?.first)
-        #expect(evidence.declarationID == "kernel-boot-post_validation_unsigned")
-        #expect(evidence.recordIndex == 0)
-        #expect(evidence.fileOffset == record.fileOffset)
-        #expect(evidence.byteCount == record.patchedBytes.count)
-        #expect(evidence.verifiedPayloadSHA256 == DeclarationExecutionEvidence.digest(input))
-        #expect(evidence.verifiedOutputSHA256 == DeclarationExecutionEvidence.digest(ARM64.cmpW0W0))
-        #expect(execution.data == input)
-        #expect(ready.buffer.data == input)
+        #expect(ready.buffer.data == output)
     }
 
     @Test(arguments: [false, true])

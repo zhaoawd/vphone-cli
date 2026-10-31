@@ -37,7 +37,6 @@ public enum VariantPlanResolver {
         public let optIn: String
         public let swiftSteps: [String]
         public let upstreamIDs: [String]
-        public var recordRules: [DeclarationRecordRule]? = nil
     }
 
     /// The resolved plan for a variant + gate snapshot.
@@ -66,10 +65,10 @@ public enum VariantPlanResolver {
     /// `buildComponentList()` without touching disk (empty-data patchers, static ids for the
     /// filesystem/manifest factories that need a restore directory), mirroring
     /// `knownAblationTargets`.
-    public static func liveStepIDs(variant: FirmwarePipeline.Variant, experimentalV2RootRemount: Bool = false) -> [String] {
+    public static func liveStepIDs(variant: FirmwarePipeline.Variant) -> [String] {
         let pipeline = FirmwarePipeline(
             vmDirectory: URL(fileURLWithPath: "/nonexistent/variant-plan"),
-            variant: variant, verbose: false, experimentalV2RootRemount: experimentalV2RootRemount)
+            variant: variant, verbose: false)
         var ids: [String] = []
         for component in pipeline.buildComponentList() {
             if component.name == "Filesystem" {
@@ -105,20 +104,10 @@ public enum VariantPlanResolver {
         gates: PatchGateSnapshot,
         baseVersionKnown: Bool = true,
         cloudOSVersionKnown: Bool = true,
-        guestEnvironmentV2: Bool = false,
         select: Set<String> = [],
         block: Set<String> = [],
         catalog: [PatchDeclaration] = PatchDeclarationCatalog.all
     ) throws -> VariantPlan {
-        if gates.experimentalV2RootRemount == true, variant != .regular {
-            throw PatcherError.invalidFormat("experimental v2 root remount requires variant regular")
-        }
-        guard !guestEnvironmentV2 || gates.guestEnvironmentV2 == true else {
-            throw PatcherError.invalidFormat("guest environment v2 must be frozen in gates")
-        }
-        guard gates.guestEnvironmentV2 != true || variant == .regular else {
-            throw PatcherError.invalidFormat("guest environment v2 requires regular")
-        }
         try PatchDeclarationCatalog.validateStructure(catalog)
         guard gates.variant == variant.rawValue else {
             throw PatchDeclarationCatalog.CatalogError.variantMismatch(
@@ -138,7 +127,7 @@ public enum VariantPlanResolver {
         }
 
         let variantName = variant.rawValue
-        let live = liveStepIDs(variant: variant, experimentalV2RootRemount: gates.experimentalV2RootRemount == true)
+        let live = liveStepIDs(variant: variant)
         let liveSet = Set(live)
 
         // Every pipeline step must be a declared Swift step.
@@ -160,7 +149,7 @@ public enum VariantPlanResolver {
             switch declaration.coverage {
             case .notImplemented:
                 notImplemented.append(entry(declaration, .notImplemented,
-                    declaration.implementationNote ?? "not implemented locally"))
+                    "not implemented locally (T18 libmisfix scope)"))
                 continue
             case .guestStep:
                 if select.contains(declaration.id)
@@ -168,23 +157,15 @@ public enum VariantPlanResolver {
                     throw PatchDeclarationCatalog.CatalogError.guestOverrideUnsupported(id: declaration.id)
                 }
                 if declaration.variants.contains(variantName) {
-                    if declaration.optIn == .guestEnvironmentV2 && gates.guestEnvironmentV2 != true {
-                        excludedByOptIn.append(entry(declaration, .excludedByOptIn, "needs guest environment v2 opt-in"))
-                        continue
-                    }
-                    if blocked {
-                        excludedByOptIn.append(entry(declaration, .excludedByOptIn, "blocked by request"))
-                        continue
-                    }
                     guestUncovered.append(entry(declaration, .guestUncovered,
-                        "guest Python/zsh declaration frozen; execution requires exact target evidence"))
+                        "guest Python/zsh step: declaration-only this round, execution not gated"))
                 }
                 continue
             case .swift:
                 break
             }
 
-            guard PatchDeclarationCatalog.applies(declaration, variant: variantName, gates: gates) else {
+            guard declaration.variants.contains(variantName) else {
                 excludedByVariant.append(entry(declaration, .excludedByVariant,
                     "not in variant \(variantName) (\(declaration.variants.sorted().joined(separator: ",")))"))
                 continue
@@ -206,10 +187,9 @@ public enum VariantPlanResolver {
                 excludedByOptIn.append(entry(declaration, .excludedByOptIn, "needs --frida opt-in"))
                 continue
             }
-            if !cloudOSVersionKnown, let rule = declaration.versionRule,
-               rule == .cloudOSFridaCapable || rule == .cloudOSIs26_4OrNewer {
+            if !cloudOSVersionKnown, declaration.versionRule == .cloudOSFridaCapable {
                 throw PatchDeclarationCatalog.CatalogError.versionIndeterminate(
-                    id: declaration.id, rule: rule)
+                    id: declaration.id, rule: .cloudOSFridaCapable)
             }
             if PatchDeclarationCatalog.ruleHolds(declaration, gates) {
                 selected.append(entry(declaration, .selected, dispositionReason(declaration)))
@@ -239,7 +219,7 @@ public enum VariantPlanResolver {
         // so at least one bound step must be live rather than all of them.
         for declaration in catalog
         where declaration.coverage == .swift && declaration.required && !declaration.swiftSteps.isEmpty {
-            guard PatchDeclarationCatalog.applies(declaration, variant: variantName, gates: gates),
+            guard declaration.variants.contains(variantName),
                   PatchDeclarationCatalog.ruleHolds(declaration, gates) else { continue }
             if !enabledIDs.contains(declaration.id)
                 || !declaration.swiftSteps.contains(where: liveSet.contains) {
@@ -296,7 +276,6 @@ public enum VariantPlanResolver {
         Entry(
             id: declaration.id, title: declaration.title, disposition: disposition, reason: reason,
             required: declaration.required, optIn: declaration.optIn.rawValue,
-            swiftSteps: declaration.swiftSteps, upstreamIDs: declaration.upstreamIDs,
-            recordRules: declaration.recordRules)
+            swiftSteps: declaration.swiftSteps, upstreamIDs: declaration.upstreamIDs)
     }
 }

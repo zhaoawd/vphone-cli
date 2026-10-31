@@ -19,10 +19,10 @@ enum APIWire {
         try APIRequest.decode(data)
     }
 
-    static func execute(_ request: APIRequest, externalProxy: Bool) -> APIReply {
+    static func execute(_ request: APIRequest) -> APIReply {
         autoreleasepool { () -> APIReply in
             do {
-                let result = try GuestAPI.execute(method: request.method, params: request.params, externalProxy: externalProxy)
+                let result = try GuestAPI.execute(method: request.method, params: request.params)
                 return .json(["type": "response", "id": request.id ?? NSNull(), "result": result])
             } catch {
                 let (code, message): (String, String) =
@@ -55,23 +55,17 @@ enum APIWire {
 final class APIEventHub: @unchecked Sendable {
     private let lock = NSLock()
     private var channels: [ObjectIdentifier: Channel] = [:]
-    /// Set once before accepting clients. Notifications run outside the lock.
-    var onSubscribedChange: (@Sendable (Bool) -> Void)?
 
     func add(_ channel: Channel) {
         lock.lock()
-        let first = channels.isEmpty
         channels[ObjectIdentifier(channel)] = channel
         lock.unlock()
-        if first { onSubscribedChange?(true) }
     }
 
     func remove(_ channel: Channel) {
         lock.lock()
-        let removed = channels.removeValue(forKey: ObjectIdentifier(channel)) != nil
-        let last = removed && channels.isEmpty
+        channels.removeValue(forKey: ObjectIdentifier(channel))
         lock.unlock()
-        if last { onSubscribedChange?(false) }
     }
 
     func broadcast(name: String, data: [String: Any]) {

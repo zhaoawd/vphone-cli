@@ -59,9 +59,8 @@ private final class GuestPeer: @unchecked Sendable {
 private final class GuestSession {
     let control: VPhoneControl
     var peer: GuestPeer
-    init(timing: VPhoneControl.Timing = .init(), binaryURL: URL? = nil) throws {
+    init(timing: VPhoneControl.Timing = .init()) throws {
         control = VPhoneControl(variant: .regular, timing: timing)
-        control.guestBinaryURL = binaryURL
         var fds: [Int32] = [-1, -1]
         guard socketpair(AF_UNIX, SOCK_STREAM, 0, &fds) == 0 else { throw POSIXError(.EIO) }
         peer = GuestPeer(fds[1])
@@ -100,40 +99,6 @@ private final class GuestSession {
 
 @MainActor
 final class GuestTransportTests: XCTestCase {
-    func testClassicAutoUpdateHoldsWriterUntilAckOrDisconnect() async throws {
-        for disconnect in [false, true] {
-            let binary = FileManager.default.temporaryDirectory.appendingPathComponent("classic-update-" + UUID().uuidString)
-            try Data("classic candidate".utf8).write(to: binary)
-            defer { try? FileManager.default.removeItem(at: binary) }
-            let session = try GuestSession(binaryURL: binary)
-            defer { session.stop() }
-            let hello = try await session.readRequest()
-            XCTAssertNotNil(hello["bin_hash"])
-            try session.peer.send(["v": 1, "t": "hello", "caps": ["file"], "need_update": true])
-            let header = try await session.readRequest()
-            XCTAssertEqual(header["t"] as? String, "update")
-            let id = try XCTUnwrap(header["id"] as? String)
-            let size = try XCTUnwrap(header["size"] as? Int)
-            let peer = session.peer
-            let bytes = try await Task.detached { try peer.read(size) }.value
-            XCTAssertEqual(bytes, Data("classic candidate".utf8))
-            var manualRan = false
-            let manual = Task { try await session.control.guestWrites.run { manualRan = true } }
-            for _ in 0..<20 { await Task.yield() }
-            XCTAssertFalse(manualRan, "enqueued bytes do not finish the update")
-            if disconnect { peer.stop() }
-            else { try peer.send(["v": 1, "t": "ok", "id": id, "msg": "updated, restarting"]) }
-            if disconnect {
-                do { try await manual.value; XCTFail("uncertain update released its writer") } catch {}
-                XCTAssertFalse(manualRan)
-                XCTAssertTrue(session.control.guestWrites.pendingRecovery)
-            } else {
-                try await manual.value
-                XCTAssertTrue(manualRan)
-            }
-        }
-    }
-
     func testTouchCapabilityAndConnectionMatrix() async throws {
         let session = try GuestSession()
         defer { session.stop() }

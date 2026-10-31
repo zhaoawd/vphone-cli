@@ -70,21 +70,6 @@ public struct VPhoneBundleGuard: Sendable {
     /// Production wiring.
     public static let live = VPhoneBundleGuard()
 
-    /// A changed-file measurement holds a shared directory lease only while
-    /// mapping. It writes no runtime record and refuses pending transactions.
-    /// An exclusive boot or mutation cannot start between the check and map.
-    public static func withMeasurementLock<T>(directory: URL, body: () -> T) -> T? {
-        let fd = open(directory.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
-        guard fd >= 0 else { return nil }
-        defer { close(fd) }
-        guard flock(fd, LOCK_SH | LOCK_NB) == 0 else { return nil }
-        defer { _ = flock(fd, LOCK_UN) }
-        guard let names = try? FileManager.default.contentsOfDirectory(atPath: directory.path),
-              !names.contains(where: { $0 == ".firmware-transaction" || $0.hasPrefix(".cfw_disk.") || $0.hasPrefix(".snapshot-revert-") }),
-              let pending = try? VPhoneDiskRebaseTransaction.pending(in: directory), pending.isEmpty else { return nil }
-        return body()
-    }
-
     // MARK: Exclusive operations
 
     /// Runs `body` while holding the bundle's exclusive lock, refusing with one
@@ -102,11 +87,8 @@ public struct VPhoneBundleGuard: Sendable {
         do {
             lock = try VPhoneVMLock(directory: directory, operation: operation)
         } catch {
-            if let lockError = error as? VPhoneVMLockError {
-                switch lockError {
-                case .firmwareRecoveryRequired, .cfwRecoveryRequired, .snapshotRecoveryRequired, .rebaseRecoveryRequired: throw lockError
-                case .unavailable: break
-                }
+            if let lockError = error as? VPhoneVMLockError, case .firmwareRecoveryRequired = lockError {
+                throw lockError
             }
             throw VPhoneBundleGuardError.busy(
                 bundle: Self.bundleName(directory), detail: holderDetail(directory: directory))

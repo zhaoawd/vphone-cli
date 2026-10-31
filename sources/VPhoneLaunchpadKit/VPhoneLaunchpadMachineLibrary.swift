@@ -1,13 +1,12 @@
 import Foundation
 import Observation
-import VPhoneCore
 
 /// The VM library, listed through `vphone-cli vm list --json`, started with
 /// `vm launch`, stopped with `vm stop`, edited offline with `vm config`,
 /// `rename`, `clone`, `delete`, `export` and `import`, and created with
-/// `vm create` (`VPhoneLaunchpadCreation`). State polling takes no VM lock.
-/// Changed-file disk measurements briefly hold a shared directory lease;
-/// `vphone-vm` and mutation CLIs take exclusive locks.
+/// `vm create` (`VPhoneLaunchpadCreation`). Launchpad never takes or probes a
+/// VM lock: `vphone-vm` holds it, and the CLI refuses conflicting work
+/// itself.
 ///
 /// Machines can live in several libraries: the default one, and folders in
 /// the `VPhoneLaunchpadLibraryRoots` default. Each library is listed with its
@@ -27,9 +26,6 @@ public final class VPhoneLaunchpadMachineLibrary {
     /// "No Machines" before it knows.
     public private(set) var hasListed = false
     public private(set) var runStates: [Path: VPhoneLaunchpadRunState] = [:]
-    public private(set) var diskUsage: [Path: VPhoneLaunchpadDiskUsage] = [:]
-    private let diskMeter = VPhoneLaunchpadDiskMeter()
-    private var nextDiskMeasurement: ContinuousClock.Instant?
     /// Further libraries, in the order they were added. The default library
     /// is not among them.
     public private(set) var addedRoots: [String]
@@ -244,71 +240,12 @@ public final class VPhoneLaunchpadMachineLibrary {
             }
             return reader.states(processList: processList, machines: paths)
         }.value
-        await refreshDiskUsage()
         if lastReportedCount != machines.count {
             lastReportedCount = machines.count
             // Diagnostic line for the smoke check, written unbuffered; machine
             // names are not printed.
             Self.diagnostic("listed \(machines.count) machines from \(roots.count) libraries")
         }
-    }
-
-    private func mayMeasureDisk(_ machine: Path) -> Bool {
-        VPhoneLaunchpadDiskAccess(
-            isLaunched: launched[machine]?.isRunning == true,
-            isHeld: runStates[machine] != .stopped,
-            isBusy: activities[machine] != nil || exports[machine] != nil || creations[machine]?.isRunning == true,
-            isLibraryBusy: globalActivity != nil || listError != nil
-        ).mayOpen
-    }
-
-    private func refreshDiskUsage() async {
-        let now = ContinuousClock.now
-        guard nextDiskMeasurement.map({ now >= $0 }) ?? true else { return }
-        nextDiskMeasurement = now + .seconds(30)
-        var folders: [VPhoneLaunchpadDiskMeter.Folder] = []
-        var stateFiles: [String: Set<String>] = [:]
-        let paths = Dictionary(uniqueKeysWithValues: machines.map { ($0.path.url.path, $0.path) })
-        for machine in machines {
-            if let manifest = try? VPhoneVirtualMachineManifest.load(from: machine.path.configURL) {
-                stateFiles[machine.path.url.path] = Set([manifest.diskImage, manifest.sepStorage, manifest.nvramStorage])
-            }
-            var allowed = mayMeasureDisk(machine.path)
-            if allowed {
-                let path = machine.path
-                allowed = await Task.detached {
-                    guard let manifest = try? VPhoneVirtualMachineManifest.load(from: path.configURL),
-                          let holders = try? VPhoneLaunchpadDiskHolders.read(path.url.appendingPathComponent(manifest.diskImage)) else { return false }
-                    return holders.isEmpty
-                }.value
-            }
-            folders.append(.init(path: machine.path.url.path, mayOpen: allowed))
-        }
-        let measured = await diskMeter.measure(folders, mayOpenNow: { [weak self] path in
-            guard let machine = paths[path] else { return false }
-            return await self?.mayMeasureDiskNow(machine) == true
-        }, mayMapNow: { [weak self, stateFiles] path, file in
-            guard let machine = paths[path] else { return false }
-            // A non-cooperating reader need not take our directory lease.
-            // Recheck holders immediately before mapping a VM state file.
-            if stateFiles[path]?.contains(URL(fileURLWithPath: file).lastPathComponent) != false {
-                return await self?.mayMeasureDiskNow(machine) == true
-            }
-            return await self?.mayMeasureDisk(machine) == true
-        })
-        diskUsage = Dictionary(uniqueKeysWithValues: measured.compactMap { path, usage in
-            paths[path].map { ($0, usage) }
-        })
-    }
-
-    private func mayMeasureDiskNow(_ machine: Path) async -> Bool {
-        guard mayMeasureDisk(machine) else { return false }
-        let clear = await Task.detached {
-            guard let manifest = try? VPhoneVirtualMachineManifest.load(from: machine.configURL),
-                  let holders = try? VPhoneLaunchpadDiskHolders.read(machine.url.appendingPathComponent(manifest.diskImage)) else { return false }
-            return holders.isEmpty
-        }.value
-        return clear && mayMeasureDisk(machine)
     }
 
     // MARK: - Start and stop
@@ -457,15 +394,16 @@ public final class VPhoneLaunchpadMachineLibrary {
     public private(set) var exports: [Path: Export] = [:]
 
     /// Exports each machine to its destination file, one at a time: each
-    /// export reads a whole disk image. Existing destinations are refused,
-    /// including when a legacy caller passes `replacing: true`. A save-panel
-    /// confirmation cannot make an older CLI publish transactionally.
+    /// export reads a whole disk image. Without `replacing`, a destination
+    /// that already exists is refused for that machine (a folder chosen for
+    /// several machines); with it, the user has agreed to replace the file
+    /// (the save panel asked).
     public func export(
-        _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing _: Bool
+        _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing: Bool
     ) async {
         var queued: [(machine: Path, destination: URL)] = []
         for item in items where exports[item.machine] == nil {
-            if VPhoneLaunchpadExportOutput.exists(item.destination) {
+            if !replacing, VPhoneLaunchpadExportOutput.exists(item.destination) {
                 actionError = VPhoneLaunchpadError(
                     String(localized: "Unable to Export \(item.machine.name)"),
                     detail: String(localized: "\(item.destination.path) already exists."))
@@ -503,12 +441,15 @@ public final class VPhoneLaunchpadMachineLibrary {
     }
 
     private func runExport(_ machine: Path, to destination: URL, densest: Bool, includeIPSW: Bool) async {
+        let existedBefore = VPhoneLaunchpadExportOutput.exists(destination)
         await perform(String(localized: "Exporting…"), on: machine,
                       VPhoneLaunchpadEditCommand.export(machine, to: destination, densest: densest, includeIPSW: includeIPSW),
                       failure: String(localized: "Unable to Export \(machine.name)"))
-        // The CLI owns its private staging cleanup. A final-path file may be
-        // committed output or another writer's file; cancellation proves neither
-        // ownership nor incompleteness. Keep legacy CLI leftovers as well.
+        // `vm export` writes the archive in place, so a cancelled one leaves
+        // a partial file behind. Only a file this export created is removed.
+        if Task.isCancelled {
+            VPhoneLaunchpadExportOutput.removeCancelled(destination, existedBefore: existedBefore)
+        }
     }
 
     // MARK: - Running edits

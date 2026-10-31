@@ -1,1 +1,0 @@
-do shell script "/Users/kolar/github/vphone-cli/.venv/bin/python3 -I -S -B /Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-15/tools/verify_roothide_undo_readers.py" with administrator privileges with prompt "只读核对指定 roothide VM 的撤销拒绝和历史原磁盘抽样，不修改 VM。"

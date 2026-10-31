@@ -59,51 +59,32 @@ static int vpIsBootstrapProgram(const char *path) {
     return length && strncmp(path, root, length) == 0 && path[length] == '/';
 }
 
-typedef int (*VPSpawnFunction)(pid_t *restrict, const char *restrict,
-                              const posix_spawn_file_actions_t *restrict,
-                              const posix_spawnattr_t *restrict,
-                              char *const [restrict], char *const [restrict]);
-
-static int vpSpawnWith(VPSpawnFunction spawn, pid_t *restrict pid, const char *restrict path,
-                       const posix_spawn_file_actions_t *restrict actions,
+static int vpSpawn(pid_t *restrict pid, const char *restrict path, const posix_spawn_file_actions_t *restrict actions,
                    const posix_spawnattr_t *restrict attributes, char *const argv[restrict],
                    char *const envp[restrict]) {
     if (!vpBootRoot[0] && path && (vpIsAppProgram(path) || strstr(path, "/.jbroot-")))
         vpFindJBRoot(vpBootRoot);
     int bootstrapProgram = vpIsBootstrapProgram(path);
     int appProgram = vpIsAppProgram(path);
-    int cameraProgram = path && strcmp(path, "/usr/libexec/cameracaptured") == 0;
     if (bootstrapProgram || appProgram) {
         int linkStatus = vpEnsureRootHideLoaderLink(path, vpBootRoot);
         if (linkStatus || (path && strstr(path, "/.jbroot-")))
             vpLogInjection("loader-link", path, linkStatus);
     }
-    if (!path || (strcmp(path, "/usr/libexec/xpcproxy") != 0 && !bootstrapProgram && !appProgram && !cameraProgram) ||
+    if (!path || (strcmp(path, "/usr/libexec/xpcproxy") != 0 && !bootstrapProgram && !appProgram) ||
         vpInjectionDisabled(envp)) {
-        int status = spawn(pid, path, actions, attributes, argv, envp);
+        int status = posix_spawn(pid, path, actions, attributes, argv, envp);
         if (appProgram)
             vpLogSpawn("app-disabled", path, status == 0 && pid ? *pid : -1, status);
         return status;
     }
     VPInjectionEnvironment injected = vpInsertHook(envp, vpBootRoot);
-    int status = spawn(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
+    int status = posix_spawn(pid, path, actions, attributes, argv, injected.values ? injected.values : envp);
     vpLogInjection(injected.values ? "inserted" : "unchanged", path, status);
     vpLogSpawn(injected.values ? "inserted" : "unchanged", path, status == 0 && pid ? *pid : -1,
                status);
     vpFreeEnvironment(&injected);
     return status;
-}
-
-static int vpSpawn(pid_t *restrict pid, const char *restrict path, const posix_spawn_file_actions_t *restrict actions,
-                   const posix_spawnattr_t *restrict attributes, char *const argv[restrict],
-                   char *const envp[restrict]) {
-    return vpSpawnWith(posix_spawn, pid, path, actions, attributes, argv, envp);
-}
-
-static int vpSpawnP(pid_t *restrict pid, const char *restrict path, const posix_spawn_file_actions_t *restrict actions,
-                   const posix_spawnattr_t *restrict attributes, char *const argv[restrict],
-                   char *const envp[restrict]) {
-    return vpSpawnWith(posix_spawnp, pid, path, actions, attributes, argv, envp);
 }
 
 // Neither bootstrap exists on the first boot. RootHide is chosen once and
@@ -298,6 +279,5 @@ __attribute__((used, section("__DATA,__interpose"))) static const struct {
 } vpInterpose[] = {
     {(const void *)vpGetValue, (const void *)xpc_dictionary_get_value},
     {(const void *)vpSpawn, (const void *)posix_spawn},
-    {(const void *)vpSpawnP, (const void *)posix_spawnp},
     {(const void *)vpMemoryStatus, (const void *)memorystatus_control},
 };

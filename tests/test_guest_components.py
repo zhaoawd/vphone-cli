@@ -1,6 +1,5 @@
 import importlib.util
 import hashlib
-import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -12,9 +11,6 @@ spec.loader.exec_module(module)
 
 
 class GuestComponentsTests(unittest.TestCase):
-    def test_repository_sources_match_recorded_inputs(self):
-        module.check_sources(json.loads(module.PINS.read_text()), ROOT)
-
     def test_source_tampering_and_symlinks_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

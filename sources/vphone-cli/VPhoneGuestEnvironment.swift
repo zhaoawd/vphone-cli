@@ -22,8 +22,7 @@ struct VPhoneGuestEnvironmentManifest: Equatable {
     var names: [String] { libraries.map(\.name) }
 
     static func load(_ url: URL) throws -> Self {
-        guard url.standardizedFileURL.path == url.resolvingSymlinksInPath().path,
-              let data = FileManager.default.contents(atPath: url.path),
+        guard let data = FileManager.default.contents(atPath: url.path),
               let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               object["schema_version"] as? Int == 1,
               let rows = object["libraries"] as? [[String: Any]], !rows.isEmpty,
@@ -55,7 +54,7 @@ struct VPhoneGuestEnvironmentRefusal: Error {
 
 // MARK: - Candidates
 
-/// Candidates carrying LC_CODE_SIGNATURE from `make guest_components_build`. Each must be a
+/// Signed candidates from `make guest_components_build`. Each must be a
 /// regular file whose SHA-256 equals the stage's manifest.json record and
 /// that has LC_CODE_SIGNATURE, the same checks as `cfw_env_update.py`.
 enum VPhoneGuestEnvironmentCandidates {
@@ -70,10 +69,7 @@ enum VPhoneGuestEnvironmentCandidates {
             VPhoneGuestEnvironmentRefusal("candidate_invalid", message, ["components": stage.path])
         }
         let record = stage.appendingPathComponent("manifest.json")
-        var recordInfo = stat()
-        guard record.standardizedFileURL.path == record.resolvingSymlinksInPath().path,
-              lstat(record.path, &recordInfo) == 0, recordInfo.st_mode & S_IFMT == S_IFREG,
-              let data = FileManager.default.contents(atPath: record.path),
+        guard let data = FileManager.default.contents(atPath: record.path),
               let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let recorded = object["files_sha256"] as? [String: String]
         else { throw refuse("\(record.path) is missing or unreadable; run make guest_components_build or pass --components") }
@@ -81,15 +77,14 @@ enum VPhoneGuestEnvironmentCandidates {
         for library in manifest.libraries {
             let file = stage.appendingPathComponent(library.stage)
             var info = stat()
-            guard file.standardizedFileURL.path == file.resolvingSymlinksInPath().path,
-                  lstat(file.path, &info) == 0, info.st_mode & S_IFMT == S_IFREG,
+            guard lstat(file.path, &info) == 0, info.st_mode & S_IFMT == S_IFREG,
                   let bytes = FileManager.default.contents(atPath: file.path)
             else { throw refuse("candidate \(file.path) is missing or not a regular file") }
             let digest = sha256(bytes)
             guard recorded[library.stage] == digest else {
                 throw refuse("candidate \(file.path) differs from \(record.path) (\(recorded[library.stage] ?? "none") recorded, \(digest) found)")
             }
-            guard hasCodeSignature(bytes) else { throw refuse("candidate \(file.path) has no 64-bit Mach-O LC_CODE_SIGNATURE") }
+            guard hasCodeSignature(bytes) else { throw refuse("candidate \(file.path) is not a signed 64-bit Mach-O") }
             result[library.name] = Candidate(name: library.name, path: file.path, sha256: digest)
         }
         return result
@@ -145,7 +140,7 @@ enum VPhoneGuestEnvironmentCandidates {
 /// in `restart`, and SpringBoard, launchd and other processes outside
 /// `restartable` are refused.
 @MainActor
-final class VPhoneGuestEnvironmentUpdater {
+struct VPhoneGuestEnvironmentUpdater {
     static let commands = ["environment_status", "environment_update", "environment_rollback"]
     /// Restarted by SIGTERM; launchd starts it again for the next camera
     /// client (upstream 2.2.3 comment; not verified on a local guest).
@@ -158,21 +153,11 @@ final class VPhoneGuestEnvironmentUpdater {
 
     let session: (any VPhoneHostAPISession)?
     let manifestURL: URL
-    let source: VPhoneGuestEnvironmentSource.Scope?
-    private var pendingOperation: VPhoneGuestEnvironmentRecovery?
-    private var expectedInstance: String?
-    private let coordinatedOperationID: String?
-
-    init(session: (any VPhoneHostAPISession)?, manifestURL: URL, source: VPhoneGuestEnvironmentSource.Scope? = nil, operationID: String? = nil) {
-        self.session = session; self.manifestURL = manifestURL; self.source = source
-        coordinatedOperationID = operationID
-    }
 
     struct Outcome {
         var ok: Bool
         var error: String?
         var fields: [String: Any]
-        var recovery: VPhoneGuestEnvironmentRecovery? = nil
     }
 
     static func capabilities(_ session: (any VPhoneHostAPISession)?) -> [String: Bool] {
@@ -180,26 +165,13 @@ final class VPhoneGuestEnvironmentUpdater {
         let caps = Set(session?.snapshot.health?.capabilities ?? [])
         return [
             "environment_status": ready && caps.contains("environment_update"),
-            "environment_update": ready && caps.isSuperset(of: ["environment_update", "environment_transaction", "environment_transaction_v2",
+            "environment_update": ready && caps.isSuperset(of: ["environment_update", "environment_transaction",
                                                                 "files", "file_upload_identity"]),
-            "environment_rollback": ready && caps.isSuperset(of: ["environment_update", "environment_transaction", "environment_transaction_v2"]),
+            "environment_rollback": ready && caps.isSuperset(of: ["environment_update", "environment_transaction"]),
         ]
     }
 
     func execute(_ command: String, request: [String: Any]) async -> Outcome {
-        expectedInstance = session?.snapshot.health?.instanceID
-        var outcome = await executeBound(command, request: request)
-        outcome.recovery = pendingOperation
-        if let pendingOperation {
-            outcome.fields["operation_may_continue"] = true
-            outcome.fields["recovery_state"] = "pending_recovery"
-            outcome.fields["context"] = pendingOperation.context
-            outcome.fields["transaction"] = pendingOperation.transaction
-        }
-        return outcome
-    }
-
-    private func executeBound(_ command: String, request: [String: Any]) async -> Outcome {
         do {
             switch command {
             case "environment_status": return try await status(request)
@@ -274,8 +246,6 @@ final class VPhoneGuestEnvironmentUpdater {
         fields["activation"] = activation(replaced: [], load: load, manifest: manifest, reboot: nil, rootReadOnly: guest.rootReadOnly)
         fields["application"] = ["state": "not_verified", "note": Self.applicationNote]
         fields["transactions"] = guest.transactions
-        fields["eligibility"] = guest.eligibility
-        fields["worker_idle"] = guest.workerIdle
         fields["root_read_only"] = guest.rootReadOnly
         return Outcome(ok: true, fields: fields)
     }
@@ -309,18 +279,13 @@ final class VPhoneGuestEnvironmentUpdater {
             throw VPhoneGuestEnvironmentRefusal("invalid_argument", "components must name the candidate stage")
         }
         let restart = try Self.restartRequest(request["restart"])
-        var required = ["environment_update", "environment_transaction", "environment_transaction_v2", "files", "file_upload_identity"]
+        var required = ["environment_update", "environment_transaction", "files", "file_upload_identity"]
         if !restart.isEmpty { required.append("processes") }
         let (session, generation) = try ready(required)
-        try qualified(session)
-        guard stage.standardizedFileURL == source?.stage.standardizedFileURL else {
-            throw VPhoneGuestEnvironmentRefusal("source_unqualified", "Candidates are outside the current Bundle")
-        }
         let manifest = try manifest()
         let candidates = try VPhoneGuestEnvironmentCandidates.verify(stage: stage, manifest: manifest)
 
         let before = try await GuestStatus.read(session, generation)
-        try eligible(before, session, generation)
         guard before.names == manifest.names else {
             throw VPhoneGuestEnvironmentRefusal("environment_mismatch",
                 "the guest daemon's environment library list differs from \(manifestURL.lastPathComponent)",
@@ -354,12 +319,11 @@ final class VPhoneGuestEnvironmentUpdater {
                 throw refusal
             } catch {
                 throw VPhoneGuestEnvironmentRefusal("upload_failed", "uploading \(name) failed; no library was replaced",
-                    ["library": name, "api_code": apiCode(error), "operation_may_continue": true,
+                    ["library": name, "api_code": apiCode(error),
                      "files": files(manifest, before: before, candidates: candidates, results: results)])
             }
         }
         let staged = try await GuestStatus.read(session, generation)
-        try eligible(staged, session, generation)
         for name in changed where staged.staged[name] != candidates[name]?.sha256 {
             throw VPhoneGuestEnvironmentRefusal("staged_digest_mismatch",
                 "the staged copy of \(name) does not match the candidate; no library was replaced",
@@ -368,16 +332,10 @@ final class VPhoneGuestEnvironmentUpdater {
                  "files": files(manifest, before: before, candidates: candidates, results: results)])
         }
 
-        // Install once. A lost reply is resolved only by this operation journal.
-        let context = operationContext(session)
-        let operation = context["operation"]!
-        var replyRecovered = false
-        pendingOperation = VPhoneGuestEnvironmentRecovery(context: context, transaction: operation, before: before.sha256, requested: Dictionary(uniqueKeysWithValues: changed.map { ($0, candidates[$0]!.sha256) }), restoring: false)
+        // Install. A failure inside the daemon is a result with its journal.
         let install: [String: Any]
         do {
-            try check(session, generation)
             let value = try await session.call("environment.install", params: [
-                "operation": .string(operation), "context": .object(context.mapValues(VPhoneJSONValue.string)),
                 "libraries": .array(changed.map { .object(["name": .string($0), "sha256": .string(candidates[$0]!.sha256)]) }),
             ], requiring: "environment_update")
             try check(session, generation, submitted: true)
@@ -389,45 +347,34 @@ final class VPhoneGuestEnvironmentUpdater {
         } catch let refusal as VPhoneGuestEnvironmentRefusal {
             throw refusal
         } catch {
+            // The daemon may have replaced some files. Read back what it holds.
             let after = try? await GuestStatus.read(session, generation)
-            if let after { try eligible(after, session, generation) }
-            let matches = after?.transactions.compactMap { $0 as? [String: Any] }.filter {
-                $0["id"] as? String == operation && $0["context"] as? [String: String] == context
-            } ?? []
-            guard matches.count == 1 else {
-                throw VPhoneGuestEnvironmentRefusal("install_failed", "Installation outcome is unknown; inspect this operation journal and files before any further write", [
-                    "api_code": apiCode(error), "outcome": "pending_recovery", "operation_may_continue": true,
-                    "transaction": operation, "context": context,
-                    "files": files(manifest, before: before, after: after, candidates: candidates, results: results),
-                    "recovery": ["steps": ["read environment status for this transaction; do not replay installation automatically"]]])
-            }
-            install = matches[0]
-            replyRecovered = true
-        }
-        guard install["id"] as? String == operation, install["context"] as? [String: String] == context else {
-            throw VPhoneGuestEnvironmentRefusal("api_protocol", "Install reply belongs to another operation or generation", ["outcome": "unknown", "operation_may_continue": true, "transaction": operation])
+            var fields: [String: Any] = ["api_code": apiCode(error), "operation_may_continue": true,
+                                         "files": files(manifest, before: before, after: after, candidates: candidates, results: results)]
+            fields["recovery"] = [
+                "transactions": after?.transactions ?? [],
+                "steps": ["read `vphone-cli guest env status <vm>`: files whose guest digest equals the candidate were replaced",
+                          "rerun `vphone-cli guest env update <vm>` to finish, or `vphone-cli guest env rollback <vm> <transaction>` "
+                          + "with the newest transaction listed above"],
+            ]
+            throw VPhoneGuestEnvironmentRefusal("install_failed", "environment.install did not return a result", fields)
         }
 
-        let journal = try validateInstall(install, requested: changed, before: before, candidates: candidates)
+        let journal = try validateInstall(install, requested: changed, candidates: candidates)
         for row in journal {
             if let name = row["name"] as? String, let state = row["state"] as? String { results[name] = state }
         }
         let complete = install["complete"] as? Bool == true
         let replaced = manifest.names.filter { results[$0] == "replaced" }
         let after = try await GuestStatus.read(session, generation)
-        try eligible(after, session, generation)
-        guard after.names == manifest.names, manifest.names.allSatisfy({ name in
-            after.sha256[name] == (replaced.contains(name) ? candidates[name]?.sha256 : before.sha256[name])
-        }) else {
+        guard replaced.allSatisfy({ after.sha256[$0] == candidates[$0]?.sha256 }) else {
             throw VPhoneGuestEnvironmentRefusal("api_protocol", "installed files do not match the reported transaction",
                 ["outcome": "unknown", "operation_may_continue": true, "transaction": install["id"] ?? NSNull(),
                  "journal": install["journal"] ?? NSNull()])
         }
-        if after.workerIdle, after.rootReadOnly == true, install["root_read_only"] as? Bool == true { pendingOperation = nil }
         var fields: [String: Any] = ["outcome": complete ? "updated" : "partial_failure",
                                      "files": files(manifest, before: before, after: after, candidates: candidates, results: results),
-                                     "transaction": install["id"] ?? NSNull(), "context": context,
-                                     "reply_recovered": replyRecovered, "source_publication": "unpublished"]
+                                     "transaction": install["id"] ?? NSNull()]
         let load = try await loadState(session, generation, manifest: manifest)
         let reboot = install["reboot_required"] as? Bool
         let rootReadOnly = install["root_read_only"] as? Bool
@@ -459,7 +406,7 @@ final class VPhoneGuestEnvironmentUpdater {
     }
 
     /// Validate the file-install reply before deriving activation or restarting processes.
-    private func validateInstall(_ value: [String: Any], requested: [String], before: GuestStatus,
+    private func validateInstall(_ value: [String: Any], requested: [String],
                                  candidates: [String: VPhoneGuestEnvironmentCandidates.Candidate]) throws -> [[String: Any]] {
         func refuse() -> VPhoneGuestEnvironmentRefusal {
             VPhoneGuestEnvironmentRefusal("api_protocol", "malformed environment.install result",
@@ -471,8 +418,6 @@ final class VPhoneGuestEnvironmentUpdater {
               let complete = value["complete"] as? Bool,
               value["state"] as? String == (complete ? "complete" : "incomplete"),
               value["reboot_required"] is Bool, value["root_read_only"] is Bool,
-              value["before_files"] as? [String: String] == before.sha256,
-              let afterFiles = value["after_files"] as? [String: String], Set(afterFiles.keys) == Set(before.sha256.keys),
               let rows = value["libraries"] as? [[String: Any]], rows.count == requested.count,
               let installed = value["installed"] as? [String], Set(installed).count == installed.count else { throw refuse() }
         var seen = Set<String>()
@@ -481,8 +426,6 @@ final class VPhoneGuestEnvironmentUpdater {
         for (index, row) in rows.enumerated() {
             guard let name = row["name"] as? String, name == requested[index], seen.insert(name).inserted,
                   row["sha256"] as? String == candidates[name]?.sha256,
-                  let previous = row["previous_sha256"] as? String, previous == before.sha256[name],
-                  row["backup"] as? String == Self.staging + "/transactions/" + id + "/backup/" + name,
                   let state = row["state"] as? String else { throw refuse() }
             switch state {
             case "replaced":
@@ -496,9 +439,7 @@ final class VPhoneGuestEnvironmentUpdater {
             default: throw refuse()
             }
         }
-        guard Set(installed) == replaced, complete == !failed, before.sha256.keys.allSatisfy({ name in
-            afterFiles[name] == (replaced.contains(name) ? candidates[name]?.sha256 : before.sha256[name])
-        }) else { throw refuse() }
+        guard Set(installed) == replaced, complete == !failed else { throw refuse() }
         return rows
     }
 
@@ -508,8 +449,6 @@ final class VPhoneGuestEnvironmentUpdater {
         var activation = activation(replaced: replaced, load: load, manifest: manifest, reboot: reboot, rootReadOnly: rootReadOnly)
         fields["load"] = load.fields
         fields["application"] = ["state": "not_verified", "note": Self.applicationNote]
-        fields["activation_state"] = "pending_activation"
-        fields["source_publication"] = "unpublished"
         var executed: [[String: Any]] = []
         var failure: String?
         for process in restart {
@@ -557,39 +496,11 @@ final class VPhoneGuestEnvironmentUpdater {
         guard let id = request["transaction"] as? String, !id.isEmpty, id.count <= 64,
               id.unicodeScalars.allSatisfy({ CharacterSet(charactersIn: "0123456789abcdefABCDEF-").contains($0) })
         else { throw VPhoneGuestEnvironmentRefusal("invalid_argument", "transaction must be a transaction id from environment status") }
-        let (session, generation) = try ready(["environment_update", "environment_transaction", "environment_transaction_v2"])
-        try qualified(session)
+        let (session, generation) = try ready(["environment_update", "environment_transaction"])
         let manifest = try manifest()
-        let before = try await GuestStatus.read(session, generation)
-        try eligible(before, session, generation)
-        let matching = before.transactions.compactMap { $0 as? [String: Any] }.filter { $0["id"] as? String == id }
-        guard matching.count == 1 else {
-            throw VPhoneGuestEnvironmentRefusal("api_protocol", "transaction is absent or ambiguous in environment.status")
-        }
-        guard let original = matching[0]["context"] as? [String: String],
-              ["vm_instance", "mode", "firmware_generation", "plan_sha256", "desired_sha256"].allSatisfy({ original[$0] == source?.context[$0] }) else {
-            throw VPhoneGuestEnvironmentRefusal("api_protocol", "Restore journal lacks matching VM, mode and frozen generation")
-        }
-        let expected = try restoreEntries(matching[0], id: id, manifest: manifest)
-        var originalFinal = matching[0]["before_files"] as! [String: String]
-        for row in expected {
-            let name = row["name"] as! String
-            originalFinal[name] = row[["replaced", "restore_failed"].contains(row["state"] as! String) ? "sha256" : "previous_sha256"] as? String
-        }
-        guard matching[0]["after_files"] as? [String: String] == originalFinal,
-              originalFinal == before.sha256 else {
-            throw VPhoneGuestEnvironmentRefusal("api_protocol", "Original transaction full file evidence does not match its states and current installed files")
-        }
-        guard expected.contains(where: { $0["state"] as? String == "replaced" }),
-              expected.allSatisfy({ row in
-                  row["state"] as? String != "replaced" || before.sha256[row["name"] as! String] == row["sha256"] as? String
-              }) else { throw VPhoneGuestEnvironmentRefusal("api_protocol", "transaction does not match installed files") }
-        let context = operationContext(session)
-        pendingOperation = VPhoneGuestEnvironmentRecovery(context: context, transaction: id, before: before.sha256, requested: Dictionary(uniqueKeysWithValues: expected.filter { $0["state"] as? String == "replaced" }.map { ($0["name"] as! String, $0["previous_sha256"] as! String) }), restoring: true, originalRows: expected.map { $0.compactMapValues { $0 as? String } }, originalContext: original, originalBefore: matching[0]["before_files"] as? [String: String])
         let value: VPhoneJSONValue
         do {
-            try check(session, generation)
-            value = try await session.call("environment.restore", params: ["transaction": .string(id), "operation": .string(context["operation"]!), "context": .object(context.mapValues(VPhoneJSONValue.string))], requiring: "environment_transaction")
+            value = try await session.call("environment.restore", params: ["transaction": .string(id)], requiring: "environment_transaction")
             try check(session, generation, submitted: true)
         } catch let refusal as VPhoneGuestEnvironmentRefusal {
             throw refusal
@@ -597,26 +508,10 @@ final class VPhoneGuestEnvironmentUpdater {
             throw VPhoneGuestEnvironmentRefusal("rollback_failed", "environment.restore did not complete",
                 ["api_code": apiCode(error), "operation_may_continue": true])
         }
-        guard let result = environmentPlain(value) as? [String: Any] else {
-            throw VPhoneGuestEnvironmentRefusal("api_protocol", "malformed environment.restore result",
-                                               ["outcome": "unknown", "operation_may_continue": true])
-        }
-        guard result["restore_context"] as? [String: String] == context else {
-            throw VPhoneGuestEnvironmentRefusal("api_protocol", "Restore reply belongs to another operation or generation", ["outcome": "pending_recovery", "operation_may_continue": true])
-        }
-        let rows = try validateRestore(result, id: id, expected: expected, original: matching[0], manifest: manifest)
+        let result = environmentPlain(value) as? [String: Any] ?? [:]
+        let rows = result["libraries"] as? [[String: Any]] ?? []
         let restored = rows.filter { $0["state"] as? String == "restored" }.compactMap { $0["name"] as? String }
-        let after = try await GuestStatus.read(session, generation)
-        try eligible(after, session, generation)
-        guard after.names == manifest.names, manifest.names.allSatisfy({ name in
-            let row = rows.first { $0["name"] as? String == name }
-            return after.sha256[name] == (row?["state"] as? String == "restored"
-                ? row?["previous_sha256"] as? String : before.sha256[name])
-        }), result["after_files"] as? [String: String] == after.sha256 else {
-            throw VPhoneGuestEnvironmentRefusal("api_protocol", "restored files do not match the reported transaction",
-                                               ["outcome": "unknown", "operation_may_continue": true, "transaction": id])
-        }
-        if after.workerIdle, after.rootReadOnly == true, result["root_read_only"] as? Bool == true { pendingOperation = nil }
+        let after = try? await GuestStatus.read(session, generation)
         let load = try await loadState(session, generation, manifest: manifest)
         var fields: [String: Any] = ["outcome": result["state"] ?? NSNull(), "transaction": id, "restored": restored,
                                      "journal": rows, "load": load.fields,
@@ -624,78 +519,10 @@ final class VPhoneGuestEnvironmentUpdater {
                                      "activation": activation(replaced: restored, load: load, manifest: manifest,
                                                               reboot: result["reboot_required"] as? Bool,
                                                               rootReadOnly: result["root_read_only"] as? Bool)]
-        fields["files"] = files(manifest, before: before, after: after, candidates: nil)
-        fields["context"] = context
-        fields["source_publication"] = "unpublished"
-        fields["recovery_state"] = "pending_recovery"
+        if let after { fields["files"] = files(manifest, before: after, candidates: nil) }
         let complete = result["state"] as? String == "restored"
         if !complete { fields["code"] = "rollback_incomplete" }
         return Outcome(ok: complete, error: complete ? nil : "the rollback restored only part of the transaction", fields: fields)
-    }
-
-    /// Status and restore must carry the same complete transaction component set.
-    /// A decoded journal describes the operation; it does not authorize a source.
-    private func restoreEntries(_ value: [String: Any], id: String,
-                                manifest: VPhoneGuestEnvironmentManifest) throws -> [[String: Any]] {
-        func refuse() -> VPhoneGuestEnvironmentRefusal {
-            VPhoneGuestEnvironmentRefusal("api_protocol", "malformed environment transaction",
-                ["outcome": "unknown", "operation_may_continue": true, "transaction": id])
-        }
-        guard value["id"] as? String == id,
-              let rows = value["libraries"] as? [[String: Any]], !rows.isEmpty,
-              let beforeFiles = value["before_files"] as? [String: String],
-              let afterFiles = value["after_files"] as? [String: String],
-              [beforeFiles, afterFiles].allSatisfy({ hashes in
-                  Set(hashes.keys) == Set(manifest.names) && hashes.values.allSatisfy { $0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) } }
-              }), let context = value["context"] as? [String: String], context["operation"] == id,
-              ["operation", "generation", "daemon_instance", "vm_instance"].allSatisfy({ context[$0].flatMap(UUID.init(uuidString:)) != nil }),
-              ["plan_sha256", "desired_sha256", "executable_sha256", "daemon_sha256"].allSatisfy({ key in
-                  context[key].map { $0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) } } == true
-              }), context["mode"] == "regular-v2", context["firmware_generation"]?.isEmpty == false,
-              context["bundle_version"]?.isEmpty == false else { throw refuse() }
-        var names = Set<String>()
-        for row in rows {
-            guard let name = row["name"] as? String, manifest.names.contains(name), names.insert(name).inserted,
-                  let state = row["state"] as? String,
-                  ["replaced", "failed", "not_attempted", "restored", "restore_failed"].contains(state),
-                  row["backup"] as? String == Self.staging + "/transactions/" + id + "/backup/" + name else { throw refuse() }
-            for key in ["sha256", "previous_sha256"] {
-                guard let hash = row[key] as? String, hash.count == 64,
-                      hash.allSatisfy({ "0123456789abcdef".contains($0) }) else { throw refuse() }
-            }
-        }
-        guard rows.allSatisfy({ row in beforeFiles[row["name"] as! String] == row["previous_sha256"] as? String }) else { throw refuse() }
-        return rows
-    }
-
-    private func validateRestore(_ value: [String: Any], id: String, expected: [[String: Any]], original: [String: Any],
-                                 manifest: VPhoneGuestEnvironmentManifest) throws -> [[String: Any]] {
-        let rows = try restoreEntries(value, id: id, manifest: manifest)
-        func refuse() -> VPhoneGuestEnvironmentRefusal {
-            VPhoneGuestEnvironmentRefusal("api_protocol", "malformed environment.restore result",
-                ["outcome": "unknown", "operation_may_continue": true, "transaction": id])
-        }
-        guard value["before_files"] as? [String: String] == original["before_files"] as? [String: String],
-              value["context"] as? [String: String] == original["context"] as? [String: String],
-              rows.count == expected.count, value["reboot_required"] is Bool, value["root_read_only"] is Bool,
-              let state = value["state"] as? String, ["restored", "restore_incomplete"].contains(state),
-              let restored = value["restored"] as? [String], Set(restored).count == restored.count else { throw refuse() }
-        var failed = false
-        for (row, original) in zip(rows, expected) {
-            for key in ["name", "sha256", "previous_sha256", "backup"] {
-                guard row[key] as? String == original[key] as? String else { throw refuse() }
-            }
-            let oldState = original["state"] as! String
-            let newState = row["state"] as! String
-            if oldState == "replaced" {
-                if failed { guard newState == "replaced" else { throw refuse() } }
-                else if newState == "restore_failed" { failed = true }
-                else { guard newState == "restored" else { throw refuse() } }
-            } else { guard newState == oldState else { throw refuse() } }
-        }
-        guard (state == "restored") == !failed,
-              Set(restored) == Set(rows.filter { $0["state"] as? String == "restored" }.compactMap { $0["name"] as? String }) else { throw refuse() }
-        return rows
     }
 
     // MARK: Guest state
@@ -707,9 +534,6 @@ final class VPhoneGuestEnvironmentUpdater {
         var aliasTarget: String?
         var rootReadOnly: Bool?
         var transactions: [Any] = []
-        var eligibility: [String: Any] = [:]
-        var workerIdle = false
-        var daemonInstance: String?
 
         @MainActor
         static func read(_ session: any VPhoneHostAPISession, _ generation: UUID?) async throws -> GuestStatus {
@@ -736,40 +560,12 @@ final class VPhoneGuestEnvironmentUpdater {
             status.aliasTarget = (object["load_alias"] as? [String: Any])?["target"] as? String
             status.rootReadOnly = object["root_read_only"] as? Bool
             status.transactions = object["transactions"] as? [Any] ?? []
-            status.eligibility = object["eligibility"] as? [String: Any] ?? [:]
-            status.workerIdle = object["worker_idle"] as? Bool == true
-            status.daemonInstance = object["daemon_instance"] as? String
             return status
         }
     }
 
-    private func operationContext(_ session: any VPhoneHostAPISession) -> [String: String] {
-        source!.context.merging(["operation": coordinatedOperationID ?? UUID().uuidString.lowercased(),
-            "generation": session.snapshot.generation!.uuidString,
-            "daemon_instance": session.snapshot.health!.instanceID!]) { $1 }
-    }
-
-    private func eligible(_ status: GuestStatus, _ session: any VPhoneHostAPISession, _ generation: UUID?) throws {
-        try check(session, generation)
-        guard status.eligibility["eligible"] as? Bool == true,
-              status.eligibility["mode"] as? String == source?.context["mode"],
-              status.eligibility["daemon_sha256"] as? String == source?.context["daemon_sha256"] else {
-            throw VPhoneGuestEnvironmentRefusal("mode_unqualified", "Actual guest loader and complete installed environment do not qualify; stop the VM and inspect its installation", ["eligibility": status.eligibility])
-        }
-    }
-
-    private func qualified(_ session: any VPhoneHostAPISession) throws {
-        guard let source, source.context["vm_instance"] == session.snapshot.vmInstanceID,
-              source.context["daemon_sha256"] == session.snapshot.health?.binaryHash,
-              session.snapshot.health?.instanceID == expectedInstance, expectedInstance != nil, session.snapshot.generation != nil else {
-            throw VPhoneGuestEnvironmentRefusal("source_unqualified", "Online operation requires the current Bundle daemon, runtime instance and frozen plan")
-        }
-        try source.verify()
-    }
-
     private func check(_ session: any VPhoneHostAPISession, _ generation: UUID?, submitted: Bool = false) throws {
         try Task.checkCancellation()
-        if source != nil { try qualified(session) }
         guard session.snapshot.state == .ready, session.snapshot.generation == generation else {
             var fields: [String: Any] = [:]
             if submitted { fields["operation_may_continue"] = true }

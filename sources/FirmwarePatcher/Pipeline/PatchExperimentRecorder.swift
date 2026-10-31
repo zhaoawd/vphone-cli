@@ -102,7 +102,6 @@ public struct PatchExperimentRecorder {
         let options = Record.Options(
             variant: pipeline.variant.rawValue, forceExcGuard: pipeline.forceExcGuard, frida: pipeline.enableFrida,
             noBinpack: pipeline.noBinpack, noVphoned: pipeline.noVphoned,
-            experimentalV2RootRemount: pipeline.experimentalV2RootRemount ? true : nil,
             ablate: Set(ablate.map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }).sorted(),
             allowAblationOutput: allowOutput)
         let conditions = collectConditions(pipeline, options: options)

@@ -3,7 +3,6 @@ import Darwin
 import Foundation
 import Img4tool
 import Testing
-import Virtualization
 @testable import FirmwarePatcher
 
 @Suite struct FirmwareTransactionTests {
@@ -19,8 +18,6 @@ import Virtualization
             try Data("original manifest".utf8).write(to: restore.appendingPathComponent("BuildManifest.plist"))
             // VM runtime data is deliberately outside the transaction.
             try Data("VM disk".utf8).write(to: root.appendingPathComponent("Disk.img"))
-            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
-                "diskImage": "Disk.img"], format: .xml, options: 0).write(to: root.appendingPathComponent("config.plist"))
         }
         deinit { try? fm.removeItem(at: root) }
         func begin(inject: @escaping (FirmwareTransaction.Event) throws -> Void = { _ in },
@@ -291,27 +288,6 @@ import Virtualization
         }
     }
 
-    @Test func stagedPipelineRetainsMountExperimentGate() throws {
-        let f = try Fixture()
-        let manifest = try PropertyListSerialization.data(fromPropertyList: ["ProductVersion": "26.1"],
-            format: .binary, options: 0)
-        for name in ["BuildManifest.plist", "iPhone-BuildManifest.plist"] {
-            try manifest.write(to: f.restore.appendingPathComponent(name))
-        }
-        let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false,
-            experimentalV2RootRemount: true, loader: FailingLoader(failRead: true))
-        try saveSyntheticDesiredPlan(pipeline)
-        #expect(throws: (any Error).self) { try pipeline.patchAllStructured() }
-        #expect(pipeline.trace.gates?.experimentalV2RootRemount == true)
-        let journal = try JSONDecoder().decode(FirmwareTransaction.Journal.self,
-            from: Data(contentsOf: f.root.appendingPathComponent(".firmware-transaction/journal.json")))
-        #expect(journal.options["experimentalV2RootRemount"] == "true")
-        #expect(journal.plan?.gates.experimentalV2RootRemount == true)
-        #expect(journal.versionInputs != nil)
-        #expect(journal.planBinding != nil)
-        try f.original()
-    }
-
     @Test(arguments: [true, false]) func pipelineReadAndPartialSaveFailuresRemainRecoverable(_ failRead: Bool) throws {
         let f = try Fixture()
         // This test exercises loader I/O after valid preflight, not malformed metadata.
@@ -321,7 +297,6 @@ import Virtualization
             try manifest.write(to: f.restore.appendingPathComponent(name))
         }
         let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false, loader: FailingLoader(failRead: failRead))
-        try saveSyntheticDesiredPlan(pipeline)
         #expect(throws: (any Error).self) {
             try pipeline.patchAllStructured(ablate: ["avpbooter"], allowOutput: true)
         }

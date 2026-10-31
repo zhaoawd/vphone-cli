@@ -130,16 +130,6 @@ struct VPhoneLaunchpadMachineInspector: View {
                 LabeledContent("CPU") { Text("\(machine.cpuCount) cores") }
                 LabeledContent("Memory") { Text(verbatim: VPhoneLaunchpadMachinesView.memory(machine.memoryMB)) }
                 LabeledContent("Disk") { Text(verbatim: VPhoneLaunchpadMachinesView.disk(machine.diskSizeBytes)) }
-                if let usage = library.diskUsage[machine.path] {
-                    LabeledContent("Allocated") {
-                        Text(verbatim: usage.allocationKnown ? VPhoneLaunchpadDiskUsage.format(usage.allocated) : String(localized: "Unknown"))
-                    }
-                    LabeledContent("Exclusive") {
-                        Text(verbatim: usage.exclusive.map { VPhoneLaunchpadDiskUsage.format($0) } ?? String(localized: "Unknown"))
-                    }
-                    .help("Blocks held by only this measured VM folder. Snapshots and unmeasured clones may retain blocks after deletion. A running or busy VM is not opened for measurement.")
-                    if !usage.isCurrent { Text("Using last disk measurement").foregroundStyle(.secondary) }
-                }
                 LabeledContent("Network") { Text(verbatim: machine.networkDescription) }
             }
 

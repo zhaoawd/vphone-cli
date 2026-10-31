@@ -100,20 +100,32 @@ import VPhoneCore
 // MARK: - Cancelled export output
 
 @Suite struct ExportOutputTests {
-    @Test func detectsExistingFilesDirectoriesAndDanglingSymlinks() throws {
+    @Test func onlyAFileTheExportCreatedIsRemoved() throws {
         let temp = try LaunchpadTemporaryDirectory("launchpad-export-output")
         let file = temp.url.appendingPathComponent("m.tzst")
         let fm = FileManager.default
+
         #expect(!VPhoneLaunchpadExportOutput.exists(file))
-        try Data("keep".utf8).write(to: file)
-        #expect(VPhoneLaunchpadExportOutput.exists(file))
+        #expect(!VPhoneLaunchpadExportOutput.removeCancelled(file, existedBefore: false))
+
+        fm.createFile(atPath: file.path, contents: Data("partial".utf8))
+        #expect(!VPhoneLaunchpadExportOutput.removeCancelled(file, existedBefore: true))
+        #expect(fm.fileExists(atPath: file.path))
+        #expect(VPhoneLaunchpadExportOutput.removeCancelled(file, existedBefore: false))
+        #expect(!fm.fileExists(atPath: file.path))
+
+        // A folder or a link at the path is never removed, nor what a link names.
         let folder = temp.url.appendingPathComponent("folder.tzst")
         try fm.createDirectory(at: folder, withIntermediateDirectories: false)
-        #expect(VPhoneLaunchpadExportOutput.exists(folder))
+        #expect(!VPhoneLaunchpadExportOutput.removeCancelled(folder, existedBefore: false))
+        let target = temp.url.appendingPathComponent("target")
+        fm.createFile(atPath: target.path, contents: Data("keep".utf8))
         let link = temp.url.appendingPathComponent("link.tzst")
-        try fm.createSymbolicLink(at: link, withDestinationURL: temp.url.appendingPathComponent("missing"))
+        try fm.createSymbolicLink(at: link, withDestinationURL: target)
         #expect(VPhoneLaunchpadExportOutput.exists(link))
-        #expect(try Data(contentsOf: file) == Data("keep".utf8))
+        #expect(!VPhoneLaunchpadExportOutput.removeCancelled(link, existedBefore: false))
+        #expect(fm.fileExists(atPath: folder.path))
+        #expect(try String(contentsOf: target, encoding: .utf8) == "keep")
     }
 }
 
@@ -171,12 +183,6 @@ struct LaunchpadEditStandIn {
           echo "import ok" ;;
         export)
           trap 'echo "export $name got SIGINT"; exit 130' INT
-          if [ -e "$root/.export-published" ] || [ -e "$root/.export-no-output" ]; then
-            [ -e "$root/.export-published" ] && echo "committed archive" > "$out"
-            : > "$root/.export-ready"
-            while [ -e "$root/.export-block" ]; do sleep 0.03; done
-            exit 0
-          fi
           : > "$out"
           i=0
           while [ $i -lt 30 ]; do
@@ -414,29 +420,9 @@ struct EditLibraryTests {
         #expect(!FileManager.default.fileExists(atPath: out.appendingPathComponent("b.tzst").path))
     }
 
-    @Test(arguments: [false, true])
-    func cancellingExportPreservesCommittedOrConcurrentOutput(committed: Bool) async throws {
-        let standIn = try LaunchpadEditStandIn()
-        try standIn.makeMachines(["a"])
-        standIn.touch(".export-block")
-        standIn.touch(committed ? ".export-published" : ".export-no-output")
-        let library = await standIn.library()
-        let file = standIn.temp.url.appendingPathComponent("a.tzst")
-        let export = Task { await library.export([(standIn.path("a"), file)], densest: false, includeIPSW: false, replacing: false) }
-        let ready = URL(fileURLWithPath: standIn.root).appendingPathComponent(".export-ready")
-        #expect(await eventually { FileManager.default.fileExists(atPath: ready.path) })
-        if !committed { try Data("competitor".utf8).write(to: file, options: .withoutOverwriting) }
-        library.cancelExport(standIn.path("a"))
-        await export.value
-        let expected = committed ? "committed archive\n" : "competitor"
-        #expect(try String(contentsOf: file, encoding: .utf8) == expected)
-        #expect(library.exports.isEmpty)
-        #expect(library.actionError == nil)
-    }
-
-    /// A legacy CLI may leave an incomplete final-path file. Launchpad cannot
-    /// prove ownership from that path and must conservatively preserve it.
-    @Test func cancellingLegacyExportPreservesUnqualifiedOutput() async throws {
+    /// Cancel sends SIGINT to the `vm export` child and removes the partial
+    /// archive that export created; it is not reported as an error.
+    @Test func cancellingARunningExportRemovesOnlyTheFileItCreated() async throws {
         let standIn = try LaunchpadEditStandIn()
         try standIn.makeMachines(["a"])
         let library = await standIn.library()
@@ -446,7 +432,7 @@ struct EditLibraryTests {
         library.cancelExport(standIn.path("a"))
         await export.value
 
-        #expect(FileManager.default.fileExists(atPath: file.path))
+        #expect(!FileManager.default.fileExists(atPath: file.path))
         #expect(library.actionError == nil)
         #expect(library.exports.isEmpty)
         // Ended by its SIGINT trap (130), not by finishing its 3 s of
@@ -455,17 +441,19 @@ struct EditLibraryTests {
         #expect(standIn.history.entries.last?.status == 130)
     }
 
-    @Test func existingOutputIsRefusedEvenAfterSavePanelReplacementConfirmation() async throws {
+    @Test func cancellingAnExportOverAnExistingFileLeavesThatFile() async throws {
         let standIn = try LaunchpadEditStandIn()
         try standIn.makeMachines(["a"])
         let library = await standIn.library()
         let file = standIn.temp.url.appendingPathComponent("a.tzst")
-        try Data("earlier archive\n".utf8).write(to: file)
-        await library.export([(standIn.path("a"), file)], densest: false, includeIPSW: false, replacing: true)
-        #expect(try String(contentsOf: file, encoding: .utf8) == "earlier archive\n")
-        #expect(standIn.edits.isEmpty)
-        #expect(library.actionError != nil)
-        #expect(library.exports.isEmpty)
+        FileManager.default.createFile(atPath: file.path, contents: Data("earlier archive\n".utf8))
+        let export = Task { await library.export([(standIn.path("a"), file)], densest: false, includeIPSW: false, replacing: true) }
+        #expect(await eventually { ((try? String(contentsOf: file, encoding: .utf8)) ?? "").hasPrefix("chunk") })
+        library.cancelExport(standIn.path("a"))
+        await export.value
+        // The save panel asked before replacing it; the export truncated it,
+        // but Launchpad does not remove a path that held a file before.
+        #expect(FileManager.default.fileExists(atPath: file.path))
     }
 
     @Test func aFolderExportDoesNotReplaceAnExistingFile() async throws {
