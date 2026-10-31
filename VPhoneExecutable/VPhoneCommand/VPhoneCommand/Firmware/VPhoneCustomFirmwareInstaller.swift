@@ -3954,8 +3954,6 @@ struct VPhoneCustomFirmwareInstaller {
         return false
     }
 
-    /// Re-seal a code-signed bundle on the mounted guest system volume.
-    ///
     /// The accessibility bundles whose executable is on the system volume and
     /// is arm64e.x1 (cpusubtype 12), or keeps a backup from an earlier run.
     /// A bundle with no executable here has its code in the shared cache.
@@ -3989,6 +3987,8 @@ struct VPhoneCustomFirmwareInstaller {
         return word(0) == 0xFEED_FACF && word(4) == 0x0100_000C && word(8) & 0x00FF_FFFF == 12
     }
 
+    /// Re-seal a code-signed bundle on the mounted guest system volume.
+    ///
     /// `patchMachO` re-signs the Mach-O it replaces, but a bundle's outer
     /// `_CodeSignature/CodeResources` seals the whole directory, and a guest
     /// built with the code-signing monitor kills the process that loads a

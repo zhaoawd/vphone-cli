@@ -115,9 +115,12 @@ source SHA, bundle hash, guest patch receipt, commands, and tested machine.
   fold/rotation/lock regressions passed. Both installed all five native probes
   through installd and passed six CSSC correctness checks, eight geometry
   samples and four focused-field checks. The app-owned geometry/focus results
-  match exactly. Both clones are stopped. New diagnostic reports remain
-  untriaged; full windowed, transition-frame, keyboard-mode and transfer
-  acceptance remains incomplete. See [new runtime evidence](RUNTIME.md),
+  match exactly. Diagnostic reports were later triaged
+  ([DIAGNOSTICS.md](DIAGNOSTICS.md)); windowed, transition-frame and
+  keyboard-mode checks are in [WINDOWED.md](WINDOWED.md); cold boots, full
+  transfer, snapshots, long idle, static display/cutout, host restart,
+  network/audio, the KFC X1 fix and F2 cart continuity are in [F6.md](F6.md),
+  with its open issues and uncovered items. See [new runtime evidence](RUNTIME.md),
   `runtime-validation.json`, and [the setup record](ACCEPTANCE.md).
 
 The imported source history is reachable from the integration branch through

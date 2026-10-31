@@ -33,6 +33,7 @@ modification is authorized.
 - [x] Move the foldable board-tree precondition before disk work in `cfw update-environment` (`db111457`; `F6.md`): root check refuses in 3 s with no disk attach. Candidate rebuilt at `ea05ba81` with it (only `vphone-cli` changed; previous bundle kept at `.build/XcodeDuo-a71f2360`).
 - [ ] Open issues recorded, not pursued (`F6.md`, Open issues): KFC 登录会员 ignoring some user clicks; how app accessibility got turned on; `display.auto_lock.set` reads back 300 s.
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
+      Repeated 2026-10-31 for `db111457` and `72b83eb2`: one misplaced doc comment fixed; guest scan finds no universal or nested X1 Mach-O under AccessibilityBundles (78 thin executables, all lowered with backups; 434 bundles in the shared cache).
 
 ## Constraints and approval gates
 

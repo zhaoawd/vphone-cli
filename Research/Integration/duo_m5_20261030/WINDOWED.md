@@ -180,6 +180,6 @@ upstream re-centring rounding, not a candidate change.
 
 ## Not covered
 
-Safe-area/navigation-bar correctness, account-dependent app
-continuity, audio, networking, long idle, snapshots, full export/import,
-static display changes and cutout on/off.
+Safe-area/navigation-bar correctness. App continuity, audio, networking,
+long idle, snapshots, full export/import, static display changes and cutout
+on/off were covered later in [F6.md](F6.md).

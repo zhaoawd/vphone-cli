@@ -121,9 +121,11 @@ not compare diagnostic-report rates or establish long-idle stability. Final
 process checks found none of the recorded source/baseline/candidate VM PIDs,
 and lsof found no open handles on their three disk images.
 
-Windowed F3/F4/F5 results are in [WINDOWED.md](WINDOWED.md). Remaining
-acceptance includes safe-area assessment, keyboard modes, account-dependent application continuity,
-audio, repeated cold boots, 120-minute idle, snapshot restoration, and a full
-64 GB export/import followed by imported boot. Static outer/inner changes and
-cutout patch on/off/on require separately prepared copies and root steps.
-Host restart and additional host privilege changes remain approval gates.
+Windowed F3/F4/F5 and keyboard-mode results are in [WINDOWED.md](WINDOWED.md).
+Account-dependent application continuity, audio, repeated cold boots,
+120-minute idle, snapshot restoration, full export/import with imported boot,
+static outer/inner, cutout on/off/on and host restart were run afterwards and
+are in [F6.md](F6.md). Still not covered: safe-area/navigation-bar assessment,
+the F6 runs on the baseline bundle, a `--max` transfer and a
+constrained-free-space import (`F6.md`, Not covered). Additional host
+privilege changes remain an approval gate.

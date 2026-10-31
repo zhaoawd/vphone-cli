@@ -511,6 +511,10 @@
 > `ApplicationAccessibilityEnabled` and `AutomationEnabled` on, KFC stayed
 > frontmost 30 s and through an accessibility walk with no report (2026-10-31).
 > Loading of that bundle into KFC was not separately logged in this run.
+> A recursive guest scan of `/System/Library/AccessibilityBundles` found no
+> universal or nested Mach-O: the only Mach-Os are these 78 thin main
+> executables, each with a `.bak`; lowering keeps the subtype-12 header, so
+> a later run still selects them without the backup (2026-10-31).
 > See `Research/Integration/duo_m5_20261030/F6.md`.
 
 > **CIBarcode standalone X1 lowering (2026-10-29, local validation):**
