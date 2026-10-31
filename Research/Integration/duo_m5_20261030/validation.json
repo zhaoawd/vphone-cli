@@ -31,6 +31,76 @@
     "candidate": {
       "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/XcodeDuo/Build/Products/Debug/VPhone.bundle",
       "version": "2.14.1",
+      "build_hash": "72b83eb2",
+      "signature_deep_strict": "passed",
+      "files": {
+        "Contents/MacOS/vphone-vm": {
+          "sha256": "f964e9f99e9e2429b0625cb123af0779a8f0342d645e2911197b77d07b17aefd",
+          "bytes": 34665296,
+          "cdhash": "8b3534977edec5209923dd6718ae7653d4822448"
+        },
+        "Contents/MacOS/vphone-cli": {
+          "sha256": "d66d753f940f3e3380a1b337c084577a11f18882e113d1c64a5497cedd3f7946",
+          "bytes": 27468736
+        },
+        "Contents/Resources/guest-resources/vphoned": {
+          "sha256": "8014b18b0139407119541da7ccdb2a2983f60947fb7608a999fa642303e51182",
+          "bytes": 12886560
+        },
+        "Contents/Resources/guest-resources/libvphonefolddisplay.dylib": {
+          "sha256": "a764b380db72e77a1d3c9f93fe84baafaa60666cf9d63b73db99211465f3295b",
+          "bytes": 117728
+        },
+        "Contents/Resources/guest-resources/libinnercutoutfix.dylib": {
+          "sha256": "91c312c56fc163fa49b6c7eca0f250764e6e058b68857ba97fde43bab873afa1",
+          "bytes": 68800
+        }
+      },
+      "rebuilt": {
+        "date": "2026-10-31",
+        "source": "72b83eb2",
+        "code_change": "72b83eb2 static X1 lowering of accessibility bundles",
+        "previous_build_hash": "ea05ba81",
+        "unchanged": "vphone-vm (CDHash 8b3534977edec5209923dd6718ae7653d4822448) and iPhone guest resources byte-identical; vphone-cli, Info.plist, TV/HomePod presets, vphoned-tvos and signature files differ",
+        "checks": [
+          "codesign --verify --deep --strict passed",
+          "FirmwarePatchSetCatalogTests + CustomFirmwareArm64eX1Tests: 40 passed"
+        ]
+      }
+    },
+    "candidate_a71f2360": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/XcodeDuo-a71f2360/VPhone.bundle",
+      "version": "2.14.1",
+      "build_hash": "a71f2360",
+      "signature_deep_strict": "passed",
+      "files": {
+        "Contents/MacOS/vphone-vm": {
+          "sha256": "f964e9f99e9e2429b0625cb123af0779a8f0342d645e2911197b77d07b17aefd",
+          "bytes": 34665296,
+          "cdhash": "8b3534977edec5209923dd6718ae7653d4822448"
+        },
+        "Contents/MacOS/vphone-cli": {
+          "sha256": "ace9b2c55530f0486ec49e42a6d28d8a1ca6d5178ea07a6a604d9c8590d63cbf",
+          "bytes": 27452240
+        },
+        "Contents/Resources/guest-resources/vphoned": {
+          "sha256": "8014b18b0139407119541da7ccdb2a2983f60947fb7608a999fa642303e51182",
+          "bytes": 12886560
+        },
+        "Contents/Resources/guest-resources/libvphonefolddisplay.dylib": {
+          "sha256": "a764b380db72e77a1d3c9f93fe84baafaa60666cf9d63b73db99211465f3295b",
+          "bytes": 117728
+        },
+        "Contents/Resources/guest-resources/libinnercutoutfix.dylib": {
+          "sha256": "91c312c56fc163fa49b6c7eca0f250764e6e058b68857ba97fde43bab873afa1",
+          "bytes": 68800
+        }
+      },
+      "note": "Pinned candidate for all VM evidence through 2026-10-31 (F3-F6, display matrix); APFS clone of the original build."
+    },
+    "candidate_ea05ba81": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/XcodeDuo-ea05ba81/VPhone.bundle",
+      "version": "2.14.1",
       "build_hash": "ea05ba81",
       "signature_deep_strict": "passed",
       "files": {
@@ -68,36 +138,6 @@
           "vphone-cli identical to .build/XcodeBoardTreeCheck build used by Regression/board-tree-precheck.zsh (passed)"
         ]
       }
-    },
-    "candidate_a71f2360": {
-      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/XcodeDuo-a71f2360/VPhone.bundle",
-      "version": "2.14.1",
-      "build_hash": "a71f2360",
-      "signature_deep_strict": "passed",
-      "files": {
-        "Contents/MacOS/vphone-vm": {
-          "sha256": "f964e9f99e9e2429b0625cb123af0779a8f0342d645e2911197b77d07b17aefd",
-          "bytes": 34665296,
-          "cdhash": "8b3534977edec5209923dd6718ae7653d4822448"
-        },
-        "Contents/MacOS/vphone-cli": {
-          "sha256": "ace9b2c55530f0486ec49e42a6d28d8a1ca6d5178ea07a6a604d9c8590d63cbf",
-          "bytes": 27452240
-        },
-        "Contents/Resources/guest-resources/vphoned": {
-          "sha256": "8014b18b0139407119541da7ccdb2a2983f60947fb7608a999fa642303e51182",
-          "bytes": 12886560
-        },
-        "Contents/Resources/guest-resources/libvphonefolddisplay.dylib": {
-          "sha256": "a764b380db72e77a1d3c9f93fe84baafaa60666cf9d63b73db99211465f3295b",
-          "bytes": 117728
-        },
-        "Contents/Resources/guest-resources/libinnercutoutfix.dylib": {
-          "sha256": "91c312c56fc163fa49b6c7eca0f250764e6e058b68857ba97fde43bab873afa1",
-          "bytes": 68800
-        }
-      },
-      "note": "Pinned candidate for all VM evidence through 2026-10-31 (F3-F6, display matrix); APFS clone of the original build."
     }
   },
   "fold_guest_binary_identical": true,
