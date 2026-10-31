@@ -8,6 +8,8 @@
 # Each phase runs display-check.zsh (windowed boot, checks, normal stop).
 # sudo is used only for `cfw update-environment duo-display-matrix` before
 # P4, P5, P6 and P7. --check performs the read-only checks and exits.
+# --resume <evidence-dir> continues at P4 in a run whose P1-P3 already passed
+# (they need no root), so only the sudo phases remain.
 set -euo pipefail
 
 repo_root="$(cd "${0:a:h}/../../../.." && pwd)"
@@ -20,7 +22,8 @@ machine=duo-display-matrix
 fold_display=system-springboard-cfw-fold_display
 inner_cutout=system-springboard-exp-inner_cutout
 mode="${1:-run}"
-[[ "$mode" == run || "$mode" == --check ]] || { print -u2 'Expected no argument or --check'; exit 2; }
+[[ "$mode" == run || "$mode" == --check || "$mode" == --resume ]] \
+    || { print -u2 'Expected no argument, --check or --resume <evidence-dir>'; exit 2; }
 (( EUID != 0 )) || { print -u2 'Run as your normal user; the script invokes sudo for each root step.'; exit 2; }
 
 codesign --verify --deep --strict "$bundle"
@@ -37,9 +40,18 @@ done
 print "Read-only checks passed: pinned candidate bundle; $machine stopped."
 [[ "$mode" != --check ]] || exit 0
 
-run_root="$repo_root/.build/acceptance/cases/display-matrix-$(date -u +%Y%m%dT%H%M%SZ)"
-mkdir -p "$run_root"
-cp "${0:a}" "$run_root/driver.zsh"
+if [[ "$mode" == --resume ]]; then
+    run_root="${2:?--resume needs the evidence directory}"
+    for phase in P1-fold P2-outer P3-inner-folddisplay; do
+        [[ -f "$run_root/$phase/results.txt" ]] || { print -u2 "Missing $phase in $run_root"; exit 1; }
+    done
+    [[ ! -e "$run_root/P4-inner-cutout-on" ]] || { print -u2 "P4 already started in $run_root"; exit 1; }
+    cp "${0:a}" "$run_root/driver-resume.zsh"
+else
+    run_root="$repo_root/.build/acceptance/cases/display-matrix-$(date -u +%Y%m%dT%H%M%SZ)"
+    mkdir -p "$run_root"
+    cp "${0:a}" "$run_root/driver.zsh"
+fi
 print "Evidence: $run_root"
 select_patches() { # select_patches <phase> [set-patches options]
     local phase="$1"; shift
@@ -53,9 +65,13 @@ update_environment() {
 }
 check() { zsh "$regression/display-check.zsh" "$machine" "$run_root/$1" || print -u2 "Phase $1 check failed"; }
 
-display P1 fold; check P1-fold
-display P2 outer; check P2-outer
-display P3 inner; check P3-inner-folddisplay
+if [[ "$mode" == --resume ]]; then
+    display P4-pre inner
+else
+    display P1 fold; check P1-fold
+    display P2 outer; check P2-outer
+    display P3 inner; check P3-inner-folddisplay
+fi
 select_patches P4 --block $fold_display --allow $inner_cutout
 update_environment P4; check P4-inner-cutout-on
 select_patches P5 --block $fold_display

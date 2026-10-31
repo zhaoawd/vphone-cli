@@ -53,7 +53,8 @@ host '{"t":"display.geometry","screen":false}' > "$output_root/geometry.json"
 note "screen: $(jq -c '.result|{width,height,orientation,scale}' "$output_root/screen.json") geometry: $(jq -c '.result|{configured_pixels,screenshot_pixels,windowed}' "$output_root/geometry.json")"
 rpc files.list '{"path":"/usr/lib"}' > "$output_root/usr-lib.json"
 note "guest libraries: $(jq -r '[.. | strings | select(test("lib(innercutoutfix|vphonefolddisplay|vphonefoldguard)\\.dylib$")) | sub(".*/"; "")] | unique | join(",")' "$output_root/usr-lib.json")"
-note "receipt guest patches: $(/usr/bin/plutil -convert json -o - "$library/$machine/PatchReceipt.plist" 2>/dev/null | jq -r '[.. | strings | select(test("inner_cutout|fold_display|fold_guard"))] | unique | join(",")')"
+# plutil -p, not JSON: the receipt holds dates/data that JSON conversion rejects.
+note "receipt guest patches: $(/usr/bin/plutil -p "$library/$machine/PatchReceipt.plist" 2>/dev/null | grep -oE '"[^"]*(inner_cutout|fold_display|fold_guard)[^"]*"' | tr -d '"' | sort -u | paste -sd, -)"
 for hinge in closed open-flat; do
     rpc display.posture "$(jq -nc --arg h "$hinge" '{hinge:$h}')" > "$output_root/posture-$hinge.json"
     /bin/sleep 3
