@@ -30,7 +30,7 @@ These counts describe path overlap, not confirmed merge conflicts.
 | Experimental panel mounting and window-frame correction | c5629f5b, 78b79d0f | Retained upstream orientation behavior; ported the independent frame restoration after toolbar installation. New window acceptance is pending. |
 | Experimental vphoned display-association injection | bf02a819 | Keep inactive unless a new reproduction establishes a requirement. |
 | SpringBoard touch diagnostics | b4680ceb and subsequent trace commits | Preserve diagnostic sources and evidence without enabling them by default. |
-| Optional inner cutout correction | b18c8f48, 9c8f2873 | Ported as a reversible, Duo-only, iOS 27.1 guest-library patch; off in standard, skipped while the fold library is installed. Catalog and resource paths tested; VM acceptance pending. |
+| Optional inner cutout correction | b18c8f48, 9c8f2873 | Ported as a reversible, Duo-only, iOS 27.1 guest-library patch; off in standard, skipped while the fold library is installed. Catalog and resource paths tested; VM on/off/on accepted 2026-10-31 (`F6.md`): taps reach apps only with it on. |
 | Previous-frame hold across fold transitions | fb41cd6b | Upstream now changes panel ownership, rendering, and wake behavior. Establish an A/B reproduction before adopting a runtime change. |
 | Plans, probes, and regression scripts | source plan folder and run/fold214 | Eight historical plan documents plus 29 current historical scripts/small results preserved; 602 run files indexed by hash. Ten native probe inputs preserved; maintained builds and regressions use explicit/new paths. |
 
