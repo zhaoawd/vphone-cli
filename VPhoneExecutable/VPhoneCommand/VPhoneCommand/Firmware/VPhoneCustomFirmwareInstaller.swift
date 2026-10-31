@@ -340,6 +340,20 @@ struct VPhoneCustomFirmwareInstaller {
         } else {
             homePodDisplay = nil
         }
+        // The same requirement `patchPreboot` enforces, checked before any disk
+        // work: an imported copy exported without its IPSW has no
+        // FirmwareOriginals, and the Preboot pass otherwise fails only after
+        // every system-volume patch has been built.
+        if Self.isFoldable(device), boardDeviceTree == nil {
+            let needsTree = [
+                FirmwareGuestSystemPatchSet.prebootFoldableProductId,
+                FirmwareGuestSystemPatchSet.prebootFoldableDisplays,
+            ].filter { plan?.isEnabled($0) ?? true }
+            if !needsTree.isEmpty {
+                let tree = (device.boardDeviceTreePath as NSString).lastPathComponent
+                throw ValidationError("\(needsTree.joined(separator: ", ")) need(s) the board's own device tree, and \(VPhoneBundleOperations.firmwareOriginalsDirectoryName) has no \(tree). Put this VM's IPSW in the IPSW cache, or copy its \(device.boardDeviceTreePath) into \(VPhoneBundleOperations.firmwareOriginalsDirectoryName)/<restore tree>/Firmware/all_flash/, then run this again.")
+            }
+        }
 
         // Work on an APFS clone of Disk.img in the private folder, then rename
         // it over the original: nothing is attached from the caller's folder,

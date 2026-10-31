@@ -27,7 +27,7 @@ modification is authorized.
 - [x] Windowed A/B: keyboard modes across folds and window frame restore (`WINDOWED.md`).
 - [x] F6 on the candidate: 5 cold boots, full 64 GB export/import with imported boots, snapshot round trip, 120-minute locked idle (`F6.md`).
 - [x] Static outer/inner and cutout on/off/on (`Regression/display-matrix.zsh`, `F6.md`): P1–P7 pass; P5 (cutout off) loses all inner taps as documented.
-- [ ] Move the foldable board-tree precondition before disk work in `cfw update-environment` (imported Duo copies lack `FirmwareOriginals`; `F6.md`).
+- [ ] Move the foldable board-tree precondition before disk work in `cfw update-environment` (imported Duo copies lack `FirmwareOriginals`; `F6.md`). Implemented and built at `.build/XcodeBoardTreeCheck`; root check `Regression/board-tree-precheck.zsh` pending the user's run. Pinned candidate in `.build/XcodeDuo` unchanged.
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
 
 ## Constraints and approval gates
