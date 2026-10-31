@@ -31,6 +31,47 @@
     "candidate": {
       "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/XcodeDuo/Build/Products/Debug/VPhone.bundle",
       "version": "2.14.1",
+      "build_hash": "ea05ba81",
+      "signature_deep_strict": "passed",
+      "files": {
+        "Contents/MacOS/vphone-vm": {
+          "sha256": "f964e9f99e9e2429b0625cb123af0779a8f0342d645e2911197b77d07b17aefd",
+          "bytes": 34665296,
+          "cdhash": "8b3534977edec5209923dd6718ae7653d4822448"
+        },
+        "Contents/MacOS/vphone-cli": {
+          "sha256": "10a7d71972657c5a95a6d891bc3fb06c8567a2a7308a30d59f75534f11da1583",
+          "bytes": 27468928
+        },
+        "Contents/Resources/guest-resources/vphoned": {
+          "sha256": "8014b18b0139407119541da7ccdb2a2983f60947fb7608a999fa642303e51182",
+          "bytes": 12886560
+        },
+        "Contents/Resources/guest-resources/libvphonefolddisplay.dylib": {
+          "sha256": "a764b380db72e77a1d3c9f93fe84baafaa60666cf9d63b73db99211465f3295b",
+          "bytes": 117728
+        },
+        "Contents/Resources/guest-resources/libinnercutoutfix.dylib": {
+          "sha256": "91c312c56fc163fa49b6c7eca0f250764e6e058b68857ba97fde43bab873afa1",
+          "bytes": 68800
+        }
+      },
+      "rebuilt": {
+        "date": "2026-10-31",
+        "source": "ea05ba81",
+        "code_change": "db111457 early foldable board-tree check",
+        "previous_build_hash": "a71f2360",
+        "unchanged": "vphone-vm (CDHash 8b3534977edec5209923dd6718ae7653d4822448) and all guest resources byte-identical; only vphone-cli, Info.plist and signature files differ",
+        "checks": [
+          "codesign --verify --deep --strict passed",
+          "Regression/display-config.zsh passed",
+          "vphone-cli identical to .build/XcodeBoardTreeCheck build used by Regression/board-tree-precheck.zsh (passed)"
+        ]
+      }
+    },
+    "candidate_a71f2360": {
+      "path": "/Users/kolar/github/vphone-cli/.worktrees/duo-integration-20261030/.build/XcodeDuo-a71f2360/VPhone.bundle",
+      "version": "2.14.1",
       "build_hash": "a71f2360",
       "signature_deep_strict": "passed",
       "files": {
@@ -55,7 +96,8 @@
           "sha256": "91c312c56fc163fa49b6c7eca0f250764e6e058b68857ba97fde43bab873afa1",
           "bytes": 68800
         }
-      }
+      },
+      "note": "Pinned candidate for all VM evidence through 2026-10-31 (F3-F6, display matrix); APFS clone of the original build."
     }
   },
   "fold_guest_binary_identical": true,

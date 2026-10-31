@@ -127,7 +127,12 @@ without replacing current upstream implementations. `main` is unchanged and
 no remote push has been made.
 
 The final candidate was built clean at `a71f2360`; later validation-record
-commits change documentation only. The baseline build at `d3af6081` differs
+commits change documentation only. On 2026-10-31 the candidate was rebuilt at `ea05ba81` for one
+code change, `db111457` (early foldable board-tree check in `cfw
+update-environment`). Only `vphone-cli` changed; `vphone-vm` (CDHash
+`8b353497…`) and the guest resources are byte-identical. All VM evidence
+through the display matrix was taken on `a71f2360`, kept at
+`.build/XcodeDuo-a71f2360`. The baseline build at `d3af6081` differs
 from upstream `39324ee7` only by this integration's initial planning documents.
 The baseline and candidate fold-display guest libraries have identical SHA-256
 hashes. The original worktree status digest still matches the pre-operation
