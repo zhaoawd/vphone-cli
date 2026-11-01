@@ -17,10 +17,11 @@ enum GuestAPIError: Error, CustomStringConvertible {
     /// The guest's Location Services switch is off, so locationd gives no
     /// client a location. vphoned leaves the switch to the guest's Settings.
     case locationServicesOff
+    case locationReadbackUnconfirmed(String)
 
     var description: String {
         switch self {
-        case let .invalidRequest(message), let .operationFailed(message): message
+        case let .invalidRequest(message), let .operationFailed(message), let .locationReadbackUnconfirmed(message): message
         case let .unsupportedMethod(method): "Unknown method: \(method)"
         case let .alreadyDone(_, message): message
         case .locationServicesOff:
@@ -34,6 +35,9 @@ enum GuestAPIError: Error, CustomStringConvertible {
         }
         if case .locationServicesOff = self {
             return "location_services_off"
+        }
+        if case .locationReadbackUnconfirmed = self {
+            return "location_readback_unconfirmed"
         }
         return "invalid_operation"
     }
@@ -404,15 +408,23 @@ enum GuestAPI {
             return try hidPress(page: page, usage: usage)
         case "location.set":
             guard CLLocationManager.locationServicesEnabled() else { throw GuestAPIError.locationServicesOff }
-            return try simulateLocation(
-                latitude: number(params, "latitude"),
-                longitude: number(params, "longitude"),
-                altitude: number(params, "altitude", default: 0),
-                horizontalAccuracy: number(params, "horizontal_accuracy", default: 5),
-                verticalAccuracy: number(params, "vertical_accuracy", default: 5),
-                speed: (params["speed"] as? NSNumber)?.doubleValue,
-                course: (params["course"] as? NSNumber)?.doubleValue,
-            )
+            let latitude = number(params, "latitude")
+            let longitude = number(params, "longitude")
+            do {
+                return try GuestLocationReadback.set(latitude: latitude, longitude: longitude, simulate: {
+                    try simulateLocation(
+                        latitude: latitude,
+                        longitude: longitude,
+                        altitude: number(params, "altitude", default: 0),
+                        horizontalAccuracy: number(params, "horizontal_accuracy", default: 5),
+                        verticalAccuracy: number(params, "vertical_accuracy", default: 5),
+                        speed: (params["speed"] as? NSNumber)?.doubleValue,
+                        course: (params["course"] as? NSNumber)?.doubleValue,
+                    )
+                }, clear: { try clearSimulatedLocation() })
+            } catch let failure as GuestLocationReadback.Failure {
+                throw GuestAPIError.locationReadbackUnconfirmed(failure.description)
+            }
         case "location.clear":
             return try clearSimulatedLocation()
         case "location.current":

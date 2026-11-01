@@ -1,0 +1,36 @@
+{
+  "request": {
+    "t": "rpc",
+    "method": "location.set",
+    "params": {
+      "latitude": 0.0,
+      "longitude": 0.0,
+      "altitude": 12.0,
+      "horizontal_accuracy": 3.0,
+      "vertical_accuracy": 4.0,
+      "speed": 2.0,
+      "course": 90.0
+    },
+    "screen": false
+  },
+  "response": {
+    "result": {
+      "simulating": true,
+      "location": {
+        "age_seconds": 5.0120439529418945,
+        "speed": 2,
+        "timestamp": "2026-11-01T01:22:55.227Z",
+        "longitude": 0.001,
+        "horizontal_accuracy": 3,
+        "latitude": 0,
+        "vertical_accuracy": 4,
+        "course": 90,
+        "fresh": true,
+        "altitude": 12,
+        "client": "/System/Library/LocationBundles/TimeZone.bundle",
+        "simulated": true
+      }
+    },
+    "ok": true
+  }
+}

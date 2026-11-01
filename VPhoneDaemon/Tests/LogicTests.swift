@@ -40,8 +40,69 @@ enum LogicTests {
         processSpawnPolicy()
         bootstrapPlatform()
         setupAssistantState()
+        locationReadback()
         print("\(checks) checks, \(failures) failures")
         exit(failures == 0 ? 0 : 1)
+    }
+
+    // MARK: - Location confirmation
+
+    static func locationReadback() {
+        let fixture = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .appendingPathComponent("Fixtures/location-origin-mismatch.json")
+        let event = try! JSONSerialization.jsonObject(with: Data(contentsOf: fixture)) as! [String: Any]
+        let actual = (event["response"] as! [String: Any])["result"] as! [String: Any]
+        let reading = actual["location"] as! [String: Any]
+        func exercise(_ result: [String: Any], expected: Bool, clearFails: Bool = false) {
+            var simulated = 0
+            var cleared = 0
+            do {
+                let value = try GuestLocationReadback.set(latitude: 0, longitude: 0, simulate: {
+                    simulated += 1
+                    return result
+                }, clear: {
+                    cleared += 1
+                    if clearFails { throw NSError(domain: "clear-failed", code: 1) }
+                    return ["simulating": false]
+                })
+                expect(expected, "unconfirmed location must throw")
+                expectEqual((value["location"] as? [String: Any])?["longitude"] as? Double, 0, "confirmed payload preserved")
+            } catch {
+                expect(!expected, "matching location should pass: \(error)")
+                if clearFails { expect(String(describing: error).contains("clear"), "clear failure remains visible") }
+            }
+            expectEqual(simulated, 1, "write is never replayed")
+            expectEqual(cleared, expected ? 0 : 1, "only invalid confirmations trigger cleanup")
+        }
+        // The exact real response: fresh/simulated, but still longitude 0.001.
+        exercise(actual, expected: false)
+        exercise(actual, expected: false, clearFails: true)
+        var matching = reading
+        matching["longitude"] = 0.0
+        exercise(["simulating": true, "location": matching], expected: true)
+        for key in ["fresh", "simulated"] {
+            var invalid = matching
+            invalid[key] = false
+            exercise(["simulating": true, "location": invalid], expected: false)
+            invalid[key] = 1
+            exercise(["simulating": true, "location": invalid], expected: false)
+        }
+        for value: Any in [Double.nan, Double.infinity, true, "0", 1e-7] {
+            var invalid = matching
+            invalid["longitude"] = value
+            exercise(["simulating": true, "location": invalid], expected: false)
+        }
+        exercise(["simulating": false, "location": matching], expected: false)
+        exercise(["simulating": 1, "location": matching], expected: false)
+        exercise(["simulating": true], expected: false)
+        var cleared = 0
+        do {
+            _ = try GuestLocationReadback.set(latitude: 0, longitude: 0, simulate: {
+                throw NSError(domain: "original", code: 42)
+            }, clear: { cleared += 1; return [:] })
+            expect(false, "original simulation failure must propagate")
+        } catch { expectEqual((error as NSError).domain, "original", "preserve original error") }
+        expectEqual(cleared, 0, "do not repeat the dependency's cleanup on its own error")
     }
 
     static func processSpawnPolicy() {
