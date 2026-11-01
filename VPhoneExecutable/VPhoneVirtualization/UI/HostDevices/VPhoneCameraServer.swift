@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import Synchronization
 import Virtualization
 
 /// Host-side virtual-camera server.
@@ -18,9 +19,14 @@ import Virtualization
 /// The header carries the format so the receiver doesn't have to
 /// assume; for now the producer fixes width/height/bpr/fmt at
 /// 1280x720 BGRA. Future producers may emit different formats.
+private final class VPhoneCameraGenerationFence: Sendable {
+    let token = Atomic<UInt64>(0)
+}
+
 @MainActor
 final class VPhoneCameraServer {
     enum SourceKind: String {
+        case image
         case off
         case testPattern
         case videoFile // .mov / .mp4 / .m4v via AVAssetReader
@@ -42,6 +48,13 @@ final class VPhoneCameraServer {
     private var timer: DispatchSourceTimer?
     private var connectionAttemptToken: UInt64 = 0
     private var framePending = false
+    private(set) var currentGeneration = ""
+    private(set) var currentRole = "neutral"
+    private(set) var presentationID = ""
+    private var fps = VPhoneCameraServer.defaultFPS
+    private var wireFrameIndex: UInt64 = 0
+    private var mayRetainQR = false
+    private let fence = VPhoneCameraGenerationFence()
 
     private let producerQueue = DispatchQueue(
         label: "com.vphone.camera.producer",
@@ -80,8 +93,13 @@ final class VPhoneCameraServer {
         if wasStreaming {
             stopStreaming()
         }
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        currentGeneration = ""
+        presentationID = ""
         sourceKind = kind
         switch kind {
+        case .image:
+            producer = nil
         case .off:
             producer = nil
         case .testPattern:
@@ -114,6 +132,102 @@ final class VPhoneCameraServer {
         }
     }
 
+    /// Present a still image under a fresh generation/role at a given FPS.
+    ///
+    /// Returns whether the host source was established and streaming (re)started.
+    /// It does NOT prove the guest consumed the frame — the two-level transport
+    /// receipt (vphoned published + libvcamcaptured observed) is assembled by the
+    /// host-control layer via the guest 1337 `vcam_status` channel, and only that
+    /// may report `ok=true` to the caller (invariant #7).
+    func present(imagePath: String, generation: String, role: String, fps: Double) -> Bool {
+        let producer: VPhoneFrameProducer
+        do {
+            producer = try VPhoneStillImageProducer(
+                url: URL(fileURLWithPath: imagePath),
+                width: Self.defaultWidth, height: Self.defaultHeight)
+        } catch {
+            print("[camera] present: failed to load \(imagePath): \(error)")
+            return false
+        }
+        return beginPresentation(producer, sourceKind: .image,
+                                 generation: generation, role: role, fps: fps)
+    }
+
+    /// Present a looping video under a fresh generation/role at a given FPS.
+    func present(videoPath: String, generation: String, role: String, fps: Double) -> Bool {
+        let producer: VPhoneFrameProducer
+        do {
+            producer = try VPhoneVideoFileProducer(
+                url: URL(fileURLWithPath: videoPath),
+                width: Self.defaultWidth, height: Self.defaultHeight)
+        } catch {
+            print("[camera] present: failed to load \(videoPath): \(error)")
+            return false
+        }
+        return beginPresentation(producer, sourceKind: .videoFile,
+                                 generation: generation, role: role, fps: fps)
+    }
+
+    func presentNeutral(generation: String, fps: Double) -> Bool {
+        beginPresentation(VPhoneNeutralFrameProducer(width: Self.defaultWidth, height: Self.defaultHeight),
+                          sourceKind: .image, generation: generation, role: "neutral", fps: fps)
+    }
+
+    private func beginPresentation(_ producer: any VPhoneFrameProducer,
+                                   sourceKind: SourceKind,
+                                   generation: String, role: String, fps: Double) -> Bool {
+        stopStreaming()
+        self.producer = producer
+        self.sourceKind = sourceKind
+        self.currentGeneration = generation
+        self.presentationID = UUID().uuidString
+        self.currentRole = role
+        if role == "qr" { mayRetainQR = true }
+        self.fps = min(30.0, max(1.0, fps))
+        self.wireFrameIndex = 0
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        if isConnected { startStreaming() }
+        print("[camera] present gen=\(generation) role=\(role) fps=\(self.fps)")
+        return isConnected
+    }
+
+    /// Stop host production only if `generation` owns the source. The guest
+    /// retains its last copied frame; this does not present a neutral image.
+    func stop(generation: String) -> Bool {
+        guard currentGeneration == generation else { return false }
+        stopStreaming()
+        producer = nil
+        sourceKind = .off
+        currentGeneration = ""
+        presentationID = ""
+        // Preserve unsafe retained QR state until a neutral frame is acknowledged.
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        return true
+    }
+
+    /// Host-side publish snapshot for one generation (§8.1). The guest-observed
+    /// half is added by the host-control layer from the 1337 `vcam_status` reply.
+    func hostStatus(generation: String) -> [String: Any] {
+        [
+            "source": sourceKind.rawValue,
+            "role": sourceKind == .off && mayRetainQR ? "qr" : currentRole,
+            "generation": currentGeneration,
+            "presentation_id": presentationID,
+            "streaming": timer != nil,
+            "connected": isConnected,
+            // Retain the legacy field; it counts scheduled ticks, not completed writes.
+            "host_published_frame_index": Int(wireFrameIndex),
+            "host_scheduled_frame_index": Int(wireFrameIndex),
+            "host_frame_index_semantics": "scheduled_tick",
+            "matches_requested": currentGeneration == generation,
+        ]
+    }
+
+    func confirmCopied(generation: String, presentationID: String) {
+        guard currentGeneration == generation, self.presentationID == presentationID else { return }
+        if currentRole == "neutral" { mayRetainQR = false }
+    }
+
     // MARK: - Streaming
 
     func startStreaming() {
@@ -121,7 +235,7 @@ final class VPhoneCameraServer {
         if timer != nil {
             return
         }
-        let interval = 1.0 / Self.defaultFPS
+        let interval = 1.0 / fps
         // Timer fires on the main queue so MainActor-isolated state
         // (producer, connectionFD) can be read directly without tripping
         // Swift 6's strict-concurrency isolation check. The frame
@@ -147,15 +261,24 @@ final class VPhoneCameraServer {
             }
             framePending = true
             let connectionToken = connectionAttemptToken
+            let sourceToken = fence.token.load(ordering: .relaxed)
+            let fence = self.fence
+            let generation = currentGeneration
+            let role = currentRole
+            let presentationID = self.presentationID
+            wireFrameIndex &+= 1
+            let frameIndex = wireFrameIndex
             let q = producerQueue
             q.async { [weak self] in
                 let frame = producer.nextFrame()
-                let ok = frame.map { Self.send(fd: fd, frame: $0) } ?? true
+                let current = fence.token.load(ordering: .relaxed) == sourceToken
+                let ok = current ? (frame.map { Self.send(fd: fd, frame: $0, generation: generation,
+                    role: role, frameIndex: frameIndex, presentationID: presentationID) } ?? true) : true
                 close(fd)
                 Task { @MainActor [weak self] in
                     guard let self else { return }
                     framePending = false
-                    if !ok, connectionAttemptToken == connectionToken, connectionFD == sourceFD {
+                    if !ok, connectionAttemptToken == connectionToken, connectionFD == sourceFD, fence.token.load(ordering: .relaxed) == sourceToken {
                         handleDisconnect()
                     }
                 }
@@ -167,6 +290,7 @@ final class VPhoneCameraServer {
     }
 
     func stopStreaming() {
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
         guard let t = timer else { return }
         t.cancel()
         timer = nil
@@ -227,7 +351,7 @@ final class VPhoneCameraServer {
     // MARK: - Wire
 
     @discardableResult
-    private nonisolated static func send(fd: Int32, frame: VPhoneCameraFrame) -> Bool {
+    private nonisolated static func send(fd: Int32, frame: VPhoneCameraFrame, generation: String = "", role: String = "test", frameIndex: UInt64 = 0, presentationID: String = "") -> Bool {
         // header
         let headerDict: [String: Any] = [
             "w": frame.width,
@@ -235,6 +359,7 @@ final class VPhoneCameraServer {
             "bpr": frame.bytesPerRow,
             "fmt": Self.pixelFormat,
             "ts": frame.timestampNS,
+            "gen": generation, "role": role, "fi": frameIndex, "presentation_id": presentationID,
         ]
         guard
             let headerData = try? JSONSerialization.data(withJSONObject: headerDict, options: [])

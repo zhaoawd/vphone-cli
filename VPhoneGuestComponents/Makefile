@@ -277,7 +277,7 @@ $(CAMFIX): $(CAMFIX_SOURCES) $(CAMFIX_INPUTS) | $(STAGE)/camfix
 	$(CLANG) $(COMMON_FLAGS) $(CAMFIX_INCLUDE_FLAGS) -dynamiclib \
 		-install_name @rpath/libcamfix.dylib \
 		-o $@ $(CAMFIX_SOURCES) \
-		-framework Foundation -framework AVFoundation -framework ImageIO \
+		-framework Foundation -framework AVFoundation -framework CoreImage -framework ImageIO \
 		-framework IOSurface -framework CoreMedia -framework CoreVideo \
 		-framework CoreGraphics -framework QuartzCore -framework Accelerate
 	@codesign --force --sign - $@

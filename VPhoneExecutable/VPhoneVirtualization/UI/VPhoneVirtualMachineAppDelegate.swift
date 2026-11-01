@@ -318,6 +318,7 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
 
             // Wire location toggle through onConnect/onDisconnect
             control.onConnect = { [weak self, weak mc, weak provider = locationProvider, weak timeZoneSync, weak clockSync, weak hostAudioLatencySync] caps in
+                Task { [weak self] in await self?.hostAutomationServer?.systemLocation?.controller.reapplyAfterReconnect() }
                 mc?.updateConnectAvailability(available: true)
                 mc?.updateInstallAvailability(available: caps.contains("ipa_install"))
                 mc?.updateBootstrapAvailability(available: caps.contains("bootstrap_install"))
@@ -379,6 +380,7 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
         } else if !command.dfu {
             // Headless mode: no menu, so the machine's setting alone decides.
             control.onConnect = { [weak self, weak control, weak provider = locationProvider, weak timeZoneSync, weak clockSync, weak hostAudioLatencySync] caps in
+                Task { [weak self] in await self?.hostAutomationServer?.systemLocation?.controller.reapplyAfterReconnect() }
                 if !caps.contains("location") {
                     print("[location] guest does not support location simulation")
                 } else if control?.syncsHostLocation == true {
@@ -418,6 +420,9 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
             screenWidth: options.screenWidth,
             screenHeight: options.screenHeight,
         )
+        server.cameraServer = cameraServer
+        server.locationProvider = locationProvider
+        locationProvider?.automationLocationIsActive = { [weak server] in server?.systemLocation?.controller.hasActiveSource == true }
         server.virtualMachine = vm
         hostAutomationServer = server
     }

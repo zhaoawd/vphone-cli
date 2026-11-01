@@ -24,6 +24,7 @@ extern "C" {
 
 /* Starts the listener on a background thread. Idempotent. */
 void vp_vcam_start(void);
+NSDictionary *vp_vcam_status(NSDictionary *msg);
 
 #ifdef __cplusplus
 }

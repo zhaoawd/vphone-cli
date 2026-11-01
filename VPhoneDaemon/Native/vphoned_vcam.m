@@ -31,6 +31,14 @@
 #include <sys/types.h>
 #include <sys/vsock.h>
 #include <unistd.h>
+#include <time.h>
+
+static uint64_t s_publisher_started_at_ns;
+static uint64_t vvc_mono_ns(void) {
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) return 0;
+  return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+}
 
 static pthread_once_t s_start_once = PTHREAD_ONCE_INIT;
 static uint8_t       *s_shm_base   = NULL;
@@ -186,6 +194,7 @@ static int open_shm(void) {
   }
   /* Zero the header on first init so seq starts at 0. */
   memset(base, 0, VPHONE_VCAM_SHM_HEADER_SIZE);
+  s_publisher_started_at_ns = vvc_mono_ns();
   s_shm_base = (uint8_t *)base;
   return 0;
 }
@@ -208,6 +217,8 @@ static void publish_frame(uint32_t w,
                           uint32_t bpr,
                           uint32_t fmt,
                           uint64_t ts_ns,
+                          const char *generation,
+                          const uint8_t presentation_id[16],
                           const uint8_t *pixels,
                           size_t pixel_len) {
   if (!s_shm_base) return;
@@ -233,6 +244,10 @@ static void publish_frame(uint32_t w,
   hdr->pixel_format = fmt;
   hdr->timestamp_ns = ts_ns;
   hdr->frame_index += 1;
+  hdr->published_at_ns = vvc_mono_ns();
+  memset(hdr->generation, 0, sizeof(hdr->generation));
+  if (generation) strlcpy(hdr->generation, generation, sizeof(hdr->generation));
+  memcpy(hdr->presentation_id, presentation_id, 16);
   hdr->pixels_length = (uint32_t)pixel_len;
   memcpy(dst, pixels, pixel_len);
 
@@ -287,6 +302,16 @@ static void handle_client(int fd) {
     uint32_t bpr = (uint32_t)[hdict[@"bpr"] unsignedIntValue];
     uint32_t fmt = (uint32_t)[hdict[@"fmt"] unsignedIntValue];
     uint64_t ts  = (uint64_t)[hdict[@"ts"]  unsignedLongLongValue];
+    char generation[VPHONE_VCAM_GENERATION_MAX] = {0};
+    id value = hdict[@"gen"];
+    if ([value isKindOfClass:NSString.class] && [(NSString *)value lengthOfBytesUsingEncoding:NSUTF8StringEncoding] < sizeof(generation))
+      strlcpy(generation, [(NSString *)value UTF8String], sizeof(generation));
+    uint8_t presentation_id[16] = {0};
+    value = hdict[@"presentation_id"];
+    if ([value isKindOfClass:NSString.class]) {
+      NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:value];
+      if (uuid) [uuid getUUIDBytes:presentation_id];
+    }
     free(header_buf);
 
     if (!hdict || jerr || w == 0 || h == 0 || bpr == 0 ||
@@ -300,7 +325,7 @@ static void handle_client(int fd) {
       free(pixel_buf);
       break;
     }
-    publish_frame(w, h, bpr, fmt, ts, pixel_buf, pixel_len);
+    publish_frame(w, h, bpr, fmt, ts, generation, presentation_id, pixel_buf, pixel_len);
     free(pixel_buf);
 
     frames++;
@@ -392,4 +417,133 @@ static void start_listener_once(void) {
 void vp_vcam_start(void) {
   vvc_logf("vphoned_vcam: vp_vcam_start called (pid=%d)", getpid());
   pthread_once(&s_start_once, start_listener_once);
+}
+
+// MARK: - vcam_status (guest half of the two-level transport receipt)
+
+/* Read the observe shm with seq-stability discipline. Returns YES if a
+ * stable snapshot was captured. The file is created lazily by
+ * libvcamcaptured after it observes its first frame, so a missing file is
+ * a normal "not observed yet" state, not an error. */
+static BOOL read_observe_snapshot(uint64_t *out_index, uint64_t *out_at_ns,
+                                  uint64_t *out_count, char *out_gen,
+                                  size_t out_gen_cap, uint8_t out_presentation_id[16]) {
+  int fd = open(VPHONE_VCAM_OBSERVE_SHM_PATH, O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK);
+  if (fd < 0) return NO;
+  struct stat st;
+  if (fstat(fd, &st) < 0 || !S_ISREG(st.st_mode) || st.st_nlink != 1 || st.st_size < VPHONE_VCAM_OBSERVE_SHM_SIZE) {
+    close(fd);
+    return NO;
+  }
+  void *base = mmap(NULL, VPHONE_VCAM_OBSERVE_SHM_SIZE, PROT_READ,
+                    MAP_SHARED, fd, 0);
+  close(fd);
+  if (base == MAP_FAILED) return NO;
+
+  BOOL ok = NO;
+  const vphone_vcam_observe_header_t *oh =
+      (const vphone_vcam_observe_header_t *)base;
+  /* Three attempts: read, then re-check seq for a torn/in-progress write. */
+  for (int attempt = 0; attempt < 3; attempt++) {
+    uint64_t seq_a = atomic_load_explicit(
+        (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+    if (seq_a & 1ull) continue;  /* writer in progress */
+    uint64_t idx = oh->observed_frame_index;
+    uint64_t at_ns = oh->observed_at_ns;
+    uint64_t count = oh->observed_count;
+    char gen[VPHONE_VCAM_GENERATION_MAX];
+    memcpy(gen, oh->observed_generation, VPHONE_VCAM_GENERATION_MAX);
+    gen[VPHONE_VCAM_GENERATION_MAX - 1] = '\0';
+    uint8_t presentation_id[16];
+    memcpy(presentation_id, oh->presentation_id, 16);
+    uint64_t seq_b = atomic_load_explicit(
+        (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+    if (seq_b != seq_a) continue;  /* torn — retry */
+    memcpy(out_presentation_id, presentation_id, 16);
+    if (out_index) *out_index = idx;
+    if (out_at_ns) *out_at_ns = at_ns;
+    if (out_count) *out_count = count;
+    if (out_gen && out_gen_cap) {
+      strncpy(out_gen, gen, out_gen_cap - 1);
+      out_gen[out_gen_cap - 1] = '\0';
+    }
+    ok = YES;
+    break;
+  }
+  munmap(base, VPHONE_VCAM_OBSERVE_SHM_SIZE);
+  return ok;
+}
+
+NSDictionary *vp_vcam_status(NSDictionary *msg) {
+  (void)msg;
+  NSMutableDictionary *r = [NSMutableDictionary dictionary];
+
+  if (!s_shm_base) {
+    /* No publisher yet: report zeros so the host stays fail-closed. */
+    r[@"vphoned_published_frame_index"] = @0;
+    r[@"libvcam_observed_frame_index"] = @0;
+    r[@"vphoned_published_at_ns"] = @0;
+    r[@"libvcam_observed_at_ns"] = @0;
+    r[@"generation"] = @"";
+    return r;
+  }
+
+  const vphone_vcam_shm_header_t *hdr =
+      (const vphone_vcam_shm_header_t *)s_shm_base;
+  /* Snapshot the publish header with the same seq discipline. */
+  uint64_t pub_index = 0, pub_at_ns = 0;
+  uint8_t pub_presentation_id[16] = {0};
+  char pub_gen[VPHONE_VCAM_GENERATION_MAX];
+  pub_gen[0] = '\0';
+  for (int attempt = 0; attempt < 3; attempt++) {
+    uint64_t seq_a = atomic_load_explicit(
+        (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+    if (seq_a & 1ull) continue;
+    uint64_t candidate_index = hdr->frame_index;
+    uint64_t candidate_at_ns = hdr->published_at_ns;
+    char candidate_gen[VPHONE_VCAM_GENERATION_MAX];
+    memcpy(candidate_gen, hdr->generation, sizeof(candidate_gen));
+    candidate_gen[VPHONE_VCAM_GENERATION_MAX - 1] = '\0';
+    uint8_t candidate_presentation_id[16];
+    memcpy(candidate_presentation_id, hdr->presentation_id, 16);
+    uint64_t seq_b = atomic_load_explicit(
+        (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+    if (seq_b == seq_a) {
+      memcpy(pub_presentation_id, candidate_presentation_id, 16);
+      pub_index = candidate_index;
+      pub_at_ns = candidate_at_ns;
+      memcpy(pub_gen, candidate_gen, sizeof(pub_gen));
+      break;
+    }
+  }
+
+  uint64_t obs_index = 0, obs_at_ns = 0, obs_count = 0;
+  char obs_gen[VPHONE_VCAM_GENERATION_MAX];
+  obs_gen[0] = '\0';
+  uint8_t obs_presentation_id[16] = {0};
+  BOOL have_obs = read_observe_snapshot(&obs_index, &obs_at_ns, &obs_count,
+                                        obs_gen, sizeof(obs_gen), obs_presentation_id);
+
+  /* The receipt proves that at least one frame of this generation was
+   * copied from the publish shm, not that the latest frame reached an app.
+   * frame_index is local to this publisher process; reject retained observe
+   * records from before initialization, even when a generation is reused. */
+  uint64_t reported_obs = 0;
+  const uint8_t empty_id[16] = {0};
+  if (have_obs && memcmp(pub_presentation_id, empty_id, 16) != 0 &&
+      memcmp(pub_presentation_id, obs_presentation_id, 16) == 0 && pub_gen[0] && pub_index > 0 &&
+      obs_index > 0 && obs_index <= pub_index &&
+      s_publisher_started_at_ns > 0 && obs_at_ns >= s_publisher_started_at_ns &&
+      strncmp(obs_gen, pub_gen, VPHONE_VCAM_GENERATION_MAX) == 0) {
+    reported_obs = obs_index;
+  }
+
+  r[@"presentation_id"] = [[NSUUID alloc] initWithUUIDBytes:pub_presentation_id].UUIDString;
+  r[@"vphoned_published_frame_index"] = @(pub_index);
+  r[@"libvcam_observed_frame_index"] = @(reported_obs);
+  r[@"vphoned_published_at_ns"] = @(pub_at_ns);
+  r[@"libvcam_observed_at_ns"] = @(reported_obs ? obs_at_ns : 0);
+  r[@"libvcam_observed_count"] = @(obs_count);
+  r[@"generation"] = [NSString stringWithUTF8String:pub_gen] ?: @"";
+  return r;
 }

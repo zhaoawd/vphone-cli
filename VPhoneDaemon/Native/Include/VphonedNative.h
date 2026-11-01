@@ -83,6 +83,9 @@ int vp_session_close(int master, pid_t pid, double grace);
 /// `*status` holding the wait status; `timeout` seconds kills it first.
 char * _Nullable vp_session_evaluate(const char * _Nonnull source, double timeout, int * _Nonnull status);
 void vp_vcam_start(void);
+#ifdef __OBJC__
+NSDictionary * _Nonnull vp_vcam_status(NSDictionary * _Nonnull msg);
+#endif
 /// Publish the HomePod MiniDisplay HID device when firmware has its geometry.
 /// The device and its callback queue live for the worker process lifetime.
 void vp_homepod_display_start(void);

@@ -55,6 +55,8 @@ class VPhoneLocationProvider: NSObject {
     private var reportedGuestServicesOff = false
     private var resendTask: Task<Void, Never>?
 
+    var automationLocationIsActive: (() -> Bool)?
+
     var isReplaying: Bool {
         replayTask != nil
     }
@@ -67,6 +69,7 @@ class VPhoneLocationProvider: NSObject {
 
     /// Begin sending location to the guest.  Safe to call on every (re)connect.
     func startForwarding() {
+        guard automationLocationIsActive?() != true else { return }
         stopReplay()
         hostModeStarted = true
         reportedGuestServicesOff = false
@@ -200,6 +203,7 @@ class VPhoneLocationProvider: NSObject {
         intervalSeconds: Double = 1.5,
         loop: Bool = true,
     ) {
+        guard automationLocationIsActive?() != true else { return }
         guard !points.isEmpty else {
             print("[location] replay '\(name)' ignored: no points")
             return

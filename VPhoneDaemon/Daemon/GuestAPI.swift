@@ -18,12 +18,13 @@ enum GuestAPIError: Error, CustomStringConvertible {
     /// client a location. vphoned leaves the switch to the guest's Settings.
     case locationServicesOff
     case locationReadbackUnconfirmed(String)
+    case locationSourceFailure(code: String, message: String)
 
     var description: String {
         switch self {
         case let .invalidRequest(message), let .operationFailed(message), let .locationReadbackUnconfirmed(message): message
         case let .unsupportedMethod(method): "Unknown method: \(method)"
-        case let .alreadyDone(_, message): message
+        case let .alreadyDone(_, message), let .locationSourceFailure(_, message): message
         case .locationServicesOff:
             "Location Services are turned off in the guest. Turn them on in Settings > Privacy & Security > Location Services."
         }
@@ -33,6 +34,7 @@ enum GuestAPIError: Error, CustomStringConvertible {
         if case let .alreadyDone(code, _) = self {
             return code
         }
+        if case let .locationSourceFailure(code, _) = self { return code }
         if case .locationServicesOff = self {
             return "location_services_off"
         }
@@ -110,6 +112,7 @@ enum GuestAPI {
                 "files",
                 "clipboard",
                 "location",
+                "location_owned",
                 "keychain",
                 "keychain_edit",
                 "ipa_install",
@@ -117,6 +120,7 @@ enum GuestAPI {
                 "bootstrap_uninstall",
                 "port_forward",
                 "camera",
+                "vcam_receipt_v3",
                 "screenshot",
                 "device_info",
                 "display",
@@ -406,27 +410,34 @@ enum GuestAPI {
                 return try hidEvent(page: page, usage: usage, down: down)
             }
             return try hidPress(page: page, usage: usage)
-        case "location.set":
+        case "camera.receipt":
+            return vp_vcam_status(params) as? [String: Any] ?? [:]
+        case "location.set", "location.source.deliver":
             guard CLLocationManager.locationServicesEnabled() else { throw GuestAPIError.locationServicesOff }
-            let latitude = number(params, "latitude")
-            let longitude = number(params, "longitude")
             do {
-                return try GuestLocationReadback.set(latitude: latitude, longitude: longitude, simulate: {
-                    try simulateLocation(
-                        latitude: latitude,
-                        longitude: longitude,
-                        altitude: number(params, "altitude", default: 0),
-                        horizontalAccuracy: number(params, "horizontal_accuracy", default: 5),
-                        verticalAccuracy: number(params, "vertical_accuracy", default: 5),
-                        speed: (params["speed"] as? NSNumber)?.doubleValue,
-                        course: (params["course"] as? NSNumber)?.doubleValue,
-                    )
-                }, clear: { try clearSimulatedLocation() })
-            } catch let failure as GuestLocationReadback.Failure {
-                throw GuestAPIError.locationReadbackUnconfirmed(failure.description)
+                let apply = { try confirmedLocation(params) }
+                if method == "location.source.deliver" {
+                    let generation = try string(params, "generation")
+                    let sequence = try integer(params, "delivery_sequence")
+                    return try GuestOwnedLocation.shared.deliver(generation, sequence: sequence, payload: params, apply: apply)
+                }
+                return try GuestOwnedLocation.shared.unowned(apply)
+            } catch let failure as GuestOwnedLocation.Failure {
+                throw GuestAPIError.locationSourceFailure(code: failure.code, message: failure.description)
             }
-        case "location.clear":
-            return try clearSimulatedLocation()
+        case "location.source.begin", "location.source.clear", "location.clear":
+            do {
+                if method == "location.source.begin" {
+                    guard CLLocationManager.locationServicesEnabled() else { throw GuestAPIError.locationServicesOff }
+                    return try GuestOwnedLocation.shared.begin(string(params, "generation"), clear: clearSimulatedLocation)
+                }
+                if method == "location.source.clear" {
+                    return try GuestOwnedLocation.shared.stop(string(params, "generation"), clear: clearSimulatedLocation)
+                }
+                return try GuestOwnedLocation.shared.unowned(clearSimulatedLocation)
+            } catch let failure as GuestOwnedLocation.Failure {
+                throw GuestAPIError.locationSourceFailure(code: failure.code, message: failure.description)
+            }
         case "location.current":
             guard CLLocationManager.locationServicesEnabled() else { throw GuestAPIError.locationServicesOff }
             return try currentLocation(timeout: number(params, "timeout", default: 10))
@@ -636,6 +647,23 @@ enum GuestAPI {
             throw GuestAPIError.invalidRequest("\(key) must be an integer")
         }
         return value.intValue
+    }
+
+    private static func confirmedLocation(_ params: [String: Any]) throws -> [String: Any] {
+        let latitude = number(params, "latitude")
+        let longitude = number(params, "longitude")
+        do {
+            return try GuestLocationReadback.set(latitude: latitude, longitude: longitude, simulate: {
+                try simulateLocation(latitude: latitude, longitude: longitude,
+                    altitude: number(params, "altitude", default: 0),
+                    horizontalAccuracy: number(params, "horizontal_accuracy", default: 5),
+                    verticalAccuracy: number(params, "vertical_accuracy", default: 5),
+                    speed: (params["speed"] as? NSNumber)?.doubleValue,
+                    course: (params["course"] as? NSNumber)?.doubleValue)
+            }, clear: { try clearSimulatedLocation() })
+        } catch let failure as GuestLocationReadback.Failure {
+            throw GuestAPIError.locationReadbackUnconfirmed(failure.description)
+        }
     }
 
     static func number(_ params: [String: Any], _ key: String, default fallback: Double = .nan) -> Double {

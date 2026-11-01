@@ -137,6 +137,12 @@ BOOL cfx_shm_frame_size(uint32_t *w, uint32_t *h) {
   return YES;
 }
 
+uint64_t cfx_shm_latest_frame_index(void) {
+  vcc_frame_desc_t frame;
+  if (!cfx_shm_frame(&frame)) return 0;
+  return frame.frame_index;
+}
+
 // Same format, size and attachments, in an IOSurface-backed buffer: camera
 // buffers are IOSurfaces, and video encoders expect that, while the data
 // plane's buffers are plain memory.

@@ -75,6 +75,10 @@ BOOL cfx_output_is_for_vcam(id self) {
         }
       }
     }
+    if ([self respondsToSelector:@selector(session)]) {
+      id session = [self valueForKey:@"session"];
+      if (session && cfx_session_is_for_vcam(session)) return YES;
+    }
   } @catch (NSException *e) {
     cfxlog(@"connection probe exception: %@", e);
   }

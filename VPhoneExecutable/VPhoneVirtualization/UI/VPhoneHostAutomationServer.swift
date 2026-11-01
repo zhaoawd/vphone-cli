@@ -84,6 +84,9 @@ class VPhoneHostAutomationServer {
     private weak var control: VPhoneGuestControl?
     /// For the `network` command; nil until the VM exists.
     weak var virtualMachine: VPhoneVirtualMachine?
+    weak var cameraServer: VPhoneCameraServer?
+    weak var locationProvider: VPhoneLocationProvider?
+    private(set) var systemLocation: VPhoneSystemLocationAutomation?
 
     /// Matches vphoned's JSON body limit, so an `rpc` line is never refused
     /// here that the guest would accept.
@@ -112,6 +115,14 @@ class VPhoneHostAutomationServer {
         self.captureView = captureView
         self.screenRecorder = screenRecorder
         self.control = control
+        self.systemLocation = VPhoneSystemLocationAutomation(control: control,
+            stateURL: URL(fileURLWithPath: socketPath).deletingLastPathComponent().appendingPathComponent("autophone-location-source.json"),
+            ownershipCheck: { [weak self, weak control] in
+                guard control?.syncsHostLocation != true, self?.locationProvider?.isReplaying != true else {
+                    throw VPhoneSystemLocationError(code: "location_owner_conflict", message: "GUI location source is active")
+                }
+            })
+        if control.isConnected { Task { [weak self] in await self?.systemLocation?.controller.reapplyAfterReconnect() } }
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
 
@@ -206,7 +217,7 @@ class VPhoneHostAutomationServer {
                 let guest = Set(connected ? (control?.guestCapabilities ?? []) : [])
                 let screen = connected && (windowedView != nil || guest.contains("screenshot"))
                 let touch = connected && (windowedView != nil || guest.contains("touch"))
-                let commands: [String: Bool] = [
+                var commands: [String: Bool] = [
                     "capabilities": true, "ping": connected, "rpc": connected, "screenshot": screen,
                     "tap": touch, "swipe": touch, "key": connected && guest.contains("hid"),
                     "type": connected && guest.contains("clipboard"),
@@ -218,6 +229,12 @@ class VPhoneHostAutomationServer {
                     "file_put": connected && guest.contains("files"),
                     "shell": connected && guest.contains("shell_exec"),
                 ]
+                for command in ["camera_present", "camera_status", "camera_stop"] {
+                    commands[command] = connected && guest.contains("vcam_receipt_v3") && cameraServer?.isConnected == true
+                }
+                for command in ["location_source_set", "location_stream_start", "location_stream_push", "location_source_control", "location_source_status", "location_source_stop"] {
+                    commands[command] = connected && guest.contains("location_owned")
+                }
                 let object: [String: Any] = ["ok": true, "protocol": "upstream_v1",
                     "guest_connected": connected, "commands": commands,
                     "guest_capabilities": Array(guest).sorted(),
@@ -300,6 +317,18 @@ class VPhoneHostAutomationServer {
                 // Not a copy the user made, so leaving the window does not
                 // put it on the Mac clipboard.
                 captureView?.clipboardSync?.adoptGuestClipboard()
+
+            case "camera_present", "camera_status", "camera_stop":
+                guard let cameraServer, let control else { return Self.reply(ok: false, error: "camera unavailable") }
+                let result = await VPhoneCameraAutomation(camera: cameraServer, control: control).handle(type, json)
+                if result["ok"] as? Bool == true { return Self.reply(ok: true, result: result) }
+                return try JSONSerialization.data(withJSONObject: result) + [0x0A]
+
+            case "location_source_set", "location_stream_start", "location_stream_push", "location_source_control", "location_source_status", "location_source_stop":
+                guard let systemLocation else { return Self.reply(ok: false, error: "location controller unavailable") }
+                let value = await systemLocation.handle(type, json)
+                if value["ok"] as? Bool == true { return Self.reply(ok: true, result: value) }
+                return try JSONSerialization.data(withJSONObject: value) + [0x0A]
 
             case "rpc":
                 guard let method = json["method"] as? String, !method.isEmpty else {

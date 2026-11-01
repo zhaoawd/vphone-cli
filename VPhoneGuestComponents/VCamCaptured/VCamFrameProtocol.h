@@ -13,7 +13,10 @@
 #define VPHONE_VCAM_APP_LOG_PATH VPHONE_VCAM_DIRECTORY "/camfix.log"
 #define VPHONE_VCAM_SYNTH_PHOTO_PATH VPHONE_VCAM_DIRECTORY "/vphone-synth-photo.bgra"
 #define VPHONE_VCAM_NOTIFY_NAME "com.vphone.vcam.frame"
-#define VPHONE_VCAM_SHM_HEADER_SIZE 64
+#define VPHONE_VCAM_SHM_HEADER_SIZE 256
+#define VPHONE_VCAM_GENERATION_MAX 80
+#define VPHONE_VCAM_OBSERVE_SHM_PATH VPHONE_VCAM_DIRECTORY "/vphone-vcam-observe.shm"
+#define VPHONE_VCAM_OBSERVE_SHM_SIZE 128
 #define VPHONE_VCAM_SHM_MAX_PIXELS (8 * 1024 * 1024)
 #define VPHONE_VCAM_SHM_TOTAL_SIZE (VPHONE_VCAM_SHM_HEADER_SIZE + VPHONE_VCAM_SHM_MAX_PIXELS)
 
@@ -28,10 +31,23 @@ typedef struct __attribute__((packed)) {
   uint64_t frame_index;
   uint32_t pixels_length;
   uint32_t _pad;
+  uint64_t published_at_ns;
+  char generation[VPHONE_VCAM_GENERATION_MAX];
+  uint8_t presentation_id[16];
 } vphone_vcam_shm_header_t;
 
 _Static_assert(offsetof(vphone_vcam_shm_header_t, timestamp_ns) == 28, "camera frame timestamp offset");
 _Static_assert(offsetof(vphone_vcam_shm_header_t, pixels_length) == 44, "camera frame length offset");
 _Static_assert(sizeof(vphone_vcam_shm_header_t) <= VPHONE_VCAM_SHM_HEADER_SIZE, "camera frame header capacity");
+
+typedef struct __attribute__((packed)) {
+  uint64_t seq __attribute__((aligned(8)));
+  uint64_t observed_frame_index;
+  uint64_t observed_at_ns;
+  uint64_t observed_count;
+  char observed_generation[VPHONE_VCAM_GENERATION_MAX];
+  uint8_t presentation_id[16];
+} vphone_vcam_observe_header_t;
+_Static_assert(sizeof(vphone_vcam_observe_header_t) == VPHONE_VCAM_OBSERVE_SHM_SIZE, "camera observe layout");
 
 #endif

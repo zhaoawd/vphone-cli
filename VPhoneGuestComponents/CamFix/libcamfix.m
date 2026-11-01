@@ -68,6 +68,11 @@
  *     finish callbacks, so Camera.app's VIDEO mode saves a movie.
  *     (Movie/CamFixMovieRecording.m)
  *
+ * 13. AVCaptureMetadataOutput QR code synthesis: advertises QR metadata
+ *     support on vcam-bound outputs and decodes QR payloads from shm frames
+ *     at most once per consumption window.
+ *     (Session/CamFixMetadataOutput.m)
+ *
  * Frames come from the vphoned shared frame file through the shared data
  * plane (Frame/CamFixFrameSource.m). Diagnostics go to the shared camera
  * media directory, written by cfxlog.
@@ -95,6 +100,7 @@ static void cfx_install_all_hooks(void) {
     cfx_install_front_camera_alias();
     cfx_install_exposure_hooks();
     cfx_install_asset_writer_settings();
+    cfx_install_metadata_output_hooks();
     cfx_install_capturePhoto_hook();
     cfx_install_moment_capture_hooks();
     cfx_install_session_guards();

@@ -41,8 +41,54 @@ enum LogicTests {
         bootstrapPlatform()
         setupAssistantState()
         locationReadback()
+        ownedLocation()
         print("\(checks) checks, \(failures) failures")
         exit(failures == 0 ? 0 : 1)
+    }
+
+    static func ownedLocation() {
+        let state = GuestOwnedLocation()
+        var applies = 0
+        var clears = 0
+        let clear: () throws -> [String: Any] = { clears += 1; return ["simulating": false] }
+        let apply: () throws -> [String: Any] = { applies += 1; return ["simulating": true] }
+        let payload: [String: Any] = ["latitude": 0.0, "longitude": 0.001]
+        func rejected(_ code: String, _ action: () throws -> Void) {
+            do { try action(); expect(false, "expected \(code)") }
+            catch let failure as GuestOwnedLocation.Failure { expectEqual(failure.code, code) }
+            catch { expect(false, "unexpected \(error)") }
+        }
+        _ = try! state.begin("A", clear: clear)
+        let first = try! state.deliver("A", sequence: 0, payload: payload, apply: apply)
+        expectEqual(first["delivery_sequence"] as? Int, 0)
+        expectEqual(first["idempotent"] as? Bool, false)
+        let duplicate = try! state.deliver("A", sequence: 0, payload: payload, apply: apply)
+        expectEqual(duplicate["idempotent"] as? Bool, true)
+        expectEqual(applies, 1, "duplicate delivery is not replayed")
+        rejected("location_sequence_conflict") { _ = try state.deliver("A", sequence: 0, payload: ["latitude": 1], apply: apply) }
+        rejected("location_sequence_conflict") { _ = try state.deliver("A", sequence: 2, payload: payload, apply: apply) }
+        rejected("location_generation_conflict") { _ = try state.deliver("B", sequence: 1, payload: payload, apply: apply) }
+        rejected("location_generation_conflict") { _ = try state.unowned(apply) }
+        _ = try! state.deliver("A", sequence: 1, payload: payload, apply: apply)
+        _ = try! state.begin("B", clear: clear)
+        rejected("location_generation_conflict") { _ = try state.stop("A", clear: clear) }
+        _ = try! state.deliver("B", sequence: 17, payload: payload, apply: apply)
+        _ = try! state.stop("B", clear: clear)
+        let stopped = try! state.stop("B", clear: clear)
+        expectEqual(stopped["idempotent"] as? Bool, true)
+        expectEqual(clears, 3, "stale stop and repeated stop never clear another source")
+        _ = try! state.unowned(apply)
+        _ = try! state.begin("C", clear: clear)
+        var failedAttempts = 0
+        let failing: () throws -> [String: Any] = { failedAttempts += 1; throw NSError(domain: "unknown", code: 1) }
+        for _ in 0..<2 {
+            do { _ = try state.deliver("C", sequence: 0, payload: payload, apply: failing); expect(false, "unknown result propagates") }
+            catch { expectEqual((error as NSError).domain, "unknown") }
+        }
+        expectEqual(failedAttempts, 1, "unknown delivery is not replayed")
+        rejected("location_sequence_conflict") { _ = try state.deliver("C", sequence: 1, payload: payload, apply: apply) }
+        rejected("invalid_location_source") { _ = try state.begin("", clear: clear) }
+        rejected("invalid_location_source") { _ = try state.deliver("C", sequence: -1, payload: payload, apply: apply) }
     }
 
     // MARK: - Location confirmation
