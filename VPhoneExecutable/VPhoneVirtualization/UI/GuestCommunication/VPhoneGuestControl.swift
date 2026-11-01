@@ -1056,6 +1056,13 @@ final class VPhoneGuestControl {
         enqueueLocation("location.clear")
     }
 
+    /// Stop queued GUI fixes and wait for the one already in flight before an
+    /// ownership handoff clears the guest. Old fixes must not restore it later.
+    func drainLocationUpdates() async {
+        locationGeneration &+= 1
+        await orderedLocation?.value
+    }
+
     private func enqueueLocation(_ method: String, params: [String: Any] = [:]) {
         locationGeneration &+= 1
         let generation = locationGeneration

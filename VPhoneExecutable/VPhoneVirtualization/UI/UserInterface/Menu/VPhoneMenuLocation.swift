@@ -102,63 +102,74 @@ extension VPhoneMenuController {
     /// Saved to this machine's config.plist, so the next start syncs, or does
     /// not, the same way. A preset or a replay pauses sync for this run only.
     @objc func toggleLocationSync() {
-        guard let item = locationMenuItem else { return }
+        guard let item = locationMenuItem, item.isEnabled else { return }
         let enabled = item.state != .on
-        do {
-            try onHostLocationSyncChange?(enabled)
+        selectLocationSource { [self] provider in
+            if enabled {
+                guard provider.startForwarding() else {
+                    throw NSError(domain: "VPhoneLocationProvider", code: 1,
+                        userInfo: [NSLocalizedDescriptionKey: "Host location forwarding could not start."])
+                }
+            }
+            do {
+                try onHostLocationSyncChange?(enabled)
+            } catch {
+                provider.stopForwarding()
+                throw error
+            }
             control.syncsHostLocation = enabled
-        } catch {
-            VPhoneAlert.present(
-                title: "Unable to Change Sync Host Location",
-                message: error.localizedDescription,
-                style: .warning,
-            )
-            return
+            item.state = enabled ? .on : .off
+            print("[location] sync toggled \(enabled ? "on" : "off") by user")
         }
-        if !enabled {
-            locationProvider?.stopForwarding()
-            control.sendLocationStop()
-            item.state = .off
-            print("[location] sync toggled off by user")
-        } else {
-            locationProvider?.stopReplay()
-            locationProvider?.startForwarding()
-            item.state = .on
-            print("[location] sync toggled on by user")
-        }
-        refreshLocationReplayState(available: item.isEnabled)
     }
 
     @objc func setLocationPreset(_ sender: NSMenuItem) {
         guard locationMenuItem?.isEnabled == true else { return }
         guard sender.tag >= 0, sender.tag < locationPresets.count else { return }
         let preset = locationPresets[sender.tag]
-        disableHostSyncForManualLocation()
-        locationProvider?.sendPreset(
-            name: preset.title,
-            latitude: preset.latitude,
-            longitude: preset.longitude,
-            altitude: preset.altitude,
-        )
-        refreshLocationReplayState(available: true)
+        selectLocationSource { [self] provider in
+            try await provider.sendPreset(
+                name: preset.title, latitude: preset.latitude,
+                longitude: preset.longitude, altitude: preset.altitude)
+            disableHostSyncForManualLocation()
+        }
     }
 
     @objc func startLocationReplay(_: NSMenuItem) {
         guard locationMenuItem?.isEnabled == true else { return }
-        disableHostSyncForManualLocation()
-        locationProvider?.startReplay(
-            name: locationReplayName,
-            points: locationReplayPoints,
-            intervalSeconds: 1.5,
-            loop: true,
-        )
-        refreshLocationReplayState(available: true)
+        selectLocationSource { [self] provider in
+            guard provider.startReplay(name: locationReplayName, points: locationReplayPoints,
+                                       intervalSeconds: 1.5, loop: true) else {
+                throw NSError(domain: "VPhoneLocationProvider", code: 2,
+                    userInfo: [NSLocalizedDescriptionKey: "Location replay could not start."])
+            }
+            disableHostSyncForManualLocation()
+        }
     }
 
     @objc func stopLocationReplay(_: NSMenuItem) {
-        locationProvider?.stopReplay()
-        control.sendLocationStop()
-        refreshLocationReplayState(available: locationMenuItem?.isEnabled ?? false)
+        selectLocationSource { _ in }
+    }
+
+    private func selectLocationSource(
+        _ selection: @escaping @MainActor (VPhoneLocationProvider) async throws -> Void
+    ) {
+        guard let provider = locationProvider else { return }
+        locationMenuItem?.isEnabled = false
+        locationPresetMenuItem?.isEnabled = false
+        locationReplayStartItem?.isEnabled = false
+        locationReplayStopItem?.isEnabled = false
+        Task { @MainActor [self] in
+            defer {
+                updateLocationCapability(available: control.isConnected && control.guestCapabilities.contains("location"))
+            }
+            do {
+                try await provider.performGUISelection { try await selection(provider) }
+            } catch {
+                VPhoneAlert.present(title: "Unable to Change Location Source",
+                    message: error.localizedDescription, style: .warning)
+            }
+        }
     }
 
     private func disableHostSyncForManualLocation() {

@@ -27,11 +27,13 @@ final class VPhoneOwnedLocationGuestAdapter: VPhoneSystemLocationGuestAdapter {
     }
     func clear(generation: String?) async throws {
         if let generation { _ = try await call("location.source.clear", ["generation": generation]) }
-        else { _ = try await call("location.clear", [:]) }
+        else { _ = try await call("location.clear", [:], requiresOwned: false) }
     }
-    private func call(_ method: String, _ params: [String: Any]) async throws -> [String: Any] {
-        try requireOwnedLocationCapability()
-        guard let control else { throw VPhoneSystemLocationError(code: "location_guest_unavailable", message: "guest disconnected") }
+    private func call(_ method: String, _ params: [String: Any], requiresOwned: Bool = true) async throws -> [String: Any] {
+        if requiresOwned { try requireOwnedLocationCapability() }
+        guard let control, control.isConnected, control.guestCapabilities.contains("location") else {
+            throw VPhoneSystemLocationError(code: "location_guest_unavailable", message: "guest location unavailable")
+        }
         do { return try await control.rpcAfterQueuedInput(method, params: params) }
         catch let failure as VPhoneGuestControl.GuestRPCFailure {
             throw VPhoneSystemLocationError(code: failure.body["code"] as? String ?? "location_delivery_rejected",

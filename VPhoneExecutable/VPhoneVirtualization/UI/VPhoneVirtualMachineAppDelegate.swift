@@ -422,7 +422,15 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
         )
         server.cameraServer = cameraServer
         server.locationProvider = locationProvider
-        locationProvider?.automationLocationIsActive = { [weak server] in server?.systemLocation?.controller.hasActiveSource == true }
+        locationProvider?.automationLocationIsActive = { [weak server] in
+            server?.systemLocation?.controller.requiresExplicitSourceSelection == true
+        }
+        locationProvider?.selectGUISource = { [weak server] commit in
+            guard let controller = server?.systemLocation?.controller else {
+                throw VPhoneSystemLocationError(code: "location_guest_unavailable", message: "location controller unavailable")
+            }
+            try await controller.selectGUISource(commit)
+        }
         server.virtualMachine = vm
         hostAutomationServer = server
     }

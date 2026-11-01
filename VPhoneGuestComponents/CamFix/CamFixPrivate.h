@@ -38,6 +38,7 @@ CFX_HIDDEN CMSampleBufferRef cfx_build_oriented_cmsb(uint32_t fmt_out, uint32_t 
                                                      uint32_t *outW, uint32_t *outH);
 CFX_HIDDEN BOOL cfx_shm_frame_size(uint32_t *w, uint32_t *h);
 CFX_HIDDEN uint64_t cfx_shm_latest_frame_index(void);
+CFX_HIDDEN NSString *cfx_shm_presentation_id(void);
 CFX_HIDDEN CGImageRef cfx_build_cgimage_from_shm(void) CF_RETURNS_RETAINED;
 CFX_HIDDEN NSData *cfx_jpeg_from_cgimage(CGImageRef img);
 CFX_HIDDEN IOSurfaceRef cfx_build_iosurface_from_shm(uint32_t *outW, uint32_t *outH) CF_RETURNS_RETAINED;

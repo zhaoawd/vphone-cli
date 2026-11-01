@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <stdatomic.h>
 #include <Accelerate/Accelerate.h>
 #include "CamFixFrameGeometry.h"
 
@@ -141,6 +142,23 @@ uint64_t cfx_shm_latest_frame_index(void) {
   vcc_frame_desc_t frame;
   if (!cfx_shm_frame(&frame)) return 0;
   return frame.frame_index;
+}
+
+NSString *cfx_shm_presentation_id(void) {
+  if (!cfx_shm_open() || cfx_shm_size < VPHONE_VCAM_SHM_HEADER_SIZE) return nil;
+  const vphone_vcam_shm_header_t *header = (const vphone_vcam_shm_header_t *)cfx_shm_base;
+  for (int attempt = 0; attempt < 3; attempt++) {
+    uint64_t before = atomic_load_explicit((const _Atomic uint64_t *)&header->seq, memory_order_acquire);
+    if (before & 1) continue;
+    uint8_t identifier[16];
+    memcpy(identifier, header->presentation_id, sizeof(identifier));
+    uint64_t after = atomic_load_explicit((const _Atomic uint64_t *)&header->seq, memory_order_acquire);
+    if (before != after) continue;
+    const uint8_t empty[16] = {0};
+    if (memcmp(identifier, empty, sizeof(identifier)) == 0) return nil;
+    return [[NSUUID alloc] initWithUUIDBytes:identifier].UUIDString;
+  }
+  return nil;
 }
 
 // Same format, size and attachments, in an IOSurface-backed buffer: camera

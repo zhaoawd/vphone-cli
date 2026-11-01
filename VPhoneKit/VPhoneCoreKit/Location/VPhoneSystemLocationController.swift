@@ -673,6 +673,20 @@ public final class VPhoneSystemLocationController {
         return snapshot()
     }
 
+    /// Keep the delivery turn until the GUI source and its visible state have
+    /// committed. An external selection waiting on the guest cannot interleave
+    /// between clearing owned simulation and establishing the GUI source.
+    public func selectGUISource(
+        _ commit: @MainActor () async throws -> Void
+    ) async throws {
+        try await acquireDeliveryTurn()
+        defer { releaseDeliveryTurn() }
+        try Task.checkCancellation()
+        try await clearSourceWhileHoldingTurn(expectedGeneration: generation)
+        try Task.checkCancellation()
+        try await commit()
+    }
+
     public func reapplyAfterReconnect() async {
         var sourceToken: ControlToken?
         var retryWasPaused = false

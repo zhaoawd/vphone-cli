@@ -5699,3 +5699,37 @@ The original approved host bundle is unavailable. Any rebuilt VM executable has
 to be identified and reviewed separately before AMFI allowlist modification.
 The scene-r9 IPA remains the previously accepted application artifact; it is not
 a host VM bundle.
+
+## Autophone location and metadata review fixes (2026-11-01)
+
+The migration adds owned location delivery (`location_owned`) and camera v3
+presentation/copy receipts (`vcam_receipt_v3`). The camera frame shared-memory
+header is 256 bytes and carries the presentation UUID; a separate 128-byte
+observe header records frames copied by libvcamcaptured. These receipts establish
+a copy into the guest consumer, not delivery to an application's metadata delegate.
+No kernel patch or firmware patch declaration changes in this review fix.
+
+The existing libcamfix camera hooks now track public `AVCaptureSession`
+`startRunning`/`stopRunning` intent separately from the preview's forced
+`isRunning` getter. Metadata output hooks associate outputs with their session
+through a zeroing weak reference. Consecutive QR repeats are suppressed only
+within the same presentation, session epoch and output configuration; a different
+QR, a new presentation, or an explicit session restart can deliver again.
+Callbacks queued before a stop, delegate/type change, detach or presentation
+replacement are rejected before invoking the delegate. Frame presentation UUIDs
+are read with the publisher's sequence-stability check. The fake AVFoundation
+host harness compiles the actual hook implementation and does not open a camera
+or guest service (`make -C VPhoneGuestComponents test-camfix-metadata`).
+
+GUI location selections use the same serialized delivery turn as external
+sources. They drain pending GUI location writes, confirm the owned guest clear,
+remove fixed-source persistence, and keep the turn through the GUI source/menu
+commit. Automatic host forwarding still cannot take over restored external state.
+The menu/provider/adapter/guest-owner host harness uses fake transport and a fake
+host-location helper (`zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-gui-location-tests.sh`).
+
+The original M14-M17 bundle identity and device evidence remain historical.
+Rebuilding this change produces a new host identity; this review does not admit
+it into AMFI or claim new device acceptance. The autophone closeout documentation
+now states that only the source VM's launch lock and ScreenLock were checked in
+that audit; the second VM's locks were not checked there.

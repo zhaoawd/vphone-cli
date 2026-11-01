@@ -584,6 +584,14 @@ test-camfix-session-reference:
 		-o $(OUT)/CamFixSessionReferenceTests Tests/CamFixSessionReferenceTests.m
 	@$(OUT)/CamFixSessionReferenceTests
 
+.PHONY: test-camfix-metadata
+test-camfix-metadata:
+	@mkdir -p $(OUT)
+	xcrun --sdk macosx clang -fobjc-arc -O1 -Wall -Wextra -Werror -Wno-unused-function -ICamFix \
+		-framework Foundation -framework CoreImage -framework CoreGraphics -framework CoreMedia \
+		-o $(OUT)/CamFixMetadataOutputTests Tests/CamFixMetadataOutputTests.m
+	@$(OUT)/CamFixMetadataOutputTests
+
 .PHONY: build-camfix-session-reproducer
 build-camfix-session-reproducer:
 	zsh Tests/CameraSessionReproducer/build.zsh "$(OUT)/camera-session-reproducer"

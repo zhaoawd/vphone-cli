@@ -217,6 +217,48 @@ private final class FakeSystemLocationGuestAdapter: VPhoneSystemLocationGuestAda
 
 @MainActor
 final class SystemLocationControllerTests: XCTestCase {
+    func testGUIHandoffKeepsDeliveryTurnUntilSourceCommit() async throws {
+        let guest = FakeSystemLocationGuestAdapter()
+        let controller = VPhoneSystemLocationController(adapter: guest)
+        _ = try await controller.setFixed(owner: "automation", fix: fix(0), heartbeatSeconds: 60)
+        let originalGeneration = controller.generation
+        var guiActive = false
+        var commitContinuation: CheckedContinuation<Void, Never>?
+        let gui = Task { @MainActor in
+            try await controller.selectGUISource {
+                await withCheckedContinuation { commitContinuation = $0 }
+                guiActive = true
+            }
+        }
+        for _ in 0..<200 where commitContinuation == nil {
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        XCTAssertNotNil(commitContinuation)
+        XCTAssertNil(controller.generation)
+        let external = Task { @MainActor in
+            _ = try await controller.startStream(owner: "external", watchdogSeconds: 60, replace: true,
+                precommit: {
+                    if guiActive {
+                        throw VPhoneSystemLocationError(code: "location_owner_conflict", message: "GUI source is active")
+                    }
+                })
+        }
+        await waitForDeliveryTurnWaiter(controller)
+        XCTAssertFalse(guiActive)
+        XCTAssertNil(controller.generation)
+        commitContinuation?.resume()
+        try await gui.value
+        do {
+            try await external.value
+            XCTFail("external selection must see the committed GUI source")
+        } catch let error as VPhoneSystemLocationError {
+            XCTAssertEqual(error.code, "location_owner_conflict")
+        }
+        XCTAssertTrue(guiActive)
+        XCTAssertEqual(guest.clears, [originalGeneration])
+        XCTAssertNil(controller.generation)
+    }
+
     private func fix(_ sequence: Int, latitude: Double = 31.2) -> VPhoneSystemLocationFix {
         VPhoneSystemLocationFix(
             producerSequence: sequence,

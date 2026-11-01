@@ -40,6 +40,7 @@ class VPhoneLocationProvider: NSObject {
     }
 
     private let control: VPhoneGuestControl
+    private let hostHelperLauncher: (() throws -> Void)?
     private var hostModeStarted = false
 
     private var helper: Process?
@@ -47,6 +48,7 @@ class VPhoneLocationProvider: NSObject {
     private var helperReader: Task<Void, Never>?
     private var lastHostLocation: HostLocation?
     private var replayTask: Task<Void, Never>?
+    private var replayRevision: UInt64 = 0
     private var replayName: String?
     var onAuthorizationFailure: (() -> Void)?
     /// Called once per sync, preset or replay when the guest refuses a
@@ -56,34 +58,52 @@ class VPhoneLocationProvider: NSObject {
     private var resendTask: Task<Void, Never>?
 
     var automationLocationIsActive: (() -> Bool)?
+    var selectGUISource: (@MainActor (@MainActor () async throws -> Void) async throws -> Void)?
 
     var isReplaying: Bool {
         replayTask != nil
     }
 
-    init(control: VPhoneGuestControl) {
+    init(control: VPhoneGuestControl, hostHelperLauncher: (() throws -> Void)? = nil) {
         self.control = control
+        self.hostHelperLauncher = hostHelperLauncher
         super.init()
         control.onLocationFailure = { [weak self] error in self?.guestRefused(error) }
     }
 
     /// Begin sending location to the guest.  Safe to call on every (re)connect.
-    func startForwarding() {
-        guard automationLocationIsActive?() != true else { return }
+    @discardableResult
+    func startForwarding() -> Bool {
+        guard automationLocationIsActive?() != true else { return false }
         stopReplay()
         hostModeStarted = true
         reportedGuestServicesOff = false
         if let last = lastHostLocation, abs(last.date.timeIntervalSinceNow) < 60 {
             forward(last)
         }
-        guard helper == nil else { return }
+        guard helper == nil else { return true }
         do {
-            try launchHelper()
+            if let hostHelperLauncher { try hostHelperLauncher() }
+            else { try launchHelper() }
             print("[location] started host location tracking")
+            return true
         } catch {
             print("[location] cannot start VPhoneLocation.app: \(error.localizedDescription)")
             hostModeStarted = false
             onAuthorizationFailure?()
+            return false
+        }
+    }
+
+    func performGUISelection(_ commit: @MainActor () async throws -> Void) async throws {
+        stopForwarding()
+        stopReplay()
+        await control.drainLocationUpdates()
+        if let selectGUISource {
+            try await selectGUISource(commit)
+        } else {
+            _ = try await control.rpcAfterQueuedInput("location.clear", params: [:])
+            try await commit()
         }
     }
 
@@ -181,18 +201,13 @@ class VPhoneLocationProvider: NSObject {
     }
 
     /// Send a fixed simulated location to the guest.
-    func sendPreset(name: String, latitude: Double, longitude: Double, altitude: Double = 0) {
+    func sendPreset(name: String, latitude: Double, longitude: Double, altitude: Double = 0) async throws {
         stopReplay()
         reportedGuestServicesOff = false
-        sendSimulatedLocation(
-            latitude: latitude,
-            longitude: longitude,
-            altitude: altitude,
-            horizontalAccuracy: 5,
-            verticalAccuracy: 8,
-            speed: 0,
-            course: -1,
-        )
+        _ = try await control.rpcAfterQueuedInput("location.set", params: [
+            "latitude": latitude, "longitude": longitude, "altitude": altitude,
+            "horizontal_accuracy": 5, "vertical_accuracy": 8, "speed": 0,
+        ])
         print("[location] applied preset '\(name)' (\(latitude), \(longitude))")
     }
 
@@ -202,11 +217,11 @@ class VPhoneLocationProvider: NSObject {
         points: [ReplayPoint],
         intervalSeconds: Double = 1.5,
         loop: Bool = true,
-    ) {
-        guard automationLocationIsActive?() != true else { return }
+    ) -> Bool {
+        guard automationLocationIsActive?() != true else { return false }
         guard !points.isEmpty else {
             print("[location] replay '\(name)' ignored: no points")
-            return
+            return false
         }
 
         stopForwarding()
@@ -219,11 +234,15 @@ class VPhoneLocationProvider: NSObject {
             "[location] starting replay '\(name)' (\(points.count) points, interval \(String(format: "%.1f", intervalSeconds))s, loop=\(loop))",
         )
 
+        replayRevision &+= 1
+        let revision = replayRevision
         replayTask = Task { @MainActor [weak self] in
             guard let self else { return }
             defer {
-                self.replayTask = nil
-                self.replayName = nil
+                if self.replayRevision == revision {
+                    self.replayTask = nil
+                    self.replayName = nil
+                }
             }
 
             var index = 0
@@ -257,11 +276,13 @@ class VPhoneLocationProvider: NSObject {
                 print("[location] replay finished: \(name)")
             }
         }
+        return true
     }
 
     /// Stop an active replay task.
     func stopReplay() {
         guard let replayTask else { return }
+        replayRevision &+= 1
         replayTask.cancel()
         self.replayTask = nil
         if let replayName {
