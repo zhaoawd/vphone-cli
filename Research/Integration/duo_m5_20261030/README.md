@@ -6,6 +6,9 @@ on an independent iOS 27.1 Duo VM in native and compatibility layouts. Coverage
 includes both panels, supported rotations, book posture and fold round trips.
 Unsupported directions and the existing Home Screen foreground-verification
 blocker are recorded separately in that evidence document.
+Subsequent Home Screen and auto-lock daemon changes have local regression
+coverage; their guest runtime acceptance is pending. The earlier App acceptance
+does not validate these later changes. See [review follow-up](REVIEW_FOLLOWUP_20261102.md).
 
 ## Inputs
 

@@ -82,8 +82,12 @@ enum GuestLockScreenIdle {
             throw IcliError.failed("Auto-Lock seconds must be between 0 and Int32.max")
         }
         let effectiveSeconds = (seconds == 0) ? never : seconds
-        try updateSettingsPlist(atPath: userSettingsPath, seconds: effectiveSeconds)
-        try updateSettingsPlist(atPath: settingsPath, seconds: effectiveSeconds)
+        // Validate both inputs before changing either file. Each subsequent
+        // write is atomic; the pair is not a filesystem transaction.
+        let userData = try updatedSettingsPlist(atPath: userSettingsPath, seconds: effectiveSeconds)
+        let effectiveData = try updatedSettingsPlist(atPath: settingsPath, seconds: effectiveSeconds)
+        try writeSettingsPlist(userData, atPath: userSettingsPath)
+        try writeSettingsPlist(effectiveData, atPath: settingsPath)
         notify_post(changedNotification)
         CFNotificationCenterPostNotification(
             CFNotificationCenterGetDarwinNotifyCenter(),
@@ -98,18 +102,27 @@ enum GuestLockScreenIdle {
         return result
     }
 
-    private static func updateSettingsPlist(atPath path: String, seconds: Int) throws {
-        let dir = (path as NSString).deletingLastPathComponent
-        if !FileManager.default.fileExists(atPath: dir) {
-            try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
-            chown(dir, 501, 501)
-        }
+    private static func updatedSettingsPlist(atPath path: String, seconds: Int) throws -> Data {
         var plist: [String: Any] = [:]
-        if let data = FileManager.default.contents(atPath: path),
-           let existing = (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: Any] {
+        let data: Data?
+        do {
+            data = try Data(contentsOf: URL(fileURLWithPath: path))
+        } catch CocoaError.fileReadNoSuchFile {
+            data = nil
+        }
+        if let data {
+            guard let existing = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] else {
+                throw IcliError.failed("Settings plist must contain a dictionary: \(path)")
+            }
             plist = existing
         }
+        guard plist["restrictedValue"] == nil || plist["restrictedValue"] is [String: Any] else {
+            throw IcliError.failed("restrictedValue must contain a dictionary: \(path)")
+        }
         var restricted = plist["restrictedValue"] as? [String: Any] ?? [:]
+        guard restricted["maxInactivity"] == nil || restricted["maxInactivity"] is [String: Any] else {
+            throw IcliError.failed("maxInactivity must contain a dictionary: \(path)")
+        }
         var setting = restricted["maxInactivity"] as? [String: Any] ?? [:]
         setting["value"] = seconds
         if seconds >= never || seconds < (setting["rangeMinimum"] as? Int ?? 0) {
@@ -117,7 +130,15 @@ enum GuestLockScreenIdle {
         }
         restricted["maxInactivity"] = setting
         plist["restrictedValue"] = restricted
-        let data = try PropertyListSerialization.data(fromPropertyList: plist, format: .binary, options: 0)
+        return try PropertyListSerialization.data(fromPropertyList: plist, format: .binary, options: 0)
+    }
+
+    private static func writeSettingsPlist(_ data: Data, atPath path: String) throws {
+        let dir = (path as NSString).deletingLastPathComponent
+        if !FileManager.default.fileExists(atPath: dir) {
+            try FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+            chown(dir, 501, 501)
+        }
         let url = URL(fileURLWithPath: path)
         try data.write(to: url, options: .atomic)
         chown(path, 501, 501)

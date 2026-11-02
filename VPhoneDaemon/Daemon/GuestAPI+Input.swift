@@ -204,7 +204,7 @@ extension GuestAPI {
         if bundle != "com.apple.springboard" && bundle != "com.apple.PineBoard" {
             return try tapElement(selector)
         }
-        let result = try uiElements(maxElements: 2000, visibleOnly: false)
+        let result = try uiElements(maxElements: 2000, visibleOnly: true)
         guard result["truncated"] as? Bool != true else {
             throw IcliError.failed("AX query was truncated; narrow the screen before selecting an element")
         }

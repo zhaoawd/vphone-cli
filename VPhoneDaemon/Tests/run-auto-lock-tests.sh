@@ -16,6 +16,7 @@ trap '/bin/rm -rf "$temporary"' EXIT
     -module-cache-path "$temporary/module-cache" -I "$temporary" -L "$temporary" \
     -lIcliKit -Xlinker -rpath -Xlinker "$temporary" \
     "$daemon/Daemon/GuestLockScreenIdle.swift" \
+    "$daemon/Daemon/GuestAPI+AutoLock.swift" \
     "$daemon/Tests/AutoLockTests.swift" \
     -o "$temporary/auto-lock-tests"
 

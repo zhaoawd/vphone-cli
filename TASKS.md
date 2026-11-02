@@ -9,7 +9,7 @@ modification is authorized.
 - [x] Import `duo-m5-v1.4`, `duo-m5-v1.5`, and `duo-m5-v1.6` with their history.
 - [x] Create isolated branch/worktree `duo-integration-20261030` at `39324ee7`.
 - [x] Record source inventory and decisions for every code change.
-- [x] Build and test the unmodified upstream code baseline (134 known fixture failures recorded).
+- [x] Build and test the unmodified upstream code baseline (134 fixture-related issue records across 128 failed test names).
 - [x] Integrate display configuration and its regression tests.
 - [x] Integrate the optional static-inner guest patch through the patch catalog, off in standard.
 - [x] Compare upstream fold transitions with the local previous-frame hold;
@@ -32,8 +32,8 @@ modification is authorized.
 - [x] Network (DNS, HTTPS, host-served page) and audible audio (Safari media and Settings ringtone preview heard by the user) on the candidate (`F6.md`).
 - [x] Static outer/inner and cutout on/off/on (`Regression/display-matrix.zsh`, `F6.md`): P1–P7 pass; P5 (cutout off) loses all inner taps as documented.
 - [x] Move the foldable board-tree precondition before disk work in `cfw update-environment` (`db111457`; `F6.md`): root check refuses in 3 s with no disk attach. Candidate rebuilt at `ea05ba81` with it (only `vphone-cli` changed; previous bundle kept at `.build/XcodeDuo-a71f2360`).
-- [x] Fix Home Screen frontmost application recognition: `vp_springboard_pid` + `no_focal_app` check verifies SpringBoard when unlocked, enabling `ui.tree`, `ui.element_at`, and `ui.tap_element` on Home Screen (`ELEMENT_TAP.md`).
-- [x] Fix ineffective auto-lock setting: write `UserSettings.plist` and `EffectiveUserSettings.plist` directly on disk with Darwin notifications and `SBMinimumLockscreenIdleTime` mirror (`AutoLockTests.swift`, 14 passed).
+- [x] Implement Home Screen foreground recognition and AX routing; local boundary-double tests pass. Guest runtime acceptance of this change remains pending (`ELEMENT_TAP.md`).
+- [x] Implement direct auto-lock plist updates and notifications; local file tests pass. Effective SpringBoard timers and persistence remain unverified (`ELEMENT_TAP.md`).
 - [ ] Open issues recorded, not pursued (`F6.md`, Open issues): KFC 登录会员 ignoring some user clicks; how app accessibility got turned on.
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
       Repeated 2026-10-31 for `db111457` and `72b83eb2`: one misplaced doc comment fixed; guest scan finds no universal or nested X1 Mach-O under AccessibilityBundles (78 thin executables, all lowered with backups; 434 bundles in the shared cache).
@@ -42,7 +42,9 @@ modification is authorized.
 
 - User instruction (2026-10-30): keep all iPhone Duo work on
   `duo-integration-20261030`; do not merge it into `main`.
-- No remote push, merge into `main`, data deletion, modification of source
+- User instruction (2026-11-02): repair the review findings, commit, and push
+  `duo-integration-20261030` to `origin`; this supersedes the earlier no-push gate for this branch.
+- No merge into `main`, data deletion, modification of source
   repositories, additional original-machine modification, or additional host privilege changes.
   Present concrete commands and results before requesting any needed approval.
 - Use Xcode targets and native components from the new upstream layout.
@@ -52,6 +54,18 @@ modification is authorized.
 - Existing source reports do not establish behavior on the integrated bundle.
 
 ## Current state
+
+Review follow-up (2026-11-02):
+
+- [x] Reproduce plist overwrite and invisible-element selection in saved tests (25 and 3 failing assertions).
+- [x] Preserve existing plists on read/parse errors and filter invisible single-display targets.
+- [x] Test existing rangeMinimum removal and the auto-lock request handler (81 auto-lock checks, 236 element-tap API checks pass).
+- [x] Correct verification scope, KFC status, and firmware failure counts in research docs (`REVIEW_FOLLOWUP_20261102.md`).
+- [x] Run daemon regressions and the complete VPhone bundle build; bundle admission and deep/strict signature verification pass (`REVIEW_FOLLOWUP_20261102.md`).
+- [x] Review the final diff and prepare the authorized current-branch commit/push. Git history and the delivery message record the resulting commit and remote verification.
+
+The candidate/build/runtime paragraphs below describe earlier checkpoints;
+they do not establish runtime acceptance of the 2026-11-02 daemon changes.
 
 Source `main`: `39324ee7fcbb1d909bfa293f6188a8ef752ba734` (2.14.1).
 Latest local Duo branch: `3f9a15624b438e132e81093ec8b5740cbe4facf8`.
@@ -67,9 +81,10 @@ passed. Full FirmwarePatcher: 780 tests with the same 134 issue records as the
 baseline, no added or removed failing names. See `validation.json` for hashes
 and evidence paths.
 
-The source history is now reachable from the integration branch through a
-history-only merge whose tree was checked unchanged. No merge into `main` or
-remote push has been performed.
+At the earlier integration checkpoint, the source history was reachable through
+a history-only merge whose tree was checked unchanged; no merge into `main` or
+remote push had been performed at that checkpoint. The 2026-11-02 instruction
+above authorizes pushing the review follow-up on the integration branch.
 
 Runtime preparation: the user approved closing `duo-m5-fold214`. The normal
 CLI stop returned success; both old processes exited and lsof found no state

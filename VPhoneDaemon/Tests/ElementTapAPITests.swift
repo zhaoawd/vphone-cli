@@ -246,6 +246,22 @@ enum ElementTapAPITests {
         let tapFallback = try GuestAPI.executeInterface("ui.tap_element", ["identifier": "Safari"])
         expect(tapFallback?["tapped"] as? Bool == true, "SpringBoard single-display tap succeeded")
         expect(TestIcli.injected.count == 1, "SpringBoard single-display touch injected")
+
+        TestIcli.elements = [
+            ["identifier": "hidden", "label": "Settings", "visible": false, "x": 20.0, "y": 30.0],
+            ["identifier": "visible", "label": "Settings", "visible": true, "x": 160.0, "y": 80.0],
+        ]
+        TestIcli.injected = []
+        let visibleTap = try GuestAPI.executeInterface("ui.tap_element", ["text": "Settings", "match": "exact"])
+        expect((visibleTap?["element"] as? [String: Any])?["identifier"] as? String == "visible",
+               "single-display selector skips hidden matching element")
+        expect(TestIcli.injected.count == 1 && abs(TestIcli.injected[0].0 - 160 / 466.0) < 1e-9,
+               "single-display tap uses visible target coordinates")
+        TestIcli.injected = []
+        var refusedHidden = false
+        do { _ = try GuestAPI.executeInterface("ui.tap_element", ["identifier": "hidden"]) }
+        catch { refusedHidden = true }
+        expect(refusedHidden && TestIcli.injected.isEmpty, "hidden-only selection is refused without injection")
         print("element tap API: \(checks) checks, \(failures) failures")
         exit(failures == 0 ? 0 : 1)
     }

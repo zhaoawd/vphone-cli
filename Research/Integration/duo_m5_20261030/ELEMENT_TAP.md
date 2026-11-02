@@ -148,7 +148,7 @@ partially-open / closed。每个阶段请求四个方向，对支持的方向点
 
 ## 未验收范围
 
-SpringBoard 图标补充验收未通过前台识别前置条件，未完成图标点击。当前 VM
+此前 SpringBoard 图标补充验收未通过前台识别前置条件，未完成图标点击。当时 VM
 主页的原始 `frontmostApp` 回报 `verified=false`、`source=unavailable`，
 RunningBoard 为 `reason=no_focal_app`、16 handles、5 states，并有隐藏的
 `com.apple.DocumentManager.DockFolderViewService` focal 服务。
@@ -158,30 +158,60 @@ RunningBoard 为 `reason=no_focal_app`、16 handles、5 states，并有隐藏的
 前台校验也拒绝该状态，没有将该结果计为坐标转换通过。证据为
 `springboard-description.json`、`springboard-tree-refusal.json`、
 `springboard-tap-refusal.json` 和 `springboard-final/`。主页前台识别需要
-单独定位和修复；本次没有放宽前台确认条件。
+单独处理；下文记录后续代码修改及本地测试，尚未完成该修改的 VM 验收。
 
 本次真实验收使用一台独立 Duo VM 与 TapProbe，不构成所有第三方 App 的
 兼容性验收。VM 验收后正常停止，磁盘、补丁收据及本地证据保留。
 
-## 主页前台识别与自动锁屏修复（2026-11-02）
+## 主页前台识别与自动锁屏修改（2026-11-02，本地测试通过，VM 验收待完成）
 
-1. **主页前台 App 识别问题定位与修复：**
-   - 问题：主页状态下无嵌入式应用持有 RunningBoard focal assertion，RunningBoard 返回 `reason: "no_focal_app"`，使 `IcliLaunch.frontmostApp()` 返回 `verified: false`、`source: "unavailable"`，从而阻断 `ui.tree`、`ui.element_at` 与 `ui.tap_element`。
-   - 证据：`springboard-tree-refusal.json`、`springboard-tap-refusal.json`。
-   - 修复：
-     - 在 `vphoned_element_tap.m` 新增 `vp_springboard_pid()`，通过 `sysctl(KERN_PROC, KERN_PROC_ALL)` 与 `proc_pidpath()` 动态获取 SpringBoard / PineBoard 进程 PID。
-     - 在 `GuestFrontmostApp.swift` 实现 `frontmostApp()`：在未锁屏、屏幕未关闭、RunningBoard 句柄有效且无其他应用持有焦点时，认定 SpringBoard 为已验证的前台系统外壳，返回 `verified: true`、`source: "runningboard"` 及 SpringBoard PID。
-     - `GuestAPI+Hierarchy.swift` 的 `hierarchyForeground()` 直接采信已验证的前台 PID，避免因 `runningApps()` 排除 SpringBoard 导致的失败。
-     - `GuestAPI+Input.swift` 实现 `GuestAPI.uiElements` 与 `elementAt`，直接以 SpringBoard PID 分发 AX 树和点击测试。
-     - `tapElementFallback` 支持 SpringBoard 模式下的单显示降级点击。
-     - 单元测试覆盖：`ElementTapAPITests.swift` 增加未锁屏/锁屏/熄屏/前台应用竞争/SpringBoard `ui.tree`/`ui.element_at`/`ui.tap_element` 测试（共 233 项测试通过）。
+主页验收记录确认 `no_focal_app` 阻断了前台校验。`bbc9a40d` 在
+`GuestFrontmostApp.swift` 中增加系统外壳回退：原结果指向 SpringBoard/PineBoard、
+原因是 `no_focal_app`、RunningBoard 句柄数大于 0、设备未锁屏且屏幕开启、
+进程 PID 有效时，返回 `verified: true` 和该 PID。AX 查询与层级查询使用该 PID。
+这项判定的真实系统行为尚未验收，不能将此前的 324 次 App 点击结果用于证明它。
 
-2. **自动锁屏设置无效问题定位与修复：**
-   - 问题：`display.auto_lock.set` 原先通过 `writePreference` 试图更新 `UserSettings.plist`，但 CFPreferences 机制无法修改磁盘文件，且 `profiled` 不会自动由该写操作触发重新生成 `EffectiveUserSettings.plist`，导致回读始终保持原始 300 s（且当参数传入 0 或 never 时被 `rangeMinimum: 120` 拦截或拒绝）。
-   - 修复：
-     - 在 `GuestLockScreenIdle.swift` 中，直接读取并原子写入 `UserSettings.plist` 与 `EffectiveUserSettings.plist`。
-     - 设置 Never（或 0 秒）或低于原 `rangeMinimum` 的秒数时，移除或更新 `rangeMinimum`，避免生效值被截断。
-     - 设置文件权限与所有权（UID/GID 501），派发 `com.apple.managedconfiguration.effectivesettingschanged` Darwin 通知。
-     - 保持与 `SBMinimumLockscreenIdleTime` 的联动。
-     - 在 `GuestAPI+Device.swift` 中允许 `never: true` 与 `seconds: 0`。
-     - 单元测试覆盖：`AutoLockTests.swift` 验证 1800 秒写入、Never（0 秒）写入、60 秒无截断写入及非法参数校验（共 14 项测试通过）。
+`c742a06a` 将自动锁屏设置改为直接更新 `UserSettings.plist` 和
+`EffectiveUserSettings.plist`，将 0 映射为 `Int32.max`，按条件移除
+`rangeMinimum`，发送 Darwin 通知，并保留 `SBMinimumLockscreenIdleTime` 联动。
+此前请求 1800 秒或 Never 后仍回读 300 秒，且观察到一次 300 秒锁屏
+（`F6.md`）。原因未查明。旧实现向绝对路径域调用 `writePreference` 并补写
+`rangeMinimum: 120`，但现有记录不足以确定 cfprefsd 落盘、profiled 合并或范围限制
+中哪个环节造成该现象；这些解释均为待验证假设。不能据此认定 CFPreferences
+无法写磁盘文件。
+
+### 评审后修改
+
+- plist 读取或解析错误会向调用方返回错误；仅文件不存在时允许创建空配置。
+  同时检查根对象、`restrictedValue` 和 `maxInactivity` 的字典类型。
+  两份输入均读取、校验、序列化后才开始写入，避免第二份输入无效时已改写第一份。
+  每个文件单独原子写入，两次写入不构成跨文件事务；写入阶段的部分失败仍可能留下不同步状态。
+- 单显示 SpringBoard/PineBoard 点击只选择可见元素，保持原选择器的可见性范围。
+- `GuestAPI+AutoLock.swift` 承载 `display.auto_lock.set` 的实际请求处理函数，
+  支持 `never: true` 与 `seconds: 0`，拒绝布尔值、非整数、字符串及越界秒数。
+
+### 本地回归证据
+
+日志目录为 `.build/review-followup-20261102/`，脚本命令均在仓库根目录执行。
+
+| 命令 | 结果 | 验证范围 |
+| --- | --- | --- |
+| `zsh VPhoneDaemon/Tests/run-element-tap-tests.sh` | API 236 checks，0 failures；原生显示、AX context 和 31 项几何检查通过 | 新增 3 项断言，先在旧实现复现失败，再验证不可见同名元素不参与选择、不可见目标不注入触摸 |
+| `zsh VPhoneDaemon/Tests/run-auto-lock-tests.sh` | 81 checks，0 failures | 真实临时 plist 读写；两份配置中的 `rangeMinimum: 120`；0/60/1800 秒；其他字段保留；读取、解析和类型错误时两份文件不变；实际请求处理函数的 Never、0 和非法参数 |
+
+修复前，新增的自动锁屏回归产生 25 个失败断言，点击回归产生 3 个失败断言；
+日志为 `auto-lock-before.log`、`element-tap-before.log`。修复后日志为
+`auto-lock-after.log`、`element-tap-after.log`。
+
+SpringBoard 前台识别及 Swift API 测试使用 IcliKit/VphonedNative 替身，
+不验证 guest 的 sysctl、进程路径、AX 动态符号或图标点击。自动锁屏测试使用
+IcliKit 偏好写入替身，不验证通知送达、SpringBoard 采用设置、profiled 后续合并、
+重启持久性或实际计时。`SBMinimumLockscreenIdleTime` 开启 Never 后要到下一次
+SpringBoard 启动才作用于锁屏界面，见 `Research/Guest/lock_screen_idle_timer.md`。
+
+### 待完成的 VM 验收
+
+在独立 VM 中部署本轮构建的 daemon，记录二进制摘要和系统版本后，验证主页
+`ui.tree`、`ui.element_at`、图标点击及锁屏/熄屏拒绝；验证自动锁屏设置的即时回读、
+实际倒计时、Never 超过原 300 秒仍不自动锁屏，以及 profiled 更新和重启后的值。
+以上项目在本轮尚未执行。

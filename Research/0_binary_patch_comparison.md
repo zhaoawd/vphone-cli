@@ -17,8 +17,11 @@
 > native and compatibility layouts across panels, supported rotations, book
 > posture and fold round trips. Twelve unsupported rotation requests are
 > recorded separately. Home Screen foreground verification (`no_focal_app`)
-> and auto-lock setting persistence are resolved via daemon sysctl/plist runtime
-> handling without binary patches. No binary patch algorithm, preset or boot-chain
+> and auto-lock updates have daemon sysctl/plist changes with local regression
+> tests; Home Screen icon actions, effective timers and persistence still need
+> guest runtime acceptance. Review follow-up rejects invalid plist inputs before
+> changing either settings file and filters invisible single-display tap targets.
+> No binary patch algorithm, preset or boot-chain
 > patch is added. See [element-tap evidence](Integration/duo_m5_20261030/ELEMENT_TAP.md).
 
 > **Duo M5 integration (2026-10-30, pending runtime acceptance).** Adds the
