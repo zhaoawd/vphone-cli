@@ -54,6 +54,36 @@ enum ElementTapAPITests {
                 }
             }
         }
+        // A pre-Duo SDK exposes a 375x667 AX canvas. The cover fits that
+        // canvas; the inner panel centers it without resizing it.
+        TestIcli.bundle = "com.autophone.tap-probe"
+        for (name, w, h) in [("cover", 466.0, 678.0), ("inner", 669.0, 951.0)] {
+            for degrees in [0, 90, 180, 270] {
+                TestIcli.degrees = degrees
+                TestIcli.display = ["dual_display": true, "name": name, "width": w, "height": h]
+                let sideways = [90, 270].contains(degrees)
+                TestIcli.appFrame = ["x": 0.0, "y": 0.0, "width": sideways ? 667.0 : 375.0,
+                                     "height": sideways ? 375.0 : 667.0]
+                let x: Double, y: Double
+                switch degrees {
+                case 90: (x, y) = (267, 200)
+                case 180: (x, y) = (175, 267)
+                case 270: (x, y) = (400, 175)
+                default: (x, y) = (200, 400)
+                }
+                TestIcli.elements = [["identifier": "target", "x": x, "y": y,
+                    "frame": ["x": x - 5, "y": y - 5, "width": 10.0, "height": 10.0]]]
+                TestIcli.injected = []
+                _ = try GuestAPI.executeInterface("ui.tap_element", params)
+                let expected: (Double, Double)
+                if name == "cover" { expected = (200.0 * (678.0 / 667.0) / 466.0, 400.0 / 667.0) }
+                else { expected = (347.0 / 669.0, 542.0 / 951.0) }
+                let actual = TestIcli.injected.last ?? (-1, -1)
+                expect(abs(actual.0 - expected.0) < 1e-9 && abs(actual.1 - expected.1) < 1e-9,
+                       "compatibility canvas \(name) \(degrees)")
+            }
+        }
+        TestIcli.appFrame = nil
         TestIcli.bundle = "com.autophone.tap-probe"
         TestIcli.elements = [["identifier": "target", "x": 100.0, "y": 124.0,
                              "frame": ["x": 90.0, "y": 114.0, "width": 20.0, "height": 20.0]]]
@@ -64,6 +94,15 @@ enum ElementTapAPITests {
             catch { expect(TestIcli.injected.isEmpty, "\(label): no injection") }
         }
         TestIcli.display = ["dual_display": true, "name": "inner", "width": 669.0, "height": 951.0]
+        TestIcli.appFrame = ["error": "unavailable"]
+        refuses("missing application frame")
+        TestIcli.appFrame = ["x": 12.0, "y": 0.0, "width": 375.0, "height": 667.0]
+        refuses("nonzero application origin")
+        TestIcli.appFrame = ["x": 0.0, "y": 0.0, "width": 375.0, "height": 667.0]
+        TestIcli.afterFrameRead = { TestIcli.appFrame?["width"] = 400.0 }
+        refuses("application frame changes during query")
+        TestIcli.afterFrameRead = nil
+        TestIcli.appFrame = nil
         TestIcli.afterQuery = { TestIcli.display["name"] = "cover" }
         refuses("fold during query")
         TestIcli.afterQuery = { TestIcli.degrees = 90 }

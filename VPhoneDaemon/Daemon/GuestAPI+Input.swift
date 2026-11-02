@@ -164,8 +164,25 @@ extension GuestAPI {
         guard query["truncated"] as? Bool != true else {
             throw IcliError.failed("AX query was truncated; narrow the screen before selecting an element")
         }
+        let applicationFrame: [String: Any]?
+        let application: GuestElementTap.Display?
+        let queryPID = (query["pid"] as? NSNumber)?.int32Value ?? 0
+        if bundle == "com.apple.springboard" {
+            applicationFrame = nil
+            application = nil
+        } else {
+            let frame = vp_element_tap_application_frame(queryPID)
+            guard frame["x"] as? Double == 0, frame["y"] as? Double == 0,
+                  let width = frame["width"] as? Double, let height = frame["height"] as? Double else {
+                throw GuestAPIError.operationFailed("Full application coordinate space unavailable")
+            }
+            let sideways = before.degrees == 90 || before.degrees == 270
+            applicationFrame = frame
+            application = try GuestElementTap.Display(name: "application", width: sideways ? height : width,
+                height: sideways ? width : height, degrees: before.degrees)
+        }
         let hits = (query["elements"] as? [[String: Any]] ?? []).filter {
-            matchesInterfaceElement($0, selector) && GuestElementTap.visible($0, display: before, source: source)
+            matchesInterfaceElement($0, selector) && GuestElementTap.visible($0, display: application ?? before, source: source)
         }
         guard hits.indices.contains(selector.index) else { throw IcliError.failed("element not found") }
         var element = hits[selector.index]
@@ -183,8 +200,12 @@ extension GuestAPI {
                 throw GuestAPIError.operationFailed("Screen geometry changed during element query; retry")
             }
         }
+        if let applicationFrame,
+           !NSDictionary(dictionary: applicationFrame).isEqual(to: vp_element_tap_application_frame(queryPID)) {
+            throw GuestAPIError.operationFailed("Application coordinate space changed during element query; retry")
+        }
         let upright = try GuestElementTap.convert(x: x, y: y, display: before, source: source)
-        let point = try GuestElementTap.point(x: upright.0, y: upright.1, display: before)
+        let point = try GuestElementTap.point(x: upright.0, y: upright.1, display: before, application: application)
         _ = try touchSequence([
             TouchEvent(phase: .down, x: point.0, y: point.1, delayMS: 50),
             TouchEvent(phase: .up, x: point.0, y: point.1),

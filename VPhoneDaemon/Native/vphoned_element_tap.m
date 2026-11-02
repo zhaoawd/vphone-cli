@@ -1,4 +1,5 @@
 #import "vphoned_element_tap.h"
+#import "vphoned_ax_hierarchy.h"
 #include "../../VPhoneGuestComponents/FoldDisplay/FoldDisplayGeometry.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <dlfcn.h>
@@ -56,4 +57,37 @@ NSDictionary<NSString *, id> *vp_element_tap_display_for_class(Class cls) {
 NSDictionary<NSString *, id> *vp_element_tap_display(void) {
     dlopen("/System/Library/Frameworks/QuartzCore.framework/QuartzCore", RTLD_LAZY | RTLD_LOCAL);
     return vp_element_tap_display_for_class(NSClassFromString(@"CADisplay"));
+}
+
+NSDictionary *vp_element_tap_frame_for_functions(VPAxFunctions f, int pid) {
+    if (pid <= 1 || !f.createApp || !f.copy || !f.getValue || !f.valueTypeID)
+        return @{@"error": @"AX application frame unavailable"};
+    CFTypeRef root = f.createApp(pid);
+    if (!root) return @{@"error": @"AX application unavailable"};
+    if (f.setTimeout) f.setTimeout(root, 0.5f);
+    CFTypeRef value = NULL;
+    int error = f.copy(root, (CFStringRef)(uintptr_t)2003, &value);
+    CFRelease(root);
+    CGRect frame = CGRectZero;
+    BOOL valid = !error && value && CFGetTypeID(value) == f.valueTypeID() && f.getValue(value, 3, &frame)
+        && isfinite(frame.origin.x) && isfinite(frame.origin.y)
+        && isfinite(frame.size.width) && isfinite(frame.size.height)
+        && frame.size.width > 0 && frame.size.height > 0;
+    if (value) CFRelease(value);
+    if (!valid) return @{@"error": @"AX application frame unavailable", @"ax_error": @(error)};
+    return @{@"x": @(frame.origin.x), @"y": @(frame.origin.y),
+             @"width": @(frame.size.width), @"height": @(frame.size.height)};
+}
+
+NSDictionary *vp_element_tap_application_frame(int pid) {
+    void *ax = dlopen("/System/Library/PrivateFrameworks/AXRuntime.framework/AXRuntime", RTLD_NOW);
+    VPAxFunctions f = {0};
+    if (ax) {
+        f.createApp = dlsym(ax, "_AXUIElementCreateAppElementWithPid");
+        f.copy = dlsym(ax, "AXUIElementCopyAttributeValue");
+        f.setTimeout = dlsym(ax, "AXUIElementSetMessagingTimeout");
+        f.valueTypeID = dlsym(ax, "AXValueGetTypeID");
+        f.getValue = dlsym(ax, "AXValueGetValue");
+    }
+    return vp_element_tap_frame_for_functions(f, pid);
 }
