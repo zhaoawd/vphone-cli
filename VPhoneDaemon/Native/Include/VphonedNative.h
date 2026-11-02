@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
+#import "../vphoned_element_tap.h"
 #endif
 
 // MARK: - Spawning

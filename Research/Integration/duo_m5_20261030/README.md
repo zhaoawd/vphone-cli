@@ -1,5 +1,8 @@
 # iPhone Duo / M5 integration, 2026-10-30
 
+2026-11-02 follow-up: [ui.tap_element active-panel coordinates](ELEMENT_TAP.md).
+Offline regressions and the iOS daemon build pass; real Duo VM acceptance is pending.
+
 ## Inputs
 
 | Input | Ref | Commit |

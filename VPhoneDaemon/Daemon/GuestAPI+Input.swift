@@ -1,6 +1,7 @@
 import CoreFoundation
 import Foundation
 import IcliKit
+import VphonedNative
 
 // MARK: - Buttons, Text, Gestures
 
@@ -89,7 +90,7 @@ extension GuestAPI {
         case "ui.element_at":
             return try elementAt(x: requiredNumber(params, "x"), y: requiredNumber(params, "y"))
         case "ui.tap_element":
-            return try tapElement(selector(params))
+            return try tapInterfaceElement(selector(params))
         case "ui.wait", "ui.wait_gone":
             return try waitForElement(
                 selector(params),
@@ -126,5 +127,87 @@ extension GuestAPI {
             match: optionalString(params, "match") ?? "contains",
             index: (params["index"] as? NSNumber)?.intValue ?? 0,
         )
+    }
+
+    private static func elementTapDisplay() throws -> GuestElementTap.Display? {
+        let report = vp_element_tap_display()
+        guard report["dual_display"] as? Bool == true else { return nil }
+        guard let name = report["name"] as? String,
+              let width = report["width"] as? Double, let height = report["height"] as? Double,
+              let degrees = interfaceRotationDegrees()
+        else {
+            throw GuestAPIError.operationFailed(report["error"] as? String ?? "Active display geometry unavailable")
+        }
+        return try GuestElementTap.Display(name: name, width: width, height: height, degrees: degrees)
+    }
+
+    private static func tapInterfaceElement(_ selector: ElementSelector) throws -> [String: Any] {
+        guard let before = try elementTapDisplay() else { return try tapElement(selector) }
+        let foreground = frontmostApp()
+        guard foreground["verified"] as? Bool == true, let bundle = foreground["bundle_id"] as? String else {
+            throw GuestAPIError.operationFailed("Cannot verify foreground application before element tap")
+        }
+        // icli's visible filter uses Main's bounds too. Query unfiltered and
+        // test each AX frame against the active panel before selecting a hit.
+        let inputScreen = screenInfo()
+        let source: GuestElementTap.Display?
+        if bundle == "com.apple.springboard" {
+            guard let width = inputScreen["width"] as? Double, let height = inputScreen["height"] as? Double,
+                  let degrees = (inputScreen["orientation"] as? NSNumber)?.intValue, degrees == before.degrees else {
+                throw GuestAPIError.operationFailed("Screen orientation changed before element query; retry")
+            }
+            let sideways = degrees == 90 || degrees == 270
+            source = try GuestElementTap.Display(name: "main", width: sideways ? height : width,
+                                                height: sideways ? width : height, degrees: degrees)
+        } else { source = nil }
+        let query = try uiElements(maxElements: 2000, visibleOnly: false)
+        guard query["truncated"] as? Bool != true else {
+            throw IcliError.failed("AX query was truncated; narrow the screen before selecting an element")
+        }
+        let hits = (query["elements"] as? [[String: Any]] ?? []).filter {
+            matchesInterfaceElement($0, selector) && GuestElementTap.visible($0, display: before, source: source)
+        }
+        guard hits.indices.contains(selector.index) else { throw IcliError.failed("element not found") }
+        var element = hits[selector.index]
+        element["visible"] = true
+        guard let x = element["x"] as? Double, let y = element["y"] as? Double else {
+            throw IcliError.failed("element has no tap point")
+        }
+        let after = frontmostApp()
+        guard after["verified"] as? Bool == true, after["bundle_id"] as? String == bundle,
+              try elementTapDisplay() == before else {
+            throw GuestAPIError.operationFailed("Foreground application or display changed during element query; retry")
+        }
+        if source != nil {
+            guard NSDictionary(dictionary: screenInfo()).isEqual(to: inputScreen) else {
+                throw GuestAPIError.operationFailed("Screen geometry changed during element query; retry")
+            }
+        }
+        let upright = try GuestElementTap.convert(x: x, y: y, display: before, source: source)
+        let point = try GuestElementTap.point(x: upright.0, y: upright.1, display: before)
+        _ = try touchSequence([
+            TouchEvent(phase: .down, x: point.0, y: point.1, delayMS: 50),
+            TouchEvent(phase: .up, x: point.0, y: point.1),
+        ], normalized: true)
+        return ["tapped": true, "element": element]
+    }
+
+    /// Preserve ElementSelector.matches from pinned icli 0.10.0. That method
+    /// is internal to IcliKit, and its public tap/wait paths filter on Main.
+    private static func matchesInterfaceElement(_ element: [String: Any], _ selector: ElementSelector) -> Bool {
+        if let role = selector.role {
+            if role == "control" {
+                if element["clickable"] as? Bool != true { return false }
+            } else if role != "element", element["role"] as? String != role { return false }
+        }
+        if let identifier = selector.identifier {
+            return element["identifier"] as? String == identifier || element["label"] as? String == identifier
+        }
+        guard let text = selector.text else { return false }
+        return ["label", "identifier", "value"].contains {
+            let value = element[$0] as? String ?? ""
+            return selector.match == "exact" ? value.compare(text, options: .caseInsensitive) == .orderedSame
+                : value.localizedCaseInsensitiveContains(text)
+        }
     }
 }

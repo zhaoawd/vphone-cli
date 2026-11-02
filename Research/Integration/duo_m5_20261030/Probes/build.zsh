@@ -6,6 +6,8 @@ source_root="${0:a:h}"
 repo_root="$(cd "$source_root/../../../.." && pwd)"
 probe_platform="${1:?usage: build.zsh <device|sim> [new-output-directory]}"
 output_root="${2:-$repo_root/.build/validation/probes/$probe_platform-$(uuidgen)}"
+probe_filter="${3:-all}"
+[[ "$probe_filter" == all || "$probe_filter" == tap ]] || exit 2
 case "$probe_platform" in
     device) probe_sdk=iphoneos; probe_target=arm64-apple-ios27.1; platform_name=iPhoneOS ;;
     sim) probe_sdk=iphonesimulator; probe_target=arm64-apple-ios27.1-simulator; platform_name=iPhoneSimulator ;;
@@ -44,8 +46,13 @@ build_app() {
     print "Built: $app_root"
 }
 
+if [[ "$probe_filter" == tap ]]; then
+    build_app TapProbe com.autophone.tap-probe tap-probe Info.plist false "$source_root/tap-probe/main.m"
+    exit 0
+fi
 build_app GeoProbe com.autophone.geoprobe geo-probe Info.plist false "$source_root/geo-probe/main.m"
 build_app GeoBare com.autophone.geobare geo-probe Info.plist false -DGEO_BARE "$source_root/geo-probe/main.m"
+build_app TapProbe com.autophone.tap-probe tap-probe Info.plist false "$source_root/tap-probe/main.m"
 build_app KBProbe com.autophone.kbprobe kb-probe Info.plist false "$source_root/kb-probe/main.m"
 build_app KBProbeFS com.autophone.kbprobe.fs kb-probe Info.plist true "$source_root/kb-probe/main.m"
 build_app Probe com.autophone.probe cssc-probe app/Info.plist false \
