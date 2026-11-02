@@ -2,12 +2,17 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <dlfcn.h>
 #import <math.h>
+#import <objc/message.h>
 #import <string.h>
 
 NSDictionary<NSString *, id> *vp_element_tap_display_for_class(Class cls) {
     @try {
         if (![cls respondsToSelector:NSSelectorFromString(@"displays")])
             return @{@"dual_display": @NO};
+        // The daemon may have enumerated before the inner panel was added.
+        // Match vp_display_modes rather than retaining that first inventory.
+        SEL refresh = NSSelectorFromString(@"updateDisplays");
+        if ([cls respondsToSelector:refresh]) ((void (*)(id, SEL))objc_msgSend)(cls, refresh);
         NSArray *displays = [cls valueForKey:@"displays"];
         id inner = nil;
         for (id display in displays) {

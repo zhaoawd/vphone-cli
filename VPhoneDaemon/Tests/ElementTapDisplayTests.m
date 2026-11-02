@@ -19,14 +19,18 @@
 @implementation TapTestDisplay
 @end
 static NSArray *inventory;
+static NSArray *pendingInventory;
+static int refreshes;
 static TapTestDisplay *primary;
 @interface TapTestCatalog : NSObject
 + (NSArray *)displays;
 + (id)mainDisplay;
++ (void)updateDisplays;
 @end
 @implementation TapTestCatalog
 + (NSArray *)displays { return inventory; }
 + (id)mainDisplay { return primary; }
++ (void)updateDisplays { refreshes++; if (pendingInventory) inventory = pendingInventory; }
 @end
 
 extern NSDictionary *vp_element_tap_display_for_class(Class cls);
@@ -46,7 +50,7 @@ int main(void) { @autoreleasepool {
     inventory = @[primary];
     assert(![report()[@"dual_display"] boolValue]);
     TapTestDisplay *inner = panel(@"VPhone Duo Inner", 2007, 2853, 1);
-    inventory = @[primary, inner];
+    pendingInventory = @[primary, inner];
     for (NSNumber *state in @[@1, @0, @1, @0]) {
         inner.stateControl.displayState = state;
         NSDictionary *r = report();
@@ -55,6 +59,8 @@ int main(void) { @autoreleasepool {
         assert([r[@"width"] doubleValue] == ([state boolValue] ? 669 : 466));
         assert([r[@"height"] doubleValue] == ([state boolValue] ? 951 : 678));
     }
+    assert(refreshes == 5);
+    pendingInventory = nil;
     inner.stateControl.displayState = @2;
     assert(report()[@"error"]);
     inner.stateControl.displayState = @1;
