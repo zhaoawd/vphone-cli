@@ -1,7 +1,11 @@
 # iPhone Duo / M5 integration, 2026-10-30
 
 2026-11-02 follow-up: [ui.tap_element active-panel coordinates](ELEMENT_TAP.md).
-Offline regressions and the iOS daemon build pass; real Duo VM acceptance is pending.
+Offline regressions, the full bundle build and 324 App button/touch receipts pass
+on an independent iOS 27.1 Duo VM in native and compatibility layouts. Coverage
+includes both panels, supported rotations, book posture and fold round trips.
+Unsupported directions and the existing Home Screen foreground-verification
+blocker are recorded separately in that evidence document.
 
 ## Inputs
 

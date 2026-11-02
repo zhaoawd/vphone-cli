@@ -1,0 +1,173 @@
+{
+  "date": "2026-11-02",
+  "branch": "duo-integration-20261030",
+  "source_commit": "e2d1905f0442342cabe79cd036e859a2ffe46419",
+  "candidate": {
+    "build_hash": "e2d1905f-dirty",
+    "vphoned_sha256": "01a91633d38dfba795ec966879f158835fe794e12c24a21dc094ae32165b5562",
+    "cli_sha256": "ab47ea426755d3e91adc22c6aced102684321ae92beebea91b4422afb1b26f98",
+    "vm_sha256": "2bc186ad3099cd896bc3df67fbd55730ef684019c75581969a4d534108c1d9e7"
+  },
+  "vm": {
+    "name": "duo-tap-20261102",
+    "library": ".build/duo-element-tap/machines",
+    "hardware": "vresearch101",
+    "model": "iPhone19,4",
+    "ios_version": "27.1",
+    "ios_build": "24A94425",
+    "cloudos_build": "23E5207q"
+  },
+  "probes": {
+    "compiler_sdk": "26.4",
+    "sdk_declarations": [
+      "26.4",
+      "27.1"
+    ],
+    "compatibility_ipa_sha256": "703b55d06658c03a918ad45531ae3ee81b0b0a317453bc0f558a22e2c76798fd",
+    "native_ipa_sha256": "54fb82d017dd082dad9e7994d4d720e8ba8d41743ec0038324d7952bc565893a",
+    "sdk_27_1_headers_used": false,
+    "installation": "apps.install"
+  },
+  "acceptance": {
+    "total_successful_taps": 324,
+    "refused_rotation_requests": 12,
+    "postures": [
+      "closed",
+      "open-flat",
+      "closed",
+      "open-flat",
+      "partially-open",
+      "closed"
+    ],
+    "requirements": [
+      "same App PID within each matrix",
+      "one target UIControl action per click",
+      "target counter and total counter each increase by one",
+      "last identifier matches",
+      "received ended touch identifier matches",
+      "each touch coordinate within 1 pt of AX activation point",
+      "CADisplay inner state matches posture",
+      "SpringBoard orientation matches requested supported direction"
+    ],
+    "native": {
+      "layout": "native",
+      "evidence_directory": ".build/duo-element-tap/window-native-final",
+      "source_commit": "e2d1905f0442342cabe79cd036e859a2ffe46419",
+      "taps": 162,
+      "applied_rotations": 18,
+      "refused_rotations": 6,
+      "pid": 498,
+      "same_pid": true,
+      "initial_total": 0,
+      "final_total": 162,
+      "per_button_delta": {
+        "tap-0": 18,
+        "tap-1": 18,
+        "tap-2": 18,
+        "tap-3": 18,
+        "tap-4": 18,
+        "tap-5": 18,
+        "tap-6": 18,
+        "tap-7": 18,
+        "tap-8": 18
+      },
+      "daemon_hash_before": "01a91633d38dfba795ec966879f158835fe794e12c24a21dc094ae32165b5562",
+      "daemon_hash_after": "01a91633d38dfba795ec966879f158835fe794e12c24a21dc094ae32165b5562",
+      "cover_scene": [
+        466,
+        678
+      ],
+      "inner_scene": [
+        669,
+        951
+      ],
+      "touch_receipts": {
+        "receipts": 162,
+        "max_x_error_pt": 5.684341886080802E-14,
+        "max_y_error_pt": 2.842170943040401E-14
+      }
+    },
+    "compatibility": {
+      "layout": "compatibility",
+      "evidence_directory": ".build/duo-element-tap/window-compatibility-final",
+      "source_commit": "e2d1905f0442342cabe79cd036e859a2ffe46419",
+      "taps": 162,
+      "applied_rotations": 18,
+      "refused_rotations": 6,
+      "pid": 627,
+      "same_pid": true,
+      "initial_total": 0,
+      "final_total": 162,
+      "per_button_delta": {
+        "tap-0": 18,
+        "tap-1": 18,
+        "tap-2": 18,
+        "tap-3": 18,
+        "tap-4": 18,
+        "tap-5": 18,
+        "tap-6": 18,
+        "tap-7": 18,
+        "tap-8": 18
+      },
+      "daemon_hash_before": "01a91633d38dfba795ec966879f158835fe794e12c24a21dc094ae32165b5562",
+      "daemon_hash_after": "01a91633d38dfba795ec966879f158835fe794e12c24a21dc094ae32165b5562",
+      "cover_scene": [
+        375,
+        667
+      ],
+      "inner_scene": [
+        375,
+        667
+      ],
+      "touch_receipts": {
+        "receipts": 162,
+        "max_x_error_pt": 5.684341886080802E-14,
+        "max_y_error_pt": 0
+      }
+    }
+  },
+  "evidence_manifests": {
+    "native_sha256": "6396efdd167019ae4f7738bec6dab0c2e5c19a26b232d7b0eb829b0b1fd11426",
+    "compatibility_sha256": "8774af62ffbb46c73195cf66f99730ec3acae50eef59682b1b0fdb1910c2da10"
+  },
+  "offline": {
+    "geometry_checks": 31,
+    "api_checks": 218,
+    "api_failures": 0,
+    "original_logic_checks": 394,
+    "native_display_and_window_tests": "passed",
+    "native_ax_context_tests": "passed",
+    "hierarchy_tests": "passed",
+    "full_bundle_build": "passed",
+    "deep_strict_signature": "passed"
+  },
+  "limitations": {
+    "unsupported_rotation_requests": {
+      "cover": "upside-down",
+      "inner": "landscape-right"
+    },
+    "springboard_icons": {
+      "status": "not_accepted",
+      "reason": "Existing foreground verification rejects Home Screen",
+      "raw_frontmost": {
+        "bundle_id": "com.apple.springboard",
+        "source": "unavailable",
+        "runningboard": {
+          "pathless_processes": 0,
+          "states": 5,
+          "reason": "no_focal_app",
+          "app_processes": 16,
+          "handles": 16,
+          "hidden_focal": [
+            "com.apple.DocumentManager.DockFolderViewService"
+          ]
+        },
+        "verified": false
+      },
+      "unchanged_ui_tree_error": "frontmost application could not be verified",
+      "evidence_directory": ".build/duo-element-tap/springboard-final"
+    },
+    "sdk_experiment": "SDK declaration changed with vtool before signing; both builds use local SDK 26.4 headers",
+    "installation_scope": "Does not establish installd installation-path acceptance"
+  }
+}

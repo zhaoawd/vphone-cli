@@ -1,17 +1,23 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
-> **Duo element taps (2026-11-02, runtime acceptance in progress).** The
-> daemon normalizes AX element points against the active panel, with the
+> **Duo element taps (2026-11-02, App runtime acceptance passed).** The
+> daemon validates the active panel and sends AX points in their own window
+> contexts, with the
 > QuartzCore display-state entitlement required to read its applied state.
 > The existing inner point scale (3) is shared by FoldDisplay and the daemon;
 > ordinary CADisplay clients report 1 for this virtual display. This extracts
 > the existing guest-library constant without changing its value. The daemon
 > reads the immediate AX windows' canvas for selection bounds (UIApplication's
 > root frame can retain fixed orientation), then re-resolves
-> the selected AX identity and uses AXElement's context-aware tap. The system
+> the selected AX element and uses AXElement's context-aware tap. The system
 > applies scene-host scale, placement and book-mode projection; no fitted
 > compatibility offsets remain. Missing, ambiguous or changing geometry and
-> unavailable ABI refuse injection. Full VM regression is in progress. No binary
+> unavailable ABI refuse injection. On an independent iOS 27.1 Duo VM, the
+> final candidate passed 324 button actions and touch-coordinate receipts in
+> native and compatibility layouts across panels, supported rotations, book
+> posture and fold round trips. Twelve unsupported rotation requests are
+> recorded separately. Home Screen icon acceptance is blocked by existing
+> foreground verification (`no_focal_app`); it is not counted as passed. No binary
 > patch algorithm, preset or boot-chain patch is added. See
 > [element-tap evidence](Integration/duo_m5_20261030/ELEMENT_TAP.md).
 
