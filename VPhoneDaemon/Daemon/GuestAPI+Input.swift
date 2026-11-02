@@ -205,11 +205,25 @@ extension GuestAPI {
             throw GuestAPIError.operationFailed("Application coordinate space changed during element query; retry")
         }
         let upright = try GuestElementTap.convert(x: x, y: y, display: before, source: source)
-        let point = try GuestElementTap.point(x: upright.0, y: upright.1, display: before, application: application)
-        _ = try touchSequence([
-            TouchEvent(phase: .down, x: point.0, y: point.1, delayMS: 50),
-            TouchEvent(phase: .up, x: point.0, y: point.1),
-        ], normalized: true)
+        _ = try GuestElementTap.fixedPoint(x: upright.0, y: upright.1, display: application ?? before)
+        var raw = element
+        if let source {
+            // Undo icli's Main-based turn. AXElement takes its original
+            // window coordinates and applies the actual scene-host context.
+            let point = try GuestElementTap.fixedPoint(x: x, y: y, display: source, validate: false)
+            let frame = element["frame"] as! [String: Any]
+            let a = try GuestElementTap.fixedPoint(x: frame["x"] as! Double, y: frame["y"] as! Double,
+                display: source, validate: false)
+            let b = try GuestElementTap.fixedPoint(x: (frame["x"] as! Double) + (frame["width"] as! Double),
+                y: (frame["y"] as! Double) + (frame["height"] as! Double), display: source, validate: false)
+            raw["x"] = point.0; raw["y"] = point.1
+            raw["frame"] = ["x": min(a.0, b.0), "y": min(a.1, b.1),
+                            "width": abs(a.0 - b.0), "height": abs(a.1 - b.1)]
+        }
+        let sent = vp_element_tap_in_context(queryPID, raw)
+        guard sent["tapped"] as? Bool == true else {
+            throw GuestAPIError.operationFailed(sent["error"] as? String ?? "AX context tap failed")
+        }
         return ["tapped": true, "element": element]
     }
 

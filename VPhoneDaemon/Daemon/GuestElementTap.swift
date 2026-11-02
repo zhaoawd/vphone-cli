@@ -31,24 +31,6 @@ enum GuestElementTap {
         }
     }
 
-    /// Fixed, normalized digitizer coordinates; no screenshot-size cache.
-    static func point(x: Double, y: Double, display: Display, application: Display? = nil) throws -> (Double, Double) {
-        let space = application ?? display
-        guard space.degrees == display.degrees else { throw Failure.invalidGeometry }
-        let fixed = try fixedPoint(x: x, y: y, display: space)
-        guard application != nil else { return (fixed.0 / display.width, fixed.1 / display.height) }
-        if display.name == "inner" {
-            // Duo hosts an older application's canvas at the center of the
-            // inner panel, retaining its point size.
-            guard space.width <= display.width, space.height <= display.height else { throw Failure.invalidGeometry }
-            return ((fixed.0 + (display.width - space.width) / 2) / display.width,
-                    (fixed.1 + (display.height - space.height) / 2) / display.height)
-        }
-        // The cover fits the application's compatibility canvas to its panel.
-        let scale = min(display.width / space.width, display.height / space.height)
-        return (fixed.0 * scale / display.width, fixed.1 * scale / display.height)
-    }
-
     static func fixedPoint(x: Double, y: Double, display: Display, validate: Bool = true) throws -> (Double, Double) {
         let sideways = display.degrees == 90 || display.degrees == 270
         let width = sideways ? display.height : display.width

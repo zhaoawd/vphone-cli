@@ -4,7 +4,7 @@ import Foundation
 enum ElementTapTests {
     static func main() throws {
         var checks = 0
-        // Fixed normalized points, with independent upright AX observations.
+        // Inverse coordinate transforms, with independent upright AX observations.
         for (name, width, height) in [("cover", 466.0, 678.0), ("inner", 669.0, 951.0)] {
             for degrees in [0, 90, 180, 270] {
                 let display = try GuestElementTap.Display(name: name, width: width, height: height, degrees: degrees)
@@ -16,8 +16,8 @@ enum ElementTapTests {
                     case 270: (x, y) = (ny * height, (1 - nx) * width)
                     default: (x, y) = (nx * width, ny * height)
                     }
-                    let actual = try GuestElementTap.point(x: x, y: y, display: display)
-                    precondition(abs(actual.0 - nx) < 1e-9 && abs(actual.1 - ny) < 1e-9,
+                    let actual = try GuestElementTap.fixedPoint(x: x, y: y, display: display)
+                    precondition(abs(actual.0 - nx * width) < 1e-9 && abs(actual.1 - ny * height) < 1e-9,
                                  "\(name) \(degrees): expected \(nx),\(ny); got \(actual)")
                     checks += 1
                 }
@@ -32,7 +32,7 @@ enum ElementTapTests {
         let display = try GuestElementTap.Display(name: "inner", width: 669, height: 951, degrees: 0)
         for (x, y) in [(-1.0, 10.0), (669.0, 10.0), (10.0, 951.0), (Double.nan, 10.0)] {
             do {
-                _ = try GuestElementTap.point(x: x, y: y, display: display)
+                _ = try GuestElementTap.fixedPoint(x: x, y: y, display: display)
                 preconditionFailure("invalid activation point accepted")
             } catch { checks += 1 }
         }

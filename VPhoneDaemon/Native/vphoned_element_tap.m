@@ -5,6 +5,7 @@
 #import <dlfcn.h>
 #import <math.h>
 #import <objc/message.h>
+#import <objc/runtime.h>
 #import <string.h>
 
 NSDictionary<NSString *, id> *vp_element_tap_display_for_class(Class cls) {
@@ -90,4 +91,96 @@ NSDictionary *vp_element_tap_application_frame(int pid) {
         f.getValue = dlsym(ax, "AXValueGetValue");
     }
     return vp_element_tap_frame_for_functions(f, pid);
+}
+
+struct __AXUIElement;
+@protocol VPElementTapFactory
++ (instancetype)elementWithAXUIElement:(struct __AXUIElement *)element;
+@end
+
+static id vpTapAttribute(VPAxFunctions f, CFTypeRef element, uint32_t attribute) {
+    CFTypeRef value = NULL;
+    int error = f.copy(element, (CFStringRef)(uintptr_t)attribute, &value);
+    if (error) { if (value) CFRelease(value); return nil; }
+    return CFBridgingRelease(value);
+}
+
+NSDictionary *vp_element_tap_context_for_functions(VPAxFunctions f, Class cls, int pid, NSDictionary *selected) {
+    @try {
+        SEL factory = @selector(elementWithAXUIElement:);
+        SEL tap = NSSelectorFromString(@"simulateTapWithFingerIndex:withPoint:");
+        Method make = class_getClassMethod(cls, factory), send = class_getInstanceMethod(cls, tap);
+        if (!make || !send || strcmp(method_getTypeEncoding(make), "@24@0:8^{__AXUIElement=}16") != 0 ||
+            strcmp(method_getTypeEncoding(send), "B40@0:8Q16{CGPoint=dd}24") != 0)
+            return @{@"error": @"AX context tap ABI unavailable"};
+        NSDictionary *frame = selected[@"frame"];
+        NSArray *numbers = @[frame[@"x"] ?: NSNull.null, frame[@"y"] ?: NSNull.null,
+            frame[@"width"] ?: NSNull.null, frame[@"height"] ?: NSNull.null,
+            selected[@"x"] ?: NSNull.null, selected[@"y"] ?: NSNull.null];
+        for (id value in numbers)
+            if (![value isKindOfClass:NSNumber.class] || !isfinite([value doubleValue]))
+                return @{@"error": @"Selected AX geometry unavailable"};
+        CGRect expected = CGRectMake([numbers[0] doubleValue], [numbers[1] doubleValue],
+                                     [numbers[2] doubleValue], [numbers[3] doubleValue]);
+        if (expected.size.width <= 0 || expected.size.height <= 0 || pid <= 1 ||
+            !f.createApp || !f.copy || !f.getValue || !f.valueTypeID || !f.elementTypeID)
+            return @{@"error": @"Selected AX element unavailable"};
+        CFTypeRef root = f.createApp(pid);
+        if (!root) return @{@"error": @"AX application unavailable"};
+        if (f.setTimeout) f.setTimeout(root, 0.5f);
+        CFTypeRef value = NULL;
+        int error = f.copy(root, (CFStringRef)(uintptr_t)3015, &value);
+        CFRelease(root);
+        id collection = CFBridgingRelease(value);
+        if (error || ![collection isKindOfClass:NSArray.class])
+            return @{@"error": @"AX context element query failed"};
+        id match = nil;
+        NSTimeInterval deadline = NSProcessInfo.processInfo.systemUptime + 2;
+        for (id element in collection) {
+            if (NSProcessInfo.processInfo.systemUptime > deadline)
+                return @{@"error": @"AX context element query timed out"};
+            CFTypeRef ref = (__bridge CFTypeRef)element;
+            if (CFGetTypeID(ref) != f.elementTypeID()) continue;
+            if (f.setTimeout) f.setTimeout(ref, 0.25f);
+            id box = vpTapAttribute(f, ref, 2003);
+            CGRect actual = CGRectZero;
+            if (!box || CFGetTypeID((__bridge CFTypeRef)box) != f.valueTypeID() ||
+                !f.getValue((__bridge CFTypeRef)box, 3, &actual)) continue;
+            if (!isfinite(actual.origin.x) || !isfinite(actual.origin.y) || !isfinite(actual.size.width) ||
+                !isfinite(actual.size.height) || actual.size.width <= 0 || actual.size.height <= 0) continue;
+            if (fabs(actual.origin.x - expected.origin.x) > 1e-6 || fabs(actual.origin.y - expected.origin.y) > 1e-6 ||
+                fabs(actual.size.width - expected.size.width) > 1e-6 || fabs(actual.size.height - expected.size.height) > 1e-6)
+                continue;
+            id identifier = vpTapAttribute(f, ref, 5019), label = vpTapAttribute(f, ref, 2001);
+            if (![identifier isKindOfClass:NSString.class]) identifier = @"";
+            if (![label isKindOfClass:NSString.class]) label = @"";
+            if (![identifier isEqual:selected[@"identifier"] ?: @""] || ![label isEqual:selected[@"label"] ?: @""]) continue;
+            if (match && !CFEqual((__bridge CFTypeRef)match, ref))
+                return @{@"error": @"Selected AX context element is ambiguous"};
+            match = element;
+        }
+        if (!match) return @{@"error": @"Selected AX context element changed; retry"};
+        id wrapped = [(Class<VPElementTapFactory>)cls elementWithAXUIElement:(struct __AXUIElement *)(__bridge void *)match];
+        if (!wrapped) return @{@"error": @"AX context element unavailable"};
+        CGPoint point = CGPointMake([numbers[4] doubleValue], [numbers[5] doubleValue]);
+        BOOL sent = ((BOOL (*)(id, SEL, NSUInteger, CGPoint))objc_msgSend)(wrapped, tap, 0, point);
+        return sent ? @{@"tapped": @YES} : @{@"error": @"AX context tap failed"};
+    } @catch (NSException *exception) {
+        return @{@"error": exception.reason ?: exception.name};
+    }
+}
+
+NSDictionary *vp_element_tap_in_context(int pid, NSDictionary *element) {
+    dlopen("/System/Library/PrivateFrameworks/AccessibilityUtilities.framework/AccessibilityUtilities", RTLD_NOW);
+    void *ax = dlopen("/System/Library/PrivateFrameworks/AXRuntime.framework/AXRuntime", RTLD_NOW);
+    VPAxFunctions f = {0};
+    if (ax) {
+        f.createApp = dlsym(ax, "_AXUIElementCreateAppElementWithPid");
+        f.copy = dlsym(ax, "AXUIElementCopyAttributeValue");
+        f.setTimeout = dlsym(ax, "AXUIElementSetMessagingTimeout");
+        f.elementTypeID = dlsym(ax, "AXUIElementGetTypeID");
+        f.valueTypeID = dlsym(ax, "AXValueGetTypeID");
+        f.getValue = dlsym(ax, "AXValueGetValue");
+    }
+    return vp_element_tap_context_for_functions(f, NSClassFromString(@"AXElement"), pid, element);
 }

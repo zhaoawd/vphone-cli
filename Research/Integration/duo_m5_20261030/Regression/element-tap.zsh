@@ -58,19 +58,26 @@ for posture in closed open-flat closed open-flat partially-open closed; do
             "$case_root/$rotation-displays.json" >/dev/null
         rpc ui.tree > "$case_root/$rotation-tree.json"
         case "$rotation" in
-            portrait) expected_orientation=1 ;;
-            landscape-left) expected_orientation=4 ;;
-            upside-down) expected_orientation=2 ;;
-            landscape-right) expected_orientation=3 ;;
+            portrait) expected_orientation=1; expected_degrees=0 ;;
+            landscape-left) expected_orientation=4; expected_degrees=90 ;;
+            upside-down) expected_orientation=2; expected_degrees=180 ;;
+            landscape-right) expected_orientation=3; expected_degrees=270 ;;
         esac
+        jq -e --argjson expected "$expected_degrees" '.result.degrees == $expected' \
+            "$case_root/$rotation.json" >/dev/null
         for attempt in {1..20}; do
             probe > "$case_root/$rotation-layout.json"
+            # A compatibility canvas can stay portrait on the turned inner
+            # panel. Record its actual geometry; parent rotation is read above.
+            if [[ "$layout" == compatibility && "$posture" != closed ]]; then break; fi
             if jq -e --argjson expected "$expected_orientation" '.orientation == $expected' \
                 "$case_root/$rotation-layout.json" >/dev/null; then break; fi
             /bin/sleep 0.5
         done
-        jq -e --argjson expected "$expected_orientation" '.orientation == $expected' \
-            "$case_root/$rotation-layout.json" >/dev/null
+        if [[ "$layout" == native || "$posture" == closed ]]; then
+            jq -e --argjson expected "$expected_orientation" '.orientation == $expected' \
+                "$case_root/$rotation-layout.json" >/dev/null
+        fi
         for index in {0..8}; do
             identifier="tap-$index"
             before=$(probe)

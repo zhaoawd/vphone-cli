@@ -48,14 +48,15 @@ enum ElementTapAPITests {
                         let result = try GuestAPI.executeInterface("ui.tap_element", params)
                         expect(result?["tapped"] as? Bool == true, "tap result")
                         let actual = TestIcli.injected.last ?? (-1, -1)
-                        expect(TestIcli.injected.count == 1 && abs(actual.0 - nx) < 1e-9 && abs(actual.1 - ny) < 1e-9,
-                               "\(name) \(degrees) \(bundle): expected \(nx),\(ny), got \(actual)")
+                        let expected = bundle == "com.apple.springboard" ? (fx, fy) : (x, y)
+                        expect(TestIcli.injected.count == 1 && abs(actual.0 - expected.0) < 1e-9 && abs(actual.1 - expected.1) < 1e-9,
+                               "\(name) \(degrees) \(bundle): context point \(expected), got \(actual)")
                     }
                 }
             }
         }
-        // A pre-Duo SDK exposes a 375x667 AX canvas. The cover fits that
-        // canvas; the inner panel centers it without resizing it.
+        // Preserve the original context coordinates of a compatibility canvas;
+        // the system owns its placement, scale and book-mode projection.
         TestIcli.bundle = "com.autophone.tap-probe"
         for (name, w, h) in [("cover", 466.0, 678.0), ("inner", 669.0, 951.0)] {
             for degrees in [0, 90, 180, 270] {
@@ -75,14 +76,23 @@ enum ElementTapAPITests {
                     "frame": ["x": x - 5, "y": y - 5, "width": 10.0, "height": 10.0]]]
                 TestIcli.injected = []
                 _ = try GuestAPI.executeInterface("ui.tap_element", params)
-                let expected: (Double, Double)
-                if name == "cover" { expected = (200.0 * (678.0 / 667.0) / 466.0, 400.0 / 667.0) }
-                else { expected = (347.0 / 669.0, 542.0 / 951.0) }
                 let actual = TestIcli.injected.last ?? (-1, -1)
-                expect(abs(actual.0 - expected.0) < 1e-9 && abs(actual.1 - expected.1) < 1e-9,
+                expect(abs(actual.0 - x) < 1e-9 && abs(actual.1 - y) < 1e-9,
                        "compatibility canvas \(name) \(degrees)")
             }
         }
+        // Observed old-SDK scene: the inner parent is 90 degrees while the
+        // application keeps its portrait 375x667 canvas.
+        TestIcli.display = ["dual_display": true, "name": "inner", "width": 669.0, "height": 951.0]
+        TestIcli.degrees = 90
+        TestIcli.appFrame = ["x": 0.0, "y": 0.0, "width": 375.0, "height": 667.0]
+        TestIcli.elements = [["identifier": "target", "x": 75.16666666666667, "y": 142.2,
+            "frame": ["x": 39.0, "y": 120.2, "width": 72.0, "height": 44.0]]]
+        TestIcli.injected = []
+        _ = try GuestAPI.executeInterface("ui.tap_element", params)
+        let pinned = TestIcli.injected.last ?? (-1, -1)
+        expect(abs(pinned.0 - 75.16666666666667) < 1e-9 && abs(pinned.1 - 142.2) < 1e-9,
+               "portrait application on rotated inner panel")
         TestIcli.appFrame = nil
         TestIcli.bundle = "com.autophone.tap-probe"
         TestIcli.elements = [["identifier": "target", "x": 100.0, "y": 124.0,

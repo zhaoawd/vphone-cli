@@ -12,3 +12,10 @@ public func vp_element_tap_application_frame(_ pid: Int32) -> [String: Any] {
     TestIcli.afterFrameRead?()
     return result
 }
+
+public func vp_element_tap_in_context(_ pid: Int32, _ element: [String: Any]) -> [String: Any] {
+    precondition(pid == 123)
+    if TestIcli.failInjection { return ["error": "context tap failed"] }
+    TestIcli.injected.append((element["x"] as! Double, element["y"] as! Double))
+    return ["tapped": true]
+}

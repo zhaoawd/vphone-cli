@@ -6,10 +6,11 @@
 > The existing inner point scale (3) is shared by FoldDisplay and the daemon;
 > ordinary CADisplay clients report 1 for this virtual display. This extracts
 > the existing guest-library constant without changing its value. The daemon
-> also reads the application's full AX canvas: older SDK canvases fit the
-> cover and are centered on the inner panel. Missing or changing geometry
-> refuses injection. Native Duo layout passed 162 actual button actions;
-> the compatibility extension is awaiting the complete VM regression. No binary
+> reads the application's full AX canvas for selection bounds, then re-resolves
+> the selected AX identity and uses AXElement's context-aware tap. The system
+> applies scene-host scale, placement and book-mode projection; no fitted
+> compatibility offsets remain. Missing, ambiguous or changing geometry and
+> unavailable ABI refuse injection. Full VM regression is in progress. No binary
 > patch algorithm, preset or boot-chain patch is added. See
 > [element-tap evidence](Integration/duo_m5_20261030/ELEMENT_TAP.md).
 
