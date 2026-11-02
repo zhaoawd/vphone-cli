@@ -11,7 +11,7 @@ temporary="$(/usr/bin/mktemp -d "${TMPDIR:-/tmp}/vphone-system-maintenance-tests
 trap '/bin/rm -rf "$temporary"' EXIT
 
 /usr/bin/xcrun --sdk macosx swiftc -swift-version 6 -parse-as-library \
-    -module-name SystemMaintenanceTests \
+    -module-cache-path "$temporary/module-cache" -module-name SystemMaintenanceTests \
     "$daemon/Daemon/GuestSystemAppPolicy.swift" \
     "$daemon/Daemon/GuestSnapshotPolicy.swift" \
     "$daemon/Tests/SystemMaintenanceTests.swift" \

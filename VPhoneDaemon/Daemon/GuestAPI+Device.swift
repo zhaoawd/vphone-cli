@@ -129,8 +129,13 @@ extension GuestAPI {
         case "display.auto_lock":
             return GuestLockScreenIdle.describe()
         case "display.auto_lock.set":
-            guard let seconds = (params["seconds"] as? NSNumber)?.intValue else {
-                throw GuestAPIError.invalidRequest("seconds must be an integer")
+            let seconds: Int
+            if let s = (params["seconds"] as? NSNumber)?.intValue {
+                seconds = s
+            } else if params["never"] as? Bool == true {
+                seconds = Int(Int32.max)
+            } else {
+                throw GuestAPIError.invalidRequest("seconds must be an integer, or never must be true")
             }
             return try GuestLockScreenIdle.setAutoLockSeconds(seconds)
         case "screen.unlock":

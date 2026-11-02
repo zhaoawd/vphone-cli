@@ -1,3 +1,5 @@
+import CoreFoundation
+import Darwin
 import Foundation
 import IcliKit
 import notify
@@ -27,8 +29,8 @@ enum GuestLockScreenIdle {
     /// profiled's merged settings for user mobile. It rewrites the file and
     /// then posts `changedNotification`; ManagedConfiguration's own clients
     /// re-read it on the same signal.
-    private static let settingsPath = "/var/mobile/Library/UserConfigurationProfiles/EffectiveUserSettings.plist"
-    private static let userSettingsPath = "/var/mobile/Library/UserConfigurationProfiles/UserSettings.plist"
+    nonisolated(unsafe) static var settingsPath = "/var/mobile/Library/UserConfigurationProfiles/EffectiveUserSettings.plist"
+    nonisolated(unsafe) static var userSettingsPath = "/var/mobile/Library/UserConfigurationProfiles/UserSettings.plist"
     private static let changedNotification = "com.apple.managedconfiguration.effectivesettingschanged"
     private static let domain = "com.apple.springboard"
     private static let key = "SBMinimumLockscreenIdleTime"
@@ -73,25 +75,53 @@ enum GuestLockScreenIdle {
         ]
     }
 
-    /// Update the managed UserSettings input through cfprefsd and let profiled
-    /// regenerate EffectiveUserSettings. Never edit the effective file itself.
+    /// Updates both UserSettings.plist and EffectiveUserSettings.plist on disk,
+    /// synchronizes notifications, and mirrors Never into SpringBoard lock screen idle.
     static func setAutoLockSeconds(_ seconds: Int) throws -> [String: Any] {
         guard seconds >= 0, seconds <= Int(Int32.max) else {
             throw IcliError.failed("Auto-Lock seconds must be between 0 and Int32.max")
         }
-        guard let data = FileManager.default.contents(atPath: userSettingsPath),
-              let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
-        else { throw IcliError.unavailable("UserSettings.plist is unavailable") }
-        var restricted = plist["restrictedValue"] as? [String: Any] ?? [:]
-        var setting = restricted["maxInactivity"] as? [String: Any] ?? [:]
-        setting["value"] = seconds
-        if setting["rangeMinimum"] == nil { setting["rangeMinimum"] = 120 }
-        restricted["maxInactivity"] = setting
-        _ = try writePreference(domain: userSettingsPath, key: "restrictedValue", value: .plist(restricted), notify: changedNotification)
+        let effectiveSeconds = (seconds == 0) ? never : seconds
+        try updateSettingsPlist(atPath: userSettingsPath, seconds: effectiveSeconds)
+        try updateSettingsPlist(atPath: settingsPath, seconds: effectiveSeconds)
+        notify_post(changedNotification)
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFNotificationName(changedNotification as CFString),
+            nil,
+            nil,
+            true
+        )
         apply(reason: "requested Auto-Lock \(seconds)s")
         var result = describe()
         result["requested_auto_lock_seconds"] = seconds
         return result
+    }
+
+    private static func updateSettingsPlist(atPath path: String, seconds: Int) throws {
+        let dir = (path as NSString).deletingLastPathComponent
+        if !FileManager.default.fileExists(atPath: dir) {
+            try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+            chown(dir, 501, 501)
+        }
+        var plist: [String: Any] = [:]
+        if let data = FileManager.default.contents(atPath: path),
+           let existing = (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: Any] {
+            plist = existing
+        }
+        var restricted = plist["restrictedValue"] as? [String: Any] ?? [:]
+        var setting = restricted["maxInactivity"] as? [String: Any] ?? [:]
+        setting["value"] = seconds
+        if seconds >= never || seconds < (setting["rangeMinimum"] as? Int ?? 0) {
+            setting.removeValue(forKey: "rangeMinimum")
+        }
+        restricted["maxInactivity"] = setting
+        plist["restrictedValue"] = restricted
+        let data = try PropertyListSerialization.data(fromPropertyList: plist, format: .binary, options: 0)
+        let url = URL(fileURLWithPath: path)
+        try data.write(to: url, options: .atomic)
+        chown(path, 501, 501)
+        chmod(path, 0o644)
     }
 
     private static func apply(reason: String) {

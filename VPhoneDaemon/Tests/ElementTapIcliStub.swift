@@ -31,8 +31,22 @@ public enum TestIcli {
     nonisolated(unsafe) public static var truncated = false
     nonisolated(unsafe) public static var appFrame: [String: Any]?
     nonisolated(unsafe) public static var afterFrameRead: (() -> Void)?
+    nonisolated(unsafe) public static var springboardPID: Int = 555
+    nonisolated(unsafe) public static var rawFrontmost: [String: Any]?
+    nonisolated(unsafe) public static var isLocked: Bool = false
+    nonisolated(unsafe) public static var isScreenOff: Bool = false
 }
-public func frontmostApp() -> [String: Any] { ["verified": true, "bundle_id": TestIcli.bundle] }
+
+public enum IcliLaunch {
+    public static func frontmostApp() -> [String: Any] {
+        TestIcli.rawFrontmost ?? ["verified": true, "bundle_id": TestIcli.bundle]
+    }
+}
+
+public func lockState() -> [String: Any] {
+    ["locked": TestIcli.isLocked, "screen_off": TestIcli.isScreenOff]
+}
+
 public func interfaceRotationDegrees() -> Int? { TestIcli.degrees }
 public func screenInfo() -> [String: Any] {
     let sideways = [90, 270].contains(TestIcli.degrees)
@@ -78,6 +92,17 @@ public func touchSequence(_ events: [TouchEvent], normalized: Bool) throws -> [S
     TestIcli.injected.append((events[0].x, events[0].y))
     return [:]
 }
+public func takeCString(_ ptr: UnsafeMutablePointer<CChar>?) -> String? {
+    guard let ptr else { return nil }
+    defer { free(ptr) }
+    return String(cString: ptr)
+}
+public func decodeBridgeJSON(_ raw: String?, _ what: String) throws -> [String: Any] {
+    guard let raw, let data = raw.data(using: .utf8),
+          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    else { throw IcliError.failed("invalid json") }
+    return json
+}
 public func pressButton(_ name: String) throws -> [String: Any] { fatalError("unused") }
 public func pressKey(_ name: String) throws -> [String: Any] { fatalError("unused") }
 public func typeText(_ text: String, delayMS: Double) throws -> [String: Any] { fatalError("unused") }
@@ -89,3 +114,19 @@ public func drag(points: [(Double, Double)], seconds: Double, hold: Double, step
 public func elementAt(x: Double, y: Double) throws -> [String: Any] { fatalError("unused") }
 public func recognizeScreen(languages: [String], minConfidence: Float) throws -> [String: Any] { fatalError("unused") }
 public func describeScreen() throws -> [String: Any] { fatalError("unused") }
+
+public enum PreferenceValue {
+    case string(String)
+    case int(Int64)
+    case float(Double)
+    case bool(Bool)
+    case plist(Any)
+}
+
+public func writePreference(domain: String, key: String, value: PreferenceValue, notify: String? = nil) throws -> [String: Any] {
+    return [:]
+}
+
+public func deletePreference(domain: String, key: String, notify: String? = nil) throws -> [String: Any] {
+    return [:]
+}
