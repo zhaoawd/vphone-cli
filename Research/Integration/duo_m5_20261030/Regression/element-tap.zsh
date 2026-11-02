@@ -63,8 +63,18 @@ for posture in closed open-flat closed open-flat partially-open closed; do
             upside-down) expected_orientation=2; expected_degrees=180 ;;
             landscape-right) expected_orientation=3; expected_degrees=270 ;;
         esac
-        jq -e --argjson expected "$expected_degrees" '.result.degrees == $expected' \
-            "$case_root/$rotation.json" >/dev/null
+        # rotationInfo also reads screenshot metrics, which can retain the
+        # previous turn in the command reply. Verify SpringBoard directly.
+        for attempt in {1..20}; do
+            rpc display.orientation > "$case_root/$rotation-orientation.json"
+            if jq -e --argjson expected "$expected_degrees" \
+                '.result.source == "springboard" and .result.degrees == $expected' \
+                "$case_root/$rotation-orientation.json" >/dev/null; then break; fi
+            /bin/sleep 0.5
+        done
+        jq -e --argjson expected "$expected_degrees" \
+            '.result.source == "springboard" and .result.degrees == $expected' \
+            "$case_root/$rotation-orientation.json" >/dev/null
         for attempt in {1..20}; do
             probe > "$case_root/$rotation-layout.json"
             # A compatibility canvas can stay portrait on the turned inner
@@ -103,8 +113,8 @@ for posture in closed open-flat closed open-flat partially-open closed; do
         done
     done
 done
-# Both panels must have produced distinct app geometry; successful calls on
-# an unchanged cover display do not establish inner-panel acceptance.
+# Check the expected native/compatibility canvas behavior. Actual panel
+# handover is established separately by each CADisplay state read above.
 jq -s -e --arg layout "$layout" '
     if $layout == "native" then (.[0].scene | sort) != (.[1].scene | sort)
     else (.[0].scene | sort) == (.[1].scene | sort) end' \

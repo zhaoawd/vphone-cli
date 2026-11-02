@@ -6,7 +6,8 @@
 > The existing inner point scale (3) is shared by FoldDisplay and the daemon;
 > ordinary CADisplay clients report 1 for this virtual display. This extracts
 > the existing guest-library constant without changing its value. The daemon
-> reads the application's full AX canvas for selection bounds, then re-resolves
+> reads the immediate AX windows' canvas for selection bounds (UIApplication's
+> root frame can retain fixed orientation), then re-resolves
 > the selected AX identity and uses AXElement's context-aware tap. The system
 > applies scene-host scale, placement and book-mode projection; no fitted
 > compatibility offsets remain. Missing, ambiguous or changing geometry and

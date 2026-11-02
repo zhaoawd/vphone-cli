@@ -61,21 +61,39 @@ NSDictionary<NSString *, id> *vp_element_tap_display(void) {
 }
 
 NSDictionary *vp_element_tap_frame_for_functions(VPAxFunctions f, int pid) {
-    if (pid <= 1 || !f.createApp || !f.copy || !f.getValue || !f.valueTypeID)
+    if (pid <= 1 || !f.createApp || !f.copy || !f.getValue || !f.valueTypeID || !f.elementTypeID)
         return @{@"error": @"AX application frame unavailable"};
     CFTypeRef root = f.createApp(pid);
     if (!root) return @{@"error": @"AX application unavailable"};
     if (f.setTimeout) f.setTimeout(root, 0.5f);
     CFTypeRef value = NULL;
-    int error = f.copy(root, (CFStringRef)(uintptr_t)2003, &value);
+    // UIApplication's frame can stay in fixed orientation while its windows
+    // and element points rotate. Immediate AX windows define the actual canvas.
+    int error = f.copy(root, (CFStringRef)(uintptr_t)5001, &value);
     CFRelease(root);
-    CGRect frame = CGRectZero;
-    BOOL valid = !error && value && CFGetTypeID(value) == f.valueTypeID() && f.getValue(value, 3, &frame)
-        && isfinite(frame.origin.x) && isfinite(frame.origin.y)
-        && isfinite(frame.size.width) && isfinite(frame.size.height)
-        && frame.size.width > 0 && frame.size.height > 0;
-    if (value) CFRelease(value);
-    if (!valid) return @{@"error": @"AX application frame unavailable", @"ax_error": @(error)};
+    id windows = CFBridgingRelease(value);
+    if (error || ![windows isKindOfClass:NSArray.class] || ![windows count] || [windows count] > 64)
+        return @{@"error": @"AX window query unavailable", @"ax_error": @(error)};
+    CGRect frame = CGRectNull;
+    NSTimeInterval deadline = NSProcessInfo.processInfo.systemUptime + 2;
+    for (id window in windows) {
+        if (NSProcessInfo.processInfo.systemUptime > deadline)
+            return @{@"error": @"AX window query timed out"};
+        CFTypeRef ref = (__bridge CFTypeRef)window;
+        if (CFGetTypeID(ref) != f.elementTypeID()) continue;
+        if (f.setTimeout) f.setTimeout(ref, 0.25f);
+        value = NULL;
+        error = f.copy(ref, (CFStringRef)(uintptr_t)2003, &value);
+        CGRect bounds = CGRectZero;
+        BOOL valid = !error && value && CFGetTypeID(value) == f.valueTypeID() && f.getValue(value, 3, &bounds)
+            && isfinite(bounds.origin.x) && isfinite(bounds.origin.y)
+            && isfinite(bounds.size.width) && isfinite(bounds.size.height)
+            && bounds.size.width > 0 && bounds.size.height > 0;
+        if (value) CFRelease(value);
+        if (valid) frame = CGRectUnion(frame, bounds);
+    }
+    if (CGRectIsNull(frame) || !isfinite(frame.size.width) || !isfinite(frame.size.height))
+        return @{@"error": @"AX window frame unavailable"};
     return @{@"x": @(frame.origin.x), @"y": @(frame.origin.y),
              @"width": @(frame.size.width), @"height": @(frame.size.height)};
 }
@@ -89,6 +107,7 @@ NSDictionary *vp_element_tap_application_frame(int pid) {
         f.setTimeout = dlsym(ax, "AXUIElementSetMessagingTimeout");
         f.valueTypeID = dlsym(ax, "AXValueGetTypeID");
         f.getValue = dlsym(ax, "AXValueGetValue");
+        f.elementTypeID = dlsym(ax, "AXUIElementGetTypeID");
     }
     return vp_element_tap_frame_for_functions(f, pid);
 }

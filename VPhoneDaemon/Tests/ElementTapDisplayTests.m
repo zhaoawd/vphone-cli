@@ -37,11 +37,18 @@ static TapTestDisplay *primary;
 extern NSDictionary *vp_element_tap_display_for_class(Class cls);
 extern NSDictionary *vp_element_tap_frame_for_functions(VPAxFunctions f, int pid);
 static CGRect appFrame = {{0, 0}, {375, 667}};
+static CGRect windowFrame = {{0, 0}, {375, 667}};
+static NSArray *windows;
 static int axError;
 static CFTypeRef createApp(pid_t pid) { return CFRetain(CFSTR("root")); }
 static int copyFrame(CFTypeRef root, CFStringRef attribute, CFTypeRef *value) {
-    assert((uintptr_t)attribute == 2003);
-    *value = CFBridgingRetain([NSValue valueWithBytes:&appFrame objCType:@encode(CGRect)]);
+    if ((uintptr_t)attribute == 5001) {
+        *value = CFBridgingRetain(windows);
+    } else {
+        assert((uintptr_t)attribute == 2003);
+        CGRect frame = CFEqual(root, CFSTR("root")) ? appFrame : windowFrame;
+        *value = CFBridgingRetain([NSValue valueWithBytes:&frame objCType:@encode(CGRect)]);
+    }
     return axError;
 }
 static CFTypeID frameType(void) {
@@ -92,14 +99,24 @@ int main(void) { @autoreleasepool {
     assert(report()[@"error"]);
     inventory = @[primary, inner, panel(@"VPhone Duo Inner", 2007, 2853, 1)];
     assert(report()[@"error"]);
-    VPAxFunctions f = {.createApp = createApp, .copy = copyFrame, .valueTypeID = frameType, .getValue = getFrame};
+    windows = @[@"window", @"text-effects-window"];
+    VPAxFunctions f = {.createApp = createApp, .copy = copyFrame, .elementTypeID = CFStringGetTypeID,
+        .valueTypeID = frameType, .getValue = getFrame};
     assert([vp_element_tap_frame_for_functions(f, 123)[@"height"] doubleValue] == 667);
+    // Actual native inner-landscape readback: UIApplication stays fixed,
+    // while its immediate windows and element points use the turned canvas.
+    appFrame = CGRectMake(0, 0, 669, 951);
+    windowFrame = CGRectMake(0, 0, 951, 669);
+    assert([vp_element_tap_frame_for_functions(f, 123)[@"width"] doubleValue] == 951);
+    assert([vp_element_tap_frame_for_functions(f, 123)[@"height"] doubleValue] == 669);
     axError = -25212;
     assert(vp_element_tap_frame_for_functions(f, 123)[@"error"]);
     axError = 0;
-    appFrame.size.width = NAN;
+    windowFrame.size.width = NAN;
     assert(vp_element_tap_frame_for_functions(f, 123)[@"error"]);
-    appFrame.size.width = 0;
+    windowFrame.size.width = 0;
+    assert(vp_element_tap_frame_for_functions(f, 123)[@"error"]);
+    windows = @[];
     assert(vp_element_tap_frame_for_functions(f, 123)[@"error"]);
     assert(vp_element_tap_frame_for_functions(f, 0)[@"error"]);
     puts("element tap native display: single panel, fold round trip and invalid-state checks passed");
