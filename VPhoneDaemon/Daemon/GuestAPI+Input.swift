@@ -129,6 +129,95 @@ extension GuestAPI {
         )
     }
 
+    static func uiElements(
+        maxElements: Int = 250,
+        visibleOnly: Bool = true,
+        clickableOnly: Bool = false,
+        limit: Int? = nil
+    ) throws -> [String: Any] {
+        guard (1 ... 2000).contains(maxElements), limit == nil || (limit! > 0 && limit! <= 2000) else {
+            throw IcliError.failed("element limits must be between 1 and 2000")
+        }
+        let foreground = frontmostApp()
+        guard foreground["verified"] as? Bool == true,
+              let bundle = foreground["bundle_id"] as? String, !bundle.isEmpty
+        else {
+            throw IcliError.failed("frontmost application could not be verified")
+        }
+        if bundle == "com.apple.springboard" || bundle == "com.apple.PineBoard" {
+            let pid = (foreground["pid"] as? Int) ?? Int(vp_springboard_pid())
+            guard pid > 1 else {
+                throw IcliError.failed("frontmost app process not found: \(bundle)")
+            }
+            guard let ptr = vp_ax_elements_json(Int32(pid), Int32(maxElements)) else {
+                throw IcliError.failed("AX runtime unavailable")
+            }
+            var result = try decodeBridgeJSON(takeCString(ptr), "AX response")
+            var elements = result["elements"] as? [[String: Any]] ?? []
+            if visibleOnly {
+                elements = elements.filter { $0["visible"] as? Bool == true }
+            }
+            if clickableOnly {
+                elements = elements.filter { $0["clickable"] as? Bool == true }
+            }
+            if let limit {
+                elements = Array(elements.prefix(limit))
+            }
+            result["elements"] = elements
+            result["count"] = elements.count
+            return result
+        }
+        return try IcliKit.uiElements(
+            maxElements: maxElements,
+            visibleOnly: visibleOnly,
+            clickableOnly: clickableOnly,
+            limit: limit
+        )
+    }
+
+    static func elementAt(x: Double, y: Double) throws -> [String: Any] {
+        let foreground = frontmostApp()
+        guard foreground["verified"] as? Bool == true,
+              let bundle = foreground["bundle_id"] as? String, !bundle.isEmpty
+        else {
+            throw IcliError.failed("frontmost application could not be verified")
+        }
+        if bundle == "com.apple.springboard" || bundle == "com.apple.PineBoard" {
+            let pid = (foreground["pid"] as? Int) ?? Int(vp_springboard_pid())
+            guard pid > 1 else {
+                throw IcliError.failed("frontmost app process not found: \(bundle)")
+            }
+            guard x.isFinite, y.isFinite, x >= 0, y >= 0 else {
+                throw IcliError.failed("coordinates must be non-negative finite numbers")
+            }
+            guard let ptr = vp_ax_element_at_json(Int32(pid), x, y) else {
+                throw IcliError.failed("AX hit testing unavailable")
+            }
+            return try decodeBridgeJSON(takeCString(ptr), "AX response")
+        }
+        return try IcliKit.elementAt(x: x, y: y)
+    }
+
+    private static func tapElementFallback(_ selector: ElementSelector) throws -> [String: Any] {
+        let foreground = frontmostApp()
+        let bundle = foreground["bundle_id"] as? String ?? ""
+        if bundle != "com.apple.springboard" && bundle != "com.apple.PineBoard" {
+            return try tapElement(selector)
+        }
+        let result = try uiElements(maxElements: 2000, visibleOnly: false)
+        guard result["truncated"] as? Bool != true else {
+            throw IcliError.failed("AX query was truncated; narrow the screen before selecting an element")
+        }
+        let hits = (result["elements"] as? [[String: Any]] ?? []).filter { matchesInterfaceElement($0, selector) }
+        guard hits.indices.contains(selector.index) else { throw IcliError.failed("element not found") }
+        let hit = hits[selector.index]
+        guard let x = hit["x"] as? Double, let y = hit["y"] as? Double else {
+            throw IcliError.failed("element has no tap point")
+        }
+        _ = try tap(x: x, y: y)
+        return ["tapped": true, "element": hit]
+    }
+
     private static func elementTapDisplay() throws -> GuestElementTap.Display? {
         let report = vp_element_tap_display()
         guard report["dual_display"] as? Bool == true else { return nil }
@@ -142,7 +231,7 @@ extension GuestAPI {
     }
 
     private static func tapInterfaceElement(_ selector: ElementSelector) throws -> [String: Any] {
-        guard let before = try elementTapDisplay() else { return try tapElement(selector) }
+        guard let before = try elementTapDisplay() else { return try tapElementFallback(selector) }
         let foreground = frontmostApp()
         guard foreground["verified"] as? Bool == true, let bundle = foreground["bundle_id"] as? String else {
             throw GuestAPIError.operationFailed("Cannot verify foreground application before element tap")
@@ -166,7 +255,7 @@ extension GuestAPI {
         }
         let applicationFrame: [String: Any]?
         let application: GuestElementTap.Display?
-        let queryPID = (query["pid"] as? NSNumber)?.int32Value ?? 0
+        let queryPID = (query["pid"] as? NSNumber)?.int32Value ?? Int32((foreground["pid"] as? Int) ?? 0)
         if bundle == "com.apple.springboard" {
             applicationFrame = nil
             application = nil

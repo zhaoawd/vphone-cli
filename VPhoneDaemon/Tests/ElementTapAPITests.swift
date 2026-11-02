@@ -163,6 +163,89 @@ enum ElementTapAPITests {
             let result = try GuestAPI.executeInterface("ui.tap_element", selection)
             expect((result?["element"] as? [String: Any])?["identifier"] as? String == "second", "selector compatibility: \(selection)")
         }
+
+        // MARK: - SpringBoard Frontmost App Recognition Tests
+        TestIcli.bundle = "com.apple.springboard"
+        TestIcli.springboardPID = 555
+        TestIcli.rawFrontmost = [
+            "bundle_id": "com.apple.springboard",
+            "verified": false,
+            "source": "unavailable",
+            "runningboard": [
+                "reason": "no_focal_app",
+                "handles": 16,
+                "states": 5
+            ]
+        ]
+        TestIcli.isLocked = false
+        TestIcli.isScreenOff = false
+
+        // Unlocked and screen on: SpringBoard recognized as verified foreground app with PID
+        let sbFront = frontmostApp()
+        expect(sbFront["verified"] as? Bool == true, "SpringBoard verified when unlocked and no focal app")
+        expect(sbFront["source"] as? String == "runningboard", "SpringBoard source is runningboard")
+        expect(sbFront["bundle_id"] as? String == "com.apple.springboard", "SpringBoard bundle_id matches")
+        expect(sbFront["pid"] as? Int == 555, "SpringBoard pid resolved from vp_springboard_pid")
+
+        // Locked state rejection
+        TestIcli.isLocked = true
+        let lockedFront = frontmostApp()
+        expect(lockedFront["verified"] as? Bool == false, "SpringBoard unverified when locked")
+        TestIcli.isLocked = false
+
+        // Screen-off rejection
+        TestIcli.isScreenOff = true
+        let screenOffFront = frontmostApp()
+        expect(screenOffFront["verified"] as? Bool == false, "SpringBoard unverified when screen off")
+        TestIcli.isScreenOff = false
+
+        // Focal app present
+        TestIcli.rawFrontmost = [
+            "bundle_id": "com.apple.mobilesafari",
+            "verified": true,
+            "source": "runningboard"
+        ]
+        let appFront = frontmostApp()
+        expect(appFront["bundle_id"] as? String == "com.apple.mobilesafari", "foreground app preserved")
+        expect(appFront["verified"] as? Bool == true, "foreground app verified")
+
+        // Reset to SpringBoard Home Screen
+        TestIcli.rawFrontmost = [
+            "bundle_id": "com.apple.springboard",
+            "verified": false,
+            "source": "unavailable",
+            "runningboard": [
+                "reason": "no_focal_app",
+                "handles": 16,
+                "states": 5
+            ]
+        ]
+
+        // ui.tree flat query on SpringBoard
+        TestIcli.elements = [
+            ["identifier": "Safari", "label": "Safari", "role": "button", "clickable": true, "visible": true,
+             "x": 60.0, "y": 80.0, "frame": ["x": 40.0, "y": 60.0, "width": 40.0, "height": 40.0]],
+            ["identifier": "Settings", "label": "Settings", "role": "button", "clickable": true, "visible": false,
+             "x": 160.0, "y": 80.0, "frame": ["x": 140.0, "y": 60.0, "width": 40.0, "height": 40.0]]
+        ]
+        let treeResult = try GuestAPI.executeInterface("ui.tree", ["visible_only": false])
+        expect(treeResult?["count"] as? Int == 2, "SpringBoard tree returns all elements when visible_only=false")
+        expect(treeResult?["pid"] as? Int == 555, "SpringBoard tree query uses SpringBoard PID")
+
+        let visibleTree = try GuestAPI.executeInterface("ui.tree", ["visible_only": true])
+        expect(visibleTree?["count"] as? Int == 1, "SpringBoard tree filters visible elements")
+
+        // ui.element_at on SpringBoard
+        let elementAtResult = try GuestAPI.executeInterface("ui.element_at", ["x": 60.0, "y": 80.0])
+        expect(elementAtResult?["pid"] as? Int == 555, "element_at uses SpringBoard PID")
+        expect((elementAtResult?["element"] as? [String: Any])?["identifier"] as? String == "Safari", "element_at returns node")
+
+        // ui.tap_element on SpringBoard (single display fallback)
+        TestIcli.display = ["dual_display": false]
+        TestIcli.injected = []
+        let tapFallback = try GuestAPI.executeInterface("ui.tap_element", ["identifier": "Safari"])
+        expect(tapFallback?["tapped"] as? Bool == true, "SpringBoard single-display tap succeeded")
+        expect(TestIcli.injected.count == 1, "SpringBoard single-display touch injected")
         print("element tap API: \(checks) checks, \(failures) failures")
         exit(failures == 0 ? 0 : 1)
     }

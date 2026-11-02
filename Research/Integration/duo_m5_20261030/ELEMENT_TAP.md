@@ -162,3 +162,26 @@ RunningBoard 为 `reason=no_focal_app`、16 handles、5 states，并有隐藏的
 
 本次真实验收使用一台独立 Duo VM 与 TapProbe，不构成所有第三方 App 的
 兼容性验收。VM 验收后正常停止，磁盘、补丁收据及本地证据保留。
+
+## 主页前台识别与自动锁屏修复（2026-11-02）
+
+1. **主页前台 App 识别问题定位与修复：**
+   - 问题：主页状态下无嵌入式应用持有 RunningBoard focal assertion，RunningBoard 返回 `reason: "no_focal_app"`，使 `IcliLaunch.frontmostApp()` 返回 `verified: false`、`source: "unavailable"`，从而阻断 `ui.tree`、`ui.element_at` 与 `ui.tap_element`。
+   - 证据：`springboard-tree-refusal.json`、`springboard-tap-refusal.json`。
+   - 修复：
+     - 在 `vphoned_element_tap.m` 新增 `vp_springboard_pid()`，通过 `sysctl(KERN_PROC, KERN_PROC_ALL)` 与 `proc_pidpath()` 动态获取 SpringBoard / PineBoard 进程 PID。
+     - 在 `GuestFrontmostApp.swift` 实现 `frontmostApp()`：在未锁屏、屏幕未关闭、RunningBoard 句柄有效且无其他应用持有焦点时，认定 SpringBoard 为已验证的前台系统外壳，返回 `verified: true`、`source: "runningboard"` 及 SpringBoard PID。
+     - `GuestAPI+Hierarchy.swift` 的 `hierarchyForeground()` 直接采信已验证的前台 PID，避免因 `runningApps()` 排除 SpringBoard 导致的失败。
+     - `GuestAPI+Input.swift` 实现 `GuestAPI.uiElements` 与 `elementAt`，直接以 SpringBoard PID 分发 AX 树和点击测试。
+     - `tapElementFallback` 支持 SpringBoard 模式下的单显示降级点击。
+     - 单元测试覆盖：`ElementTapAPITests.swift` 增加未锁屏/锁屏/熄屏/前台应用竞争/SpringBoard `ui.tree`/`ui.element_at`/`ui.tap_element` 测试（共 233 项测试通过）。
+
+2. **自动锁屏设置无效问题定位与修复：**
+   - 问题：`display.auto_lock.set` 原先通过 `writePreference` 试图更新 `UserSettings.plist`，但 CFPreferences 机制无法修改磁盘文件，且 `profiled` 不会自动由该写操作触发重新生成 `EffectiveUserSettings.plist`，导致回读始终保持原始 300 s（且当参数传入 0 或 never 时被 `rangeMinimum: 120` 拦截或拒绝）。
+   - 修复：
+     - 在 `GuestLockScreenIdle.swift` 中，直接读取并原子写入 `UserSettings.plist` 与 `EffectiveUserSettings.plist`。
+     - 设置 Never（或 0 秒）或低于原 `rangeMinimum` 的秒数时，移除或更新 `rangeMinimum`，避免生效值被截断。
+     - 设置文件权限与所有权（UID/GID 501），派发 `com.apple.managedconfiguration.effectivesettingschanged` Darwin 通知。
+     - 保持与 `SBMinimumLockscreenIdleTime` 的联动。
+     - 在 `GuestAPI+Device.swift` 中允许 `never: true` 与 `seconds: 0`。
+     - 单元测试覆盖：`AutoLockTests.swift` 验证 1800 秒写入、Never（0 秒）写入、60 秒无截断写入及非法参数校验（共 14 项测试通过）。

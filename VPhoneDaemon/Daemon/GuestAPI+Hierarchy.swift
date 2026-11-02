@@ -24,11 +24,18 @@ extension GuestAPI {
     private static func hierarchyForeground() throws -> [String: Any] {
         let front = frontmostApp()
         guard front["verified"] as? Bool == true,
-              let bundle = front["bundle_id"] as? String, !bundle.isEmpty,
-              let running = try runningApps()["apps"] as? [[String: Any]],
-              let pid = running.first(where: { $0["bundle_id"] as? String == bundle })?["pid"] as? Int,
-              pid > 1, pid <= Int(Int32.max)
+              let bundle = front["bundle_id"] as? String, !bundle.isEmpty
         else { throw GuestAPIError.operationFailed("Cannot verify foreground application and PID") }
+        let pid: Int
+        if let directPID = front["pid"] as? Int, directPID > 1, directPID <= Int(Int32.max) {
+            pid = directPID
+        } else {
+            guard let running = try runningApps()["apps"] as? [[String: Any]],
+                  let found = running.first(where: { $0["bundle_id"] as? String == bundle })?["pid"] as? Int,
+                  found > 1, found <= Int(Int32.max)
+            else { throw GuestAPIError.operationFailed("Cannot verify foreground application and PID") }
+            pid = found
+        }
         return ["bundle_id": bundle, "pid": pid, "verified": true, "source": front["source"] ?? ""]
     }
 

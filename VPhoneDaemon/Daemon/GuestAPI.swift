@@ -270,7 +270,7 @@ enum GuestAPI {
             return [
                 "bundle_id": id,
                 "name": name,
-                "pid": running.first(where: { $0["bundle_id"] as? String == id })?["pid"] ?? 0,
+                "pid": (front["pid"] as? Int) ?? (running.first(where: { $0["bundle_id"] as? String == id })?["pid"] ?? 0),
                 "verified": front["verified"] ?? false,
                 "source": front["source"] ?? "",
             ]

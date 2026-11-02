@@ -37,6 +37,7 @@ done
     -module-cache-path "$temporary/module-cache" -I "$temporary" -L "$temporary" \
     -lIcliKit -lVphonedNative -Xlinker -rpath -Xlinker "$temporary" \
     "${VPHONE_ELEMENT_TAP_INPUT:-$daemon/Daemon/GuestAPI+Input.swift}" \
+    "$daemon/Daemon/GuestFrontmostApp.swift" \
     "$daemon/Daemon/GuestElementTap.swift" "$daemon/Tests/ElementTapAPITests.swift" \
     -o "$temporary/element-tap-api-tests"
 "$temporary/element-tap-api-tests"

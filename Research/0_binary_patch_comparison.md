@@ -16,10 +16,10 @@
 > final candidate passed 324 button actions and touch-coordinate receipts in
 > native and compatibility layouts across panels, supported rotations, book
 > posture and fold round trips. Twelve unsupported rotation requests are
-> recorded separately. Home Screen icon acceptance is blocked by existing
-> foreground verification (`no_focal_app`); it is not counted as passed. No binary
-> patch algorithm, preset or boot-chain patch is added. See
-> [element-tap evidence](Integration/duo_m5_20261030/ELEMENT_TAP.md).
+> recorded separately. Home Screen foreground verification (`no_focal_app`)
+> and auto-lock setting persistence are resolved via daemon sysctl/plist runtime
+> handling without binary patches. No binary patch algorithm, preset or boot-chain
+> patch is added. See [element-tap evidence](Integration/duo_m5_20261030/ELEMENT_TAP.md).
 
 > **Duo M5 integration (2026-10-30, pending runtime acceptance).** Adds the
 > opt-in `system-springboard-exp-inner_cutout` guest-library declaration from

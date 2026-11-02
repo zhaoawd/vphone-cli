@@ -203,3 +203,61 @@ NSDictionary *vp_element_tap_in_context(int pid, NSDictionary *element) {
     }
     return vp_element_tap_context_for_functions(f, NSClassFromString(@"AXElement"), pid, element);
 }
+
+#include <sys/sysctl.h>
+#if __has_include(<libproc.h>)
+#include <libproc.h>
+#else
+extern int proc_pidpath(int pid, void *buffer, uint32_t buffersize);
+#endif
+
+int vp_springboard_pid(void) {
+    int mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL};
+    size_t length = 0;
+    if (sysctl(mib, 3, NULL, &length, NULL, 0) != 0 || length == 0) return 0;
+    length += 64 * sizeof(struct kinfo_proc);
+    struct kinfo_proc *processes = calloc(1, length);
+    if (!processes) return 0;
+    if (sysctl(mib, 3, processes, &length, NULL, 0) != 0) {
+        free(processes);
+        return 0;
+    }
+    int found = 0;
+    size_t count = length / sizeof(struct kinfo_proc);
+    for (size_t i = 0; i < count; i++) {
+        pid_t pid = processes[i].kp_proc.p_pid;
+        if (pid <= 1) continue;
+        const char *comm = processes[i].kp_proc.p_comm;
+        if (strncmp(comm, "SpringBoard", sizeof(processes[i].kp_proc.p_comm)) == 0 ||
+            strncmp(comm, "PineBoard", sizeof(processes[i].kp_proc.p_comm)) == 0) {
+            char path[4096] = {0};
+            proc_pidpath(pid, path, sizeof(path));
+            if (strstr(path, "/SpringBoard") != NULL || strstr(path, "/PineBoard") != NULL) {
+                found = (int)pid;
+                break;
+            }
+        }
+    }
+    free(processes);
+    return found;
+}
+
+char *vp_ax_elements_json(int pid, int maxElements) {
+    static char *(*fn)(int, int);
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        fn = (char *(*)(int, int))dlsym(RTLD_DEFAULT, "icli_ax_elements_json");
+    });
+    if (!fn) return NULL;
+    return fn(pid, maxElements);
+}
+
+char *vp_ax_element_at_json(int pid, double x, double y) {
+    static char *(*fn)(int, double, double);
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        fn = (char *(*)(int, double, double))dlsym(RTLD_DEFAULT, "icli_ax_element_at_json");
+    });
+    if (!fn) return NULL;
+    return fn(pid, x, y);
+}
