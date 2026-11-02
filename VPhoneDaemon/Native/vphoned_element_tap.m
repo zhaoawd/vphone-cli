@@ -1,4 +1,5 @@
 #import "vphoned_element_tap.h"
+#include "../../VPhoneGuestComponents/FoldDisplay/FoldDisplayGeometry.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <dlfcn.h>
 #import <math.h>
@@ -35,7 +36,9 @@ NSDictionary<NSString *, id> *vp_element_tap_display_for_class(Class cls) {
         BOOL innerActive = [state boolValue];
         id display = innerActive ? inner : [cls valueForKey:@"mainDisplay"];
         NSValue *value = [display valueForKey:@"bounds"];
-        double scale = [[display valueForKey:@"pointScale"] doubleValue];
+        // The virtual display reports 1 to clients. SpringBoard and the
+        // render adapter apply the shared inner-panel point scale instead.
+        double scale = innerActive ? VPhoneDuoInnerPointScale : [[display valueForKey:@"pointScale"] doubleValue];
         if (![value isKindOfClass:NSValue.class] || strcmp(value.objCType, @encode(CGRect)) != 0)
             return @{@"dual_display": @YES, @"error": @"Active display bounds unavailable"};
         CGRect bounds = CGRectZero;

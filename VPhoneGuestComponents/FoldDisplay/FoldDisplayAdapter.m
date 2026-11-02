@@ -57,7 +57,7 @@ static id vpInnerConfigurationInit(id self, SEL selector, id display, id origina
 }
 
 static NSUInteger vpInnerPointScale(id self, SEL selector) {
-    return vpIsInnerDisplay(self) ? 3 : ((NSUInteger (*)(id, SEL))vpOriginalPointScale)(self, selector);
+    return vpIsInnerDisplay(self) ? VPhoneDuoInnerPointScale : ((NSUInteger (*)(id, SEL))vpOriginalPointScale)(self, selector);
 }
 
 static BOOL vpInnerExternal(id self, SEL selector) {

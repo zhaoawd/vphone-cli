@@ -178,7 +178,7 @@ static id vpSurfaceExtendedProperties(id self, SEL cmd) {
     derived[@"kMGQDeviceSurfaceType"] = surfaceType;
     // The inner panel as Xcode 27.1's iPhone Duo simulator describes its
     // second display.
-    if (inner) [derived addEntriesFromDictionary:@{@"DisplayRotation": @270, @"DisplayScale": @3,
+    if (inner) [derived addEntriesFromDictionary:@{@"DisplayRotation": @270, @"DisplayScale": @(VPhoneDuoInnerPointScale),
         @"ChromeIdentifier": @"com.apple.dt.devicekit.chrome.phone14", @"DeviceCornerRadius": @[@55, @55, @55, @55]}];
     return [derived copy];
 }

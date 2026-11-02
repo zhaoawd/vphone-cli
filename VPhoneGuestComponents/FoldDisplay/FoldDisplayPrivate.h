@@ -8,6 +8,7 @@
 // dylib: it links across files but stays out of the export table.
 
 #import <Foundation/Foundation.h>
+#include "FoldDisplayGeometry.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <objc/runtime.h>
 #import <objc/message.h>

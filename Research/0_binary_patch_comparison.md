@@ -1,5 +1,14 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Duo element taps (2026-11-02, runtime acceptance in progress).** The
+> daemon normalizes AX element points against the active panel, with the
+> QuartzCore display-state entitlement required to read its applied state.
+> The existing inner point scale (3) is shared by FoldDisplay and the daemon;
+> ordinary CADisplay clients report 1 for this virtual display. This extracts
+> the existing guest-library constant without changing its value. No binary
+> patch algorithm, preset or boot-chain patch is added. See
+> [element-tap evidence](Integration/duo_m5_20261030/ELEMENT_TAP.md).
+
 > **Duo M5 integration (2026-10-30, pending runtime acceptance).** Adds the
 > opt-in `system-springboard-exp-inner_cutout` guest-library declaration from
 > the local `duo-m5-v1.6` work. It is limited to iOS 27.1, blocked in `standard`

@@ -50,6 +50,8 @@ int main(void) { @autoreleasepool {
     inventory = @[primary];
     assert(![report()[@"dual_display"] boolValue]);
     TapTestDisplay *inner = panel(@"VPhone Duo Inner", 2007, 2853, 1);
+    // Real daemon clients lack SpringBoard's pointScale override.
+    inner.pointScale = @1;
     pendingInventory = @[primary, inner];
     for (NSNumber *state in @[@1, @0, @1, @0]) {
         inner.stateControl.displayState = state;
@@ -64,9 +66,10 @@ int main(void) { @autoreleasepool {
     inner.stateControl.displayState = @2;
     assert(report()[@"error"]);
     inner.stateControl.displayState = @1;
-    inner.pointScale = @0;
+    inner.stateControl.displayState = @0;
+    primary.pointScale = @0;
     assert(report()[@"error"]);
-    inner.pointScale = @3;
+    primary.pointScale = @3;
     inner.stateControl = nil;
     assert(report()[@"error"]);
     inventory = @[primary, inner, panel(@"VPhone Duo Inner", 2007, 2853, 1)];

@@ -45,10 +45,12 @@
 - (void)record {
     UIWindowScene *scene = self.view.window.windowScene;
     if (!scene) return;
+    UIWindowSceneGeometry *geometry = scene.effectiveGeometry;
     NSDictionary *report = @{@"pid": @(getpid()), @"total": @(self.total),
         @"last_identifier": self.lastIdentifier, @"counts": self.counts,
-        @"orientation": @(scene.interfaceOrientation),
-        @"scene": @[@(scene.coordinateSpace.bounds.size.width), @(scene.coordinateSpace.bounds.size.height)]};
+        @"orientation": @(geometry.interfaceOrientation),
+        @"scene": @[@(geometry.coordinateSpace.bounds.size.width), @(geometry.coordinateSpace.bounds.size.height)],
+        @"view": @[@(self.view.bounds.size.width), @(self.view.bounds.size.height)]};
     NSData *data = [NSJSONSerialization dataWithJSONObject:report options:NSJSONWritingSortedKeys error:NULL];
     NSURL *documents = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
     [data writeToURL:[documents URLByAppendingPathComponent:@"tap-probe.json"] atomically:YES];
