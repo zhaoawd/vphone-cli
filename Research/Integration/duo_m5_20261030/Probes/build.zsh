@@ -4,10 +4,14 @@ set -euo pipefail
 
 source_root="${0:a:h}"
 repo_root="$(cd "$source_root/../../../.." && pwd)"
-probe_platform="${1:?usage: build.zsh <device|sim> [new-output-directory]}"
+probe_platform="${1:?usage: build.zsh <device|sim> [new-output-directory] [all|tap] [SDK declaration]}"
 output_root="${2:-$repo_root/.build/validation/probes/$probe_platform-$(uuidgen)}"
 probe_filter="${3:-all}"
+probe_sdk_declaration="${4:-}"
 [[ "$probe_filter" == all || "$probe_filter" == tap ]] || exit 2
+if [[ -n "$probe_sdk_declaration" ]]; then
+    [[ "$probe_platform" == device && "$probe_filter" == tap && "$probe_sdk_declaration" =~ '^[0-9]+(\.[0-9]+){1,2}$' ]] || exit 2
+fi
 case "$probe_platform" in
     device) probe_sdk=iphoneos; probe_target=arm64-apple-ios27.1; platform_name=iPhoneOS ;;
     sim) probe_sdk=iphonesimulator; probe_target=arm64-apple-ios27.1-simulator; platform_name=iPhoneSimulator ;;
@@ -23,6 +27,13 @@ build_app() {
     xcrun --sdk "$probe_sdk" clang -O2 -target "$probe_target" -fobjc-arc \
         -framework UIKit -framework Foundation -framework CoreGraphics \
         -o "$app_root/$name" "$@"
+    if [[ -n "$probe_sdk_declaration" ]]; then
+        # Explicit runtime-compatibility experiment; headers still come from
+        # the selected local SDK. Re-sign the rewritten load command below.
+        xcrun vtool -set-build-version ios 27.1 "$probe_sdk_declaration" -replace \
+            -output "$app_root/$name.sdk" "$app_root/$name"
+        mv "$app_root/$name.sdk" "$app_root/$name"
+    fi
     cp "$source_root/$component/$plist" "$app_root/Info.plist"
     for key in CFBundleExecutable CFBundleName CFBundleDisplayName; do
         plutil -replace "$key" -string "$name" "$app_root/Info.plist"

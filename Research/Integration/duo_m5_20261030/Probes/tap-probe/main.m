@@ -7,8 +7,10 @@
 @property NSMutableDictionary<NSString *, NSNumber *> *counts;
 @property NSString *lastIdentifier;
 @property NSUInteger total;
+- (void)record;
 @end
 @implementation TapProbeController
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations { return UIInterfaceOrientationMaskAll; }
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.systemBackgroundColor;
@@ -46,14 +48,37 @@
     UIWindowScene *scene = self.view.window.windowScene;
     if (!scene) return;
     UIWindowSceneGeometry *geometry = scene.effectiveGeometry;
+    UIScreen *screen = scene.screen;
     NSDictionary *report = @{@"pid": @(getpid()), @"total": @(self.total),
         @"last_identifier": self.lastIdentifier, @"counts": self.counts,
         @"orientation": @(geometry.interfaceOrientation),
         @"scene": @[@(geometry.coordinateSpace.bounds.size.width), @(geometry.coordinateSpace.bounds.size.height)],
-        @"view": @[@(self.view.bounds.size.width), @(self.view.bounds.size.height)]};
+        @"view": @[@(self.view.bounds.size.width), @(self.view.bounds.size.height)],
+        @"screen": @{@"scale": @(screen.scale), @"native_scale": @(screen.nativeScale),
+                     @"bounds": @[@(screen.bounds.size.width), @(screen.bounds.size.height)],
+                     @"fixed": @[@(screen.fixedCoordinateSpace.bounds.size.width), @(screen.fixedCoordinateSpace.bounds.size.height)],
+                     @"native": @[@(screen.nativeBounds.size.width), @(screen.nativeBounds.size.height)]}};
     NSData *data = [NSJSONSerialization dataWithJSONObject:report options:NSJSONWritingSortedKeys error:NULL];
     NSURL *documents = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
     [data writeToURL:[documents URLByAppendingPathComponent:@"tap-probe.json"] atomically:YES];
+}
+@end
+@interface TapProbeWindow : UIWindow
+@end
+@implementation TapProbeWindow
+- (void)sendEvent:(UIEvent *)event {
+    NSMutableArray *touches = [NSMutableArray array];
+    for (UITouch *touch in event.allTouches) {
+        CGPoint point = [touch locationInView:self];
+        [touches addObject:@{@"phase": @(touch.phase), @"x": @(point.x), @"y": @(point.y),
+                            @"identifier": touch.view.accessibilityIdentifier ?: @""}];
+    }
+    if (touches.count) {
+        NSURL *documents = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+        [[NSJSONSerialization dataWithJSONObject:touches options:0 error:NULL]
+            writeToURL:[documents URLByAppendingPathComponent:@"tap-touch.json"] atomically:YES];
+    }
+    [super sendEvent:event];
 }
 @end
 @interface TapProbeSceneDelegate : UIResponder <UIWindowSceneDelegate>
@@ -61,9 +86,12 @@
 @end
 @implementation TapProbeSceneDelegate
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)options {
-    self.window = [[UIWindow alloc] initWithWindowScene:(UIWindowScene *)scene];
+    self.window = [[TapProbeWindow alloc] initWithWindowScene:(UIWindowScene *)scene];
     self.window.rootViewController = [TapProbeController new];
     [self.window makeKeyAndVisible];
+}
+- (void)windowScene:(UIWindowScene *)scene didUpdateEffectiveGeometry:(UIWindowSceneGeometry *)previousGeometry {
+    [(TapProbeController *)self.window.rootViewController record];
 }
 @end
 @interface TapProbeDelegate : UIResponder <UIApplicationDelegate>
