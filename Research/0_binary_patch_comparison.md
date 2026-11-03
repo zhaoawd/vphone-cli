@@ -5810,3 +5810,83 @@ The host VM view now derives its input geometry from the active Duo viewport (`a
 > **Duo: folds through SpringBoard, and DeviceHub follows them (2026-10-29 night, PR Lakr233/vphone-cli#774):** no binary change. vphoned's `display.posture` `position` asks SpringBoard to fold itself through `SBSDisplayToolService` (entitlement `com.apple.springboard.sbdisplay.service`) and then sets only the virtual hinge (`Research/vphoned_http_api.md`, "Device pose"). In `system-springboard-cfw-fold_display`, `libvphonefolddisplay.dylib` (1) re-reads the shared panel's owner on `-[SpringBoard displayContentModeCoordinator:handleSwapTransitionFromPrimaryWindowScene:toPrimaryWindowScene:withContinuationLockProvider:]` as well, because a continuous close swaps the primary content as it finishes and the panel kept showing the (black) inner display for 3 s; and (2) in backboardd keeps every clone on the panel: `-[CAWindowServerDisplay addClone:options:]` on the inner render display attaches the clone to display 1 instead, and `removeClone:` removes a clone from its real `cloneMaster` (CoreAnimation aborts otherwise). backboardd moves a mirror (DeviceHub's capture display, AirPlay, recording) to the display with the primary content, so open it carried the inner display upright, while DeviceHub draws an open Duo's stream as the inner panel's native portrait framebuffer and turned it a quarter more; the panel is that framebuffer. Row 26's `libdevicehubfix` gains a `CMDeviceStateManager` stand-in in dtdeviceinfod (`VPCMAngleManager.m`: `isAvailable`, `startUpdatesToQueue:withHandler:`, `stopUpdates`, real `CMDeviceStateEvent`s with A device orientation 1, B the hinge state from `VPhoneHingeLatest`, C 0, delivered at start and on change): Xcode 27.1's DeviceHub (CoreDevicePop plugins) draws a foldable from CoreDevice's device motion state (`streamdevicemotionstate`), which a guest's CoreMotion could not answer ("Pose monitoring failed … 1001"), so the device was always drawn closed. **Validated on iPhone19,4 27.1 (24A94425):** closed shows the folded device with the cover screen, open the opened device with the inner screen upright and filling the panel, following live folds; the VM window is unchanged. **Open:** at book DeviceHub draws the cover (it names the inner panel only from DisplayInfo's `active` integrated display, and reporting the inner display as integrated makes DeviceHub want a per-display stream the guest cannot supply); DeviceHub's own pose controls (vendor-defined HID) are not wired to the guest.
 
 > **Duo: a hardware-shaped inner display, and DeviceHub's controls (2026-10-29 late, PR Lakr233/vphone-cli#774):** supersedes the clone redirect above and closes both of its open items. In `system-springboard-cfw-fold_display`, backboardd's inner `CAWindowServerVirtualDisplay` is now a portrait 2007×2853 framebuffer at 3× (the simulator's inner `CADisplay`), its `extendedProperties` adding `DisplayRotation` 270, `DisplayScale` 3, `ChromeIdentifier` `com.apple.dt.devicekit.chrome.phone14` and `DeviceCornerRadius` 55 beside `DeviceSurfaceType` 2; its one 120 Hz timing is 2007×2853; the digitizer's 270° position turn and both clone hooks (`addClone:options:`, `removeClone:`) are removed; SpringBoard's compositor draws the inner display's frames onto the panel without a turn. SpringBoard lays the inner UI out at interface orientation 90 into that framebuffer. Row 26's `libdevicehubfix`: `dtremotedisplayd` answers `0x184` (adds `0x100`, drops system audio `0x8`, video output by display ID: DeviceHub draws each integrated panel from its own stream and shows its pose controls only then); in `dtdeviceinfod`, `CADisplay` `displayType` answers 0 (integrated) and `pointScale` 3 for the display named `VPhone Duo Inner`; the `CMAngleManager` stand-in skips `-[CMAngleManagerInternal stopAngleUpdatesPrivate]` (reached from `-[CMAngleManager dealloc]`, it asserts the real hinge notifier is available and aborted `dtdeviceinfod` whenever DeviceHub reconnected), its `minAngleDegrees`/`maxAngleDegrees` return floats, and its `angleDegrees`, `mechanicalAngleDegrees` and `velocityDegreesPerSeconds` return floats, as `dtdeviceinfod`'s `CMAngle_Bridge` declares them (`Tf`, read from `s0`): doubles read as 0° for every whole angle, which in book (where DeviceHub takes the angle from this stream) drew the device nearly shut and focused the cover; `CMDeviceStateManager`'s A is the device orientation vphoned publishes (`VPhoneDeviceOrientation`). vphoned (no binary change) decodes DeviceHub's vendor-defined HID controls (usage page `0xFF61`, usage `0x5B`, an IOKit binary-serialized dictionary from the DDI's `dtuhidd`) and folds or turns through `display.posture`'s paths. **Validated on iPhone19,4 27.1 (24A94425), sbdisplay-duo:** open and closed from DeviceHub's buttons follow and settle; book at 130° (DeviceHub's preset) draws the inner face upright with a vertical crease, as DeviceHub draws a simulator Duo; open and book fill the panel without black bars; 48 scripted folds over every path came back in the expected orientation; `display.rotation` 0/90/180/270 on the open inner panel turns it and DeviceHub's model with it. **Open:** DeviceHub's orientation picker and its book button were not pressed since the float fix (both run the paths measured above). **With the foldable product-id** (on in standard since Lakr233/vphone-cli#778) both `dtdeviceinfod` stand-ins (`CMAngleManager`, `CMDeviceStateManager`) step aside for CoreMotion's own managers, and locationd's relay takes DeviceHub's controls itself (dtuhidd's avpCustom service has the host controls' usage) while vphoned keeps the virtual hinge on each slider value and lights a sleeping cover before an opening run; measured on sbdisplay-duo, one guest fold per DeviceHub click. **2026-10-30:** in `system-springboard-cfw-fold_display` FoldDisplay turns SpringBoard's fold fade to black off for folds made awake (`SBDeviceContinuousFoldInteractionSettings.fadeToBlackEnabled`, via `+[SBDeviceContinuousFoldInteractionDomain rootSettings]`; kept for a fold that starts with the panel off or just lit, where it hides the inner content the effect carries over) and hands the shared panel to the inner display inside the primary-swap callback, so opening out of closed shows a few dark frames instead of 0.12 to 0.2 s of black (`Research/Guest/iphone_duo_bringup.md`, "the fold's fade to black on one panel").
+
+## Always On display (2026-11-02)
+
+No new patch identifier and no new bytes in an Apple binary.
+`preboot-cfw-devicetree_iphone_product` (the iPhone product repair, which `cfw
+install` and `cfw update-environment` run) also adds
+`/product/vphone-always-on-display = 1` when the board's own tree has
+`/arm-io/disp0` `always-on-time`. MobileGestalt reads nothing by that name.
+vphoned reads it at startup and answers DeviceSupportsAlwaysOnDisplay
+(`2OOJf1VhaM7NxfRok3HbWQ`) and DeviceSupportsAlwaysOnTime
+(`j8/Omm6s1lsmTDFsXjsBfA`) yes in the MobileGestalt cache's `CacheExtra`
+(`GuestMobileGestaltAnswers`, `GuestMobileGestaltCache.presentAlwaysOnDisplayOnStartup`).
+Settings then offers Always On Display and SpringBoard dims the Lock Screen
+instead of turning it off. Issue #650.
+
+**Why not the tree.** libMobileGestalt (24A446) answers the three questions from
+one node:
+
+| Answer | Source |
+| --- | --- |
+| DeviceSupportsAlwaysOnTime | `IODeviceTree:/arm-io/disp0` `always-on-time` |
+| DeviceSupportsAlwaysOnDisplay | AlwaysOnTime, else `disp0` `always-on-device` |
+| DeviceSupportsAlwaysOnDisplayFlipbook | AlwaysOnTime, else `disp0` `always-on-device-flipbook` |
+
+Settings shows the row only with AlwaysOnTime (DisplayAndBrightnessSettings
+asks for it; with AlwaysOnDisplay alone there is no row, measured). The board's
+`always-on-time` therefore answers the flipbook yes too. CoreBrightness reads it
+in backboardd (`-[CBAODState initializeAODSupportConfiguration]`) and drives the
+flipbook through the panel controller (DCP), which the paravirtual panel does
+not have. An iPhone18,1 27.0.1 guest with an `/arm-io/disp0` stub carrying the
+board's `always-on-time` lost backboardd at every boot (`rebooting due to
+critical process crashes: backboardd`) and launchd restarted it into the device
+recovery environment. A second guest made without the stub booted, and
+answering all three yes in its `CacheExtra` crashed it the same way. Without
+the flipbook, `-[BLSHBacklightOSInterfaceProvider initWithPlatformProvider:]`
+gives SpringBoard BacklightServices' own renderer (`BLSHPseudoFlipbook`), which
+works on a guest. Answering the first two in the cache leaves the flipbook
+unanswered there and so no. Keeping `always-on-time` in the tree and answering
+the flipbook no in the cache would not do: the tree decides whenever the cache
+is missing, at a guest's first boot and after every drop, and one boot with the
+flipbook is enough to lose backboardd.
+
+A guest that went through that crash loop kept losing backboardd after the
+answers and the whole cache were removed; the cause was not found. Do not
+test the flipbook answer on a VM you want to keep.
+
+**When the answers land.** libMobileGestalt writes the cache when a process
+first asks after it is gone: at a guest's first boot, and after vphoned drops a
+cache older than the tree. vphoned waits for it (up to 10 minutes), adds the
+answers once, and sets `mobilegestalt_restart_pending`; the cache keeps them
+across boots, and a rebuilt cache gets them again at the next start. A new
+machine's creation boots more than once, so it is offered from its first use.
+
+**The window.** On a foldable guest the VM window covers the panel while
+`display.orientation` says `screen_off`, so a waking panel does not show its
+frame from before (`bde6440c`). SpringBoard posts `hasBlankedScreen` for the
+always-on Lock Screen too, so the window covered it. FoldDisplay now publishes
+whether the panel went off since SpringBoard last lit the screen
+(`com.vphone.folddisplay.panel-dark`: 1 stayed on, 2 went off), and
+`screen_off` is SpringBoard's blank and that.
+
+**Upstream verification (PR #801).**
+- New machine: iPhone18,1 27.0.1, cloudOS 26.4, bundle from this branch on
+  2.14.2. `cfw install` logged `product/vphone-always-on-display: 'absent' ->
+  '01000000'`; with nothing done by hand, the cache had both answers yes and the
+  flipbook unanswered, Settings showed Always On Display On, and the locked
+  screen stayed dimmed with the clock moving (9:34 to 9:36). No backboardd crash.
+- Existing machine: iPhone19,4 27.1 (24A94425), `vm set-bundle
+  --update-environment`. The repair added the marker; the next boot dropped the
+  cache, the rebuilt one got the answers and the restart was reported pending;
+  after the restart the Lock Screen went always-on, the panel state stayed 1,
+  `screen_off` false, and the VM window showed it. With Always On Display
+  switched off in Settings the panel went off (state 2), `screen_off` was true
+  and the window covered it, then uncovered it on wake.
+
+**Not covered.** Other iPhones with the display were not run. Apple Watch:
+N227b's tree has `always-on-time` too, but on a Watch7,18 26.4 guest the same two
+answers left the screen fully dark after the timeout (Carousel decides; not
+investigated), so the repair stays iPhone-only. No iPad board has the property.
+The VM keeps rendering while dimmed: there is no low-power display.
