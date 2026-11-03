@@ -117,6 +117,7 @@ enum GuestAPI {
                 "keychain_edit",
                 "ipa_install",
                 "bootstrap_install",
+                "bootstrap_packages",
                 "bootstrap_uninstall",
                 "port_forward",
                 "camera",
@@ -162,7 +163,7 @@ enum GuestAPI {
                 "motion_attitude",
             ] + pointerCapabilities() + scriptCapabilities() + GuestHomePodDisplay.capabilities
                 + (GuestShellCommands.program == nil ? [] : ["shell_exec"])
-                + GuestHomePodDebug.capabilities,
+                + GuestHomePodDebug.capabilities + GuestHomeViewDistance.capabilities,
         ]
     }
 
@@ -318,6 +319,8 @@ enum GuestAPI {
                 layout: layout,
                 packagePath: params["package_path"] as? String,
             )
+        case "bootstrap.packages":
+            return try GuestIrisinInstaller.installPackages(GuestIrisinInstaller.initialPackages)
         case "bootstrap.status":
             return GuestIrisinInstaller.status()
         case "bootstrap.inspect":

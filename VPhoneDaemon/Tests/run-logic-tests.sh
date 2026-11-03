@@ -21,6 +21,7 @@ trap '/bin/rm -rf "$temporary"' EXIT
     "$daemon/Daemon/GuestSetupAssistantState.swift" \
     "$daemon/Daemon/GuestLocationReadback.swift" \
     "$daemon/Daemon/GuestOwnedLocation.swift" \
+    "$daemon/Daemon/GuestHomeViewDistancePolicy.swift" \
     "$daemon/Tests/LogicTests.swift" \
     -o "$temporary/logic-tests"
 
