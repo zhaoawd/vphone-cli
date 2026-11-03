@@ -25,6 +25,8 @@ import VPhoneCoreKit
 /// Supported commands:
 ///   {"t":"screenshot"}                          → full-res save to Desktop (or explicit path)
 ///   {"t":"screenshot","path":"/tmp/shot.png"}   → save to explicit path (PNG/JPEG by extension)
+///                                                 a portrait `.png` is the display's own frame, and
+///                                                 the reply's `result.lossless` is true
 ///   {"t":"tap","x":645,"y":1398}                → tap at pixel coordinates
 ///   {"t":"swipe","x1":645,"y1":2600,"x2":645,"y2":1400,"ms":300}  → swipe
 ///   {"t":"key","name":"home"}                   → hardware key (home/power/volup/voldown)
@@ -248,6 +250,11 @@ class VPhoneHostAutomationServer {
                 return Self.reply(ok: true)
 
             case "screenshot":
+                if json["save"] as? Bool != false, let path = json["path"] as? String,
+                   path.lowercased().hasSuffix(".png"), let frame = await losslessScreenshot() {
+                    let url = try screenRecorder.saveScreenshot(image: frame, to: URL(fileURLWithPath: path))
+                    return Self.reply(ok: true, path: url.path, image: compactJPEG(frame), result: ["lossless": true])
+                }
                 let image = try await automationScreenshot()
                 var outputPath: String?
                 if json["save"] as? Bool != false {
@@ -507,6 +514,20 @@ class VPhoneHostAutomationServer {
         // A native VM view can still receive input while vphoned starts.
         if let view { return VPhoneDisplayViewport(panel: panel, active: panel, orientation: view.displayedOrientation)! }
         throw HostControlError.inputGeometryUnavailable
+    }
+
+    /// The VM display's own frame, for captures whose pixels get compared. Only
+    /// when that buffer is already the upright full screen; otherwise nil, and the
+    /// caller falls back to the guest JPEG, which the reply does not mark lossless.
+    private func losslessScreenshot() async -> CGImage? {
+        guard let before = try? await automationInputGeometry(),
+              before.active == before.panel, before.orientation == .portrait,
+              let display = virtualMachine?.virtualMachine.graphicsDevices.first?.displays.first,
+              let frame = await VPhoneGraphicsDisplayCapture.capture(display),
+              frame.width == Int(before.panel.width), frame.height == Int(before.panel.height),
+              let after = try? await automationInputGeometry(), after == before
+        else { return nil }
+        return frame
     }
 
     private func automationScreenshot() async throws -> Data {

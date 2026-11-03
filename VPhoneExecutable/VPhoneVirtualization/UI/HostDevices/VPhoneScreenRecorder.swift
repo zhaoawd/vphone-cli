@@ -152,6 +152,18 @@ class VPhoneScreenRecorder {
         return url
     }
 
+    /// Writes the frame's own pixels, so a `.png` is lossless. Saving guest JPEG
+    /// bytes as PNG keeps the compression artifacts.
+    func saveScreenshot(image: CGImage, to url: URL) throws -> URL {
+        guard let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil) else {
+            throw CaptureError.encodingFailed
+        }
+        CGImageDestinationAddImage(destination, image, nil)
+        guard CGImageDestinationFinalize(destination) else { throw CaptureError.encodingFailed }
+        print("[record] lossless screenshot saved - \(url.path)")
+        return url
+    }
+
     // MARK: - Frame Capture
 
     private func captureFrame() {
