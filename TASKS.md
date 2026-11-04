@@ -140,8 +140,9 @@ Detailed evidence and change decisions:
 
 - [x] Apply #804, #805 and #812 to the Duo branch and verify the full bundle, signatures and targeted regressions.
 - [x] Adapt the upstream machine and storage chapters in all four languages to the current Duo branch.
-- [ ] Validate peak restore disk use, real host shortcut routing, and X1 undo migration on disposable VMs.
-- [ ] Evaluate upstream Duo display changes, older firmware support, and the documentation site separately.
+- [x] Validate X1 undo migration and boot on disposable VMs.
+- [ ] Measure peak restore disk use and test host shortcut routing with Accessibility access.
+- [ ] Evaluate older firmware support and the documentation site separately.
 
 See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_20261104.md).
 
@@ -150,6 +151,7 @@ See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_2026110
 - [x] Integrate #788, #799, #800 and #801, retaining the local AX and auto-lock paths.
 - [x] Verify the full bundle, device-tree and patch catalogue tests, hinge tests, and daemon regressions.
 - [x] Prepare and verify two disposable VM clones and the read-only root preparation preflight.
-- [ ] Apply the signed bundles to the isolated guests and admit the two VM binaries, then run windowed Duo regressions.
+- [x] Apply the signed bundles to the isolated guests, admit both VM binaries, and run windowed Duo regressions.
+- [ ] Exercise the actual WDA HTTP endpoint and real shared-cache rollback.
 
 See [the display sync record](Research/Integration/duo_m5_20261030/UPSTREAM_DISPLAY_SYNC_20261104.md).

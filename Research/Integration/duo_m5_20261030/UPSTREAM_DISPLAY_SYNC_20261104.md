@@ -32,4 +32,22 @@
 
 两版 `host preflight` 均报告 AMFI 拒绝。验收目录内的 `prepare-root.zsh --check` 已验证签名、二进制哈希、磁盘 inode 和停止状态。`--apply` 由用户在终端运行：仅更新这两个隔离副本的 guest 环境，并通过包内的 `vphone-escalator` 放行这两个签名，随后重跑宿主预检。脚本不会启动 VM。
 
-未验证：Duo 实际折叠和旋转后的 AX 点击、WDA 铰链事件、常亮锁屏和唤醒、实际键盘焦点切换、真实 guest 的 X1 日志迁移和共享缓存回滚、完整固件恢复的峰值磁盘占用。
+## 运行时验收（2026-11-04）
+
+管理员脚本执行成功，两台隔离副本均通过宿主预检并启动。两台客户机通过
+`device.info` 回报的 vphoned SHA-256 均与各自 bundle 内的程序一致。原始证据
+保存在工作区 `.build/duo-display-acceptance/`。
+
+| 项目 | 结果 | 证据目录或文件 |
+| --- | --- | --- |
+| X1 旧日志迁移 | 两台副本均从 215449 个页记录迁移出 24834397 条指令记录。两台启动后，客户机的 `.vphone-dsc-undo.words` 均为 298012849 字节，JSON 为 3260 字节 | `root-*/{storage,display}-update.log`、`{storage,display}-dyld-cache-list.json` |
+| 窗口、折叠、旋转 | `vm-smoke.zsh` 通过 6 轮折叠、6 个受支持的旋转组合、2 个预期拒绝和熄屏折叠保持锁定。SpringBoard 与 backboardd 的 PID 未变 | `display-smoke/` |
+| 内屏类型与缩放 | vphoned 在内屏启用时读取到 `displayType=0`、`pointScale=3`，原生画布为 669×951 点 | `display-tap-native/02-open-flat/portrait-displays.json` 及对应 TapProbe 回执 |
+| AX 点击 | `element-tap.zsh` 对原生布局和 SDK 26.4 声明的兼容布局分别通过 18 组旋转与姿态、162 次真实控件点击；每种布局另有 6 个预期拒绝，未计入通过数。兼容布局的内外屏画布均为 375×667 点 | `display-tap-native/`、`display-tap-compat/` |
+| WDA 的 HID 铰链请求 | 无私有 HID 权限的本地探针按 WDA 的格式发出三个事件；角度依次为 120°、0°、180°，写回的接受计数从 0 到 3，发送失败计数仍为 0。没有运行 WDA HTTP 端点 | `hinge-client-probe/main.m`、`display-hinge-client/` |
+| 常亮锁屏和唤醒 | 第一次启动后缓存含两项常亮显示答复，没有写入 flipbook 答复。重启后锁屏第 10 秒，SpringBoard 报告锁定和屏幕关闭，面板状态为 1，宿主轮询使用的 `display.orientation.screen_off` 为 false。截图显示调暗的锁屏；唤醒并解锁成功 | `display-first-gestalt.plist`、`display-reboot-verdict.json`、`display-always-on/` |
+
+两台隔离副本均已正常关机，未发现仍占用磁盘、SEP 或 NVRAM 文件的进程。
+已保存 [常亮锁屏回归脚本](Regression/always-on.zsh)。本轮未对共享缓存执行
+真实回滚，未测量完整固件恢复的峰值磁盘占用。宿主窗口日志确认负责启动的
+进程没有辅助功能权限，覆盖了未授权路径；已授权时快捷键的焦点切换尚未验证。
