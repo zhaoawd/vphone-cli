@@ -1,13 +1,13 @@
 # Documentation
 
-Start with the [Launchpad quick start](../README.md#get-started). For terminal use, see [Create and Run](Guides/create-and-run.md). Version 2.x applies the complete firmware patch set; there are no selectable patch variants.
+Start with the [Launchpad quick start](../README.md#get-started). For terminal use, see the [virtual machine manual](en/README.md). The public firmware mode is JB; presets and per-machine overrides control which patches it applies.
 
 | Guide | Use it for |
 | --- | --- |
 | [Downloads](Downloads/README.md) | Notarized Launchpad versions and matching `VPhone.bundle` versions |
 | [Host Setup](Guides/host-setup.md) | Apple Silicon, SIP and AMFI settings, signing and preflight |
-| [Create and Run](Guides/create-and-run.md) | Firmware inputs, full or manual pipeline, vphoned, storage and backups |
-| [Snapshots](Guides/snapshots.md) | Saving a stopped VM's disk state and reverting to it |
+| [Create and Run](en/machines/create-and-run.md) | Creating, starting and stopping a VM from Terminal |
+| [Snapshots](en/storage/snapshots.md) | Saving a stopped VM's disk state and reverting to it |
 | [Compatibility](Guides/compatibility.md) | Verified firmware pairs and what the checks prove |
 | [iPadOS Guests](Guides/ipados.md) | Running iPadOS from an iPad restore IPSW instead of iOS |
 | [Other iPhone Models](Guides/iphone-models.md) | Running iOS from an iPhone 16 Pro, 17, 17 Pro, Air or other model's IPSW |
@@ -19,7 +19,7 @@ Start with the [Launchpad quick start](../README.md#get-started). For terminal u
 
 [中文](README_zh.md) · [日本語](README_ja.md) · [한국어](README_ko.md)
 
-These pages give a translated overview and quick start. The guides above hold the current procedures.
+The virtual machine manual is also available in [中文](zh/README.md), [日本語](ja/README.md) and [한국어](ko/README.md).
 
 ## For Contributors
 

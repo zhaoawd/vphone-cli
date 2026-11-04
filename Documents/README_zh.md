@@ -162,3 +162,7 @@ vphone-cli vm config myphone --rom apple --seprom apple       # Apple 的 ROM
 
 - [wh1te4ever/super-tart-vphone-writeup](https://github.com/wh1te4ever/super-tart-vphone-writeup)
 - [owngoal-dev/OpenAVB](https://github.com/owngoal-dev/OpenAVB) 和 [owngoal-dev/OpenSEP](https://github.com/owngoal-dev/OpenSEP)：新虚拟机使用的启动 ROM
+
+## 虚拟机手册
+
+虚拟机操作、批量创建、存储与备份见[虚拟机手册](zh/README.md)。

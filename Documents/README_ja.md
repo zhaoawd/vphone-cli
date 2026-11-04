@@ -164,3 +164,7 @@ vphone-cli vm config myphone --rom apple --seprom apple       # Apple の ROM
 
 - [wh1te4ever/super-tart-vphone-writeup](https://github.com/wh1te4ever/super-tart-vphone-writeup)
 - [owngoal-dev/OpenAVB](https://github.com/owngoal-dev/OpenAVB) と [owngoal-dev/OpenSEP](https://github.com/owngoal-dev/OpenSEP)：新しい仮想マシンが起動に使うブート ROM
+
+## 仮想マシンマニュアル
+
+マシンの操作、一括作成、ストレージとバックアップについては、[仮想マシンマニュアル](ja/README.md)をご覧ください。

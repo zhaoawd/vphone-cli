@@ -163,3 +163,7 @@ vphone-cli vm config myphone --rom apple --seprom apple       # Apple의 ROM
 
 - [wh1te4ever/super-tart-vphone-writeup](https://github.com/wh1te4ever/super-tart-vphone-writeup)
 - [owngoal-dev/OpenAVB](https://github.com/owngoal-dev/OpenAVB)와 [owngoal-dev/OpenSEP](https://github.com/owngoal-dev/OpenSEP): 새 가상 머신이 부팅에 쓰는 부트 ROM
+
+## 가상 머신 설명서
+
+머신 운영, 일괄 생성, 저장소 및 백업은 [가상 머신 설명서](ko/README.md)를 참고하세요.

@@ -135,3 +135,12 @@ See `RUNTIME.md`, `WINDOWED.md`, `F6.md` and `runtime-validation.json`.
 
 Detailed evidence and change decisions:
 `Research/Integration/duo_m5_20261030/README.md`.
+
+## Upstream sync (2026-11-04)
+
+- [x] Apply #804, #805 and #812 to the Duo branch and verify the full bundle, signatures and targeted regressions.
+- [x] Adapt the upstream machine and storage chapters in all four languages to the current Duo branch.
+- [ ] Validate peak restore disk use, real host shortcut routing, and X1 undo migration on disposable VMs.
+- [ ] Evaluate upstream Duo display changes, older firmware support, and the documentation site separately.
+
+See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_20261104.md).

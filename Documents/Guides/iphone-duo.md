@@ -1,9 +1,8 @@
 # iPhone Duo display choices
 
-This integration adds optional static display configuration to the upstream
-fold model. The default remains `fold`. Firmware-free validation is recorded
-in [the integration record](../../Research/Integration/duo_m5_20261030/README.md);
-runtime acceptance of the integrated bundle is pending.
+See the [iPhone Duo display manual](../en/machines/iphone-duo.md) for current
+procedures. The [integration record](../../Research/Integration/duo_m5_20261030/README.md)
+identifies which builds and display configurations were tested.
 
 ```zsh
 vphone-cli vm config lab --display fold
