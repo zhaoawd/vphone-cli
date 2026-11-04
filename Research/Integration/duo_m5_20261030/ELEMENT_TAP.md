@@ -215,3 +215,36 @@ SpringBoard 启动才作用于锁屏界面，见 `Research/Guest/lock_screen_idl
 `ui.tree`、`ui.element_at`、图标点击及锁屏/熄屏拒绝；验证自动锁屏设置的即时回读、
 实际倒计时、Never 超过原 300 秒仍不自动锁屏，以及 profiled 更新和重启后的值。
 以上项目在本轮尚未执行。
+
+### Duo 运行时验收续测（2026-11-04）
+
+使用两个从 `duo-sync-display` 克隆并重新生成身份的隔离 VM：
+`duo-sync-ax` 用于 AX，`duo-sync-ax-idle` 用于计时。客户机为
+iPhone19,4、iOS 27.1（24A94425），启动使用 `XcodeX1UndoFix` 构建。
+`device.info` 回报的 vphoned 摘要为
+`4290edc31866e9c16c9d939faf3bdf8a91abdd42264332d750ab2b1b3b0ca985`，
+与 bundle 中的 daemon 一致。原始记录位于工作区
+`.build/duo-display-acceptance/`。
+
+| AX 用例 | 结果 |
+| --- | --- |
+| 外屏主屏幕 | `apps.foreground` 验证为 SpringBoard；`ui.tree` 找到“设置”，`ui.element_at` 返回同一图标；`ui.tap_element` 后 `com.apple.Preferences` 成为已验证的前台进程。 |
+| 内屏主屏幕 | SpringBoard 前台验证、`ui.tree` 和实际图标点击通过；使用树中“设置”的中心点调用 `ui.element_at` 返回 `AX hit testing failed (-25202)`。在两个隔离副本上复现，原因未查明。 |
+| 锁定且熄屏 | `device.screen` 报告已锁定，`display.orientation.screen_off` 为 true；树、坐标命中和点击均因无法验证前台而拒绝。 |
+| 锁定且亮屏 | `device.screen` 报告已锁定且屏幕亮起；同样三个操作均拒绝。 |
+
+正式回归为 [home-screen-ax.zsh](Regression/home-screen-ax.zsh)，证据目录为
+`home-screen-ax-final/`。脚本在保存内屏失败后继续检查其他用例，最终
+退出码为 1。当前运行时缺口为内屏主屏幕 `ui.element_at`，不能计为通过。
+
+| 自动锁屏用例 | 结果 |
+| --- | --- |
+| 30 秒 | RPC 与两份 plist 均为 30 秒。最后一次输入后，第 28 秒仍未锁定，第 30 秒首次采样到锁定。 |
+| Never | RPC、`UserSettings.plist`、`EffectiveUserSettings.plist` 和锁屏最小超时回读均为 2147483647。最后一次输入后持续观察 333 秒，每次采样均为未锁定、未熄屏。低电量模式关闭。 |
+| 同一次启动中重启 profiled | TERM 后 PID 未变；KILL 后进程退出。打开“设置”并请求设备管理页面后仍未看到进程重新启动，`EffectiveUserSettings.plist` 的修改时间未变。未验证同一次启动中的有效设置重算。 |
+| 冷启动 | 启动会话 UUID 变化，daemon 摘要不变。冷启动后 profiled 已运行，`EffectiveUserSettings.plist` 的修改时间和大小均变化；两份 plist、RPC 及锁屏最小超时仍为 Never。未独立追踪文件写入进程。 |
+
+命令使用 [auto-lock-runtime.zsh](Regression/auto-lock-runtime.zsh) 的
+`observe`、`profiled`、`after-reboot` 模式。证据位于
+`auto-lock-runtime/` 和 `auto-lock-profiled-retry/`。两台隔离 VM
+均已正常关机。

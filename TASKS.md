@@ -32,8 +32,10 @@ modification is authorized.
 - [x] Network (DNS, HTTPS, host-served page) and audible audio (Safari media and Settings ringtone preview heard by the user) on the candidate (`F6.md`).
 - [x] Static outer/inner and cutout on/off/on (`Regression/display-matrix.zsh`, `F6.md`): P1–P7 pass; P5 (cutout off) loses all inner taps as documented.
 - [x] Move the foldable board-tree precondition before disk work in `cfw update-environment` (`db111457`; `F6.md`): root check refuses in 3 s with no disk attach. Candidate rebuilt at `ea05ba81` with it (only `vphone-cli` changed; previous bundle kept at `.build/XcodeDuo-a71f2360`).
-- [x] Implement Home Screen foreground recognition and AX routing; local boundary-double tests pass. Guest runtime acceptance of this change remains pending (`ELEMENT_TAP.md`).
-- [x] Implement direct auto-lock plist updates and notifications; local file tests pass. Effective SpringBoard timers and persistence remain unverified (`ELEMENT_TAP.md`).
+- [x] Verify Home Screen foreground recognition, icon taps on both panels, cover hit testing, and rejection on the lit and dark Lock Screen (`ELEMENT_TAP.md`).
+- [ ] Investigate and fix inner-panel Home Screen `ui.element_at` returning AX error -25202.
+- [x] Verify actual 30-second Auto-Lock, Never for 333 seconds, and persistence across cold boot (`ELEMENT_TAP.md`).
+- [ ] Verify an independent effective-settings rewrite by profiled within one boot.
 - [ ] Open issues recorded, not pursued (`F6.md`, Open issues): KFC 登录会员 ignoring some user clicks; how app accessibility got turned on.
 - [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
       Repeated 2026-10-31 for `db111457` and `72b83eb2`: one misplaced doc comment fixed; guest scan finds no universal or nested X1 Mach-O under AccessibilityBundles (78 thin executables, all lowered with backups; 434 bundles in the shared cache).
