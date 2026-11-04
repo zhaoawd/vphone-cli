@@ -51,3 +51,53 @@
 已保存 [常亮锁屏回归脚本](Regression/always-on.zsh)。本轮未对共享缓存执行
 真实回滚，未测量完整固件恢复的峰值磁盘占用。宿主窗口日志确认负责启动的
 进程没有辅助功能权限，覆盖了未授权路径；已授权时快捷键的焦点切换尚未验证。
+
+## X1 回滚与恢复树发布验证（2026-11-04）
+
+从 `duo-sync-storage` 只读导出 80 个真实缓存文件及两个撤销日志；逐文件核对
+传输大小。以下命令仅对工作区内的导出副本运行：
+
+1. `cfw patch-dsc-revert --dry-run` 识别出 228326 条启动闭包和 24606071 条
+   其余 X1 指令记录。
+2. `cfw patch-dsc-revert` 只指定这两个 X1 补丁，重算 34 个分片的
+   215442 个签名槽，并移除这两个补丁的撤销记录。
+3. 依次运行 `cfw patch-arm64e-x1-bootstrap-cache` 和
+   `cfw patch-arm64e-x1-cache`，对比初始 SHA-256。80 个文件中 78 个
+   一致，分片 `.01` 和 `.40` 不一致。
+4. 从隔离客户机重新导出两个分片，确认它们仍与初次导出哈希一致。差异由以下
+   4 个指令和各分片一个 32 字节签名槽组成：
+
+| 分片 | 文件偏移 | 补丁 |
+| --- | --- | --- |
+| `.01` | 1897532、1897536、1897540 | `dyld-boot-xpc_lwcr` |
+| `.40` | 103076044 | `dyld-boot-lockdown_mode` |
+
+原始 JSON 记录将这 4 条指令归于表中两个补丁，但迁移后的
+`.vphone-dsc-undo.words` 同时将它们归于 `dyld-boot-arm64e_x1_bootstrap`。
+`convertingRunsToWords` 把旧 X1 页记录与当前缓存的每处差异都归于 X1，
+其中包含同页其他补丁的修改。只回滚 X1 时也撤销了这 4 条指令。
+对照实验仅补跑 `cfw patch-xpc-lwcr` 和 `cfw patch-lockdown-mode`，
+随后全部 80 个文件的 SHA-256 与初始值一致。此缺陷未修复；现有日志已迁移的
+VM 也需要覆盖。证据见 `.build/duo-display-acceptance/real-cache-roundtrip/`
+中的 `difference-details.json`、`reapplied-diff.txt` 和 `control-diff.txt`。
+隔离副本已关机，回滚实验没有写入其客户机磁盘。
+
+恢复树发布使用 Duo 实际恢复树的 232 个文件，共 13,441,690,754 字节。
+用 #804 前后的 `VPhoneConfinedDirectory.replaceFile` 分别写回同一 APFS
+卷上的两个预先克隆的目录，并通过 `df -k` 采样卷可用容量：
+
+| 实现 | 发布时间 | 观测到的峰值额外占用 |
+| --- | ---: | ---: |
+| #804 前，复制 | 3.36 秒 | 13.52 GB |
+| #804 后，克隆 | 0.062 秒 | 未观察到增加 |
+
+两个输出目录的 232 个文件均与输入 SHA-256 一致。该测量覆盖文件发布，不
+覆盖 Cryptex 解密与合并、DFU 恢复或创建 VM 的总磁盘峰值。采样日志和工具
+源码见 `.build/duo-display-acceptance/restore-publication/`。
+
+WDA HTTP 尚未执行：未在工作区、本机搜索索引或 Appium 缓存找到可启动的
+WebDriverAgentRunner，本机未查到有效的代码签名身份。后续使用一套能在
+显示隔离副本运行的 Runner，依据 [WDA 铰链端点文档](https://github.com/appium/WebDriverAgent/blob/master/docs/hinge-angle.md)
+逐个 POST 120、0、180，同时核对 WDA GET 与 vphoned `display.orientation`。
+宿主快捷键仍待在授权辅助功能的终端中启动显示副本，分别在 VM 窗口获得焦点、
+切到宿主应用、退出 VM 后测试已配置的 Spotlight 快捷键。

@@ -141,7 +141,8 @@ Detailed evidence and change decisions:
 - [x] Apply #804, #805 and #812 to the Duo branch and verify the full bundle, signatures and targeted regressions.
 - [x] Adapt the upstream machine and storage chapters in all four languages to the current Duo branch.
 - [x] Validate X1 undo migration and boot on disposable VMs.
-- [ ] Measure peak restore disk use and test host shortcut routing with Accessibility access.
+- [x] Compare the disk footprint of the restore-tree publication step before and after #804.
+- [ ] Measure the full restore pipeline's peak disk use and test host shortcut routing with Accessibility access.
 - [ ] Evaluate older firmware support and the documentation site separately.
 
 See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_20261104.md).
@@ -152,6 +153,8 @@ See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_2026110
 - [x] Verify the full bundle, device-tree and patch catalogue tests, hinge tests, and daemon regressions.
 - [x] Prepare and verify two disposable VM clones and the read-only root preparation preflight.
 - [x] Apply the signed bundles to the isolated guests, admit both VM binaries, and run windowed Duo regressions.
-- [ ] Exercise the actual WDA HTTP endpoint and real shared-cache rollback.
+- [x] Exercise rollback on an export of the real shared cache; reproduce four unintended instruction restores.
+- [ ] Correct X1 undo ownership and verify recovery for logs already converted.
+- [ ] Exercise the actual WDA HTTP endpoint with a running WebDriverAgentRunner.
 
 See [the display sync record](Research/Integration/duo_m5_20261030/UPSTREAM_DISPLAY_SYNC_20261104.md).
