@@ -693,10 +693,16 @@ struct VPhoneCustomFirmwareDyldSharedCacheRevertCommand: ParsableCommand {
 
     func run() throws {
         let url = URL(fileURLWithPath: undoLog)
-        guard let log = try DyldSharedCacheUndoLog.load(log: url) else {
+        guard let stored = try DyldSharedCacheUndoLog.load(log: url) else {
             print("  [=] no dyld undo log at \(undoLog); nothing to revert")
             return
         }
+        // Normalize before restoring any patch. Reverting a separate patch
+        // also removes the record that identifies its false X1 entries.
+        let log = try stored.convertingRunsToWords(
+            of: DyldSharedCacheArm64eX1BootstrapPatcher.wordUndoPatchIDs,
+            in: chunksDirectory,
+        ) ?? stored
         let wanted = Set(patches)
         let present = wanted.intersection(log.patchIDs)
         guard !present.isEmpty else {
@@ -743,8 +749,8 @@ struct VPhoneCustomFirmwareDyldSharedCacheRevertCommand: ParsableCommand {
 /// earlier into words, once. Those runs are gigabytes of originals, and every cache verb
 /// that records anything decodes and re-encodes the whole log; the words keep
 /// only the instructions the lowering changed, in the file beside it.
-/// `cfw install` and `cfw update-environment` invoke this before the cache
-/// patches; it is not a verb a researcher reaches for by hand.
+/// Also repairs logs converted before ownership was checked.
+/// `cfw install` and `cfw update-environment` invoke this before the cache patches.
 struct VPhoneCustomFirmwareDyldSharedCacheUndoWordsCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "patch-dsc-undo-words",
@@ -776,7 +782,13 @@ struct VPhoneCustomFirmwareDyldSharedCacheUndoWordsCommand: ParsableCommand {
             chmod(wordsPath, metadata.st_mode & 0o7777)
             chown(wordsPath, metadata.st_uid, metadata.st_gid)
         }
+        let runs = log.records.count - converted.records.count
         let words = converted.words.values.reduce(0) { $0 + $1.count }
-        print("  [+] dyld undo log: \(log.records.count - converted.records.count) X1 page run(s) kept as \(words) instruction(s)")
+        if runs > 0 {
+            print("  [+] dyld undo log: \(runs) X1 page run(s) kept as \(words) instruction(s)")
+        } else {
+            let removed = log.words.values.reduce(0) { $0 + $1.count } - words
+            print("  [+] dyld undo log: removed \(removed) instruction(s) owned by other patches from the X1 undo")
+        }
     }
 }

@@ -77,8 +77,8 @@
 `convertingRunsToWords` 把旧 X1 页记录与当前缓存的每处差异都归于 X1，
 其中包含同页其他补丁的修改。只回滚 X1 时也撤销了这 4 条指令。
 对照实验仅补跑 `cfw patch-xpc-lwcr` 和 `cfw patch-lockdown-mode`，
-随后全部 80 个文件的 SHA-256 与初始值一致。此缺陷未修复；现有日志已迁移的
-VM 也需要覆盖。证据见 `.build/duo-display-acceptance/real-cache-roundtrip/`
+随后全部 80 个文件的 SHA-256 与初始值一致。修复及已迁移日志的验证见下文。
+复现证据见 `.build/duo-display-acceptance/real-cache-roundtrip/`
 中的 `difference-details.json`、`reapplied-diff.txt` 和 `control-diff.txt`。
 隔离副本已关机，回滚实验没有写入其客户机磁盘。
 
@@ -101,3 +101,28 @@ WebDriverAgentRunner，本机未查到有效的代码签名身份。后续使用
 逐个 POST 120、0、180，同时核对 WDA GET 与 vphoned `display.orientation`。
 宿主快捷键仍待在授权辅助功能的终端中启动显示副本，分别在 VM 窗口获得焦点、
 切到宿主应用、退出 VM 后测试已配置的 Spotlight 快捷键。
+
+### X1 撤销归属修复
+
+转换旧页日志和修复既有 `.words` 日志使用同一规则：仅当另一补丁的
+JSON 记录覆盖同一映射位置的完整指令、且记录的原值相同，才从 X1
+撤销项中移除该指令。原值不同的记录继续保留。安装和环境更新在应用
+补丁之前处理日志，直接回滚也会先处理，以免先移除用于判定归属的记录。
+
+`xcodebuild -workspace VPhone.xcworkspace -scheme FirmwarePatcherTests test`
+限定撤销日志、字级撤销和旧实现检测三个套件。旧实现触发 3 条失败断言；
+修复后 25 项测试通过。完整 `VPhone` Debug 构建、bundle admission 和
+`codesign --verify --deep --strict` 均通过。
+
+对已迁移的真实日志，修复移除 4 条误归属记录，第二次运行无改动。用原始
+未修复的日志直接调用回滚，再仅重新应用两个 X1 补丁，80 个缓存文件的
+SHA-256 全部与输入一致。证据见
+`.build/duo-display-acceptance/x1-ownership-fixed/migrated-evidence/`。
+
+从旧格式隔离副本另行导出 4,445,306,789 字节的原始 JSON 日志和缓存。
+转换 215,449 条页记录后保留 24,834,393 条指令记录，生成的 `.words` 文件为
+298,012,801 字节。两条路径的回滚预览和回滚后缓存 SHA-256 均一致。
+旧格式路径仅重新应用两个 X1 补丁后，全部 80 个文件的 SHA-256 也与输入一致。
+证据见 `.build/duo-display-acceptance/x1-ownership-fixed/legacy-evidence/`。
+所有写入均发生在导出文件的副本中；旧格式隔离副本已正常关机。
+此修复校正日志归属，不能自动补回旧版本已经误回滚的其他补丁指令。

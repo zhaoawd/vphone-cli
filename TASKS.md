@@ -154,7 +154,7 @@ See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_2026110
 - [x] Prepare and verify two disposable VM clones and the read-only root preparation preflight.
 - [x] Apply the signed bundles to the isolated guests, admit both VM binaries, and run windowed Duo regressions.
 - [x] Exercise rollback on an export of the real shared cache; reproduce four unintended instruction restores.
-- [ ] Correct X1 undo ownership and verify recovery for logs already converted.
+- [x] Correct X1 undo ownership and verify both legacy conversion and already-converted logs with real cache round trips.
 - [ ] Exercise the actual WDA HTTP endpoint with a running WebDriverAgentRunner.
 
 See [the display sync record](Research/Integration/duo_m5_20261030/UPSTREAM_DISPLAY_SYNC_20261104.md).

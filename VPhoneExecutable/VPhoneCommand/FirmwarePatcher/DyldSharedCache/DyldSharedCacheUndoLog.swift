@@ -95,6 +95,16 @@ public struct DyldSharedCacheUndoLog: Codable, Sendable, Hashable {
             originals.append(original)
         }
 
+        fileprivate func index(of address: UInt64) -> Int? {
+            var lower = 0, upper = count
+            while lower < upper {
+                let mid = lower + (upper - lower) / 2
+                if addresses[mid] < address { lower = mid + 1 }
+                else { upper = mid }
+            }
+            return lower < count && addresses[lower] == address ? lower : nil
+        }
+
         /// Both sets of words; where both hold an address, this one's original
         /// wins, because it is the older and so the closer to pristine.
         func merging(_ newer: Words) -> Words {
@@ -377,14 +387,14 @@ public struct DyldSharedCacheUndoLog: Codable, Sendable, Hashable {
 
     // MARK: - Converting
 
-    /// This log with the runs of `patchIDs` held as words: every instruction
-    /// whose original differs from what the cache in `directory` holds now,
-    /// which is what the patch changed. Logs written before words existed hold
-    /// the X1 lowering as page runs, gigabytes of originals for instructions it
-    /// never touched. A run that is not whole aligned instructions stays a run.
-    /// Nil when no run belongs to `patchIDs`.
+    /// Keep the X1 undo as words. Older logs captured entire page runs, so a
+    /// difference in the live cache may also belong to a separate patch on the
+    /// same page. Remove those false entries during conversion and from logs
+    /// already converted. Unaligned runs stay as runs. Nil when nothing changes.
     public func convertingRunsToWords(of patchIDs: Set<String>, in directory: URL) throws -> DyldSharedCacheUndoLog? {
-        guard records.contains(where: { patchIDs.contains($0.patchID) }) else { return nil }
+        guard records.contains(where: { patchIDs.contains($0.patchID) && $0.vma % 4 == 0 && $0.original.count % 4 == 0 }) else {
+            return try removingMisattributedWords(of: patchIDs, in: directory)
+        }
         try validate(in: directory, patchIDs: patchIDs)
         var kept: [Record] = []
         var changed: [String: [(vma: UInt64, original: UInt32)]] = [:]
@@ -415,7 +425,51 @@ public struct DyldSharedCacheUndoLog: Codable, Sendable, Hashable {
             }
             converted.merge(DyldSharedCacheUndoLog(words: [patchID: run]))
         }
-        return converted
+        return try converted.removingMisattributedWords(of: patchIDs, in: directory) ?? converted
+    }
+
+    /// A separate patch that recorded the same original at the same mapped
+    /// word saw it before the X1 lowering had changed it. Its own record owns
+    /// that write. An original that differs may instead be the lowered word;
+    /// keep the X1 record in that case.
+    private func removingMisattributedWords(of patchIDs: Set<String>, in directory: URL) throws -> DyldSharedCacheUndoLog? {
+        let candidates = words.filter { patchIDs.contains($0.key) && !$0.value.isEmpty }
+        guard !candidates.isEmpty else { return nil }
+        var chunks: DyldSharedCacheChunkSet?
+        var removals: [String: Set<Int>] = [:]
+        for record in records where !patchIDs.contains(record.patchID) && record.fileOffset >= 0 {
+            let alignment = Int((4 - (record.vma % 4)) % 4)
+            for offset in stride(from: alignment, through: record.original.count - 4, by: 4) {
+                let (address, addressOverflow) = record.vma.addingReportingOverflow(UInt64(offset))
+                let (fileOffset, offsetOverflow) = record.fileOffset.addingReportingOverflow(offset)
+                guard !addressOverflow, !offsetOverflow else { continue }
+                let original = record.original.loadLE(UInt32.self, at: offset)
+                for (patchID, run) in candidates {
+                    guard let index = run.index(of: address), run.originals[index] == original else { continue }
+                    if chunks == nil { chunks = try DyldSharedCacheChunkSet(directory: directory) }
+                    guard let mapped = try? chunks?.fileRange(of: .init(vma: address, length: 4)),
+                          mapped.chunkURL.lastPathComponent == record.chunk, mapped.range.lowerBound == fileOffset
+                    else { continue }
+                    removals[patchID, default: []].insert(index)
+                }
+            }
+        }
+        guard !removals.isEmpty else { return nil }
+        var repaired = self
+        for (patchID, indices) in removals {
+            let run = candidates[patchID]!
+            var kept = Words()
+            kept.addresses.reserveCapacity(run.count - indices.count)
+            kept.originals.reserveCapacity(run.count - indices.count)
+            var start = 0
+            for end in indices.sorted() + [run.count] {
+                kept.addresses.append(contentsOf: run.addresses[start ..< end])
+                kept.originals.append(contentsOf: run.originals[start ..< end])
+                start = end + 1
+            }
+            repaired.words[patchID] = kept.isEmpty ? nil : kept
+        }
+        return repaired
     }
 
     // MARK: - Restoring

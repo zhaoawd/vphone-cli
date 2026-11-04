@@ -596,6 +596,12 @@
 > about 20 GB to 10 MB. A log written by 2.15.0 or earlier is converted once
 > by the hidden `cfw patch-dsc-undo-words` verb before the cache patches run.
 > See [Undo words](Guest/iphone_duo_bringup.md#undo-words-instead-of-page-runs-issue-789-2026-11-03).
+> **Duo migration correction (2026-11-04):** a page-run diff also captured
+> words changed by XPC LWCR and Lockdown Mode. Before using the X1 undo,
+> the CLI now excludes a word when a separate patch logged the same original
+> at the same mapped file location. This also corrects an already converted
+> log; it does not rewrite cache contents. See the
+> [Duo reproduction and validation](Integration/duo_m5_20261030/UPSTREAM_DISPLAY_SYNC_20261104.md#x1-回滚与恢复树发布验证2026-11-04).
 
 > **Foldable VM sub-type (2026-10-23):** `preboot-cfw-devicetree_foldable_vm_subtype`
 > (guest system set, Preboot device-tree repair, on in `standard`, blocked in

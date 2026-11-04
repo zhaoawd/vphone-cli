@@ -2315,18 +2315,18 @@ struct VPhoneCustomFirmwareInstaller {
         }
         let undoAbsolute = (dsc as NSString).appendingPathComponent(Self.dscUndoLogLeaf)
         let undoRelative = "\(cacheRelative)/\(Self.dscUndoLogLeaf)"
-        // A log from 2.15.0 or earlier keeps the X1 lowering as gigabytes of
-        // page runs; convert it once, before anything here decodes it.
+        // Convert the old X1 page runs or repair an earlier conversion before
+        // any patch can use or remove the records that identify its writes.
+        let undoWords = DyldSharedCacheUndoLog.wordsPath(forLog: undoRelative)
         if dyld.contains(where: { DyldSharedCacheArm64eX1BootstrapPatcher.wordUndoPatchIDs.contains($0.id) }),
-           (try? system.exists(undoRelative)) == true
+           (try? system.exists(undoRelative)) == true || (try? system.exists(undoWords)) == true
         {
             do {
                 try patch("patch-dsc-undo-words", [dsc, "--undo-log", undoAbsolute])
             } catch {
-                print("  [!] dyld undo log: keeping the X1 page runs as they are: \(error)")
+                print("  [!] dyld undo log: could not normalize the X1 undo: \(error)")
             }
         }
-        let undoWords = DyldSharedCacheUndoLog.wordsPath(forLog: undoRelative)
         let undoLog = (try? system.readData(undoRelative)).flatMap { json in
             let words = (try? system.exists(undoWords)) == true ? try? system.readData(undoWords) : nil
             return try? DyldSharedCacheUndoLog.decode(json, words: words)

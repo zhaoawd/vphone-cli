@@ -393,6 +393,57 @@ struct DyldSharedCacheUndoWordsTests {
             #expect(try Data(contentsOf: chunk).subdata(in: 0x4000 ..< 0x4010) == pristine.subdata(in: 0x4000 ..< 0x4010))
         }
     }
+
+    @Test
+    func `Migrating a page and repairing an existing sidecar preserve a separate patch on that page`() throws {
+        try withCache { dir, chunk in
+            let pristine = try Data(contentsOf: chunk)
+            let x1 = "x1"
+            let x1Address = Self.base + 0x4004
+            let otherAddress = Self.base + 0x4008
+            let other = DyldSharedCacheUndoLog.Record(
+                patchID: "other", chunk: chunk.lastPathComponent, fileOffset: 0x4008, vma: otherAddress,
+                original: pristine.subdata(in: 0x4008 ..< 0x400C),
+            )
+            let page = DyldSharedCacheUndoLog.Record(
+                patchID: x1, chunk: chunk.lastPathComponent, fileOffset: 0x4000, vma: Self.base + 0x4000,
+                original: pristine.subdata(in: 0x4000 ..< 0x4010),
+            )
+            let legacy = DyldSharedCacheUndoLog(records: [page, other])
+            let badSidecar = DyldSharedCacheUndoLog(
+                records: [other], words: [x1: words([(x1Address, 0x4004), (otherAddress, 0x4008)])],
+            )
+            let url = dir.appendingPathComponent(".vphone-dsc-undo.json")
+            try badSidecar.write(log: url)
+            let migrated = try #require(try DyldSharedCacheUndoLog.load(log: url))
+
+            for input in [legacy, migrated] {
+                try overwrite(chunk, at: [0x4004], with: [0x1F, 0x20, 0x03, 0xD5])
+                try overwrite(chunk, at: [0x4008], with: [0xAA, 0xAA, 0xAA, 0xAA])
+                let converted = try #require(try input.convertingRunsToWords(of: [x1], in: dir))
+                #expect(converted.records == [other])
+                #expect(converted.words[x1]?.addresses == [x1Address])
+                #expect(try converted.convertingRunsToWords(of: [x1], in: dir) == nil)
+                try converted.restore(patchIDs: [x1], in: dir)
+                #expect(try word(in: chunk, at: 0x4004) == 0x4004)
+                #expect(try word(in: chunk, at: 0x4008) == 0xAAAA_AAAA)
+            }
+        }
+    }
+
+    @Test
+    func `A separate patch with a different original does not disown an X1 word`() throws {
+        try withCache { dir, chunk in
+            let address = Self.base + 0x4004
+            let other = DyldSharedCacheUndoLog.Record(
+                patchID: "other", chunk: chunk.lastPathComponent, fileOffset: 0x4004, vma: address,
+                original: Data([0x1F, 0x20, 0x03, 0xD5]),
+            )
+            let log = DyldSharedCacheUndoLog(records: [other], words: ["x1": words([(address, 0x4004)])])
+            let repaired = try log.convertingRunsToWords(of: ["x1"], in: dir)
+            #expect(repaired == nil)
+        }
+    }
 }
 
 @Suite("Dyld patches whose implementation changed")
