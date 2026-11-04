@@ -144,3 +144,12 @@ Detailed evidence and change decisions:
 - [ ] Evaluate upstream Duo display changes, older firmware support, and the documentation site separately.
 
 See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_20261104.md).
+
+## Duo display sync (2026-11-04)
+
+- [x] Integrate #788, #799, #800 and #801, retaining the local AX and auto-lock paths.
+- [x] Verify the full bundle, device-tree and patch catalogue tests, hinge tests, and daemon regressions.
+- [x] Prepare and verify two disposable VM clones and the read-only root preparation preflight.
+- [ ] Apply the signed bundles to the isolated guests and admit the two VM binaries, then run windowed Duo regressions.
+
+See [the display sync record](Research/Integration/duo_m5_20261030/UPSTREAM_DISPLAY_SYNC_20261104.md).

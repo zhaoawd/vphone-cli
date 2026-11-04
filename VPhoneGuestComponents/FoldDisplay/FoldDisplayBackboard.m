@@ -148,9 +148,11 @@ static void vpSetInnerDisplayPointScale(unsigned int attempt) {
     }
     vpMarkInnerDisplayBuiltIn(vpInnerRenderDisplay);
     id properties = [objc_getClass("CADisplayProperties") new];
-    ((void (*)(id, SEL, unsigned long long))objc_msgSend)(properties, sel_registerName("setPointScale:"), 3);
+    ((void (*)(id, SEL, unsigned long long))objc_msgSend)(
+        properties, sel_registerName("setPointScale:"), VPhoneDuoInnerPointScale);
     BOOL accepted = ((BOOL (*)(id, SEL, id))objc_msgSend)(inner, sel_registerName("setDisplayProperties:"), properties);
-    vpFoldDisplayLog([NSString stringWithFormat:@"inner display: point scale 3 %@", accepted ? @"sent" : @"refused"]);
+    vpFoldDisplayLog([NSString stringWithFormat:@"inner display: point scale %d %@",
+        VPhoneDuoInnerPointScale, accepted ? @"sent" : @"refused"]);
 }
 
 // Adds the inner panel's render display to a render server, once. It is
