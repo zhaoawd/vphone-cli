@@ -1,5 +1,22 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Local autophone baseline (2026-11-05).** A new iPhone17,3 VM uses the
+> existing `standard` preset from tag `2.15.0-ap.2` (`bb533bd7`), independently
+> built and installed as `2.15.0-local.ec12bbac`, with iOS 27.0.1 (24A446)
+> and cloudOS 26.4 (23E5207q). CFW installation, independent restarts,
+> vphoned identity, rootless bootstrap, SSH/Frida endpoint identity and
+> isolated Control Plane registration passed. This deployment adds no patch
+> identifier, algorithm or preset change; the counts below describe this
+> branch, not the pinned deployment. The food_ordering_v2 dish-default
+> requirement reached accepted with 13/13 exit conditions. Seven IPA builds
+> passed installation checks; the subsequent host-side launch readiness fix
+> passed six launch checks across KFC Prod, Feishu and WeCom. Local multi-VM
+> capacity, account/data migration and complete commercial workflows remain
+> unverified. See the [local VM record](Integration/autophone_local_20261105.md),
+> [service deployment](Integration/autophone_local_services_20261105.md),
+> [business acceptance](Integration/autophone_local_business_20261105.md) and
+> [launch readiness fix](Integration/autophone_launch_readiness_20261105.md).
+
 > **Watch audio budget runtime check (2026-10-31).** A fresh Watch7,18 VM on
 > 26.4 (23T240): native Resonate text-message
 > alert completed with `BudgetNotAvailable = 0`; explicit Playback-category
