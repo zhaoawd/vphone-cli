@@ -39,4 +39,4 @@ To go back to the Mac's time, turn **Set Automatically** on again there.
 
 - [Create and Run a VM](create-and-run.md)
 - [Library and Backups](../storage/library-and-backups.md)
-- [Networking](../../Guides/networking.md)
+- [Networking](../networking/overview.md)

@@ -81,7 +81,7 @@ New Machine（新建虚拟机）打开时是一个简短的页面：名称、来
 
 对于这些组合，Launchpad 仍会显示一个 `ipsw` 工具字段，供用它来准备组合的旧版兼容 Core Bundle（2.12.0）使用。Core Bundle 2.12.1 及更新版本会原生提取，并忽略所选的路径。
 
-iPhone XS Max 运行 iOS 18.1 到 18.7.2，每个版本都运行在各自版本的 cloudOS 上，不使用模板，默认使用 Minimal 预设。它的组合总是需要重建 kernelcache，因此 **Firmware** 还会要求填写 macOS 构建机：
+iPhone XS Max 运行 iOS 18.1 到 18.7.2，每个版本都运行在各自版本的 cloudOS 上，不使用模板，默认使用 Minimal 预设；Standard 同样可用（已在 18.6 上验证）。它的组合总是需要重建 kernelcache，因此 **Firmware** 还会要求填写 macOS 构建机：
 
 - 一台运行 macOS 15 或 26.0 到 26.3、已打开“远程登录”的 Mac 或 macOS 虚拟机的 `user@host`；
 - 用于 ssh 和 sudo 的密码；如果使用 ssh 密钥且 sudo 无需密码，则留空。
@@ -114,5 +114,5 @@ New Machine 的 **Patch Settings**（补丁设置）中的单个补丁覆盖设�
 
 - [模板](templates.md)
 - [批量创建虚拟机](many-machines.md)
-- [固件准备](../../../Research/Firmware/firmware_manifest_and_origins.md)
-- [Launchpad CLI](../../Guides/launchpad-cli.md)
+- [固件准备](../firmware/firmware-preparation.md)
+- [Launchpad CLI](../launchpad/launchpad-cli.md)

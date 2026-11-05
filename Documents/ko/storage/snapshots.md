@@ -62,4 +62,4 @@ vphone-cli vm snapshot delete myphone clean
 
 - [보관함, 펌웨어, 백업](library-and-backups.md)
 - [가상 머신 간 디스크 공간 공유](sharing-disk-space.md)
-- [문제 해결](../../Guides/troubleshooting.md)
+- [문제 해결](../help/troubleshooting.md)

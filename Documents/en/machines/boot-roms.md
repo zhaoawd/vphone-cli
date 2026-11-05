@@ -47,5 +47,5 @@ For the details, see the research notes on [OpenAVB](../../../Research/Firmware/
 ## See also
 
 - [Create and Run a VM](create-and-run.md)
-- [Firmware Preparation](../../../Research/Firmware/firmware_manifest_and_origins.md)
-- [Troubleshooting](../../Guides/troubleshooting.md)
+- [Firmware Preparation](../firmware/firmware-preparation.md)
+- [Troubleshooting](../help/troubleshooting.md)

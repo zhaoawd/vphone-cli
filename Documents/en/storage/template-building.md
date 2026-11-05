@@ -81,7 +81,7 @@ Under **Firmware**, a release that also runs on its own cloudOS (`fw catalog`'s 
 
 Launchpad still shows an `ipsw` tool field for these pairings, for older compatible Core Bundles (2.12.0) that stage the mix with it. Core Bundle 2.12.1 and later extract natively and ignore the selected path.
 
-The iPhone XS Max runs iOS 18.1 to 18.7.2, each on its own release's cloudOS, with no template and the Minimal preset by default. Its pairings always rebuild the kernelcache, so **Firmware** also asks for the macOS builder:
+The iPhone XS Max runs iOS 18.1 to 18.7.2, each on its own release's cloudOS, with no template and the Minimal preset by default; Standard works as well (checked on 18.6). Its pairings always rebuild the kernelcache, so **Firmware** also asks for the macOS builder:
 
 - `user@host` of a Mac or macOS VM running macOS 15 or 26.0 to 26.3 with Remote Login on;
 - its password for ssh and sudo, empty with ssh keys and passwordless sudo.
@@ -114,5 +114,5 @@ Once it has built a template, the creation offers to delete the two IPSWs it cam
 
 - [Templates](templates.md)
 - [Create many machines](many-machines.md)
-- [Firmware preparation](../../../Research/Firmware/firmware_manifest_and_origins.md)
-- [Launchpad CLI](../../Guides/launchpad-cli.md)
+- [Firmware preparation](../firmware/firmware-preparation.md)
+- [Launchpad CLI](../launchpad/launchpad-cli.md)

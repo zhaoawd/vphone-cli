@@ -419,6 +419,14 @@ Why the guest compiles at all, and why it starts over at each boot:
   changes (19,148 bytes, foreign header kept) and backboardd compiles 2
   functions in the guest instead of 92.
 
+  **2026-11-03 correction:** on the measured iOS 26.6.2 base the same env=1
+  branch also skips the 32-byte compiler cache key, not just the 64-byte
+  boot/system stamp. Therefore a compiler update can retain stale shader
+  output even after its key changes. The native GLES cache repair keeps the
+  key comparison on the reuse path and derives the driver's key from the
+  installed plugin; see [Native GLES semantics](#native-gles-semantics).
+  The measurements above establish cross-boot reuse but did not test compiler-version changes.
+
 Effect on the first go-home, five Settings rounds after a backboardd relaunch
 with a foreign UUID in its cache (a stand-in for a boot):
 
@@ -820,7 +828,7 @@ patch is part of the template's boot-chain digest, so a template lacking Task3
 does not satisfy the new Standard key. Existing machines need their new Core
 Bundle bound, `cfw update-environment`, then `cfw update-kernel` while stopped.
 Launchpad exposes both updates through its helper. No restore or data erasure
-is involved. See `Documents/Guides/shader-cache.md` for the user workflow.
+is involved. See `Documents/en/storage/shader-cache.md` for the user workflow.
 
 This changes preset selection and record naming only; the four kernel writes
 and runtime coverage above are unchanged. The direct kernel patcher default
@@ -1025,6 +1033,203 @@ cost is 12 to 28 bytes more per indexed draw.
 Verified on the iPad guest with the patched driver in place: every heap row
 above covers 100%, the plain-buffer probe is unchanged, and Subway Surfers
 draws its menu scene and gameplay correctly.
+
+## OpenGL ES
+
+Upstream issue Lakr233/vphone-cli#793: `[[EAGLContext alloc] initWithAPI:]`
+returned nil for every API in a guest while Metal worked. OpenGL ES on Apple
+GPUs is AppleMetalGLRenderer, a renderer over Metal, and on the paravirtual GPU
+it failed at three points in turn. Measured on 2026-11-02: host macOS 27.2,
+cloudOS 26.4 (23E5207q) kernel, iPhone17,3 iOS 27.0.1 userland, test VM
+`glestest-iphone`.
+
+### No renderer
+
+`gfxInitializeLibrary` in `OpenGLES.framework/libGFXShared.dylib` walks the
+`IOAcceleratorES` services and, for each, reads `IOGLESBundleName` and
+`IOGLESMetalBundleName` from the registry; the renderer it loads is
+`/System/Library/Extensions/<name>.bundle`. With neither key there is no
+renderer and no context. The AGX personalities carry
+`IOGLESBundleName = AppleMetalGLRenderer` (`AGXG14X` in the j236c kernelcache
+of the same cloudOS IPSW); `AppleParavirtGPUARM` names only its Metal plugin.
+A personality's keys become the driver's property table, so
+`kernel-cfw-paravirt_gles_renderer` adds the AGX key to the personality in
+`__PRELINK_INFO`. With it, all three APIs return a context, `GLEngine` and
+`AppleMetalGLRenderer` load, and `glClear` with a readback works.
+
+### Shaders crash the compiler service
+
+The first draw with a shader failed with
+`GPU Hang Error (00000003:kIOGPUCommandBufferCallbackErrorHang)` and an
+unchanged framebuffer, while `MTLCompilerService` crashed in the compiler
+plugin, `libAppleParavirtCompilerPluginIOGPUFamily.dylib`, which this project
+builds (`VPhoneGuestComponents/GraphicLoader`). A copy of the plugin that wrote
+each module it received to `/private/var/tmp` showed what OpenGL ES sends it:
+
+```
+target triple = "air64-apple-ios"
+!air.language_version = !{!0}
+!air.fragment = !{!4}
+!0 = !{!"OpenGL ES GLSL", i32 1, i32 0, i32 0}
+!10 = !{i32 2, !"air.buffer", !"air.buffer_size", i32 112, !"air.location_index", i32 12, i32 1, !"air.read"}
+!12 = !{i32 4, !"air.sampler", !"air.location_index", i32 0, i32 1}
+```
+
+A module from the Metal front end has `!air.version = !{i32 2, i32 7, i32 0}`,
+a versioned triple, and argument nodes that go on to `air.address_space`,
+`air.arg_type_size`, `air.arg_type_align_size`, `air.arg_type_name` and
+`air.arg_name`. GPUCompiler reads those without bounds or null checks:
+`MTLDowngradeAIRModule` and `MetalModule::materialize` dereference
+`getNamedMetadata("air.version")`, and `air::Reflection::create` reads
+`air.address_space` at a fixed index past the end of the GL buffer node. The
+plugin now completes an OpenGL ES module before compiling it, from the entry
+point's own types, and gives it the version the front end writes, 2.7.0 — also
+the plugin's target, which `MTLCompilerService` passes as a packed version tuple
+(`0x700000002`) in the field the plugin calls `targetTriple`.
+
+The host carries the same GPUCompiler (32023), so the plugin built for macOS
+runs the guest's modules on the host: `make -C VPhoneGuestComponents
+test-gles-air` turns three captured modules into metallibs, loads each in the
+host's Metal and links the vertex and fragment functions into a pipeline.
+
+### The host refuses the primitive restart command
+
+Shaders then compiled, and the guest kernel logged an `AppleParavirtGPU
+HardwareDiagnosisReport` and a GPU restart for every GL command buffer. The
+host task (`com.apple.gpusw.ParavirtualizedGraphicsGPUTask`) logged
+`Command buffer failed: NSGenericException <redacted reason>`. A task starts
+for each guest process that opens the GPU, so a probe that pauses after creating
+its context leaves time to attach lldb to the new one and break on
+`objc_exception_throw`: the reason is `Invalid viewport index`, thrown by the
+handler that replays `setPrimitiveRestartEnabled:index:` after checking `index`
+against `[device maxViewportCount]`. OpenGL ES sends the restart index there,
+`0xffffffff`. `system-paravirt_gpu-cfw-primitive_restart` makes the guest
+driver's serialiser for that call return at entry, so Metal's own restart
+behaviour applies (on, at the index type's largest value).
+
+### Measured
+
+| Probe | Result |
+| --- | --- |
+| EAGL API 1, 2, 3 | all OK; `GL_RENDERER` "Apple Paravirtual device GPU", `GL_VERSION` "OpenGL ES 3.0 Metal - 105" |
+| ES 2 shader draw, root and mobile launchd jobs | exact readback of draw and clear |
+| ES 2 textured quad, 2x2 nearest texture, `mat4`/`float`/`vec4` uniforms, varyings | all four texels exact |
+| ES 3 uniform block, flat `int` varying, `texelFetch`, fixed-index restart strip | both quads exact, the split gap clear |
+| App drawing through `CAEAGLLayer` at 1290x2796 | 1560 frames presented, a rotating triangle on screen |
+
+No `MTLCompilerService` crash and no GPU restart in any of these.
+`Research/0_binary_patch_comparison.md` ("OpenGL ES in guests (2026-11-02)") has
+the bytes and what is not covered.
+
+### Native GLES semantics
+
+Further testing on iOS 26.6.2 (23G90), cloudOS 26.4 (23E5207q) and macOS
+26.6.2 (25G83, Apple M5 Max) found failures after contexts and basic draws
+worked. The following results come from development builds on that OS pair.
+Six declarations cover these repairs; their semantic discovery, version gates
+and rollback rules are in the [patch comparison](../0_binary_patch_comparison.md#native-gles-follow-up-2026-11-02).
+
+**Drawable orientation.** The renderer normally uses a private IOSurface
+attachment `yInvert` flag. A 16-case host/guest control showed it reversing
+host rows but having no effect through PV. Selecting the renderer's existing
+`AGX_GL_VIEWPORT_INVERT_CONFIG=UPPER_LEFT` path corrects viewport/scissor
+orientation. SystemHook sets it only while `/usr/lib/vphone-gles-upper-left`
+exists and preserves explicit environment values. This locates a behavioral
+gap without identifying the exact missing transport field.
+
+**Vertex and instance IDs.** Captured vertex-ID AIR compiles on host Metal
+without a descriptor or with public UInt (36), but private format 43 aborts
+in `CloneAttributeDescriptor`; the guest's ID buffer contains the expected
+uint values, including 0, 1, 2. Only the serialized formats 43/44 become UInt,
+after guest shader variant generation, preserving original descriptors and
+AIR. Separately, ES1's generated fragments use `OpenGL ES Program`;
+`GLESAIR.mm` accepts it alongside `OpenGL ES GLSL` and completes missing buffer
+address space, size and alignment independently, preserving producer values.
+Partial buffer metadata was not demonstrated to cause the descriptor crash.
+
+**Restart-disabled strips.** Suppressing the unsupported restart command
+leaves Metal discarding the maximum index even when GLES restart is disabled.
+The repair selects GLEngine's existing primitive expansion for disabled
+indexed line/triangle strips: vertices are packed into a nonindexed draw,
+retaining vertex/instance IDs. Every affected strip incurs CPU copying, even
+when its indices contain no maximum value. Seven baseline cases, seven
+builtin controls and a 36-case line/triangle matrix passed in the guest;
+UInt8/UInt16 exercise maximum indices, UInt32 uses 65535 as a high-index control.
+
+**Points.** PV inherits a zero-returning
+`pipelineFlagsWithVertexVariant:fragmentVariant:` implementation. Four guards
+on the resulting point-size usage bit suppress valid `GL_POINTS` draws.
+Removing only those guards restores 12 size cases and three triangle controls
+(15/21), but six coordinate gradients remain inverted. Host/guest replay
+shows that `pointCoordYFlipEnabled` changes host pixels and has no effect
+through the measured PV path, independently of drawable orientation.
+The compiler therefore lowers only GLES fragment `air.point_coord.y` to
+`1-y` for `float2` and `half2`, preserving X. A named metadata marker makes
+this idempotent; malformed indices/types are rejected without mutation,
+and ordinary varyings and non-GLES modules are unchanged. Retained
+[AIR tests](../../VPhoneGuestComponents/Tests/GLESAIRTests.mm) record fixture
+origins and the coordinate oracle. Revisit this compensation if PV begins
+honoring the native flag, to avoid double inversion.
+
+**Stale compiler output.** A fresh process cache passed 21/21 point cases
+while the old default cache remained at 15/21 after the compiler change.
+The driver hashes fixed date/time literals into its function-cache identity;
+Metal's library cache has a separate identity. Deriving the driver's seed
+from the installed plugin is necessary but insufficient: on this base,
+`FS_CACHE_REUSE_ON_REBOOT=1` skips both the 32-byte key comparison and the
+64-byte boot/system-stamp comparison. The repair retains key validation while
+skipping only the boot check. After restoring the old default cache, updating
+and rebooting, the first run and a warm repeat both pass 21/21 without a
+cache-path override, cache deletion or rendering hook. The installed driver's
+seed was checked against the installed plugin's content-derived identity.
+
+### Verifying the GLES repairs
+
+Historical development validation passed 22 standalone guest processes: 20
+correctness checks covering original ID shaders, texture effects, shared
+contexts, BGRA/NV12 imports and conversion/fences, a three-slot queue, VBO
+controls, restart and points; two timing checks measured submission/completion
+and restart copying. Timing observations do not establish application performance.
+An ordinary app separately passed ES1/2/3 and Metal, with each surface submitting
+30 frames. A nine-position native-resolution screenshot comparison had maximum
+sampled RGB difference 1.465452/255 (tolerance 8). These are sampled screen checks.
+
+For independent guest validation, exercise nonzero first/indexed vertex IDs,
+instance IDs, restart-enabled/disabled strips with maximum indices, and ES1/2/3
+point sizes and coordinate gradients through native GLES. Record pixel results,
+process exit status/signal and a native-resolution app screenshot. Change one
+selection at a time with `fw set-patches`, run `cfw update-environment`, fully
+reboot and check applied/pending receipts before rerunning identical inputs.
+Re-upload temporary binaries after each reboot. Point on/off/on measured
+21 → 3 → 21: the disabled run had zero GL errors and only triangles passed.
+Orientation and restart opt-outs reproduced their failures and recovered when
+re-enabled. Restore `standard` after these controls. Separately restore an old
+default cache before a compiler update, then verify both first-use and warm
+results without overriding the cache path.
+
+Run retained host regressions from the repository root with Xcode and an Apple
+GPU. AIR checks cover completion, point pixels, scope and idempotence; patcher
+checks cover discovery rejection, exact mutations, dependencies and rollback:
+
+```zsh
+make -C VPhoneGuestComponents test-gles-air
+xcodebuild -workspace VPhone.xcworkspace -scheme FirmwarePatcherTests \
+  -configuration Debug -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath /tmp/vphone-native-patcher-tests \
+  -only-testing:FirmwarePatcherTests/DyldSharedCacheMetalVertexFormatTests \
+  -only-testing:FirmwarePatcherTests/DyldSharedCacheGLESPrimitiveRestartTests \
+  -only-testing:FirmwarePatcherTests/DyldSharedCacheGLESPointDrawTests \
+  -only-testing:FirmwarePatcherTests/DyldSharedCacheMetalCacheReuseTests \
+  -only-testing:FirmwarePatcherTests/CustomFirmwareParavirtGPUCompilerCacheTests \
+  -only-testing:FirmwarePatcherTests/MachOSymbolTargetsTests \
+  -only-testing:FirmwarePatcherTests/FirmwarePatchSetCatalogTests \
+  -only-testing:FirmwarePatcherTests/FirmwareGuestPatchResolutionTests test
+```
+
+Host tests do not establish installed-VM rendering. The guest checks do not
+establish full GLES conformance, ES1 lighting/fog, every framebuffer combination,
+arbitrary app compatibility, physical-camera behavior or performance. Validate
+other OS pairs before widening the gates.
 
 ## Settings That Do Nothing Here
 

@@ -4,12 +4,18 @@
 // entitlement flag thread_set_state wants, and the immutability vm_map_delete
 // enforces over code pages. Two more stand between Frida and some targets: the
 // TPRO state dyld asserts on entry, which aborts spawned apps, and the per-process
-// syscall filters, which deny the agent inside filtered daemons. The last two are
-// ported from mowisec/frida_patches_srd. None is needed to boot, and all widen
-// what any process in the guest can do, so this set is opt-in — no preset that a
-// VM gets by default includes it.
+// syscall filters, which deny the agent inside filtered daemons. Those two are
+// ported from mowisec/frida_patches_srd. A fifth lets an instrumented process
+// fork: the child of a parent holding Apple's `com.apple.private.cs.debugger`
+// keeps the code-signing monitor's debug-region association of the pages Frida
+// rewrote, which fork does not carry over. None is needed to boot, and all but the last widen what any
+// process in the guest can do, so this set is opt-in — no preset that a VM gets
+// by default includes it.
 //
-// Gated to cloudOS 26.4 and newer, where these shapes were verified.
+// Gated to cloudOS 26.4 and newer, where these shapes were verified. The
+// thread_set_state flag and the syscall filters also have their shape on the
+// iOS 18 research board kernels (cloudOS 18.x); TPRO and the immutable-code
+// check do not exist there in this form.
 
 import Foundation
 import VPhonePatchKit
@@ -18,6 +24,9 @@ public enum FirmwareKernelFridaPatchSet {
     public static let identifier = "com.vphone.patchset.kernel.frida"
 
     private static let fridaCapable = VPhonePatchApplicability(cloudOS: .atLeast(major: 26, minor: 4))
+    private static let fridaCapableWithIOS18 = VPhonePatchApplicability(
+        cloudOS: .oneOf([.atLeast(major: 26, minor: 4), .major(18)]),
+    )
 
     public static let manifest = VPhonePatchSetManifest(
         identifier: identifier,
@@ -29,7 +38,7 @@ public enum FirmwareKernelFridaPatchSet {
                 title: "thread_set_state entitlement",
                 summary: "Drops the entitlement flag thread_set_state checks, so Stalker can set thread state.",
                 target: .firmware(.kernelcache),
-                applicability: fridaCapable,
+                applicability: fridaCapableWithIOS18,
             ),
             VPhonePatchDeclaration(
                 identifier: "kernel-exp-frida_vm_map_delete_immutable_code",
@@ -49,6 +58,17 @@ public enum FirmwareKernelFridaPatchSet {
                 identifier: "kernel-exp-frida_syscall_filter_off",
                 title: "Syscall filters off",
                 summary: "Ignores per-process syscall filters, so Frida's agent survives inside filtered daemons such as trustd or backboardd.",
+                target: .firmware(.kernelcache),
+                // 26.1 for the iOS 16/17 experimental pairings, 26.4+ and iOS 18
+                // for the Frida-capable standard presets; union of #802 and #808.
+                applicability: VPhonePatchApplicability(cloudOS: .oneOf([
+                    .release(major: 26, minor: 1), .atLeast(major: 26, minor: 4), .major(18),
+                ])),
+            ),
+            VPhonePatchDeclaration(
+                identifier: "kernel-exp-frida_fork_inherit_invalid_code",
+                title: "Fork inherits invalid code",
+                summary: "Lets a fork child keep executing the code pages its parent rewrote, as the parent could, when the parent holds com.apple.private.cs.debugger. Other processes, exec and spawn are unchanged.",
                 target: .firmware(.kernelcache),
                 applicability: fridaCapable,
             ),

@@ -69,7 +69,8 @@ public enum FirmwarePatchSetCatalog {
             .union(hypervisorConcealmentPatches)
             .union([FirmwareGuestSystemPatchSet.innerCutout])
             .union(experimentalIdentityPatches)
-            .union([FirmwareGuestSystemPatchSet.otaUserland, FirmwareGuestSystemPatchSet.homePodTopCap, FirmwareGuestSystemPatchSet.homePodSetupBypass, FirmwareGuestSystemPatchSet.homePodAirPlayVM, FirmwareGuestSystemPatchSet.homePodAudioProduct, FirmwareGuestSystemPatchSet.homePodWelcome, FirmwareGuestSystemPatchSet.homePodSiriSpeech, FirmwareGuestSystemPatchSet.homePodOTAUserland, FirmwareGuestSystemPatchSet.homePodSoundGlow, FirmwareGuestSystemPatchSet.homePodCryptexStaging, FirmwareGuestSystemPatchSet.homePodCryptexClass, FirmwareGuestSystemPatchSet.homePodAdHocInstall])
+            .union([FirmwareGuestSystemPatchSet.homeViewEnvironmentService, FirmwareGuestSystemPatchSet.ios17Desktop, FirmwareGuestSystemPatchSet.ios16MachPorts, FirmwareGuestSystemPatchSet.ios16KeybaglessUI, FirmwareGuestSystemPatchSet.ios16Touchscreen, FirmwareGuestSystemPatchSet.ios16EphemeralStorage, FirmwareGuestSystemPatchSet.ios16Framebuffer, FirmwareGuestSystemPatchSet.ios16Surface, FirmwareGuestSystemPatchSet.ios16Desktop, FirmwareGuestSystemPatchSet.ios16Keybag, FirmwareGuestSystemPatchSet.ios16Migration, FirmwareGuestSystemPatchSet.ios16PortsLookup])
+            .union([FirmwareGuestSystemPatchSet.homeViewProfileLookup, FirmwareGuestSystemPatchSet.homeViewDisplayLookups, FirmwareGuestSystemPatchSet.homeViewSetupBypass, FirmwareGuestSystemPatchSet.otaUserland, FirmwareGuestSystemPatchSet.homePodTopCap, FirmwareGuestSystemPatchSet.homePodSetupBypass, FirmwareGuestSystemPatchSet.homePodAirPlayVM, FirmwareGuestSystemPatchSet.homePodAudioProduct, FirmwareGuestSystemPatchSet.homePodWelcome, FirmwareGuestSystemPatchSet.homePodSiriSpeech, FirmwareGuestSystemPatchSet.homePodOTAUserland, FirmwareGuestSystemPatchSet.homePodSoundGlow, FirmwareGuestSystemPatchSet.homePodCryptexStaging, FirmwareGuestSystemPatchSet.homePodCryptexClass, FirmwareGuestSystemPatchSet.homePodAdHocInstall])
             .union([FirmwareKernelCustomFirmwarePatchSet.tvTPROPagers, misTrustAuthPatch, FirmwareGuestSystemPatchSet.settingsRootRows, FirmwareGuestSystemPatchSet.settingsSoftwareUpdate, FirmwareGuestSystemPatchSet.tvTPRO, FirmwareGuestSystemPatchSet.tvOTAUserland, FirmwareGuestSystemPatchSet.tvSetupDisplayLookup, FirmwareGuestSystemPatchSet.tvSetupFocus, FirmwareGuestSystemPatchSet.tvLocalActivation, FirmwareGuestSystemPatchSet.tvLegacySetup])
 
     /// ProMotion: the 120 Hz timing for the paravirtual display.
@@ -95,6 +96,11 @@ public enum FirmwarePatchSetCatalog {
     /// `Research/Guest/gpu_acceleration.md`.
     public static let paravirtTask3Patch = "kernel-cfw-paravirt_gpu_task3"
 
+    /// OpenGL ES: the paravirtual GPU's personality names AppleMetalGLRenderer
+    /// as AGX's does, so `EAGLContext` gets a renderer. On in `standard`. See
+    /// `Research/Guest/gpu_acceleration.md`.
+    public static let paravirtGLESPatch = "kernel-cfw-paravirt_gles_renderer"
+
     /// Identifiers an installed bundle declared that a later one renamed, old to new.
     ///
     /// A VM's `PatchSelection.plist` and `PatchReceipt.plist` outlive the bundle
@@ -105,6 +111,8 @@ public enum FirmwarePatchSetCatalog {
         "kernel-exp-display_refresh_120hz": proMotionPatch,
         "kernel-exp-paravirt_gpu_task3": paravirtTask3Patch,
         "preboot-exp-devicetree_foldable_product_id": FirmwareGuestSystemPatchSet.prebootFoldableProductId,
+        // Boot-essential until the vphoned step signed launchd.plist itself.
+        "filesystem-boot-launchd_cache_loader_unsecure_cache_gate": FirmwareRestoreImagePatchSet.launchdCacheLoader,
     ]
 
     /// The identifiers this bundle declares for ones a VM recorded, in order, each
@@ -228,7 +236,7 @@ public enum FirmwarePatchSetCatalog {
         freshly restored 26.4 guest does not survive. The HomePod-only top cap is off.
         """,
         patchSets: bundledReferences,
-        selection: .block([FirmwareGuestSystemPatchSet.tvLegacySetup, FirmwareGuestSystemPatchSet.tvSetupDisplayLookup, FirmwareGuestSystemPatchSet.tvSetupFocus, FirmwareGuestSystemPatchSet.tvLocalActivation, FirmwareGuestSystemPatchSet.homePodTopCap, FirmwareGuestSystemPatchSet.homePodSetupBypass, FirmwareGuestSystemPatchSet.homePodAirPlayVM, FirmwareGuestSystemPatchSet.homePodAudioProduct, FirmwareGuestSystemPatchSet.homePodWelcome, FirmwareGuestSystemPatchSet.homePodSiriSpeech, FirmwareGuestSystemPatchSet.homePodOTAUserland, FirmwareGuestSystemPatchSet.homePodSoundGlow, FirmwareGuestSystemPatchSet.homePodCryptexStaging, FirmwareGuestSystemPatchSet.homePodCryptexClass, FirmwareGuestSystemPatchSet.homePodAdHocInstall]),
+        selection: .block([FirmwareGuestSystemPatchSet.ios16KeybaglessUI, FirmwareGuestSystemPatchSet.ios16Touchscreen, FirmwareGuestSystemPatchSet.ios16EphemeralStorage, FirmwareGuestSystemPatchSet.ios16Framebuffer, FirmwareGuestSystemPatchSet.ios16Surface, FirmwareGuestSystemPatchSet.ios16Desktop, FirmwareGuestSystemPatchSet.ios16Keybag, FirmwareGuestSystemPatchSet.ios16Migration, FirmwareGuestSystemPatchSet.ios16PortsLookup, FirmwareGuestSystemPatchSet.ios16MachPorts, FirmwareGuestSystemPatchSet.ios17Desktop, FirmwareGuestSystemPatchSet.homeViewEnvironmentService, FirmwareGuestSystemPatchSet.homeViewProfileLookup, FirmwareGuestSystemPatchSet.homeViewDisplayLookups, FirmwareGuestSystemPatchSet.homeViewSetupBypass, FirmwareGuestSystemPatchSet.tvLegacySetup, FirmwareGuestSystemPatchSet.tvSetupDisplayLookup, FirmwareGuestSystemPatchSet.tvSetupFocus, FirmwareGuestSystemPatchSet.tvLocalActivation, FirmwareGuestSystemPatchSet.homePodTopCap, FirmwareGuestSystemPatchSet.homePodSetupBypass, FirmwareGuestSystemPatchSet.homePodAirPlayVM, FirmwareGuestSystemPatchSet.homePodAudioProduct, FirmwareGuestSystemPatchSet.homePodWelcome, FirmwareGuestSystemPatchSet.homePodSiriSpeech, FirmwareGuestSystemPatchSet.homePodOTAUserland, FirmwareGuestSystemPatchSet.homePodSoundGlow, FirmwareGuestSystemPatchSet.homePodCryptexStaging, FirmwareGuestSystemPatchSet.homePodCryptexClass, FirmwareGuestSystemPatchSet.homePodAdHocInstall]),
     )
 
     /// The iOS payloads, hooks and shared-cache patches an Apple TV guest has no
@@ -236,7 +244,12 @@ public enum FirmwarePatchSetCatalog {
     /// plain-arm64 HD cannot load it), debugserver, the environment hooks, and
     /// the iPhone 19 ARM64E_X1 boot path.
     public static let tvOSBlockedPatches: Set<String> = [
+        FirmwareGuestSystemPatchSet.metalCacheReuseKey,
+        FirmwareGuestSystemPatchSet.glesPointDraw,
+        FirmwareGuestSystemPatchSet.glesPrimitiveRestart,
+        FirmwareGuestSystemPatchSet.metalVertexIDFormat,
         paravirtTask3Patch,
+        paravirtGLESPatch,
         FirmwareGuestSystemPatchSet.arm64eX1CacheBootstrap,
         FirmwareGuestSystemPatchSet.arm64eX1CacheRemaining,
         FirmwareGuestSystemPatchSet.arm64eX1CIBarcode,
@@ -281,6 +294,9 @@ public enum FirmwarePatchSetCatalog {
         "system-mobileactivationd-boot-should_hactivate",
         FirmwareGuestSystemPatchSet.arm64eX1MountBootstrap,
         "system-paravirt_gpu-cfw-heap_index_offset",
+        "system-paravirt_gpu-cfw-primitive_restart",
+        FirmwareGuestSystemPatchSet.paravirtGPUCompilerCache,
+        FirmwareGuestSystemPatchSet.glesUpperLeft,
         "system-systemhook-cfw-metal_cache_reuse",
         "system-systemversion-cfw-build_version",
         "system-virtiosound-cfw-hal_plugin",
@@ -337,6 +353,20 @@ public enum FirmwarePatchSetCatalog {
         ),
     )
 
+    /// HomeView shares the arm64e tvOS OTA path but keeps its touch-driven setup.
+    /// Apple TV remote/focus/activation adapters are deliberately left off.
+    public static let homeViewPreset = VPhonePatchPreset(
+        identifier: VPhonePatchPreset.homeViewIdentifier,
+        title: "HomeView",
+        summary: "Research: HomeView's own arm64e tvOS OTA over the Apple TV HD restore base, with its donor board identity, touch display, vphoned and paravirtual GPU. Native setup is retained by default.",
+        patchSets: bundledReferences,
+        selection: .block(
+            manualOnlyPatches
+                .subtracting([FirmwareGuestSystemPatchSet.tvOTAUserland, FirmwareGuestSystemPatchSet.homeViewDisplayLookups, FirmwareGuestSystemPatchSet.homeViewProfileLookup])
+                .union(tvOSBlockedPatches.subtracting(["system-extensions-boot-gpu_bundle"]).subtracting(tvOS27UserlandPatches)),
+        ),
+    )
+
     /// HomePod mini uses its own monolithic arm64e TVOS IPSW. Keep the 27
     /// kernel compatibility patches, but never swap in an Apple TV OTA or
     /// install the iPhone GPU/routing environment. The shared virtio audio
@@ -366,11 +396,13 @@ public enum FirmwarePatchSetCatalog {
         "devicetree-cfw-watch_companion",
     ]
 
-    /// The boot chain patches ``minimalPreset`` keeps: iBEC's and LLB's, which the
-    /// old `.less` variant applied too. A stock LLB does not get the restored
-    /// guest to its kernel (it restarts after its banner, with Apple's ROMs as
-    /// with OpenAVB and OpenSEP). AVPBooter, iBSS, TXM and the restore ramdisk
-    /// stay stock.
+    /// The boot chain patches ``minimalPreset`` and ``watchOSPreset`` keep: iBEC's
+    /// and LLB's. A stock LLB boots a guest with 8192 MB, but with 4096 MB
+    /// OpenAVB accepts and decompresses it and the virtual machine stops at
+    /// once (iOS 26.6.2 23G90 on cloudOS 26.4 23E5207q and watchOS 26.4 23T240
+    /// on cloudOS 26.4 23E244, 2026-11-03), even with every BuildManifest
+    /// digest rehashed; with these patches both boot at 4096 MB. AVPBooter,
+    /// iBSS, TXM and the restore ramdisk stay stock.
     public static let minimalBootChainPatches: Set<String> = [
         "ibec-cfw-serial_label",
         "ibec-boot-image4_callback",
@@ -384,10 +416,12 @@ public enum FirmwarePatchSetCatalog {
         "llb-cfw-display_scale",
     ]
 
-    /// A guest on a stock kernel and TXM, with only iBEC and LLB patched: the
-    /// system is customised before the restore instead
-    /// (``FirmwareRestoreImagePatchSet``), and nothing after it. Names only the
-    /// sets it draws on, so no kernel or guest patcher is built.
+    /// A guest on a stock kernel and TXM, with only iBEC and LLB patched
+    /// (``minimalBootChainPatches``): the system is customised before the
+    /// restore instead (``FirmwareRestoreImagePatchSet``), and nothing after
+    /// it. It names the two kernel sets but selects nothing from them, so the
+    /// kernel stays stock and no kernel patcher is built; naming them is what
+    /// lets a machine turn on ``userspaceDebugging``. No guest set is named.
     /// The shipped `minimal.plist` must match this.
     public static let minimalPreset = VPhonePatchPreset(
         identifier: VPhonePatchPreset.minimalIdentifier,
@@ -395,6 +429,8 @@ public enum FirmwarePatchSetCatalog {
         summary: "No kernel or TXM patches and only iBEC and LLB in the boot chain: the restore installs a resealed system with vphoned, the GPU driver and activation, and nothing writes it afterwards.",
         patchSets: [
             .bundled(FirmwareBootChainPatchSet.identifier),
+            .bundled(FirmwareKernelBasePatchSet.identifier),
+            .bundled(FirmwareKernelCustomFirmwarePatchSet.identifier),
             .bundled(FirmwareResearchBoardPatchSet.identifier),
             .bundled(FirmwareDeviceTreePatchSet.identifier),
             .bundled(FirmwareRestoreImagePatchSet.identifier),
@@ -403,7 +439,8 @@ public enum FirmwarePatchSetCatalog {
             minimalBootChainPatches
                 .union(minimalDeviceTreePatches)
                 .union(FirmwareResearchBoardPatchSet.manifest.patches.map(\.identifier))
-                .union(FirmwareRestoreImagePatchSet.manifest.patches.map(\.identifier)),
+                .union(FirmwareRestoreImagePatchSet.presetPatches)
+                .subtracting([FirmwareRestoreImagePatchSet.launchdCacheLoader]),
         ),
     )
 
@@ -423,20 +460,22 @@ public enum FirmwarePatchSetCatalog {
     ]
 
     /// ``minimalPreset`` for an Apple Watch: its device tree presents the watch
-    /// board. The shipped `watchos.plist` must match this.
+    /// board, and it keeps the same iBEC and LLB patches. The shipped
+    /// `watchos.plist` must match this.
     public static let watchOSPreset = VPhonePatchPreset(
         identifier: VPhonePatchPreset.watchOSIdentifier,
         title: "Apple Watch",
-        summary: "Minimal for an Apple Watch guest: the watch board's device tree, and a resealed system with vphoned, the GPU driver and activation restored onto a stock kernel and TXM.",
+        summary: "Minimal for an Apple Watch guest: the watch board's device tree, and a resealed system with vphoned, the GPU driver, speaker audio and activation restored onto a stock kernel and TXM.",
         patchSets: minimalPreset.patchSets,
         selection: .allow(
             minimalBootChainPatches
                 .union(watchOSDeviceTreePatches)
                 .union(FirmwareResearchBoardPatchSet.manifest.patches.map(\.identifier))
-                .union(FirmwareRestoreImagePatchSet.manifest.patches.map(\.identifier)),
+                .union(FirmwareRestoreImagePatchSet.presetPatches)
+                .subtracting([FirmwareRestoreImagePatchSet.launchdCacheLoader]),
         ),
     )
 
     /// The presets the bundle ships.
-    public static let builtInPresets: [VPhonePatchPreset] = [standardPreset, experimentalPreset, tvOSPreset, tvOS4KPreset, homePodMiniPreset, minimalPreset, watchOSPreset]
+    public static let builtInPresets: [VPhonePatchPreset] = [standardPreset, experimentalPreset, tvOSPreset, tvOS4KPreset, homeViewPreset, homePodMiniPreset, minimalPreset, watchOSPreset]
 }

@@ -110,6 +110,7 @@ enum GuestAPI {
                 "keychain_edit",
                 "ipa_install",
                 "bootstrap_install",
+                "bootstrap_packages",
                 "bootstrap_uninstall",
                 "port_forward",
                 "camera",
@@ -153,14 +154,22 @@ enum GuestAPI {
                 "motion_gyroscope_toggle",
                 "motion_attitude",
             ] + pointerCapabilities() + scriptCapabilities() + GuestHomePodDisplay.capabilities
-                + GuestHomePodDebug.capabilities,
+                + GuestHomePodDebug.capabilities + GuestHomeViewDistance.capabilities,
         ]
     }
 
-    /// iPadOS takes a pointing device as it is; iOS on an iPhone only through
-    /// AssistiveTouch, so `input.pointer` and `input.scroll` are an iPad's.
+    /// iPadOS accepts a pointing device directly. iPhones normally need
+    /// AssistiveTouch, but may explicitly opt in to host pointer forwarding.
+    /// Advertising the transport does not promise that iOS consumes it.
     private static func pointerCapabilities() -> [String] {
-        GuestVirtualAudioProduct.machine().hasPrefix("iPad") ? ["pointer_scroll", "pointer_buttons"] : []
+        let machine = GuestVirtualAudioProduct.machine()
+        if machine.hasPrefix("iPad") { return ["pointer_scroll", "pointer_buttons"] }
+        guard machine.hasPrefix("iPhone"),
+              let preference = try? readPreference(domain: "com.vphone.vphoned", key: "iPhonePointerEnabled"),
+              preference["type"] as? String == "bool",
+              preference["value"] as? Bool == true
+        else { return [] }
+        return ["pointer_scroll", "pointer_buttons"]
     }
 
     static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
@@ -299,6 +308,8 @@ enum GuestAPI {
                 layout: layout,
                 packagePath: params["package_path"] as? String,
             )
+        case "bootstrap.packages":
+            return try GuestIrisinInstaller.installPackages(GuestIrisinInstaller.initialPackages)
         case "bootstrap.status":
             return GuestIrisinInstaller.status()
         case "bootstrap.inspect":

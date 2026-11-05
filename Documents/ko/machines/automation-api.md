@@ -74,5 +74,5 @@ Swift 앱에서는 `VPhoneAPIKit` 패키지의 `VPhoneAPIClient`를 사용할 �
 
 - [전체 API 레퍼런스](../../../Research/vphoned_http_api.md)
 - [가상 머신 생성 및 실행](create-and-run.md)
-- [포트 포워딩](../../Guides/networking.md#port-forwarding)
-- [Launchpad 명령줄](../../Guides/launchpad-cli.md)
+- [포트 포워딩](../networking/port-forwarding.md)
+- [Launchpad 명령줄](../launchpad/launchpad-cli.md)

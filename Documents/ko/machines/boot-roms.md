@@ -47,5 +47,5 @@ vphone-cli vm config myphone --rom apple --seprom apple       # Apple's ROMs
 ## 함께 보기
 
 - [가상 머신 생성 및 실행](create-and-run.md)
-- [펌웨어 준비](../../../Research/Firmware/firmware_manifest_and_origins.md)
-- [문제 해결](../../Guides/troubleshooting.md)
+- [펌웨어 준비](../firmware/firmware-preparation.md)
+- [문제 해결](../help/troubleshooting.md)

@@ -81,7 +81,7 @@ New Machine은 짧은 페이지로 열립니다. 이름, 펌웨어 카탈로그�
 
 이전의 호환 Core Bundle(2.12.0)은 `ipsw` 도구로 믹스를 준비하므로, Launchpad는 이런 조합에 여전히 `ipsw` 도구 필드를 표시합니다. Core Bundle 2.12.1 이상은 네이티브로 추출하며 선택한 경로를 무시합니다.
 
-iPhone XS Max는 iOS 18.1~18.7.2를 각 릴리스 자체의 cloudOS에서 템플릿 없이 실행하며, 기본 프리셋은 Minimal입니다. 이 조합은 항상 kernelcache를 다시 빌드하므로 **Firmware**에서 macOS 빌더도 묻습니다.
+iPhone XS Max는 iOS 18.1~18.7.2를 각 릴리스 자체의 cloudOS에서 템플릿 없이 실행하며, 기본 프리셋은 Minimal입니다. Standard도 동작합니다(18.6에서 확인). 이 조합은 항상 kernelcache를 다시 빌드하므로 **Firmware**에서 macOS 빌더도 묻습니다.
 
 - 원격 로그인이 켜져 있고 macOS 15 또는 26.0~26.3을 실행하는 Mac이나 macOS 가상 머신의 `user@host`
 - ssh와 sudo에 사용할 암호. ssh 키와 암호 없는 sudo를 사용하면 비워 둡니다.
@@ -114,5 +114,5 @@ New Machine의 **Patch Settings**에서 지정한 패치별 재정의는 템플�
 
 - [템플릿](templates.md)
 - [여러 머신 만들기](many-machines.md)
-- [펌웨어 준비](../../../Research/Firmware/firmware_manifest_and_origins.md)
-- [Launchpad CLI](../../Guides/launchpad-cli.md)
+- [펌웨어 준비](../firmware/firmware-preparation.md)
+- [Launchpad CLI](../launchpad/launchpad-cli.md)

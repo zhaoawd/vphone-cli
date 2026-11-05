@@ -74,5 +74,5 @@ Swift App 可以使用 `VPhoneAPIKit` 软件包中的 `VPhoneAPIClient`，它会
 
 - [完整 API 参考](../../../Research/vphoned_http_api.md)
 - [创建与运行虚拟机](create-and-run.md)
-- [端口转发](../../Guides/networking.md#port-forwarding)
-- [Launchpad 命令行](../../Guides/launchpad-cli.md)
+- [端口转发](../networking/port-forwarding.md)
+- [Launchpad 命令行](../launchpad/launchpad-cli.md)

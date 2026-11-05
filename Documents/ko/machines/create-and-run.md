@@ -14,7 +14,7 @@ vphone-cli vm export myphone --out myphone.tzst
 
 ## 가상 머신 만들기
 
-iPhone17,3 복원 IPSW와 호환되는 PCC/cloudOS IPSW가 로컬 경로나 URL로 필요합니다. 지금까지 검증된 조합은 [호환성](../../Guides/compatibility.md)에 있습니다.
+iPhone17,3 복원 IPSW와 호환되는 PCC/cloudOS IPSW가 로컬 경로나 URL로 필요합니다. 지금까지 검증된 조합은 [호환성](../firmware/compatibility.md)에 있습니다.
 
 ```sh
 vphone-cli host preflight
@@ -45,6 +45,7 @@ vphone-cli vm create myphone \
 | `--unlock-at-startup` | `on` 또는 `off`(기본값). |
 | `--no-template` | 템플릿에서 복제하지 않고 가상 머신을 단독으로 만듭니다. |
 | `--skip-first-boot` | 마지막 부팅을 생략합니다. 호출하는 쪽에서 가상 머신을 직접 부팅할 때 사용합니다. |
+| `--bootstrap roothide` | 첫 부팅 중에 패키지 환경을 설치합니다. [패키지 환경](package-environment.md)을 참고하세요. |
 | `--keep-artifacts` | `--no-template`과 함께 지정하면 준비된 복원 트리를 보존합니다. 디스크 공간을 절약하려면 생략하세요. |
 
 `--cpu`, `--memory`, `--network`, `--unlock-at-startup`은 새 가상 머신에 같은 이름의 `vm config` 설정을 지정합니다.
@@ -57,7 +58,7 @@ vphone-cli vm create myphone \
 
 펌웨어 작업 흐름에는 모드가 하나뿐입니다. 부트 체인과 게스트 시스템을 패치하고 vphoned를 설치하며, 사용자 환경은 비워 둡니다. Sileo, apt, TrollStore, SSH 서버, VNC 서버는 설치하지 않습니다. 적용할 패치는 패치 프리셋이 선택하며, `vphone-cli fw set-patches`에 `--block` 또는 `--allow`를 지정하면 개별 패치를 끄거나 켤 수 있습니다.
 
-패치하기 전에 생성 과정에서 펌웨어를 준비합니다. 임시 cloudOS 복원으로 GPU 드라이버를 얻고, vphone600 구성 요소가 없는 cloudOS에는 다시 빌드한 kernelcache가 필요합니다. [펌웨어 준비](../../../Research/Firmware/firmware_manifest_and_origins.md)를 참고하세요. 목록 하나로 여러 머신을 만들려면 [여러 머신 만들기](../storage/many-machines.md)를 참고하세요.
+패치하기 전에 생성 과정에서 펌웨어를 준비합니다. 임시 cloudOS 복원으로 GPU 드라이버를 얻고, vphone600 구성 요소가 없는 cloudOS에는 다시 빌드한 kernelcache가 필요합니다. [펌웨어 준비](../firmware/firmware-preparation.md)를 참고하세요. 목록 하나로 여러 머신을 만들려면 [여러 머신 만들기](../storage/many-machines.md)를 참고하세요.
 
 ## 시작 및 중지
 

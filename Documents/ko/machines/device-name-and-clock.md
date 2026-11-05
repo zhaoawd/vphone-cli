@@ -39,4 +39,4 @@ Mac의 시간으로 돌아가려면 같은 곳에서 **자동으로 설정**을 
 
 - [가상 머신 생성 및 실행](create-and-run.md)
 - [보관함과 백업](../storage/library-and-backups.md)
-- [네트워크](../../Guides/networking.md)
+- [네트워크](../networking/overview.md)

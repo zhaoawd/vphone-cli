@@ -62,4 +62,4 @@ vphone-cli vm snapshot delete myphone clean
 
 - [资料库、固件与备份](library-and-backups.md)
 - [在虚拟机之间共享磁盘空间](sharing-disk-space.md)
-- [故障排查](../../Guides/troubleshooting.md)
+- [故障排查](../help/troubleshooting.md)

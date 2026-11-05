@@ -36,6 +36,7 @@ id vpReadObjectIvar(id object, const char *name);
 // MARK: - FoldDisplayBackboard.m
 
 void vpInstallInnerRenderDisplay(void);
+void vpTagRenderDisplay(id display, NSString *tagName);
 
 // MARK: - FoldDisplayInnerPages.m
 
@@ -44,6 +45,9 @@ void vpShareInnerDisplayPages(id display);
 // MARK: - FoldDisplayAdapter.m
 
 BOOL vpIsInnerDisplay(id display);
+BOOL vpIsInnerDisplayIdentity(id identity);
+void vpInstallExternalDisplay(BOOL serverProcess);
+void vpPrepareExternalRenderDisplays(id server);
 BOOL vpSceneIsOnInnerDisplay(id scene);
 /// The SpringBoard window scene (not an aperture subclass) on the inner
 /// display, or on Main.

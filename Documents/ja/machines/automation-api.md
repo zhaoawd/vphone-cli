@@ -74,5 +74,5 @@ Swift のアプリでは、`VPhoneAPIKit` パッケージの `VPhoneAPIClient` �
 
 - [API の完全なリファレンス](../../../Research/vphoned_http_api.md)
 - [仮想マシンの作成と実行](create-and-run.md)
-- [ポート転送](../../Guides/networking.md#port-forwarding)
-- [Launchpad コマンドライン](../../Guides/launchpad-cli.md)
+- [ポート転送](../networking/port-forwarding.md)
+- [Launchpad コマンドライン](../launchpad/launchpad-cli.md)

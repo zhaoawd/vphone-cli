@@ -74,5 +74,5 @@ The VM's control socket accepts the same methods without the API listener: send 
 
 - [Full API reference](../../../Research/vphoned_http_api.md)
 - [Create and Run a VM](create-and-run.md)
-- [Port Forwarding](../../Guides/networking.md#port-forwarding)
-- [Launchpad Command Line](../../Guides/launchpad-cli.md)
+- [Port Forwarding](../networking/port-forwarding.md)
+- [Launchpad Command Line](../launchpad/launchpad-cli.md)

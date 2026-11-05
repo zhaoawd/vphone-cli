@@ -14,7 +14,7 @@ vphone-cli vm export myphone --out myphone.tzst
 
 ## 创建虚拟机
 
-你需要一个 iPhone17,3 恢复 IPSW 和一个兼容的 PCC/cloudOS IPSW，可以是本地路径或 URL。[兼容性](../../Guides/compatibility.md)列出了目前已验证的组合。
+你需要一个 iPhone17,3 恢复 IPSW 和一个兼容的 PCC/cloudOS IPSW，可以是本地路径或 URL。[兼容性](../firmware/compatibility.md)列出了目前已验证的组合。
 
 ```sh
 vphone-cli host preflight
@@ -45,6 +45,7 @@ vphone-cli vm create myphone \
 | `--unlock-at-startup` | `on` 或 `off`（默认）。 |
 | `--no-template` | 单独构建虚拟机，不从模板克隆。 |
 | `--skip-first-boot` | 跳过最后的启动，适用于由调用方自行启动虚拟机的情况。 |
+| `--bootstrap roothide` | 在首次启动时安装软件包环境。见[软件包环境](package-environment.md)。 |
 | `--keep-artifacts` | 与 `--no-template` 一起使用时保留已准备的恢复树。需要节省磁盘空间时省略此选项。 |
 
 `--cpu`、`--memory`、`--network` 和 `--unlock-at-startup` 会为新虚拟机设置与 `vm config` 相同的配置项。
@@ -57,7 +58,7 @@ vphone-cli vm create myphone \
 
 固件流程只有一种模式。它为启动链和客户机系统打补丁，安装 vphoned，用户环境保持为空：不会安装 Sileo、apt、TrollStore、SSH 服务器或 VNC 服务器。补丁预设决定应用哪些补丁；`vphone-cli fw set-patches` 配合 `--block` 或 `--allow` 可以单独关闭或开启某个补丁。
 
-打补丁之前，创建流程会先准备固件：一次临时的 cloudOS 恢复用于提供 GPU 驱动，不含 vphone600 组件的 cloudOS 需要重新构建 kernelcache。见[固件准备](../../../Research/Firmware/firmware_manifest_and_origins.md)。要从一份列表创建多台虚拟机，请参阅[批量创建虚拟机](../storage/many-machines.md)。
+打补丁之前，创建流程会先准备固件：一次临时的 cloudOS 恢复用于提供 GPU 驱动，不含 vphone600 组件的 cloudOS 需要重新构建 kernelcache。见[固件准备](../firmware/firmware-preparation.md)。要从一份列表创建多台虚拟机，请参阅[批量创建虚拟机](../storage/many-machines.md)。
 
 ## 启动与停止
 

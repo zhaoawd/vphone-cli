@@ -33,6 +33,61 @@ struct FirmwarePatchSetCatalogTests {
         }
     }
 
+    @Test func `Legacy startup compatibility is opt in and scoped to iOS 16`() throws {
+        for id in [FirmwareGuestSystemPatchSet.ios16KeybaglessUI, FirmwareGuestSystemPatchSet.ios16Touchscreen, FirmwareGuestSystemPatchSet.ios16EphemeralStorage, FirmwareGuestSystemPatchSet.ios16Framebuffer, FirmwareGuestSystemPatchSet.ios16Surface, FirmwareGuestSystemPatchSet.ios16MachPorts, FirmwareGuestSystemPatchSet.ios16PortsLookup, FirmwareGuestSystemPatchSet.ios16Desktop, FirmwareGuestSystemPatchSet.ios16Keybag, FirmwareGuestSystemPatchSet.ios16Migration] {
+            for version in ["16.6.1", "17.7", "18.6.2", "26.1", "27.1"] {
+                for selected in [false, true] {
+                    var preset = FirmwarePatchSetCatalog.standardPreset
+                    if selected { preset.selection = preset.selection.allowing([id]) }
+                    let plan = try VPhonePatchPlan.resolve(
+                        preset: preset, patchSets: FirmwarePatchSetCatalog.bundled,
+                        iOSBase: VPhoneVersion(version), cloudOS: VPhoneVersion("26.1")
+                    )
+                    #expect(plan.isEnabled(id) == (selected && version == "16.6.1"))
+                }
+            }
+        }
+    }
+
+    @Test func `iOS 17 desktop workaround is opt in and unavailable on other bases`() throws {
+        let id = FirmwareGuestSystemPatchSet.ios17Desktop
+        for version in ["16.6.1", "17.7", "18.6.2", "26.1", "27.1"] {
+            for enabled in [false, true] {
+                var preset = FirmwarePatchSetCatalog.standardPreset
+                if enabled { preset.selection = preset.selection.allowing([id]) }
+                let plan = try VPhonePatchPlan.resolve(
+                    preset: preset, patchSets: FirmwarePatchSetCatalog.bundled,
+                    iOSBase: VPhoneVersion(version), cloudOS: VPhoneVersion("26.1")
+                )
+                #expect(plan.isEnabled(id) == (enabled && version == "17.7"))
+            }
+        }
+    }
+
+    @Test func `Local iOS 16 experiment selects older userland boot compatibility without the iOS 17 hook`() throws {
+        let plan = try VPhonePatchPlan.resolve(
+            preset: FirmwarePatchSetCatalog.standardPreset,
+            patchSets: FirmwarePatchSetCatalog.bundled,
+            iOSBase: VPhoneVersion("16.6.1"), cloudOS: VPhoneVersion("26.1")
+        )
+        #expect(plan.isEnabled("dyld-boot-iomfb_swapend"))
+        #expect(plan.isEnabled("kernel-boot-thread_guard_violation"))
+        #expect(plan.isEnabled(FirmwarePatchSetCatalog.paravirtUserClientsPatch))
+        #expect(!plan.isEnabled(FirmwareGuestSystemPatchSet.ios17Desktop))
+    }
+
+    @Test func `Experimental iOS 17 selects the older userland boot compatibility patches`() throws {
+        let plan = try VPhonePatchPlan.resolve(
+            preset: FirmwarePatchSetCatalog.standardPreset,
+            patchSets: FirmwarePatchSetCatalog.bundled,
+            iOSBase: VPhoneVersion("17.7"), cloudOS: VPhoneVersion("26.1"),
+        )
+        #expect(plan.isEnabled("dyld-boot-iomfb_swapend"))
+        #expect(plan.isEnabled("kernel-boot-thread_guard_violation"))
+        #expect(plan.isEnabled(FirmwarePatchSetCatalog.paravirtUserClientsPatch))
+        #expect(!plan.isEnabled("dyld-boot-iomfb_force_kern"))
+    }
+
     @Test(arguments: [FirmwareGuestSystemPatchSet.arm64eX1CIBarcode, FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles])
     func `Standalone X1 lowering is scoped to the measured base and can be disabled`(identifier: String) throws {
         for base in ["26.4", "27.0.1", "27.1", "27.1.1", "27.2", "28.0"] {
@@ -171,17 +226,22 @@ struct FirmwarePatchSetCatalogTests {
                     // Nothing a shipped iOS preset does should drop a boot-essential
                     // patch: these are the combinations we claim boot. The tvOS
                     // presets drop exactly the iOS ones an Apple TV has no port of.
-                    let tvPresets = [VPhonePatchPreset.tvOSIdentifier, VPhonePatchPreset.tvOS4KIdentifier, VPhonePatchPreset.homePodMiniIdentifier]
-                    // `minimal` drops every boot chain patch but iBEC's and LLB's:
-                    // its system is customised before the restore instead.
+                    let tvPresets = [VPhonePatchPreset.homeViewIdentifier, VPhonePatchPreset.tvOSIdentifier, VPhonePatchPreset.tvOS4KIdentifier, VPhonePatchPreset.homePodMiniIdentifier]
+                    // `minimal` and `watchos` drop every boot chain patch but
+                    // iBEC's and LLB's, and every kernel patch of the two sets
+                    // they name only so a machine can turn some on: their system
+                    // is customised before the restore instead, onto a stock
+                    // kernel.
                     let restoreImagePresets = [VPhonePatchPreset.minimalIdentifier, VPhonePatchPreset.watchOSIdentifier]
+                    let droppable = Set(
+                        [FirmwareBootChainPatchSet.manifest, FirmwareKernelBasePatchSet.manifest, FirmwareKernelCustomFirmwarePatchSet.manifest]
+                            .flatMap { $0.patches.map(\.identifier) },
+                    )
                     let expected = if tvPresets.contains(preset.identifier) {
                         Set(plan.droppedBootEssentials).isSubset(of: FirmwarePatchSetCatalog.tvOSBlockedPatches)
                     } else if restoreImagePresets.contains(preset.identifier) {
-                        Set(plan.droppedBootEssentials).isDisjoint(with: FirmwarePatchSetCatalog.minimalBootChainPatches)
-                            && plan.droppedBootEssentials.allSatisfy {
-                                FirmwareBootChainPatchSet.manifest.patches.map(\.identifier).contains($0)
-                            }
+                        Set(plan.droppedBootEssentials).isSubset(of: droppable)
+                            && Set(plan.droppedBootEssentials).isDisjoint(with: FirmwarePatchSetCatalog.minimalBootChainPatches)
                     } else {
                         plan.droppedBootEssentials.isEmpty
                     }
@@ -221,10 +281,21 @@ struct FirmwarePatchSetCatalogTests {
             iOSBase: VPhoneVersion("26.4"),
             cloudOS: VPhoneVersion("26.4"),
         )
-        let restoreImage = Set(FirmwareRestoreImagePatchSet.manifest.patches.map(\.identifier))
-        let bootChain = FirmwarePatchSetCatalog.minimalBootChainPatches
+        // The opt-in patches, like the debugserver re-sign, stay off.
+        let restoreImage = FirmwareRestoreImagePatchSet.presetPatches
+        #expect(!restoreImage.contains(FirmwareRestoreImagePatchSet.debugserver))
         let researchBoard = Set(FirmwareResearchBoardPatchSet.manifest.patches.map(\.identifier))
-        #expect(plan.enabled == restoreImage.union(FirmwarePatchSetCatalog.minimalDeviceTreePatches).union(bootChain).union(researchBoard))
+        // The unsecure-cache gate stays out: the launchd.plist minimal edits is
+        // signed and in the trust cache, so the stock launchd_cache_loader takes it.
+        #expect(!plan.isEnabled(FirmwareRestoreImagePatchSet.launchdCacheLoader))
+        let bootChain = FirmwarePatchSetCatalog.minimalBootChainPatches
+        let allBootChain = Set(FirmwareBootChainPatchSet.manifest.patches.map(\.identifier))
+        #expect(bootChain.isSubset(of: allBootChain))
+        #expect(plan.enabled == restoreImage.subtracting([FirmwareRestoreImagePatchSet.launchdCacheLoader])
+            .union(FirmwarePatchSetCatalog.minimalDeviceTreePatches).union(bootChain).union(researchBoard))
+        // A stock LLB does not reach the kernel on an OpenAVB machine: iBEC and
+        // LLB stay patched, AVPBooter and iBSS stay stock.
+        #expect(plan.enabled.intersection(allBootChain) == bootChain)
         #expect(plan.droppedBootEssentials.allSatisfy { !$0.hasPrefix("ibec-") && !$0.hasPrefix("llb-") })
 
         let watch = try VPhonePatchPlan.resolve(
@@ -233,8 +304,113 @@ struct FirmwarePatchSetCatalogTests {
             iOSBase: VPhoneVersion("26.4"),
             cloudOS: VPhoneVersion("26.4"),
         )
-        #expect(watch.enabled == restoreImage
+        #expect(!watch.isEnabled(FirmwareRestoreImagePatchSet.launchdCacheLoader))
+        #expect(watch.enabled == restoreImage.subtracting([FirmwareRestoreImagePatchSet.launchdCacheLoader])
             .union(FirmwarePatchSetCatalog.watchOSDeviceTreePatches).union(bootChain).union(researchBoard))
+        #expect(watch.enabled.intersection(allBootChain) == bootChain)
+    }
+
+    @Test
+    func `The presets naming the restore image set include the audio payload`() throws {
+        func enabled(_ preset: VPhonePatchPreset) throws -> Set<String> {
+            try VPhonePatchPlan.resolve(
+                preset: preset,
+                patchSets: FirmwarePatchSetCatalog.bundled,
+                iOSBase: VPhoneVersion("26.4"),
+                cloudOS: VPhoneVersion("26.4"),
+            ).enabled
+        }
+
+        let namesRestoreImage: Set<String> = [
+            VPhonePatchPreset.minimalIdentifier,
+            VPhonePatchPreset.watchOSIdentifier,
+        ]
+
+        for preset in FirmwarePatchSetCatalog.builtInPresets {
+            let resolved = try enabled(preset)
+            #expect(
+                resolved.contains(FirmwareRestoreImagePatchSet.watchAudio)
+                    == namesRestoreImage.contains(preset.identifier),
+                "\(preset.identifier)",
+            )
+        }
+    }
+
+    @Test
+    func `The watch audio payload stays selected across supported bases`() throws {
+        for base in ["26.4", "26.5", "27.0"] {
+            let plan = try VPhonePatchPlan.resolve(
+                preset: FirmwarePatchSetCatalog.watchOSPreset,
+                patchSets: FirmwarePatchSetCatalog.bundled,
+                iOSBase: VPhoneVersion(base), cloudOS: VPhoneVersion("26.4"),
+            )
+            #expect(plan.enabled.contains(FirmwareRestoreImagePatchSet.watchAudio))
+        }
+    }
+
+    @Test
+    func `Userspace debugging resolves on every preset but Apple TV, taking the debugserver its sets deliver`() throws {
+        let feature = FirmwarePatchSetCatalog.userspaceDebugging
+        let declared = Set(FirmwarePatchSetCatalog.allDeclarations.map(\.identifier))
+        #expect(feature.allPatches.isSubset(of: declared))
+        let restoreImage = [VPhonePatchPreset.minimalIdentifier, VPhonePatchPreset.watchOSIdentifier]
+        // cfw install refuses the debugserver and launchd patches on an Apple TV
+        // and on HomeView.
+        let appleTV = [VPhonePatchPreset.tvOSIdentifier, VPhonePatchPreset.tvOS4KIdentifier, VPhonePatchPreset.homeViewIdentifier]
+        for preset in FirmwarePatchSetCatalog.builtInPresets {
+            if appleTV.contains(preset.identifier) {
+                #expect(feature.patches(in: preset) == nil, "\(preset.identifier)")
+                continue
+            }
+            let patches = try #require(feature.patches(in: preset), "\(preset.identifier)")
+            let debugserver = restoreImage.contains(preset.identifier)
+                ? FirmwareRestoreImagePatchSet.debugserver : "system-debugserver-cfw-install"
+            #expect(patches.contains(debugserver), "\(preset.identifier)")
+            #expect(patches.count == feature.parts.count, "\(preset.identifier)")
+            // Allowing them resolves.
+            _ = try VPhonePatchPlan.resolve(
+                preset: preset,
+                patchSets: FirmwarePatchSetCatalog.bundled,
+                iOSBase: VPhoneVersion("26.4"),
+                cloudOS: VPhoneVersion("26.4"),
+                allowed: patches,
+            )
+        }
+
+        for preset in [FirmwarePatchSetCatalog.minimalPreset, FirmwarePatchSetCatalog.watchOSPreset] {
+            let patches = try #require(feature.patches(in: preset))
+            for base in ["18.6.2", "26.4"] {
+                let plain = try VPhonePatchPlan.resolve(
+                    preset: preset,
+                    patchSets: FirmwarePatchSetCatalog.bundled,
+                    iOSBase: VPhoneVersion(base),
+                    cloudOS: VPhoneVersion("26.4"),
+                )
+                let debugging = try VPhonePatchPlan.resolve(
+                    preset: preset,
+                    patchSets: FirmwarePatchSetCatalog.bundled,
+                    iOSBase: VPhoneVersion(base),
+                    cloudOS: VPhoneVersion("26.4"),
+                    allowed: patches,
+                )
+                // The plain preset keeps a stock kernel; the feature adds only its own.
+                let kernelSets = [FirmwareKernelBasePatchSet.manifest, FirmwareKernelCustomFirmwarePatchSet.manifest]
+                    .flatMap { $0.patches.map(\.identifier) }
+                #expect(plain.enabled.isDisjoint(with: kernelSets), "\(preset.identifier) \(base)")
+                #expect(debugging.enabled.subtracting(plain.enabled).isSubset(of: patches), "\(preset.identifier) \(base)")
+                #expect(debugging.enabled.union(debugging.skippedByVersion).isSuperset(of: patches), "\(preset.identifier) \(base)")
+            }
+        }
+    }
+
+    @Test
+    func `Standard turns userspace debugging on whole, so no box is offered there`() throws {
+        let preset = FirmwarePatchSetCatalog.standardPreset
+        let named = Set(preset.patchSets.map(\.identifier))
+        let standard = Set(FirmwarePatchSetCatalog.bundled.filter { named.contains($0.identifier) }
+            .flatMap(\.patches).map(\.identifier).filter { preset.selection.includes($0) })
+        let patches = try #require(FirmwarePatchSetCatalog.userspaceDebugging.patches(in: preset))
+        #expect(patches.isSubset(of: standard), "\(patches.subtracting(standard).sorted())")
     }
 
     @Test
@@ -271,6 +447,10 @@ struct FirmwarePatchSetCatalogTests {
             )
             let applicableManual = Set(FirmwarePatchSetCatalog.allDeclarations.filter {
                 FirmwarePatchSetCatalog.manualOnlyPatches.contains($0.identifier)
+                    && $0.identifier != FirmwareGuestSystemPatchSet.homeViewProfileLookup
+                    && $0.identifier != FirmwareGuestSystemPatchSet.homeViewDisplayLookups
+                    && $0.identifier != FirmwareGuestSystemPatchSet.homeViewSetupBypass
+                    && $0.identifier != FirmwareGuestSystemPatchSet.homeViewEnvironmentService
                     && $0.identifier != FirmwareGuestSystemPatchSet.homePodTopCap
                     && $0.identifier != FirmwareGuestSystemPatchSet.homePodSetupBypass
                     && $0.identifier != FirmwareGuestSystemPatchSet.homePodWelcome
@@ -409,6 +589,78 @@ struct FirmwarePatchSetCatalogTests {
         }
     }
 
+    @Test(arguments: [FirmwareGuestSystemPatchSet.glesUpperLeft, FirmwareGuestSystemPatchSet.metalVertexIDFormat,
+                     FirmwareGuestSystemPatchSet.glesPrimitiveRestart, FirmwareGuestSystemPatchSet.glesPointDraw,
+                     FirmwareGuestSystemPatchSet.paravirtGPUCompilerCache, FirmwareGuestSystemPatchSet.metalCacheReuseKey])
+    func `Native GLES corrections follow the measured OS pair and can be reverted`(patch: String) throws {
+        for base in ["26.4", "26.5", "26.6", "26.6.2", "26.7", "27.0.1", "unknown"] {
+            for cloud in ["26.1", "26.4", "26.5", "unknown"] {
+                let plan = try VPhonePatchPlan.resolve(
+                    preset: FirmwarePatchSetCatalog.standardPreset,
+                    patchSets: FirmwarePatchSetCatalog.bundled,
+                    iOSBase: VPhoneVersion(base), cloudOS: VPhoneVersion(cloud),
+                )
+                let supported = (base == "26.6" || base == "26.6.2") && cloud == "26.4"
+                #expect(plan.isEnabled(patch) == supported, "\(base)/\(cloud)")
+                let updated = FirmwareGuestPatchResolution.effectiveEnabled(
+                    planEnabled: [], selectionEnabled: plan.enabled,
+                )
+                #expect(updated.contains(patch) == supported, "A guest update must include new patches absent from the boot plan")
+            }
+        }
+        let blocked = try VPhonePatchPlan.resolve(
+            preset: FirmwarePatchSetCatalog.standardPreset,
+            patchSets: FirmwarePatchSetCatalog.bundled,
+            iOSBase: VPhoneVersion("26.6.2"), cloudOS: VPhoneVersion("26.4"),
+            blocked: [patch],
+        )
+        #expect(!blocked.isEnabled(patch))
+        #expect(FirmwareGuestPatchResolution.guestPatchesOff(selectionEnabled: blocked.enabled).contains(patch))
+        #expect(!FirmwareGuestPatchResolution.effectiveEnabled(
+            planEnabled: [patch], selectionEnabled: blocked.enabled,
+        ).contains(patch))
+        let unsupported = try VPhonePatchPlan.resolve(
+            preset: FirmwarePatchSetCatalog.standardPreset,
+            patchSets: FirmwarePatchSetCatalog.bundled,
+            iOSBase: VPhoneVersion("27.0.1"), cloudOS: VPhoneVersion("26.4"),
+            allowed: [patch],
+        )
+        #expect(!unsupported.isEnabled(patch), "An explicit selection must not widen the version gate")
+        // Test the preset exclusions on the applicable pair so the version
+        // gate cannot hide an accidentally missing block-list entry.
+        for preset in [FirmwarePatchSetCatalog.tvOSPreset, FirmwarePatchSetCatalog.tvOS4KPreset,
+                       FirmwarePatchSetCatalog.homePodMiniPreset, FirmwarePatchSetCatalog.homeViewPreset] {
+            let plan = try VPhonePatchPlan.resolve(
+                preset: preset, patchSets: FirmwarePatchSetCatalog.bundled,
+                iOSBase: VPhoneVersion("26.6.2"), cloudOS: VPhoneVersion("26.4"),
+            )
+            #expect(!plan.isEnabled(patch), "\(preset.identifier)")
+        }
+    }
+
+    @Test
+    func `Standard names the GLES renderer on every base while tvOS stays off`() throws {
+        let patch = FirmwarePatchSetCatalog.paravirtGLESPatch
+        #expect(!FirmwarePatchSetCatalog.manualOnlyPatches.contains(patch))
+        for base in ["18.6.2", "26.4", "26.6.2", "27.0.1"] {
+            for cloud in ["26.1", "26.4"] {
+                let plan = try VPhonePatchPlan.resolve(
+                    preset: FirmwarePatchSetCatalog.standardPreset,
+                    patchSets: FirmwarePatchSetCatalog.bundled,
+                    iOSBase: VPhoneVersion(base), cloudOS: VPhoneVersion(cloud),
+                )
+                #expect(plan.isEnabled(patch), "\(patch) on \(base)/\(cloud)")
+            }
+        }
+        for preset in [FirmwarePatchSetCatalog.tvOSPreset, FirmwarePatchSetCatalog.tvOS4KPreset, FirmwarePatchSetCatalog.homePodMiniPreset] {
+            let plan = try VPhonePatchPlan.resolve(
+                preset: preset, patchSets: FirmwarePatchSetCatalog.bundled,
+                iOSBase: VPhoneVersion("27.0"), cloudOS: VPhoneVersion("26.4"),
+            )
+            #expect(!plan.isEnabled(patch))
+        }
+    }
+
     @Test
     func `A renamed patch maps to one the catalogue declares`() {
         let declared = Set(FirmwarePatchSetCatalog.allDeclarations.map(\.identifier))
@@ -430,7 +682,7 @@ struct FirmwarePatchSetCatalogTests {
     }
 
     @Test
-    func `The Frida relaxations need cloudOS 26.4`() throws {
+    func `Frida gates retain the measured cloudOS 26.1 syscall filter exception`() throws {
         for cloud in ["26.1", "26.4"] {
             let plan = try VPhonePatchPlan.resolve(
                 preset: FirmwarePatchSetCatalog.experimentalPreset,
@@ -442,6 +694,12 @@ struct FirmwarePatchSetCatalogTests {
                 plan.isEnabled($0.identifier)
             }
             #expect(on == (cloud == "26.4"))
+            #expect(plan.isEnabled("kernel-exp-frida_syscall_filter_off"))
+            let standard = try VPhonePatchPlan.resolve(
+                preset: FirmwarePatchSetCatalog.standardPreset, patchSets: FirmwarePatchSetCatalog.bundled,
+                iOSBase: VPhoneVersion("16.6.1"), cloudOS: VPhoneVersion(cloud)
+            )
+            #expect(!standard.isEnabled("kernel-exp-frida_syscall_filter_off"))
         }
     }
 

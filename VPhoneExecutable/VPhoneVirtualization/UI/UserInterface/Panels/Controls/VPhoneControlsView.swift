@@ -7,6 +7,9 @@ struct VPhoneControlsView: View {
         VStack(spacing: 0) {
             Form {
                 displaySection
+                if model.control.isHomeViewGuest {
+                    VPhoneHomeViewDistanceSection(control: model.control)
+                }
                 audioSection
                 if model.control.isHomePodGuest {
                     VPhoneHomePodDebugSection(control: model.control)
@@ -187,7 +190,9 @@ struct VPhoneControlsView: View {
                 Spacer(minLength: 8)
                 Button("Paste") { Task { await model.pasteText() } }
                     .help("Insert the whole text at once")
-                Button("Type") { Task { await model.typeText() } }
+                Button(String(localized: "keyboard.type", defaultValue: "Type", bundle: VPhoneLocalization.bundle)) {
+                    Task { await model.typeText() }
+                }
                     .help("Type the text one character at a time (⌘↩)")
             }
             .disabled(!model.canSendText)

@@ -149,8 +149,8 @@ struct VPhoneCustomFirmwarePatchSeputilCommand: ParsableCommand {
         to "AA" makes the path /mnt7/AA.gl on every guest, which is what lets
         the install ship one pre-made .gl file instead of one per device.
 
-        The literal is found in __TEXT,__cstring and confirmed by an adrp+add
-        pair in __TEXT,__text that computes its address — the Python takes the
+        The literal is found in __TEXT,__cstring and confirmed by an adr or adrp+add
+        reference in __TEXT,__text that computes its address — the Python takes the
         first substring hit anywhere in the file. Both land on the same byte in
         this firmware; this one cannot land on a coincidence in the next.
 
@@ -652,6 +652,68 @@ struct VPhoneCustomFirmwarePatchParavirtGPUIndexOffsetCommand: ParsableCommand {
     }
 }
 
+// MARK: - patch-paravirt-gpu-primitive-restart
+
+struct VPhoneCustomFirmwarePatchParavirtGPUPrimitiveRestartCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "patch-paravirt-gpu-primitive-restart",
+        abstract: "Stop the paravirtual GPU driver sending the primitive restart override",
+        discussion: """
+        OpenGL ES calls setPrimitiveRestartEnabled:index: with the restart
+        index itself, 0xffffffff. The cloudOS 26.4 driver sends it as command
+        0x91, and the host checks the index against maxViewportCount, throws,
+        and fails the command buffer. The serialiser method's pacibsp becomes
+        ret, so the command is never sent and Metal's own restart behaviour
+        applies.
+
+        The method is found from the command's mov w2/mov w3 setup, which is
+        unique in __text. Idempotent: a method that already returns at entry is
+        reported and the file is not rewritten.
+        """,
+    )
+
+    @Argument(help: "Path to the AppleParavirtGPUMetalIOGPUFamily Mach-O, patched in place", transform: URL.init(fileURLWithPath:))
+    var binary: URL
+
+    func run() throws {
+        try requireUntruncatedMachO(at: binary)
+        // No re-attestation: the caller re-signs.
+        try CustomFirmwareParavirtGPUPrimitiveRestart.patch(fileAt: binary, log: machOVerbLog)
+    }
+}
+
+// MARK: - patch-paravirt-gpu-compiler-cache
+
+struct VPhoneCustomFirmwarePatchParavirtGPUCompilerCacheCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "patch-paravirt-gpu-compiler-cache",
+        abstract: "Version the paravirtual GPU shader cache with its compiler plugin",
+        discussion: """
+        The cloudOS 26.4 driver hashes a fixed compiler identity into its shader-cache
+        namespace. Replace its two eight-byte identity inputs with a SHA-256-derived
+        identity of the compiler plugin that will be loaded in the guest. A plugin
+        update then recompiles shaders without deleting existing caches.
+
+        The setupCompiler SHA256_Update call flow locates both inputs. Instructions
+        are unchanged. Reapplying the same plugin identity leaves the file unchanged.
+        The caller must re-sign the driver after patching.
+        """,
+    )
+
+    @Argument(help: "Path to the AppleParavirtGPUMetalIOGPUFamily Mach-O, patched in place", transform: URL.init(fileURLWithPath:))
+    var binary: URL
+
+    @Option(name: .customLong("compiler-plugin"), help: "Path to the compiler plugin installed alongside the driver", transform: URL.init(fileURLWithPath:))
+    var compilerPlugin: URL
+
+    func run() throws {
+        try requireUntruncatedMachO(at: binary)
+        try CustomFirmwareParavirtGPUCompilerCache.patch(
+            fileAt: binary, compilerPluginAt: compilerPlugin, log: machOVerbLog,
+        )
+    }
+}
+
 enum VPhoneCustomFirmwareMachOVerbs {
     /// Registered into `vphone-cli cfw` by `VPhoneCustomFirmwareCommand`.
     ///
@@ -673,6 +735,8 @@ enum VPhoneCustomFirmwareMachOVerbs {
             VPhoneCustomFirmwarePatchVirtualAudioVolumeGateCommand.self,
             VPhoneCustomFirmwarePatchVirtualAudioDeviceStateNullGateCommand.self,
             VPhoneCustomFirmwarePatchParavirtGPUIndexOffsetCommand.self,
+            VPhoneCustomFirmwarePatchParavirtGPUPrimitiveRestartCommand.self,
+            VPhoneCustomFirmwarePatchParavirtGPUCompilerCacheCommand.self,
         ]
     }
 }

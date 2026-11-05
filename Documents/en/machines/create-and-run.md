@@ -14,7 +14,7 @@ VMs are stored in `~/.vphone/`. Run `vphone-cli <group> --help` to see all comma
 
 ## Create a VM
 
-You need an iPhone17,3 restore IPSW and a compatible PCC/cloudOS IPSW, as local paths or URLs. [Compatibility](../../Guides/compatibility.md) lists the pairs verified so far.
+You need an iPhone17,3 restore IPSW and a compatible PCC/cloudOS IPSW, as local paths or URLs. [Compatibility](../firmware/compatibility.md) lists the pairs verified so far.
 
 ```sh
 vphone-cli host preflight
@@ -45,6 +45,7 @@ Success ends with `[+] First boot: vphoned ping succeeded.` and `CFW VM created;
 | `--unlock-at-startup` | `on` or `off` (default). |
 | `--no-template` | Build the VM on its own instead of cloning it from a template. |
 | `--skip-first-boot` | Leave out the final boot, for a caller that boots the VM itself. |
+| `--bootstrap roothide` | Install a package environment during the first boot. See [Package Environment](package-environment.md). |
 | `--keep-artifacts` | With `--no-template`, keep the prepared restore tree. Omit this option to save space. |
 
 `--cpu`, `--memory`, `--network` and `--unlock-at-startup` set the same `vm config` settings on the new VM.
@@ -57,7 +58,7 @@ By default the pipeline builds a [template](../storage/templates.md) and clones 
 
 The firmware workflow has one mode. It patches the boot chain and guest system, installs vphoned, and leaves the user environment empty: it does not install Sileo, apt, TrollStore, an SSH server or a VNC server. A patch preset selects which patches apply; `vphone-cli fw set-patches` with `--block` or `--allow` turns single patches off or on.
 
-Before patching, creation prepares the firmware: a temporary cloudOS restore supplies the GPU driver, and a cloudOS without vphone600 components needs a rebuilt kernelcache. See [Firmware Preparation](../../../Research/Firmware/firmware_manifest_and_origins.md). To create several machines from one list, see [Many Machines](../storage/many-machines.md).
+Before patching, creation prepares the firmware: a temporary cloudOS restore supplies the GPU driver, and a cloudOS without vphone600 components needs a rebuilt kernelcache. See [Firmware Preparation](../firmware/firmware-preparation.md). To create several machines from one list, see [Many Machines](../storage/many-machines.md).
 
 ## Start and stop
 

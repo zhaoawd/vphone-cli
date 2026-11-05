@@ -62,4 +62,4 @@ A snapshot keeps the disk blocks it was taken with. `vm rebase` frees nothing wh
 
 - [Library, firmware and backups](library-and-backups.md)
 - [Sharing disk space between VMs](sharing-disk-space.md)
-- [Troubleshooting](../../Guides/troubleshooting.md)
+- [Troubleshooting](../help/troubleshooting.md)

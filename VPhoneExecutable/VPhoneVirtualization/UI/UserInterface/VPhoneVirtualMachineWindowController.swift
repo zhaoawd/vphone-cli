@@ -10,6 +10,7 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
     private weak var virtualMachineView: VPhoneVirtualMachineView?
     private(set) var homePodDisplayView: VPhoneHomePodDisplayView?
     private var homePodGuest = false
+    private var usesTVOS = false
     private(set) var touchIDMonitor: VPhoneTouchIDMonitor?
     private var homeButton: NSButton?
     private var foldButton: NSButton?
@@ -47,10 +48,12 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
         name: String,
         sceneIdentifier: String,
         homePodGuest: Bool = false,
+        usesTVOS: Bool = false,
         foldableGuest: Bool = false,
     ) {
         self.control = control
         self.homePodGuest = homePodGuest
+        self.usesTVOS = usesTVOS
         self.foldableGuest = foldableGuest
         machineDirectory = URL(fileURLWithPath: sceneIdentifier)
         homeButton = nil
@@ -397,8 +400,11 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
             }
         })
         for name in [NSWindow.didResignKeyNotification, NSWindow.willCloseNotification] {
-            keyStateObservers.append(center.addObserver(forName: name, object: window, queue: .main) { _ in
-                MainActor.assumeIsolated { VPhoneHostHotKeys.shared.resume() }
+            keyStateObservers.append(center.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    self?.captureView?.setMouseCaptured(false)
+                    VPhoneHostHotKeys.shared.resume()
+                }
             })
         }
         if window.isKeyWindow, !homePodGuest, captureView?.hardwareKeyboardEnabled == true {
@@ -511,7 +517,7 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
         var parts: [String] = []
         if control.isConnected {
             if let version = control.guestIOSVersion, !version.isEmpty {
-                let osName = homePodGuest ? "HomePod" : homeButtonHoldsInGuest ? "tvOS" : "iOS"
+                let osName = homePodGuest ? "HomePod" : usesTVOS ? "tvOS" : "iOS"
                 parts.append("\(osName) \(version)")
             }
             if let address = control.guestIPAddress, !address.isEmpty {

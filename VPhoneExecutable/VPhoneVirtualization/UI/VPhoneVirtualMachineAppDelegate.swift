@@ -110,10 +110,11 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
 
         let control = VPhoneGuestControl()
         control.isHomePodGuest = options.isHomePodGuest
+        control.isHomeViewGuest = options.isHomeViewGuest
         self.control = control
         if !command.dfu {
             control.unlocksAtStartup = vm.unlocksAtStartup
-            control.syncsGuestEnvironment = !options.isTVGuest && !options.isHomePodGuest
+            control.syncsGuestEnvironment = !options.usesTVOS
             control.syncsHostLocation = vm.syncsHostLocation
             control.guestDeviceName = Self.guestDeviceName(forConfig: options.configURL)
             startNetworkServices(vm: vm, control: control)
@@ -176,6 +177,7 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
                     .resolvingSymlinksInPath()
                     .path,
                 homePodGuest: options.isHomePodGuest,
+                usesTVOS: options.usesTVOS,
                 foldableGuest: options.isFoldableGuest,
             )
             wc.captureView?.escapeIsBackGesture = !options.isPadGuest && !options.isTVGuest

@@ -39,4 +39,4 @@ vphone-cli vm rename myphone <new-name>
 
 - [创建与运行虚拟机](create-and-run.md)
 - [资料库与备份](../storage/library-and-backups.md)
-- [网络](../../Guides/networking.md)
+- [网络](../networking/overview.md)

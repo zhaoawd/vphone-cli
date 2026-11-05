@@ -81,7 +81,7 @@ New Machine は短いページで開きます：名前、ファームウェア�
 
 これらの組み合わせでは、ミックスの準備に `ipsw` ツールを使う古い互換の Core Bundle（2.12.0）のために、Launchpad は引き続き `ipsw` ツールの欄を表示します。Core Bundle 2.12.1 以降はネイティブで展開し、選択したパスは無視します。
 
-iPhone XS Max は iOS 18.1〜18.7.2 を、それぞれのリリース自身の cloudOS 上で、テンプレートなしで、既定では Minimal プリセットで実行します。これらの組み合わせでは常に kernelcache を作り直すため、**Firmware** で macOS ビルダーも尋ねられます。
+iPhone XS Max は iOS 18.1〜18.7.2 を、それぞれのリリース自身の cloudOS 上で、テンプレートなしで、既定では Minimal プリセットで実行します。Standard も動作します（18.6 で確認）。これらの組み合わせでは常に kernelcache を作り直すため、**Firmware** で macOS ビルダーも尋ねられます。
 
 - macOS 15 または 26.0〜26.3 を実行し、リモートログインがオンになっている Mac または macOS 仮想マシンの `user@host`
 - ssh と sudo 用のパスワード。ssh 鍵とパスワードなしの sudo を使う場合は空にします
@@ -114,5 +114,5 @@ New Machine の **Patch Settings** でのパッチごとの上書き設定は、
 
 - [テンプレート](templates.md)
 - [複数マシンの一括作成](many-machines.md)
-- [ファームウェアの準備](../../../Research/Firmware/firmware_manifest_and_origins.md)
-- [Launchpad CLI](../../Guides/launchpad-cli.md)
+- [ファームウェアの準備](../firmware/firmware-preparation.md)
+- [Launchpad CLI](../launchpad/launchpad-cli.md)

@@ -14,7 +14,7 @@ vphone-cli vm export myphone --out myphone.tzst
 
 ## 仮想マシンを作成する
 
-iPhone17,3 の復元用 IPSW と、互換性のある PCC/cloudOS の IPSW が必要です。ローカルのパスでも URL でも指定できます。これまでに検証された組み合わせは[互換性](../../Guides/compatibility.md)に記載されています。
+iPhone17,3 の復元用 IPSW と、互換性のある PCC/cloudOS の IPSW が必要です。ローカルのパスでも URL でも指定できます。これまでに検証された組み合わせは[互換性](../firmware/compatibility.md)に記載されています。
 
 ```sh
 vphone-cli host preflight
@@ -45,6 +45,7 @@ vphone-cli vm create myphone \
 | `--unlock-at-startup` | `on` または `off`（標準）。 |
 | `--no-template` | テンプレートから複製せず、仮想マシンを単独で作成します。 |
 | `--skip-first-boot` | 最後の起動を省きます。呼び出し側が自分で仮想マシンを起動する場合に使います。 |
+| `--bootstrap roothide` | 初回起動中にパッケージ環境をインストールします。[パッケージ環境](package-environment.md)をご覧ください。 |
 | `--keep-artifacts` | `--no-template` と併用すると、準備した復元ツリーを保持します。ディスク容量を節約するには省略します。 |
 
 `--cpu`、`--memory`、`--network`、`--unlock-at-startup` は、新しい仮想マシンに `vm config` の同じ設定を行います。
@@ -57,7 +58,7 @@ vphone-cli vm create myphone \
 
 ファームウェアの処理には 1 つのモードしかありません。ブートチェーンとゲストのシステムにパッチを適用し、vphoned をインストールし、ユーザ環境は空のままにします。Sileo、apt、TrollStore、SSH サーバ、VNC サーバはインストールしません。適用するパッチはパッチプリセットで選びます。`vphone-cli fw set-patches` に `--block` または `--allow` を付けると、個々のパッチをオフまたはオンにできます。
 
-パッチを適用する前に、作成処理はファームウェアを準備します。一時的な cloudOS の復元から GPU ドライバを取り出し、vphone600 のコンポーネントを含まない cloudOS の場合は kernelcache を作り直します。[ファームウェアの準備](../../../Research/Firmware/firmware_manifest_and_origins.md)をご覧ください。1 つのリストから複数のマシンを作成するには、[複数マシンの一括作成](../storage/many-machines.md)をご覧ください。
+パッチを適用する前に、作成処理はファームウェアを準備します。一時的な cloudOS の復元から GPU ドライバを取り出し、vphone600 のコンポーネントを含まない cloudOS の場合は kernelcache を作り直します。[ファームウェアの準備](../firmware/firmware-preparation.md)をご覧ください。1 つのリストから複数のマシンを作成するには、[複数マシンの一括作成](../storage/many-machines.md)をご覧ください。
 
 ## 起動と停止
 

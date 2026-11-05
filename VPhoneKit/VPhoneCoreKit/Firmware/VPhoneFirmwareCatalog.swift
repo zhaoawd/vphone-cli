@@ -398,6 +398,7 @@ public enum VPhoneFirmwareCatalog {
         // Initial single-display bring-up; see Research/Guest/iphone_duo_bringup.md.
         (devices: ["iPhone19,4"], releases: [
             ("27.1", "https://updates.cdn-apple.com/2026FallFCS/3f41a447-d8a6-48ae-83ae-056a64f57fd4/iPhone19,4_27.1_24A94425_Restore.ipsw"),
+            ("27.2", "https://updates.cdn-apple.com/2026FallFCS/8d0335dc-f553-4d16-b07b-28951fde8f9e/iPhone19,4_27.2_24B91020_Restore.ipsw"),
         ]),
     ]
 
@@ -562,6 +563,28 @@ public enum VPhoneFirmwareCatalog {
     /// `tvReleases` entry of its `baseVersion` for its `restoreBase`. The keys
     /// are from AppleDB or the device's Pallas response.
     public static let otaReleases: [VPhoneOTARelease] = [
+        // HomeView 27.2 (Pallas, 2026-10-30), staged over the Apple TV HD restore base.
+        .init(
+            productType: "HomeAccessory17,1",
+            version: "27.2",
+            build: "24V514",
+            url: "https://updates.cdn-apple.com/2026FallFCS/0e08432f-4524-4949-ac8d-cddd47d4940f/com_apple_MobileAsset_SoftwareUpdate/91e6292d137569817d83050e9a21c6c93c25af6ab02fbaa7eeddb9ad5439b99a.aea",
+            size: 6_509_559_808,
+            key: "C6bVk4JwejgY6PfCJTX/nbrw/CtdphOG5EmsQMYe6As=",
+            baseVersion: "26.6",
+            minimumHostMacOS: VPhoneOTARelease.lzravenMinimumMacOS,
+        ),
+        .init(
+            productType: "HomeAccessory17,2",
+            version: "27.2",
+            build: "24V514",
+            url: "https://updates.cdn-apple.com/2026FallFCS/0e08432f-4524-4949-ac8d-cddd47d4940f/com_apple_MobileAsset_SoftwareUpdate/91e6292d137569817d83050e9a21c6c93c25af6ab02fbaa7eeddb9ad5439b99a.aea",
+            size: 6_509_559_808,
+            key: "C6bVk4JwejgY6PfCJTX/nbrw/CtdphOG5EmsQMYe6As=",
+            baseVersion: "26.6",
+            minimumHostMacOS: VPhoneOTARelease.lzravenMinimumMacOS,
+        ),
+
         .init(
             productType: "AppleTV14,1",
             version: "26.6",
@@ -620,6 +643,14 @@ public enum VPhoneFirmwareCatalog {
     public static func otaRelease(source: String) -> VPhoneOTARelease? {
         let name = (source as NSString).lastPathComponent
         return otaReleases.first { $0.url == source || $0.fileName == name }
+    }
+
+    /// Shared assets can cover more than one board. Prefer the requested
+    /// model while retaining mismatch diagnostics for an unrelated source.
+    public static func otaRelease(source: String, preferring productType: String?) -> VPhoneOTARelease? {
+        let name = (source as NSString).lastPathComponent
+        let matches = otaReleases.filter { $0.url == source || $0.fileName == name }
+        return matches.first { $0.productType == productType } ?? matches.first
     }
 
     /// The URL of the base device's IPSW `release` is restored over.
@@ -696,7 +727,7 @@ public enum VPhoneFirmwareCatalog {
 
     static func recommendedCloudOS(for family: VPhoneGuestDevice.Family, version: String) -> VPhoneCloudOSOption {
         switch family {
-        case .appleTV: VPhoneCloudOSOption(name: "cloudOS 26.4", url: cloud264)
+        case .appleTV, .homeView: VPhoneCloudOSOption(name: "cloudOS 26.4", url: cloud264)
         case .homePod: researchBoardCloudOS(forVersion: version) ?? VPhoneCloudOSOption(name: "cloudOS 26.4", url: cloud264)
         case .watch: researchBoardCloudOS(forVersion: version) ?? recommendedCloudOS(forVersion: version)
         case .iPhone, .iPad: recommendedCloudOS(forVersion: version)
@@ -735,7 +766,7 @@ public enum VPhoneFirmwareCatalog {
     public static func report(hostMacOS: Int) -> VPhoneFirmwareCatalogReport {
         func entries(_ pairings: [VPhoneFirmwarePairing]) -> [VPhoneFirmwareCatalogReport.Entry] {
             pairings.map {
-                let ota = otaRelease(source: $0.iosURL)
+                let ota = otaRelease(source: $0.iosURL, preferring: $0.device)
                 let base = ota.flatMap(restoreBaseURL(for:)).map { ($0 as NSString).lastPathComponent }
                 return .init(
                     ios: .init(

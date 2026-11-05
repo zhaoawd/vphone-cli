@@ -493,8 +493,14 @@ struct VPhoneLaunchpadNewMachineView: View {
             if let kernelcacheBuilderProblem {
                 Text(kernelcacheBuilderProblem).foregroundStyle(.red)
             } else {
-                Text("With \(cloudOS): the kernelcache is rebuilt and linked \(kernelcacheBuilder.map { "on \($0.destination)" } ?? "on this Mac"), and the restore image asks for administrator access once.")
-                    .foregroundStyle(.secondary)
+                Group {
+                    if let builder = kernelcacheBuilder {
+                        Text("With \(cloudOS): the kernelcache is rebuilt and linked on \(builder.destination), and the restore image asks for administrator access once.")
+                    } else {
+                        Text("With \(cloudOS): the kernelcache is rebuilt and linked on this Mac, and the restore image asks for administrator access once.")
+                    }
+                }
+                .foregroundStyle(.secondary)
             }
         } else if rebuildsKernelcache, let cloudOS = selectedPairing?.recommendedCloudOS.name {
             Text("With \(cloudOS): the kernelcache is rebuilt with the watch's kexts, which asks for administrator access once.")
@@ -843,9 +849,10 @@ struct VPhoneLaunchpadNewMachineView: View {
         usesCustomSources ? customGuestProductType : selectedGuest?.productType
     }
 
-    /// Apple TV and HomePod are restored without iOS templates or slimming.
+    /// Apple TV, HomePod and HomeView are restored without iOS templates or slimming.
     private var requiresStandaloneRestore: Bool {
         guestProductType?.hasPrefix("AppleTV") == true || guestProductType?.hasPrefix("AudioAccessory") == true
+            || guestProductType?.hasPrefix("HomeAccessory") == true
     }
 
     private func applyGuestDefaults(previousProductType: String?) {

@@ -3,6 +3,25 @@ import Testing
 @testable import VPhoneCoreKit
 
 struct FirmwareCatalogReportTests {
+    /// Experimental bring-ups created from IPSW URLs given by hand; the catalog
+    /// offers no pairing for them, so the report leaves them out.
+    private static let offCatalog: [VPhoneGuestDevice] = [.iPhone15_4, .iPhone15_2]
+
+    @Test(arguments: ["HomeAccessory17,1", "HomeAccessory17,2"])
+    func `HomeView 27_2 uses its full Pallas OTA and the HD restore base`(type: String) throws {
+        let release = try #require(VPhoneFirmwareCatalog.otaRelease(for: type, build: "24V514"))
+        #expect(release.version == "27.2" && release.size == 6_509_559_808)
+        #expect(VPhoneFirmwareCatalog.otaRelease(source: release.url, preferring: type) == release)
+        #expect(release.key == "C6bVk4JwejgY6PfCJTX/nbrw/CtdphOG5EmsQMYe6As=")
+        let pairings = VPhoneFirmwareCatalog.pairings(for: type, hostMacOS: 27)
+        #expect(pairings.count == 1 && pairings[0].iosURL == release.url)
+        #expect(pairings[0].cloudosURL == VPhoneFirmwareCatalog.cloud264)
+        #expect(VPhoneFirmwareCatalog.restoreBaseURL(for: release)?.hasSuffix("AppleTV5,3_26.6_23L773_Restore.ipsw") == true)
+        #expect(VPhoneFirmwareCatalog.pairings(for: type, hostMacOS: 26).isEmpty)
+        let report = try #require(VPhoneFirmwareCatalog.report(hostMacOS: 27).devices.first { $0.productType == type })
+        #expect(report.family == "homeView" && report.pairings[0].ios.build == "24V514")
+    }
+
     @Test func `maps every pairing`() {
         let report = VPhoneFirmwareCatalog.report
         #expect(report.device == VPhoneFirmwareCatalog.device)
@@ -50,8 +69,9 @@ struct FirmwareCatalogReportTests {
 
     @Test func `lists every curated guest`() {
         let report = VPhoneFirmwareCatalog.report(hostMacOS: 27)
-        #expect(report.devices.map(\.productType) == VPhoneGuestDevice.known.map(\.productType))
+        #expect(report.devices.map(\.productType) == VPhoneGuestDevice.known.filter { !Self.offCatalog.contains($0) }.map(\.productType))
         #expect(report.devices.first?.pairings == report.pairings)
+        #expect(Self.offCatalog.allSatisfy { VPhoneFirmwareCatalog.pairings(for: $0.productType, hostMacOS: 27).isEmpty })
         for device in report.devices.dropFirst() {
             #expect(device.family == VPhoneGuestDevice.named(device.productType)?.family.rawValue)
             #expect(!device.pairings.isEmpty)
@@ -183,7 +203,7 @@ struct FirmwareCatalogReportTests {
     @Test func `a Mac before macOS 27 is offered no OTA it cannot unpack`() throws {
         // tvOS 27.0 and HomePod Software 27.2 compress their chunks with LZRAVEN.
         let lzraven = VPhoneFirmwareCatalog.otaReleases.filter { $0.minimumHostMacOS == 27 }
-        #expect(Set(lzraven.map(\.build)) == ["24J361", "24K120"])
+        #expect(Set(lzraven.map(\.build)) == ["24J361", "24K120", "24V514"])
         // Every 27-series OTA is LZRAVEN so far: a new one must say so, or an
         // older Mac would be offered it and fail only after its downloads.
         for release in VPhoneFirmwareCatalog.otaReleases where Int(release.version.split(separator: ".")[0]) ?? 0 >= 27 {
@@ -221,7 +241,7 @@ struct FirmwareCatalogReportTests {
     }
 
     @Test func `other i phones have pairings of their own`() {
-        for guest in VPhoneGuestDevice.known where guest.family == .iPhone && guest.presentsBoard && guest != .iPhone17_3 {
+        for guest in VPhoneGuestDevice.known where guest.family == .iPhone && guest.presentsBoard && guest != .iPhone17_3 && !Self.offCatalog.contains(guest) {
             let pairings = VPhoneFirmwareCatalog.pairings(for: guest.productType)
             let firstRelease = switch guest.productType {
             case "iPhone18,5": "iOS 26.3.1"
@@ -230,7 +250,7 @@ struct FirmwareCatalogReportTests {
             default: "iOS 26.0"
             }
             #expect(pairings.map(\.iosName).first == firstRelease)
-            #expect(pairings.map(\.iosName).last == (guest.productType == "iPhone19,4" ? "iOS 27.1" : "iOS 27.0.1"))
+            #expect(pairings.map(\.iosName).last == (guest.productType == "iPhone19,4" ? "iOS 27.2" : "iOS 27.0.1"))
             for p in pairings {
                 #expect(p.device == guest.productType)
                 #expect(p.iosURL.hasPrefix("https://updates.cdn-apple.com/"))

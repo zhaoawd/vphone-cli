@@ -62,4 +62,4 @@ vphone-cli vm snapshot delete myphone clean
 
 - [ライブラリ、ファームウェア、バックアップ](library-and-backups.md)
 - [仮想マシン間でのディスク容量の共有](sharing-disk-space.md)
-- [トラブルシューティング](../../Guides/troubleshooting.md)
+- [トラブルシューティング](../help/troubleshooting.md)

@@ -496,13 +496,14 @@ request carries `"force": true`.
 
 | Area | Methods |
 | --- | --- |
-| Device | `device.snapshot`, `device.info` (snapshot plus network, screen, rotation, brightness, volume, low power, Developer Mode, agent, `device_name` `{name, own_name}`: the pinned name and the guest's own ComputerName), `device.screen`, `device.network`, `device.displays` (a flat IOService probe of every display-ish object with its small properties — what the display stack bound; built for the foldable display work: `AppleParavirtGPU` `DisplayPortCount`, and each `AppleParavirtDisplay` width/height/`primary`), `device.ioreg {plane}`, `device.environment`, `device.basebin {archive?}` |
+| Device | `device.snapshot`, `device.info` (snapshot plus network, screen, rotation, brightness, volume, low power, Developer Mode (the last answer amfid gave, refreshed in the background every 30 s; `{}` until it answers, and always on the tvOS 26.6 and HomePod 27.0 guests checked, whose amfid does not; `developer_mode.status` asks amfid directly and waits up to 10 s), agent, `device_name` `{name, own_name}`: the pinned name and the guest's own ComputerName), `device.screen`, `device.network`, `device.displays` (a flat IOService probe of every display-ish object with its small properties — what the display stack bound; built for the foldable display work: `AppleParavirtGPU` `DisplayPortCount`, and each `AppleParavirtDisplay` width/height/`primary`), `device.ioreg {plane}`, `device.environment`, `device.basebin {archive?}` |
 | Display, audio | `display.pose` (read-only SpringBoard pose snapshot: orientation, device_orientation, hinge, tabletop; reports unavailable for an unsupported ABI), `display.modes` (read-only CoreAnimation display bounds, native size, current/available modes, and virtual-mode selector availability; availability does not prove a mode change is supported), `display.brightness {value?}`, `display.rotation {orientation?}`, `display.posture {hinge, orientation?, tabletop?}` (a foldable guest's pose through SpringBoard's test-automation override, see below; capability `device_pose`), `display.orientation` (`{degrees, source, fold_angle?, screen_off?}`: SpringBoard's interface orientation without a screen capture, for polling; `degrees` is null while SpringBoard has no answer; on a foldable `fold_angle` is the virtual hinge's angle, so a host can follow folds it did not ask for, and `screen_off` whether the panel is dark, so a host can keep the panel's frame from before off its window as it comes on (SpringBoard has the screen off and FoldDisplay saw the panel go off since it was last lit; the always-on Lock Screen keeps the panel on and is not dark); capability `display_orientation`), `display.rotation_lock {locked}`, `display.auto_lock` (`{auto_lock_seconds, never, lock_screen_minimum_seconds}`), `display.auto_lock.set {seconds}` (writes the mobile UserSettings input through cfprefsd, posts profiled's effective-settings notification, and returns an immediate readback; the caller must verify the effective value), `screen.unlock {passcode?, timeout?}` (`{locked, screen_off, was_locked, was_screen_off}`: the display on and the Lock Screen passed, see below; capability `screen_unlock`), `audio.volume {value?, category?}`, `audio.state` |
 | Input | `input.touch`, `input.hid {page, usage, down?, long_press?}`, `input.button {name}`, `input.key {name}`, `input.type {text, delay_ms?}`, `input.paste {text}`, `input.tap`, `input.double_tap`, `input.long_press`, `input.swipe`, `input.drag {points}`, `input.touch_sequence {events}` — gesture coordinates are screen points; `input.pointer {x, y, seq?, buttons?}`, `input.scroll {phase, dx?, dy?, x?, y?}` (capabilities `pointer_scroll` and `pointer_buttons`, see below) |
 | UI | `ui.tree` (alias `accessibility.tree`), `ui.element_at`, `ui.tap_element`, `ui.wait`, `ui.wait_gone`, `ui.ocr {languages?, min_confidence?}`, `ui.describe`, `screen.screenshot` |
 | Processes | `processes.list {filter?}`, `processes.kill {pid, signal?}` **force**, `process.spawn {executable, arguments?, timeout_seconds?}`, `memory.jetsam`, `memory.pressure` (only the three kernel memory sysctls, for polling) |
 | launchd | `services.list`, `status`, `print`, `dump`, `disabled`, `start`, `enable`, `load`, `profile` (see below), `kickstart {label, kill?}` (`launchctl kickstart`, capability `service_kickstart`, see below); `services.stop`, `disable`, `remove`, `signal`, `unload`, `profile.apply {profile, groups?, allow?}` **force**, and `kickstart` with `kill` **force**; `launchd.getenv`, `setenv`, `unsetenv`. On tvOS, which never enables user sessions, they read the system domain alone; before icli 0.8.6 the foreground-user lookup trapped there and killed vphoned |
-| Logs | `logs.syslog {seconds, process?, level?, max_lines?}` (a bounded capture of at most 60 s), `logs.crashes {bundle_id?}`, `logs.crash {path}` |
+| Logs | `logs.syslog {seconds, process?, level?, max_lines?, subsystem?, category?, message_contains?}` (a bounded capture of at most 60 s; filters apply before the line cap), `logs.crashes {bundle_id?}`, `logs.crash {path}` |
+| HomeView distance | `homeview.distance.get`, `homeview.distance.set {mode, reset_environment?}` (capability `homeview_distance`; near/standard/far map to native detail2/1/0; automatic requires `reset_environment:true` and clears persona, display-style, detail and backlight overrides together). Returns `available`, `mode`, `level_of_detail`, `override_active`, `applied`, `reset_scope:"environment"`, plus native `display_style` and `backlight_state` (null if their integer ABI is unavailable). Unknown ownership is `mode:"unknown"`, `override_active:null`; readback does not prove a rendered UI change. |
 | Darwin notifications | `notify.post {name, state?}` (`postDarwinNotification`; `state` is a UInt64, as a number or a decimal string, stored before the post), `notify.state {name}` (`darwinNotificationState`) |
 | Network, security | `network.capture {seconds, interface?, filter?}` (writes a pcap in the guest scratch directory and returns its path), `network.ipv4.get {interface?}`, `network.ipv4.set {interface?, method, address?, subnet_mask?, router?, dns?}`, `network.hostname.get`, `network.hostname.set {local_host_name?}`, `device.name.get`, `device.name.set {name}` (see below), `network.static_names.get`, `network.static_names.set {entries}`, `network.resolve {host, family?, port?, first_only?, timeout_ms?}` (see below), `security.ssl_killswitch` |
 | Apps | `apps.list`, `search`, `refresh`, `launch`, `terminate`, `foreground`, `open_url`, `install`, `info`, `binary`, `data_dir`, `url_schemes`, `handlers`, `registration`, `register`, `network_policy {repair?}`; `apps.uninstall`, `unregister`, `unregister_dir` **force**; `apps.removed_system`, `apps.remove_system {bundle_ids, backup?, respring?}` **force**, `apps.restore_system {bundle_ids?, respring?}` **force** (removable system apps, see below) |
@@ -787,8 +788,8 @@ with the same override as `services.disable`; launchd honors it from the next
 boot, so the guest has to restart. `apply {profile, groups?, allow?}`:
 
 - `profile: "trimmed"` disables the default groups of the list for the
-  guest's iOS major version (`base`, the 137 labels measured on iOS 27.0, or
-  on iOS 26 the 131 of them 26.6.2 loads;
+  guest's iOS major version (`base`, the 133 labels measured on iOS 27.0, or
+  on iOS 26 the 127 of them 26.6.2 loads;
   `app_store`, appstored and itunesstored; `signin_followup`, followupd and
   appleidsetupd), plus the optional groups named in `groups` (`accounts`:
   akd, amsaccountsd, appleaccountd, after which the guest cannot sign in to an
@@ -799,7 +800,8 @@ boot, so the guest has to restart. `apply {profile, groups?, allow?}`:
 - A label already disabled by somebody else (the OTA block, a user in the
   Services panel) is skipped and never recorded, so `none` leaves it disabled.
   A recorded label the profile no longer selects is turned back on. The jobs
-  in `GuestServiceProfile.neverDisable` (sleepd, CommCenter and its helpers,
+  in `GuestServiceProfile.neverDisable` (sleepd, generativeexperiencesd,
+  CommCenter and its helpers,
   cloudd, NanoRegistry, mobileassetd, storekitd, vphoned, and what vphone's
   features use) are refused whatever names them.
 - The labels the profile owns go to `/var/db/vphoned/service-profile.plist`
@@ -1358,3 +1360,51 @@ properties, plus up to4096 bytes per available report descriptor as base64.
 No HID event is dispatched. `available=false` reports missing native APIs or
 failure to create the read client. Absent properties are omitted; their absence
 does not establish a zero range. Service metadata is not a touch-hit receipt.
+
+### iPhone pointer forwarding opt-in (local extension, 2026-10-29)
+
+An iPhone guest can explicitly advertise `pointer_scroll` and `pointer_buttons`
+by setting the mobile-user preference through RPC:
+
+```text
+settings.set {"domain":"com.vphone.vphoned","key":"iPhonePointerEnabled","type":"bool","value":true}
+```
+
+The preference is read by each health response; the VM window picks up the
+capabilities on its next health probe without a restart. It persists across
+boots. False, deletion, or a non-boolean value restores the default iPhone
+behavior. iPads remain enabled by default; other products do not opt in.
+Advertising support does not capture the mouse. Device → Capture Mouse is
+off for every new window, is never enabled by clicking the display, and is
+not persisted. It forwards relative mouse movement, buttons and native scroll
+only after explicit menu activation. Control–Option–M or Device → Release
+Mouse releases it, as does losing window focus or closing the window. The
+Mac cursor is re-associated on release and any held guest pointer buttons are
+released. Trackpad-to-touch replay remains a separate setting.
+This only advertises/forwards input; it does not enable AssistiveTouch or
+promise iOS will show a pointer. The inner Duo display's pointer mapping is
+not established by this opt-in.
+
+### Optional Duo external display (local extension, 2026-10-29)
+
+The existing Duo display component supports one connected external monitor,
+disabled at boot. Only these pixel dimensions are accepted: 1920x1080 and
+3840x2160. Other dimensions fail before changing the active configuration.
+
+| Method | Parameters and result |
+| --- | --- |
+| `display.external.status` | No parameters; returns `enabled` and, when available, the selected display's name and geometry. |
+| `display.external.configure` | `enabled: Bool`; enabling also requires supported integer `width` and `height`. Waits up to five seconds for a matching acknowledgement. |
+| `display.external.frame` | No parameters; returns a JPEG as base64 `data` with `mime_type: image/jpeg`, captured from the selected external display. Requires a connected monitor. |
+| `display.external.diagnostics` | No parameters; read-only SpringBoard display-source, root-scene and policy snapshot, with up to five seconds for generation. |
+
+Example: `display.external.configure {"enabled":true,"width":3840,"height":2160}`.
+Disconnect with `display.external.configure {"enabled":false}`. This component
+is currently installed only on Duo guests. Native guest policy and each app
+control external scene or mirroring behavior; the frame is not a phone screenshot.
+
+Device → External Display offers the same two modes and Disconnect. Closing
+the preview disconnects it. The output-only host window requests one JPEG at a
+time, targeting 60 Hz with actual throughput dependent on rendering, encoding,
+transfer and decoding. Resolution switching and reconnecting work at runtime;
+neither requires a VM reboot.

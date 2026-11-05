@@ -94,10 +94,22 @@ bool vp_homepod_debug_available(void);
 /// Validated operation result or error, returned as malloc-owned JSON.
 char * _Null_unspecified vp_homepod_debug_copy_json(const char * _Null_unspecified operation, const char * _Null_unspecified arguments_json);
 
+/// HomeView's native distance-derived level-of-detail override. A NULL mode
+/// reads the current environment; otherwise automatic, near, standard or far.
+/// Automatic clears all native environment simulation overrides. Its RPC caller
+/// must require explicit reset_environment acknowledgement before invoking it.
+/// Availability here is an artifact/ABI capability, not a live service verdict.
+bool vp_homeview_distance_available(void);
+char * _Null_unspecified vp_homeview_distance_copy_json(const char * _Null_unspecified mode);
+
 /// Load the IOKit digitizer symbols used for multi-finger injection. Idempotent,
 /// safe to call more than once; returns false (injection then stays a no-op)
 /// on bases that do not expose the private symbols.
 bool vp_hid_load(void);
+/// Register the opt-in iOS 16 lab's missing main touchscreen service.
+void vp_ios16_touchscreen_start(void);
+/// Maintain the explicitly selected fresh ephemeral lab's UI-only lease.
+void vp_ios16_keybagless_ui_start(void);
 /// A keyboard/consumer hold transition, including KeyboardLongPress on release.
 bool vp_hid_keyboard_hold(uint16_t page, uint16_t usage, bool down);
 
@@ -169,6 +181,9 @@ typedef struct {
     double cpu_seconds;
     uint64_t footprint_bytes;
     uint64_t resident_bytes;
+    /// When the process started on the uptime clock (`ProcessInfo.systemUptime`),
+    /// which, unlike `start_time`, a change of the wall clock does not move.
+    double start_uptime;
     bool has_task_info;
 } VPProcessUsage;
 
@@ -236,6 +251,10 @@ bool vp_device_tree_has_property(const char * _Nonnull path, const char * _Nonnu
 NSArray * _Nonnull vp_display_probe(void);
 /// Read-only CoreAnimation display modes and capability surface.
 NSDictionary<NSString *, id> * _Nonnull vp_display_modes(void);
+NSDictionary<NSString *, id> * _Nonnull vp_external_display_status(void);
+NSDictionary<NSString *, id> * _Nonnull vp_external_display_diagnostics(void);
+NSDictionary<NSString *, id> * _Nonnull vp_external_display_configure(BOOL enabled, NSInteger width, NSInteger height);
+NSData * _Nullable vp_external_display_frame(NSString * _Nullable * _Nullable error);
 NSDictionary<NSString *, id> * _Nonnull vp_device_pose_get(void);
 /// Set the hinge to `angleDegrees` at once. `orientation` is CoreMotion's
 /// device orientation for the host controls (1 portrait … 6 face down), or 0

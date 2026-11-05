@@ -30,6 +30,26 @@ import Foundation
 import Testing
 import VPhonePatchKit
 
+// LDR literal and BR cases below were checked using the same native Keystone
+// 0.9.2 C driver, outside the repository, for the iOS 16 IOSurface transport stub.
+
+@Suite("Literal transport stub encoders")
+struct ARM64LiteralStubTests {
+    @Test func `Keystone checked literal load and branch operands`() {
+        #expect(ARM64Encoder.encodeLdrXLiteral(rt: 16, from: 0, to: 8) == ARM64.encodeU32(0x5800_0050))
+        #expect(ARM64Encoder.encodeLdrXLiteral(rt: 0, from: 0, to: -1048576) == ARM64.encodeU32(0x5880_0000))
+        #expect(ARM64Encoder.encodeLdrXLiteral(rt: 30, from: 0, to: 1048572) == ARM64.encodeU32(0x587F_FFFE))
+        #expect(ARM64Encoder.encodeBR(rn: 16) == ARM64.encodeU32(0xD61F_0200))
+        #expect(ARM64Encoder.encodeBR(rn: 0) == ARM64.encodeU32(0xD61F_0000))
+        #expect(ARM64Encoder.encodeBR(rn: 30) == ARM64.encodeU32(0xD61F_03C0))
+        #expect(ARM64Encoder.encodeBR(rn: 31) == nil)
+        #expect(ARM64Encoder.encodeLdrXLiteral(rt: 32, from: 0, to: 8) == nil)
+        #expect(ARM64Encoder.encodeLdrXLiteral(rt: 16, from: 0, to: 7) == nil)
+        #expect(ARM64Encoder.encodeLdrXLiteral(rt: 16, from: 0, to: 1048576) == nil)
+        #expect(ARM64Encoder.encodeLdrXLiteral(rt: 16, from: 0, to: -1048580) == nil)
+    }
+}
+
 // MARK: - Case Model
 
 /// One encoder output paired with the keystone encoding of the same instruction.
@@ -547,7 +567,20 @@ struct ARM64EncoderKeystoneParityTests {
         .init(source: "b.hi #0x0 @0x100000", keystone: 0x5480_0008, encoded: ARM64Encoder.encodeBCond(from: 0x10_0000, to: 0, condition: .hi), origin: "B.cond max backward"),
     ]
 
-    static let allCases: [ARM64EncodingCase] = asmCallSiteCases + operandCoverageCases + x1ComparisonCases + x1LoweringCases + task3Cases + aksUnlockBagCases
+    // Frozen from Keystone 0.9.2 (Homebrew `kstool -b arm64 "<insn>" <address>`) outside the repository.
+    static let watchBudgetFixtureCases: [ARM64EncodingCase] = [
+        .init(source: "cmp x0, x8", keystone: 0xEB08_001F, encoded: ARM64Encoder.encodeCmpX(rn: 0, rm: 8), origin: "watch budget fixture"),
+        .init(source: "cmp x31, x30", keystone: 0xEB1E_03FF, encoded: ARM64Encoder.encodeCmpX(rn: 31, rm: 30), origin: "register boundary"),
+        .init(source: "movk w8, #0xfc31, lsl #16", keystone: 0x72BF_8628, encoded: ARM64Encoder.encodeMovkW(rd: 8, imm16: 0xFC31, shift: 16), origin: "first VM token"),
+        .init(source: "movk w8, #0x71c6, lsl #16", keystone: 0x72AE_38C8, encoded: ARM64Encoder.encodeMovkW(rd: 8, imm16: 0x71C6, shift: 16), origin: "second VM token"),
+        .init(source: "movk w0, #0xffff", keystone: 0x729F_FFE0, encoded: ARM64Encoder.encodeMovkW(rd: 0, imm16: 0xFFFF), origin: "unshifted lane"),
+        .init(source: "strb w8, [x9]", keystone: 0x3900_0128, encoded: ARM64Encoder.encodeStrBUnsignedOffset(rt: 8, rn: 9, offset: 0), origin: "flag store"),
+        .init(source: "ldrb w0, [x0]", keystone: 0x3940_0000, encoded: ARM64Encoder.encodeLdrBUnsignedOffset(rt: 0, rn: 0, offset: 0), origin: "flag getter"),
+        .init(source: "strb w31, [sp, #4095]", keystone: 0x393F_FFFF, encoded: ARM64Encoder.encodeStrBUnsignedOffset(rt: 31, rn: 31, offset: 4095), origin: "byte offset boundary"),
+        .init(source: "ldrb w30, [x29, #4095]", keystone: 0x397F_FFBE, encoded: ARM64Encoder.encodeLdrBUnsignedOffset(rt: 30, rn: 29, offset: 4095), origin: "byte offset boundary"),
+    ]
+
+    static let allCases: [ARM64EncodingCase] = asmCallSiteCases + operandCoverageCases + x1ComparisonCases + x1LoweringCases + task3Cases + aksUnlockBagCases + watchBudgetFixtureCases
 
     @Test func `Task3 encoders reject invalid registers and offsets`() {
         for invalid in [UInt32(32), 100] {
@@ -651,6 +684,7 @@ struct ARM64EncoderKeystoneParityTests {
             ("cmp w0, w0", ARM64.cmpW0W0, 0x6B00_001F),
             ("cmp x0, x0", ARM64.cmpX0X0, 0xEB00_001F),
             ("strb w0, [x20, #0x30]", ARM64.strbW0X20_30, 0x3900_C280),
+            ("strb w0, [x20, #0x20]", ARM64.strbW0X20_20, 0x3900_8280),
             ("cbz x2, #8", ARM64.cbzX2_8, 0xB400_0042),
             ("str x0, [x2]", ARM64.strX0X2, 0xF900_0040),
             ("cmp xzr, xzr", ARM64.cmpXzrXzr, 0xEB1F_03FF),

@@ -39,4 +39,4 @@ Mac の時刻に戻すには、同じ画面で **自動設定** をもう一度�
 
 - [仮想マシンの作成と実行](create-and-run.md)
 - [ライブラリとバックアップ](../storage/library-and-backups.md)
-- [ネットワーク](../../Guides/networking.md)
+- [ネットワーク](../networking/overview.md)

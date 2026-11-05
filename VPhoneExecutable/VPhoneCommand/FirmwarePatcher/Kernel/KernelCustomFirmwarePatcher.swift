@@ -58,6 +58,10 @@ public final class KernelCustomFirmwarePatcher: KernelCustomFirmwarePatcherBase,
     /// enables it. False here so direct patchers preserve the reference corpus.
     public var applyParavirtTask3 = false
 
+    /// The paravirtual GPU's OpenGL ES renderer. Set from the plan; `standard`
+    /// enables it. False here so direct patchers preserve the reference corpus.
+    public var applyParavirtGLES = false
+
     public func findAll() throws -> [PatchRecord] {
         parseMachO()
         buildADRPIndex()
@@ -130,13 +134,16 @@ public final class KernelCustomFirmwarePatcher: KernelCustomFirmwarePatcherBase,
 
         // Opt-in Frida support, from the kernel.frida patch set: existing-thread
         // follow (thread_set_state), repeated VM_PROT_COPY overwrite
-        // (vm_map_delete), spawn (TPRO) and syscall-filtered targets. The gate
-        // writes each only when its own identifier is selected.
+        // (vm_map_delete), spawn (TPRO), syscall-filtered targets, and fork
+        // after instrumentation (the child of an entitled parent keeps its
+        // permission to run rewritten code). The gate writes each only when its
+        // own identifier is selected.
         if applyFrida {
             patchThreadSetStateEntitlementFlag()
             patchVmMapDeleteImmutableCode()
             patchTproOff()
             patchSyscallFilterOff()
+            patchForkInheritInvalidCode()
         }
 
         // The paravirtual display advertises 120 Hz instead of the host's
@@ -152,6 +159,11 @@ public final class KernelCustomFirmwarePatcher: KernelCustomFirmwarePatcherBase,
                     NSLocalizedDescriptionKey: "Cannot resolve the complete Task3 shader-cache patch; kernel was not installed",
                 ])
             }
+        }
+
+        // Name the GLES renderer in the paravirtual GPU's personality.
+        if applyParavirtGLES {
+            patchParavirtGLESRenderer()
         }
 
         // Group C
