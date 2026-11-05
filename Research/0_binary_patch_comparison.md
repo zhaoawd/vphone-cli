@@ -6855,3 +6855,26 @@ developer mode `enabled`, and LLDB attached to configd through the re-signed
 debugserver, evaluated `(int)getpid()` and read 16 bytes at its pc. The watch
 guest needed more than 2048 MB: at 2048 MB a stock LLB, with or without the
 feature, stops the VM after `iLLB decompressed`; at 8192 MB both boot.
+
+## Re-sealing through the shared CodeResources (2026-11-05)
+
+No new patch identifier and no new bytes in an Apple binary. Every installer
+step that re-seals a guest bundle (`sealGuestBundle`, first reached by the
+VirtualAudio patches) ran `codesign -f` on a CodeResources that iOS stores as
+one file for every bundle sealing no resources: 6111 hard links on iOS 27.2
+24B91020. codesign rewrote it in place, so the plugin's seal landed in all of
+them. xpcroleaccountd then refused Instruments' dtsecurity XPC service
+(`errSecCSBadResource`, `setup_role_account failed, error 0x4f`), and
+DTServiceHub could build no symbolicator: Time Profiler stacks were bare
+addresses (issue Lakr233/vphone-cli#824).
+
+**Change.** `sealGuestBundle` gives a hard-linked CodeResources or executable a
+file of its own before codesign runs. When the shared CodeResources is no longer
+Apple's seal and the bundle's original executable (`.bak`) was signed over that
+seal (CodeDirectory special slot 3), the installer writes Apple's seal back
+through every link. The seal is rebuilt by `CustomFirmwareBundleSeal`, byte for
+byte the shipped file (18.6.2 and 27.2 checked). A damaged guest is repaired by
+the next install or Update Guest Environment that reaches the VirtualAudio
+step.
+
+**Reveal and validation.** `Research/Guest/instruments_symbolication.md`.
