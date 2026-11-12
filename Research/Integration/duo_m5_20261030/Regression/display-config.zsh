@@ -61,10 +61,22 @@ run_config duo --display fold > "$evidence_root/fold.log"
 expect_screen 1398 2034
 [[ ! -e "$library_root/duo/display-choice" ]]
 
+run_config duo --display inner --developer-tunnel on > "$evidence_root/inner-tunnel.log"
+expect_screen 2007 2853
+expect_value "$duo_config" holdsDeveloperTunnel true
+[[ "$(<"$library_root/duo/display-choice")" == inner ]]
+run_config duo --display outer > "$evidence_root/outer-keep-tunnel.log"
+expect_screen 1398 2034
+expect_value "$duo_config" holdsDeveloperTunnel true
+run_config duo --developer-tunnel off > "$evidence_root/tunnel-off-keep-outer.log"
+expect_screen 1398 2034
+expect_value "$duo_config" holdsDeveloperTunnel false
+[[ "$(<"$library_root/duo/display-choice")" == outer ]]
+
 cp "$plain_config" "$evidence_root/before-unsupported.plist"
 expect_failure single-display run_config plain --display inner --cpu 3
 cmp "$plain_config" "$evidence_root/before-unsupported.plist"
 [[ ! -e "$library_root/plain/display-choice" ]]
 
-print 'Display CLI regression: passed (inner/outer/fold, persistence, unchanged fields, invalid options, unsupported guest)'
+print 'Display CLI regression: passed (inner/outer/fold, developer tunnel persistence, unchanged fields, invalid options, unsupported guest)'
 print "Evidence: $evidence_root"

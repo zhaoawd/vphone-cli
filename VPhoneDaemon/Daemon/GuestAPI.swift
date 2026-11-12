@@ -117,6 +117,9 @@ enum GuestAPI {
                 "screenshot",
                 "device_info",
                 "display",
+                "display_layout",
+                "display_metrics",
+                "display_capture_active",
                 "display_orientation",
                 "display_auto_lock",
                 "device_pose",
@@ -179,7 +182,7 @@ enum GuestAPI {
             snapshot["jailbreak"] = jailbreakInfo()
             return snapshot
         case "device.screen":
-            return screenInfo()
+            return try activeScreenInfo()
         case "screen.screenshot":
             return try takeScreenshot(base64: true, nativeResolution: true)
         case "apps.list":
@@ -324,22 +327,7 @@ enum GuestAPI {
         case "bootstrap.firmware":
             return try GuestIrisinInstaller.repairFirmwareRecord()
         case "input.touch":
-            guard let phase = (params["phase"] as? String).flatMap(TouchPhase.init(rawValue:)) else {
-                throw GuestAPIError.invalidRequest("phase must be down, move or up")
-            }
-            // A touch that starts at a screen edge needs the digitizer edge
-            // flags, which icli does not set; vphoned injects those itself.
-            if let edge = params["edge"] as? Int, edge != 0 {
-                guard params["normalized"] as? Bool ?? true else {
-                    throw GuestAPIError.invalidRequest("edge touch coordinates are normalized 0..1 only")
-                }
-                vp_hid_touch_edge(touchPhaseCode(phase), number(params, "x"), number(params, "y"), Int32(edge))
-                return ["phase": phase.rawValue, "edge": edge]
-            }
-            return try touch(
-                phase, x: number(params, "x"), y: number(params, "y"),
-                normalized: params["normalized"] as? Bool ?? true,
-            )
+            return try executeTouch(params)
         case "input.touch2":
             // Two fingers in one hand event. icli's `input.touch` carries a
             // single digitizer point, so a pinch has to go through vphoned's own

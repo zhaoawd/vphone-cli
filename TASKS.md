@@ -1,5 +1,28 @@
 # Duo M5 integration — 2026-10-30
 
+## 上游显示与输入同步（2026-11-12）
+
+候选从 `4cb164c8773a530c4e463ea654428d5825c0f1c6` 创建，参考上游
+`0fb0d8cbab471e01cbe230f41f7619b7aad91b52`。首批只同步显示与输入，
+保留当前 Duo 的 RPC 分发、AX 点击、Auto-Lock、X1 回滚归属修复及预设。
+
+- [x] 同步 #864、#866、#886、#879、#890、#891、#885、#872 中的显示、
+      姿态、输入和捕获逻辑，并将离线回归接入 CI。
+- [x] 用 CLI 配置回归复现切换显示模式时丢失 developer tunnel 设置，修复 manifest 字段保留。
+- [x] 通过显示布局、显示指标、外屏捕获、点坐标、锁屏轮询、AX、Auto-Lock 和 daemon 逻辑回归。
+- [x] 最终 Debug Bundle 构建、严格签名检查和 CLI 配置回归通过。
+      增加回归后，修复前的 CLI 在同一条命令切换显示并启用 developer tunnel 时
+      缺少 `holdsDeveloperTunnel`；修复后同时设置、分别修改和回读均通过。
+- [x] 最终构建执行 `vphone-cli host preflight`；当前宿主的 AMFI 拒绝启动
+      `vphone-vm`。未更改宿主安全设置，未改动 VM。
+- [ ] 在隔离的 iOS 27.1／24A94425 Duo 上验证冷启动、外屏/内屏捕获、宿主和 guest 输入、
+      Duo 旋转、F2 聚焦合拢及 F5 帧序列。
+- [ ] 单独评估 `methods.list`、类型化 RPC schema、GLES 和 iOS 27.2。
+
+本批没有合入启动链、签名校验策略或 Cryptex 改动。
+构建和测试日志位于候选工作区的 `.build/duo-upstream-20261112/`。
+外屏捕获测试在宿主环境通过；受限工具环境内未通过首个实际渲染断言。
+
 Scope: integrate the iPhone Duo work from `vphone-cli-up` and
 `vphone-duo-m5` onto `duo-integration-20261030`, based on upstream `main`, without changing the original
 worktrees. Source directories are read-only inputs. On 2026-10-30 the user

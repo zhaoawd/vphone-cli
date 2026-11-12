@@ -610,6 +610,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
             hardwareKeyboardEnabled: hardwareKeyboardEnabled,
             unlocksAtStartup: unlocksAtStartup,
             syncsHostLocation: syncsHostLocation,
+            holdsDeveloperTunnel: holdsDeveloperTunnel,
         )
     }
 

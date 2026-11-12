@@ -68,6 +68,15 @@ jobs:
             [[ "$archs" == *" $arch "* ]] || { echo "::error::vphone-escalator lacks $arch"; exit 1; }
           done
 
+      - name: Guest display and point input tests
+        run: |
+          set -euo pipefail
+          zsh VPhoneDaemon/Tests/run-display-layout-tests.sh
+          zsh VPhoneDaemon/Tests/run-display-metrics-tests.sh
+          zsh VPhoneDaemon/Tests/run-display-capture-tests.sh
+          zsh VPhoneDaemon/Tests/run-point-geometry-tests.sh
+          zsh VPhoneDaemon/Tests/run-element-tap-tests.sh
+
       - name: Guest component tests
         run: |
           make -C VPhoneGuestComponents test-mach-ports-compat
