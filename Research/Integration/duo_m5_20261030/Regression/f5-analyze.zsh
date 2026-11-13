@@ -16,8 +16,10 @@ awk '/^frame:/{f=$1; sub("frame:","",f); t=$3; sub("pts_time:","",t)}
      /YAVG=/{split($0,a,"="); y[f]=a[2]}
      END{for(i in ts) printf "%d\t%.3f\t%d\t%.1f\n", i, ts[i], pb[i], y[i]}' "$dir/meta.txt" | sort -n > "$dir/frames.tsv"
 
-# Guest FoldDisplay lines start with an epoch timestamp.
-awk -v t0="$t0" '$1+0 >= t0-2 {i=index($0,"inner display:"); if(i) printf "%.3f\t%s\n", $1-t0, substr($0,i+15)}' \
+# The file may also contain older entries with local time-of-day prefixes.
+awk -v t0="$t0" '$1 ~ /^[0-9]+\.[0-9]+$/ && $1+0 >= t0-2 {
+    i=index($0,"inner display:"); if(i) printf "%.3f\t%s\n", $1-t0, substr($0,i+15)
+}' \
     "$dir/folddisplay.log" > "$dir/events.tsv" 2>/dev/null || : > "$dir/events.tsv"
 
 awk -F'\t' '$3>=10' "$dir/frames.tsv" | awk -F'\t' 'BEGIN{OFS="\t"}
@@ -35,8 +37,8 @@ FILENAME==ARGV[2] {et[++m]=$1; ev[m]=$2; next}
   for(i=1;i<=n;i++){d=s-at[i]; if(d>-0.3 && d<bd){bd=d; best=i}}
   label = best ? al[best] : "(before first action)"; base = best ? at[best] : 0
   evs=""
-  for(j=1;j<=m;j++) if(best && et[j]>=base-0.05 && et[j]<=base+2.2 && ev[j] ~ /hold o|shown=/) {
-      tag = ev[j] ~ /hold on/ ? "hold-on" : ev[j] ~ /hold off/ ? "hold-off" : substr(ev[j],1,7)
+  for(j=1;j<=m;j++) if(best && et[j]>=base-0.05 && et[j]<=base+2.2 && ev[j] ~ /hold o|shown=|handoff (held|released)/) {
+      tag = ev[j] ~ /handoff / ? ev[j] : ev[j] ~ /hold on/ ? "hold-on" : ev[j] ~ /hold off/ ? "hold-off" : substr(ev[j],1,7)
       evs = evs sprintf(" %s@+%d", tag, (et[j]-base)*1000) }
   printf "%-24s dark +%5d..+%5dms (%3d fr, max %3d%%) |%s\n", label, (s-base)*1000, (e-base)*1000+33, $3, $4, evs }' \
     "$dir/actions.tsv" "$dir/events.tsv" "$dir/runs.tsv" > "$dir/aligned.txt"
@@ -49,3 +51,27 @@ FILENAME==ARGV[2] {et[++m]=$1; ev[m]=$2; next}
     print -r -- "failed actions: $(awk -F'\t' '$3 !~ /"ok":true/' "$dir/actions.tsv" | cut -f2 | paste -sd, -)"
 } > "$dir/summary.txt"
 cat "$dir/summary.txt" "$dir/aligned.txt"
+
+# Count fully dark samples near each successful Home Screen fold. Keep this
+# separate from dark portions of app content and deliberate screen-off time.
+awk -F '\t' -v off="$offset" '
+FILENAME==ARGV[1] {
+    if ($2 ~ /^home-(open|close)-[0-9]+$/ && $3 ~ /"ok":true/) {
+        label[++n]=$2; start[n]=$1
+    }
+    next
+}
+$3==100 {
+    t=$2+off
+    for(i=1;i<=n;i++) if(t>=start[i]-0.3 && t<start[i]+1.15){hits[i]++; break}
+}
+END {
+    print "action\tblack_samples"
+    for(i=1;i<=n;i++) {
+        printf "%s\t%d\n",label[i],hits[i]+0
+        if(hits[i]) affected++
+        total+=hits[i]
+    }
+    printf "total\t%d/%d transitions\t%d samples\n",affected+0,n,total+0
+}' "$dir/actions.tsv" "$dir/frames.tsv" > "$dir/fold-blackframes.tsv"
+cat "$dir/fold-blackframes.tsv"

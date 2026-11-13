@@ -5,20 +5,33 @@
 # host time offset from the recording request for later frame alignment.
 # Ported from the v1.6 run/fold214/f5-record.sh. The menu item is pressed
 # through Accessibility, so no keystrokes reach whichever app is frontmost.
-#   f5-record.zsh <baseline|candidate> <new-output-directory>
+#   f5-record.zsh <baseline|candidate|absolute-vphone.sock> <new-output-directory>
+# With a workspace CFFIXED_USER_HOME on the VM launch, set
+# VPHONE_F5_RECORDING_DIR to that home's Desktop directory.
 set -euo pipefail
 source "${0:a:h}/rpc-request.zsh"
 source "${0:a:h}/host-request.zsh"
 
 repo_root="$(cd "${0:a:h}/../../../.." && pwd)"
-variant="${1:?usage: f5-record.zsh <baseline|candidate> <new-output-directory>}"
+target="${1:?usage: f5-record.zsh <baseline|candidate|absolute-vphone.sock> <new-output-directory>}"
 output_root="${2:?new evidence directory required}"
-[[ "$variant" == baseline || "$variant" == candidate ]] || exit 2
-machine="duo-$variant-20261030"
-socket_path="$repo_root/.build/acceptance/machines/$machine/vphone.sock"
-[[ -S "$socket_path" && "$output_root" == "$repo_root/.build/"* && ! -e "$output_root" ]] || exit 2
-vm_pid=$(pgrep -f "vphone-vm.*$machine" | head -1) || true
-[[ -n "$vm_pid" ]] || { print -u2 "No windowed vphone-vm process for $machine"; exit 1; }
+socket_path=$(vphone_acceptance_socket "$repo_root" "$target")
+output_root="${output_root:A}"
+[[ "$output_root" == "$repo_root/.build/"* && ! -e "$output_root" ]] || exit 2
+recording_dir="${VPHONE_F5_RECORDING_DIR:-$HOME/Desktop}"
+if [[ -n "${VPHONE_F5_RECORDING_DIR:-}" ]]; then
+    recording_dir="${recording_dir:A}"
+    [[ "$recording_dir" == "$repo_root/.build/"*/Desktop && -d "$recording_dir" ]] || {
+        print -u2 'Expected a recording Desktop directory below this worktree/.build'
+        exit 2
+    }
+fi
+machine="${socket_path:h:t}"
+[[ "$machine" == [a-zA-Z0-9]* && "$machine" != *[^a-zA-Z0-9_-]* ]] || exit 2
+vm_pid=$(pgrep -f "vphone-vm.*[ /]$machine([ /]|$)") || true
+[[ "$vm_pid" == <-> ]] || { print -u2 "Expected one vphone-vm process for $machine"; exit 1; }
+vphone_host_request "$socket_path" '{"t":"display.geometry","screen":false}' \
+    | jq -e '.result.windowed == true' >/dev/null
 mkdir -p "$output_root"
 cp "${0:a}" "$output_root/driver.zsh"
 shasum -a 256 "${0:a}" > "$output_root/driver-sha256.txt"
@@ -92,7 +105,6 @@ print -r -- "$idle_title" > "$output_root/recorder-idle-title.txt"
 rpc logs.crashes > "$output_root/crashes-before.json"
 rpc processes.list | jq -c '[.result.processes[]|select(.name=="SpringBoard" or .name=="backboardd")|{name,pid}]|sort_by(.name)' > "$output_root/processes-before.json"
 
-before=$(/bin/ls -t ~/Desktop | grep -E '^vphone-recording' | head -1 || true)
 t0=$(now)
 recorder press > /dev/null
 /bin/sleep 1
@@ -135,15 +147,15 @@ act final-close display.posture '{"hinge":"closed"}' 4
 
 recorder press > /dev/null
 /bin/sleep 3
-rec=""
-for _ in {1..20}; do
-    rec=$(/bin/ls -t ~/Desktop | grep -E '^vphone-recording' | head -1 || true)
-    [[ -n "$rec" && "$rec" != "$before" ]] && break
-    /bin/sleep 1
-done
 dismiss_alert > "$output_root/alert.txt"
-[[ -n "$rec" && "$rec" != "$before" ]] || { print -u2 "No new recording"; exit 1; }
-mv ~/Desktop/"$rec" "$output_root/recording.mov"
+alert=$(<"$output_root/alert.txt")
+prefix="$recording_dir/vphone-recording-"
+[[ "$alert" == *"$prefix"*.mov ]] || { print -u2 'The recorder did not report a Desktop movie'; exit 1; }
+suffix="${alert##*"$prefix"}"
+recording="$prefix$suffix"
+[[ "$suffix" != */* && -f "$recording" && ! -L "$recording" ]] || exit 1
+(( $(stat -f %m "$recording") >= ${t0%.*} )) || { print -u2 'The recorder reported an older movie'; exit 1; }
+cp "$recording" "$output_root/recording.mov"
 rpc screen.unlock '{"timeout":30}' > "$output_root/unlock-after.json" || true
 rpc logs.crashes > "$output_root/crashes-after.json"
 rpc processes.list | jq -c '[.result.processes[]|select(.name=="SpringBoard" or .name=="backboardd")|{name,pid}]|sort_by(.name)' > "$output_root/processes-after.json"

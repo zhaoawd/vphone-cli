@@ -11,9 +11,9 @@ void vpFoldDisplayLog(NSString *line) {
     int fd = open("/var/mobile/Library/Caches/vphone-folddisplay.log", O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
     if (fd < 0)
         return;
-    NSString *stamp = [NSDateFormatter localizedStringFromDate:NSDate.date dateStyle:NSDateFormatterNoStyle
-                                                     timeStyle:NSDateFormatterMediumStyle];
-    const char *bytes = [NSString stringWithFormat:@"%@ %@\n", stamp, line].UTF8String;
+    // Epoch seconds to the millisecond: Regression/f5-analyze.zsh aligns these
+    // lines with a recording, and a fold's events fall within one second.
+    const char *bytes = [NSString stringWithFormat:@"%.3f %@\n", NSDate.date.timeIntervalSince1970, line].UTF8String;
     if (bytes)
         write(fd, bytes, strlen(bytes));
     close(fd);

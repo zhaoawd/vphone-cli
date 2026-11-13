@@ -18,7 +18,8 @@ planning documents only). Candidate code is `a71f2360`. Later branch commits
 record validation and scripts; these runs do not test a rebuilt binary from
 those commits. Baseline and candidate fold-display libraries are byte-identical,
 SHA-256 `a764b380db72e77a1d3c9f93fe84baafaa60666cf9d63b73db99211465f3295b`.
-The old `fb41cd6b` previous-frame hold is inactive.
+The `fb41cd6b` previous-frame hold was inactive for these runs; it was ported
+to the current compositor on 2026-11-13 (`ACCEPTANCE.md`, "F5 上一帧保持验证").
 
 Only one clone runs at a time, headless, with its matching CLI and an explicit
 machine library below this worktree's `.build`. Probe IPAs are the same

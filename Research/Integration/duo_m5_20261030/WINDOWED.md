@@ -119,6 +119,9 @@ User decision, 2026-10-30: do not adapt `fb41cd6b` for this integration.
 The hold stays in source history only; the candidate keeps upstream's
 hand-over behaviour, including the measured black frames.
 
+User decision, 2026-11-13: adapt it after all. The port and its F5 and lock
+validation are in `ACCEPTANCE.md`, "F5 上一帧保持验证".
+
 ## F2 keyboard modes
 
 `Regression/kb-modes.zsh`, KBProbe and KBProbeFS (`UIRequiresFullScreen`

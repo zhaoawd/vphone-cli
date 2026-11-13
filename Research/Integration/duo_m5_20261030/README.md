@@ -41,7 +41,7 @@ These counts describe path overlap, not confirmed merge conflicts.
 | Experimental vphoned display-association injection | bf02a819 | Keep inactive unless a new reproduction establishes a requirement. |
 | SpringBoard touch diagnostics | b4680ceb and subsequent trace commits | Preserve diagnostic sources and evidence without enabling them by default. |
 | Optional inner cutout correction | b18c8f48, 9c8f2873 | Ported as a reversible, Duo-only, iOS 27.1 guest-library patch; off in standard, skipped while the fold library is installed. Catalog and resource paths tested; VM on/off/on accepted 2026-10-31 (`F6.md`): taps reach apps only with it on. |
-| Previous-frame hold across fold transitions | fb41cd6b | Upstream now changes panel ownership, rendering, and wake behavior. Establish an A/B reproduction before adopting a runtime change. |
+| Previous-frame hold across fold transitions | fb41cd6b | Ported to the current compositor 2026-11-13 (user decision), with the scanout kept lit across the hand-over. F5 on a fresh clone: 0/18 transitions black against 10/18 for the control. See `ACCEPTANCE.md`, "F5 上一帧保持验证". |
 | Plans, probes, and regression scripts | source plan folder and run/fold214 | Eight historical plan documents plus 29 current historical scripts/small results preserved; 602 run files indexed by hash. Ten native probe inputs preserved; maintained builds and regressions use explicit/new paths. |
 
 The latest upstream already changes the same fold transition hooks used by the

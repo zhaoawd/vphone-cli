@@ -6878,3 +6878,36 @@ the next install or Update Guest Environment that reaches the VirtualAudio
 step.
 
 **Reveal and validation.** `Research/Guest/instruments_symbolication.md`.
+
+## Duo fold hand-over: panel kept lit and last frame held (2026-11-13)
+
+No new patch. `system-springboard-cfw-fold_display`'s `libvphonefolddisplay.dylib`
+changes its SpringBoard behaviour in `FoldDisplay/FoldDisplayPanel.m`:
+
+- **Power handoff.** When the shared panel changes hands while lit and the
+  arriving display has not yet been asked to come on, the scanout (display 1)
+  and the inner display stay lit until SpringBoard asks for the arriving
+  display, the screen blanks, or 2 s pass. Before, closing turned the scanout
+  off between the primary swap and SpringBoard's `display 1 wants state 1`
+  (opening after the inner display went off, likewise).
+- **Last-frame hold**, ported from `fb41cd6b` (v1.6) to the current
+  pages-hosted compositor. At
+  `-[SBDisplayContentModeCoordinator performDisplayContentModeTransitionWithCoordinator:]`
+  Main is rendered (`CARenderServerRenderDisplay`) into an IOSurface shown
+  above everything on Main's `UIRootSceneWindow` (zPosition 2e9). Opening
+  releases it one frame after a render of the inner display shows anything
+  but black, closing 150 ms after the cover holds the primary scene; never
+  longer than 2 s; at once if the panel goes off or the screen blanks. A fold
+  with the panel off, lit under 1 s ago, or the screen blanked or unblanked
+  under 1 s ago is not held, so a dark fold keeps upstream's fade
+  (`bde6440c`).
+- The log stamps lines with epoch seconds to the millisecond again, which
+  `Regression/f5-analyze.zsh` and `f5-handoff-report.mjs` read.
+
+**Reveal and validation.** `Research/Integration/duo_m5_20261030/ACCEPTANCE.md`,
+"F5 上一帧保持验证". iPhone19,4 27.1 (24A94425), fresh clone of the 84e3ce54 seed,
+4 s between folds: 18/18 hand-overs, 0 near-black samples (control with the
+84e3ce54 library: 10 of 18 transitions black); holds 237–259 ms closing, 198–721 ms
+opening, no timeouts. Power 0.1 s after opening or closing ends
+locked and off and wakes to the lock screen; a fold made while blanked is not
+held.
