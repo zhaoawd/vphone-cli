@@ -334,6 +334,11 @@ private final class HTTPJob: @unchecked Sendable {
     }
 
     func run() {
+        guard GuestRenderServerLifecycle.shared.beginRequest() else {
+            GuestHyperTextHandler.send(APIWire.error("Render server changed; reconnecting the guest agent", status: 503), on: channel)
+            return
+        }
+        defer { GuestRenderServerLifecycle.shared.endRequest() }
         let reply = APIWire.execute(request)
         if reply.status == 200 {
             hub.broadcast(name: "operation.completed", data: ["method": request.method])

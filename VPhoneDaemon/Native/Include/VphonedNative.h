@@ -151,6 +151,10 @@ void vp_device_orientation_publish(int deviceOrientation);
 /// hinge's host controls into CoreMotion and SpringBoard reads its pose from
 /// there; otherwise only the test-automation pose override reaches it.
 bool vp_core_motion_hinge(void);
+/// Verified backboardd PID and process start time, nil while unavailable.
+#ifdef __OBJC__
+NSString * _Nullable vp_backboardd_epoch(void);
+#endif
 
 /// Ask launchd to shut the guest down and halt. Returns 0 once the request is
 /// accepted, otherwise an errno value. Needs root.

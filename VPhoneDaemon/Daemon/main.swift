@@ -31,6 +31,9 @@ GuestVirtualAudioProduct.storeOnStartup()
 // After SpringBoard has had time to come up, so the inner panel's layout
 // matches the posture it was booted with.
 GuestFoldPose.startOnStartup()
+if vp_core_motion_hinge() {
+    GuestRenderServerLifecycle.shared.start { vp_backboardd_epoch() }
+}
 GuestDeviceHubControl.startOnStartup()
 vp_vcam_start()
 GuestHomePodDisplay.startOnStartup()
