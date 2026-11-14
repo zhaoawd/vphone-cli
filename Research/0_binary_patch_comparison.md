@@ -7004,3 +7004,23 @@ page records or repairing an existing words sidecar.
 Actual CFW install/System unmount and Linux FUSE/SSHFS behavior were not
 runtime-tested. Evidence, commands, exact hashes and the four VM phases are
 recorded in `Research/Integration/duo_m5_20261030/CACHE_LIFECYCLE_20261115.md`.
+
+### Recovery source check and RPC integration preflight (2026-11-15)
+
+No production patch, declaration or preset changed. Recovery retry cleanup
+comes from #854 (`f20bf92a`), already integrated as Duo `3b4ac980`; the current
+libirecovery source is byte-identical to the file at upstream merge
+`bb79a93b`. The regression now compiles the production open routine through
+both libusb and IOKit branches with fake backends: 7/7 and 8/8 pass. Old code
+fails 6 and 7 checks respectively, including the IOKit async-event failure's
+output-pointer clearing. Physical USB recovery is outside this evidence.
+
+RPC preflight compiles pinned upstream `13169405` declarations/admission and
+paging alongside the current Duo catalog: 203 upstream declarations,
+12 local catalog declarations, 8 differing entries. It directly reproduces
+the upstream admission rejecting Duo's `display.auto_lock.set {never:true}`.
+24 isolated admission/paging checks and the upstream 1262-check offline suite
+pass; current Duo Auto-Lock and AX regressions also pass. RPC production
+integration and host/guest VM combinations remain pending. Sources, detailed
+differences and executable preflight are recorded in
+`Research/Integration/duo_m5_20261030/RPC_SYNC_PREFLIGHT_20261115.md`.
