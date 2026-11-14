@@ -1,0 +1,50 @@
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+
+typedef enum {
+    IRECV_E_SUCCESS, IRECV_E_UNABLE_TO_CONNECT, IRECV_E_NO_DEVICE,
+    IRECV_E_USB_CONFIGURATION, IRECV_E_USB_INTERFACE
+} irecv_error_t;
+enum { IRECV_K_DFU_MODE, IRECV_K_PORT_DFU_MODE, IRECV_K_WTF_MODE, IRECV_K_RECOVERY_MODE_2, KIS_PRODUCT_ID };
+enum { IRECV_CONNECTED };
+typedef struct { unsigned size; void *data; double progress; int type; } irecv_event_t;
+typedef struct client *irecv_client_t;
+struct client {
+    int mode;
+    struct { uint64_t ecid; void *ap_nonce, *sep_nonce; unsigned ap_nonce_size, sep_nonce_size; } device_info;
+    void (*connected_callback)(irecv_client_t, const irecv_event_t *);
+};
+static struct client usb_client;
+static int closes;
+static int libirecovery_debug;
+static irecv_error_t open_result, config_result, interface_result, kis_init_result, kis_info_result;
+
+#define debug(...) ((void)0)
+static void irecv_set_debug_level(int level) { (void)level; }
+static irecv_error_t libusb_open_with_ecid(irecv_client_t *out, uint64_t ecid) {
+    (void)ecid;
+    if (open_result == IRECV_E_SUCCESS) *out = &usb_client;
+    return open_result;
+}
+static void irecv_close(irecv_client_t client) { if (client) closes++; }
+static irecv_error_t irecv_usb_set_configuration(irecv_client_t client, int config) {
+    assert(client == &usb_client && config == 1);
+    return config_result;
+}
+static irecv_error_t irecv_usb_set_interface(irecv_client_t client, int interface, int alt) {
+    assert(client == &usb_client && interface == 0 && alt == 0);
+    return interface_result;
+}
+static irecv_error_t irecv_kis_init(irecv_client_t client) {
+    assert(client == &usb_client);
+    return kis_init_result;
+}
+static irecv_error_t irecv_kis_load_device_info(irecv_client_t client) {
+    assert(client == &usb_client);
+    return kis_info_result;
+}
+static void irecv_copy_nonce_with_tag(irecv_client_t client, const char *tag, void **nonce, unsigned *size) {
+    assert(client == &usb_client);
+    (void)tag; (void)nonce; (void)size;
+}

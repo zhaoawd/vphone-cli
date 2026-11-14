@@ -1,0 +1,37 @@
+static int check(const char *name, uint64_t ecid, irecv_error_t expected, int expected_closes) {
+    struct client previous;
+    irecv_client_t out = &previous;
+    closes = 0;
+    irecv_error_t actual = irecv_open_with_ecid(&out, ecid);
+    if (actual == expected && closes == expected_closes &&
+        out == (expected == IRECV_E_SUCCESS ? &usb_client : NULL)) {
+        return 0;
+    }
+    fprintf(stderr, "FAIL: %s: error=%d closes=%d output_is_null=%d\n", name, actual, closes, out == NULL);
+    return 1;
+}
+
+int main(void) {
+    int failures = 0;
+    open_result = IRECV_E_NO_DEVICE;
+    failures += check("USB discovery failure", 0, IRECV_E_NO_DEVICE, 0);
+    open_result = IRECV_E_SUCCESS;
+    config_result = IRECV_E_USB_CONFIGURATION;
+    failures += check("USB configuration failure", 0, IRECV_E_USB_CONFIGURATION, 1);
+    config_result = IRECV_E_SUCCESS;
+    interface_result = IRECV_E_USB_INTERFACE;
+    failures += check("USB interface failure", 0, IRECV_E_USB_INTERFACE, 1);
+    interface_result = IRECV_E_SUCCESS;
+    usb_client.mode = KIS_PRODUCT_ID;
+    kis_init_result = IRECV_E_UNABLE_TO_CONNECT;
+    failures += check("KIS initialization failure", 0, IRECV_E_UNABLE_TO_CONNECT, 1);
+    kis_init_result = IRECV_E_SUCCESS;
+    kis_info_result = IRECV_E_UNABLE_TO_CONNECT;
+    failures += check("KIS device information failure", 0, IRECV_E_UNABLE_TO_CONNECT, 1);
+    kis_info_result = IRECV_E_SUCCESS;
+    usb_client.device_info.ecid = 1;
+    failures += check("KIS ECID mismatch", 2, IRECV_E_NO_DEVICE, 1);
+    failures += check("successful open publishes the client", 1, IRECV_E_SUCCESS, 0);
+    printf("Recovery client: %d/7 passed\n", 7 - failures);
+    return failures != 0;
+}
