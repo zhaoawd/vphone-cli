@@ -3,7 +3,7 @@ set -euo pipefail
 
 daemon="${0:a:h:h}"
 root="${daemon:h}"
-icli="$root/.build/XcodeBundle/SourcePackages/checkouts/icli"
+icli="$root/.build/XcodeDaemon/SourcePackages/checkouts/icli"
 input="$daemon/Daemon/GuestAPI+Gestures.swift"
 host="$root/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlSystem.swift"
 while (( $# )); do
@@ -33,7 +33,7 @@ flags=(-swift-version 6 -warnings-as-errors -module-cache-path "$temporary/modul
 "${compiler[@]}" "${flags[@]}" -emit-library -emit-module -module-name VphonedNative \
     "$daemon/Tests/PointGeometry/NativeTestSupport.swift" -o "$temporary/libVphonedNative.$extension"
 "${compiler[@]}" "${flags[@]}" -parse-as-library -lIcliKit -lVphonedNative -Xlinker -rpath -Xlinker "$temporary" \
-    "$daemon/Daemon/GuestPointGeometry.swift" \
+    "$daemon/Daemon/GuestPointGeometry.swift" "$daemon/Daemon/GuestDuoMethod.swift" \
     "$daemon/Daemon/GuestAPI+PointGeometry.swift" "$input" "$daemon/Tests/PointGeometry/PointGeometryTests.swift" \
     -o "$temporary/point-tests"
 "$temporary/point-tests"

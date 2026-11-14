@@ -48,8 +48,10 @@ NSDictionary<NSString *, id> *vp_element_tap_display_for_class(Class cls) {
         if (!isfinite(scale) || scale <= 0 || !isfinite(bounds.size.width) || !isfinite(bounds.size.height) ||
             bounds.size.width <= 0 || bounds.size.height <= 0)
             return @{@"dual_display": @YES, @"error": @"Active display geometry unavailable"};
-        return @{@"dual_display": @YES, @"name": innerActive ? @"inner" : @"cover",
-                 @"width": @(bounds.size.width / scale), @"height": @(bounds.size.height / scale)};
+        NSMutableDictionary *report = [@{@"dual_display": @YES, @"name": innerActive ? @"inner" : @"cover",
+                 @"width": @(bounds.size.width / scale), @"height": @(bounds.size.height / scale)} mutableCopy];
+        if ([display respondsToSelector:sel_registerName("displayId")]) report[@"display_id"] = [display valueForKey:@"displayId"];
+        return report;
     } @catch (NSException *exception) {
         return @{@"dual_display": @YES, @"error": exception.reason ?: exception.name};
     }
@@ -122,6 +124,99 @@ static id vpTapAttribute(VPAxFunctions f, CFTypeRef element, uint32_t attribute)
     int error = f.copy(element, (CFStringRef)(uintptr_t)attribute, &value);
     if (error) { if (value) CFRelease(value); return nil; }
     return CFBridgingRelease(value);
+}
+
+NSDictionary *vp_ax_display_hit_for_functions(VPAxFunctions f, Class cls, int pid, unsigned int displayID,
+                                              double x, double y, double width, double height, int degrees) {
+    @try {
+        if (pid <= 1 || !displayID || !isfinite(x) || !isfinite(y) || !isfinite(width) || !isfinite(height)
+            || width <= 0 || height <= 0 || !f.copy || !f.getValue || !f.valueTypeID || !f.elementTypeID || !f.getPid)
+            return @{@"error": @"AX display hit testing unavailable"};
+        SEL selector = sel_registerName("uiElementAtCoordinate:displayId:");
+        Method method = class_getClassMethod(cls, selector);
+        NSMethodSignature *signature = method ? [NSMethodSignature signatureWithObjCTypes:method_getTypeEncoding(method)] : nil;
+        if (!signature || signature.numberOfArguments != 4 || strcmp(signature.methodReturnType, @encode(id))
+            || strcmp([signature getArgumentTypeAtIndex:2], @encode(CGPoint))
+            || strcmp([signature getArgumentTypeAtIndex:3], @encode(unsigned int)))
+            return @{@"error": @"Display-scoped AX hit test ABI unavailable"};
+        BOOL sideways = degrees == 90 || degrees == 270;
+        if (x < 0 || y < 0 || x >= (sideways ? height : width) || y >= (sideways ? width : height)
+            || (degrees != 0 && degrees != 90 && degrees != 180 && degrees != 270))
+            return @{@"error": @"Point lies outside the active display"};
+        CGPoint point = CGPointMake(x, y);
+        switch (degrees) {
+            case 90: point = CGPointMake(y, height - x); break;
+            case 180: point = CGPointMake(width - x, height - y); break;
+            case 270: point = CGPointMake(width - y, x); break;
+        }
+        id hit = ((id (*)(id, SEL, CGPoint, unsigned int))objc_msgSend)(cls, selector, point, displayID);
+        if (!hit) return @{@"source": @"ax", @"pid": @(pid), @"element": @{}, @"x": @(x), @"y": @(y)};
+        Method getter = class_getInstanceMethod(object_getClass(hit), sel_registerName("axElement"));
+        if (!getter || strcmp(method_getTypeEncoding(getter), "^{__AXUIElement=}16@0:8"))
+            return @{@"error": @"AX hit element ABI unavailable"};
+        CFTypeRef element = ((CFTypeRef (*)(id, SEL))objc_msgSend)(hit, sel_registerName("axElement"));
+        pid_t actualPID = 0;
+        if (!element || CFGetTypeID(element) != f.elementTypeID() || f.getPid(element, &actualPID) || actualPID != pid)
+            return @{@"error": @"AX hit belongs to a different foreground process; retry"};
+        if (f.setTimeout) f.setTimeout(element, 0.25f);
+        id box = vpTapAttribute(f, element, 2003);
+        CGRect frame;
+        if (!box || CFGetTypeID((__bridge CFTypeRef)box) != f.valueTypeID()
+            || !f.getValue((__bridge CFTypeRef)box, 3, &frame)
+            || !isfinite(frame.origin.x) || !isfinite(frame.origin.y)
+            || !isfinite(frame.size.width) || !isfinite(frame.size.height))
+            return @{@"error": @"AX hit frame unavailable"};
+        CGPoint activation = CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame));
+        box = vpTapAttribute(f, element, 2007);
+        CGPoint candidate;
+        if (box && CFGetTypeID((__bridge CFTypeRef)box) == f.valueTypeID()
+            && f.getValue((__bridge CFTypeRef)box, 1, &candidate) && isfinite(candidate.x) && isfinite(candidate.y)) activation = candidate;
+        // SpringBoard AX coordinates are fixed; ordinary apps report their
+        // window coordinates. Convert only SpringBoard's serialized result.
+        if (pid == vp_springboard_pid()) {
+            CGAffineTransform transform = CGAffineTransformIdentity;
+            if (degrees == 90) transform = CGAffineTransformMake(0, 1, -1, 0, height, 0);
+            if (degrees == 180) transform = CGAffineTransformMake(-1, 0, 0, -1, width, height);
+            if (degrees == 270) transform = CGAffineTransformMake(0, -1, 1, 0, 0, width);
+            frame = CGRectApplyAffineTransform(frame, transform);
+            activation = CGPointApplyAffineTransform(activation, transform);
+        }
+        id label = vpTapAttribute(f, element, 2001), identifier = vpTapAttribute(f, element, 5019);
+        id value = vpTapAttribute(f, element, 2006), rawTraits = vpTapAttribute(f, element, 2004);
+        uint64_t traits = [rawTraits respondsToSelector:@selector(unsignedLongLongValue)] ? [rawTraits unsignedLongLongValue] : 0;
+        BOOL enabled = (traits & (1ull << 8)) == 0;
+        BOOL clickable = enabled && frame.size.width > 0 && frame.size.height > 0
+            && ((traits & ((1ull << 0) | (1ull << 1) | (1ull << 12))) || !(traits & (1ull << 6)));
+        NSDictionary *node = @{@"label": [label isKindOfClass:NSString.class] ? label : @"",
+            @"identifier": [identifier isKindOfClass:NSString.class] ? identifier : @"",
+            @"value": [value isKindOfClass:NSString.class] || ([value isKindOfClass:NSNumber.class] && isfinite([value doubleValue])) ? value : @"",
+            @"role": traits & 1 ? @"button" : (traits & (1ull << 6) ? @"text" : @"element"), @"traits": @(traits),
+            @"enabled": @(enabled), @"clickable": @(clickable), @"visible": @(!CGRectIsEmpty(CGRectIntersection(frame,
+                CGRectMake(0, 0, sideways ? height : width, sideways ? width : height)))),
+            @"x": @(activation.x), @"y": @(activation.y),
+            @"frame": @{@"x": @(frame.origin.x), @"y": @(frame.origin.y), @"width": @(frame.size.width), @"height": @(frame.size.height)}};
+        return @{@"source": @"ax", @"pid": @(pid), @"element": node, @"x": @(x), @"y": @(y)};
+    } @catch (NSException *exception) {
+        return @{@"error": exception.reason ?: exception.name};
+    }
+}
+
+NSDictionary *vp_ax_display_element_at(int pid, unsigned int displayID, double x, double y, double width, double height, int degrees) {
+    // Let the existing icli entry point load the target's accessibility bundle
+    // and manage the accessibility switches. It does not choose the hit below.
+    char *prepared = vp_ax_elements_json(pid, 1);
+    if (prepared) free(prepared);
+    void *ax = dlopen("/System/Library/PrivateFrameworks/AXRuntime.framework/AXRuntime", RTLD_NOW);
+    VPAxFunctions f = {0};
+    if (ax) {
+        f.copy = dlsym(ax, "AXUIElementCopyAttributeValue");
+        f.getValue = dlsym(ax, "AXValueGetValue");
+        f.valueTypeID = dlsym(ax, "AXValueGetTypeID");
+        f.elementTypeID = dlsym(ax, "AXUIElementGetTypeID");
+        f.getPid = dlsym(ax, "AXUIElementGetPid");
+        f.setTimeout = dlsym(ax, "AXUIElementSetMessagingTimeout");
+    }
+    return vp_ax_display_hit_for_functions(f, NSClassFromString(@"AXUIElement"), pid, displayID, x, y, width, height, degrees);
 }
 
 NSDictionary *vp_element_tap_context_for_functions(VPAxFunctions f, Class cls, int pid, NSDictionary *selected) {

@@ -120,6 +120,26 @@ extension GuestAPI {
         else {
             throw IcliError.failed("frontmost application could not be verified")
         }
+        if let before = try elementTapDisplay() {
+            let report = vp_element_tap_display()
+            guard let identifier = report["display_id"] as? NSNumber,
+                  CFGetTypeID(identifier) != CFBooleanGetTypeID(), identifier.doubleValue > 0,
+                  identifier.doubleValue <= Double(UInt32.max), identifier.doubleValue.rounded() == identifier.doubleValue else {
+                throw IcliError.failed("Active AX display identity unavailable")
+            }
+            let pid = try elementHitPID(foreground)
+            let result = vp_ax_display_element_at(Int32(pid), identifier.uint32Value, x, y,
+                                                 before.width, before.height, Int32(before.degrees))
+            if let error = result["error"] as? String { throw IcliError.failed(error) }
+            let after = frontmostApp()
+            guard before == (try elementTapDisplay()),
+                  after["verified"] as? Bool == true, try elementHitPID(after) == pid,
+                  after["bundle_id"] as? String == bundle,
+                  (vp_element_tap_display()["display_id"] as? NSNumber)?.uint32Value == identifier.uint32Value else {
+                throw IcliError.failed("Foreground application or display changed during hit testing; retry")
+            }
+            return result
+        }
         if bundle == "com.apple.springboard" || bundle == "com.apple.PineBoard" {
             let pid = (foreground["pid"] as? Int) ?? Int(vp_springboard_pid())
             guard pid > 1 else {
@@ -134,6 +154,20 @@ extension GuestAPI {
             return try decodeBridgeJSON(takeCString(ptr), "AX response")
         }
         return try IcliKit.elementAt(x: x, y: y)
+    }
+
+    private static func elementHitPID(_ foreground: [String: Any]) throws -> Int {
+        var value = foreground["pid"] as? NSNumber
+        if value == nil, let bundle = foreground["bundle_id"] as? String {
+            let apps = try runningApps()["apps"] as? [[String: Any]] ?? []
+            let matches = apps.filter { $0["bundle_id"] as? String == bundle }
+            if matches.count == 1 { value = matches[0]["pid"] as? NSNumber }
+        }
+        guard let value, CFGetTypeID(value) != CFBooleanGetTypeID(), value.doubleValue > 1,
+              value.doubleValue <= Double(Int32.max), value.doubleValue.rounded() == value.doubleValue else {
+            throw IcliError.failed("The verified foreground application's PID is unavailable")
+        }
+        return value.intValue
     }
 
     private static func tapElementFallback(_ selector: ElementSelector) throws -> [String: Any] {

@@ -7,6 +7,7 @@ typedef struct {
  CFTypeID (*elementTypeID)(void);
  CFTypeID (*valueTypeID)(void);
  Boolean (*getValue)(CFTypeRef,int,void *);
+ int (*getPid)(CFTypeRef,pid_t *);
 } VPAxFunctions;
 NSDictionary *vp_ax_walk(VPAxFunctions functions, CFTypeRef root, pid_t pid, int maxElements, int maxDepth, int timeoutMS);
 // switchesEnabled is true only when this invocation enabled a previously disabled AX switch.

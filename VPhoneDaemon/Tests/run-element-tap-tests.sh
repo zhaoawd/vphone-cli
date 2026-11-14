@@ -15,6 +15,11 @@ trap '/bin/rm -rf "$temporary"' EXIT
     -o "$temporary/element-tap-context-tests"
 "$temporary/element-tap-context-tests"
 
+/usr/bin/xcrun --sdk macosx clang -fobjc-arc -framework Foundation -framework CoreGraphics \
+    "$daemon/Native/vphoned_element_tap.m" "$daemon/Tests/AXDisplayHitTests.m" \
+    -o "$temporary/ax-display-hit-tests"
+"$temporary/ax-display-hit-tests"
+
 /usr/bin/xcrun --sdk macosx swiftc -swift-version 6 -parse-as-library \
     -module-cache-path "$temporary/module-cache" \
     "$daemon/Daemon/GuestElementTap.swift" "$daemon/Tests/ElementTapTests.swift" \

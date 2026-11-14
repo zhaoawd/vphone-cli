@@ -47,6 +47,11 @@ public func lockState() -> [String: Any] {
     ["locked": TestIcli.isLocked, "screen_off": TestIcli.isScreenOff]
 }
 
+public func runningApps() throws -> [String: Any] {
+    let bundle = TestIcli.rawFrontmost?["bundle_id"] as? String ?? TestIcli.bundle
+    return ["apps": [["bundle_id": bundle, "pid": bundle == "com.apple.springboard" ? TestIcli.springboardPID : 123]]]
+}
+
 public func interfaceRotationDegrees() -> Int? { TestIcli.degrees }
 public func screenInfo() -> [String: Any] {
     let sideways = [90, 270].contains(TestIcli.degrees)

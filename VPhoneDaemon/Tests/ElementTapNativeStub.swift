@@ -1,7 +1,13 @@
 import Foundation
 import IcliKit
 
-public func vp_element_tap_display() -> [String: Any] { TestIcli.display }
+public func vp_element_tap_display() -> [String: Any] {
+    var report = TestIcli.display
+    if report["dual_display"] as? Bool == true, report["display_id"] == nil {
+        report["display_id"] = report["name"] as? String == "inner" ? 7 : 1
+    }
+    return report
+}
 
 public func vp_element_tap_application_frame(_ pid: Int32) -> [String: Any] {
     precondition(pid == 123 || pid == Int32(TestIcli.springboardPID))
@@ -22,6 +28,13 @@ public func vp_element_tap_in_context(_ pid: Int32, _ element: [String: Any]) ->
 }
 
 public func vp_springboard_pid() -> Int32 { Int32(TestIcli.springboardPID) }
+
+public func vp_ax_display_element_at(_ pid: Int32, _ displayID: UInt32, _ x: Double, _ y: Double,
+                                     _ width: Double, _ height: Double, _ degrees: Int32) -> [String: Any] {
+    TestIcli.afterQuery?()
+    return ["source": "ax", "pid": Int(pid), "element": TestIcli.elements.first ?? [:],
+            "x": x, "y": y, "test_display_id": Int(displayID)]
+}
 
 public func vp_ax_elements_json(_ pid: Int32, _ maxElements: Int32) -> UnsafeMutablePointer<CChar>? {
     TestIcli.afterQuery?()

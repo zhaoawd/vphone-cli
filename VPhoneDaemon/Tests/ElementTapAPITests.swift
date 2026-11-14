@@ -240,6 +240,20 @@ enum ElementTapAPITests {
         expect(elementAtResult?["pid"] as? Int == 555, "element_at uses SpringBoard PID")
         expect((elementAtResult?["element"] as? [String: Any])?["identifier"] as? String == "Safari", "element_at returns node")
 
+        let savedForeground = TestIcli.rawFrontmost
+        for bundle in ["com.autophone.tap-probe", "com.apple.springboard"] {
+            TestIcli.bundle = bundle
+            // The actual icli focal-app reply has no pid. apps.foreground
+            // adds one for JSON clients, while this direct caller must resolve it.
+            TestIcli.rawFrontmost = ["verified": true, "bundle_id": bundle, "source": "runningboard"]
+            TestIcli.display = ["dual_display": true, "name": "inner", "width": 669.0, "height": 951.0, "display_id": 7]
+            let hit = try GuestAPI.executeInterface("ui.element_at", ["x": 60.0, "y": 80.0])
+            expect(hit?["test_display_id"] as? Int == 7, "Duo app and SpringBoard hit tests pass the active display ID")
+            expect(hit?["pid"] as? Int == (bundle == "com.apple.springboard" ? 555 : 123), "native hit is scoped to the actual foreground process")
+        }
+        TestIcli.rawFrontmost = savedForeground
+        TestIcli.bundle = "com.apple.springboard"
+
         // ui.tap_element on SpringBoard (single display fallback)
         TestIcli.display = ["dual_display": false]
         TestIcli.injected = []

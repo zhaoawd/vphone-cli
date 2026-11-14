@@ -15,3 +15,6 @@ int vp_springboard_pid(void);
 char * _Nullable vp_ax_elements_json(int pid, int maxElements);
 /// Query AX element at position via icli_ax_element_at_json if present in the runtime.
 char * _Nullable vp_ax_element_at_json(int pid, double x, double y);
+/// Native display-scoped AX hit test. Coordinates use the active interface.
+NSDictionary<NSString *, id> * _Nonnull vp_ax_display_element_at(int pid, unsigned int displayID, double x, double y,
+                                                               double width, double height, int degrees);
