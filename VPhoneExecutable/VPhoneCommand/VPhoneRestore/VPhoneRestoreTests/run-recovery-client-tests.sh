@@ -17,4 +17,8 @@ trap 'rm -rf "$out"' EXIT
     cat "$tests/RecoveryClientFixture.cfrag"
 } > "$out/recovery-client.c"
 "${CC:-clang}" -std=c11 -Wall -Wextra -Werror "$out/recovery-client.c" -o "$out/recovery-client"
-"$out/recovery-client"
+result=0
+"$out/recovery-client" || result=1
+"${CC:-clang}" -std=c11 -DHAVE_IOKIT -Wall -Wextra -Werror "$out/recovery-client.c" -o "$out/recovery-client-iokit"
+"$out/recovery-client-iokit" || result=1
+exit "$result"

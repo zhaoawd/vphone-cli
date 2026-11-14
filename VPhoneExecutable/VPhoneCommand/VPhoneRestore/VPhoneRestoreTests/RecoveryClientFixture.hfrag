@@ -10,8 +10,17 @@ enum { IRECV_K_DFU_MODE, IRECV_K_PORT_DFU_MODE, IRECV_K_WTF_MODE, IRECV_K_RECOVE
 enum { IRECV_CONNECTED };
 typedef struct { unsigned size; void *data; double progress; int type; } irecv_event_t;
 typedef struct client *irecv_client_t;
+#ifdef HAVE_IOKIT
+struct fixture_iokit {
+    irecv_error_t (*CreateDeviceAsyncEventSource)(struct fixture_iokit **, void **);
+};
+#endif
 struct client {
     int mode;
+#ifdef HAVE_IOKIT
+    struct fixture_iokit **handle;
+    void *async_event_source;
+#endif
     struct { uint64_t ecid; void *ap_nonce, *sep_nonce; unsigned ap_nonce_size, sep_nonce_size; } device_info;
     void (*connected_callback)(irecv_client_t, const irecv_event_t *);
 };
@@ -19,6 +28,22 @@ static struct client usb_client;
 static int closes;
 static int libirecovery_debug;
 static irecv_error_t open_result, config_result, interface_result, kis_init_result, kis_info_result;
+#ifdef HAVE_IOKIT
+static irecv_error_t async_result;
+static int frees;
+static irecv_error_t create_async_source(struct fixture_iokit **handle, void **source) {
+    assert(handle && *handle && source);
+    *source = NULL;
+    return async_result;
+}
+static struct fixture_iokit fixture_interface = { create_async_source };
+static struct fixture_iokit *fixture_interface_pointer = &fixture_interface;
+static void fixture_free(void *client) { assert(client == &usb_client); frees++; }
+#define free fixture_free
+static void *CFRunLoopGetCurrent(void) { return NULL; }
+static void CFRunLoopAddSource(void *loop, void *source, void *mode) { (void)loop; (void)source; (void)mode; }
+#define kCFRunLoopDefaultMode NULL
+#endif
 
 #define debug(...) ((void)0)
 static void irecv_set_debug_level(int level) { (void)level; }
@@ -27,6 +52,13 @@ static irecv_error_t libusb_open_with_ecid(irecv_client_t *out, uint64_t ecid) {
     if (open_result == IRECV_E_SUCCESS) *out = &usb_client;
     return open_result;
 }
+#ifdef HAVE_IOKIT
+static irecv_error_t iokit_open_with_ecid(irecv_client_t *out, uint64_t ecid) {
+    irecv_error_t result = libusb_open_with_ecid(out, ecid);
+    if (result == IRECV_E_SUCCESS) (*out)->handle = &fixture_interface_pointer;
+    return result;
+}
+#endif
 static void irecv_close(irecv_client_t client) { if (client) closes++; }
 static irecv_error_t irecv_usb_set_configuration(irecv_client_t client, int config) {
     assert(client == &usb_client && config == 1);

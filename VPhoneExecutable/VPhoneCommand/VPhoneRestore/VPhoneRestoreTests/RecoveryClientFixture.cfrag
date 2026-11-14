@@ -2,8 +2,14 @@ static int check(const char *name, uint64_t ecid, irecv_error_t expected, int ex
     struct client previous;
     irecv_client_t out = &previous;
     closes = 0;
+#ifdef HAVE_IOKIT
+    frees = 0;
+#endif
     irecv_error_t actual = irecv_open_with_ecid(&out, ecid);
     if (actual == expected && closes == expected_closes &&
+#ifdef HAVE_IOKIT
+        frees == (async_result == IRECV_E_SUCCESS ? 0 : 1) &&
+#endif
         out == (expected == IRECV_E_SUCCESS ? &usb_client : NULL)) {
         return 0;
     }
@@ -19,6 +25,11 @@ int main(void) {
     config_result = IRECV_E_USB_CONFIGURATION;
     failures += check("USB configuration failure", 0, IRECV_E_USB_CONFIGURATION, 1);
     config_result = IRECV_E_SUCCESS;
+#ifdef HAVE_IOKIT
+    async_result = IRECV_E_UNABLE_TO_CONNECT;
+    failures += check("IOKit asynchronous event source failure", 0, IRECV_E_UNABLE_TO_CONNECT, 0);
+    async_result = IRECV_E_SUCCESS;
+#endif
     interface_result = IRECV_E_USB_INTERFACE;
     failures += check("USB interface failure", 0, IRECV_E_USB_INTERFACE, 1);
     interface_result = IRECV_E_SUCCESS;
@@ -32,6 +43,10 @@ int main(void) {
     usb_client.device_info.ecid = 1;
     failures += check("KIS ECID mismatch", 2, IRECV_E_NO_DEVICE, 1);
     failures += check("successful open publishes the client", 1, IRECV_E_SUCCESS, 0);
-    printf("Recovery client: %d/7 passed\n", 7 - failures);
+#ifdef HAVE_IOKIT
+    printf("Recovery client (IOKit fixture): %d/8 passed\n", 8 - failures);
+#else
+    printf("Recovery client (libusb fixture): %d/7 passed\n", 7 - failures);
+#endif
     return failures != 0;
 }
