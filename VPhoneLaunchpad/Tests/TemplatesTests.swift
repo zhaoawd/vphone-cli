@@ -1,10 +1,16 @@
 import Darwin
 import Foundation
 
+struct VPhoneLaunchpadError: Error {
+    init(_ message: String) { self.message = message }
+    let message: String
+}
+
 @main
 struct TemplatesTests {
     static func main() async throws {
         slimmingArguments()
+        try standaloneSlimmingSwitches()
         slimmingCompatibility()
         commandArguments()
         patchOverrides()
@@ -19,6 +25,29 @@ struct TemplatesTests {
     }
 
     // MARK: - Switches
+
+    static func standaloneSlimmingSwitches() throws {
+        func resolve(_ options: [String], usesTemplate: Bool = false) throws -> VPhoneLaunchpadSlimming {
+            var foreground = false
+            let request = try VPhoneLaunchpadControlRequest.parse(
+                ["vm", "create", "fixture"] + (usesTemplate ? [] : ["--no-template"]) + options,
+                foreground: &foreground,
+            )
+            return try SlimmingControlFixture.slimming(request, usesTemplate: usesTemplate)
+        }
+        let disabled = try resolve(["--slim", "off"])
+        let enabled = try resolve(["--slim", "on"])
+        let defaultOptions = try resolve([])
+        precondition(!disabled.slim && enabled.slim && defaultOptions.slim)
+        for options in [["--trim", "none"], ["--accounts-off"], ["--slim", "maybe"]] {
+            do {
+                _ = try resolve(options)
+                preconditionFailure("Unexpectedly accepted \(options) without a template")
+            } catch is VPhoneLaunchpadError {}
+        }
+        let template = try resolve(["--trim", "none"], usesTemplate: true)
+        precondition(template.trim == .none)
+    }
 
     static func slimmingArguments() {
         let standard = VPhoneLaunchpadSlimming()
