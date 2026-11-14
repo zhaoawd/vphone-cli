@@ -58,6 +58,9 @@ public protocol VPhoneTemplateSetupMachine: AnyObject {
     /// Why the VM can no longer serve the setup boot (its process exited, the
     /// guest panicked), or nil while it runs.
     func failure() -> String?
+    /// Whether the VM process has exited with status 0 and no guest panic,
+    /// as vphone-vm does when the guest powers the virtual machine off.
+    func exitedCleanly() -> Bool
     /// Whether vphoned answers through the VM's control socket.
     func ping() -> Bool
     /// One vphoned method. Throws ``VPhoneGuestCallError``.
@@ -960,15 +963,30 @@ public final class VPhoneTemplateSetupBoot {
         try restartGuest(deadline: deadline(timeouts.reboot))
     }
 
-    private func restartGuest(deadline end: Date) throws {
+    // Internal so a native VM regression can exercise only the reboot path,
+    // without the setup runner's snapshot and application removal steps.
+    func restartGuest(deadline end: Date) throws {
         let before = try bootMarker(deadline: end)
         do {
             _ = try machine.call("system.reboot", params: ["force": true], timeout: 30)
         } catch let error as VPhoneGuestCallError where error.kind == .transport {
             // The guest can go down before it answers.
         }
+
+        // A guest that powers off instead of restarting stops the virtual
+        // machine, and vphone-vm exits with status 0 (guestDidStop). Start it
+        // again once for the second boot; any other exit still fails the step.
+        var relaunched = false
         while true {
-            try checkMachine()
+            // Read failure first: a clean exit between these polls must be
+            // handled here rather than rejected by the next failure read.
+            let failure = machine.failure()
+            if !relaunched, machine.exitedCleanly() {
+                relaunched = true
+                try machine.start()
+                continue
+            }
+            if let failure { throw StepError(failure) }
             if machine.ping(), let after = try? machine.call("processes.list", params: [:], timeout: timeouts.rebootPoll),
                let marker = Self.bootMarker(after), marker != before
             {

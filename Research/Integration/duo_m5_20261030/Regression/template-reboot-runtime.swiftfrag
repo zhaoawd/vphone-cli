@@ -1,0 +1,143 @@
+import Foundation
+@testable import VPhoneCoreKit
+
+private struct RegressionFailure: Error, CustomStringConvertible {
+    let description: String
+    init(_ message: String) { description = message }
+}
+
+private final class ObservedMachine: VPhoneTemplateSetupMachine {
+    let base: VPhoneTemplateSetupVirtualMachine
+    let output: URL
+    let powerOffControl: Bool
+    var starts = 0
+    var cleanExits = 0
+    var rebootRequests = 0
+    var forbiddenCalls: [String] = []
+
+    init(base: VPhoneTemplateSetupVirtualMachine, output: URL, powerOffControl: Bool) {
+        self.base = base; self.output = output; self.powerOffControl = powerOffControl
+    }
+
+    func save(_ name: String, _ object: [String: Any]) throws {
+        try JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent(name))
+    }
+
+    func saveBoot() throws {
+        guard starts > 0 else { return }
+        try base.regressionOutput.write(to: output.appendingPathComponent("boot-\(starts).log"), atomically: true, encoding: .utf8)
+    }
+
+    func start() throws {
+        try saveBoot()
+        try base.start()
+        starts += 1
+        print("started VM \(starts)")
+    }
+    func failure() -> String? { base.failure() }
+    func exitedCleanly() -> Bool {
+        let clean = base.exitedCleanly()
+        if clean { cleanExits += 1 }
+        return clean
+    }
+    func ping() -> Bool { base.ping() }
+    func call(_ method: String, params: [String: Any], timeout: TimeInterval) throws -> [String: Any] {
+        guard ["processes.list", "system.reboot"].contains(method) else {
+            forbiddenCalls.append(method)
+            throw RegressionFailure("Unexpected setup operation: \(method)")
+        }
+        if method == "system.reboot" {
+            rebootRequests += 1
+            // An explicit control for a guest that restarts in place: a real
+            // shutdown exercises the same clean-exit/relaunch host path.
+            return try base.call(powerOffControl ? "system.shutdown" : method, params: params, timeout: timeout)
+        }
+        return try base.call(method, params: params, timeout: timeout)
+    }
+    func stop(timeout: TimeInterval) -> Bool { base.stop(timeout: timeout) }
+    func kill() { forbiddenCalls.append("kill") }
+
+    func normalShutdown() throws {
+        if base.regressionRunning {
+            _ = try? base.call("system.shutdown", params: ["force": true], timeout: 10)
+            let end = Date().addingTimeInterval(60)
+            while base.regressionRunning, Date() < end { Thread.sleep(forTimeInterval: 0.25) }
+        }
+        try saveBoot()
+        guard !base.regressionRunning, base.exitedCleanly() else {
+            throw RegressionFailure("Normal shutdown did not complete")
+        }
+    }
+}
+
+@main
+private struct NativeTemplateRebootRegression {
+    static func require(_ condition: Bool, _ message: String) throws {
+        if !condition { throw RegressionFailure(message) }
+    }
+
+    static func run() throws {
+        guard CommandLine.arguments.count == 5 else { throw RegressionFailure("Expected machine, resources, output and native|poweroff") }
+        let paths = CommandLine.arguments.dropFirst().prefix(3).map { URL(fileURLWithPath: $0).standardizedFileURL }
+        let (machineURL, resourceURL, output) = (paths[0], paths[1], paths[2])
+        let mode = CommandLine.arguments[4]
+        try require(["native", "poweroff"].contains(mode), "Unknown mode")
+        try require(machineURL.lastPathComponent == "duo-template-reboot-20261114" && machineURL.path.contains("/.build/"), "Pinned isolated copy required")
+        let bundle = try VPhoneBundle.load(at: machineURL)
+        let base = VPhoneTemplateSetupVirtualMachine(bundle: bundle, launcher: try VPhoneGuestLaunchPlanner(),
+            resources: VPhoneResources(base: resourceURL), headless: true, verbosity: .trace)
+        let machine = ObservedMachine(base: base, output: output, powerOffControl: mode == "poweroff")
+        var shutdownComplete = false
+        defer { if !shutdownComplete { try? machine.normalShutdown() } }
+        try machine.start()
+        let connectDeadline = Date().addingTimeInterval(180)
+        while !machine.ping() {
+            if let reason = machine.failure() { throw RegressionFailure(reason) }
+            try require(Date() < connectDeadline, "Guest did not connect")
+            Thread.sleep(forTimeInterval: 1)
+        }
+        Thread.sleep(forTimeInterval: 4)
+        let info = try base.call("device.info", params: [:], timeout: 15)
+        try machine.save("device-before.json", info)
+        try require((info["agent"] as? [String: Any])?["binary_hash"] as? String == "446925b66b983e6395bc2c6715885f1eae1d1836cee014a3df136f468540419b", "Unexpected daemon")
+        let environment = try base.call("environment.status", params: [:], timeout: 15)
+        try machine.save("environment-before.json", environment)
+        try require(environment["root_read_only"] as? Bool == true, "Read-only cold root required")
+        let before = try base.call("processes.list", params: [:], timeout: 15)
+        try machine.save("processes-before.json", before)
+        let marker = VPhoneTemplateSetupBoot.bootMarker(before)
+        try require(marker != nil, "launchd start time required")
+        var timeouts = VPhoneTemplateSetupTimeouts()
+        timeouts.reboot = 180; timeouts.rebootPoll = 5; timeouts.retryInterval = 1
+        let plan = VPhoneTemplateSetupPlan(slimming: VPhoneTemplateSlimmingRequest.defaultSlimming,
+            requiresEveryApp: true, timeouts: timeouts)
+        let boot = VPhoneTemplateSetupBoot(machine: machine, plan: plan)
+        try boot.restartGuest(deadline: Date().addingTimeInterval(timeouts.reboot))
+        let after = try base.call("processes.list", params: [:], timeout: 15)
+        try machine.save("processes-after.json", after)
+        try require(VPhoneTemplateSetupBoot.bootMarker(after) != marker, "Boot marker did not change")
+        let updated = try base.call("environment.status", params: [:], timeout: 15)
+        try machine.save("environment-after.json", updated)
+        try require(updated["root_read_only"] as? Bool == true, "Root mount changed")
+        let libraries = try JSONSerialization.data(withJSONObject: environment["libraries"] ?? [], options: [.sortedKeys])
+        let updatedLibraries = try JSONSerialization.data(withJSONObject: updated["libraries"] ?? [], options: [.sortedKeys])
+        try require(libraries == updatedLibraries, "Guest libraries changed")
+        try require(machine.rebootRequests == 1 && machine.forbiddenCalls.isEmpty, "Unexpected mutation or reboot count")
+        try require((1...2).contains(machine.starts), "Unexpected VM start count")
+        if mode == "poweroff" { try require(machine.starts == 2 && machine.cleanExits == 1, "Clean exit must relaunch exactly once") }
+        try machine.normalShutdown()
+        shutdownComplete = true
+        let summary: [String: Any] = ["mode": mode, "starts": machine.starts, "cleanExitRelaunches": machine.cleanExits,
+            "rebootRequests": machine.rebootRequests, "bootMarkerBefore": marker!,
+            "bootMarkerAfter": VPhoneTemplateSetupBoot.bootMarker(after)!, "librariesUnchanged": true,
+            "rootReadOnly": true, "normalShutdown": true, "forbiddenCalls": machine.forbiddenCalls]
+        try machine.save("summary.json", summary)
+        print(String(decoding: try JSONSerialization.data(withJSONObject: summary, options: [.sortedKeys]), as: UTF8.self))
+    }
+
+    static func main() {
+        do { try run() }
+        catch { FileHandle.standardError.write(Data("template reboot regression: \(error)\n".utf8)); exit(1) }
+    }
+}
