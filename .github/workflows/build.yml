@@ -92,6 +92,8 @@ jobs:
           zsh VPhoneDaemon/Tests/run-health-tests.sh
           zsh VPhoneDaemon/Tests/run-process-pipe-tests.sh
           zsh VPhoneDaemon/Tests/run-process-output-tests.sh
+          zsh VPhoneDaemon/Tests/run-cached-binary-identity-tests.sh
+          zsh VPhoneDaemon/Tests/run-cached-binary-confirmation-tests.sh
 
       - name: Recovery client cleanup tests
         run: zsh VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/run-recovery-client-tests.sh
@@ -106,6 +108,20 @@ jobs:
             -disableAutomaticPackageResolution -parallel-testing-enabled NO -jobs 4 test \
             -only-testing:VPhoneCoreKitTests/TemplateSetupBootTests \
             -only-testing:VPhoneCoreKitTests/APIRequestGateTests
+
+      - name: Dyld mapping lifetime and undo tests
+        run: |
+          set -euo pipefail
+          xcodebuild -workspace VPhone.xcworkspace -scheme FirmwarePatcherTests \
+            -configuration Debug -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath .build/XcodeCommandTests \
+            -clonedSourcePackagesDirPath .build/XcodeBundle/SourcePackages \
+            -disableAutomaticPackageResolution -parallel-testing-enabled NO -jobs 4 test \
+            -only-testing:FirmwarePatcherTests/DyldSharedCacheMappingLifetimeTests \
+            -only-testing:FirmwarePatcherTests/DyldSharedCacheArm64eX1BootstrapTests \
+            -only-testing:FirmwarePatcherTests/DyldSharedCacheUndoLogTests \
+            -only-testing:FirmwarePatcherTests/DyldSharedCacheUndoWordsTests \
+            -only-testing:FirmwarePatcherTests/DyldSharedCacheOutdatedImplementationTests
 
       - name: Guest display and point input tests
         run: |

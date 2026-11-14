@@ -6966,3 +6966,41 @@ second cold boot verified all 21 baseline library entries, read-only root,
 trace=0 and original power/rotation settings, followed by normal shutdown
 with no state-file handles. Final source and candidate bundle remain for
 review; see `rollback-final.json` in the task evidence directory.
+
+### DSC mapping lifetime and cached worker integration (2026-11-15)
+
+Integrated the final changes from #853 (`2fdcf16c`), #897 (`aa3d1ed9`)
+and #865 (`ea5990ec`) against the Duo branch. No patch identifier,
+declaration, preset, instruction selection or undo implementation changed.
+Duo `31933ff2` continues to preserve other patches when migrating X1 undo
+page records or repairing an existing words sidecar.
+
+- X1 planning releases mapped chunks after each image, including error exits.
+  Linux limits planning to four workers; macOS keeps its CPU-based limit.
+  Export lookup and the installer's guest-volume scope drain autoreleased
+  objects before returning to their callers.
+- The daemon compares the opened cached image's device/inode to the running
+  executable path, allowing aliases such as `/var` and `/private/var`.
+  Confirmation validates the cache directory, pending marker and image before
+  promotion. Production root ownership, no-follow, digest, executable and
+  post-hash checks remain in place. The historical pending-marker failures'
+  complete cause is not established; the prior cache-directory incident is
+  not attributed to aliasing.
+- Saved old-code failures cover retained mappings after success/error and a
+  real export lookup, plus confirmation through an alias and rejection of a
+  symlink pending marker. Fixed code passes 29 firmware tests and 15 C checks.
+  Full Bundle build/admission and strict signatures pass.
+- Two APFS clones of an already lowered real DSC produce identical old/new
+  plans (38 images, zero rewrites) and identical SHA-256 for all 82 outputs
+  after undo normalization; 22 records belonging to other patches remain.
+  This real-cache comparison does not exercise nonzero rewriting; synthetic
+  X1 tests cover that behavior.
+- A new isolated VM, using the approved baseline host with automatic daemon
+  updates disabled, retains the new cached worker across a cold boot. It was
+  then restored to the original daemon and markers and cold-boot checked
+  again. All 21 library entries and read-only root remained unchanged; normal
+  shutdown left no state-file handles. The original VM was not booted.
+
+Actual CFW install/System unmount and Linux FUSE/SSHFS behavior were not
+runtime-tested. Evidence, commands, exact hashes and the four VM phases are
+recorded in `Research/Integration/duo_m5_20261030/CACHE_LIFECYCLE_20261115.md`.
