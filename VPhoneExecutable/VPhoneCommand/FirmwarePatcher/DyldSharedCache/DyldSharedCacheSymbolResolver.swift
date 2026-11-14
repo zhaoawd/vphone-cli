@@ -131,7 +131,10 @@ public final class DyldSharedCacheSymbolResolver {
 
         var result: [String: Resolution] = [:]
 
-        if let machO = machOFile(forImage: imagePath) {
+        // MachOKit autoreleases objects that keep every sub-cache mapped. A
+        // command-line process does not drain its pool before guest unmount.
+        autoreleasepool {
+            guard let machO = machOFile(forImage: imagePath) else { return }
             for exported in machO.exportedSymbols {
                 guard let offset = exported.offset, offset != 0 else { continue }
                 let address = headerAddress &+ UInt64(offset)
