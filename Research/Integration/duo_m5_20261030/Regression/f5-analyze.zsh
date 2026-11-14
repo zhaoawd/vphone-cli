@@ -40,7 +40,7 @@ FILENAME==ARGV[2] {et[++m]=$1; ev[m]=$2; next}
   for(j=1;j<=m;j++) if(best && et[j]>=base-0.05 && et[j]<=base+2.2 && ev[j] ~ /hold o|shown=|handoff (held|released)/) {
       tag = ev[j] ~ /handoff / ? ev[j] : ev[j] ~ /hold on/ ? "hold-on" : ev[j] ~ /hold off/ ? "hold-off" : substr(ev[j],1,7)
       evs = evs sprintf(" %s@+%d", tag, (et[j]-base)*1000) }
-  printf "%-24s dark +%5d..+%5dms (%3d fr, max %3d%%) |%s\n", label, (s-base)*1000, (e-base)*1000+33, $3, $4, evs }' \
+  printf "%-24s dark sample PTS %+5d..%+5dms (%3d fr, max %3d%%) |%s\n", label, (s-base)*1000, (e-base)*1000, $3, $4, evs }' \
     "$dir/actions.tsv" "$dir/events.tsv" "$dir/runs.tsv" > "$dir/aligned.txt"
 
 {

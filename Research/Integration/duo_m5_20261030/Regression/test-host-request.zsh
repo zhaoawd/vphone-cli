@@ -17,7 +17,15 @@ run_case() {
         [[ ! -S "$directory/vphone.sock" ]] || break
         sleep 0.02
     done
-    if [[ "$path_kind" == relative ]]; then
+    if [[ "$path_kind" == acceptance ]]; then
+        local selected
+        selected=$(vphone_acceptance_socket "$repo_root" "$directory/vphone.sock")
+        if vphone_acceptance_socket "$work" "$selected" >/dev/null 2>&1; then
+            print -u2 'Acceptance socket outside the supplied workspace was accepted'
+            failures=$((failures + 1))
+        fi
+        if vphone_host_request "$selected" '{"t":"fixture"}' > "$work/$tag.json" 2> "$work/$tag.err"; then result=0; else result=1; fi
+    elif [[ "$path_kind" == relative ]]; then
         if (cd "$directory" && vphone_host_request vphone.sock '{"t":"fixture"}') > "$work/$tag.json" 2> "$work/$tag.err"; then result=0; else result=1; fi
     else
         if vphone_host_request "$directory/vphone.sock" '{"t":"fixture"}' > "$work/$tag.json" 2> "$work/$tag.err"; then result=0; else result=1; fi
@@ -41,5 +49,6 @@ run_case empty empty relative failure
 run_case false false relative failure
 run_case invalid invalid relative failure
 run_case long-path ok absolute success
+run_case acceptance-path ok acceptance success
 (( failures == 0 )) || { print -u2 "Transport contract failed: $failures; evidence: $work"; exit 1; }
-print "Host request contract: 5 cases passed; evidence: $work"
+print "Host request contract: 6 cases passed; evidence: $work"

@@ -30,7 +30,7 @@ class VPhoneScreenRecorder {
     private var videoInput: AVAssetWriterInput?
     private var adaptor: AVAssetWriterInputPixelBufferAdaptor?
     private var timer: Timer?
-    private var frameCount: Int64 = 0
+    private var timeline = VPhoneRecordingTimeline()
     private var outputURL: URL?
     private var graphicsDisplay: VZGraphicsDisplay?
     private var screenshotInFlight = false
@@ -79,7 +79,7 @@ class VPhoneScreenRecorder {
         videoInput = input
         self.adaptor = adaptor
         graphicsDisplay = display
-        frameCount = 0
+        timeline = VPhoneRecordingTimeline()
         screenshotInFlight = false
         didLogCaptureFailure = false
 
@@ -171,8 +171,11 @@ class VPhoneScreenRecorder {
 
         screenshotInFlight = true
         takeGraphicsScreenshot(from: graphicsDisplay) { [weak self] cgImage in
+            // Virtualization returns its last presented image without a frame
+            // timestamp. Use the host monotonic clock at capture completion.
+            let capturedAt = DispatchTime.now().uptimeNanoseconds
             Task { @MainActor in
-                guard let self else { return }
+                guard let self, self.timer != nil, self.adaptor === adaptor else { return }
 
                 self.screenshotInFlight = false
 
@@ -187,7 +190,7 @@ class VPhoneScreenRecorder {
                 }
 
                 self.didLogCaptureFailure = false
-                self.appendFrame(from: adaptor, cgImage: cgImage)
+                self.appendFrame(from: adaptor, cgImage: cgImage, capturedAt: capturedAt)
             }
         }
     }
@@ -200,8 +203,9 @@ class VPhoneScreenRecorder {
         return cgImage
     }
 
-    private func appendFrame(from adaptor: AVAssetWriterInputPixelBufferAdaptor, cgImage: CGImage) {
-        guard let input = videoInput, input.isReadyForMoreMediaData else { return }
+    private func appendFrame(from adaptor: AVAssetWriterInputPixelBufferAdaptor, cgImage: CGImage, capturedAt: UInt64) {
+        guard let input = videoInput, input.isReadyForMoreMediaData,
+              let time = timeline.presentationTime(for: capturedAt) else { return }
         guard let pool = adaptor.pixelBufferPool else { return }
 
         var pixelBuffer: CVPixelBuffer?
@@ -225,9 +229,13 @@ class VPhoneScreenRecorder {
         }
         CVPixelBufferUnlockBaseAddress(pb, [])
 
-        let time = CMTime(value: frameCount, timescale: 30)
-        adaptor.append(pb, withPresentationTime: time)
-        frameCount += 1
+        if adaptor.append(pb, withPresentationTime: time) {
+            let isFirstFrame = timeline.firstCaptureUptimeNanoseconds == nil
+            timeline.didAppend(at: capturedAt)
+            if isFirstFrame, let outputURL {
+                print("[record] first frame - uptime_ns=\(capturedAt) file=\(outputURL.path)")
+            }
+        }
     }
 
     private func resolveCaptureSource(for view: NSView) throws -> VZGraphicsDisplay {
