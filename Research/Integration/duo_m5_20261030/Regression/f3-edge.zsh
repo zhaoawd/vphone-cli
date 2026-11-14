@@ -3,19 +3,19 @@
 # edge and record whether the app left the foreground. Paths: the window's
 # host `swipe` (VZ touchscreen), vphoned `input.swipe` (no edge flags), and
 # vphoned `input.touch` with `edge: 2` (vphoned's own digitizer edge event).
-#   f3-edge.zsh <baseline|candidate> <new-output-directory> [trials]
+#   f3-edge.zsh <baseline|candidate|absolute-vphone.sock> <new-output-directory> [trials]
 set -euo pipefail
 source "${0:a:h}/rpc-request.zsh"
 source "${0:a:h}/host-request.zsh"
 
 repo_root="$(cd "${0:a:h}/../../../.." && pwd)"
-variant="${1:?usage: f3-edge.zsh <baseline|candidate> <new-output-directory> [trials]}"
+target="${1:?usage: f3-edge.zsh <baseline|candidate|absolute-vphone.sock> <new-output-directory> [trials]}"
 output_root="${2:?new evidence directory required}"
 trials="${3:-3}"
-[[ "$variant" == baseline || "$variant" == candidate ]] || exit 2
 [[ "$trials" == <-> ]] && (( trials > 0 && trials <= 20 )) || exit 2
-socket_path="$repo_root/.build/acceptance/machines/duo-$variant-20261030/vphone.sock"
-[[ -S "$socket_path" && "$output_root" == "$repo_root/.build/"* && ! -e "$output_root" ]] || exit 2
+socket_path=$(vphone_acceptance_socket "$repo_root" "$target")
+output_root="${output_root:A}"
+[[ "$output_root" == "$repo_root/.build/"* && ! -e "$output_root" ]] || exit 2
 mkdir -p "$output_root"
 cp "${0:a}" "$output_root/driver.zsh"
 shasum -a 256 "${0:a}" > "$output_root/driver-sha256.txt"

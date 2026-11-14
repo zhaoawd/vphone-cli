@@ -8,6 +8,7 @@ repo="${0:a:h:h:h:h:h}"
 socket="${1:?usage: auto-lock-runtime.zsh <acceptance-socket> <evidence-directory> <observe|profiled|after-reboot>}"
 out="${2:?evidence directory required}"
 mode="${3:?observe, profiled, or after-reboot required}"
+expected="${4:-}"
 [[ "$socket" == "$repo/.build/"* && -S "$socket" && "$out" == "$repo/.build/"* ]]
 rpc() { vphone_host_request "$socket" "$(vphone_rpc_request "$@")"; }
 guest_dir=/var/mobile/Library/UserConfigurationProfiles
@@ -28,7 +29,13 @@ has_value() {
 }
 new_device_info() {
     rpc device.info > "$1"
-    jq -e '.result.device_name.name=="duo-sync-ax-idle"' "$1" >/dev/null
+    if [[ -n "$expected" ]]; then
+        [[ ${#expected} == 64 && "$expected" != *[^0-9a-f]* ]] || return 1
+        jq -e --arg name "${socket:h:t}" --arg sha "$expected" \
+            '.result.device_name.name == $name and .result.agent.binary_hash == $sha' "$1" >/dev/null
+    else
+        jq -e '.result.device_name.name=="duo-sync-ax-idle"' "$1" >/dev/null
+    fi
 }
 if [[ "$mode" == after-reboot ]]; then
     [[ -f "$out/device-before.json" && ! -e "$out/device-after-reboot.json" ]]
@@ -87,23 +94,18 @@ observe_never() {
     jq -se 'length>1 and .[-1].elapsed_s>=330 and all(.[]; .locked==false and .screen_off==false)' "$out/never-samples.jsonl" > "$out/never-verdict.json"
 }
 observe_profiled() {
-    local before_pid after_pid i
+    local before_pid after_pid i label=com.apple.managedconfiguration.profiled
     prefs before-profiled
-    rpc processes.list '{"filter":"profiled"}' > "$out/profiled-before.json"
-    before_pid=$(jq -er '[.result.processes[] | select(.name=="profiled" and .pid>1)] | select(length==1) | .[0].pid' "$out/profiled-before.json") || return 1
-    rpc processes.kill "{\"pid\":$before_pid,\"signal\":\"TERM\",\"force\":true}" > "$out/profiled-terminate.json" || return 1
+    has_value before-profiled 2147483647 || return 1
+    rpc services.status "{\"label\":\"$label\"}" > "$out/profiled-before.json" || return 1
+    before_pid=$(jq -er '.result | select(.loaded and .running and .pid>1) | .pid' "$out/profiled-before.json") || return 1
+    rpc services.kickstart "{\"label\":\"$label\",\"kill\":true,\"force\":true}" > "$out/profiled-kickstart.json" || return 1
     for i in {1..20}; do
-        rpc processes.list '{"filter":"profiled"}' > "$out/profiled-after.json"
-        if jq -e --argjson before "$before_pid" 'any(.result.processes[]; .name=="profiled" and .pid>1 and .pid!=$before)' "$out/profiled-after.json" >/dev/null; then break; fi
-        if (( i == 4 )); then rpc apps.launch '{"bundle_id":"com.apple.Preferences"}' > "$out/profiled-settings.json"; fi
-        if (( i == 8 )) &&
-           jq -e --argjson before "$before_pid" 'any(.result.processes[]; .name=="profiled" and .pid==$before)' "$out/profiled-after.json" >/dev/null; then
-            rpc processes.kill "{\"pid\":$before_pid,\"signal\":\"KILL\",\"force\":true}" > "$out/profiled-kill.json" || return 1
-        fi
-        if (( i == 12 )); then rpc apps.launch '{"bundle_id":"com.apple.Preferences"}' > "$out/profiled-settings-after-kill.json"; fi
+        rpc services.status "{\"label\":\"$label\"}" > "$out/profiled-after.json" || return 1
+        if after_pid=$(jq -er --argjson before "$before_pid" '.result | select(.running and .pid>1 and .pid!=$before) | .pid' "$out/profiled-after.json"); then break; fi
         sleep 1
     done
-    after_pid=$(jq -er --argjson before "$before_pid" '[.result.processes[] | select(.name=="profiled" and .pid>1 and .pid!=$before)] | select(length==1) | .[0].pid' "$out/profiled-after.json") || return 1
+    [[ -n "$after_pid" ]] || return 1
     sleep 5
     prefs after-profiled
     has_value after-profiled 2147483647 || return 1

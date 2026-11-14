@@ -6,11 +6,18 @@ source "${0:a:h}/rpc-request.zsh"
 repo="${0:a:h:h:h:h:h}"
 socket="${1:?usage: home-screen-ax.zsh <acceptance-socket> <new-evidence-directory>}"
 out="${2:?new evidence directory required}"
+expected="${3:-}"
 [[ "$socket" == "$repo/.build/"* && -S "$socket" && "$out" == "$repo/.build/"* && ! -e "$out" ]]
 mkdir "$out"
 rpc() { vphone_host_request "$socket" "$(vphone_rpc_request "$@")"; }
 rpc device.info > "$out/device.json"
-jq -e '.result.device_name.name == "duo-sync-ax" or .result.device_name.name == "duo-sync-ax-idle"' "$out/device.json" >/dev/null
+if [[ -n "$expected" ]]; then
+    [[ ${#expected} == 64 && "$expected" != *[^0-9a-f]* ]]
+    jq -e --arg name "${socket:h:t}" --arg sha "$expected" \
+        '.result.device_name.name == $name and .result.agent.binary_hash == $sha' "$out/device.json" >/dev/null
+else
+    jq -e '.result.device_name.name == "duo-sync-ax" or .result.device_name.name == "duo-sync-ax-idle"' "$out/device.json" >/dev/null
+fi
 rpc screen.unlock '{"timeout":30}' > "$out/unlock.json"
 rpc input.button '{"name":"home"}' > "$out/initial-home.json"
 sleep 2

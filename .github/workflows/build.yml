@@ -68,6 +68,45 @@ jobs:
             [[ "$archs" == *" $arch "* ]] || { echo "::error::vphone-escalator lacks $arch"; exit 1; }
           done
 
+      - name: Host health probe tests
+        run: zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-health-probe-tests.sh
+
+      - name: Host orientation hold tests
+        run: zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-orientation-hold-tests.sh
+
+      - name: Host HTTP read tests
+        run: zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-http-read-tests.sh
+
+      - name: Test host shell relay
+        run: zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-host-shell-relay-tests.sh
+
+      - name: RPC error relay and daemon logic tests
+        run: |
+          set -euo pipefail
+          zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-rpc-error-relay-tests.sh
+          zsh VPhoneDaemon/Tests/run-logic-tests.sh
+
+      - name: Guest health and process capture tests
+        run: |
+          set -euo pipefail
+          zsh VPhoneDaemon/Tests/run-health-tests.sh
+          zsh VPhoneDaemon/Tests/run-process-pipe-tests.sh
+          zsh VPhoneDaemon/Tests/run-process-output-tests.sh
+
+      - name: Recovery client cleanup tests
+        run: zsh VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/run-recovery-client-tests.sh
+
+      - name: CoreKit template reboot and API gate tests
+        run: |
+          set -euo pipefail
+          xcodebuild -project VPhoneKit/VPhoneKit.xcodeproj -scheme VPhoneCoreKitTests \
+            -configuration Debug -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath .build/XcodeCoreTests \
+            -clonedSourcePackagesDirPath .build/XcodeBundle/SourcePackages \
+            -disableAutomaticPackageResolution -parallel-testing-enabled NO -jobs 4 test \
+            -only-testing:VPhoneCoreKitTests/TemplateSetupBootTests \
+            -only-testing:VPhoneCoreKitTests/APIRequestGateTests
+
       - name: Guest display and point input tests
         run: |
           set -euo pipefail
@@ -76,6 +115,8 @@ jobs:
           zsh VPhoneDaemon/Tests/run-display-capture-tests.sh
           zsh VPhoneDaemon/Tests/run-point-geometry-tests.sh
           zsh VPhoneDaemon/Tests/run-element-tap-tests.sh
+          zsh VPhoneDaemon/Tests/run-render-server-lifecycle-tests.zsh
+          zsh Research/Integration/duo_m5_20261030/Regression/test-runtime-cleanup.zsh
 
       - name: Guest component tests
         run: |
@@ -88,3 +129,6 @@ jobs:
           make -C VPhoneGuestComponents test-vcam-drive-gate
           make -C VPhoneGuestComponents test-camfix-geometry
           make -C VPhoneGuestComponents test-camfix-session-reference
+          make -C VPhoneGuestComponents test-fold-display-samples
+          make -C VPhoneGuestComponents test-fold-display-wake
+          make -C VPhoneGuestComponents test-fold-display-panel-power
