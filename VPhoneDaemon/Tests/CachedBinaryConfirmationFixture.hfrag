@@ -1,0 +1,29 @@
+#define _DARWIN_C_SOURCE
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include "VphonedCacheIdentity.h"
+
+static char cache_directory[4096], cache[4096], marker[4096], pending[4096], executable[4096];
+static const char *leaf(const char *path) {
+    const char *slash = strrchr(path, '/');
+    return slash ? slash + 1 : path;
+}
+static int _NSGetExecutablePath(char *path, uint32_t *size) {
+    if (*size <= strlen(executable)) return -1;
+    strcpy(path, executable);
+    return 0;
+}
+// The fixture owns its temporary files. Only the UID predicate is adapted;
+// production still requires UID 0. Modes, types and no-follow opens stay real.
+static bool root_only(int descriptor, mode_t type) {
+    struct stat info;
+    return fstat(descriptor, &info) == 0 && (info.st_mode & S_IFMT) == type && info.st_uid == getuid() &&
+        (info.st_mode & (S_IWGRP | S_IWOTH)) == 0;
+}
