@@ -10,6 +10,7 @@ if [[ -x /usr/bin/xcrun ]]; then compiler=(/usr/bin/xcrun --sdk macosx swiftc); 
 "${compiler[@]}" -swift-version 6 -parse-as-library \
     -module-cache-path "$temporary/module-cache" \
     "$daemon/Daemon/GuestDisplayMetrics.swift" \
+    "$daemon/Daemon/GuestDuoMethod.swift" \
     "$daemon/Tests/DisplayMetricsTests.swift" \
     -o "$temporary/display-metrics-tests"
 "$temporary/display-metrics-tests"

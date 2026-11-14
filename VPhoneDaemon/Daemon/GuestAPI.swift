@@ -117,6 +117,7 @@ enum GuestAPI {
                 "screenshot",
                 "device_info",
                 "display",
+                "methods_list",
                 "display_layout",
                 "display_metrics",
                 "display_capture_active",
@@ -177,6 +178,8 @@ enum GuestAPI {
 
     static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
         switch method {
+        case GuestDuoMethod.list.rawValue:
+            return GuestDuoMethod.catalog()
         case "device.snapshot":
             var snapshot = try collectDeviceSnapshot()
             snapshot["jailbreak"] = jailbreakInfo()

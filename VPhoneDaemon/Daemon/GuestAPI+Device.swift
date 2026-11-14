@@ -118,11 +118,11 @@ extension GuestAPI {
             return ["displays": vp_display_probe()]
         case "display.modes":
             return vp_display_modes()
-        case "display.layout":
+        case GuestDuoMethod.layout.rawValue:
             return vp_display_layout()
-        case "display.metrics":
+        case GuestDuoMethod.metrics.rawValue:
             return GuestDisplayMetrics.report(from: vp_display_layout())
-        case "display.capture_active":
+        case GuestDuoMethod.capture.rawValue:
             return vp_display_capture_active()
         case "display.external.status":
             return vp_external_display_status()
@@ -154,7 +154,7 @@ extension GuestAPI {
                 try setBrightness(requiredNumber(params, "value"))
             }
             return brightnessState()
-        case "display.rotation":
+        case GuestDuoMethod.rotation.rawValue:
             rotationLock.lock()
             defer { rotationLock.unlock() }
             if let orientation = optionalString(params, "orientation"), vp_hinge_get()["enabled"] as? Bool == true {
@@ -192,9 +192,9 @@ extension GuestAPI {
             var rotation = rotationInfo()
             rotation["accelerometer"] = vp_accelerometer_get()
             return rotation
-        case "display.orientation":
+        case GuestDuoMethod.orientation.rawValue:
             return interfaceOrientation()
-        case "display.posture":
+        case GuestDuoMethod.posture.rawValue:
             return try setDevicePose(params)
         case "display.pose":
             return vp_device_pose_get()
@@ -203,9 +203,9 @@ extension GuestAPI {
                 throw GuestAPIError.invalidRequest("locked must be true or false")
             }
             return try setRotationLock(locked)
-        case "display.auto_lock":
+        case GuestDuoMethod.autoLock.rawValue:
             return GuestLockScreenIdle.describe()
-        case "display.auto_lock.set":
+        case GuestDuoMethod.setAutoLock.rawValue:
             return try setAutoLock(params)
         case "screen.unlock":
             return try GuestScreenUnlock.unlock(

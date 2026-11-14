@@ -1,3 +1,4 @@
+import CoreFoundation
 import Foundation
 
 @main
@@ -23,6 +24,40 @@ enum DisplayMetricsTests {
         precondition((report["bounds"] as? [String: Double])?["width"] == 744)
         precondition((report["reference_bounds"] as? [String: Double])?["height"] == 1133)
         precondition(report["interface_orientation"] == nil && report["geometry_available"] == nil)
+        let catalog = try JSONSerialization.jsonObject(with: JSONSerialization.data(withJSONObject: GuestDuoMethod.catalog()))
+            as! [String: Any]
+        precondition(catalog["scope"] as? String == "duo_display" && catalog["complete"] as? Bool == false)
+        let methods = catalog["methods"] as! [[String: Any]]
+        let names = methods.map { $0["name"] as! String }
+        precondition(names == Array(Set(names)).sorted())
+        func fields(_ name: String, _ kind: String = "result") -> [[String: Any]] {
+            methods.first { $0["name"] as? String == name }![kind] as! [[String: Any]]
+        }
+        func checkMetricSchema(_ report: [String: Any]) {
+            let fields = fields("display.metrics")
+            let required = fields.filter { $0["required"] as? Bool == true }.map { $0["name"] as! String }
+            let declared = fields.map { $0["name"] as! String }
+            precondition(Set(required).isSubset(of: report.keys) && Set(report.keys).isSubset(of: declared))
+            for field in fields {
+                guard let value = report[field["name"] as! String] else { continue }
+                switch field["type"] as! String {
+                case "boolean": precondition(CFGetTypeID(value as! NSNumber) == CFBooleanGetTypeID())
+                case "integer":
+                    let number = value as! NSNumber
+                    precondition(CFGetTypeID(number) != CFBooleanGetTypeID() && number.doubleValue.rounded() == number.doubleValue)
+                case "number": precondition(CFGetTypeID(value as! NSNumber) != CFBooleanGetTypeID())
+                case "string": precondition(value is String)
+                case "object": precondition(value is [String: Any])
+                default: preconditionFailure("Unknown metric result type")
+                }
+            }
+        }
+        checkMetricSchema(report)
+        let degrees = fields("display.orientation").first { $0["name"] as? String == "degrees" }!
+        precondition(degrees["required"] as? Bool == true && degrees["nullable"] as? Bool == true && degrees["type"] as? String == "integer")
+        let autoLockOptions = fields("display.auto_lock.set", "params")
+        precondition(Set(autoLockOptions.map { $0["name"] as! String }) == ["seconds", "never"])
+        precondition(autoLockOptions.allSatisfy { $0["required"] as? Bool == false })
 
         func changingMonitor(_ change: (inout [String: Any]) -> Void) -> [String: Any] {
             var changed = layout
@@ -33,6 +68,7 @@ enum DisplayMetricsTests {
         }
         func refuses(_ input: [String: Any]) {
             let answer = GuestDisplayMetrics.report(from: input)
+            checkMetricSchema(answer)
             precondition(answer["available"] as? Bool == false)
             precondition(!(answer["reason"] as! String).isEmpty)
             precondition(answer["point_scale"] == nil && answer["display_id"] == nil)

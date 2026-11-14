@@ -25,9 +25,9 @@ extension GuestAPI {
                 clickableOnly: bool(params, "clickable_only"),
                 limit: (params["limit"] as? NSNumber)?.intValue,
             )
-        case "ui.element_at":
+        case GuestDuoMethod.elementAt.rawValue:
             return try elementAt(x: requiredNumber(params, "x"), y: requiredNumber(params, "y"))
-        case "ui.tap_element":
+        case GuestDuoMethod.tapElement.rawValue:
             return try tapInterfaceElement(selector(params))
         case "ui.wait", "ui.wait_gone":
             return try waitForElement(

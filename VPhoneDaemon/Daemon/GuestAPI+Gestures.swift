@@ -15,7 +15,7 @@ extension GuestAPI {
             return try typeText(string(params, "text"), delayMS: number(params, "delay_ms", default: 30))
         case "input.paste":
             return try pasteText(string(params, "text"))
-        case "input.tap":
+        case GuestDuoMethod.tap.rawValue:
             let x = try requiredNumber(params, "x"), y = try requiredNumber(params, "y")
             return try withActivePointGeometry { try tap(x: x, y: y) }
         case "input.double_tap":
