@@ -54,10 +54,15 @@ filePool.start()
 let fileIO = NonBlockingFileIO(threadPool: filePool)
 let hub = APIEventHub()
 let eventPublisher = GuestEventPublisher(hub: hub)
+let vsockSendBufferLimit: SocketOptionValue = 64 * 1024
 
 do {
     let server = try ServerBootstrap(group: group)
         .serverChannelOption(ChannelOptions.backlog, value: 128)
+        // Bound coalesced writes to the virtio-vsock payload limit. Do not
+        // validate a readback: cloudOS may reset the buffer to peer credit
+        // when the first request arrives, before channel setup completes.
+        .childChannelOption(ChannelOptions.socketOption(.so_sndbuf), value: vsockSendBufferLimit)
         .childChannelInitializer { channel in
             let http = GuestHyperTextHandler(hub: hub, fileIO: fileIO)
             let upgrader = NIOWebSocketServerUpgrader(
@@ -125,6 +130,7 @@ do {
         }
         .bind(to: VsockAddress(cid: .any, port: 1339))
         .wait()
+    try server.pipeline.addHandler(GuestAcceptErrorLogger()).wait()
     vp_native_confirm_cached_binary()
     NSLog("vphoned: HTTP/WebSocket API listening on vsock 1339")
     server.closeFuture.whenComplete { _ in
@@ -149,3 +155,13 @@ do {
 // scheduled on it.
 RunLoop.main.add(Timer(fire: .distantFuture, interval: 0, repeats: false) { _ in }, forMode: .default)
 RunLoop.main.run()
+
+// MARK: - Refused connections
+
+final class GuestAcceptErrorLogger: ChannelInboundHandler, Sendable {
+    typealias InboundIn = Channel
+
+    func errorCaught(context _: ChannelHandlerContext, error: Error) {
+        NSLog("vphoned: connection refused during setup: %@", String(describing: error))
+    }
+}

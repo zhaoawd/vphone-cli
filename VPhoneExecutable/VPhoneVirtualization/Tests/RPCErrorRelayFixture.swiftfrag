@@ -1,0 +1,14 @@
+import NIOCore
+import NIOHTTP1
+import NIOWebSocket
+
+final class UpgradeFallback: ChannelInboundHandler, Sendable {
+    typealias InboundIn = HTTPServerRequestPart
+    typealias OutboundOut = HTTPServerResponsePart
+
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
+        guard context.channel.isActive, case .end = unwrapInboundIn(data) else { return }
+        let head = HTTPResponseHead(version: .http1_1, status: .upgradeRequired)
+        context.write(wrapOutboundOut(.head(head)), promise: nil)
+        context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+    }

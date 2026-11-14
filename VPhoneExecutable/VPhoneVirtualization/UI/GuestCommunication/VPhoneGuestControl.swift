@@ -310,7 +310,16 @@ final class VPhoneGuestControl {
 
     private func probe() async {
         do {
-            let response = try await http(method: "GET", path: "/v1/health")
+            let response: VPhoneHTTPResponse
+            do {
+                response = try await http(method: "GET", path: "/v1/health")
+            } catch where isConnected && !Task.isCancelled {
+                // Older vphoned builds can refuse a connection while checking
+                // their send buffer. Retry once before marking a connected
+                // guest unavailable. State-changing RPCs are not retried.
+                response = try await http(method: "GET", path: "/v1/health")
+            }
+            try Task.checkCancellation()
             guard response.status == 200,
                   let info = try JSONSerialization.jsonObject(with: response.body) as? [String: Any],
                   info["api_version"] as? Int == 1
@@ -326,6 +335,7 @@ final class VPhoneGuestControl {
                 try await createDirectory(path: "/var/root/Library/Caches")
                 try await uploadFile(path: "/var/root/Library/Caches/vphoned.next", data: data)
                 _ = try await call("agent.apply_update", params: ["sha256": hash])
+                guard !Task.isCancelled else { return }
                 setDisconnected()
                 return
             }
@@ -379,6 +389,7 @@ final class VPhoneGuestControl {
                 }
             }
         } catch {
+            guard !Task.isCancelled else { return }
             if !isConnected {
                 print("[control] probe failed: \(error)")
             }
