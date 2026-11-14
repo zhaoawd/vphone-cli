@@ -407,7 +407,8 @@ extension GuestAPI {
         defer { GuestFoldPose.finishExplicitRequest(settledHinge: springBoardSwept ? Int32(hinge) : nil) }
         let published: Bool
         if relayed {
-            if let current = vp_hinge_get()["angle"] as? Double, hingeState(for: current) == 1, hingeState(for: angle!) != 1 {
+            if let current = vp_hinge_get()["angle"] as? Double, hingeState(for: current) == 1, hingeState(for: angle!) != 1,
+               GuestScreenUnlock.panelIsDark {
                 // Opening a closed device wakes it; the hinge sensor's own wake
                 // flag does that on hardware, and the host controls cannot set
                 // it. SpringBoard's pose provider publishes a pose in motion only

@@ -6911,3 +6911,58 @@ changes its SpringBoard behaviour in `FoldDisplay/FoldDisplayPanel.m`:
 opening, no timeouts. Power 0.1 s after opening or closing ends
 locked and off and wakes to the lock screen; a fold made while blanked is not
 held.
+
+### Duo display repairs (2026-11-14)
+
+The existing `system-springboard-cfw-fold_display` declaration and preset
+selection still own FoldDisplay. No kernel or firmware instruction patch,
+new declaration, or preset was added.
+
+- AOD: the daemon wakes only a genuinely dark panel. ABI-checked native
+  unlock options and the independent backlight boundary preserve AOD only
+  for the runtime-described content-mode transition source. The inactive
+  backlight state is resolved and round-trip checked with native helpers;
+  source/state enums are not hardcoded. Callbacks and other requests remain
+  forwarded. The final VM run preserved all 240 AOD observations across four
+  folds and a no-fold control; both true-off folds woke the locked screen.
+- Presentation: capture before the native scene is hidden; use a separate,
+  prewarmed displayable CAContext with verified Main binding. Mirror valid
+  native root-context frames and retain the last valid frame across a black
+  gap. Exclude the hold by context ID and do not render hosted windows outside
+  their parent visibility. Reconcile ownership before changing power intent.
+  Native did-change/postflight callbacks also cover Home paths with no App
+  swap callback. After postflight, two nonblack probes plus 1/30 s permit
+  release; content timeout is 2 s, outer timeout 12 s for the public 10 s sweep.
+  Stale generations and target epochs cannot release a newer hold.
+- The system's native Snapshot policy is retained by the user's explicit
+  decision. Temporary forced-Live, dimming and direct-inner experiments were
+  removed. Final Home 10 s Live sweeps and cold Safari Snapshot each confirmed
+  six handoffs with zero near-black MOV samples in their observation windows.
+  Safari still contained a 431.666 ms repeated downscaled-luma span; complete
+  elimination or a single cause of all repeated frames is not established.
+- Native AX hits now pass the active CADisplay ID, validate PID ownership,
+  and recheck foreground and geometry. Ordinary App PID resolution uses a
+  unique running-app bundle match when icli focal supplies no PID. Final VM
+  coverage is 15/15 targets plus locked rejection; API/native/geometry tests
+  also pass. Right-landscape VM input is outside the verified host pose path.
+- The daemon watches backboardd PID/start time, refuses new RPC admission,
+  drains active RPCs and recreates its worker through the existing supervisor.
+  Native source identity admission is unchanged. Final respring response was
+  retained, worker 1803→1878, and native inner capture recovered. Health and
+  stream connections are outside the RPC drain count.
+
+Final FoldDisplay SHA-256 is
+`a96179b729b9469800214ac748d3b20b9ed821c238a9e6d0b48d32c6b9ba4d87`.
+Complete Bundle build, strict signatures and bundle admission pass. Power
+ownership and native mode regression fixtures fail on saved old source and
+pass on the fix; postflight/obsolete callback checks also pass. Opt-in
+`[DEBUG-f5-hold]` trace observations remain disabled by default and add no
+render of their own. MOV timing, actual orientation changes, cold mount
+checks, rollback evidence and commands are recorded in
+`Research/Integration/duo_m5_20261030/FIXES_20261114.md`.
+
+The isolated guest was restored to the original daemon and FoldDisplay. A
+second cold boot verified all 21 baseline library entries, read-only root,
+trace=0 and original power/rotation settings, followed by normal shutdown
+with no state-file handles. Final source and candidate bundle remain for
+review; see `rollback-final.json` in the task evidence directory.

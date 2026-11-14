@@ -491,6 +491,20 @@ $(FOLDDISPLAY): $(FOLDDISPLAY_SOURCES) $(FOLDDISPLAY_INPUTS) | $(STAGE)/folddisp
 		-framework Foundation -framework CoreGraphics -Wl,-not_for_dyld_shared_cache
 	@codesign --force --sign - $@
 
+.PHONY: test-fold-display-samples
+.PHONY: test-fold-display-wake test-fold-display-panel-power
+test-fold-display-wake:
+	zsh Tests/run-fold-display-wake-tests.zsh
+
+test-fold-display-panel-power:
+	zsh Tests/run-fold-display-panel-power-tests.zsh
+
+test-fold-display-samples:
+	@mkdir -p $(OUT)/tests
+	xcrun --sdk macosx clang -fobjc-arc -Wall -Wextra -Werror \
+		Tests/FoldDisplaySurfaceSamplesTests.m -framework Foundation -o $(OUT)/tests/fold-display-samples
+	$(OUT)/tests/fold-display-samples
+
 .PHONY: test-gyroscope test-accelerometer test-hinge
 test-accelerometer:
 	@mkdir -p $(OUT)

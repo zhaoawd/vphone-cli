@@ -57,6 +57,13 @@ void vpInstallInnerDisplayAdapter(void);
 // MARK: - FoldDisplayPanel.m
 
 void vpInstallSharedPanel(void);
+BOOL vpPanelIsAlwaysOn(void);
+void vpInstallAlwaysOnWakePolicy(void);
+
+// MARK: - FoldDisplayTrace.m
+
+BOOL vpFoldTraceEnabled(void);
+void vpFoldTrace(NSString *event, void *surface, id layer, NSDictionary *fields);
 
 // MARK: - FoldDisplayStatusBar.m
 

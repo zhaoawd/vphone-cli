@@ -4,10 +4,16 @@
 
 #import "FoldDisplayPrivate.h"
 #include <notify.h>
+#include <math.h>
 
 static void vpShowInnerDisplay(BOOL shown);
 static void vpFollowInnerPages(void);
 static void vpHoldPanel(void);
+static void vpPrewarmPanelHoldContext(unsigned attempt);
+static void vpWatchNativePanelContent(void);
+static void vpNativeContentModeDidChange(unsigned long generation, BOOL finished);
+static unsigned long vpPanelHoldGeneration;
+static BOOL vpPanelHoldUsesNativeLifecycle;
 static void vpReleasePanelHold(NSString *reason);
 static void vpPanelHoldFollowOwner(BOOL innerOwns);
 
@@ -77,6 +83,8 @@ static BOOL vpScreenBlanked(void) {
     return blanked != 0;
 }
 
+BOOL vpPanelIsAlwaysOn(void) { return vpScreenBlanked() && !vpPanelWentDark; }
+
 static void vpFollowPanelPower(long long state) {
     if (!state) vpPanelWentDark = YES;
     else if (!vpScreenBlanked()) vpPanelWentDark = NO;
@@ -102,10 +110,12 @@ static void vpInstallPanelDark(void) {
     });
     vpPanelWentDark = !vpPrimaryAppliedState;
     vpPublishPanelDark();
+    vpInstallAlwaysOnWakePolicy();
 }
 
 static void vpApplyPanelState(id control, long long state, long long *applied, id completion) {
     if (!control || (state == *applied && !completion)) return;
+    if (vpFoldTraceEnabled()) vpFoldTrace(@"panel_power", NULL, nil, @{@"display": @(vpStateControlDisplayId(control)), @"from": @(*applied), @"to": @(state), @"owner": @(vpInnerOwnedPanel)});
     if (control == vpPrimaryStateControl && state && !*applied) vpPanelOnAt = NSProcessInfo.processInfo.systemUptime;
     *applied = state;
     if (control == vpPrimaryStateControl) vpFollowPanelPower(state);
@@ -145,8 +155,18 @@ static void vpHoldHandoff(BOOL innerOwns) {
     });
 }
 
-static void vpApplyPanelStates(id primaryCompletion, id innerCompletion) {
+static void vpUpdatePanelOwner(void) {
     BOOL innerOwns = vpInnerOwnsPanel();
+    if (innerOwns == vpInnerOwnedPanel) return;
+    vpInnerOwnedPanel = innerOwns;
+    vpFoldDisplayLog([NSString stringWithFormat:@"inner display: panel owned by the %@", innerOwns ? @"inner display" : @"cover"]);
+    vpHoldHandoff(innerOwns);
+    vpPanelHoldFollowOwner(innerOwns);
+}
+
+static void vpApplyPanelStates(id primaryCompletion, id innerCompletion) {
+    vpUpdatePanelOwner();
+    BOOL innerOwns = vpInnerOwnedPanel == 1;
     BOOL lit = (innerOwns ? vpInnerWantedState : vpPrimaryWantedState) || vpHandoffHeld;
     vpApplyPanelState(vpPrimaryStateControl, lit ? 1 : 0, &vpPrimaryAppliedState, primaryCompletion);
     long long inner = innerOwns && lit ? 1 : 0;
@@ -178,6 +198,10 @@ static void vpAdoptInnerStateControl(void) {
 }
 
 static void vpSharedScanoutTransition(id self, SEL selector, long long state, id completion) {
+    // Some native transition styles change ownership before requesting power,
+    // without calling SpringBoard's primary-swap observer. Reconcile before
+    // changing wanted state, so the arriving panel can hold the lit scanout.
+    vpUpdatePanelOwner();
     unsigned int displayId = vpStateControlDisplayId(self);
     vpFoldDisplayLog([NSString stringWithFormat:@"inner display: display %u wants state %lld", displayId, state]);
     if (displayId == 1) {
@@ -211,13 +235,7 @@ static void vpSharedScanoutTransition(id self, SEL selector, long long state, id
 static IMP vpOriginalPerformContentModeTransition, vpOriginalHandlePrimarySwap;
 
 static void vpApplyPanelOwner(void) {
-    BOOL innerOwns = vpInnerOwnsPanel();
-    if (innerOwns == vpInnerOwnedPanel) return;
-    vpInnerOwnedPanel = innerOwns;
-    vpFoldDisplayLog([NSString stringWithFormat:@"inner display: panel owned by the %@", innerOwns ? @"inner display" : @"cover"]);
-    vpHoldHandoff(innerOwns);
     vpApplyPanelStates(nil, nil);
-    vpPanelHoldFollowOwner(innerOwns);
 }
 
 static void vpFollowPanelOwner(void) {
@@ -238,13 +256,45 @@ static void vpSetFoldFadeToBlack(BOOL enabled) {
     if ([settings respondsToSelector:setFade]) ((void (*)(id, SEL, BOOL))objc_msgSend)(settings, setFade, enabled);
 }
 
+static NSString *vpTransitionStyleName(id transitionCoordinator) {
+    id context = vpReadObject(transitionCoordinator, "currentContext");
+    Method style = class_getInstanceMethod(object_getClass(context), sel_registerName("transitionStyle"));
+    NSString *(*describe)(NSInteger) = dlsym(RTLD_DEFAULT, "SBFStringForDisplayContentModeTransitionStyle");
+    if (!style || strcmp(method_getTypeEncoding(style), "q16@0:8") || !describe) return nil;
+    return describe(((NSInteger (*)(id, SEL))objc_msgSend)(context, sel_registerName("transitionStyle")));
+}
+
 static void vpFollowContentModeTransition(id self, SEL selector, id transitionCoordinator) {
+    NSString *style = vpTransitionStyleName(transitionCoordinator);
+    if (vpFoldTraceEnabled()) {
+        vpFoldTrace(@"transition_perform", NULL, nil, @{@"owner": @(vpInnerOwnedPanel),
+            @"coordinator": NSStringFromClass([transitionCoordinator class]), @"transition_style": style ?: @"unavailable"});
+    }
+    vpSetFoldFadeToBlack(!vpPrimaryAppliedState || NSProcessInfo.processInfo.systemUptime - vpPanelOnAt < 1);
     NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
-    BOOL dark = !vpPrimaryAppliedState || now - vpPanelOnAt < 1;
-    vpSetFoldFadeToBlack(dark);
-    // A frame rendered as the screen wakes may be the one from before it
-    // blanked (bde6440c): only a fold made awake is held.
-    if (!dark && !vpScreenBlanked() && now - vpScreenBlankChangedAt >= 1) vpHoldPanel();
+    if (vpPrimaryAppliedState && now - vpPanelOnAt >= 1 && !vpScreenBlanked() && now - vpScreenBlankChangedAt >= 1) {
+        vpHoldPanel();
+        vpWatchNativePanelContent();
+    }
+    SEL changed = sel_registerName("addDisplayContentModeDidChangeHandlerFromParticipant:handler:");
+    Method didChange = class_getInstanceMethod(object_getClass(transitionCoordinator), changed);
+    SEL postflight = sel_registerName("addPostflightActionsFromParticipant:actions:");
+    Method didFinish = class_getInstanceMethod(object_getClass(transitionCoordinator), postflight);
+    BOOL hasPostflight = didFinish && !strcmp(method_getTypeEncoding(didFinish), "v32@0:8@16@?24");
+    unsigned long generation = vpPanelHoldGeneration;
+    if (didChange && !strcmp(method_getTypeEncoding(didChange), "v32@0:8@16@?24")) {
+        static id participant;
+        if (!participant) participant = [NSObject new];
+        ((void (*)(id, SEL, id, id))objc_msgSend)(transitionCoordinator, changed, participant, ^(id context, id lockProvider) {
+            (void)context; (void)lockProvider;
+            vpNativeContentModeDidChange(generation, !hasPostflight);
+        });
+        vpPanelHoldUsesNativeLifecycle = YES;
+        if (hasPostflight) ((void (*)(id, SEL, id, id))objc_msgSend)(transitionCoordinator, postflight, participant, ^(id context, id lockProvider) {
+            (void)context; (void)lockProvider;
+            vpNativeContentModeDidChange(generation, YES);
+        });
+    } else vpFoldDisplayLog(@"inner display: content-mode completion ABI unavailable");
     ((void (*)(id, SEL, id))vpOriginalPerformContentModeTransition)(self, selector, transitionCoordinator);
     vpFollowPanelOwner();
 }
@@ -252,6 +302,15 @@ static void vpFollowContentModeTransition(id self, SEL selector, id transitionCo
 // At once, in SpringBoard's own transaction: it hides the content leaving
 // the panel here, and a later hop showed the panel empty in between.
 static void vpFollowPrimarySwap(id self, SEL selector, id coordinator, id from, id to, id lockProvider) {
+    // This also covers a swap not seen at the transition entry. A frame
+    // rendered as the screen wakes may be the one
+    // from before it blanked (bde6440c), so only a fold made awake is held.
+    NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
+    BOOL eligible = vpPrimaryAppliedState && now - vpPanelOnAt >= 1 && !vpScreenBlanked() && now - vpScreenBlankChangedAt >= 1;
+    if (vpFoldTraceEnabled()) vpFoldTrace(@"swap", NULL, nil, @{@"eligible": @(eligible), @"owner": @(vpInnerOwnedPanel),
+        @"panel_on_age": @(now - vpPanelOnAt), @"blank_changed_age": @(now - vpScreenBlankChangedAt)});
+    if (eligible)
+        vpHoldPanel();
     ((void (*)(id, SEL, id, id, id, id))vpOriginalHandlePrimarySwap)(self, selector, coordinator, from, to, lockProvider);
     vpApplyPanelOwner();
 }
@@ -286,6 +345,7 @@ void vpInstallSharedPanel(void) {
     vpOriginalTransitionDisplayState = method_setImplementation(transition, (IMP)vpSharedScanoutTransition);
     vpInstallPanelDark();
     vpInstallContentModeOwnership();
+    dispatch_async(dispatch_get_main_queue(), ^{ vpPrewarmPanelHoldContext(0); });
     vpFollowInnerPages();
     vpSetFoldFadeToBlack(NO);
     vpFoldDisplayLog(@"inner display: shared scanout installed");
@@ -399,28 +459,25 @@ static void vpReleaseInnerPanelSurfaces(void) {
 
 // MARK: - hand-over hold
 
-// A fold hands the panel from one display to the other in steps, and the
-// panel showed black in between even with the scanout kept lit (the power
-// handoff above): closing, the compositor leaves before the cover has drawn
-// again (SpringBoard takes Main's scenes off screen while open); opening, the
-// inner display's first frames are black for a moment, more with an app moving
-// over. The hold is the panel's last frame, rendered into a surface of its own
-// and shown above everything on Main's root scene window, from the moment
-// SpringBoard starts the content mode transition until the other display has
-// drawn: opening, until a render of the inner display shows anything but
-// black (then one more frame, for backboardd's page to reach the panel);
-// closing, 150 ms after the cover holds the primary scene again, since
-// nothing reports its first frame. Never longer than 2 s, and released at
-// once when the panel goes off or the screen blanks. A fold made with the
-// panel off or just lit keeps SpringBoard's fade instead (bde6440c): there is
-// no current frame to hold. Ported from fb41cd6b (v1.6), which measured 0
-// black frames in 26 transitions.
-static id vpPanelHold;
-static void *vpPanelHoldSurface, *vpPanelHoldProbe;
+// Mirror valid native frames before the swap, retaining the last one across
+// a black gap. A separate displayable context survives native scene hiding.
+// Render only native displayable roots, with this context excluded; hosted
+// windows retain their parents' visibility. After the native mode changes,
+// release after two nonblack probes, with a 2 s content deadline. The outer
+// 12 s deadline covers the public 10 s sweep and 2 s for arriving content.
+// Panel-off/screen blanking still releases immediately.
+static id vpPanelHold, vpPanelHoldContext;
+static NSString *vpPanelHoldDisplayName;
+static uint32_t vpPanelHoldDisplayId;
+static BOOL (*vpRenderDisplayClients)(mach_port_t, CFStringRef, uint32_t, const uint32_t *, void *, int32_t, int32_t);
+static void *vpPanelHoldSurface, *vpPanelHoldProbes[3];
+static int vpPanelHoldProbeShown = -1;
 static double vpPanelHoldSince;
-static unsigned long vpPanelHoldGeneration;
 static dispatch_source_t vpPanelHoldWatch;
 static BOOL vpPanelHoldProbing; // main thread only
+static unsigned vpPanelHoldReadyFrames;
+static BOOL vpPanelHoldAwaitingChange;
+static unsigned long vpPanelHoldTargetEpoch;
 
 static void *vpCreatePanelSurface(CGSize pixels) {
     static void *(*createSurface)(CFDictionaryRef);
@@ -447,8 +504,8 @@ static BOOL vpSurfaceHasContent(void *surface) {
         bytesPerRow = dlsym(library, "IOSurfaceGetBytesPerRow");
         lock = dlsym(library, "IOSurfaceLock");
     }
-    if (!surface || !lock || !unlock || !base || !width || !height || !bytesPerRow) return YES;
-    if (lock(surface, 1 /* read-only */, NULL) != 0) return YES;
+    if (!surface || !lock || !unlock || !base || !width || !height || !bytesPerRow) return NO;
+    if (lock(surface, 1 /* read-only */, NULL) != 0) return NO;
     const uint8_t *pixels = base(surface);
     size_t w = width(surface), h = height(surface), row = bytesPerRow(surface);
     BOOL content = NO;
@@ -467,21 +524,30 @@ static void vpReleasePanelHold(NSString *reason) {
         vpPanelHoldWatch = nil;
     }
     if (!vpPanelHold) return;
+    if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_off_request", NULL, vpPanelHold,
+        @{@"generation": @(vpPanelHoldGeneration), @"reason": reason, @"owner": @(vpInnerOwnedPanel)});
     Class transaction = objc_getClass("CATransaction");
     ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
     ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
-    ((void (*)(id, SEL))objc_msgSend)(vpPanelHold, sel_registerName("removeFromSuperlayer"));
+    ((void (*)(id, SEL, id))objc_msgSend)(vpPanelHoldContext, sel_registerName("setLayer:"), nil);
     ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
     vpPanelHold = nil;
     vpPanelHoldGeneration++;
     // The render server may still show the old contents for this commit, and
     // a probe render may still be running into its surface.
-    void *surface = vpPanelHoldSurface, *probe = vpPanelHoldProbe;
-    vpPanelHoldSurface = vpPanelHoldProbe = NULL;
+    void *surface = vpPanelHoldSurface;
+    void *probe0 = vpPanelHoldProbes[0], *probe1 = vpPanelHoldProbes[1], *probe2 = vpPanelHoldProbes[2];
+    vpPanelHoldSurface = NULL;
+    memset(vpPanelHoldProbes, 0, sizeof(vpPanelHoldProbes));
+    vpPanelHoldProbeShown = -1;
     dispatch_queue_t queue = vpInnerPanelQueue;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (surface) CFRelease(surface);
-        if (probe) dispatch_async(queue, ^{ CFRelease(probe); });
+        dispatch_async(queue, ^{
+            if (probe0) CFRelease(probe0);
+            if (probe1) CFRelease(probe1);
+            if (probe2) CFRelease(probe2);
+        });
     });
     vpFoldDisplayLog([NSString stringWithFormat:@"inner display: hold off (%@) after %.0f ms",
         reason, (NSDate.date.timeIntervalSince1970 - vpPanelHoldSince) * 1000]);
@@ -489,14 +555,69 @@ static void vpReleasePanelHold(NSString *reason) {
 
 static void vpReleasePanelHoldAfter(double seconds, NSString *reason) {
     unsigned long generation = vpPanelHoldGeneration;
+    unsigned long epoch = vpPanelHoldTargetEpoch;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(seconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (generation == vpPanelHoldGeneration) vpReleasePanelHold(reason);
+        if (generation == vpPanelHoldGeneration && epoch == vpPanelHoldTargetEpoch) vpReleasePanelHold(reason);
     });
+}
+
+// The render server fills in a new context's display binding asynchronously.
+// Prepare an empty context before any fold, and admit it only after readback
+// matches Main. Keeping it between holds also keeps probes independent of it.
+static BOOL vpPreparePanelHoldContext(void) {
+    if (vpPanelHoldContext) return ((uint32_t (*)(id, SEL))objc_msgSend)(vpPanelHoldContext, sel_registerName("displayId")) == vpPanelHoldDisplayId;
+    id rootWindow = vpMainRootSceneWindow();
+    id main = vpReadObject(objc_getClass("CADisplay"), "mainDisplay");
+    NSString *name = [main valueForKey:@"name"];
+    if (!rootWindow || !name) return NO;
+    Class contextClass = objc_getClass("CAContext");
+    Method create = class_getClassMethod(contextClass, sel_registerName("remoteContextWithOptions:"));
+    Method level = class_getInstanceMethod(contextClass, sel_registerName("setLevel:"));
+    Method getLevel = class_getInstanceMethod(contextClass, sel_registerName("level"));
+    Method getDisplay = class_getInstanceMethod(contextClass, sel_registerName("displayId"));
+    Method getID = class_getInstanceMethod(contextClass, sel_registerName("contextId"));
+    Method all = class_getClassMethod(contextClass, sel_registerName("allContexts"));
+    CFStringRef *displayKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayId");
+    CFStringRef *nameKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayName");
+    CFStringRef *displayableKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayable");
+    CFStringRef *hitTestKey = dlsym(RTLD_DEFAULT, "kCAContextIgnoresHitTest");
+    vpRenderDisplayClients = dlsym(RTLD_DEFAULT, "CARenderServerRenderDisplayClientList");
+    if (!create || strcmp(method_getTypeEncoding(create), "@24@0:8@16") ||
+        !level || strcmp(method_getTypeEncoding(level), "v20@0:8f16") ||
+        !getLevel || strcmp(method_getTypeEncoding(getLevel), "f16@0:8") ||
+        !getDisplay || strcmp(method_getTypeEncoding(getDisplay), "I16@0:8") ||
+        !getID || strcmp(method_getTypeEncoding(getID), "I16@0:8") ||
+        !all || strcmp(method_getTypeEncoding(all), "@16@0:8") ||
+        !displayKey || !nameKey || !displayableKey || !hitTestKey || !vpRenderDisplayClients) {
+        vpFoldDisplayLog(@"inner display: independent hold context ABI unavailable");
+        return NO;
+    }
+    id mainContext = vpReadObject(vpReadObject(rootWindow, "layer"), "context");
+    if (!mainContext) return NO;
+    uint32_t displayId = ((uint32_t (*)(id, SEL))objc_msgSend)(mainContext, sel_registerName("displayId"));
+    NSMutableDictionary *options = [vpReadObject(mainContext, "options") mutableCopy] ?: [NSMutableDictionary dictionary];
+    options[(__bridge NSString *)*nameKey] = name;
+    options[(__bridge NSString *)*displayableKey] = @YES;
+    options[(__bridge NSString *)*hitTestKey] = @YES;
+    id context = ((id (*)(id, SEL, id))objc_msgSend)(contextClass, sel_registerName("remoteContextWithOptions:"), options);
+    if (!context) return NO;
+    vpPanelHoldContext = context;
+    vpPanelHoldDisplayName = name;
+    vpPanelHoldDisplayId = displayId;
+    return ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("displayId")) == displayId;
+}
+
+static void vpPrewarmPanelHoldContext(unsigned attempt) {
+    @try { if (vpPreparePanelHoldContext()) return; }
+    @catch (__unused NSException *exception) {}
+    if (attempt < 100) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 10), dispatch_get_main_queue(), ^{ vpPrewarmPanelHoldContext(attempt + 1); });
+    else vpFoldDisplayLog(@"inner display: independent hold context unavailable at startup");
 }
 
 static void vpHoldPanel(void) {
     if (vpPanelHold) return;
     @try {
+        if (!vpPreparePanelHoldContext()) return;
         id rootWindow = vpMainRootSceneWindow();
         id main = vpReadObject(objc_getClass("CADisplay"), "mainDisplay");
         NSString *name = [main valueForKey:@"name"];
@@ -510,26 +631,43 @@ static void vpHoldPanel(void) {
         }
         if (!vpInnerPanelQueue) vpInnerPanelQueue = dispatch_queue_create("com.vphone.folddisplay.inner-panel", DISPATCH_QUEUE_SERIAL);
         double start = NSDate.date.timeIntervalSince1970;
+        double renderStart = NSProcessInfo.processInfo.systemUptime;
         vpRenderDisplay(0, (__bridge CFStringRef)name, surface, 0, 0);
-        id rootLayer = vpReadObject(rootWindow, "layer");
+        if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_source", surface, nil, @{@"generation": @(vpPanelHoldGeneration + 1), @"display": name,
+            @"render_start_uptime": @(renderStart), @"render_end_uptime": @(NSProcessInfo.processInfo.systemUptime)});
+        id context = vpPanelHoldContext;
+        uint32_t displayId = vpPanelHoldDisplayId;
+        Class contextClass = objc_getClass("CAContext");
+        float top = 0;
+        for (id context in vpReadObject(contextClass, "allContexts")) {
+            if (context == vpPanelHoldContext || ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("displayId")) != displayId) continue;
+            float candidate = ((float (*)(id, SEL))objc_msgSend)(context, sel_registerName("level"));
+            if (isfinite(candidate) && candidate > top) top = candidate;
+        }
         id hold = [objc_getClass("CALayer") new];
-        ((void (*)(id, SEL, CGRect))objc_msgSend)(hold, sel_registerName("setFrame:"),
-            ((CGRect (*)(id, SEL))objc_msgSend)(rootLayer, sel_registerName("bounds")));
-        // Above the inner display's layer (1e9).
-        ((void (*)(id, SEL, double))objc_msgSend)(hold, sel_registerName("setZPosition:"), 2.0e9);
+        ((void (*)(id, SEL, CGRect))objc_msgSend)(hold, sel_registerName("setFrame:"), (CGRect){CGPointZero, pixels});
         Class transaction = objc_getClass("CATransaction");
         ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
         ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
         ((void (*)(id, SEL, id))objc_msgSend)(hold, sel_registerName("setContents:"), (__bridge id)surface);
-        ((void (*)(id, SEL, id))objc_msgSend)(rootLayer, sel_registerName("addSublayer:"), hold);
+        ((void (*)(id, SEL, float))objc_msgSend)(context, sel_registerName("setLevel:"), nextafterf(top, INFINITY));
+        ((void (*)(id, SEL, id))objc_msgSend)(context, sel_registerName("setLayer:"), hold);
         ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
         vpPanelHold = hold;
+        vpPanelHoldContext = context;
+        vpPanelHoldDisplayName = name;
+        vpPanelHoldDisplayId = displayId;
+        vpPanelHoldReadyFrames = 0;
+        vpPanelHoldAwaitingChange = YES;
+        vpPanelHoldUsesNativeLifecycle = NO;
+        vpPanelHoldTargetEpoch++;
         vpPanelHoldSurface = surface;
         vpPanelHoldSince = NSDate.date.timeIntervalSince1970;
         unsigned long generation = ++vpPanelHoldGeneration;
+        if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_on_commit", NULL, nil, @{@"generation": @(generation), @"owner": @(vpInnerOwnedPanel)});
         vpFoldDisplayLog([NSString stringWithFormat:@"inner display: hold on (%@ rendered in %.0f ms)",
             name, (vpPanelHoldSince - start) * 1000]);
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(12.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (generation == vpPanelHoldGeneration) vpReleasePanelHold(@"timeout");
         });
     } @catch (NSException *exception) {
@@ -537,32 +675,70 @@ static void vpHoldPanel(void) {
     }
 }
 
-// Opening: renders the inner display each frame until it shows something.
-static void vpWatchInnerDisplayDrawn(void) {
+// Render the native physical panel without the hold, for either direction.
+static void vpWatchNativePanelContent(void) {
     if (!vpPanelHold || vpPanelHoldWatch) return;
-    if (!vpPanelHoldProbe) vpPanelHoldProbe = vpCreatePanelSurface(vpInnerDisplayPixels());
-    if (!vpPanelHoldProbe || !vpRenderDisplay) {
+    if (!vpPanelHoldProbes[0]) {
+        id main = vpReadObject(objc_getClass("CADisplay"), "mainDisplay");
+        CGSize pixels = ((CGRect (*)(id, SEL))objc_msgSend)(main, sel_registerName("bounds")).size;
+        for (int index = 0; index < 3; index++) vpPanelHoldProbes[index] = vpCreatePanelSurface(pixels);
+    }
+    if (!vpPanelHoldProbes[0] || !vpPanelHoldProbes[1] || !vpPanelHoldProbes[2] || !vpRenderDisplay) {
         vpReleasePanelHold(@"inner display not observable");
         return;
     }
     unsigned long generation = vpPanelHoldGeneration;
-    void *probe = vpPanelHoldProbe;
     vpPanelHoldWatch = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
     dispatch_source_set_timer(vpPanelHoldWatch, DISPATCH_TIME_NOW, NSEC_PER_SEC / 60, NSEC_PER_SEC / 240);
     dispatch_source_set_event_handler(vpPanelHoldWatch, ^{
         if (vpPanelHoldProbing || generation != vpPanelHoldGeneration) return;
         vpPanelHoldProbing = YES;
+        int next = (vpPanelHoldProbeShown + 1) % 3;
+        void *probe = vpPanelHoldProbes[next];
+        unsigned long epoch = vpPanelHoldTargetEpoch;
+        BOOL awaitingChange = vpPanelHoldAwaitingChange;
         CFRetain(probe);
+        NSMutableData *clients = [NSMutableData data];
+        uint32_t holdIdentifier = ((uint32_t (*)(id, SEL))objc_msgSend)(vpPanelHoldContext, sel_registerName("contextId"));
+        CFStringRef *nameKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayName");
+        CFStringRef *displayableKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayable");
+        for (id context in vpReadObject(objc_getClass("CAContext"), "allContexts")) {
+            uint32_t identifier = ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("contextId"));
+            NSDictionary *options = vpReadObject(context, "options");
+            // Hosted window contexts are drawn by their displayable parent.
+            // Rendering them directly bypasses that parent's visibility.
+            if (!displayableKey || ![options[(__bridge NSString *)*displayableKey] boolValue]) continue;
+            NSString *name = nameKey ? options[(__bridge NSString *)*nameKey] : nil;
+            if (identifier == holdIdentifier || (name && ![name isEqual:vpPanelHoldDisplayName]) ||
+                ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("displayId")) != vpPanelHoldDisplayId) continue;
+            if (identifier) [clients appendBytes:&identifier length:sizeof(identifier)];
+        }
+        NSString *displayName = vpPanelHoldDisplayName;
         dispatch_async(vpInnerPanelQueue, ^{
-            vpRenderDisplay(0, (__bridge CFStringRef)vpInnerDisplayName, probe, 0, 0);
-            BOOL drawn = vpSurfaceHasContent(probe);
+            BOOL rendered = clients.length && vpRenderDisplayClients(0, (__bridge CFStringRef)displayName,
+                (uint32_t)(clients.length / sizeof(uint32_t)), clients.bytes, probe, 0, 0);
+            BOOL drawn = rendered && vpSurfaceHasContent(probe);
+            if (drawn && vpFoldTraceEnabled()) vpFoldTrace(awaitingChange ? @"hold_frame_update" : @"target_content_detected", probe, nil,
+                @{@"generation": @(generation), @"display": displayName, @"client_count": @(clients.length / sizeof(uint32_t))});
             CFRelease(probe);
             dispatch_async(dispatch_get_main_queue(), ^{
                 vpPanelHoldProbing = NO;
-                if (!drawn || generation != vpPanelHoldGeneration || !vpPanelHoldWatch) return;
+                if (generation != vpPanelHoldGeneration || !vpPanelHoldWatch) return;
+                if (epoch != vpPanelHoldTargetEpoch) return;
+                if (drawn) {
+                    Class transaction = objc_getClass("CATransaction");
+                    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
+                    ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
+                    ((void (*)(id, SEL, id))objc_msgSend)(vpPanelHold, sel_registerName("setContents:"), (__bridge id)probe);
+                    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+                    vpPanelHoldProbeShown = next;
+                }
+                if (vpPanelHoldAwaitingChange) { vpPanelHoldReadyFrames = 0; return; }
+                vpPanelHoldReadyFrames = drawn ? vpPanelHoldReadyFrames + 1 : 0;
+                if (vpPanelHoldReadyFrames < 2) return;
                 dispatch_source_cancel(vpPanelHoldWatch);
                 vpPanelHoldWatch = nil;
-                vpReleasePanelHoldAfter(1.0 / 30, @"inner display drawn");
+                vpReleasePanelHoldAfter(1.0 / 30, @"native panel content drawn");
             });
         });
     });
@@ -571,8 +747,28 @@ static void vpWatchInnerDisplayDrawn(void) {
 
 static void vpPanelHoldFollowOwner(BOOL innerOwns) {
     if (!vpPanelHold) return;
-    if (innerOwns) vpWatchInnerDisplayDrawn();
-    else vpReleasePanelHoldAfter(0.15, @"cover redrawn");
+    if (!vpPanelHoldUsesNativeLifecycle) vpPanelHoldAwaitingChange = NO;
+    vpPanelHoldReadyFrames = 0;
+    vpPanelHoldTargetEpoch++;
+    if (!vpPanelHoldUsesNativeLifecycle) vpReleasePanelHoldAfter(2.0, @"native content timeout");
+    if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_follow_owner", NULL, nil, @{@"generation": @(vpPanelHoldGeneration), @"inner_owns": @(innerOwns)});
+    vpWatchNativePanelContent();
+}
+
+static void vpNativeContentModeDidChange(unsigned long generation, BOOL finished) {
+    if (!NSThread.isMainThread) {
+        dispatch_async(dispatch_get_main_queue(), ^{ vpNativeContentModeDidChange(generation, finished); });
+        return;
+    }
+    vpApplyPanelStates(nil, nil);
+    if (vpPanelHold && generation == vpPanelHoldGeneration) {
+        if (finished) vpPanelHoldAwaitingChange = NO;
+        vpPanelHoldReadyFrames = 0;
+        vpPanelHoldTargetEpoch++;
+        if (finished) vpReleasePanelHoldAfter(2.0, @"native content timeout");
+        vpWatchNativePanelContent();
+    }
+    if (vpFoldTraceEnabled()) vpFoldTrace(finished ? @"native_mode_postflight" : @"native_mode_did_change", NULL, nil, @{@"owner": @(vpInnerOwnedPanel)});
 }
 
 static void vpShowInnerDisplay(BOOL shown) {
