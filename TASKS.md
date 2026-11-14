@@ -1,185 +1,41 @@
-# Duo M5 integration — 2026-10-30
+# Duo M5 当前任务
 
-## 上游显示与输入同步（2026-11-12）
+更新：2026-11-14。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 已刷新到 `13169405`（2.17.1）；本地 `main` 仍为 `6f57024a`。本轮改动已按范围评审并拆分为本地提交；尚未推送或发布。
 
-候选从 `4cb164c8773a530c4e463ea654428d5825c0f1c6` 创建，参考上游
-`0fb0d8cbab471e01cbe230f41f7619b7aad91b52`。首批只同步显示与输入，
-保留当前 Duo 的 RPC 分发、AX 点击、Auto-Lock、X1 回滚归属修复及预设。
+## 当前待办
 
-- [x] 同步 #864、#866、#886、#879、#890、#891、#885、#872 中的显示、
-      姿态、输入和捕获逻辑，并将离线回归接入 CI。
-- [x] 用 CLI 配置回归复现切换显示模式时丢失 developer tunnel 设置，修复 manifest 字段保留。
-- [x] 通过显示布局、显示指标、外屏捕获、点坐标、锁屏轮询、AX、Auto-Lock 和 daemon 逻辑回归。
-- [x] 最终 Debug Bundle 构建、严格签名检查和 CLI 配置回归通过。
-      增加回归后，修复前的 CLI 在同一条命令切换显示并启用 developer tunnel 时
-      缺少 `holdsDeveloperTunnel`；修复后同时设置、分别修改和回读均通过。
-- [x] 最终构建执行 `vphone-cli host preflight`；当前宿主的 AMFI 拒绝启动
-      `vphone-vm`。未更改宿主安全设置，未改动 VM。
-- [ ] 在隔离的 iOS 27.1／24A94425 Duo 上验证冷启动、外屏/内屏捕获、宿主和 guest 输入、
-      Duo 旋转、F2 聚焦合拢及 F5 帧序列。
-- [ ] 单独评估 `methods.list`、类型化 RPC schema、GLES 和 iOS 27.2。
+后续整理完成：现有源码按依赖拆成 13 项本地提交，CI、共享回归和记录分别整理。评审复现并修复 #899 重启等待的两次状态读取竞态，47 项状态机测试通过；新隔离副本的原生重启与真实关机对照均通过，后者恰好补启动一次。历史诊断入口遗漏孤立 VM 关机的问题也由失败回归复现并修复，CI 增加该项检查。完整 Bundle 构建、admission 和严格签名通过。当前未推送或发布；详见 CHANGE_REVIEW_20261114.md。
 
-本批没有合入启动链、签名校验策略或 Cryptex 改动。
-构建和测试日志位于候选工作区的 `.build/duo-upstream-20261112/`。
-外屏捕获测试在宿主环境通过；受限工具环境内未通过首个实际渲染断言。
+三项修复验收完成（2026-11-14）：最终候选 T2 的完整 Bundle 构建、严格签名、Bundle admission 和相关回归通过。实际 VM 的 15 点 AX／锁屏拒绝、四次 AOD 开合与 240 个采样点、两个真正熄屏唤醒对照、重启后的原生来源自动恢复均通过。Home 六次 10 秒原生 Live 和冷启动 Safari 六次原生 Snapshot 交接均确认，观察窗口无近黑样本。用户选择保留 Snapshot；最长约 432 ms 的重复亮度样本仍存在，其全部原因未查明。过渡中采到方向变化，不计为全程固定纵向。隔离副本已恢复原 daemon 和 FoldDisplay，第二次冷启动核对 21 项库、根只读、trace=0、低电量和旋转锁原值后正常关机，无状态文件句柄。源码与最终候选留存供审阅，详见 FIXES_20261114.md。
 
-Scope: integrate the iPhone Duo work from `vphone-cli-up` and
-`vphone-duo-m5` onto `duo-integration-20261030`, based on upstream `main`, without changing the original
-worktrees. Source directories are read-only inputs. On 2026-10-30 the user
-approved normal shutdown of the existing source VM; no other original-VM
-modification is authorized.
+- [x] 内屏 `ui.element_at`：修复实际 display ID 命中及普通 App PID 解析；最终 15/15 目标命中，锁屏拒绝通过。见 [修复验收](Research/Integration/duo_m5_20261030/FIXES_20261114.md)。
+- [x] 常亮锁屏：修复 daemon 主动唤醒、原生 unlock 选项与独立背光请求；四次开合和无姿态对照的 240 个样本保持 AOD，真正熄屏开合仍唤醒锁屏。
+- [x] 动态交接与来源恢复：代次变化自动重建 API worker；最终原生 Live／Snapshot 各六次交接均确认，观察窗口无近黑样本。保留用户选择的原生 Snapshot；约 432 ms 的重复亮度区间仍存在，完整原因未查明。最终原组件、21 项库、根只读和正常关机已核对。
 
-- [x] Import `duo-m5-v1.4`, `duo-m5-v1.5`, and `duo-m5-v1.6` with their history.
-- [x] Create isolated branch/worktree `duo-integration-20261030` at `39324ee7`.
-- [x] Record source inventory and decisions for every code change.
-- [x] Build and test the unmodified upstream code baseline (134 fixture-related issue records across 128 failed test names).
-- [x] Integrate display configuration and its regression tests.
-- [x] Integrate the optional static-inner guest patch through the patch catalog, off in standard.
-- [x] Compare upstream fold transitions with the local previous-frame hold;
-      upstream still shows 1–12 black hand-over frames. User decision
-      (2026-10-30): do not adapt `fb41cd6b`; keep upstream behaviour.
-- [x] Preserve research, probes, historical scripts/results, and maintained regression scripts with provenance.
-- [x] Reproduce and repair sparse archive round-trip behavior using isolated test data; 103 archive tests pass.
-- [x] Build the integrated bundle and run affected firmware-free tests; existing firmware-fixture failures match baseline.
-- [x] Prepare VM A/B commands and create/verify isolated seed, baseline, and candidate copies after authorized shutdown.
-- [x] Run authorized VM acceptance; distinguish historic evidence from new runs.
-      Closed by the user 2026-10-31. Not run, accepted as uncovered: safe-area/navigation-bar assessment, F6 on the baseline bundle, a `--max` transfer, and a constrained-free-space import (`F6.md`, Not covered).
-- [x] Complete isolated baseline/candidate headless smoke and native probe checks;
-      preserve new diagnostic reports and remaining windowed/transfer checks.
-- [x] Triage new diagnostic reports against baseline, source history and repeats.
-- [x] Windowed A/B: F3 touch and edge gestures, F5 transition frames, F4 power during close (`WINDOWED.md`).
-- [x] Windowed A/B: keyboard modes across folds and window frame restore (`WINDOWED.md`).
-- [x] F6 on the candidate: 5 cold boots, full 64 GB export/import with imported boots, snapshot round trip, 120-minute locked idle (`F6.md`).
-- [x] F2 cart and navigation continuity on KFC across folds (`F6.md`): cart, sheet and exit dialog survive inner/cover folds; PID unchanged.
-- [x] Host restart: 2/2 candidate cold boots pass after re-running `vphone-escalator allow` (AMFI heap patch does not survive a restart; `F6.md`).
-- [x] Network (DNS, HTTPS, host-served page) and audible audio (Safari media and Settings ringtone preview heard by the user) on the candidate (`F6.md`).
-- [x] Static outer/inner and cutout on/off/on (`Regression/display-matrix.zsh`, `F6.md`): P1–P7 pass; P5 (cutout off) loses all inner taps as documented.
-- [x] Move the foldable board-tree precondition before disk work in `cfw update-environment` (`db111457`; `F6.md`): root check refuses in 3 s with no disk attach. Candidate rebuilt at `ea05ba81` with it (only `vphone-cli` changed; previous bundle kept at `.build/XcodeDuo-a71f2360`).
-- [x] Verify Home Screen foreground recognition, icon taps on both panels, cover hit testing, and rejection on the lit and dark Lock Screen (`ELEMENT_TAP.md`).
-- [ ] Investigate and fix inner-panel Home Screen `ui.element_at` returning AX error -25202.
-- [x] Verify actual 30-second Auto-Lock, Never for 333 seconds, and persistence across cold boot (`ELEMENT_TAP.md`).
-- [ ] Verify an independent effective-settings rewrite by profiled within one boot.
-- [ ] Open issues recorded, not pursued (`F6.md`, Open issues): KFC 登录会员 ignoring some user clicks; how app accessibility got turned on.
-- [x] Review the current prepared diff, record results and remaining approval gates; repeat after VM-driven changes if needed.
-      Repeated 2026-10-31 for `db111457` and `72b83eb2`: one misplaced doc comment fixed; guest scan finds no universal or nested X1 Mach-O under AccessibilityBundles (78 thin executables, all lowered with backups; 434 bundles in the shared cache).
+## 上游同步
 
-## Constraints and approval gates
+- [ ] #853、#897 DSC 映射生命周期；#865 缓存 worker。逐项核对依赖和 Duo 行为。#849 实际是 Remote Pairing 预设改动；另行定位恢复连接重试的提交。
+- [x] #899 模板重启的实际 VM 验收：新身份隔离副本验证原生重启总启动 1 次；真实关机对照验证状态 0 退出后恰好补启动一次。47 项状态机回归、库摘要、根只读和正常关机核对通过。见 [评审与验收](Research/Integration/duo_m5_20261030/CHANGE_REVIEW_20261114.md)。
+- [ ] RPC 目录、类型和契约（#841、#857、#884、#892、#908、#914–#916）。覆盖旧客户端兼容、参数、分页、输出清理与输入观察，保留 Duo AX 和 Auto-Lock。
+- [ ] #906 网页摄像头路径、#861/#869/#870/#888 构建分发。集成后核对 Bundle 与 Launchpad 的版本、签名及双向兼容性。
+- [ ] 单独评估 #924 X1 声明与撤销归属、#919/#923 TXM，以及 DriverKit、Cryptex、启动链和其他设备改动。旧固件与文档站另行评估。
 
-- User instruction (2026-10-30): keep all iPhone Duo work on
-  `duo-integration-20261030`; do not merge it into `main`.
-- User instruction (2026-11-02): repair the review findings, commit, and push
-  `duo-integration-20261030` to `origin`; this supersedes the earlier no-push gate for this branch.
-- No merge into `main`, data deletion, modification of source
-  repositories, additional original-machine modification, or additional host privilege changes.
-  Present concrete commands and results before requesting any needed approval.
-- Use Xcode targets and native components from the new upstream layout.
-- Do not read or modify the repository-root `TODO.md`.
-- Build/test artifacts stay under `.build`; tracked evidence contains summaries,
-  commands, hashes, and small reproducible inputs rather than VM disks or videos.
-- Existing source reports do not establish behavior on the integrated bundle.
+## 需要独立环境或权限
 
-## Current state
+| 项目 | 现状及继续条件 |
+| --- | --- |
+| USB/DFU 恢复重试、恢复空间峰值 | 客户端 7/7、原生恢复 72/72 通过。实际验收需要独立目标；涉及擦除的恢复须先获明确批准。 |
+| 27.2 铰链与音频、GLES、独立 RPC 候选 | 三个候选预检仍被 AMFI 拒绝。当前 27.1 的局部 RPC 验收已完成；不替代独立候选。见 [候选和运行条件](Research/Integration/duo_m5_20261030/ACCEPTANCE.md#后续独立候选)。 |
+| WDA HTTP、宿主快捷键 | 分别需要运行中的 WebDriverAgentRunner 和已获辅助功能权限的宿主环境。 |
+| KFC 登录会员点击、应用辅助功能启用来源 | 历史观察，尚无定位证据。见 [F6 记录](Research/Integration/duo_m5_20261030/F6.md)。 |
 
-Review follow-up (2026-11-02):
+## 已完成证据
 
-- [x] Reproduce plist overwrite and invisible-element selection in saved tests (25 and 3 failing assertions).
-- [x] Preserve existing plists on read/parse errors and filter invisible single-display targets.
-- [x] Test existing rangeMinimum removal and the auto-lock request handler (81 auto-lock checks, 236 element-tap API checks pass).
-- [x] Correct verification scope, KFC status, and firmware failure counts in research docs (`REVIEW_FOLLOWUP_20261102.md`).
-- [x] Run daemon regressions and the complete VPhone bundle build; bundle admission and deep/strict signature verification pass (`REVIEW_FOLLOWUP_20261102.md`).
-- [x] Review the final diff and prepare the authorized current-branch commit/push. Git history and the delivery message record the resulting commit and remote verification.
+- [Duo 运行验收](Research/Integration/duo_m5_20261030/ACCEPTANCE.md)：连接稳定性、异常响应、慢响应、断连方向、显示与输入、窗口采样。内屏左横屏边缘手势使用旋转后的面板坐标，复测 3/3。
+- [AX 与 Auto-Lock](Research/Integration/duo_m5_20261030/ELEMENT_TAP.md)：30 秒、Never、冷启动，以及同次启动中按 launchd 标签重启 `profiled` 后观察到有效设置更新，测试后恢复原值。
+- #917 shell JSON 状态行修复：旧实现复现失败，修复后 6 项通过并接入 CI；完整 Bundle 构建和严格签名通过。
+- #907 Launchpad CLI：允许 `--no-template --slim on|off`，其他模板专用开关仍拒绝；旧实现复现失败，模板参数和计划回归、Launchpad Debug 构建均通过。同步四语手册。
+- #899 模板重启：guest 在请求重启后正常退出时，宿主只补启动一次。CoreKit 模板设置回归 46/46、完整 Debug Bundle 构建和严格签名均通过。#907、#899 日志位于 `.build/launchpad-907.FUmycAhy/`。
+- [截至 2026-11-13 的执行记录](Research/Integration/duo_m5_20261030/WORK_LOG_20261113.md)：保留原清单的提交、命令、日志、历史验收范围和授权来源。旧状态以当前清单为准。
 
-The candidate/build/runtime paragraphs below describe earlier checkpoints;
-they do not establish runtime acceptance of the 2026-11-02 daemon changes.
-
-Source `main`: `39324ee7fcbb1d909bfa293f6188a8ef752ba734` (2.14.1).
-Latest local Duo branch: `3f9a15624b438e132e81093ec8b5740cbe4facf8`.
-Source code worktrees were clean at inspection. The original `vphone-cli`
-worktree remains on its previous integration branch with its uncommitted files.
-
-Current checks: CoreKit 668 passed; patch catalogue 25 passed; ArchiveKit 103
-passed; FoldGuard seven passed; saved CLI display regression passed; RPC request
-contract five checks passed. Native device/simulator probe builds passed and
-the host CSSC probe returned six correct results. Final candidate build,
-bundle admission, deep/strict signature verification, and final CLI regression
-passed. Full FirmwarePatcher: 780 tests with the same 134 issue records as the
-baseline, no added or removed failing names. See `validation.json` for hashes
-and evidence paths.
-
-At the earlier integration checkpoint, the source history was reachable through
-a history-only merge whose tree was checked unchanged; no merge into `main` or
-remote push had been performed at that checkpoint. The 2026-11-02 instruction
-above authorizes pushing the review follow-up on the integration branch.
-
-Runtime preparation: the user approved closing `duo-m5-fold214`. The normal
-CLI stop returned success; both old processes exited and lsof found no state
-file readers. The seed and two isolated clones are created and verified.
-Source metadata/small-state hashes were unchanged during copying; clones have
-distinct disk inodes, identical SEP/NVRAM data and reset identities. No clone
-had been booted or updated at that checkpoint. The user then ran the prepared
-root script. Both CFW updates completed successfully, both receipts list the
-same 54 Guest patches with fold display/guard enabled and inner cutout absent,
-and the allowlist log contains both expected VM CDHashes. The completion
-marker is dated 2026-10-30 15:29:53 Asia/Shanghai.
-See `Research/Integration/duo_m5_20261030/runtime-preparation.json` and
-`Regression/prepare-root.zsh` there.
-
-Runtime checkpoint: baseline and candidate headless smoke passed six supported
-rotation cases, two exact unsupported-pose errors, six fold cycles, dark-fold
-locked state and stable SpringBoard/backboardd PIDs. Both passed installd
-installation of five probes, six CSSC checks, eight app geometry samples and
-four focus/text checks. Geometry and focus measurements match between builds.
-Both copies are now normally stopped; the original remains stopped. The
-original worktree status digest still matches the recorded digest. Transport
-and RPC contract checks each passed five cases. No product binary changed
-after build `a71f2360`.
-
-Diagnostic triage (`DIAGNOSTICS.md`): SiriSearchFeedback is a session log;
-ReportSystemMemory's libdispatch `KERN_DENIED` crash recurs near boot on both
-builds and on the source VM since Oct 27; the one ExcUserFault_lsd is a
-non-fatal iconservices fault not reproduced in two candidate repeats. None is
-attributed to the candidate. Rotation is refused about 30 s after boot on the
-baseline too; runners must wait for a settled boot.
-
-Windowed A/B (`WINDOWED.md`): F3 tap tables are identical between builds
-(80/80; inner scale 1.435/1.404, residual ≤ 0.17 pt); edge gestures match
-(host and `edge: 2` 3/3 on both displays). F5: both builds show 1–12 fully
-black hand-over frames (72 vs 66 total), so the `fb41cd6b` gap persists
-upstream; the user chose not to adapt the hold. F4: 10/10 power-during-
-close trials end on the lock screen without cover Safari frames. Keyboard
-modes: 8/8 focus/text continuity in hardware and software modes on both
-builds; window restore: baseline loses ~32 pt per relaunch, candidate stable.
-F6 (`F6.md`): 5/5 cold boots, sparse 64 GB transfer (28.6 GB imported)
-with 2/2 imported boots, snapshot round trip, and a 120-minute locked idle
-with stable PIDs and no new reports. Display matrix (`F6.md`, 2026-10-31):
-fold/outer/inner and cutout on/off/on/fold restored all pass; without the
-cutout fix the static inner screen takes no app taps, with it 8/8 arrive,
-and P7 returns to P1's geometry. The run needed the board tree copied into
-the imported copy's `FirmwareOriginals` first.
-See `RUNTIME.md`, `WINDOWED.md`, `F6.md` and `runtime-validation.json`.
-
-Detailed evidence and change decisions:
-`Research/Integration/duo_m5_20261030/README.md`.
-
-## Upstream sync (2026-11-04)
-
-- [x] Apply #804, #805 and #812 to the Duo branch and verify the full bundle, signatures and targeted regressions.
-- [x] Adapt the upstream machine and storage chapters in all four languages to the current Duo branch.
-- [x] Validate X1 undo migration and boot on disposable VMs.
-- [x] Compare the disk footprint of the restore-tree publication step before and after #804.
-- [ ] Measure the full restore pipeline's peak disk use and test host shortcut routing with Accessibility access.
-- [ ] Evaluate older firmware support and the documentation site separately.
-
-See [the sync record](Research/Integration/duo_m5_20261030/UPSTREAM_SYNC_20261104.md).
-
-## Duo display sync (2026-11-04)
-
-- [x] Integrate #788, #799, #800 and #801, retaining the local AX and auto-lock paths.
-- [x] Verify the full bundle, device-tree and patch catalogue tests, hinge tests, and daemon regressions.
-- [x] Prepare and verify two disposable VM clones and the read-only root preparation preflight.
-- [x] Apply the signed bundles to the isolated guests, admit both VM binaries, and run windowed Duo regressions.
-- [x] Exercise rollback on an export of the real shared cache; reproduce four unintended instruction restores.
-- [x] Correct X1 undo ownership and verify both legacy conversion and already-converted logs with real cache round trips.
-- [ ] Exercise the actual WDA HTTP endpoint with a running WebDriverAgentRunner.
-
-See [the display sync record](Research/Integration/duo_m5_20261030/UPSTREAM_DISPLAY_SYNC_20261104.md).
+当前任务的验证使用隔离副本。删除数据、变更宿主安全设置、修改其他仓库或原始 VM、发布和推送前，须核对当前任务的明确授权。构建和大体积证据留在 `.build`。四语手册发布前按仓库约定完成 Argon 审阅。

@@ -243,6 +243,64 @@ zsh "$reg/f5-analyze.zsh" "$out/f5"
 
 本文件的命令仅针对上述隔离副本。运行结果以每组日志为准。
 
+### 断连方向保持
+
+在通过宿主预检的隔离 Duo 上，分别对内屏和外屏执行下列用例。每次记录
+宿主连接状态、窗口方向变化时间、guest 方向和折叠姿态。持续时间从宿主确认
+断连算起；宿主未确认断连的样本不计入短断连结果。
+
+| 实验设置 | 预期结果 |
+| --- | --- |
+| 横屏，vphoned 断连后在 5 秒内重连 | 窗口保持横屏，期间没有回到竖屏；重连后可再次旋转 |
+| 横屏，vphoned 持续不可用超过 5 秒 | 窗口在断连约 5 秒后回到竖屏；重连后跟随新方向读数 |
+| 横屏，断连后的 5 秒内停止 VM | VM 正常退出；停止期间没有迟到的响应恢复旧方向 |
+| 竖屏，短断连并重连 | 窗口保持竖屏；重连后可切到横屏 |
+| 重连后切换横竖屏并开合 | 窗口跟随 guest 方向，内外屏呈现和折叠姿态正常更新 |
+
+在 `duo-rpc-accept-205443` 的窗口模式下，用
+`node Regression/connection-runtime.mjs "$socket" "$new_output" "$daemon_sha256" orientation` 复测。
+分别让 Safari 在内外屏处于横屏。故障注入临时暂停该副本的 vphoned 代理、结束工作进程，
+由 guest 测试会话按时恢复代理，验证新工作进程重新连接。以 `vphone.sock` 首次明确返回
+`guest not connected` 为起点，约每 150 ms 读取一次宿主 `display.geometry` 中的窗口方向。
+
+| 面板 | 短断连：首个成功 RPC | 长断连：首次读到窗口回竖屏 | 长断连：首个成功 RPC |
+| --- | ---: | ---: | ---: |
+| 外屏 | 1.07 s，窗口始终横屏 | 5.21 s | 9.19 s，随后恢复横屏 |
+| 内屏 | 1.07 s，窗口始终横屏 | 5.21 s | 9.20 s，随后恢复横屏 |
+
+较早一轮内屏短断连的首个成功 RPC 在 5.06 s，样本未计入短断连通过结果。
+后续用 `orientation portrait` 补测：外屏和内屏从竖屏开始，分别在明确断连后
+4.14 s 和 3.05 s 重连，采样期间窗口始终竖屏。两个面板重连后均能主动切到横屏、
+再回竖屏，并通过姿态请求切换到另一面板；guest 方向、铰链角度和宿主窗口方向均符合预期。
+用 `orientation stop "$cli"` 补测：内屏横屏、宿主确认断连时发出 `vm stop`，
+最后一次采样仍为横屏；CLI 发送 SIGINT 后约 0.85 s 退出，无 SIGKILL，VM 进程以 0 退出，
+磁盘状态文件没有打开句柄。停机请求发送后没有继续观测窗口帧，迟到响应由离线回归覆盖。
+补测证据位于 `.build/duo-sync-20261113/runtime/connection-final.4eH2RMJb/`。
+
+同一 Bundle 上通过 `vphone.sock` 发送 `script.eval`。等待 2 秒的对照在 2.03 秒正常返回 `42`；
+等待 125 秒、guest 脚本超时设为 140 秒的请求在 120.01 秒返回
+`API protocol error: HTTP response timed out`。随后同一 daemon PID `115` 仍能处理请求。
+复跑入口为 `connection-runtime.mjs` 的 `slow` 模式。证据在
+`.build/duo-sync-20261113/runtime/connection.jtrO9SPy/`。
+
+第一批连接稳定性、第三批进程捕获与并发健康检查、第四批 RPC 异常响应已在隔离副本
+`duo-rpc-accept-205443` 上完成运行验收（证据位于
+`.build/duo-sync-20261113/runtime/{vm-smoke-evidence,rpc-stability-evidence,rpc-extra-evidence}/`）：
+
+- 离线 `cfw update-environment` 后冷启动，`vphoned` `binary_hash` 核对为
+  `446925b66b983e6395bc2c6715885f1eae1d1836cee014a3df136f468540419b`。
+  通过 `files.list` 查明此前在线自动更新返回 `Could not install update` 的原因：
+  `/var/root/Library/Caches/vphoned` 为非空目录（含 `Cache.db`、`Cache.db-shm`、`Cache.db-wal`），
+  导致 `rename("/var/root/Library/Caches/vphoned.next", "/var/root/Library/Caches/vphoned")` 因 `EISDIR` 失败。
+- `vm-smoke.zsh`：内外屏原生 PNG 捕获、6 个受支持旋转组合、2 个不支持姿态的精确错误回执、
+  6 次开合循环、暗屏展开保持锁定通过；SpringBoard（pid 37）与 backboardd（pid 73）前后一致，崩溃计数不变（114）。
+- `rpc-stability-runtime.zsh`：30 次连续 `/v1/health`、12 路并发 `/v1/health`、
+  `settings.set` 3 类无效参数返回 400、WebSocket 握手拒绝（版本 12 返回 426、缺 key 返回 426、带 Origin 返回 403）、
+  `methods.list` 返回 12 项 `duo_display` 目录、`process.spawn` 正常捕获与 64 KiB（65536 字节）输出上限、
+  256 KiB 随机文件上传／下载逐字节一致并清理、`services.kickstart` 杀死 `vphoned` 时代理返回 502 `guest_closed`，
+  以及 launchd 重拉起后自动重连至新实例均通过。
+- 后续横屏断连与慢响应结果见上文；USB/DFU 恢复重试仍待单独验收，内屏横屏边缘手势另列。
+
 ### 27.1 A/B 运行结果（2026-11-13）
 
 证据位于 `.build/duo-runtime-84e3ce54/results/runtime-ab.oXsZCNyW/`。
@@ -503,6 +561,236 @@ FoldDisplay SHA-256 `86ecf0de…`。副本 `duo-final-84e3ce54` 是 B 的新克�
 0.9–1.4 s；常亮锁屏下的开合；DeviceHub 连续扫动。四台测试副本均已
 正常关机。
 
+### 当前 Bundle 窗口补验（2026-11-13）
+
+使用第四批验收的 Bundle 和隔离副本 `duo-rpc-accept-205443`，以窗口模式启动。
+运行中 `vphoned` SHA-256 为 `446925b66b983e6395bc2c6715885f1eae1d1836cee014a3df136f468540419b`；
+通过 guest 文件读取核对 `/usr/lib/libvphonefolddisplay.dylib` 的 SHA-256 为
+`c95fbf375e8ee3028e2399e3cf66f38eeacdf86e65e9da9175837994a3a076b1`，两者均与 Bundle 一致。
+证据位于 `.build/duo-sync-20261113/runtime/windowed.Db9KaTQE/`。
+
+对每组执行 `zsh Regression/f5-scenarios.zsh "$socket" "$new_output" "$daemon_sha256" "$scenario"`，
+其中 `scenario` 为 `safari`、`sweep-06`、`sweep-15` 或 `aod`。每组尝试 3 次展开和 3 次合拢；
+请求返回后继续采样 1.8 秒，再等待 2.4 秒。以 FoldDisplay 日志中的目标面板归属确认交接，
+以上一帧释放日志中的时长记录保持时间。
+
+| 实验设置 | 面板交接 | 检出近黑的交接（样本数） | 上一帧保持时长 |
+| --- | ---: | ---: | --- |
+| Safari 前台 | 6/6 | 4/6（4） | 展开 375–746 ms；合拢 163–183 ms |
+| 连续扫动 0.6 s | 6/6 | 0/6（0） | 展开 142–256 ms；合拢 151–158 ms |
+| 连续扫动 1.5 s | 6/6 | 2/6（2） | 展开 103–122 ms；合拢 156–158 ms |
+| 常亮锁屏 | 6/6 | 6/6（112） | 无保持起止记录 |
+
+Safari 在 6 次开合前后均为已验证的前台应用，PID 为 417。连续扫动通过
+`display.posture` 的 `position`、`duration` 和 `profile: continuous` 执行；未验证 DeviceHub 界面。
+常亮锁屏组每次开合前 `locked=true`、`screen_off=true`、`panel-dark=1`；
+开合后均保持 `locked=true` 和 `panel-dark=1`，但 `screen_off` 均变为 `false`，
+所以常亮状态保持断言失败。3 次合拢分别检出 35、34、39 个近黑样本，3 次展开分别检出 1、2、1 个。
+这些读数不能确定屏幕何时退出常亮状态或近黑样本的原因。
+
+报告另记录相同亮度样本间隔和采样间隔。Safari 组最长相同样本间隔 1135 ms，
+最大相邻采样间隔 612 ms；静止内容和采样间隔限制了停帧判断。未执行带应用事件回执的首次有效输入计时。
+验收结束后 `system.shutdown` 返回 `accepted: true`，宿主记录 `Guest stopped`，VM 进程以 0 退出；
+`Disk.img`、`SEPStorage` 和 `nvram.bin` 均无打开句柄。
+
+### 常亮锁屏对照与首次有效输入（2026-11-13）
+
+使用同一 Bundle 和隔离副本，证据位于 `.build/duo-sync-20261113/runtime/f5-followup/`。
+`f5-scenarios.zsh` 的 `aod` 和 `aod-hinge-only` 两组额外记录原始
+`com.apple.springboard.hasBlankedScreen`、FoldDisplay `panel-dark`、RPC 锁定状态和宿主采集画面。
+
+- 首次展开前不改变姿态，等待 4.2 秒；对照仍为暗色常亮锁屏，`hasBlankedScreen=1`、`panel-dark=1`。
+- 带方向参数的 6 次交接后，`hasBlankedScreen` 均变为 `0`，`locked` 均保持为 `true`。
+  首次读到 `0` 的请求回执距姿态请求发送：展开 876–915 ms、合拢 78–153 ms。
+  首次展开的配对截图显示暗色常亮锁屏切换为点亮的锁屏，排除了仅有 RPC 字段变化的解释。
+- 只发送 `{"hinge":"open"}` 也复现了 1 次面板交接和锁屏唤醒。下一次合拢前未能重新建立常亮状态，
+  该组停止，因此没有仅改变铰链的合拢结果。显式方向参数不是展开唤醒的必要条件。
+  两次展开的姿态回执均为 `source: coremotion`。在该路径，`GuestAPI.setDevicePose`
+  发现铰链从合拢转为展开时会先调用 `GuestScreenUnlock.wakeDisplay()`；该函数以
+  SpringBoard 的 blanked 状态为条件，尝试解除变暗，必要时发送电源键事件。
+  常亮锁屏满足 blanked 条件。现有证据未区分本次实际成功的是解除变暗调用还是电源键，
+  也未确认合拢的唤醒路径。源码说明在关闭显示时，提前唤醒是为了让 SpringBoard 发布新姿态；
+  修改前需要保留熄屏展开的正向对照。
+
+在窗口模式运行 `node Regression/f5-first-input.mjs "$socket" "$new_output" "$daemon_sha256" 192.168.64.1`。
+本地测试页在 Safari 收到 `touchstart` 后回传事件。计时从宿主发送姿态请求开始，到宿主收到第一个页面回执为止。
+每次开合后验证了目标面板归属、铰链角度和 Safari PID。未开合时单次触摸对照为 21 ms。
+
+| 场景 | 有效交接及触摸回执 | 发送姿态请求至首次页面回执 |
+| --- | ---: | --- |
+| 展开 | 3/3 | 828、882、1133 ms |
+| 合拢 | 3/3 | 599、789、814 ms |
+
+这些时长包含探测间隔、宿主输入路径和页面回传。结果表示测试在何时首次收到回执，无法确定触摸最早可用时刻，也不代表画面停帧时长。
+隔离副本正常关机，三个状态文件均无打开句柄。
+
+### AX 网格、常亮时序和动态画面复测（2026-11-13）
+
+证据位于 `.build/duo-sync-20261113/runtime/three-followup.1I2WvgjK/`。
+AX 网格结果见 [ELEMENT_TAP.md](ELEMENT_TAP.md)。
+
+- **常亮锁屏**：6 次姿态请求均返回 `source: coremotion`，之后仍锁定但不再 blanked。
+  `f5-aod-timeline.mjs` 给出状态变化的宿主采样区间：3 次合拢分别为 86–160、8–83、78–152 ms。
+  guest 日志中外屏请求点亮的相对时间约为 1126–1147 ms。两种时钟未独立校准；该批也未从
+  FoldDisplay 归属日志确认 6 次目标交接。两种时间不能作为严格的跨端事件顺序或因果证据。
+- **动态画面**：`zsh Regression/f5-motion.zsh "$socket" "$new_output" "$daemon_sha256" 192.168.64.1`
+  使用本地 Safari 动画页，约每 100 ms 更新并回传进度。6 次请求前均收到 10 个更新回执，
+  开合附近相邻回执的最长间隔为 240 ms。宿主采样中，3 次展开检出 3、3、2 个近黑样本，
+  3 次合拢均未检出；最长相同样本间隔和最长相邻采样间隔均为 381 ms。
+  但 6 次请求的面板归属日志都与预期相反，脚本按设计返回失败。这批样本不能作为有效面板交接的停帧结果。
+  现有录制器以帧序号合成 30 fps 的 PTS，不能用于推算采集间隔；仍需有采集时间戳的原生流。
+
+隔离副本正常关机，三个状态文件均无打开句柄。
+
+### 动态画面续测与录制时间戳（2026-11-14）
+
+`f5-motion.zsh` 通过 `--check-panel` 在每次姿态请求前后分别保存原生截图来源。
+报告同时要求预期的画面来源变化和 FoldDisplay 归属日志。当前隔离副本确认 5/6 次交接；
+首次展开的截图因采集过程中显示身份或几何变化而不可用，归属日志也未确认该次交接。
+确认的 5 次中，1 次合拢检出 1 个近黑样本；最长相同样本间隔为 450 ms，最长相邻采样间隔为 458 ms。
+这些是 RPC 采样指标，不能确定实际停帧时长。证据位于
+`.build/duo-sync-20261113/runtime/panel-identity.jKdB9PS2/`；隔离副本已正常关机。
+
+录制器改用宿主单调时钟在截图回调时记时；以第一张成功写入的帧为零点，保留漏采间隔，
+不再用帧序号除以 30 生成时间戳。Virtualization 的截图接口只返回最近的画面，
+没有提供 guest 帧的呈现时间。`zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-recording-timeline-tests.sh`
+生成 MOV 并用 `ffprobe` 复读，确认 320 ms 采集间隔得以保留。完整 Debug Bundle 构建与严格签名通过，
+新 Bundle 尚未在 VM 中录制。
+
+续测：新 Bundle 的 `vphone-cli host preflight` 报告 AMFI 拒绝，CDHash 为
+`8e12c3249153bcdded03288642d2456cc42a3589`。未启动副本或更改宿主安全设置。
+使用 `f5-clock-report.mjs --timing` 重算已有动态样本：
+
+- 首次有效合拢的最大回执间隔为 458 ms，最长单次请求为 442 ms，请求之间的空档最多 23 ms。
+- 第二次展开的四个连续相同亮度样本，按首末请求窗口计算，观测间隔为 436–706 ms；
+  第三次展开的七个相同样本对应 283–473 ms。有效交接的动作后样本均有图像。
+  相同样本之间的画面不可见，这些区间不能作为连续停帧时长。
+- `f5-analyze.zsh` 现在按首末暗样本的 MOV PTS 报告区间，不再给末帧加固定 33 ms。
+  用 0、40、360、400 ms 四帧的变间隔 MOV 验证，报告末帧为 400 ms，保留了中间 320 ms 的采集间隔。
+
+### 新版录制器实际 VM 验收（2026-11-14）
+
+宿主预检通过后，用 CDHash `8e12c3249153bcdded03288642d2456cc42a3589` 的 Bundle 启动
+`duo-rpc-accept-205443`，通过自带的录制菜单录制 `f5-motion.zsh` 的动态 Safari 开合。
+原生截图来源和 FoldDisplay 日志共同确认 6/6 次交接。证据位于
+`.build/duo-sync-20261113/runtime/native-mov.Ai9rkHRx/`，包括原始 MOV、逐帧 PTS 和
+`node Regression/f5-mov-timing.mjs <recording.mov>` 的报告。
+
+MOV 为 1398×2034、1358 帧，首末帧相隔 45.225 秒。相邻帧 PTS 严格递增，间隔
+25–40 ms，中位数 33.333 ms；没有超过 100 ms 的采集间隔。最长非黑相同亮度样本序列
+含 19 帧，首末相隔 601.7 ms，期间最大采集间隔 40 ms。这表明本段相同画面在持续采集中被反复观察到。
+比较使用缩放至 64×64 的亮度数据；MOV 时间零点是第一帧的宿主采集时间，未与开合请求的时钟原点精确对齐，
+因此不能将这段时长归给某次交接，也不能推断 guest 的原生帧时间。独立 RPC 画面采样在最后一次合拢检出 1 个近黑样本。
+隔离副本正常关机，三个状态文件均无打开句柄。
+
+### MOV 与姿态请求的单调时钟对齐准备（2026-11-14）
+
+录制器在第一张帧成功写入后输出 `[record] first frame - uptime_ns=… file=…`。
+该值取自截图回调的 `DispatchTime.now().uptimeNanoseconds`，与 MOV 的 PTS 零点一致。
+`f5-clock.mjs` 将 `process.hrtime.bigint()` 的原点作为十进制字符串保存到
+`clock.json.host_uptime_ns_at_monotonic_zero`。绝对纳秒值以整数相减后才转换为毫秒，
+避免 JavaScript 浮点数丢失低位精度。
+
+`zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-recording-timeline-tests.sh`
+在宿主环境通过：MOV 保留 320 ms 的采集间隔，4 项对齐回归全部通过。
+其中跨进程检查连续 3 次确认 Swift 的时间值位于 Node 调用前后的单调时间区间内。
+其余用例覆盖跨请求边界的重复样本、基线样本排除、缺失或多重录制起点、录像覆盖不足及失败请求。
+受限环境中的 H.264 编码失败；上述通过结果来自宿主重跑。
+
+复测时保存单次录制的 VM 日志、`f5-motion.zsh` 输出和 MOV，再执行：
+
+```zsh
+node Research/Integration/duo_m5_20261030/Regression/f5-mov-timing.mjs "$out/recording.mov" > "$out/movie-timing.json"
+node Research/Integration/duo_m5_20261030/Regression/f5-mov-align.mjs \
+  "$out/movie-timing.json" "$out/boot.log" "$out/motion/samples" > "$out/movie-alignment.json"
+```
+
+对齐要求录制与采样来自同一次宿主启动。报告给出请求的 MOV PTS，以及与请求后观察区间
+相交的重复样本段相对请求的时间；它不将时间重叠作为因果证据。面板交接仍需独立通过
+`handoff.tsv` 的截图来源和 FoldDisplay 日志检查。旧录像及旧 `clock.json` 缺少两个单调时钟原点，
+不能使用本方法补算。
+
+完整 Debug Bundle 构建和 `codesign --verify --deep --strict` 通过。日志位于
+`.build/duo-sync-20261113/recording-align-{tests,build-host,signature,preflight}.log`。
+新 VM 程序的 CDHash 为 `d85f81edab6cc06b9589205ecec130585ac941e8`，宿主 AMFI 预检拒绝。
+用户随后明确批准该 allowlist 命令及 `duo-rpc-accept-205443` 隔离副本复测。
+`sudo -n` 返回 `sudo: a password is required`；已改由 macOS 管理员授权对话框执行同一 helper。
+日志为 `recording-align-allow.log` 和 `recording-align-allow-dialog.log`；复测脚本为
+`.build/duo-sync-20261113/run-recording-align.zsh`。系统认证后的实际结果见下节。
+
+### MOV 与姿态请求实际对齐（2026-11-14）
+
+系统认证完成后，helper 报告已更新 allowlist，amfid 已采用新 requirement。
+`vphone-cli host preflight` 通过。使用获准的同一 Bundle 和隔离副本
+`duo-rpc-accept-205443` 运行录制菜单及 `f5-motion.zsh`，未更新 guest 组件。
+运行中的 vphoned SHA-256 仍为 `446925b66b983e6395bc2c6715885f1eae1d1836cee014a3df136f468540419b`。
+原生截图来源与 FoldDisplay 日志确认 6/6 次交接，Safari 前台应用和 PID 检查通过。
+证据位于 `.build/duo-sync-20261113/runtime/aligned-mov.PMuQoYWe/`，包括 `driver.zsh`、
+`boot.log`、`motion/`、`recording.mov`、`movie-timing.json`、`movie-alignment.json` 和汇总 TSV。
+
+MOV 为 1398×2034、1372 帧，首末帧相隔 45.700 秒。相邻 PTS 间隔为 28.3–38.3 ms，
+中位数 33.333 ms，没有超过 100 ms 的采集间隔。首帧单调时间为
+`1085914223042125` ns；使用采样器的单调原点直接对齐，未使用 wall clock 推算。
+MOV 的轨道时基为 1/600 秒；以下相对时间为近似值，受 PTS 量化影响。
+
+表中的样本段按缩放至 64×64 的亮度数据逐帧完全相同判定，范围为与请求后观察区间相交的
+最长非黑样本段。它表示持续采集中反复观察到相同亮度样本，不提供 guest 的原生帧时间。
+
+| 交接 | 相同亮度样本数 | 首末样本间隔 | 相对姿态请求的首末时间 | MOV 近黑样本数 |
+| --- | ---: | ---: | --- | ---: |
+| 第一次展开 | 11 | 333.3 ms | 502.7–836.0 ms | 0 |
+| 第一次合拢 | 3 | 68.3 ms | 1569.2–1637.6 ms | 0 |
+| 第二次展开 | 7 | 201.7 ms | 421.9–623.5 ms | 0 |
+| 第二次合拢 | 3 | 66.7 ms | 1136.1–1202.7 ms | 1 |
+| 第三次展开 | 7 | 200.0 ms | 356.4–556.4 ms | 0 |
+| 第三次合拢 | 3 | 65.0 ms | 1802.2–1867.2 ms | 4 |
+
+全片最长非黑相同亮度样本段即第一次展开的 11 帧，期间最大采集间隔为 35.0 ms。
+本次没有复现此前约 602 ms 的样本段；旧录像缺少单调原点，仍不能确定旧样本段属于哪次交接。
+新对齐结果确认了本次重复样本所在的请求区间，重复画面的原因未查明。
+
+第二次合拢的近黑样本位于请求后约 202.7 ms；第三次合拢的四个近黑样本分别位于
+302.2、467.2、502.2、540.6 ms。最后三张在 MOV 中相邻，首末相隔 73.3 ms。
+这些是采集点的观测，不能据此确定样本之间的完整画面变化。独立 RPC 采样仅在第三次合拢
+检出 1 个近黑样本。页面在各请求前 1 秒均收到 10 个动画回执，开合附近最长回执间隔为 196 ms；
+页面回执不代表画面已呈现。
+
+收尾脚本首次 `system.shutdown` 请求缺少必需的 `force: true` 确认字段，RPC 拒绝，脚本返回失败。
+核对 handler 后补发带确认字段的请求，launchd 接受正常关机，guest 日志记录
+`ApplePSCI - system off` 和 `[vphone] Guest stopped`。三个状态文件的打开句柄检查为空，VM 进程已退出。
+未发送强制停止信号。复测脚本的关机参数已修正；原始失败请求和补发回执均保留在证据目录。
+MOV 分析和对齐命令随后独立执行成功。补充近黑采集点的对齐回归后，宿主录制时间戳回归 5/5 通过，
+跨进程时钟检查和 320 ms 采集间隔检查通过，日志为 `recording-timeline-tests.log`。
+
+后续完成原生截图、无 guest 采样对照、原生截图重复三轮。近黑同时在 guest 原生 PNG、
+宿主 RPC JPEG 和 MOV 中观察到；原因未查明，采样影响也未确认。三轮分别确认 6/6、6/6、5/6 次交接，
+方向变化及未确认的首次展开均单独记录。来源比较与时钟回归 8/8 通过，副本均正常关机。
+具体证据、失败判据和下一步见 [F5 动态画面来源检查](F5_PRESENTATION.md)。
+
+获准的保持层内部诊断轮随后完成六次姿态请求，但内屏原生来源校验失败，交接验收为 0/6，
+不计为有效交接结果。内部 8×8 栅格显示三次展开的保持源采样点已黑，合拢源则含非黑像素；
+原因仍未查明。启动自动同步造成的备份来源错误已修正，最终从先前只读备份恢复原库，
+两次冷启动核对全部环境库哈希及只读根状态，正常关机且状态文件无句柄。保存回归 15/15 通过。
+见 [保持层内部诊断实际执行与回滚](F5_PRESENTATION.md#保持层内部诊断实际执行与回滚)。
+
+### 内屏横屏边缘手势复测（2026-11-13）
+
+在当前 Bundle 的 `duo-rpc-accept-205443` 上运行
+`zsh Regression/f3-edge-orientation.zsh "$socket" "$new_output" "$daemon_sha256"`。
+每次注入前确认 Settings 在前台、铰链角度至少为 175°、界面方向为 0° 或 90°；
+以已验证的 `com.apple.springboard` 前台状态作为返回主屏幕的判据。
+证据位于 `.build/duo-sync-20261113/runtime/edge-followup/`。
+
+| 界面方向 | 宿主窗口向上划动 | guest 固定面板底边 | guest 界面底边 |
+| --- | ---: | ---: | ---: |
+| 竖屏（0°） | 3/3 | 3/3 | 3/3 |
+| 左横屏（90°） | 3/3 | 0/3 | 3/3 |
+
+`input.touch` 的带边缘标志路径接受固定面板的归一化坐标。90° 时，界面底边对应面板右边：
+将旧输入的 `(0.5, 0.995)`、`edge=2` 改为 `(0.995, 0.5)`、`edge=4`，
+并沿减小 `x` 的方向移动，恢复返回主屏幕的行为。旧输入的 0/3 表示未触发主屏幕手势，
+无法据此判断 HID 事件是否送达。未重跑历史 A/B Bundle，也未覆盖其他横屏方向。
+
 ## 后续独立候选
 
 以下候选均以 `84e3ce54` 为父系。前面的 A/B 继续使用原始固定构建。
@@ -533,3 +821,35 @@ DriverKit 单独评估：先确认故障是否发生在设备枚举。早期 27.
 已记录宿主和 guest 两条输入路径在 F3 共收到 80 次点击；这不覆盖新候选，
 也不支持把先前状态栏截获归为虚拟 USB 枚举失败。调试库 X1 lowering
 在有独立调试库失败证据时评估。TXM 和 Cryptex 保留在新制机评审范围。
+
+## 三项问题续查（2026-11-14）
+
+原库隔离副本完成七轮诊断，未新增产品修复：内屏 Settings 也复现 AX
+`-25202`；常亮合拢的点亮请求来自 SpringBoard 显示内容模式切换；重启
+SpringBoard/backboardd 后，存活 daemon 的旧 CADisplay UUID 会使来源验证拒绝，
+单独重启 daemon 可恢复。该恢复不代表动态黑帧或重复画面已修复。
+保存了可重跑入口、基线失败判定、过滤日志与真正熄屏对照。
+七轮原库／其他环境库摘要和只读状态均保持，隔离副本已正常关机。
+证据与未验证范围见 [三项诊断](THREE_ISSUES_20261114.md)。
+
+## 三项修复最终候选（2026-11-14）
+
+用户选择保留原生 Snapshot 策略。最终候选 T2 的完整 Bundle 构建、严格签名和 admission 通过；未再次修改宿主 AMFI。既有补丁声明和 preset 不变。
+
+| 问题 | 结果 | 证据 |
+| --- | --- | --- |
+| 内屏 AX 命中 | 实际显示 ID 命中与 PID 校验生效；外／内屏 Home、Settings 和内屏左横屏 15/15，锁屏命中拒绝 | `.build/duo-fixes-20261114/final-live.25fpDfuA/ax/` |
+| AOD 开合点亮 | 四次开合与无姿态对照均保持 AOD，240 个采样点无状态偏离；真正熄屏开合均唤醒且保持锁定，低电量模式恢复 false | 同目录 `samples/`、`off/` |
+| 来源恢复 | 保留 respring 成功响应；worker 1803→1878，内屏原生截图自动恢复 | 同目录 `lifecycle/` |
+| Home 最长扫动 | 六次 10 秒原生 Live 交接均确认，MOV 观察窗口无近黑采集点，保持 9494–9553 ms，无超时 | `.build/duo-fixes-20261114/live-recording.Zk5F4a9d/` |
+| 冷启动 Safari | 六次均为系统原生 Snapshot，六次交接均确认，观察窗口无近黑采集点；最长非黑重复亮度区间约 431.666 ms、14 张，内部最大间隔 35 ms | `.build/duo-fixes-20261114/cold-record.Q0ubnxdi/` |
+
+冷启动 Safari MOV 共 1504 帧，中位间隔约 33.333 ms；录制起点一次约 211.667 ms 间隔位于交接窗口之外。10 秒 Home MOV 起点也有一次约 223.333 ms 间隔。两轮均采到过渡方向变化，不计为全程固定纵向验证。近黑判定使用下采样亮度，保持就绪使用 8×8 RGB 网格。重复亮度样本没有全部消除，其全部原因未查明；没有将其全部归因于 Snapshot。
+
+最终 FoldDisplay SHA-256 为 `a96179b729b9469800214ac748d3b20b9ed821c238a9e6d0b48d32c6b9ba4d87`，daemon 为 `95d37ab731c6acc45ad6f75b5705a946e5c3a26cdc5edcacfdf022bc21233c9e`。冷启动录制前后根均只读，21 项库摘要一致；该轮 trace=0，正常关机且状态文件无打开句柄。原组件恢复、具体命令、失败实验和验证限制见 [修复执行记录](FIXES_20261114.md)。
+
+最终回滚完成：`cold-rollback.Kv83eQrk` 恢复原组件，`cold-verify.hUSuyJ0t` 冷启动核对原 daemon、原 FoldDisplay、21 项库、根只读、trace=0、低电量模式及旋转锁原值；随后正常关机，状态文件均无打开句柄。候选 Bundle 与源码保留，隔离副本当前运行组件为基线原版。
+
+## #899 模板重启实际验收（2026-11-14）
+
+新身份副本 `duo-template-reboot-20261114` 的原生 `system.reboot` 在 VM 内完成，宿主总启动次数为 1；真实关机对照使 VM 正常退出后，生产重启流程恰好补启动一次，总启动次数为 2。两组 launchd 启动时间均变化，环境库摘要不变、根只读，随后正常关机且状态文件无打开句柄。原验收副本保持关机。评审另复现并修复 clean-exit 与 failure 两次读取之间退出的竞态，47 项 CoreKit 模板回归通过。本轮只执行生产重启流程与启动适配器，完整模板初始化未实测。具体命令、源文件、两组对照和证据见 [改动评审记录](CHANGE_REVIEW_20261114.md)。

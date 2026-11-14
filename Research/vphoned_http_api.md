@@ -53,7 +53,10 @@ proxy removes the `Authorization` header and the `token` query item, so
 `/v1/events?token=…` reaches vphoned as `/v1/events`. It forwards every other
 byte unchanged. The token covers the whole TCP connection. vphoned closes
 each HTTP connection after one reply, and a WebSocket stays on the connection
-it was admitted on. A listen address other than loopback prints a warning.
+it was admitted on. If the guest closes the connection before sending any
+reply byte, the proxy answers `502 Bad Gateway` with error code
+`guest_closed` and closes; a reply already under way is never altered.
+A listen address other than loopback prints a warning.
 The proxy then sends `Host: localhost` in place of the client's value, so
 vphoned's Host check still passes. `VPhoneAPIClient` sends the token as a
 bearer header on HTTP and as the `token` query item on WebSocket. It takes
@@ -485,6 +488,14 @@ daemon: install a guest image carrying this vphoned build before using the new
 host control client.
 
 ## Method catalog
+
+`methods.list {}` returns `{scope:"duo_display", complete:false, methods:[...]}`
+on this Duo build. It describes the display, point input and accessibility
+methods covered by the Duo regression scripts. Other RPC methods still work;
+an omitted method is not evidence that the guest lacks it. Entries describe
+parameters, force requirements and selected result keys. In a result schema,
+`required` describes whether a key is present and `nullable` describes
+whether it can contain JSON null. Undeclared result keys can still be present.
 
 Every method is reachable through `POST /v1/rpc` and the WebSocket. The
 original methods also have REST routes in `GuestHyperTextHandler.swift`; the
@@ -1192,6 +1203,12 @@ descriptor for each in-flight send; the original descriptor remains owned by
 local control socket operations have bounded timeouts. The optional TCP
 proxy uses NIO channels and closes the paired channel when either side ends.
 
+Health checks run off the HTTP event loop. Concurrent requests share one
+check, with at most 32 waiting responses. `GET /v1/health` returns HTTP 503
+with `health_check_timed_out` when the check exceeds its three-second deadline,
+or `health_check_busy` when the waiter limit is reached or an expired check
+is still running. The successful response fields are unchanged.
+
 ## Usage
 
 ```sh
@@ -1236,6 +1253,13 @@ that can reach it needs only the token, which travels in clear text over
 plain HTTP, so use it only on a trusted network.
 
 ## Device pose
+
+For `input.touch` with a nonzero `edge`, coordinates and the edge code refer
+to the fixed panel, with a top-left origin and coordinates normalized to `0…1`.
+Transform the intended gesture from the current interface orientation before
+sending it. For example, on Duo at `display.orientation.degrees = 90`, an
+upward swipe from the interface's bottom starts at the panel's right edge:
+use `edge: 4`, start near `x: 0.995, y: 0.5`, and move toward decreasing `x`.
 
 `display.posture` sets a foldable guest's pose (iPhone Duo). The virtual
 hinge (`system-backboardd-cfw-hinge`, `libvphonehinge.dylib` in backboardd)

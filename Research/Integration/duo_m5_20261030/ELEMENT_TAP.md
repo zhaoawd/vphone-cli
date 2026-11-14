@@ -229,7 +229,13 @@ iPhone19,4、iOS 27.1（24A94425），启动使用 `XcodeX1UndoFix` 构建。
 | AX 用例 | 结果 |
 | --- | --- |
 | 外屏主屏幕 | `apps.foreground` 验证为 SpringBoard；`ui.tree` 找到“设置”，`ui.element_at` 返回同一图标；`ui.tap_element` 后 `com.apple.Preferences` 成为已验证的前台进程。 |
-| 内屏主屏幕 | SpringBoard 前台验证、`ui.tree` 和实际图标点击通过；使用树中“设置”的中心点调用 `ui.element_at` 返回 `AX hit testing failed (-25202)`。在两个隔离副本上复现，原因未查明。 |
+| 内屏主屏幕 | SpringBoard 前台验证、`ui.tree` 和实际图标点击通过。2026-11-13 在内屏竖屏，Settings、Camera 的 AX 激活点和几何中心四次调用均返回 `AX hit testing failed (-25202)`。原因未查明。 |
+
+补充对照：用 `zsh Regression/ax-hit-grid.zsh "$socket" "$new_output" "$daemon_sha256"`，
+在已验证的竖屏 SpringBoard 前台上查询覆盖屏幕的 20 个网格点和 Settings 激活点。
+外屏 21/21 次 RPC 成功（含空命中），内屏 21/21 次均返回 `-25202`。
+结果排除了仅某个图标或单点坐标异常的解释；尚未验证系统命中接口使用的显示上下文。
+证据位于 `.build/duo-sync-20261113/runtime/three-followup.1I2WvgjK/ax-grid/`。
 | 锁定且熄屏 | `device.screen` 报告已锁定，`display.orientation.screen_off` 为 true；树、坐标命中和点击均因无法验证前台而拒绝。 |
 | 锁定且亮屏 | `device.screen` 报告已锁定且屏幕亮起；同样三个操作均拒绝。 |
 
@@ -241,10 +247,24 @@ iPhone19,4、iOS 27.1（24A94425），启动使用 `XcodeX1UndoFix` 构建。
 | --- | --- |
 | 30 秒 | RPC 与两份 plist 均为 30 秒。最后一次输入后，第 28 秒仍未锁定，第 30 秒首次采样到锁定。 |
 | Never | RPC、`UserSettings.plist`、`EffectiveUserSettings.plist` 和锁屏最小超时回读均为 2147483647。最后一次输入后持续观察 333 秒，每次采样均为未锁定、未熄屏。低电量模式关闭。 |
-| 同一次启动中重启 profiled | TERM 后 PID 未变；KILL 后进程退出。打开“设置”并请求设备管理页面后仍未看到进程重新启动，`EffectiveUserSettings.plist` 的修改时间未变。未验证同一次启动中的有效设置重算。 |
+| 同一次启动中重启 profiled | 早期使用进程信号的实验未观察到新进程。2026-11-13 按实际 launchd 标签 `com.apple.managedconfiguration.profiled` 执行 `services.kickstart`：PID 260→457，`EffectiveUserSettings.plist` 修改时间更新，两份 plist 与 RPC 回读均保持 Never。未跟踪写入系统调用；测试后恢复原值 120 秒。 |
 | 冷启动 | 启动会话 UUID 变化，daemon 摘要不变。冷启动后 profiled 已运行，`EffectiveUserSettings.plist` 的修改时间和大小均变化；两份 plist、RPC 及锁屏最小超时仍为 Never。未独立追踪文件写入进程。 |
 
 命令使用 [auto-lock-runtime.zsh](Regression/auto-lock-runtime.zsh) 的
 `observe`、`profiled`、`after-reboot` 模式。证据位于
 `auto-lock-runtime/` 和 `auto-lock-profiled-retry/`。两台隔离 VM
 均已正常关机。
+
+### 内屏命中续查（2026-11-14）
+
+原库冷启动后，外屏四次坐标命中成功，内屏四次均返回 `-25202`，同时四组
+原生截图来源有效。随后在内屏依次验证主屏幕、Settings、主屏幕，每组选择
+三个 AX 元素点，9/9 次均失败；坐标均在 `x<400,y<600`。因此故障范围包含普通
+App，不能仅归为 SpringBoard 专用路径。根和窗口的 AX frame 不同是已观测的
+上下文差异，其因果关系仍待验证。详见 [三项诊断](THREE_ISSUES_20261114.md)。
+
+### 显示范围命中修复验收（2026-11-14）
+
+Duo 活动显示使用 `+[AXUIElement uiElementAtCoordinate:displayId:]`，传入实际 CADisplay ID；校验 ABI、返回 AX 类型和 PID，查询后重查前台、显示身份与几何。普通 App 的 icli focal 没有 PID 时，从唯一 runningApps bundle 匹配取得 PID，再次校验。原路径的 `-25202` 失败已有基线记录。
+
+最终 daemon `95d37ab7…` 的实际 VM 回归在 `.build/duo-fixes-20261114/final-live.25fpDfuA/ax/`：外屏和内屏 Home／Settings、内屏 Settings 左横屏，共 15/15 返回目标 identifier；锁屏命中被拒绝。右横屏仍未通过现有宿主 pose 路径，因此未计为 VM 验收。`run-element-tap-tests.sh` 的 240 API 检查、原生 ABI／PID／旋转检查和 31 项几何检查通过。详见 [修复执行记录](FIXES_20261114.md)。
