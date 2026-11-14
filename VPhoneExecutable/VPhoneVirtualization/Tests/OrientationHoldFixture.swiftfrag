@@ -1,0 +1,68 @@
+import Foundation
+
+private struct VPhoneHTTPResponse {
+    let status = 200
+    let body = Data(#"{"api_version":1,"instance":"test","capabilities":["display_orientation"]}"#.utf8)
+}
+
+@MainActor final class OrientationControl {
+    enum ControlError: Error {
+        case notConnected, protocolError(String)
+    }
+
+    struct Setting {}
+    struct Digest { func sha256(of _: URL) -> String? { nil } }
+    var monitor: Task<Void, Never>?
+    var orderedInput: Task<Void, Never>?
+    var orderedLocation: Task<Void, Never>?
+    var openScroll: Int?
+    var pendingPointer: Int?
+    var openPointerPress: Int?
+    var heldPointerButtons = 0
+    var device: Int?
+    var isConnected = false
+    var guestCapabilities: [String] = []
+    var guestIPAddress: String?
+    var guestIOSVersion: String?
+    var isSetupAssistantPending = false
+    var onConnect: (([String]) -> Void)?
+    var onDisconnect: (() -> Void)?
+    var onGuestIPAddressChange: ((String?) -> Void)?
+    var connectedInstance: String?
+    var guestBinaryURL: URL?
+    var guestBinaryDigest = Digest()
+    var unlocksAtStartup = false
+    var syncsGuestEnvironment = false
+    var guestIPv4Setting: Setting?
+    var guestLocalHostName: String?
+    var guestDeviceName: String?
+    var guestStaticNames: (() -> [String])?
+    var foldAngle: Double?
+    var foldPosition: String?
+    var foldSweepSeconds: Double = 0
+
+    var pendingHealth: CheckedContinuation<Void, Never>?
+    var delayHealth = false
+    var pendingRotation: CheckedContinuation<Void, Never>?
+    var delayRotation = false
+
+    private func http(method _: String, path _: String) async throws -> VPhoneHTTPResponse {
+        if delayHealth { await withCheckedContinuation { pendingHealth = $0 } }
+        return VPhoneHTTPResponse()
+    }
+
+    func call(_ method: String, params _: [String: Any] = [:]) async throws -> [String: Any] {
+        if method == "display.rotation", delayRotation {
+            await withCheckedContinuation { pendingRotation = $0 }
+        }
+        return [:]
+    }
+
+    private func createDirectory(path _: String) async throws {}
+    private func uploadFile(path _: String, data _: Data) async throws {}
+    private func unlockAtStartup() async {}
+    private func syncEnvironment() async {}
+    private func applyGuestIPv4(_: Setting) async {}
+    private func applyGuestLocalHostName(_: String?) async {}
+    private func applyGuestDeviceName(_: String?) async {}
+    private func applyGuestStaticNames(_: [String]) async {}

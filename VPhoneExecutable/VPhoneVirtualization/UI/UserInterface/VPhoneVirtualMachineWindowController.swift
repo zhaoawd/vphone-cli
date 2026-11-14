@@ -328,10 +328,12 @@ class VPhoneVirtualMachineWindowController: NSObject, NSWindowDelegate {
               let control, control.isConnected, !control.isChangingOrientation,
               control.guestCapabilities.contains("display_orientation")
         else { return }
+        let connection = control.connectionGeneration
         orientationPollInFlight = true
         Task {
             defer { orientationPollInFlight = false }
-            guard let result = try? await control.call("display.orientation") else { return }
+            guard let result = try? await control.call("display.orientation"),
+                  connection == control.connectionGeneration else { return }
             // A foldable guest reports where its hinge is. DeviceHub's slider
             // moves it as it animates, so the window takes a fold once two
             // reads agree, rather than reshaping at each step of a sweep.

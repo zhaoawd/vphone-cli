@@ -366,15 +366,20 @@ extension VPhoneMenuController {
     /// Screen) being skipped for the one after it.
     private func rotate(clockwise: Bool) {
         Task {
+            guard control.isConnected else { return }
+            let connection = control.connectionGeneration
             if control.deviceOrientation == nil, control.interfaceOrientation == nil {
                 if control.guestCapabilities.contains("display_orientation") {
-                    if let reading = try? await control.call("display.orientation") {
+                    if let reading = try? await control.call("display.orientation"),
+                       connection == control.connectionGeneration {
                         control.followOrientation(reading)
                     }
-                } else if let degrees = try? await (control.call("display.rotation")["degrees"] as? NSNumber)?.intValue {
+                } else if let degrees = try? await (control.call("display.rotation")["degrees"] as? NSNumber)?.intValue,
+                          connection == control.connectionGeneration {
                     control.interfaceOrientation = VPhoneDisplayOrientation(degrees: degrees)
                 }
             }
+            guard connection == control.connectionGeneration else { return }
             if let device = control.deviceOrientation {
                 try? await control.rotate(toFirstOf: [device.turned(clockwise: clockwise)])
             } else if let current = control.interfaceOrientation {

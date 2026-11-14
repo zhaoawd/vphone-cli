@@ -105,7 +105,7 @@ final class VPhoneGuestControl {
 
     /// The guest interface orientation: the one the window last read, or the
     /// one a menu rotation turned it to. Nil until one is known, and again
-    /// after a disconnect.
+    /// once a disconnect has lasted `orientationHold`, or when control stops.
     var interfaceOrientation: VPhoneDisplayOrientation? {
         didSet {
             guard interfaceOrientation != oldValue else { return }
@@ -121,6 +121,24 @@ final class VPhoneGuestControl {
     /// front or the rotation lock keeps the interface from following. Nil
     /// when the guest publishes none (no gravity provider, an older vphoned).
     @ObservationIgnored var deviceOrientation: VPhoneDisplayOrientation?
+
+    /// Short agent interruptions leave the guest's display turned. A longer
+    /// disconnect can be a reboot, whose boot screen is unturned.
+    private static let orientationHold: Duration = .seconds(5)
+    @ObservationIgnored private var orientationExpiry: Task<Void, Never>?
+    /// Display replies issued before a disconnect can arrive after it.
+    @ObservationIgnored private(set) var connectionGeneration: UInt64 = 0
+
+    private func cancelOrientationExpiry() {
+        orientationExpiry?.cancel()
+        orientationExpiry = nil
+    }
+
+    private func forgetOrientation() {
+        cancelOrientationExpiry()
+        interfaceOrientation = nil
+        deviceOrientation = nil
+    }
 
     /// Takes the interface and device orientation from a `display.orientation`
     /// reply. A null interface reading (SpringBoard not answering) leaves the
@@ -220,15 +238,20 @@ final class VPhoneGuestControl {
     /// A rotation started while another one waits for the guest supersedes
     /// it: the older one's answer, arriving after, changes nothing.
     func rotate(toFirstOf candidates: [VPhoneDisplayOrientation]) async throws {
+        guard isConnected else { throw ControlError.notConnected }
+        let connection = connectionGeneration
         let previous = interfaceOrientation
         let watchesGuest = deviceOrientation != nil
         rotationGeneration &+= 1
         let generation = rotationGeneration
-        let isLatest: @MainActor () -> Bool = { generation == self.rotationGeneration }
+        let isLatest: @MainActor () -> Bool = {
+            generation == self.rotationGeneration && connection == self.connectionGeneration
+        }
         pendingRotations += 1
         defer { pendingRotations -= 1 }
         var refusal: Error = ControlError.protocolError("no orientation to rotate to")
         for orientation in candidates {
+            guard connection == connectionGeneration else { throw ControlError.notConnected }
             var watch: Task<Void, Never>?
             if watchesGuest {
                 deviceOrientation = orientation
@@ -306,6 +329,7 @@ final class VPhoneGuestControl {
         orderedLocation = nil
         device = nil
         setDisconnected()
+        forgetOrientation()
     }
 
     private func probe() async {
@@ -359,6 +383,7 @@ final class VPhoneGuestControl {
                 isSetupAssistantPending = setupPending
             }
             if !isConnected {
+                cancelOrientationExpiry()
                 isConnected = true
                 print("[control] connected to vphoned HTTP API (iOS \(guestIOSVersion ?? "?"))")
                 onConnect?(guestCapabilities)
@@ -402,12 +427,17 @@ final class VPhoneGuestControl {
         else { return }
         let wasConnected = isConnected
         isConnected = false
+        connectionGeneration &+= 1
         guestCapabilities = []
         guestIPAddress = nil
         onGuestIPAddressChange?(nil)
         guestIOSVersion = nil
-        interfaceOrientation = nil
-        deviceOrientation = nil
+        cancelOrientationExpiry()
+        orientationExpiry = Task { [weak self] in
+            try? await Task.sleep(for: Self.orientationHold)
+            guard !Task.isCancelled, let self, !isConnected else { return }
+            forgetOrientation()
+        }
         foldAngle = nil
         foldPosition = nil
         foldSweepSeconds = 0
@@ -1436,6 +1466,9 @@ private final class VPhoneHTTPTransaction: @unchecked Sendable {
         repeat {
             count = Darwin.read(fd, &bytes, bytes.count)
         } while count < 0 && errno == EINTR
+        if count < 0, errno == EAGAIN || errno == EWOULDBLOCK {
+            throw VPhoneGuestControl.ControlError.protocolError("HTTP response timed out")
+        }
         guard count > 0 else {
             throw VPhoneGuestControl.ControlError.notConnected
         }
