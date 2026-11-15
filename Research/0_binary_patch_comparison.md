@@ -1,5 +1,17 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **WebKit camera integration (2026-11-15).** Upstream #906 adds the
+> WebKit GPU process to the existing SystemHook CamFix loading path, before
+> the app-only gate. The original library reproduced a WebKit GPU abort;
+> the candidate delivered changing frames in native AVCapture, WKWebView
+> and Safari on the isolated iOS 27.1 Duo VM. No new firmware patch identifier,
+> patch set, preset, instruction replacement or boot-chain change is added.
+> The existing SystemHook installation component owns this source update.
+> The original library, daemon and markers were restored and checked after
+> a cold boot. Build/notice changes from #861/#869/#870/#888 affect build and
+> distribution validation, not firmware selection. See
+> [implementation and acceptance](Integration/duo_m5_20261030/HOST_WEBCAM_DISTRIBUTION_20261115.md).
+
 > **Main integration (2026-11-05).** Merges origin/main through `bc4137e4`.
 > Retains the Duo static-inner cutout selection, standalone accessibility-bundle
 > X1 lowering and X1 undo ownership repair alongside the upstream HomeView,
