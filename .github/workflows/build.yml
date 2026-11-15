@@ -98,6 +98,17 @@ jobs:
       - name: Recovery client cleanup tests
         run: zsh VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/run-recovery-client-tests.sh
 
+      - name: Check RPC result schemas
+        run: |
+          set -euo pipefail
+          icli="$PWD/.build/XcodeBundle/SourcePackages/checkouts/icli"
+          zsh VPhoneDaemon/Tests/run-methods-tests.sh
+          zsh VPhoneDaemon/Tests/run-methods-tests.sh --self-test
+          zsh VPhoneDaemon/Tests/run-methods-live-stub-tests.sh
+          RS_ICLI="$icli" zsh VPhoneDaemon/Tests/run-result-schema-runner-tests.sh
+          RS_ICLI="$icli" zsh VPhoneDaemon/Tests/run-result-schema-tests.sh --jobs 4
+          zsh VPhoneDaemon/Tests/run-result-schema-check.sh --icli "$icli"
+
       - name: CoreKit template reboot and API gate tests
         run: |
           set -euo pipefail

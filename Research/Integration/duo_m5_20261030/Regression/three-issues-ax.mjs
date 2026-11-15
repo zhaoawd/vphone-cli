@@ -33,8 +33,19 @@ for(const hinge of ['closed','open-flat']){
       await sleep(1500);
       const foreground=await checked('apps.foreground');
       if(foreground.bundle_id!==app||foreground.verified!==true)throw Error('Foreground precondition failed');
-      const layout=await checked('display.layout'),tree=await checked('ui.tree');
-      const points=tree.elements.filter(e=>e.identifier&&e.clickable&&e.x>10&&e.y>70).slice(0,3);
+      const layout=await checked('display.layout');
+      const observations=[];
+      let tree,points=[];
+      for(let attempt=0;attempt<20;attempt++){
+        tree=await checked('ui.tree');
+        points=tree.elements.filter(e=>e.identifier&&e.clickable&&e.x>10&&e.y>70).slice(0,3);
+        const current=await checked('apps.foreground');
+        observations.push({attempt,elapsed:now(),foreground:current,tree});
+        save('ax-precondition.json',{hinge,app,orientation,layout,observations});
+        if(current.bundle_id!==app||current.verified!==true)throw Error('Foreground changed before AX measurement');
+        if(points.length===3)break;
+        await sleep(500);
+      }
       if(points.length!==3)throw Error('Three visible AX targets required');
       const hits=[];
       for(const point of points){

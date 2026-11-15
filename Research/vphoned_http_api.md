@@ -489,13 +489,18 @@ host control client.
 
 ## Method catalog
 
-`methods.list {}` returns `{scope:"duo_display", complete:false, methods:[...]}`
-on this Duo build. It describes the display, point input and accessibility
-methods covered by the Duo regression scripts. Other RPC methods still work;
-an omitted method is not evidence that the guest lacks it. Entries describe
-parameters, force requirements and selected result keys. In a result schema,
+`methods.list {}` returns `{scope:"guest", complete:true, methods:[...]}`
+on this Duo build. Its 195 entries come from the same typed declarations that
+drive dispatch and force admission. Entries describe parameters, defaults,
+ranges, force requirements and result keys. Parameter types, required flags
+and ranges are descriptive; handlers still validate values. Undeclared
+request keys are filtered before a handler runs. In a result schema,
 `required` describes whether a key is present and `nullable` describes
-whether it can contain JSON null. Undeclared result keys can still be present.
+whether it can contain JSON null. The static result checker compares these
+declarations with their Swift, native and icli producers. Nested values marked
+`open` are data rather than a declaration of their child keys. Result schemas
+describe top-level fields; an object field does not imply a child-key schema. Older Duo
+builds advertised only a `duo_display` subset with `complete:false`.
 
 Every method is reachable through `POST /v1/rpc` and the WebSocket. The
 original methods also have REST routes in `GuestHyperTextHandler.swift`; the

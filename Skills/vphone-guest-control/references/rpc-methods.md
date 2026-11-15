@@ -9,7 +9,10 @@ vphoned itself refused, the last stderr line is its whole error object as JSON
 (`code`, `message` and fields such as `results`, `reason`, `errno`,
 `retryable`); `vphone.sock` carries the same object as `guest_error`. Add `--screen` to also get the small screen image.
 
-The complete catalog, with REST routes and result details, is
+Call `methods.list {}` to discover this guest build's method names, params,
+force rules and result fields from its actual dispatch declarations. Older
+Duo builds return a partial catalog with `complete:false`; the full catalog
+reports `scope:"guest", complete:true`. REST routes and background details are in
 `Research/vphoned_http_api.md` ("Method catalog"). This file is the working
 subset with parameter names checked against the daemon source
 (`VPhoneDaemon/Daemon/GuestAPI*.swift`). When a call fails with an

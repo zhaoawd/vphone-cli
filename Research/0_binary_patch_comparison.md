@@ -7024,3 +7024,39 @@ pass; current Duo Auto-Lock and AX regressions also pass. RPC production
 integration and host/guest VM combinations remain pending. Sources, detailed
 differences and executable preflight are recorded in
 `Research/Integration/duo_m5_20261030/RPC_SYNC_PREFLIGHT_20261115.md`.
+
+### Typed guest RPC foundation (2026-11-15)
+
+Integrated #841, #857, #884 and #892 over the Duo handlers. The existing
+`system-vphoned-boot-install` still owns the daemon payload; no patch
+declaration, preset or firmware instruction selection changed. FoldDisplay
+and the user's native Snapshot policy are unchanged.
+
+The 195 routable methods now share typed declarations for dispatch, force
+admission and the full `methods.list` catalog (`scope: guest`, `complete:
+true`). Handler value validation remains in place. Duo's `never:true`, active
+point geometry, native AX identity checks and render-server worker lifecycle
+are preserved. The native AX result producer is included alongside the icli
+fallback: a saved real reply exposed an undeclared integer `pid`, now
+declared optional and checked against every measured native hit.
+
+195 method checks, 36 catalog mutation checks, 130 extractor tests, the full
+release producer drift check, 109 Swift HTTP fixture checks and existing Duo
+regressions pass. The HTTP fixture uses a compiled Swift server; no
+interpreter was added. Full Bundle/admission and strict signatures pass.
+Final daemon SHA-256 is
+`c1d3207755de0164b400761394f26cf254f21eda962832877df08ddef82bb7e9`.
+
+An isolated copy retaining an already accepted identity passed 212 catalog/
+interface checks, 15/15 AX hits and 15 reply-schema checks, locked rejection,
+and respring recovery (worker 119 to 491). Both test copies were restored to
+their original daemon/markers, cold-boot checked with 21 unchanged library
+entries and read-only root, then normally shut down with no state-file
+handles. The source VM was not booted; host AMFI was not changed.
+
+A new-identity copy's Trust dialog stayed visible after an acknowledged
+Don't Trust tap; the cause remains unknown. It blocked that copy's Home
+precondition and is not counted as an AX measurement pass. Renames, coded
+errors, bounded output/paging and observe remain separate follow-up work.
+Commands, failed attempts, final evidence and limits are recorded in
+`Research/Integration/duo_m5_20261030/RPC_FOUNDATION_20261115.md`.
