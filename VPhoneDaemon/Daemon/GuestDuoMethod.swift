@@ -95,6 +95,8 @@ enum GuestDuoMethod: String, CaseIterable {
         case .elementAt:
             return ("Find the accessibility element at a screen point.", point,
                     [.init("element", .object, optional: true), .init("error", .string, optional: true),
+                     .init("pid", .integer, optional: true), .init("x", .number, optional: true),
+                     .init("y", .number, optional: true),
                      .init("source", .string, optional: true)])
         case .tapElement:
             return ("Tap an accessibility element matched by identifier or text.",

@@ -10,12 +10,10 @@ import VphonedNative
 /// A timeout is an answer, not an error: `settled: false` with the last
 /// signals and the conditions still unmet.
 extension GuestAPI {
-    static func executeFirstBoot(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "setup.settle":
+    static func executeFirstBoot(_ m: FirstBootMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .setupSettle:
             try waitForFirstBootSettle(params)
-        default:
-            nil
         }
     }
 

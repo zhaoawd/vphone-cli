@@ -7,35 +7,37 @@ import VphonedNative
 // MARK: - Processes and Memory
 
 extension GuestAPI {
-    static func executeProcess(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "process.spawn":
+    static func executeProcess(_ m: ProcessMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .processSpawn:
             return try spawnProcess(params)
-        case "poster.inspect":
+        case .posterInspect:
             return try inspectPoster(params)
-        case "processes.list":
+        case .processesList:
             return try processList(filter: optionalString(params, "filter"))
-        case "processes.kill":
-            let pid = try integer(params, "pid")
-            guard pid > 1, pid != Int(getpid()) else {
-                throw GuestAPIError.invalidRequest("pid \(pid) cannot be signalled")
-            }
-            let name = optionalString(params, "signal")?.uppercased() ?? "TERM"
-            guard let signal = signals[name.hasPrefix("SIG") ? String(name.dropFirst(3)) : name] else {
-                throw GuestAPIError.invalidRequest("signal must be one of \(signals.keys.sorted().joined(separator: ", "))")
-            }
-            try requireForce(params, "send SIG\(name) to \(pid)")
+        case .processesKill:
+            let (pid, name, signal) = try killRequest(params)
             guard kill(pid_t(pid), signal) == 0 else {
                 throw GuestAPIError.operationFailed("kill(\(pid)): \(String(cString: strerror(errno)))")
             }
             return ["pid": pid, "signal": name]
-        case "memory.jetsam":
+        case .memoryJetsam:
             return try jetsamSnapshot()
-        case "memory.pressure":
+        case .memoryPressure:
             return ["memory": memoryPressure()]
-        default:
-            return nil
         }
+    }
+
+    static func killRequest(_ params: [String: Any]) throws -> (pid: Int, name: String, signal: Int32) {
+        let pid = try integer(params, "pid")
+        guard pid > 1, pid != Int(getpid()) else {
+            throw GuestAPIError.invalidRequest("pid \(pid) cannot be signalled")
+        }
+        let name = optionalString(params, "signal")?.uppercased() ?? "TERM"
+        guard let signal = signals[name.hasPrefix("SIG") ? String(name.dropFirst(3)) : name] else {
+            throw GuestAPIError.invalidRequest("signal must be one of \(signals.keys.sorted().joined(separator: ", "))")
+        }
+        return (pid, name, signal)
     }
 
     /// Read-only poster probe plumbing. The signed helper is intentionally

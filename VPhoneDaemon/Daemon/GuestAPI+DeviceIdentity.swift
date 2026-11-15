@@ -52,19 +52,17 @@ extension GuestAPI {
     /// asks for the UDID, and stopping it would take the home screen down with it.
     static let udidHookedDaemons = ["misagent", "installd", "lockdownd", "remoted"]
 
-    static func executeDeviceIdentity(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "udid.get":
+    static func executeDeviceIdentity(_ m: DeviceIdentityMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .udidGet:
             udidState()
-        case "udid.set":
+        case .udidSet:
             // Stored exactly as sent, with no format check: the API is also
             // for probing what misagent does with an unusual value. The VM
             // window's menu is what holds a person to a real UDID's shape.
             try applyUDID(string(params, "udid"))
-        case "udid.clear":
+        case .udidClear:
             try applyUDID(nil)
-        default:
-            nil
         }
     }
 

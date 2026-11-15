@@ -15,15 +15,13 @@ import VphonedNative
 /// `{ok, result | error, output, crashed}`: a script that throws is an answer,
 /// not a failed request, and its output comes back either way.
 extension GuestAPI {
-    static func executeScript(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "script.eval":
+    static func executeScript(_ m: ScriptMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .scriptEval:
             let source = try string(params, "source")
             return try evaluateScript(source: source, timeout: scriptTimeout(params))
-        case "script.info":
+        case .scriptInfo:
             return scriptInfo()
-        default:
-            return nil
         }
     }
 

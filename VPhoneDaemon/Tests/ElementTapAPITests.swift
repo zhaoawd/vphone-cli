@@ -1,7 +1,6 @@
 import Foundation
 import IcliKit
 
-enum GuestAPIError: Error { case invalidRequest(String), operationFailed(String) }
 enum GuestAPI {
     static let interfaceLock = NSRecursiveLock()
     static func nestedHierarchy(_ params: [String: Any]) throws -> [String: Any] { fatalError("unused") }
@@ -45,8 +44,8 @@ enum ElementTapAPITests {
                         TestIcli.elements = [["identifier": "target", "x": x, "y": y,
                             "visible": false, "frame": ["x": x - 5, "y": y - 5, "width": 10.0, "height": 10.0]]]
                         TestIcli.injected = []
-                        let result = try GuestAPI.executeInterface("ui.tap_element", params)
-                        expect(result?["tapped"] as? Bool == true, "tap result")
+                        let result = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, params)
+                        expect(result["tapped"] as? Bool == true, "tap result")
                         let actual = TestIcli.injected.last ?? (-1, -1)
                         let expected = bundle == "com.apple.springboard" ? (fx, fy) : (x, y)
                         expect(TestIcli.injected.count == 1 && abs(actual.0 - expected.0) < 1e-9 && abs(actual.1 - expected.1) < 1e-9,
@@ -75,7 +74,7 @@ enum ElementTapAPITests {
                 TestIcli.elements = [["identifier": "target", "x": x, "y": y,
                     "frame": ["x": x - 5, "y": y - 5, "width": 10.0, "height": 10.0]]]
                 TestIcli.injected = []
-                _ = try GuestAPI.executeInterface("ui.tap_element", params)
+                _ = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, params)
                 let actual = TestIcli.injected.last ?? (-1, -1)
                 expect(abs(actual.0 - x) < 1e-9 && abs(actual.1 - y) < 1e-9,
                        "compatibility canvas \(name) \(degrees)")
@@ -89,7 +88,7 @@ enum ElementTapAPITests {
         TestIcli.elements = [["identifier": "target", "x": 75.16666666666667, "y": 142.2,
             "frame": ["x": 39.0, "y": 120.2, "width": 72.0, "height": 44.0]]]
         TestIcli.injected = []
-        _ = try GuestAPI.executeInterface("ui.tap_element", params)
+        _ = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, params)
         let pinned = TestIcli.injected.last ?? (-1, -1)
         expect(abs(pinned.0 - 75.16666666666667) < 1e-9 && abs(pinned.1 - 142.2) < 1e-9,
                "portrait application on rotated inner panel")
@@ -100,7 +99,7 @@ enum ElementTapAPITests {
         TestIcli.degrees = 0
         func refuses(_ label: String) {
             TestIcli.injected = []
-            do { _ = try GuestAPI.executeInterface("ui.tap_element", params); expect(false, label) }
+            do { _ = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, params); expect(false, label) }
             catch { expect(TestIcli.injected.isEmpty, "\(label): no injection") }
         }
         TestIcli.display = ["dual_display": true, "name": "inner", "width": 669.0, "height": 951.0]
@@ -136,11 +135,11 @@ enum ElementTapAPITests {
         TestIcli.degrees = 0
         TestIcli.elements = [["identifier": "target", "x": 100.0, "y": 124.0]]
         TestIcli.injected = []
-        _ = try GuestAPI.executeInterface("ui.tap_element", params)
+        _ = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, params)
         expect(abs(TestIcli.injected[0].0 - 100 / 466.0) < 1e-9, "single display legacy path")
         TestIcli.primary = (669, 951)
         TestIcli.injected = []
-        _ = try GuestAPI.executeInterface("ui.tap_element", params)
+        _ = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, params)
         expect(abs(TestIcli.injected[0].0 - 100 / 669.0) < 1e-9, "static inner legacy path")
         TestIcli.primary = (466, 678)
 
@@ -160,8 +159,8 @@ enum ElementTapAPITests {
             ["identifier": "TARGET", "text": "ignored"],
         ] {
             TestIcli.injected = []
-            let result = try GuestAPI.executeInterface("ui.tap_element", selection)
-            expect((result?["element"] as? [String: Any])?["identifier"] as? String == "second", "selector compatibility: \(selection)")
+            let result = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, selection)
+            expect((result["element"] as? [String: Any])?["identifier"] as? String == "second", "selector compatibility: \(selection)")
         }
 
         // MARK: - SpringBoard Frontmost App Recognition Tests
@@ -228,17 +227,17 @@ enum ElementTapAPITests {
             ["identifier": "Settings", "label": "Settings", "role": "button", "clickable": true, "visible": false,
              "x": 160.0, "y": 80.0, "frame": ["x": 140.0, "y": 60.0, "width": 40.0, "height": 40.0]]
         ]
-        let treeResult = try GuestAPI.executeInterface("ui.tree", ["visible_only": false])
-        expect(treeResult?["count"] as? Int == 2, "SpringBoard tree returns all elements when visible_only=false")
-        expect(treeResult?["pid"] as? Int == 555, "SpringBoard tree query uses SpringBoard PID")
+        let treeResult = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tree")!, ["visible_only": false])
+        expect(treeResult["count"] as? Int == 2, "SpringBoard tree returns all elements when visible_only=false")
+        expect(treeResult["pid"] as? Int == 555, "SpringBoard tree query uses SpringBoard PID")
 
-        let visibleTree = try GuestAPI.executeInterface("ui.tree", ["visible_only": true])
-        expect(visibleTree?["count"] as? Int == 1, "SpringBoard tree filters visible elements")
+        let visibleTree = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tree")!, ["visible_only": true])
+        expect(visibleTree["count"] as? Int == 1, "SpringBoard tree filters visible elements")
 
         // ui.element_at on SpringBoard
-        let elementAtResult = try GuestAPI.executeInterface("ui.element_at", ["x": 60.0, "y": 80.0])
-        expect(elementAtResult?["pid"] as? Int == 555, "element_at uses SpringBoard PID")
-        expect((elementAtResult?["element"] as? [String: Any])?["identifier"] as? String == "Safari", "element_at returns node")
+        let elementAtResult = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.element_at")!, ["x": 60.0, "y": 80.0])
+        expect(elementAtResult["pid"] as? Int == 555, "element_at uses SpringBoard PID")
+        expect((elementAtResult["element"] as? [String: Any])?["identifier"] as? String == "Safari", "element_at returns node")
 
         let savedForeground = TestIcli.rawFrontmost
         for bundle in ["com.autophone.tap-probe", "com.apple.springboard"] {
@@ -247,9 +246,9 @@ enum ElementTapAPITests {
             // adds one for JSON clients, while this direct caller must resolve it.
             TestIcli.rawFrontmost = ["verified": true, "bundle_id": bundle, "source": "runningboard"]
             TestIcli.display = ["dual_display": true, "name": "inner", "width": 669.0, "height": 951.0, "display_id": 7]
-            let hit = try GuestAPI.executeInterface("ui.element_at", ["x": 60.0, "y": 80.0])
-            expect(hit?["test_display_id"] as? Int == 7, "Duo app and SpringBoard hit tests pass the active display ID")
-            expect(hit?["pid"] as? Int == (bundle == "com.apple.springboard" ? 555 : 123), "native hit is scoped to the actual foreground process")
+            let hit = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.element_at")!, ["x": 60.0, "y": 80.0])
+            expect(hit["test_display_id"] as? Int == 7, "Duo app and SpringBoard hit tests pass the active display ID")
+            expect(hit["pid"] as? Int == (bundle == "com.apple.springboard" ? 555 : 123), "native hit is scoped to the actual foreground process")
         }
         TestIcli.rawFrontmost = savedForeground
         TestIcli.bundle = "com.apple.springboard"
@@ -257,8 +256,8 @@ enum ElementTapAPITests {
         // ui.tap_element on SpringBoard (single display fallback)
         TestIcli.display = ["dual_display": false]
         TestIcli.injected = []
-        let tapFallback = try GuestAPI.executeInterface("ui.tap_element", ["identifier": "Safari"])
-        expect(tapFallback?["tapped"] as? Bool == true, "SpringBoard single-display tap succeeded")
+        let tapFallback = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, ["identifier": "Safari"])
+        expect(tapFallback["tapped"] as? Bool == true, "SpringBoard single-display tap succeeded")
         expect(TestIcli.injected.count == 1, "SpringBoard single-display touch injected")
 
         TestIcli.elements = [
@@ -266,14 +265,14 @@ enum ElementTapAPITests {
             ["identifier": "visible", "label": "Settings", "visible": true, "x": 160.0, "y": 80.0],
         ]
         TestIcli.injected = []
-        let visibleTap = try GuestAPI.executeInterface("ui.tap_element", ["text": "Settings", "match": "exact"])
-        expect((visibleTap?["element"] as? [String: Any])?["identifier"] as? String == "visible",
+        let visibleTap = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, ["text": "Settings", "match": "exact"])
+        expect((visibleTap["element"] as? [String: Any])?["identifier"] as? String == "visible",
                "single-display selector skips hidden matching element")
         expect(TestIcli.injected.count == 1 && abs(TestIcli.injected[0].0 - 160 / 466.0) < 1e-9,
                "single-display tap uses visible target coordinates")
         TestIcli.injected = []
         var refusedHidden = false
-        do { _ = try GuestAPI.executeInterface("ui.tap_element", ["identifier": "hidden"]) }
+        do { _ = try GuestAPI.executeInterface(InterfaceMethod(rawValue: "ui.tap_element")!, ["identifier": "hidden"]) }
         catch { refusedHidden = true }
         expect(refusedHidden && TestIcli.injected.isEmpty, "hidden-only selection is refused without injection")
         print("element tap API: \(checks) checks, \(failures) failures")

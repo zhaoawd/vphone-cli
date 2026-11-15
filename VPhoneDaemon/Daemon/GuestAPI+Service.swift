@@ -5,9 +5,9 @@ import IcliSystem
 // MARK: - launchd Services
 
 extension GuestAPI {
-    static func executeService(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "services.list":
+    static func executeService(_ m: ServiceMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .servicesList:
             var result = try listServices()
             if let disabled = try? disabledServiceOverrides()["disabled"] as? [String: Bool] {
                 let rows = result["services"] as? [[String: Any]] ?? []
@@ -20,66 +20,58 @@ extension GuestAPI {
                 }
             }
             return result
-        case "services.status":
+        case .servicesStatus:
             return try serviceStatus(string(params, "label"))
-        case "services.print":
+        case .servicesPrint:
             return try printService(string(params, "label"))
-        case "services.dump":
+        case .servicesDump:
             return try servicesDump()
-        case "services.disabled":
+        case .servicesDisabled:
             return try disabledServiceOverrides()
-        case "services.profile":
+        case .servicesProfile:
             return try serviceProfileState()
-        case "services.profile.apply":
-            try requireForce(params, "apply a service profile")
+        case .servicesProfileApply:
             return try applyServiceProfile(params)
-        case "services.start":
+        case .servicesStart:
             return try startService(string(params, "label"))
-        case "services.kickstart":
+        case .servicesKickstart:
             let label = try string(params, "label")
-            let kill = bool(params, "kill")
-            if kill {
-                try requireForce(params, "kill and restart \(label)")
-            }
-            return try kickstartService(label, kill: kill)
-        case "services.enable":
+            return try kickstartService(label, kill: bool(params, "kill"))
+        case .servicesEnable:
             return try setServiceEnabled(string(params, "label"), enabled: true)
-        case "services.stop":
+        case .servicesStop:
             let label = try string(params, "label")
-            try requireForce(params, "stop \(label)")
             return try stopService(label)
-        case "services.disable":
+        case .servicesDisable:
             let label = try string(params, "label")
-            try requireForce(params, "disable \(label)")
             return try setServiceEnabled(label, enabled: false)
-        case "services.remove":
+        case .servicesRemove:
             let label = try string(params, "label")
-            try requireForce(params, "remove \(label)")
             return try removeService(label)
-        case "services.signal":
+        case .servicesSignal:
             let label = try string(params, "label")
             let signal = try string(params, "signal")
-            try requireForce(params, "send \(signal) to \(label)")
             return try signalService(label, signal: signal)
-        case "services.load", "services.unload":
-            guard let paths = params["paths"] as? [String], !paths.isEmpty else {
-                throw GuestAPIError.invalidRequest("paths must list plist files or directories")
-            }
-            let load = method == "services.load"
+        case .servicesLoad, .servicesUnload:
+            let paths = try servicePaths(params)
+            let load = m == .servicesLoad
             if load {
                 try GuestIrisinInstaller.prepareBootstrapDaemons(paths)
-            } else {
-                try requireForce(params, "unload services")
             }
             return try loadServices(paths, load: load, override: bool(params, "override"))
-        case "launchd.getenv":
+        case .launchdGetenv:
             return try launchdEnvironment(string(params, "key"))
-        case "launchd.setenv":
+        case .launchdSetenv:
             return try setLaunchdEnvironment(string(params, "key"), value: string(params, "value"))
-        case "launchd.unsetenv":
+        case .launchdUnsetenv:
             return try setLaunchdEnvironment(string(params, "key"), value: nil)
-        default:
-            return nil
         }
+    }
+
+    static func servicePaths(_ params: [String: Any]) throws -> [String] {
+        guard let paths = params["paths"] as? [String], !paths.isEmpty else {
+            throw GuestAPIError.invalidRequest("paths must list plist files or directories")
+        }
+        return paths
     }
 }

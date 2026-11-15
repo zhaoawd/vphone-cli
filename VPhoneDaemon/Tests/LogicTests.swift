@@ -44,6 +44,7 @@ enum LogicTests {
         homeViewDistancePolicy()
         mobileGestaltAnswers()
         settingsValue()
+        methodDispatch()
         print("\(checks) checks, \(failures) failures")
         exit(failures == 0 ? 0 : 1)
     }
@@ -565,5 +566,147 @@ enum LogicTests {
         expectEqual(sources(nil, roothide, 15), ["deb https://roothide.github.io/procursus iphoneos-arm64e/1800 main", "https://apt.owngoal.dev"])
         expectEqual(sources([["source": "https://repo.example"]], roothide, 27), ["https://repo.example"], "a managed list with entries wins")
         expectEqual(sources(nil, nil, 27), [], "no list recommends nothing")
+    }
+
+    // MARK: Method dispatch
+
+    enum FixtureMethod: String, GuestMethod {
+        case echo = "fixture.echo"
+        case always = "fixture.always"
+        case when = "fixture.when"
+        case varies = "fixture.varies"
+        case declared = "fixture.declared"
+        case empty = "fixture.empty"
+
+        var spec: MethodSpec {
+            switch self {
+            case .echo: MethodSpec(.required("a", .string, "a"), .optional("b", .integer, "b"), summary: "echo fixture")
+            case .always:
+                MethodSpec(.required("a", .string, "a"), summary: "always fixture", force: .always("act on <a>") { p in
+                    guard let a = p["a"] as? String, !a.isEmpty else { throw GuestAPIError.invalidRequest("a is required") }
+                    return "act on \(a)"
+                })
+            case .when: MethodSpec(.optional("kill", .boolean, "kill"), summary: "when fixture", force: .when("kill", "kill fixture") { _ in "kill fixture" })
+            case .varies:
+                MethodSpec(.optional("userspace", .boolean, "userspace"), summary: "varies fixture", force: .always("reboot fixture") { p in
+                    GuestMethodArea.flag(p, "userspace") ? "restart fixture userspace" : "reboot fixture"
+                })
+            case .declared:
+                MethodSpec(.required("a", .string, "a"), summary: "declared fixture", result: [
+                    .optional("z", .boolean), .required("x", .integer), .hidden("y", .string), .required("e", .object).open(),
+                ])
+            case .empty: MethodSpec(summary: "empty fixture", result: [])
+            }
+        }
+    }
+
+    nonisolated(unsafe) static var specCount = 0
+
+    enum CountedMethod: String, GuestMethod {
+        case one = "counted.one"
+        case two = "counted.two"
+
+        var spec: MethodSpec {
+            LogicTests.specCount += 1
+            return MethodSpec(summary: "counted fixture")
+        }
+    }
+
+    static func json(_ value: [String: Any]?) -> String {
+        guard let value, let data = try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys]) else { return "" }
+        return String(data: data, encoding: .utf8) ?? ""
+    }
+
+    static func methodDispatch() {
+        let area = GuestMethodArea.make(FixtureMethod.self) { _, params in params }
+        func run(_ method: String, _ params: [String: Any]) -> (result: [String: Any]?, error: String?, code: String?) {
+            do { return (try area.execute(method, params), nil, nil) } catch let error as GuestAPIError {
+                return (nil, String(describing: error), error.code)
+            } catch { return (nil, "\(error)", nil) }
+        }
+
+        expect(run("other", [:]).result == nil && run("other", [:]).error == nil, "an unknown name is not this area's")
+        expectEqual(json(run("fixture.echo", ["a": "x", "b": 1, "z": 9]).result), json(["a": "x", "b": 1]), "undeclared keys are dropped")
+        expectEqual(json(run("fixture.echo", ["z": 9]).result), "{}", "no declared key leaves nothing")
+
+        let refusal = "Pass force: true to act on x"
+        let refused = run("fixture.always", ["a": "x"])
+        expectEqual(refused.error ?? "", refusal)
+        expectEqual(refused.code ?? "", "invalid_operation")
+        expectEqual(run("fixture.always", ["a": "x", "force": false]).error ?? "", refusal)
+        expectEqual(run("fixture.always", ["a": "x", "force": "yes"]).error ?? "", refusal)
+        expectEqual(json(run("fixture.always", ["a": "x", "force": true]).result), json(["a": "x"]), "force: true admits")
+        expectEqual(json(run("fixture.always", ["a": "x", "force": 1]).result), json(["a": "x"]), "force: 1 admits")
+        expectEqual(run("fixture.always", [:]).error ?? "", "a is required", "invalid and unforced fails validation first")
+
+        expectEqual(run("fixture.varies", [:]).error ?? "", "Pass force: true to reboot fixture")
+        expectEqual(run("fixture.varies", ["userspace": true]).error ?? "", "Pass force: true to restart fixture userspace", "the action text follows the params")
+        expectEqual(json(run("fixture.varies", ["userspace": true, "force": true]).result), json(["userspace": true]), "forced action runs")
+
+        expectEqual(json(run("fixture.when", ["kill": false]).result), json(["kill": false]), "kill: false needs no force")
+        expectEqual(json(run("fixture.when", [:]).result), "{}", "no kill needs no force")
+        expectEqual(run("fixture.when", ["kill": true]).error ?? "", "Pass force: true to kill fixture")
+        expectEqual(json(run("fixture.when", ["kill": true, "force": true]).result), json(["kill": true]), "forced kill admits")
+
+        // ResultKey storage: undeclared is nil, declared empty is []
+        expect(FixtureMethod.echo.spec.result == nil, "no result: reads back nil")
+        expectEqual(FixtureMethod.empty.spec.result?.count ?? -1, 0, "result: [] reads back empty")
+
+        let catalog = GuestMethodArea.catalog([area])
+        let expected: [String: Any] = ["scope": "guest", "complete": true, "methods": [
+            ["name": "fixture.echo", "description": "echo fixture", "params": [
+                ["name": "a", "type": "string", "required": true, "description": "a"],
+                ["name": "b", "type": "integer", "required": false, "description": "b"],
+            ], "force": "never"],
+            ["name": "fixture.always", "description": "always fixture", "params": [["name": "a", "type": "string", "required": true, "description": "a"]], "force": "always", "force_action": "act on <a>"],
+            ["name": "fixture.when", "description": "when fixture", "params": [["name": "kill", "type": "boolean", "required": false, "description": "kill"]], "force": "when:kill", "force_action": "kill fixture"],
+            ["name": "fixture.varies", "description": "varies fixture", "params": [["name": "userspace", "type": "boolean", "required": false, "description": "userspace"]], "force": "always", "force_action": "reboot fixture"],
+            ["name": "fixture.declared", "description": "declared fixture", "params": [["name": "a", "type": "string", "required": true, "description": "a"]], "force": "never", "result": [
+                ["name": "e", "type": "object", "required": true, "open": true, "nullable": false],
+                ["name": "x", "type": "integer", "required": true, "open": false, "nullable": false],
+                ["name": "z", "type": "boolean", "required": false, "open": false, "nullable": false],
+            ]],
+            ["name": "fixture.empty", "description": "empty fixture", "params": [] as [[String: Any]], "force": "never", "result": [] as [[String: Any]]],
+        ]]
+        expectEqual(json(catalog), json(expected), "catalog")
+
+        // catalog and dispatcher agree
+        let listed = (catalog["methods"] as? [[String: Any]] ?? []).compactMap { $0["name"] as? String }
+        let dispatched = FixtureMethod.allCases.map(\.rawValue).filter { (try? area.execute($0, ["a": "x", "force": true])) != nil }
+        expectEqual(listed, dispatched, "catalog names equal dispatched names")
+        expectEqual(Set(listed).count, listed.count, "catalog names are unique")
+
+        // specs are built lazily
+        let counted = GuestMethodArea.make(CountedMethod.self) { _, params in params }
+        specCount = 0
+        for _ in 0 ..< 1000 { _ = try? counted.execute("other", [:]) }
+        expectEqual(specCount, 0, "no spec is built for a foreign name")
+        for _ in 0 ..< 1000 { _ = try? counted.execute("counted.one", [:]) }
+        expectEqual(specCount, 1000, "one spec per dispatch")
+        _ = GuestMethodArea.catalog([counted])
+        expectEqual(specCount, 1002, "catalog builds each spec once")
+
+        // methods.list reaches the dispatch through the same walk GuestAPI.execute uses
+        enum FixtureCore: String, GuestMethod {
+            case methodsList = "methods.list"
+            var spec: MethodSpec { MethodSpec(summary: "core fixture") }
+        }
+        nonisolated(unsafe) var table: [GuestMethodArea] = []
+        table = [
+            .make(FixtureCore.self) { _, _ in GuestMethodArea.catalog(table) },
+            GuestMethodArea.make(FixtureMethod.self) { _, params in params },
+        ]
+        func call(_ params: [String: Any]) -> [String: Any]? {
+            try? GuestMethodArea.dispatch(table, method: "methods.list", params: params)
+        }
+        let answer = call([:])
+        let names = (answer?["methods"] as? [[String: Any]] ?? []).compactMap { $0["name"] as? String }
+        expect(names.contains("methods.list") && names.contains("fixture.echo"), "methods.list lists itself and the other areas")
+        expectEqual(json(call(["x": 1])), json(answer), "methods.list ignores params")
+        expectEqual(json(call([:])), json(answer), "two calls are byte-identical")
+        expect(json(answer).utf8.count < 1 << 20, "the answer is far below the 1 MiB body limit")
+        var unknown = ""
+        do { _ = try GuestMethodArea.dispatch(table, method: "nope.nothing", params: [:]) } catch { unknown = String(describing: error) }
+        expectEqual(unknown, "Unknown method: nope.nothing", "no area answering is an unknown method")
     }
 }

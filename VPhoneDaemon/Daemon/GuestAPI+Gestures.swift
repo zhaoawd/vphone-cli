@@ -5,34 +5,34 @@ import IcliKit
 
 extension GuestAPI {
     /// Gesture coordinates are screen points, as `device.screen` reports them.
-    static func executeInput(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "input.button":
+    static func executeInput(_ m: InputMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .inputButton:
             return try pressButton(string(params, "name"))
-        case "input.key":
+        case .inputKey:
             return try pressKey(string(params, "name"))
-        case "input.type":
+        case .inputType:
             return try typeText(string(params, "text"), delayMS: number(params, "delay_ms", default: 30))
-        case "input.paste":
+        case .inputPaste:
             return try pasteText(string(params, "text"))
-        case GuestDuoMethod.tap.rawValue:
+        case .inputTap:
             let x = try requiredNumber(params, "x"), y = try requiredNumber(params, "y")
             return try withActivePointGeometry { try tap(x: x, y: y) }
-        case "input.double_tap":
+        case .inputDoubleTap:
             let x = try requiredNumber(params, "x"), y = try requiredNumber(params, "y")
             let interval = number(params, "interval", default: 0.1)
             return try withActivePointGeometry { try doubleTap(x: x, y: y, interval: interval) }
-        case "input.long_press":
+        case .inputLongPress:
             let x = try requiredNumber(params, "x"), y = try requiredNumber(params, "y")
             let seconds = number(params, "seconds", default: 1)
             return try withActivePointGeometry { try longPress(x: x, y: y, seconds: seconds) }
-        case "input.swipe":
+        case .inputSwipe:
             let x1 = try requiredNumber(params, "x1"), y1 = try requiredNumber(params, "y1")
             let x2 = try requiredNumber(params, "x2"), y2 = try requiredNumber(params, "y2")
             let seconds = number(params, "seconds", default: 0.3)
             let steps = (params["steps"] as? NSNumber)?.intValue ?? 20
             return try withActivePointGeometry { try swipe(x1: x1, y1: y1, x2: x2, y2: y2, seconds: seconds, steps: steps) }
-        case "input.drag":
+        case .inputDrag:
             guard let rows = params["points"] as? [[NSNumber]], rows.count >= 2,
                   rows.allSatisfy({ $0.count == 2 })
             else {
@@ -42,7 +42,7 @@ extension GuestAPI {
             let seconds = number(params, "seconds", default: 0.5), hold = number(params, "hold", default: 0.5)
             let steps = (params["steps"] as? NSNumber)?.intValue ?? 20
             return try withActivePointGeometry { try drag(points: points, seconds: seconds, hold: hold, steps: steps) }
-        case "input.touch_sequence":
+        case .inputTouchSequence:
             guard let events = params["events"] as? [[String: Any]] else {
                 throw GuestAPIError.invalidRequest("events must be an array of {phase, x, y, delay_ms}")
             }
@@ -51,8 +51,6 @@ extension GuestAPI {
             let normalized = bool(params, "normalized", default: true)
             if normalized { return try touchSequence(parsed, normalized: true) }
             return try withActivePointGeometry { try touchSequence(parsed, normalized: false) }
-        default:
-            return nil
         }
     }
 }

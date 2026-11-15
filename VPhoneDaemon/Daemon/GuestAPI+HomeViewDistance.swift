@@ -25,18 +25,16 @@ enum GuestHomeViewDistance {
 }
 
 extension GuestAPI {
-    static func executeHomeViewDistance(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "homeview.distance.get":
+    static func executeHomeViewDistance(_ m: HomeViewDistanceMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .homeviewDistanceGet:
             return try GuestHomeViewDistance.call()
-        case "homeview.distance.set":
+        case .homeviewDistanceSet:
             let mode = try string(params, "mode")
             if let rejection = GuestHomeViewDistancePolicy.rejection(mode: mode, resetEnvironment: params["reset_environment"] as? Bool == true) {
                 throw GuestAPIError.invalidRequest(rejection)
             }
             return try GuestHomeViewDistance.call(mode: mode)
-        default:
-            return nil
         }
     }
 }

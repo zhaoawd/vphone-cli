@@ -3,7 +3,6 @@ import IcliKit
 import IcliPrivate
 import VphonedNative
 
-enum GuestAPIError: Error { case invalidRequest(String) }
 
 enum GuestAPI {
     static func number(_ p: [String: Any], _ k: String, default d: Double = .nan) -> Double {
@@ -45,7 +44,7 @@ func rejects(_ operation: () throws -> Void) {
         LayoutWitness.layout = layout()
         // The real handler must validate and normalize beyond the legacy
         // 678-point capture width, using the actual Icli C conversion core.
-        _ = try GuestAPI.executeInput("input.tap", ["x": 900, "y": 300])
+        _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.tap")!, ["x": 900, "y": 300])
         let point = PointInputWitness.points.last!
         precondition(abs(point[0] - 300 / 669.0) < 1e-9 && abs(point[1] - 51 / 951.0) < 1e-9)
         precondition(!icli_interface_geometry_current(nil))
@@ -65,19 +64,19 @@ func rejects(_ operation: () throws -> Void) {
             let snapshots = PointInputWitness.snapshotReads
             precondition(NSDictionary(dictionary: GuestAPI.activeScreenState()).isEqual(NSDictionary(dictionary: legacy)))
             precondition(PointInputWitness.snapshotReads == snapshots)
-            _ = try GuestAPI.executeInput("input.tap", ["x": 600, "y": 300])
+            _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.tap")!, ["x": 600, "y": 300])
             let fallbackPoint = PointInputWitness.points.last!
             precondition(abs(fallbackPoint[0] - 300 / 466.0) < 1e-9)
             precondition(abs(fallbackPoint[1] - 78 / 678.0) < 1e-9)
             for method in ["input.double_tap", "input.long_press", "input.swipe", "input.drag"] {
-                _ = try GuestAPI.executeInput(method, ["x": 600, "y": 300, "x1": 600, "y1": 300,
+                _ = try GuestAPI.executeInput(InputMethod(rawValue: method)!, ["x": 600, "y": 300, "x1": 600, "y1": 300,
                                                       "x2": 500, "y2": 200, "points": [[600, 300], [500, 200]]])
             }
             _ = try GuestAPI.executeTouch(["phase": "down", "x": 600, "y": 300, "normalized": false])
-            _ = try GuestAPI.executeInput("input.touch_sequence",
+            _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.touch_sequence")!,
                                          ["normalized": false, "events": [["phase": "down", "x": 600, "y": 300]]])
             let inputs = PointInputWitness.points.count
-            rejects { _ = try GuestAPI.executeInput("input.tap", ["x": 900, "y": 300]) }
+            rejects { _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.tap")!, ["x": 900, "y": 300]) }
             precondition(PointInputWitness.points.count == inputs, "fallback bypassed Icli point bounds")
             precondition(!icli_interface_geometry_current(nil), "fallback installed an active override")
         } catch {
@@ -118,16 +117,16 @@ func rejects(_ operation: () throws -> Void) {
         rejects { _ = try GuestPointGeometry.geometry(from: [:]) }
         LayoutWitness.layout = layout(orientation: 0)
         let before = LayoutWitness.reads
-        rejects { _ = try GuestAPI.executeInput("input.tap", ["x": "invalid", "y": 1]) }
-        rejects { _ = try GuestAPI.executeInput("input.drag", ["points": [[1]]]) }
-        rejects { _ = try GuestAPI.executeInput("input.touch_sequence", ["events": [["phase": "bad", "x": 0, "y": 0]]]) }
+        rejects { _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.tap")!, ["x": "invalid", "y": 1]) }
+        rejects { _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.drag")!, ["points": [[1]]]) }
+        rejects { _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.touch_sequence")!, ["events": [["phase": "bad", "x": 0, "y": 0]]]) }
         precondition(LayoutWitness.reads == before, "invalid parameters reached layout observation")
-        _ = try GuestAPI.executeInput("input.touch_sequence", ["events": [["phase": "down", "x": 0.5, "y": 0.5]]])
+        _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.touch_sequence")!, ["events": [["phase": "down", "x": 0.5, "y": 0.5]]])
         _ = try GuestAPI.executeTouch(["phase": "down", "x": 0.5, "y": 0.5])
         let edge = try GuestAPI.executeTouch(["phase": "down", "edge": 1, "normalized": true, "x": 0.5, "y": 0.5])
         precondition(edge["phase"] as? String == "down" && edge["edge"] as? Int == 1)
         rejects { _ = try GuestAPI.executeTouch(["phase": "down", "edge": 1, "normalized": false]) }
-        _ = try GuestAPI.executeInput("input.button", ["name": "home"])
+        _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.button")!, ["name": "home"])
         precondition(LayoutWitness.reads == before, "normalized or native operations acquired point geometry")
         let state = GuestAPI.activeScreenState()
         precondition(state["available"] as? Bool == false && state["width"] == nil && state["orientation"] == nil)
@@ -138,11 +137,11 @@ func rejects(_ operation: () throws -> Void) {
         precondition(PointInputWitness.snapshotReads == snapshots, "device.info repeated its existing snapshot")
         LayoutWitness.layout = layout()
         for flag: Any in [false, NSNumber(value: 0)] {
-            _ = try GuestAPI.executeInput("input.touch_sequence", ["normalized": flag, "events": [["phase": "down", "x": 900, "y": 300]]])
+            _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.touch_sequence")!, ["normalized": flag, "events": [["phase": "down", "x": 900, "y": 300]]])
             _ = try GuestAPI.executeTouch(["phase": "down", "normalized": flag, "x": 900, "y": 300])
         }
         for method in ["input.double_tap", "input.long_press", "input.swipe", "input.drag"] {
-            _ = try GuestAPI.executeInput(method, ["x": 900, "y": 300, "x1": 900, "y1": 300,
+            _ = try GuestAPI.executeInput(InputMethod(rawValue: method)!, ["x": 900, "y": 300, "x1": 900, "y1": 300,
                                                   "x2": 800, "y2": 400, "points": [[900, 300], [800, 400]]])
         }
         rejects { _ = try GuestAPI.withActivePointGeometry { throw IcliError.failed("input failed") } }

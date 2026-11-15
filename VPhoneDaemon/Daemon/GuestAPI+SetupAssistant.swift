@@ -20,15 +20,12 @@ import IcliSystem
 /// leaves SpringBoard alone. `Research/Guest/setup_assistant_skip.md` has the
 /// experiments behind this.
 extension GuestAPI {
-    static func executeSetupAssistant(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "setup.status":
-            return try setupAssistantStatus()
-        case "setup.skip":
-            try requireForce(params, "skip Setup Assistant")
-            return try skipSetupAssistant()
-        default:
-            return nil
+    static func executeSetupAssistant(_ m: SetupAssistantMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .setupStatus:
+            try setupAssistantStatus()
+        case .setupSkip:
+            try skipSetupAssistant()
         }
     }
 

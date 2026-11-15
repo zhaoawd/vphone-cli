@@ -28,18 +28,16 @@ enum GuestHomePodDebug {
 }
 
 extension GuestAPI {
-    static func executeHomePodDebug(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "homepod.debug.catalog":
+    static func executeHomePodDebug(_ m: HomePodDebugMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .homepodDebugCatalog:
             return try GuestHomePodDebug.call("catalog")
-        case "homepod.debug.call":
+        case .homepodDebugCall:
             let operation = try string(params, "operation")
             guard let arguments = params["arguments"] as? [String: Any] else {
                 throw GuestAPIError.invalidRequest("arguments must be an object")
             }
             return try GuestHomePodDebug.call(operation, arguments: arguments)
-        default:
-            return nil
         }
     }
 }

@@ -39,9 +39,9 @@ extension GuestAPI {
     ]
     static let environmentStaging = "/var/root/Library/Caches/vphone-environment"
 
-    static func executeEnvironment(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "environment.status":
+    static func executeEnvironment(_ m: EnvironmentMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .environmentStatus:
             var root = statfs()
             guard statfs("/", &root) == 0 else {
                 throw GuestAPIError.operationFailed("statfs(/): \(String(cString: strerror(errno)))")
@@ -55,10 +55,8 @@ extension GuestAPI {
                 "staging": environmentStaging,
                 "root_read_only": root.f_flags & UInt32(MNT_RDONLY) != 0,
             ]
-        case "environment.install":
+        case .environmentInstall:
             return try installEnvironment(params)
-        default:
-            return nil
         }
     }
 

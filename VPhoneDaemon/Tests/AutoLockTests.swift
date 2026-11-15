@@ -1,7 +1,6 @@
 import Foundation
 import IcliKit
 
-enum GuestAPIError: Error { case invalidRequest(String) }
 enum GuestAPI {}
 
 @main
@@ -167,6 +166,20 @@ enum AutoLockTests {
                 && Data(contentsOf: URL(fileURLWithPath: effectivePlist)) == beforeInvalidEffective,
                    "invalid request leaves both files unchanged")
         }
+
+        // Exercise the actual method declaration and admission before the
+        // production setter: an undeclared `never` would otherwise be lost.
+        let area = GuestMethodArea.make(DeviceMethod.self) { method, params in
+            precondition(method == .displayAutoLockSet)
+            return try GuestAPI.setAutoLock(params)
+        }
+        let throughDispatch = try GuestMethodArea.dispatch([area], method: "display.auto_lock.set", params: ["never": true])
+        expect(throughDispatch["never"] as? Bool == true, "never survives declared admission and reaches setter")
+        let catalog = GuestMethodArea.catalog([area])["methods"] as! [[String: Any]]
+        let setter = catalog.first { $0["name"] as? String == "display.auto_lock.set" }!
+        let fields = setter["params"] as! [[String: Any]]
+        expect(fields.contains { $0["name"] as? String == "never" && $0["type"] as? String == "boolean" }, "never is discoverable")
+        expect(fields.first { $0["name"] as? String == "seconds" }?["required"] as? Bool == false, "seconds is optional when never is used")
 
         print("auto-lock tests: \(checks) checks, \(failures) failures")
         exit(failures == 0 ? 0 : 1)

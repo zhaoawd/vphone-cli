@@ -4,9 +4,9 @@ import IcliKit
 // MARK: - Unified Log and Crash Reports
 
 extension GuestAPI {
-    static func executeLog(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
-        switch method {
-        case "logs.syslog":
+    static func executeLog(_ m: LogMethod, _ params: [String: Any]) throws -> [String: Any] {
+        switch m {
+        case .logsSyslog:
             return try captureSyslog(
                 seconds: number(params, "seconds", default: 2),
                 process: optionalString(params, "process"),
@@ -16,7 +16,7 @@ extension GuestAPI {
                 category: optionalString(params, "category"),
                 messageContains: optionalString(params, "message_contains"),
             )
-        case "logs.crashes":
+        case .logsCrashes:
             let paths = try crashLogs(bundleID: optionalString(params, "bundle_id"))["crashes"] as? [String] ?? []
             let reports = paths.map { path -> [String: Any] in
                 let name = (path as NSString).lastPathComponent
@@ -30,10 +30,8 @@ extension GuestAPI {
                 ]
             }
             return ["crashes": reports, "count": reports.count]
-        case "logs.crash":
+        case .logsCrash:
             return try readCrashLog(string(params, "path"))
-        default:
-            return nil
         }
     }
 

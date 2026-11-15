@@ -3,14 +3,16 @@ import Foundation
 import IcliKit
 import VphonedNative
 
+// MARK: - Buttons, Text, Gestures
+
 extension GuestAPI {
     // MARK: - Accessibility and OCR
 
-    static func executeInterface(_ method: String, _ params: [String: Any]) throws -> [String: Any]? {
+    static func executeInterface(_ m: InterfaceMethod, _ params: [String: Any]) throws -> [String: Any] {
         interfaceLock.lock()
         defer { interfaceLock.unlock() }
-        switch method {
-        case "ui.tree", "accessibility.tree":
+        switch m {
+        case .uiTree, .accessibilityTree:
             if let value = params["nested"] {
                 guard let number = value as? NSNumber, CFGetTypeID(number) == CFBooleanGetTypeID() else {
                     throw GuestAPIError.invalidRequest("nested must be a boolean")
@@ -25,27 +27,25 @@ extension GuestAPI {
                 clickableOnly: bool(params, "clickable_only"),
                 limit: (params["limit"] as? NSNumber)?.intValue,
             )
-        case GuestDuoMethod.elementAt.rawValue:
+        case .uiElementAt:
             return try elementAt(x: requiredNumber(params, "x"), y: requiredNumber(params, "y"))
-        case GuestDuoMethod.tapElement.rawValue:
+        case .uiTapElement:
             return try tapInterfaceElement(selector(params))
-        case "ui.wait", "ui.wait_gone":
+        case .uiWait, .uiWaitGone:
             return try waitForElement(
                 selector(params),
-                appear: method == "ui.wait",
+                appear: m == .uiWait,
                 timeout: number(params, "timeout", default: 10),
             )
-        case "ui.ocr":
+        case .uiOcr:
             try requireTextRecognition()
             return try recognizeScreen(
                 languages: params["languages"] as? [String] ?? ["en-US"],
                 minConfidence: Float(number(params, "min_confidence", default: 0.3)),
             )
-        case "ui.describe":
+        case .uiDescribe:
             try requireTextRecognition()
             return try describeScreen()
-        default:
-            return nil
         }
     }
 
