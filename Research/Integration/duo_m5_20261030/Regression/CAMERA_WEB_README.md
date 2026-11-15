@@ -33,4 +33,4 @@ GUI 回归使用 `mixed-gui.cua.js`。在 cua_repl 选择 `com.vphone.bundle`，
 
 先停止 fixture，核实 `apps.info` 的 bundle ID／路径后注销注册，并归档生成的 App；保留数据容器和报告。恢复原 SystemHook 和测试 Bundle 对应资源，正常关机，冷启动核对原 daemon／标记、21 项库、根只读及原设置，再正常关机并核对状态文件无句柄。不要使用默认机器或其他 VM。
 
-2026-11-15 的候选正式运行使用证据目录中的 `probe-runtime.mjs`；此处保存其路径可迁移版本并增加会话目录和原库断言。保存版本通过语法检查；新增前置断言未再次安装候选进行实机运行。实际结果和限制见 [验收记录](../HOST_WEBCAM_DISTRIBUTION_20261115.md)。
+2026-11-15 首轮候选运行使用证据目录中的 `probe-runtime.mjs`；此处保存其路径可迁移版本并增加会话目录和原库断言。后续保存版本已在实际 VM 的 `mixed-session.yXsrIAl0` 执行 install、accept 和 safari：原生 14/14 不同帧摘要、WKWebView 10/10、Safari 10/10 通过。首次 accept 因测试权限提示超时，提示处理后原命令重跑通过；失败证据保留。7 项记录回复前置检查另行通过，不计为 VM 结果。测试 App 已注销归档，原 SystemHook／21 项库、原 daemon／标记、根只读和 Auto-Lock 已在冷启动核对，随后正常关机，无状态句柄。实际结果和限制见 [本轮验证](../VALIDATION_GAPS_20261115.md)；首轮结果见 [验收记录](../HOST_WEBCAM_DISTRIBUTION_20261115.md)。

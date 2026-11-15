@@ -7113,3 +7113,42 @@ markers and 21 library entries were restored. One baseline boot did not
 connect; after the user-approved SIGINT, a new cold boot verified the
 original components, read-only root and original Auto-Lock setting, followed
 by normal shutdown and no state-file handles. The boot failure cause is unknown.
+
+### CFW and saved runtime follow-up — 2026-11-15
+
+No production patch source, manifest, preset, instruction replacement or native
+Snapshot policy changed in this follow-up. The user approved host admission for
+cdhash `974031b523fa25f5975784700b5030123213efdd` and full CFW validation on
+`duo-cfw-followup-20261115`, a new-identity clone. Full `cfw install
+--keep-artifacts` and `cfw update-environment` completed without reported patch
+warnings. The attached-image inventories remained the same five pre-existing
+simulator images after each operation; no CFW work image or state-file handle
+remained. The 240-entry receipt retained its two existing boot-component pending
+entries; those are outside this guest-system installation.
+
+The candidate daemon `c04e362a…` and all 21 library entries matched the Bundle on
+two actual cold boots, with read-only root. The saved camera helper also ran on
+the foundation copy: native 14/14, WKWebView 10/10 and Safari 10/10 changing-frame
+hashes passed using the generated host test pattern. Its generated fixture was
+unregistered and archived, retaining its data. The temporary SystemHook was
+restored to `755f089d…`; original daemon/markers, 21 original library entries,
+read-only root and Auto-Lock 120 seconds were checked on another cold boot,
+followed by normal shutdown and no state-file handles.
+
+New display evidence does not establish a complete fix. A continuous native
+capture run confirmed six handoffs but recorded five near-black MOV samples in
+the third close. A six-handoff control without continuous native capture had no
+near-black samples, yet included a 700 ms repeated downscaled-luma span. Both
+runs changed orientation in the third open/close. One control does not establish
+causation. After foreground-readiness and capture-availability checks were added
+to the harness, the final eight orientation/source/refusal cases and restoration
+passed; a three-cycle scene-resumption attempt did not reproduce the earlier
+rotation failure. Earlier failures remain saved, and no product rotation fix is
+claimed. Both isolated copies ended with normal shutdown and no state-file
+handles, and the final image inventory matched the five pre-existing simulator
+images. Intermittent cold-boot RPC failure also remains unexplained.
+Linux FUSE/concurrency, physical USB/DFU, restore peak space and the independent
+27.2 candidate remain unvalidated. Detailed evidence, failed attempts and final
+cleanup are recorded in `VALIDATION_GAPS_20261115.md` and
+`DISPLAY_BOOT_DIAGNOSIS_20261115.md` under
+`Research/Integration/duo_m5_20261030/`.
