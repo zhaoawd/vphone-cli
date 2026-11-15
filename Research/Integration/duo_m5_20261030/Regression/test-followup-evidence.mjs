@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {compareRGBA} from './f5-frame-detail.mjs';
+import {classifyBoot} from './boot-evidence-report.mjs';
+
+const image = Buffer.from([20, 30, 40, 255, 20, 30, 40, 255]);
+assert.equal(compareRGBA(image, image).meanAbsoluteRGB, 0);
+const alphaOnly = Buffer.from(image); alphaOnly[3] = 0;
+assert.equal(compareRGBA(image, alphaOnly).pixelFractionAbove[0], 0);
+const small = Buffer.from(image); small[0]++;
+assert.equal(compareRGBA(image, small).pixelFractionAbove[0], 0.5);
+assert.equal(compareRGBA(image, small).pixelFractionAbove[2], 0);
+const large = Buffer.from(image); large[0] += 20;
+assert.equal(compareRGBA(image, large).pixelFractionAbove[16], 0.5);
+assert.throws(() => compareRGBA(image, image.subarray(0, 4)), /Invalid RGBA/);
+const failed = classifyBoot('[vphone] VM started\nDK: HID failed to find server');
+assert.equal(failed.phase, 'guest_rpc_unavailable');
+assert.equal(failed.cause, null);
+assert.equal(classifyBoot('[vphone] VM started\n[control] connected to vphoned HTTP API\nDK: HID failed to find server').phase, 'rpc_connected');
+assert.equal(classifyBoot('', 'AMFI blocked vphone-vm').phase, 'host_preflight_refused');
+assert.equal(classifyBoot('').phase, 'insufficient_evidence');
+assert.throws(() => classifyBoot('[vphone] VM started', 'AMFI blocked vphone-vm'), /separate attempt/);
+console.log('12 evidence checks passed: RGB differences, alpha exclusion, phase separation and no causal inference from DriverKit errors');
