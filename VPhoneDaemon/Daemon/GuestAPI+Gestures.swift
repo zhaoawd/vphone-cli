@@ -1,8 +1,6 @@
 import Foundation
 import IcliKit
 
-// MARK: - Buttons, Text, Gestures
-
 extension GuestAPI {
     /// Gesture coordinates are screen points, as `device.screen` reports them.
     static func executeInput(_ m: InputMethod, _ params: [String: Any]) throws -> [String: Any] {
@@ -27,8 +25,13 @@ extension GuestAPI {
             let seconds = number(params, "seconds", default: 1)
             return try withActivePointGeometry { try longPress(x: x, y: y, seconds: seconds) }
         case .inputSwipe:
-            let x1 = try requiredNumber(params, "x1"), y1 = try requiredNumber(params, "y1")
-            let x2 = try requiredNumber(params, "x2"), y2 = try requiredNumber(params, "y2")
+            guard let from = params["from"] as? [NSNumber], from.count == 2,
+                  let to = params["to"] as? [NSNumber], to.count == 2
+            else {
+                throw GuestAPIError.invalidRequest("from and to must be [x, y] pairs")
+            }
+            let x1 = from[0].doubleValue, y1 = from[1].doubleValue
+            let x2 = to[0].doubleValue, y2 = to[1].doubleValue
             let seconds = number(params, "seconds", default: 0.3)
             let steps = (params["steps"] as? NSNumber)?.intValue ?? 20
             return try withActivePointGeometry { try swipe(x1: x1, y1: y1, x2: x2, y2: y2, seconds: seconds, steps: steps) }
@@ -41,7 +44,9 @@ extension GuestAPI {
             let points = rows.map { ($0[0].doubleValue, $0[1].doubleValue) }
             let seconds = number(params, "seconds", default: 0.5), hold = number(params, "hold", default: 0.5)
             let steps = (params["steps"] as? NSNumber)?.intValue ?? 20
-            return try withActivePointGeometry { try drag(points: points, seconds: seconds, hold: hold, steps: steps) }
+            _ = try withActivePointGeometry { try drag(points: points, seconds: seconds, hold: hold, steps: steps) }
+            // `points` is the name of this count before `count`; kept for older clients.
+            return ["count": rows.count, "points": rows.count]
         case .inputTouchSequence:
             guard let events = params["events"] as? [[String: Any]] else {
                 throw GuestAPIError.invalidRequest("events must be an array of {phase, x, y, delay_ms}")
@@ -53,4 +58,5 @@ extension GuestAPI {
             return try withActivePointGeometry { try touchSequence(parsed, normalized: false) }
         }
     }
+
 }

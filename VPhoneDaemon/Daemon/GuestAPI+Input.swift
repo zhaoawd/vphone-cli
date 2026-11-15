@@ -8,6 +8,14 @@ import VphonedNative
 extension GuestAPI {
     // MARK: - Accessibility and OCR
 
+    /// `observed` for `input.*` calls with `observe: true`. `executeInterface` takes `interfaceLock` itself.
+    static func liveObservation(
+        frontmost: () throws -> [String: Any] = { frontmostApp() },
+        tree: () throws -> [String: Any] = { try executeInterface(.uiTree, ["visible_only": true, "max_elements": 500]) },
+    ) throws -> [String: Any] {
+        try GuestMethodArea.observation(frontmost: frontmost, tree: tree)
+    }
+
     static func executeInterface(_ m: InterfaceMethod, _ params: [String: Any]) throws -> [String: Any] {
         interfaceLock.lock()
         defer { interfaceLock.unlock() }
@@ -15,7 +23,7 @@ extension GuestAPI {
         case .uiTree, .accessibilityTree:
             if let value = params["nested"] {
                 guard let number = value as? NSNumber, CFGetTypeID(number) == CFBooleanGetTypeID() else {
-                    throw GuestAPIError.invalidRequest("nested must be a boolean")
+                    throw GuestAPIError.invalidRequest("nested must be a boolean", hint: "true or false")
                 }
             }
             if bool(params, "nested") {
@@ -32,11 +40,13 @@ extension GuestAPI {
         case .uiTapElement:
             return try tapInterfaceElement(selector(params))
         case .uiWait, .uiWaitGone:
-            return try waitForElement(
-                selector(params),
-                appear: m == .uiWait,
-                timeout: number(params, "timeout", default: 10),
-            )
+            // Checked here so the refusal names timeout_ms in milliseconds;
+            // IcliKit's own check speaks in seconds.
+            let timeout = number(params, "timeout_ms", default: 10000)
+            guard timeout.isFinite, (0 ... 60000).contains(timeout) else {
+                throw GuestAPIError.invalidRequest("timeout_ms must be 0–60000")
+            }
+            return try waitForElement(selector(params), appear: m == .uiWait, timeout: timeout / 1000)
         case .uiOcr:
             try requireTextRecognition()
             return try recognizeScreen(
@@ -53,7 +63,7 @@ extension GuestAPI {
     /// it weakly, so its classes are nil on a watch.
     private static func requireTextRecognition() throws {
         guard NSClassFromString("VNRecognizeTextRequest") != nil else {
-            throw GuestAPIError.operationFailed("Text recognition needs Vision, which this guest does not have")
+            throw GuestAPIError.unavailable("Text recognition needs Vision, which this guest does not have")
         }
     }
 

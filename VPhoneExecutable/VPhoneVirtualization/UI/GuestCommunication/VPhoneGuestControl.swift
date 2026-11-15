@@ -711,6 +711,8 @@ final class VPhoneGuestControl {
     /// enforces the executable and argument limits; this wrapper keeps the
     /// response typed enough for process discovery without hiding raw output.
     func spawnDiagnostic(executable: String, arguments: [String] = [], timeout: Double = 3) async throws -> [String: Any] {
+        // The names from before the renames, which every vphoned answers:
+        // a machine keeps its older vphoned until it is redeployed.
         try await call("process.spawn", params: [
             "executable": executable,
             "arguments": arguments,
@@ -819,11 +821,25 @@ final class VPhoneGuestControl {
         }
         var params = request
         params.removeValue(forKey: "t")
-        var result = try await call(method, params: params)
+        let listKey = ["file_list": "entries", "app_list": "apps"][type]
+        var result: [String: Any]
+        if let listKey { result = try await callList(method, key: listKey, params: params) }
+        else { result = try await call(method, params: params) }
         if result["ok"] == nil {
             result["ok"] = true
         }
         return (result, nil)
+    }
+
+    /// Reads all pages for UI lists; raw RPC callers retain the paged contract.
+    func callList(_ method: String, key: String, params: [String: Any] = [:]) async throws -> [String: Any] {
+        var pages = VPhoneGuestListPages(key: key)
+        var request = params
+        repeat {
+            let page = try await call(method, params: request)
+            guard let cursor = try pages.append(page) else { return pages.result }
+            request["cursor"] = cursor
+        } while true
     }
 
     /// Calls one named vphoned operation over `/v1/rpc` and returns its result object.

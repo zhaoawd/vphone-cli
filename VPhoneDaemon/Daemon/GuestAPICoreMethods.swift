@@ -78,7 +78,7 @@ enum CoreMethod: String, GuestMethod {
                                                     .hidden("path", .string),
                                                     .required("width", .integer)])
         case .appsList: MethodSpec(.optional("filter", .string, "Which apps to list", values: ["all", "running", "user", "system"], default: "all"),
-                                    summary: "List installed apps with bundle id, name, version, type, and running state.", result: [.required("apps", .array)])
+                                    summary: "List installed apps with bundle id, name, version, type, and running state.", result: [.required("apps", .array)], paged: MethodSpec.Paged(key: "apps", order: .keys(["bundle_id", "path"])))
         case .appsSearch: MethodSpec(.required("query", .string, "Text to match against app names and bundle ids"),
                                       summary: "Search installed apps by name or bundle id.", result: [.required("apps", .array), .required("query", .string)])
         case .appsRefresh: MethodSpec(.optional("directory", .string, "App directory to rescan; the installed bootstrap Applications directory when omitted"),
@@ -159,6 +159,7 @@ enum CoreMethod: String, GuestMethod {
         case .bootstrapStatus: MethodSpec(summary: "Report bootstrap install progress: phase, download bytes, and any error.", result: [
                 .optional("downloaded_bytes", .integer),
                 .optional("error", .string),
+                .optional("message", .string),
                 .optional("jbroot", .string),
                 .optional("layout", .string),
                 .optional("packages", .array),
@@ -235,12 +236,12 @@ enum CoreMethod: String, GuestMethod {
                        .optional("course", .number, "Heading in degrees from 0 up to but not including 360; unset when omitted", min: 0),
                        summary: "Simulate the device location at a coordinate until cleared.", result: [.required("location", .object), .required("simulating", .boolean)])
         case .locationClear: MethodSpec(summary: "Stop simulating location and return to the real one.", result: [.optional("location", .object), .required("simulating", .boolean)])
-        case .locationCurrent: MethodSpec(.optional("timeout", .number, "Seconds to wait for a fix; more than 0", default: 10, max: 300),
+        case .locationCurrent: MethodSpec(.optional("timeout_ms", .number, "Milliseconds to wait for a fix; more than 0", default: 10000, max: 300000),
                                           summary: "Get the current location fix, simulated or real.", result: [.optional("age_seconds", .number),
                                                    .optional("altitude", .number),
                                                    .optional("client", .string),
                                                    .optional("course", .number),
-                                                   .optional("error", .string),
+                                                   .hidden("error", .string),
                                                    .optional("fresh", .boolean),
                                                    .optional("horizontal_accuracy", .number),
                                                    .optional("latitude", .number),
@@ -286,7 +287,7 @@ enum CoreMethod: String, GuestMethod {
                 .required("text", .string),
                 .required("types", .array)])
         case .filesList: MethodSpec(.required("path", .string, "Guest directory path to list"),
-                                     summary: "List the entries of a guest directory.", result: [.required("entries", .array), .required("path", .string)])
+                                     summary: "List the entries of a guest directory.", result: [.required("entries", .array), .required("path", .string)], paged: MethodSpec.Paged(key: "entries", order: .keep))
         case .filesMkdir: MethodSpec(.required("path", .string, "Guest directory path to create"),
                                       summary: "Create a guest directory, including any missing parent directories.", result: [.required("created", .boolean), .required("path", .string)])
         case .filesRemove: MethodSpec(.required("path", .string, "Guest file or directory path to delete"),

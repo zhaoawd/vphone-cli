@@ -39,12 +39,19 @@ enum LogicTests {
         deviceNameRule()
         pointerScroll()
         processSpawnPolicy()
+        paging()
+        spawnOutputCut()
+        pagedFindOrder()
+        spool()
         bootstrapPlatform()
         setupAssistantState()
         homeViewDistancePolicy()
         mobileGestaltAnswers()
         settingsValue()
         methodDispatch()
+        observeWrapper()
+        observeUnknownParams()
+        observeCatalog()
         print("\(checks) checks, \(failures) failures")
         exit(failures == 0 ? 0 : 1)
     }
@@ -132,8 +139,504 @@ enum LogicTests {
         expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: Array(repeating: "x", count: 17), timeout: 3) != nil, "argument count is bounded")
         expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [String(repeating: "x", count: 257)], timeout: 3) != nil, "argument length is bounded")
         expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: ["x\n"], timeout: 3) != nil, "control characters are refused")
-        expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [], timeout: 0.09) != nil, "short timeout is refused")
-        expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [], timeout: 10.01) != nil, "long timeout is refused")
+        expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [], timeout: 0.09) == "timeout_ms must be 100–10000", "short timeout is refused with the range")
+        expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [], timeout: 10.01) == "timeout_ms must be 100–10000", "long timeout is refused with the range")
+        expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [], timeout: 0.1) == nil, "100 ms timeout is accepted")
+        expect(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [], timeout: 10) == nil, "10000 ms timeout is accepted")
+        let refusal = GuestAPIError.invalidRequest(GuestProcessSpawnPolicy.validate(executable: "ps", arguments: [], timeout: 10.001) ?? "").wireBody
+        expect(refusal["code"] as? String == "invalid_param" && refusal["message"] as? String == "timeout_ms must be 100–10000" && refusal["hint"] == nil,
+               "timeout refusal is a hintless invalid_param naming the range")
+    }
+
+    // MARK: - Paging
+
+    /// Probe methods whose specs declare `paged:`, dispatched through the real `GuestMethodArea`.
+    enum PagingProbe: String, GuestMethod {
+        case keep = "probe.keep"
+        case strings = "probe.strings"
+        case keys = "probe.keys"
+        case pid = "probe.pid"
+
+        var spec: MethodSpec {
+            switch self {
+            case .keep: MethodSpec(summary: "Fixture.", paged: MethodSpec.Paged(key: "rows", order: .keep))
+            case .strings: MethodSpec(summary: "Fixture.", paged: MethodSpec.Paged(key: "matches", order: .strings))
+            case .keys: MethodSpec(summary: "Fixture.", paged: MethodSpec.Paged(key: "rows", order: .keys(["bundle_id", "path"])))
+            case .pid: MethodSpec(summary: "Fixture.", paged: MethodSpec.Paged(key: "rows", order: .keys(["pid"])))
+            }
+        }
+    }
+
+    /// Dispatches `method` over an executor that returns `result`, with params decoded as the daemon gets them.
+    static func dispatchPaged(_ method: PagingProbe, _ result: [String: Any], _ params: String = "{}") throws -> [String: Any] {
+        let decoded = (try? JSONSerialization.jsonObject(with: Data(params.utf8)) as? [String: Any]) ?? [:]
+        let area = GuestMethodArea.make(PagingProbe.self) { _, _ in result }
+        return try GuestMethodArea.dispatch([area], method: method.rawValue, params: decoded, observer: { nil })
+    }
+
+    static func paging() {
+        func page(_ result: [String: Any], _ params: String = "{}", _ method: PagingProbe = .keep) -> [String: Any]? {
+            try? dispatchPaged(method, result, params)
+        }
+        func message(_ result: [String: Any], _ params: String) -> String {
+            do { _ = try dispatchPaged(.keep, result, params); return "" } catch {
+                return (error as? GuestAPIError).map { if case .invalidRequest = $0 { return String(describing: $0) } else { return "" } } ?? ""
+            }
+        }
+        let dicts: [String: Any] = ["rows": (0 ..< 250).map { ["id": $0] as [String: Any] }, "count": 250, "path": "/x"]
+        let strings: [String: Any] = ["matches": (0 ..< 250).map { String(format: "s%03d", $0) }]
+
+        // dict rows and string rows: three pages, exact concatenation, no cursor on the last
+        for (name, source, method) in [("dict", dicts, PagingProbe.keep), ("string", strings, PagingProbe.strings)] {
+            var collected: [Any] = []
+            var cursor: String?
+            var sizes: [Int] = []
+            var truncatedFlags: [Bool] = []
+            var lastHasCursor = true
+            for _ in 0 ..< 3 {
+                let params = cursor.map { "{\"limit\":100,\"cursor\":\"\($0)\"}" } ?? "{\"limit\":100}"
+                guard let reply = page(source, params, method) else { expect(false, "\(name) page failed"); break }
+                let key = method == .strings ? "matches" : "rows"
+                let rows = reply[key] as? [Any] ?? []
+                collected += rows
+                sizes.append(rows.count)
+                truncatedFlags.append(reply["truncated"] as? Bool ?? false)
+                expectEqual(reply["total"] as? Int, 250, "\(name) total counts entries before paging")
+                cursor = reply["next_cursor"] as? String
+                lastHasCursor = cursor != nil
+            }
+            expectEqual(sizes, [100, 100, 50], "\(name) pages")
+            expectEqual(truncatedFlags, [true, true, false], "\(name) truncated flags")
+            expect(!lastHasCursor, "\(name) last page has no next_cursor")
+            expectEqual(json(["rows": collected]), json(["rows": source[method == .strings ? "matches" : "rows"] as Any]), "\(name) pages concatenate to the full list")
+        }
+        let first = page(dicts, "{\"limit\":10}")
+        expectEqual((first?["rows"] as? [Any])?.count, 10, "limit 10 returns 10")
+        expectEqual(first?["count"] as? Int, 10, "count is the page size")
+        expectEqual(first?["path"] as? String, "/x", "other keys are kept")
+        expectEqual(first?["next_cursor"] as? String, "10", "cursor is the decimal offset")
+        let capped = page(dicts)
+        expectEqual((capped?["rows"] as? [Any])?.count, 200, "default cap is 200")
+        expectEqual(capped?["truncated"] as? Bool, true, "default cap truncates 250")
+        let empty = page(["rows": [Any]()])
+        expectEqual((empty?["rows"] as? [Any])?.count, 0, "empty list stays empty")
+        expectEqual(empty?["truncated"] as? Bool, false, "empty list is not truncated")
+        expectEqual(empty?["total"] as? Int, 0, "empty list total")
+        expect(empty?["next_cursor"] == nil, "empty list has no next_cursor")
+        expectEqual((page(dicts, "{\"limit\":1000}")?["rows"] as? [Any])?.count, 250, "limit 1000 is accepted")
+        expectEqual((page(dicts, "{\"cursor\":\"250\"}")?["rows"] as? [Any])?.count, 0, "cursor at total is the empty last page")
+
+        for bad in ["0", "1001", "10.5", "1e20", "true", "\"5\"", "null", "-1"] {
+            let text = message(dicts, "{\"limit\":\(bad)}")
+            expect(text.contains("limit") && text.contains("1 to 1000") && text.contains("got"), "limit \(bad) is invalid: \(text)")
+        }
+        expect(message(dicts, "{\"limit\":0}").hasSuffix("got 0"), "message carries the received value")
+        for bad in ["\"abc\"", "\"-1\"", "\"+5\"", "\" 5\"", "\"251\"", "\"\"", "5", "true"] {
+            let text = message(dicts, "{\"cursor\":\(bad)}")
+            expect(text.contains("cursor") && text.contains("without a cursor"), "cursor \(bad) is invalid: \(text)")
+        }
+
+        // a missing or non-array key is an operation failure, never a crash
+        for source: [String: Any] in [["x": 1], ["rows": "nope"]] {
+            var failed = false
+            do { _ = try GuestPaging.apply(source, MethodSpec.Paged(key: "rows", order: .keep), [:]) } catch { failed = true }
+            expect(failed, "apply throws without an array under the key")
+        }
+
+        // strictInt, also used for max_output_bytes
+        func strict(_ json: String) -> Int?? {
+            let value = (try? JSONSerialization.jsonObject(with: Data("{\"v\":\(json)}".utf8)) as? [String: Any])?["v"]
+            do { return try GuestPaging.strictInt(value, name: "max_output_bytes", range: 1 ... 65536) } catch { return .some(nil) }
+        }
+        expect(strict("1") == .some(1) && strict("65536") == .some(65536) && strict("100.0") == .some(100), "range bounds are accepted")
+        expect(try! GuestPaging.strictInt(nil, name: "n", range: 1 ... 2) == nil, "an absent param is nil")
+
+        // sorted: every order, with missing, string and wrong-typed keys
+        let unsorted: [Any] = [
+            ["pid": 30, "bundle_id": "b", "path": "/2"] as [String: Any], ["bundle_id": "a"] as [String: Any],
+            ["pid": 5, "bundle_id": "b", "path": "/1"] as [String: Any], ["pid": 30] as [String: Any],
+            ["pid": "7", "bundle_id": 9] as [String: Any],
+        ]
+        func pids(_ rows: [Any]) -> [Int] { rows.map { ($0 as? [String: Any])?["pid"] as? Int ?? -1 } }
+        expectEqual(pids(GuestPaging.sorted(unsorted, .keys(["pid"]))), [-1, -1, 5, 30, 30], "a missing or string pid sorts as -1")
+        expectEqual(GuestPaging.sorted(unsorted, .keys(["bundle_id", "path"])).map { row -> String in
+            let dict = row as? [String: Any]
+            return (dict?["bundle_id"] as? String ?? "") + (dict?["path"] as? String ?? "")
+        }, ["", "", "a", "b/1", "b/2"], "bundle_id then path, missing and wrong-typed keys as empty")
+        expectEqual(json(["rows": GuestPaging.sorted(unsorted, .keep)]), json(["rows": unsorted]), "keep leaves the order")
+        expectEqual(GuestPaging.sorted(["b", "a", 3, "c"], .strings).map { $0 as? String ?? "" }, ["", "a", "b", "c"], "strings sort, a non-string sorts as empty")
+        expectEqual(GuestPaging.sorted([], .keys(["nothing"])).count, 0, "sorting nothing is fine")
+        let shuffled = page(["rows": unsorted], "{}", .pid)
+        expectEqual(pids(shuffled?["rows"] as? [Any] ?? []), [-1, -1, 5, 30, 30], "dispatch sorts by the declared order")
+    }
+
+    // MARK: - processes.spawn output cap
+
+    static func spawnOutputCut() {
+        func cut(_ bytes: [UInt8], _ cap: Int) -> (data: Data, truncated: Bool) {
+            GuestProcessSpawnPolicy.cutOutput(Data(bytes), cap: cap)
+        }
+        // exactly cap bytes is whole; one more is cut
+        let exact = cut(Array(repeating: 0x61, count: 100), 100)
+        expectEqual(exact.data.count, 100, "cap bytes stay whole")
+        expect(!exact.truncated, "cap bytes are not truncated")
+        let over = cut(Array(repeating: 0x61, count: 101), 100)
+        expectEqual(over.data.count, 100, "cap + 1 bytes are cut to the cap")
+        expect(over.truncated, "cap + 1 bytes are truncated")
+        let short = cut([0x61, 0x62], 100)
+        expect(!short.truncated && short.data.count == 2, "a short stream is untouched")
+
+        // multi-byte characters: 2, 3 and 4 byte forms cut at every offset end on a character boundary
+        for scalar in ["\u{E9}", "\u{20AC}", "\u{1F600}"] {
+            let unit = Array(scalar.utf8)
+            for pad in 0 ..< unit.count {
+                let bytes = Array(repeating: UInt8(0x61), count: pad) + unit + unit + Array("tail".utf8)
+                for cap in pad + 1 ... pad + unit.count + 1 {
+                    let result = cut(bytes, cap)
+                    expect(result.truncated, "\(scalar) pad \(pad) cap \(cap) is truncated")
+                    expect(result.data.count <= cap, "\(scalar) pad \(pad) cap \(cap) stays within the cap")
+                    expect(String(data: result.data, encoding: .utf8) != nil, "\(scalar) pad \(pad) cap \(cap) ends on a character boundary")
+                }
+            }
+        }
+        // a complete character right at the cap stays; a split one goes
+        expectEqual(cut(Array("a\u{20AC}b".utf8), 4).data, Data(Array("a\u{20AC}".utf8)), "a character that fits at the cap stays")
+        expectEqual(cut(Array("a\u{20AC}b".utf8), 3).data, Data(Array("a".utf8)), "a character the cap splits goes whole")
+
+        let euro = Array("\u{20AC}".utf8)
+        let straddle = cut(Array(repeating: 0x61, count: 98) + euro + Array("tail".utf8), 100)
+        expectEqual(straddle.data.count, 98, "a 3-byte character straddling cap 100 is dropped whole")
+        let fits = cut(Array(repeating: 0x61, count: 97) + euro + Array("tail".utf8), 100)
+        expectEqual(fits.data.count, 100, "a 3-byte character ending exactly at cap 100 is kept")
+
+        // no lead byte in the window: cut exactly at the cap, no error
+        let run = cut(Array(repeating: 0x80, count: 200), 100)
+        expect(run.truncated && run.data.count == 100, "a run of continuation bytes is cut at the cap")
+        let invalid = cut(Array("valid text here".utf8) + Array(repeating: 0x61, count: 100) + [0xFF], 100)
+        expect(invalid.truncated && invalid.data.count <= 100, "a stray 0xFF stays within the cap")
+        let tail = cut(Array(repeating: 0x61, count: 99) + [0xFF, 0x61, 0x61], 100)
+        expect(tail.truncated && tail.data.count == 100, "an invalid lead byte at the cap is cut at the cap")
+        let empty = cut([], 1)
+        expect(!empty.truncated && empty.data.isEmpty, "empty output is untouched")
+    }
+
+    // MARK: - files.find order
+
+    static func pagedFindOrder() {
+        let paths = (0 ..< 120).map { "/var/mobile/dir\($0 % 7)/file\($0).txt" }
+        // two different input orders of the same matches
+        var rotated = paths
+        for _ in 0 ..< 37 { rotated.append(rotated.removeFirst()) }
+        let reversed = Array(paths.reversed())
+        func pages(_ input: [String]) -> [String] {
+            var result: [String] = []
+            var cursor: String?
+            repeat {
+                let params = cursor.map { "{\"limit\":50,\"cursor\":\"\($0)\"}" } ?? "{\"limit\":50}"
+                guard let page = try? dispatchPaged(.strings, ["matches": input, "root": "/"], params) else {
+                    expect(false, "paging the matches failed")
+                    return result
+                }
+                result.append(json(["rows": page["matches"] ?? []]))
+                cursor = page["next_cursor"] as? String
+            } while cursor != nil
+            return result
+        }
+        let reference = pages(paths)
+        expectEqual(reference.count, 3, "120 matches make three pages of 50")
+        expectEqual(pages(rotated), reference, "a rotated input pages identically")
+        expectEqual(pages(reversed), reference, "a reversed input pages identically")
+    }
+
+    // MARK: - processes.spawn spool
+
+    final class TestClock: @unchecked Sendable {
+        var date = Date(timeIntervalSince1970: 1_000_000)
+    }
+
+    static func failure(_ body: () throws -> Void) -> (kind: String, message: String)? {
+        do { try body(); return nil } catch let error as GuestAPIError { return (error.code, error.description) } catch { return ("other", "\(error)") }
+    }
+
+    static let releasedText = "is released, expired or evicted; repeat processes.spawn to capture the output again"
+
+    /// A fresh parent dir with a `spool` root inside it (not created yet).
+    static func spoolParent() -> (parent: URL, root: URL) {
+        let parent = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("vphone-spool-\(UUID().uuidString)")
+        try? FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
+        return (parent, parent.appendingPathComponent("spool"))
+    }
+
+    /// Spools `stdout` bytes through the real reserve, writer and finish path.
+    @discardableResult
+    static func fill(_ spool: GuestProcessSpool, _ stdout: Data, stderr: Data = Data(), capture: Int = 100, keep: Bool = true) throws -> GuestProcessSpool.Reservation {
+        let r = try spool.reserve(maxCaptureBytes: capture)
+        try spool.writer(r, stream: "stdout").write(contentsOf: stdout)
+        try spool.writer(r, stream: "stderr").write(contentsOf: stderr)
+        spool.finish(r, keep: keep)
+        return r
+    }
+
+    static func mode(_ url: URL) -> Int {
+        var info = stat()
+        return lstat(url.path, &info) == 0 ? Int(info.st_mode & 0o777) : -1
+    }
+
+    static func spool() {
+        let (parent, root) = spoolParent()
+        defer { chmodTree(parent); try? FileManager.default.removeItem(at: parent) }
+        let clock = TestClock()
+        var logged: [String] = []
+        let store = GuestProcessSpool(root: root, totalCap: 1000, now: { clock.date }, log: { logged.append($0) })
+
+        // slices: successive next_offset values concatenate byte-exactly; a normal spool is private
+        let bytes = Data((0 ..< 700).map { UInt8($0 % 251) })
+        guard let r = try? fill(store, bytes, stderr: Data("err".utf8)) else { expect(false, "a spool is created"); return }
+        expectEqual(mode(root), 0o700, "the spool root is 0700")
+        expectEqual(mode(r.outputDir), 0o700, "a spool dir is 0700")
+        expectEqual(mode(r.outputDir.appendingPathComponent("stdout")), 0o600, "a stream file is 0600")
+        var joined = Data()
+        var offset = 0
+        var slices = 0
+        while true {
+            guard let slice = try? store.slice(outputID: r.outputID, stream: "stdout", offset: offset, limit: 300, binary: true) else { expect(false, "slice failed"); break }
+            joined.append(Data(base64Encoded: slice.data) ?? Data())
+            expectEqual(slice.total, 700, "total counts the raw bytes captured")
+            slices += 1
+            guard let next = slice.nextOffset else { break }
+            offset = next
+        }
+        expectEqual(joined, bytes, "binary slices join to the captured bytes")
+        expectEqual(slices, 3, "700 bytes make three slices of 300")
+        let past = try? store.slice(outputID: r.outputID, stream: "stdout", offset: 5000, limit: 300, binary: false)
+        expect(past?.data == "" && past?.nextOffset == nil && past?.total == 700, "an offset past the end gives empty data")
+        expectEqual(try? store.slice(outputID: r.outputID.lowercased(), stream: "stderr", offset: 0, limit: 10, binary: false).data, "err", "a lowercase UUID reads the same spool")
+
+        // a 3-byte character split across slices joins back; text mode cuts on a boundary
+        let euros = Data(Array("aa\u{20AC}\u{20AC}b".utf8))
+        if let e = try? fill(store, euros) {
+            var parts = Data()
+            var at = 0
+            while let slice = try? store.slice(outputID: e.outputID, stream: "stdout", offset: at, limit: 4, binary: true) {
+                parts.append(Data(base64Encoded: slice.data) ?? Data())
+                guard let next = slice.nextOffset else { break }
+                at = next
+            }
+            expectEqual(parts, euros, "a split character joins to the original bytes")
+            let text = try? store.slice(outputID: e.outputID, stream: "stdout", offset: 0, limit: 4, binary: false)
+            expectEqual(text?.data, "aa", "text mode drops a character the slice end splits")
+            expectEqual(text?.nextOffset, 2, "next_offset counts the raw bytes returned")
+        } else { expect(false, "euro spool") }
+        if let tiny = try? fill(store, Data(Array("\u{20AC}".utf8))) {
+            let stalled = try? store.slice(outputID: tiny.outputID, stream: "stdout", offset: 0, limit: 1, binary: false)
+            expectEqual(stalled?.nextOffset, 1, "a limit inside the first character still advances")
+        }
+
+        // a max-length 0xFF run decodes to at most 3 times the cap
+        let roomy = GuestProcessSpool(root: root, log: { _ in })
+        if let ff = try? fill(roomy, Data(repeating: 0xFF, count: 65536), capture: 65536) {
+            let page = try? roomy.firstPage(outputID: ff.outputID, stream: "stdout", cap: 65536)
+            expect((page?.text.utf8.count ?? .max) <= 196_608, "firstPage of 65536 x 0xFF is at most 196608 bytes")
+            let text = try? roomy.slice(outputID: ff.outputID, stream: "stdout", offset: 0, limit: 65536, binary: false)
+            expect((text?.data.utf8.count ?? .max) <= 196_608, "a text slice of 65536 x 0xFF is at most 196608 bytes")
+        } else { expect(false, "0xFF spool") }
+
+        // firstPage reports truncated only when more than cap bytes were spooled
+        for (size, expected) in [(9, false), (10, false), (11, true)] {
+            if let spool = try? fill(roomy, Data(repeating: 0x61, count: size), capture: 100),
+               let page = try? roomy.firstPage(outputID: spool.outputID, stream: "stdout", cap: 10) {
+                expect(page.truncated == expected && page.text.utf8.count == min(size, 10), "firstPage of \(size) bytes at cap 10: truncated \(expected)")
+            } else { expect(false, "firstPage spool of \(size) bytes") }
+        }
+
+        // hostile and unknown ids; invalid stream
+        for hostile in ["../../etc/passwd", "/", "", "not-a-uuid"] {
+            let read = failure { _ = try store.slice(outputID: hostile, stream: "stdout", offset: 0, limit: 10, binary: false) }
+            expect(read?.kind == "invalid_param" && read?.message == "output_id must be a UUID", "slice rejects id '\(hostile)': \(String(describing: read))")
+            let page = failure { _ = try store.firstPage(outputID: hostile, stream: "stdout", cap: 10) }
+            expect(page?.message == "output_id must be a UUID", "firstPage rejects id '\(hostile)'")
+            let drop = failure { try store.release(outputID: hostile) }
+            expect(drop?.kind == "invalid_param" && drop?.message == "output_id must be a UUID", "release rejects id '\(hostile)'")
+        }
+        let unknown = UUID().uuidString
+        let missing = failure { _ = try store.slice(outputID: unknown, stream: "stdout", offset: 0, limit: 10, binary: false) }
+        expect(missing?.kind == "not_found" && missing?.message == "output_id \(unknown) \(releasedText)", "an unknown UUID is released/expired/evicted: \(String(describing: missing))")
+        expect(failure { try store.release(outputID: unknown) }.map { $0.kind == "not_found" && $0.message == "output_id \(unknown) \(releasedText)" } == true, "release of an unknown UUID")
+        let badStream = failure { _ = try store.slice(outputID: r.outputID, stream: "both", offset: 0, limit: 10, binary: false) }
+        expect(badStream?.kind == "invalid_param" && badStream?.message.contains("stream") == true, "an unknown stream names the param")
+        expectEqual(FileManager.default.fileExists(atPath: parent.appendingPathComponent("etc").path), false, "nothing outside the root is created")
+
+        // stream files removed after the id check give the released text
+        if let gone = try? fill(store, Data("x".utf8)) {
+            try? FileManager.default.removeItem(at: gone.outputDir.appendingPathComponent("stdout"))
+            let result = failure { _ = try store.slice(outputID: gone.outputID, stream: "stdout", offset: 0, limit: 10, binary: false) }
+            expect(result?.kind == "not_found" && result?.message == "output_id \(gone.outputID) \(releasedText)", "a removed stream file reads as released")
+            try? store.release(outputID: gone.outputID)
+        }
+
+        // strictInt for the offset, limit and capture params
+        func strict(_ json: String, _ name: String, _ range: ClosedRange<Int>) -> String? {
+            let value = (try? JSONSerialization.jsonObject(with: Data("{\"v\":\(json)}".utf8)) as? [String: Any])?["v"]
+            do { _ = try GuestPaging.strictInt(value, name: name, range: range); return nil } catch GuestAPIError.invalidRequest(let text, _) { return text } catch { return "other" }
+        }
+        for bad in ["-1", "10.5", "1e20", "9223372036854775808", "18446744073709551621", "true", "\"5\"", "1099511627777", "1e300"] {
+            let text = strict(bad, "offset", 0 ... 1_099_511_627_776)
+            expect(text?.contains("offset") == true && text?.contains("0 to 1099511627776") == true && text?.contains("got") == true, "offset \(bad): \(text ?? "accepted")")
+        }
+        for bad in ["0", "65537", "-1", "10.5", "1e20", "9223372036854775808", "18446744073709551621", "true", "\"5\""] {
+            let text = strict(bad, "limit", 1 ... 65536)
+            expect(text?.contains("limit") == true && text?.contains("1 to 65536") == true && text?.contains("got") == true, "limit \(bad): \(text ?? "accepted")")
+        }
+        for bad in ["0", "16777217", "10.5", "18446744073709551621", "true"] {
+            let text = strict(bad, "max_capture_bytes", 1 ... 16_777_216)
+            expect(text?.contains("max_capture_bytes") == true && text?.contains("1 to 16777216") == true && text?.contains("got") == true, "max_capture_bytes \(bad): \(text ?? "accepted")")
+        }
+        expect(strict("0", "offset", 0 ... 1_099_511_627_776) == nil && strict("1099511627776", "offset", 0 ... 1_099_511_627_776) == nil, "offset bounds are accepted")
+
+        spoolLifecycle(clock: clock)
+        spoolSafety()
+    }
+
+    static func chmodTree(_ url: URL) {
+        for case let item as URL in FileManager.default.enumerator(at: url, includingPropertiesForKeys: nil) ?? NSEnumerator() { chmod(item.path, 0o700) }
+    }
+
+    static func spoolLifecycle(clock: TestClock) {
+        let (parent, root) = spoolParent()
+        defer { chmodTree(parent); try? FileManager.default.removeItem(at: parent) }
+        clock.date = Date(timeIntervalSince1970: 1_000_000)
+        var logged: [String] = []
+        let store = GuestProcessSpool(root: root, totalCap: 1000, now: { clock.date }, log: { logged.append($0) })
+        func readable(_ r: GuestProcessSpool.Reservation) -> Bool {
+            (try? store.slice(outputID: r.outputID, stream: "stdout", offset: 0, limit: 10, binary: false)) != nil
+        }
+        let blob = Data(repeating: 0x61, count: 300)
+
+        // TTL: 10 minutes from creation, then release
+        guard let old = try? fill(store, blob) else { expect(false, "spool created"); return }
+        clock.date += 599
+        expect(readable(old), "a spool is readable before the TTL")
+        clock.date += 2
+        let expired = failure { _ = try store.slice(outputID: old.outputID, stream: "stdout", offset: 0, limit: 10, binary: false) }
+        expect(expired?.kind == "not_found" && expired?.message == "output_id \(old.outputID) \(releasedText)", "an expired spool reads as released")
+        expectEqual(FileManager.default.fileExists(atPath: old.outputDir.path), false, "an expired spool is removed")
+        if let gone = try? fill(store, blob) {
+            try? store.release(outputID: gone.outputID)
+            expect(!readable(gone) && !FileManager.default.fileExists(atPath: gone.outputDir.path), "release removes the files and later reads fail")
+            expectEqual(failure { try store.release(outputID: gone.outputID) }?.kind, "not_found", "a second release is not_found")
+        }
+
+        // eviction: the oldest goes first and the newest stays; still no room is "spool full"
+        var spools: [GuestProcessSpool.Reservation] = []
+        for _ in 0 ..< 3 {
+            clock.date += 1
+            if let s = try? fill(store, blob) { spools.append(s) }
+        }
+        clock.date += 1
+        if let fourth = try? fill(store, blob) {
+            spools.append(fourth)
+            expect(!readable(spools[0]), "the oldest spool is evicted first")
+            expect(readable(spools[1]) && readable(spools[2]) && readable(spools[3]), "newer spools stay")
+        } else { expect(false, "creation past the cap evicts and succeeds") }
+        let full = failure { _ = try store.reserve(maxCaptureBytes: 600) }
+        expect(full?.kind == "unavailable" && full?.message == "spool full: release outputs with processes.output_release or repeat later", "a reservation that cannot fit is spool full: \(String(describing: full))")
+        for s in spools { try? store.release(outputID: s.outputID) }
+
+        // a spawn that has not replied is never evicted
+        if let inflight = try? store.reserve(maxCaptureBytes: 400) {
+            let blocked = failure { _ = try store.reserve(maxCaptureBytes: 200) }
+            expect(blocked?.message.hasPrefix("spool full:") == true, "an in-flight reservation is not evicted")
+            store.finish(inflight, keep: false)
+            expect((try? store.reserve(maxCaptureBytes: 200)) != nil, "a released reservation lets the creation succeed")
+        } else { expect(false, "in-flight reservation") }
+        store.sweepAll()
+
+        // two concurrent creations under a cap that forces eviction both stay readable
+        _ = try? fill(store, Data(repeating: 0x62, count: 700))
+        let lock = NSLock()
+        final class Made: @unchecked Sendable { var list: [GuestProcessSpool.Reservation] = [] }
+        let box = Made()
+        DispatchQueue.concurrentPerform(iterations: 2) { _ in
+            if let r = try? fill(store, Data("hello".utf8), capture: 200) {
+                lock.lock(); box.list.append(r); lock.unlock()
+            }
+        }
+        let made = box.list
+        expectEqual(made.count, 2, "both concurrent creations succeed")
+        expect(made.allSatisfy(readable), "both concurrent spools are readable")
+        store.sweepAll()
+
+        // failed exit paths (write error, timeout, launch failure) leave nothing and free the reservation
+        if let failed = try? store.reserve(maxCaptureBytes: 400) {
+            _ = try? store.writer(failed, stream: "stdout")
+            let again = failure { _ = try store.writer(failed, stream: "stdout") }
+            expect(again?.kind == "invalid_operation" && again?.message.hasPrefix("spool write failed: ") == true && again?.message.hasSuffix("; repeat the command") == true, "a stream write failure: \(String(describing: again))")
+            store.finish(failed, keep: false)
+            expectEqual(FileManager.default.fileExists(atPath: failed.outputDir.path), false, "a failed spawn leaves no subdir")
+            expect(!readable(failed), "a failed spawn's id is unreadable")
+            expect((try? fill(store, blob, capture: 400)) != nil, "a same-size creation succeeds after a failed one")
+        } else { expect(false, "reservation for the failure path") }
+        store.sweepAll()
+
+        // restart: a new store over the same dir removes the old subdirs
+        _ = try? fill(store, blob)
+        _ = try? fill(store, blob)
+        let restarted = GuestProcessSpool(root: root, totalCap: 1000, now: { clock.date }, log: { logged.append($0) })
+        restarted.sweepAll()
+        expectEqual((try? FileManager.default.contentsOfDirectory(atPath: root.path))?.count, 0, "the startup sweep removes old subdirs")
+
+        // an undeletable old spool does not fail a new creation
+        if let stuck = try? fill(store, blob) {
+            chmod(stuck.outputDir.path, 0o500)
+            clock.date += 601
+            expect((try? fill(store, blob)) != nil, "an undeletable expired spool does not fail a new creation")
+            chmod(stuck.outputDir.path, 0o700)
+        }
+    }
+
+    static func spoolSafety() {
+        let (parent, root) = spoolParent()
+        defer { chmodTree(parent); try? FileManager.default.removeItem(at: parent) }
+        let unsafe = "is not private (it must be a daemon-owned 0700 directory, not a symlink); remove it on the guest and repeat"
+        let target = parent.appendingPathComponent("target")
+        try? FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
+
+        // root as a symlink: creation fails, nothing is written through it
+        symlink(target.path, root.path)
+        var logged: [String] = []
+        let linked = GuestProcessSpool(root: root, log: { logged.append($0) })
+        let viaLink = failure { _ = try linked.reserve(maxCaptureBytes: 10) }
+        expect(viaLink?.kind == "invalid_operation" && viaLink?.message == "spool directory \(root.path) \(unsafe)", "a symlink root is refused: \(String(describing: viaLink))")
+        expectEqual((try? FileManager.default.contentsOfDirectory(atPath: target.path))?.count, 0, "nothing is written through the symlink")
+
+        // a fresh store (restart) over a root symlinked to a dir holding a subdir leaves it
+        let kept = target.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: kept, withIntermediateDirectories: true)
+        GuestProcessSpool(root: root, log: { logged.append($0) }).sweepAll()
+        expect(FileManager.default.fileExists(atPath: kept.path), "the startup sweep leaves a symlinked root's target alone")
+        expect(!logged.isEmpty, "the refused sweep is logged")
+        unlink(root.path)
+
+        // a pre-created 0777 root is refused and stays empty
+        try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        chmod(root.path, 0o777)
+        let loose = failure { _ = try GuestProcessSpool(root: root, log: { _ in }).reserve(maxCaptureBytes: 10) }
+        expect(loose?.kind == "invalid_operation" && loose?.message == "spool directory \(root.path) \(unsafe)", "a 0777 root is refused: \(String(describing: loose))")
+        expectEqual((try? FileManager.default.contentsOfDirectory(atPath: root.path))?.count, 0, "the 0777 root stays empty")
+        try? FileManager.default.removeItem(at: root)
+
+        // the root replaced by a symlink after a spool exists: release, TTL sweep and reserve leave the target intact
+        let clock = TestClock()
+        let store = GuestProcessSpool(root: root, totalCap: 1000, now: { clock.date }, log: { logged.append($0) })
+        guard let a = try? fill(store, Data("a".utf8)), let b = try? fill(store, Data("b".utf8)) else { expect(false, "spools created"); return }
+        try? FileManager.default.moveItem(at: root, to: parent.appendingPathComponent("moved"))
+        symlink(target.path, root.path)
+        let planted = [a, b].map { target.appendingPathComponent($0.outputID) }
+        for dir in planted { try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true) }
+        try? store.release(outputID: a.outputID)
+        clock.date += 601
+        _ = try? store.reserve(maxCaptureBytes: 10)
+        expect(planted.allSatisfy { FileManager.default.fileExists(atPath: $0.path) }, "release, TTL sweep and reserve leave the symlink target intact")
     }
 
     // MARK: - Setup Assistant
@@ -618,21 +1121,33 @@ enum LogicTests {
     }
 
     static func methodDispatch() {
+        methodDispatchBody()
+        rpcErrorEnvelope()
+        inBandFailures()
+    }
+
+    static func methodDispatchBody() {
         let area = GuestMethodArea.make(FixtureMethod.self) { _, params in params }
-        func run(_ method: String, _ params: [String: Any]) -> (result: [String: Any]?, error: String?, code: String?) {
-            do { return (try area.execute(method, params), nil, nil) } catch let error as GuestAPIError {
-                return (nil, String(describing: error), error.code)
-            } catch { return (nil, "\(error)", nil) }
+        func run(_ method: String, _ params: [String: Any]) -> (result: [String: Any]?, error: String?, code: String?, hint: String?) {
+            do { return (try area.execute(method, params), nil, nil, nil) } catch let error as GuestAPIError {
+                return (nil, String(describing: error), error.code, error.hint)
+            } catch { return (nil, "\(error)", nil, nil) }
         }
 
         expect(run("other", [:]).result == nil && run("other", [:]).error == nil, "an unknown name is not this area's")
-        expectEqual(json(run("fixture.echo", ["a": "x", "b": 1, "z": 9]).result), json(["a": "x", "b": 1]), "undeclared keys are dropped")
-        expectEqual(json(run("fixture.echo", ["z": 9]).result), "{}", "no declared key leaves nothing")
+        let extra = run("fixture.echo", ["a": "x", "b": 1, "z": 9])
+        expectEqual(extra.result == nil, true, "an undeclared key fails the call")
+        expectEqual(extra.code ?? "", "invalid_param")
+        expectEqual(extra.error ?? "", "Unknown param: z")
+        expectEqual(extra.hint ?? "", "Did you mean `a`? Valid params: a, b")
+        expectEqual(json(run("fixture.echo", ["a": "x", "b": 1]).result), json(["a": "x", "b": 1]), "declared keys pass")
+        expectEqual(run("fixture.echo", ["z": 9]).error ?? "", "Unknown param: z", "no declared key still fails on the extra")
 
         let refusal = "Pass force: true to act on x"
         let refused = run("fixture.always", ["a": "x"])
         expectEqual(refused.error ?? "", refusal)
-        expectEqual(refused.code ?? "", "invalid_operation")
+        expectEqual(refused.code ?? "", "force_required")
+        expectEqual(refused.hint ?? "", "Confirm with the user, then repeat the call with force: true")
         expectEqual(run("fixture.always", ["a": "x", "force": false]).error ?? "", refusal)
         expectEqual(run("fixture.always", ["a": "x", "force": "yes"]).error ?? "", refusal)
         expectEqual(json(run("fixture.always", ["a": "x", "force": true]).result), json(["a": "x"]), "force: true admits")
@@ -672,7 +1187,11 @@ enum LogicTests {
 
         // catalog and dispatcher agree
         let listed = (catalog["methods"] as? [[String: Any]] ?? []).compactMap { $0["name"] as? String }
-        let dispatched = FixtureMethod.allCases.map(\.rawValue).filter { (try? area.execute($0, ["a": "x", "force": true])) != nil }
+        let dispatched = FixtureMethod.allCases.map(\.rawValue).filter { name in
+            var params: [String: Any] = ["force": true]
+            for declared in FixtureMethod(rawValue: name)?.spec.params ?? [] { params[declared.name] = "x" }
+            return (try? area.execute(name, params)) != nil
+        }
         expectEqual(listed, dispatched, "catalog names equal dispatched names")
         expectEqual(Set(listed).count, listed.count, "catalog names are unique")
 
@@ -697,16 +1216,344 @@ enum LogicTests {
             GuestMethodArea.make(FixtureMethod.self) { _, params in params },
         ]
         func call(_ params: [String: Any]) -> [String: Any]? {
-            try? GuestMethodArea.dispatch(table, method: "methods.list", params: params)
+            try? GuestMethodArea.dispatch(table, method: "methods.list", params: params, observer: { nil })
         }
         let answer = call([:])
         let names = (answer?["methods"] as? [[String: Any]] ?? []).compactMap { $0["name"] as? String }
         expect(names.contains("methods.list") && names.contains("fixture.echo"), "methods.list lists itself and the other areas")
-        expectEqual(json(call(["x": 1])), json(answer), "methods.list ignores params")
+        expectEqual(call(["x": 1]) == nil, true, "methods.list takes no params")
         expectEqual(json(call([:])), json(answer), "two calls are byte-identical")
         expect(json(answer).utf8.count < 1 << 20, "the answer is far below the 1 MiB body limit")
+        // every param methods.list describes is admitted by the unknown-param check
+        for entry in answer?["methods"] as? [[String: Any]] ?? [] {
+            guard let name = entry["name"] as? String, name.hasPrefix("fixture.") else { continue }
+            var all: [String: Any] = ["force": true]
+            for param in entry["params"] as? [[String: Any]] ?? [] { all[param["name"] as? String ?? ""] = "x" }
+            var rejected = false
+            do { _ = try GuestMethodArea.dispatch(table, method: name, params: all, observer: { nil }) } catch { rejected = String(describing: error).hasPrefix("Unknown param") }
+            expect(!rejected, "\(name): every listed param is admitted")
+        }
         var unknown = ""
-        do { _ = try GuestMethodArea.dispatch(table, method: "nope.nothing", params: [:]) } catch { unknown = String(describing: error) }
+        do { _ = try GuestMethodArea.dispatch(table, method: "nope.nothing", params: [:], observer: { nil }) } catch { unknown = String(describing: error) }
         expectEqual(unknown, "Unknown method: nope.nothing", "no area answering is an unknown method")
+    }
+
+    // MARK: RPC error envelope
+
+    /// The wire body of one failure as JSON text, as APIWire.execute sends it (it uses `GuestAPIError.wireBody`).
+    static func wire(_ error: GuestAPIError) -> [String: Any] {
+        let data = try! JSONSerialization.data(withJSONObject: error.wireBody, options: [.sortedKeys])
+        return try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+    }
+
+    /// inBandFailure turns a producer's error map into the thrown error the caller's closure builds, and passes a clean result through.
+    /// Which code each of the three handlers picks is not asserted here: they need a guest.
+    static func inBandFailures() {
+        var thrown: GuestAPIError?
+        var returned: [String: Any]?
+        do { returned = try GuestAPIError.inBandFailure(["entries": [Any](), "error": "no io registry"], as: { .operationFailed($0) }) }
+        catch let error as GuestAPIError { thrown = error } catch {}
+        expect(returned == nil, "no success body")
+        let body = thrown.map(wire) ?? [:]
+        expectEqual(body["code"] as? String ?? "", "invalid_operation")
+        expectEqual(body["message"] as? String ?? "", "no io registry")
+        expect(body["hint"] == nil, "no hint key")
+        let ok = try? GuestAPIError.inBandFailure(["enabled": true, "ok": true], as: { .operationFailed($0) })
+        expect(ok?["enabled"] as? Bool == true, "a result without an error key passes through")
+    }
+
+    static func rpcErrorEnvelope() {
+        // Wire: code, message, hint; the hint key is absent (not null) without one.
+        let withHint = wire(.notFound("No such file", hint: "List the directory first"))
+        expectEqual(withHint["code"] as? String ?? "", "not_found")
+        expectEqual(withHint["message"] as? String ?? "", "No such file")
+        expectEqual(withHint["hint"] as? String ?? "", "List the directory first")
+        // Each constructor maps to one code; none carries a hint key without one.
+        let codes: [(GuestAPIError, String)] = [
+            (.notFound("x"), "not_found"), (.unavailable("x"), "unavailable"), (.permission("x"), "permission"),
+            (.forceRequired("x"), "force_required"), (.invalidRequest("x"), "invalid_param"),
+            (.operationFailed("x"), "invalid_operation"), (.unsupportedMethod("x"), "not_found"),
+            (.locationServicesOff, "location_services_off"), (.alreadyDone(code: "already_done", message: "x"), "already_done"),
+        ]
+        for (error, code) in codes {
+            let body = wire(error)
+            expectEqual(body["code"] as? String ?? "", code, "code of \(error.code)")
+            expect(body["hint"] == nil, "no hint key on \(error.code)")
+            expect(!json(body).contains("hint"), "no hint text on \(error.code)")
+        }
+
+        enum Wide: String, GuestMethod {
+            case wide = "wide.call"
+            case none = "wide.none"
+            var spec: MethodSpec {
+                switch self {
+                case .wide: MethodSpec(.optional("alpha", .string, "alpha"), .optional("beta", .string, "beta"), .optional("gamma", .string, "gamma"), summary: "fixture")
+                case .none: MethodSpec(summary: "fixture")
+                }
+            }
+        }
+        let area = GuestMethodArea.make(Wide.self) { _, params in params }
+        func failure(_ method: String, _ params: [String: Any]) -> [String: Any] {
+            do { _ = try area.execute(method, params) } catch let error as GuestAPIError { return wire(error) } catch {}
+            return [:]
+        }
+
+        // Unknown params
+        var body = failure("wide.call", ["alpa": 1])
+        expectEqual(body["code"] as? String ?? "", "invalid_param")
+        expectEqual(body["message"] as? String ?? "", "Unknown param: alpa")
+        expectEqual(body["hint"] as? String ?? "", "Did you mean `alpha`? Valid params: alpha, beta, gamma")
+        body = failure("wide.call", ["zzzzzzzz": 1])
+        expectEqual(body["hint"] as? String ?? "", "Valid params: alpha, beta, gamma", "no near param, no suggestion")
+        body = failure("wide.call", ["zeta": 1, "alpa": 1])
+        expectEqual(body["message"] as? String ?? "", "Unknown param: alpa, zeta", "two extras are sorted")
+        expectEqual(body["hint"] as? String ?? "", "Did you mean `alpha`? Valid params: alpha, beta, gamma", "the first sorted extra drives the suggestion")
+        body = failure("wide.none", ["a": 1])
+        expectEqual(body["message"] as? String ?? "", "Unknown param: a")
+        expectEqual(body["hint"] as? String ?? "", "This method takes no params")
+        expectEqual(failure("wide.call", ["alpha": 1, "force": true]).isEmpty, true, "force is always admitted")
+
+        // 5 extras list all, 6 add " and 1 more"; 1000 extras stay bounded
+        func extras(_ n: Int) -> [String: Any] { Dictionary(uniqueKeysWithValues: (0 ..< n).map { (String(format: "k%04d", $0), 1) }) }
+        expectEqual(failure("wide.call", extras(5))["message"] as? String ?? "", "Unknown param: k0000, k0001, k0002, k0003, k0004")
+        expectEqual(failure("wide.call", extras(6))["message"] as? String ?? "", "Unknown param: k0000, k0001, k0002, k0003, k0004 and 1 more")
+        body = failure("wide.call", extras(1000))
+        expectEqual(body["message"] as? String ?? "", "Unknown param: k0000, k0001, k0002, k0003, k0004 and 995 more")
+        expect((body["message"] as? String ?? "").count < 500, "1000 extras: bounded message")
+
+        // closest: bounds and ties
+        let sixtyFour = String(repeating: "a", count: 64)
+        let sixtyFive = String(repeating: "a", count: 65)
+        expectEqual(GuestAPIError.closest(sixtyFour, [sixtyFour + "bb"]) ?? "", sixtyFour + "bb", "a 64-character name is matched")
+        expect(GuestAPIError.closest(sixtyFive, [sixtyFive]) == nil, "a 65-character name is not")
+        expect(GuestAPIError.closest(String(repeating: "a", count: 10_000), ["a"]) == nil, "a 10,000-character name is not")
+        expectEqual(GuestAPIError.closest("cat", ["cap", "car"]) ?? "", "cap", "equidistant: the first candidate wins")
+        expectEqual(GuestAPIError.closest("cat", ["car", "cap"]) ?? "", "car", "equidistant: order decides")
+        expectEqual(GuestAPIError.closest("abcdef", ["abcdxx"]) ?? "", "abcdxx", "distance 2 is within the bound")
+        expect(GuestAPIError.closest("abcdef", ["abcxxx"]) == nil, "distance 3 over a 6-character name is out")
+        expectEqual(GuestAPIError.closest("abcdefghi", ["abcdefxxx"]) ?? "", "abcdefxxx", "9 characters allow distance 3")
+        expect(GuestAPIError.closest("x", ["abc"]) == nil, "nothing near")
+
+        // Unknown method: hint only with a near method
+        func unknownMethod(_ name: String) -> [String: Any] {
+            do { _ = try GuestMethodArea.dispatch([area], method: name, params: [:], observer: { nil }) } catch let error as GuestAPIError { return wire(error) } catch {}
+            return [:]
+        }
+        body = unknownMethod("wide.cal")
+        expectEqual(body["code"] as? String ?? "", "not_found")
+        expectEqual(body["message"] as? String ?? "", "Unknown method: wide.cal")
+        expectEqual(body["hint"] as? String ?? "", "Did you mean `wide.call`?")
+        expect(unknownMethod("nothing.like.it")["hint"] == nil, "no near method: no hint key")
+        body = unknownMethod(String(repeating: "m", count: 10_000))
+        expect(body["hint"] == nil, "no Did you mean for a 10,000-character name")
+        expect((body["message"] as? String ?? "").count < 500, "a 10,000-character name keeps the message under 500 characters")
+        expectEqual(body["message"] as? String ?? "", "Unknown method: " + String(repeating: "m", count: 64) + "…", "the name is cut at 64 characters")
+        expectEqual(unknownMethod(String(repeating: "m", count: 64))["message"] as? String ?? "", "Unknown method: " + String(repeating: "m", count: 64), "a 64-character name is shown whole")
+        expectEqual(unknownMethod("wide.nonf")["hint"] as? String ?? "", "Did you mean `wide.none`?")
+
+        errnoClassification()
+    }
+
+    /// `fromErrno` is the one reclassification helper the handlers share (kill, posix_spawn, shutdown);
+    /// the handlers themselves need a guest, so the mapping is proven here.
+    static func errnoClassification() {
+        let cases: [(errno: Int32, code: String)] = [
+            (ENOENT, "not_found"), (ESRCH, "not_found"), (EACCES, "permission"), (EPERM, "permission"),
+            (EIO, "invalid_operation"), (EINVAL, "invalid_operation"), (0, "invalid_operation"),
+        ]
+        for c in cases {
+            let body = wire(GuestAPIError.fromErrno(c.errno, "boom \(c.errno)"))
+            expectEqual(body["code"] as? String ?? "", c.code, "errno \(c.errno)")
+            expectEqual(body["message"] as? String ?? "", "boom \(c.errno)", "errno \(c.errno) keeps the message")
+            expect(body["hint"] == nil, "errno \(c.errno): no hint key")
+        }
+    }
+
+    // MARK: Observe wrapper
+
+    enum ObserveFixture: String, GuestMethod {
+        case tap = "input.tap"
+        case key = "input.key"
+        var spec: MethodSpec { MethodSpec(summary: "fixture") }
+    }
+
+    enum CatalogFixture: String, GuestMethod, CaseIterable {
+        case button = "input.button", doubleTap = "input.double_tap", drag = "input.drag", hid = "input.hid"
+        case key = "input.key", longPress = "input.long_press", paste = "input.paste", pointer = "input.pointer"
+        case scroll = "input.scroll", swipe = "input.swipe", tap = "input.tap", touch = "input.touch"
+        case touch2 = "input.touch2", touchSequence = "input.touch_sequence", type = "input.type"
+        case other = "ui.tree"
+        var spec: MethodSpec { MethodSpec(summary: "fixture", result: [.required("x", .number)]) }
+    }
+
+    /// `methods.list` declares observe, observe_delay_ms and observed once, on every input.* name.
+    static func observeCatalog() {
+        let catalog = GuestMethodArea.catalog([GuestMethodArea.make(CatalogFixture.self) { _, _ in [:] }])
+        let methods = catalog["methods"] as? [[String: Any]] ?? []
+        let inputs = methods.filter { ($0["name"] as? String)?.hasPrefix("input.") == true }
+        expectEqual(inputs.count, 15, "the catalog lists 15 input.* methods")
+        for method in methods {
+            let name = method["name"] as? String ?? ""
+            let params = method["params"] as? [[String: Any]] ?? []
+            let result = method["result"] as? [[String: Any]] ?? []
+            let observe = params.first { $0["name"] as? String == "observe" }
+            let delay = params.first { $0["name"] as? String == "observe_delay_ms" }
+            let observed = result.first { $0["name"] as? String == "observed" }
+            if name.hasPrefix("input.") {
+                expectEqual(observe?["type"] as? String, "boolean", "\(name): observe is boolean")
+                expectEqual(observe?["required"] as? Bool, false, "\(name): observe is optional")
+                expectEqual(observe?["default"] as? Bool, false, "\(name): observe defaults to false")
+                expectEqual(delay?["type"] as? String, "integer", "\(name): observe_delay_ms is integer")
+                expectEqual(delay?["required"] as? Bool, false, "\(name): observe_delay_ms is optional")
+                expectEqual(delay?["default"] as? Int, 300, "\(name): delay defaults to 300")
+                expectEqual(delay?["minimum"] as? Double, 0, "\(name): delay minimum")
+                expectEqual(delay?["maximum"] as? Double, 5000, "\(name): delay maximum")
+                for param in [observe, delay] {
+                    expect((param?["description"] as? String ?? "").count <= 120, "\(name): description is at most 120 chars")
+                    expect(!(param?["description"] as? String ?? "").isEmpty, "\(name): description is set")
+                }
+                expectEqual(observed?["type"] as? String, "object", "\(name): observed is an object")
+                expectEqual(observed?["required"] as? Bool, false, "\(name): observed is optional")
+                expectEqual(result.count, 2, "\(name): observed is added once")
+                expectEqual(params.count, 2, "\(name): both params added once")
+            } else {
+                expect(observe == nil && delay == nil && observed == nil, "\(name): non-input methods are unchanged")
+            }
+        }
+    }
+
+    static func observeWrapper() {
+        nonisolated(unsafe) var actions = 0
+        let area = GuestMethodArea.make(ObserveFixture.self) { method, _ in
+            actions += 1
+            if method == .key { throw GuestAPIError.invalidRequest("unknown key") }
+            return ["x": 1, "y": 2]
+        }
+        let seen: [String: Any] = ["bundle_id": "com.apple.Preferences", "verified": true]
+        let treeOf: (Int) -> () throws -> [String: Any] = { count in { ["count": count] } }
+        struct Down: Error, CustomStringConvertible { var description: String { "down" } }
+        func dispatch(_ method: String, _ params: [String: Any],
+                      frontmost: @escaping () throws -> [String: Any] = { ["bundle_id": "com.apple.Preferences", "verified": true] },
+                      tree: @escaping () throws -> [String: Any] = { ["count": 7] }) -> (result: [String: Any]?, error: String?) {
+            do {
+                let result = try GuestMethodArea.dispatch([area], method: method, params: params) {
+                    try GuestMethodArea.observation(frontmost: frontmost, tree: tree)
+                }
+                return (result, nil)
+            } catch { return (nil, String(describing: error)) }
+        }
+
+        // pass-through
+        actions = 0
+        expectEqual(json(dispatch("input.tap", [:]).result), json(["x": 1, "y": 2]), "absent observe returns the action reply")
+        expectEqual(json(dispatch("input.tap", ["observe": false]).result), json(["x": 1, "y": 2]), "observe false returns the action reply")
+        expectEqual(json(dispatch("input.tap", ["observe_delay_ms": 0]).result), json(["x": 1, "y": 2]), "a valid delay without observe adds nothing")
+
+        // validation: the action does not run
+        let delayMessage = "observe_delay_ms must be an integer from 0 to 5000"
+        let observeMessage = "observe must be a boolean"
+        actions = 0
+        for bad: Any in [-1, 5001, 1.5, "300", true] {
+            for observe: Bool? in [nil, true] {
+                var params: [String: Any] = ["observe_delay_ms": bad]
+                if let observe { params["observe"] = observe }
+                expectEqual(dispatch("input.tap", params).error ?? "", delayMessage, "delay \(bad) observe \(String(describing: observe))")
+            }
+        }
+        expectEqual(dispatch("input.tap", ["observe": "yes"]).error ?? "", observeMessage, "observe: \"yes\"")
+        expectEqual(dispatch("input.tap", ["observe": 1]).error ?? "", observeMessage, "observe: 1")
+        expectEqual(dispatch("input.tap", ["observe": "yes", "observe_delay_ms": 5001]).error ?? "", observeMessage, "observe is checked before observe_delay_ms")
+        expectEqual(actions, 0, "an invalid observe request does not run the action")
+
+        // delay bounds
+        let defaultStart = Date()
+        let replyDefault = dispatch("input.tap", ["observe": true])
+        expect(replyDefault.error == nil && replyDefault.result?["observed"] != nil, "the default delay succeeds")
+        expect(Date().timeIntervalSince(defaultStart) >= 0.3, "an absent observe_delay_ms waits the 300 ms default")
+        let start = Date()
+        let reply5000 = dispatch("input.tap", ["observe": true, "observe_delay_ms": 5000])
+        expect(reply5000.error == nil && reply5000.result?["observed"] != nil, "delay 5000 succeeds")
+        expect(Date().timeIntervalSince(start) >= 5, "delay 5000 waits 5 seconds")
+
+        // observed shape
+        let ok = dispatch("input.tap", ["observe": true, "observe_delay_ms": 0]).result
+        expectEqual(json(ok?["observed"] as? [String: Any]), json(["frontmost_bundle_id": "com.apple.Preferences", "frontmost_verified": true, "ui_element_count": 7]), "observed shape")
+        expectEqual(ok?["x"] as? Int ?? 0, 1, "action keys stay")
+
+        // failed action: same error, no observed
+        let failed = dispatch("input.key", ["observe": true, "observe_delay_ms": 0])
+        expectEqual(failed.error ?? "", "unknown key", "a throwing action keeps its error")
+        expect(failed.result == nil, "a throwing action has no reply")
+
+        // failed observe: action keys plus observed.observe_error only
+        let observeKeys = ["frontmost_bundle_id", "frontmost_verified", "ui_element_count"]
+        func failedObserve(_ name: String, frontmost: @escaping () throws -> [String: Any], tree: @escaping () throws -> [String: Any]) {
+            let reply = dispatch("input.tap", ["observe": true, "observe_delay_ms": 0], frontmost: frontmost, tree: tree)
+            let observed = reply.result?["observed"] as? [String: Any]
+            expect(reply.error == nil && reply.result?["x"] as? Int == 1, "\(name): the action succeeds")
+            expect(observed?["observe_error"] as? String != nil, "\(name): observed.observe_error is set")
+            expect(observeKeys.allSatisfy { observed?[$0] == nil }, "\(name): no partial fields")
+        }
+        failedObserve("frontmost throws", frontmost: { throw Down() }, tree: treeOf(7))
+        failedObserve("frontmost empty", frontmost: { [:] }, tree: treeOf(7))
+        failedObserve("bundle id empty", frontmost: { ["bundle_id": "", "verified": true] }, tree: treeOf(7))
+        failedObserve("bundle id not a string", frontmost: { ["bundle_id": 5, "verified": true] }, tree: treeOf(7))
+        failedObserve("tree throws", frontmost: { seen }, tree: { throw Down() })
+        failedObserve("tree reply carries error", frontmost: { seen }, tree: { ["error": "no ui stack", "count": 3] })
+        failedObserve("tree reply has no count", frontmost: { seen }, tree: { [:] })
+        let treeError = dispatch("input.tap", ["observe": true, "observe_delay_ms": 0], tree: { ["error": "no ui stack"] }).result?["observed"] as? [String: Any]
+        expectEqual(treeError?["observe_error"] as? String, "no ui stack", "the ui.tree error message is observed.observe_error")
+        let nilObserver = try? GuestMethodArea.dispatch([area], method: "input.tap", params: ["observe": true, "observe_delay_ms": 0]) { nil }
+        expect(nilObserver?["observed"] is [String: Any] && (nilObserver?["observed"] as? [String: Any])?["observe_error"] != nil, "a nil observer result is observed.observe_error")
+
+        // verified false passes through; the count is capped at 500
+        let unverified = dispatch("input.tap", ["observe": true, "observe_delay_ms": 0], frontmost: { ["bundle_id": "com.apple.Preferences", "verified": false] }).result
+        expectEqual((unverified?["observed"] as? [String: Any])?["frontmost_verified"] as? Bool, false, "verified false is reported")
+        let capped = dispatch("input.tap", ["observe": true, "observe_delay_ms": 0], tree: treeOf(501)).result
+        expectEqual((capped?["observed"] as? [String: Any])?["ui_element_count"] as? Int, 500, "501 elements report 500")
+
+        // the sleep holds no lock: a plain call finishes while an observe call sleeps
+        nonisolated(unsafe) let sleeping = dispatch
+        let sleeper = Thread {
+            _ = sleeping("input.tap", ["observe": true, "observe_delay_ms": 1500], { ["bundle_id": "a", "verified": true] }, { ["count": 1] })
+        }
+        sleeper.start()
+        Thread.sleep(forTimeInterval: 0.2)
+        let plainStart = Date()
+        _ = dispatch("input.tap", [:])
+        expect(Date().timeIntervalSince(plainStart) < 0.5, "a plain call finishes while an observe call sleeps")
+        while !sleeper.isFinished { Thread.sleep(forTimeInterval: 0.05) }
+    }
+
+    enum DeclaredFixture: String, GuestMethod {
+        case tap = "input.tap"
+        var spec: MethodSpec { MethodSpec(.required("x", .number, "x"), .required("y", .number, "y"), summary: "fixture") }
+    }
+
+    /// observe through the real dispatch and the real unknown-param check of a `make`-built area with declared params.
+    static func observeUnknownParams() {
+        nonisolated(unsafe) var seen: [String: Any] = [:]
+        let area = GuestMethodArea.make(DeclaredFixture.self) { _, params in
+            seen = params
+            return ["x": params["x"] ?? 0, "y": params["y"] ?? 0]
+        }
+        func call(_ params: [String: Any]) -> (result: [String: Any]?, error: [String: Any]) {
+            do {
+                let result = try GuestMethodArea.dispatch([area], method: "input.tap", params: params) {
+                    ["frontmost_bundle_id": "a", "frontmost_verified": true, "ui_element_count": 1]
+                }
+                return (result, [:])
+            } catch let error as GuestAPIError { return (nil, wire(error)) } catch { return (nil, ["message": "\(error)"]) }
+        }
+        let ok = call(["x": 1, "y": 2, "observe": true, "observe_delay_ms": 0])
+        expect(ok.error.isEmpty, "observe is accepted on a declared input.* method: \(ok.error)")
+        expectEqual((ok.result?["observed"] as? [String: Any])?["ui_element_count"] as? Int, 1, "observed is added")
+        expectEqual(seen.keys.sorted(), ["x", "y"], "the handler never sees the observe params")
+        let bogus = call(["x": 1, "y": 2, "observe": true, "bogus": 1])
+        expectEqual(bogus.error["code"] as? String ?? "", "invalid_param", "a bogus param is invalid_param")
+        expectEqual(bogus.error["message"] as? String ?? "", "Unknown param: bogus", "a bogus param is still rejected")
+        let range = call(["x": 1, "y": 2, "observe": true, "observe_delay_ms": 5001])
+        expectEqual(range.error["code"] as? String ?? "", "invalid_param", "observe_delay_ms 5001 is invalid_param")
+        expectEqual(range.error["message"] as? String ?? "", "observe_delay_ms must be an integer from 0 to 5000")
     }
 }

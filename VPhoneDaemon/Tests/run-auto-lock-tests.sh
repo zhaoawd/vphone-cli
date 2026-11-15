@@ -15,7 +15,7 @@ trap '/bin/rm -rf "$temporary"' EXIT
 /usr/bin/xcrun --sdk macosx swiftc -swift-version 6 -parse-as-library \
     -module-cache-path "$temporary/module-cache" -I "$temporary" -L "$temporary" \
     -lIcliKit -Xlinker -rpath -Xlinker "$temporary" \
-    "$daemon/Daemon/GuestMethodSpec.swift" \
+    "$daemon/Daemon/GuestMethodSpec.swift" "$daemon/Daemon/GuestPaging.swift" \
     "${VPHONE_AUTO_LOCK_METHODS:-$daemon/Daemon/GuestAPIDeviceMethods.swift}" \
     "$daemon/Daemon/GuestLockScreenIdle.swift" \
     "$daemon/Daemon/GuestAPI+AutoLock.swift" \

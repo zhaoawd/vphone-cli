@@ -18,11 +18,18 @@
 #   VPHONE_LIVE_TIMEOUT positive integer seconds per schema-comparison call (default 30); anything else -> exit 2
 # Schema comparison: every catalog row classed `read` is called serially with no params (no retry, 1048576-byte
 #   reply cap) and its reply's top-level keys and JSON types are compared to the row's result column.
+#   display.external.diagnostics and display.external.status also pass on a well-formed error with code
+#   invalid_operation and unavailable respectively (a guest with no external display).
 #   `mutating` and `excluded:<reason>` rows are never called. Prints `PASS <method>` or `FAIL <method>: <reason>`;
 #   only keys, types and escaped error codes are printed, never reply values, and no reply is written to a file.
 #   Three consecutive timeout/transport/unparsable failures print `FAIL guest unresponsive` and stop the run.
 # Test seam (no VM): VPHONE_LIVE_BASE_URL (e.g. http://127.0.0.1:9), VPHONE_LIVE_TOKEN and optionally
-#   VPHONE_LIVE_CATALOG run only the schema comparison against that server (run-methods-live-stub-tests.sh).
+#   VPHONE_LIVE_CATALOG run only the schema comparison against that server (run-methods-live-stub-tests.sh);
+#   with VPHONE_LIVE_UNFORCED_CHECK=1 they run one unforced system.reboot refusal check instead.
+# Unforced calls to force methods: a guest-closed reply (HTTP 000, or the proxy's 502 `guest_closed`) is retried
+#   once and prints `RETRY <method> <params>: guest closed without a reply`; a second one halts with LEAK.
+# Input observe (checks numbered 9): unlocks the guest, launches Settings (apps.launch), taps its status bar in
+#   Settings, presses a letter key and the home button.
 # Output: `PASS <check>` or `FAIL <check>: expected <x> got <y>` per check, then
 #   live: <n> checks, <f> failures
 #   TOTAL_FAILS=<f>
@@ -110,6 +117,10 @@ schema_section() {
       case $out in
         PASS) echo "PASS $m"; sp=$((sp+1)); consec=0 ;;
         FAIL\ *) schema_fail "$m" "${out#FAIL }" 0 ;;
+        "ERR invalid_operation") if [ "$m" = display.external.diagnostics ]; then echo "PASS $m"; sp=$((sp+1)); consec=0
+          else schema_fail "$m" "error invalid_operation" 0; fi ;;
+        "ERR unavailable") if [ "$m" = display.external.status ]; then echo "PASS $m"; sp=$((sp+1)); consec=0
+          else schema_fail "$m" "error unavailable" 0; fi ;;
         ERR\ *) schema_fail "$m" "error ${out#ERR }" 0 ;;
         *) schema_fail "$m" "unparsable reply" 1 ;;
       esac
@@ -219,7 +230,8 @@ k=$(print -r -- "$r1" | J -r "$L | map(select(.name==\"services.kickstart\")) | 
 [ "$f" = "$n_forces" ] && chk "2 $n_forces force methods" ok || chk "2 $n_forces force methods" bad "$n_forces" "$f"
 [ "$k" = when:kill ] && chk "2 kickstart when:kill" ok || chk "2 kickstart when:kill" bad when:kill "$k"
 r2=$(rpc '{"method":"methods.list","params":{"x":1}}')
-[ -n "$r1" ] && [ "$r1" = "$r2" ] && chk "2 params ignored (byte-identical)" ok || chk "2 params ignored (byte-identical)" bad "identical non-empty replies" "differ or empty"
+{ print -r -- "$r2" | grep -qF '"invalid_param"' && strs "$r2" | grep -qxF 'Unknown param: x' && strs "$r2" | grep -qxF 'This method takes no params'; } \
+  && chk "2 undeclared param rejected" ok || chk "2 undeclared param rejected" bad "invalid_param, Unknown param: x, This method takes no params" "$r2"
 r3=$(rpc '{"method":"methods.list"}')
 [ -n "$r1" ] && [ "$r1" = "$r3" ] && chk "2 twice byte-identical" ok || chk "2 twice byte-identical" bad "identical non-empty replies" "differ or empty"
 
@@ -240,21 +252,169 @@ else chk "4 auth parity (4xx refusal equal to processes.list's)" bad "401/403 eq
 if ps -ww -axo args | VPHONE_API_TOKEN=$token awk 'index($0, ENVIRON["VPHONE_API_TOKEN"]) { f = 1 } END { exit f }'; then chk "5 token not in argv" ok
 else chk "5 token not in argv" bad "token absent from ps args" "token found"; fi
 
-# --- undeclared keys are dropped on a real method ---------------------------
-# The filter is a substring match, so transient launchd-named helpers come and go between the two calls; compare launchd itself.
-pn() { print -r -- "$1" | J -c '[.. | objects | select(has("processes")) | .processes[] | .name? | select(. == "launchd")] | sort'; }
-p1=$(pn "$(rpc '{"method":"processes.list","params":{"filter":"launchd"}}')")
-p2=$(pn "$(rpc '{"method":"processes.list","params":{"filter":"launchd","extra":1}}')")
-if [ -n "$p1" ] && [ "$p1" != "[]" ] && [ "$p1" = "$p2" ]; then chk "6 processes.list extra key dropped" ok
-else chk "6 processes.list extra key dropped" bad "same non-empty names" "plain=$p1 extra=$p2"; fi
+# --- an undeclared key fails a real method ----------------------------------
+r=$(rpc '{"method":"processes.list","params":{"filter":"launchd","extra":1}}')
+{ print -r -- "$r" | grep -qF '"invalid_param"' && strs "$r" | grep -qxF 'Unknown param: extra' && strs "$r" | grep -qF 'Valid params:'; } \
+  && chk "6 processes.list extra key rejected" ok || chk "6 processes.list extra key rejected" bad "invalid_param, Unknown param: extra, Valid params" "$r"
 
-# --- the 20 force methods: refused unforced, a required param is validated before the force refusal
-# A reply to an unforced destructive call without `Pass force` means it may have run: stop at once.
+# --- bounded replies: processes.list pages (sorted by pid), processes.spawn cuts its output ---------
+pg1=$(rpc '{"method":"processes.list","params":{"limit":5}}')
+cur=$(print -r -- "$pg1" | J -r '[.. | objects | select(has("next_cursor")) | .next_cursor][0] // empty')
+pg2=$(rpc "{\"method\":\"processes.list\",\"params\":{\"limit\":5,\"cursor\":\"$cur\"}}")
+first=$(print -r -- "$pg1" | J -c '[.. | objects | select(has("processes")) | {n: (.processes | length), t: .truncated, hi: ([.processes[].pid] | max)}][0]')
+second=$(print -r -- "$pg2" | J -c '[.. | objects | select(has("processes")) | {n: (.processes | length), lo: ([.processes[].pid] | min)}][0]')
+if [ -n "$cur" ] && [ "$(print -r -- "$first" | J '.n == 5 and .t == true')" = true ] && [ "$(print -r -- "$second" | J '.n == 5')" = true ] \
+   && [ "$(jq -n --argjson a "${first:-null}" --argjson b "${second:-null}" '$b.lo > $a.hi' 2>/dev/null || true)" = true ]; then chk "7 processes.list pages by pid" ok
+else chk "7 processes.list pages by pid" bad "two pages of 5, the second after the first" "cursor='$cur' first=$first second=$second"; fi
+# rf <reply> <jq path in the result object>: one field of the first reply object holding stdout_total.
+rf() { print -r -- "$1" | J -r "[.. | objects | select(has(\"stdout_total\"))][0] | $2"; }
+# The guest has no launchctl or log binary; ps is the allowlisted command that runs there. Its 25 repeated
+# command columns are about 100 KiB. bigspawn [extra params json] repeats the spawn up to 4 times while the
+# guest's ps outruns the 10 s timeout.
+pscols=$(printf 'command,%.0s' {1..24})command
+bigspawn() {
+  local r i
+  for i in 1 2 3 4; do
+    r=$(rpc "{\"method\":\"processes.spawn\",\"params\":{\"executable\":\"ps\",\"arguments\":[\"-axwwo\",\"$pscols\"],\"timeout_ms\":10000${1-}}}")
+    [ "$(rf "$r" '.timed_out')" = true ] || break
+  done
+  print -r -- "$r"
+}
+sps=$(bigspawn ',"max_output_bytes":100')
+spawned=$(print -r -- "$sps" | J -c '[.. | objects | select(has("stdout_truncated")) | {b: (.stdout | utf8bytelength), t: .stdout_truncated, n: .stdout_total, i: (.output_id | type), d: (.output_dir | type)}][0]')
+if [ "$(print -r -- "$spawned" | J '.t == true and .b <= 100 and .b > 0 and .n > 100 and .i == "string" and .d == "string"')" = true ]; then chk "8 processes.spawn ps output cut at 100 bytes" ok
+else chk "8 processes.spawn ps output cut at 100 bytes" bad "stdout_truncated true, 1 to 100 bytes, stdout_total above 100, output_id and output_dir" "$spawned"; fi
+ap=$(rpc '{"method":"apps.list","params":{"limit":50}}')
+if [ "$(print -r -- "$ap" | J '[.. | objects | select(has("apps")) | .apps][0] | (length > 1) and (. == sort_by([(.bundle_id // ""), (.path // "")]))')" = true ]; then chk "10 apps.list sorted by bundle_id then path" ok
+else chk "10 apps.list sorted by bundle_id then path" bad "at least two apps in bundle_id, path order" "$(print -r -- "$ap" | head -c 300)"; fi
+# pages <method> <key> <row id jq> <keep|strings> [params prefix]: a limit-2 page (truncated, with next_cursor) and the
+# page its cursor names continue one limit-1000 listing in order, with no gap, repeat or overlap; `strings` is sorted.
+pages() {
+  local sel="[.. | objects | select(has(\"$2\"))][0]" full q1 q2 c
+  full=$(rpc "{\"method\":\"$1\",\"params\":{${5-}\"limit\":1000}}" | J -c "$sel | {t: .truncated, ids: [.$2[] | $3]}")
+  q1=$(rpc "{\"method\":\"$1\",\"params\":{${5-}\"limit\":2}}" | J -c "$sel | {t: .truncated, c: .next_cursor, ids: [.$2[] | $3]}")
+  c=$(print -r -- "$q1" | J -r '.c // empty')
+  q2=$(rpc "{\"method\":\"$1\",\"params\":{${5-}\"limit\":2,\"cursor\":\"$c\"}}" | J -c "$sel | {ids: [.$2[] | $3]}")
+  if [ "$(jq -n --argjson f "${full:-null}" --argjson a "${q1:-null}" --argjson b "${q2:-null}" --arg o "$4" '
+      ($a.ids | length) as $n | ($b.ids | length) as $m
+      | $f.t == false and ($f.ids | length) > 4 and $a.t == true and ($a.c | type) == "string" and $n == 2 and $m >= 1 and $m <= 2
+        and $a.ids + $b.ids == $f.ids[0:$n + $m] and ($a.ids + $b.ids | unique | length) == $n + $m
+        and ($o == "keep" or $f.ids == ($f.ids | sort))' 2>/dev/null || true)" = true ]; then chk "14 $1 pages in $4 order" ok
+  else chk "14 $1 pages in $4 order" bad "two limit-2 pages continuing one untruncated listing of 5+ in $4 order" "full=$(print -r -- "$full" | head -c 200) first=$q1 second=$q2"; fi
+}
+pages services.list services .label keep
+pages files.find matches . strings '"root":"/System/Library/LaunchDaemons","pattern":"com.apple.mobile",'
+for bad in 0 65537 100.7 18446744073709551621 true; do
+  r=$(rpc "{\"method\":\"processes.spawn\",\"params\":{\"executable\":\"ps\",\"max_output_bytes\":$bad}}"); s=$(strs "$r"); c=$(cat "$hdr.code" 2>/dev/null || true)
+  if daemon_status "$c" && print -r -- "$r" | grep -qF '"invalid_param"' && print -r -- "$s" | grep -qF 'max_output_bytes must be an integer from 1 to 65536'; then chk "9 processes.spawn max_output_bytes $bad rejected" ok
+  else chk "9 processes.spawn max_output_bytes $bad rejected" bad "invalid_param naming max_output_bytes" "status=$c '$s'"; fi
+done
+for bad in 0 16777217 10.5 18446744073709551621 true; do
+  r=$(rpc "{\"method\":\"processes.spawn\",\"params\":{\"executable\":\"ps\",\"max_capture_bytes\":$bad}}"); s=$(strs "$r"); c=$(cat "$hdr.code" 2>/dev/null || true)
+  if daemon_status "$c" && print -r -- "$r" | grep -qF '"invalid_param"' && print -r -- "$s" | grep -qF 'max_capture_bytes must be an integer from 1 to 16777216'; then chk "9 processes.spawn max_capture_bytes $bad rejected" ok
+  else chk "9 processes.spawn max_capture_bytes $bad rejected" bad "invalid_param naming max_capture_bytes" "status=$c '$s'"; fi
+done
+for bad in 9223372036854775808 1e300; do
+  for call in "processes.output|\"output_id\":\"$(uuidgen)\",\"stream\":\"stdout\"" "files.read|\"path\":\"/etc/hosts\""; do
+    r=$(rpc "{\"method\":\"${call%%|*}\",\"params\":{${call#*|},\"offset\":$bad}}"); s=$(strs "$r"); c=$(cat "$hdr.code" 2>/dev/null || true)
+    if daemon_status "$c" && print -r -- "$r" | grep -qF '"invalid_param"' && print -r -- "$s" | grep -qF 'offset must be an integer from 0 to 1099511627776'; then chk "9 ${call%%|*} offset $bad rejected" ok
+    else chk "9 ${call%%|*} offset $bad rejected" bad "invalid_param naming offset" "status=$c '$s'"; fi
+  done
+done
+
+# --- spooled spawn output: ps with 25 repeated command columns is about 100 KiB, over one 64 KiB page ----
+gone='is released, expired or evicted'
+bs=$(bigspawn)
+id=$(rf "$bs" '.output_id // empty'); dir=$(rf "$bs" '.output_dir // empty'); tot=$(rf "$bs" '.stdout_total')
+if [ "$(rf "$bs" '.stdout_truncated')" = true ] && [ "$(rf "$bs" '.timed_out')" = false ] && [ "$(rf "$bs" '.exit_code')" = 0 ] && [ -n "$id" ] && [ -n "$dir" ] && [ "${tot:-0}" -gt 65536 ]; then chk "11 ps repeated-column spawn truncated with output_id" ok
+else chk "11 ps repeated-column spawn truncated with output_id" bad "stdout_truncated true, timed_out false, exit_code 0, output_id, output_dir, stdout_total above 65536" "id=$id dir=$dir total=$tot $(rf "$bs" '[.timed_out, .exit_code] | @json')"; fi
+# processes.output pages joined by next_offset
+: > $sdir/po.bin; off=0; guard=0
+while [ -n "$id" ] && [ $guard -lt 300 ]; do
+  guard=$((guard+1))
+  r=$(rpc "{\"method\":\"processes.output\",\"params\":{\"output_id\":\"$id\",\"stream\":\"stdout\",\"offset\":$off,\"binary\":true}}")
+  print -r -- "$r" | J -r '[.. | objects | select(has("data"))][0].data // empty' | base64 -D >> $sdir/po.bin 2>/dev/null || true
+  nx=$(print -r -- "$r" | J -r '[.. | objects | select(has("data"))][0].next_offset // empty')
+  [ -n "$nx" ] || break
+  off=$nx
+done
+po=$(wc -c < $sdir/po.bin | tr -d ' ')
+[ -n "$id" ] && [ "$po" = "$tot" ] && chk "11 processes.output pages join to stdout_total bytes" ok || chk "11 processes.output pages join to stdout_total bytes" bad "$tot bytes" "$po"
+# files.read offset pages on <output_dir>/stdout, joined by next_offset; each page reports total, the last no next_offset
+: > $sdir/fr.bin; off=0; guard=0; frok=1; page=
+while [ -n "$dir" ] && [ $guard -lt 300 ]; do
+  guard=$((guard+1))
+  r=$(rpc "{\"method\":\"files.read\",\"params\":{\"path\":\"$dir/stdout\",\"offset\":$off,\"limit\":65536,\"binary\":true}}")
+  print -r -- "$r" | J -r '[.. | objects | select(has("content"))][0].content // empty' | base64 -D > $sdir/chunk.bin 2>/dev/null || true
+  cat $sdir/chunk.bin >> $sdir/fr.bin
+  got=$(wc -c < $sdir/chunk.bin | tr -d ' ')
+  page=$(print -r -- "$r" | J -c '[.. | objects | select(has("content"))][0] | {t: .truncated, n: .next_offset, total}')
+  nx=$(print -r -- "$page" | J -r '.n // empty')
+  [ "$(print -r -- "$page" | J -r '.total')" = "$tot" ] || frok=0
+  if [ "$(print -r -- "$page" | J -r '.t')" = true ]; then [ "$nx" = $((off+got)) ] || frok=0; else [ -z "$nx" ] || frok=0; fi
+  [ -n "$nx" ] && [ "$got" -gt 0 ] || break
+  off=$nx
+done
+fr=$(wc -c < $sdir/fr.bin | tr -d ' ')
+if [ -n "$dir" ] && [ "$fr" = "$tot" ] && cmp -s $sdir/po.bin $sdir/fr.bin; then chk "11 files.read offset pages equal processes.output pages" ok
+else chk "11 files.read offset pages equal processes.output pages" bad "$tot identical bytes" "po=$po fr=$fr"; fi
+if [ -n "$dir" ] && [ $frok = 1 ]; then chk "11 files.read pages report total and next_offset" ok
+else chk "11 files.read pages report total and next_offset" bad "total $tot on each page, next_offset = offset + bytes while truncated, none on the last" "page $page"; fi
+# files.read offset without limit: at most 512 KiB from the offset, truncated exactly when more remains
+r=$(rpc "{\"method\":\"files.read\",\"params\":{\"path\":\"$dir/stdout\",\"offset\":1000,\"binary\":true}}")
+print -r -- "$r" | J -r '[.. | objects | select(has("content"))][0].content // empty' | base64 -D > $sdir/chunk.bin 2>/dev/null || true
+got=$(wc -c < $sdir/chunk.bin | tr -d ' '); more=$(print -r -- "$r" | J -r '[.. | objects | select(has("content"))][0].truncated')
+want=$((${tot:-0}-1000)); [ $want -gt 524288 ] && { want=524288; wantmore=true; } || wantmore=false
+if [ -n "$dir" ] && [ "$got" = "$want" ] && [ "$more" = "$wantmore" ] && tail -c +1001 $sdir/po.bin | head -c $want | cmp -s - $sdir/chunk.bin; then chk "11 files.read offset without limit is capped at 512 KiB" ok
+else chk "11 files.read offset without limit is capped at 512 KiB" bad "$want bytes from 1000, truncated=$wantmore" "got=$got truncated=$more"; fi
+# files.read without offset or limit pages nothing: no total or next_offset
+r=$(rpc '{"method":"files.read","params":{"path":"/etc/hosts"}}')
+if [ "$(print -r -- "$r" | J '[.. | objects | select(has("content"))][0] | (has("total") or has("next_offset")) == false')" = true ]; then chk "11 files.read without offset or limit has no total or next_offset" ok
+else chk "11 files.read without offset or limit has no total or next_offset" bad "no total, no next_offset" "$(print -r -- "$r" | J -c '[.. | objects | select(has("content"))][0] | keys')"; fi
+# release
+r=$(rpc "{\"method\":\"processes.output_release\",\"params\":{\"output_id\":\"$id\"}}")
+rel=$(print -r -- "$r" | J -r '[.. | objects | select(has("released"))][0].released')
+r=$(rpc "{\"method\":\"processes.output\",\"params\":{\"output_id\":\"$id\",\"stream\":\"stdout\"}}"); s=$(strs "$r"); c=$(cat "$hdr.code" 2>/dev/null || true)
+if [ "$rel" = true ] && daemon_status "$c" && print -r -- "$r" | grep -qF '"not_found"' && print -r -- "$s" | grep -qF "$gone"; then chk "11 processes.output_release then processes.output fails" ok
+else chk "11 processes.output_release then processes.output fails" bad "released true, then not_found $gone" "released=$rel status=$c '$s'"; fi
+# capture ceiling: the child is drained and discarded, so it finishes before the timeout
+cs=$(bigspawn ',"max_capture_bytes":1000')
+if [ "$(rf "$cs" '.capture_truncated')" = true ] && [ "$(rf "$cs" '.stdout_total')" = 1000 ] && [ "$(rf "$cs" '.timed_out')" = false ] && [ "$(rf "$cs" '.exit_code')" = 0 ]; then chk "12 max_capture_bytes 1000 caps the capture before the timeout" ok
+else chk "12 max_capture_bytes 1000 caps the capture before the timeout" bad "capture_truncated true, stdout_total 1000, timed_out false" "$(rf "$cs" '[.capture_truncated, .stdout_total, .timed_out] | @json')"; fi
+# short output: nothing truncated, no spool handle
+ss=$(rpc '{"method":"processes.spawn","params":{"executable":"ps","arguments":["-p","1","-o","pid="]}}')
+sl=$(rf "$ss" '.stdout | utf8bytelength')
+if [ "$(rf "$ss" '.stdout_truncated')" = false ] && [ "$(rf "$ss" '.stdout_total')" = "$sl" ] && [ "$(rf "$ss" '.capture_truncated')" = false ] \
+   && [ "$(rf "$ss" '(.output_id // empty), (.output_dir // empty)')" = "" ]; then chk "13 short ps spawn: not truncated, no output_id or output_dir" ok
+else chk "13 short ps spawn: not truncated, no output_id or output_dir" bad "flags false, stdout_total $sl, no output_id/output_dir" "$(rf "$ss" '@json')"; fi
+# timed out: the spool is dropped, so no output_id or output_dir
+ts=$(rpc "{\"method\":\"processes.spawn\",\"params\":{\"executable\":\"ps\",\"arguments\":[\"-axwwo\",\"$pscols\"],\"timeout_ms\":100}}")
+if [ "$(rf "$ts" '.timed_out')" = true ] && [ "$(rf "$ts" '(.output_id // empty), (.output_dir // empty)')" = "" ]; then chk "13 timed-out spawn has no output_id or output_dir" ok
+else chk "13 timed-out spawn has no output_id or output_dir" bad "timed_out true, no output_id/output_dir" "$(rf "$ts" '[.timed_out, .output_id, .output_dir] | @json')"; fi
+# default capture with a small max_output_bytes: the cut is not a capture truncation
+ds=$(bigspawn ',"max_output_bytes":100')
+if [ "$(rf "$ds" '.capture_truncated')" = false ] && [ "$(rf "$ds" '.stdout_truncated')" = true ]; then chk "13 max_output_bytes 100 at default capture: capture_truncated false" ok
+else chk "13 max_output_bytes 100 at default capture: capture_truncated false" bad "capture_truncated false, stdout_truncated true" "$(rf "$ds" '[.capture_truncated, .stdout_truncated] | @json')"; fi
+# restart: spool dirs are removed when the daemon starts
+rs=$(bigspawn); rid=$(rf "$rs" '.output_id // empty')
+rpc '{"method":"services.kickstart","params":{"label":"com.vphone.vphoned","kill":true,"force":true}}' > /dev/null || true
+back=0; end=$((SECONDS+30))
+while [ $SECONDS -lt $end ]; do
+  sleep 2
+  [ "$(rpc '{"method":"time.clock"}' | J '[.. | objects | select(has("time") or has("unix") or has("epoch"))] | length > 0')" = true ] && { back=1; break; }
+done
+r=$(rpc "{\"method\":\"processes.output\",\"params\":{\"output_id\":\"$rid\",\"stream\":\"stdout\"}}"); s=$(strs "$r"); c=$(cat "$hdr.code" 2>/dev/null || true)
+if [ -n "$rid" ] && [ $back = 1 ] && daemon_status "$c" && print -r -- "$r" | grep -qF '"not_found"' && print -r -- "$s" | grep -qF "$gone"; then chk "13 spool is gone after a vphoned restart" ok
+else chk "13 spool is gone after a vphoned restart" bad "reconnect within 30 s, then not_found $gone" "id=$rid back=$back status=$c '$s'"; fi
+
 e() {
-  r=$(rpc "{\"method\":\"$1\",\"params\":$2}"); s=$(strs "$r"); c=$(cat "$hdr.code" 2>/dev/null || true)
+  local r c s
+  r=$(rpc "{\"method\":\"$1\",\"params\":$2}"); c=$(cat "$hdr.code" 2>/dev/null || true); s=$(print -r -- "$r" | J -r '.error.message // empty')
   if daemon_status "$c" && print -r -- "$s" | grep -qxF -- "$3"; then chk "$1 $2" ok; else chk "$1 $2" bad "'$3' with status 200/400" "status=$c '$s'"; fi
   case $3 in *'Pass force'*) if ! print -r -- "$s" | grep -qF 'Pass force'; then echo "LEAK: $1 was not refused unforced; stopping"; finish || true; exit 1; fi ;; esac
 }
+
+# --- the 20 force methods: refused unforced (e, above), a required param is validated before the force refusal
 e processes.kill '{"pid":4242}' 'Pass force: true to send SIGTERM to 4242'
 e processes.kill '{"pid":1}' 'pid 1 cannot be signalled'
 e apps.uninstall '{}' 'bundle_id is required'
@@ -365,6 +525,68 @@ while IFS=$'\t' read -r fm fp fpat; do
 done <<< "$fa"
 floor=$((n_forces-4))
 [ $verified -ge $floor ] && chk "8 force text verified >= $floor" ok || chk "8 force text verified >= $floor" bad ">= $floor of $n_forces" "$verified"
+
+# --- rpc-method-contracts: renamed method, ms timeouts, swipe/drag shapes, message beside error --------------------
+# The handlers' clamps and mappings are private to the guest daemon, so they are checked here on the real dispatch.
+# The names from before the renames still work (GuestLegacyNames): old params are translated, old result keys kept.
+# q <method> <params> <jq filter>: the filter's output for the reply, e.g. `.result.count` or `.error.message`.
+q() { rpc "{\"method\":\"$1\",\"params\":$2}" | J -r "$3"; }
+# qc <label> <method> <params> <jq filter> <expected>
+qc() { local g; g=$(q "$2" "$3" "$4"); [ "$g" = "$5" ] && chk "$1" ok || chk "$1" bad "$5" "$g"; }
+# processes.spawn is dispatched, and so is its old name process.spawn.
+qc "processes.spawn dispatched" processes.spawn '{"executable":"ps"}' '.result.executable' /bin/ps
+qc "process.spawn still dispatched" process.spawn '{"executable":"ps"}' '.result.executable' /bin/ps
+# timeout_ms is milliseconds, 100..10000 for processes.spawn; the old timeout_seconds is read as seconds.
+for t in 100 10000; do qc "processes.spawn timeout_ms $t accepted" processes.spawn "{\"executable\":\"ps\",\"timeout_ms\":$t}" '.result.pid | type' number; done
+for t in 99 10001; do qc "processes.spawn timeout_ms $t refused" processes.spawn "{\"executable\":\"ps\",\"timeout_ms\":$t}" '.error.message' 'timeout_ms must be 100–10000'; done
+qc "process.spawn timeout_seconds 10 is 10000 ms" process.spawn '{"executable":"ps","timeout_seconds":10}' '.result.pid | type' number
+qc "processes.spawn timeout_seconds 11 is 11000 ms, refused" processes.spawn '{"executable":"ps","timeout_seconds":11}' '.error.message' 'timeout_ms must be 100–10000'
+for k in timeout timeout_s; do qc "processes.spawn $k refused as unknown" processes.spawn "{\"executable\":\"ps\",\"$k\":99999}" '.error.message' "Unknown param: $k"; done
+# script.eval clamps to 1000..600000 ms: 1 ms becomes 1 s (the upper clamp would need a 10 minute script); the old
+# timeout in seconds reaches the same clamp.
+qc "script.eval timeout_ms 1 clamps to 1 s" script.eval '{"source":"while(true){}","timeout_ms":1}' '.error.message' 'The script did not finish within 1 seconds and was stopped'
+qc "script.eval timeout 0.001 s clamps to 1 s" script.eval '{"source":"while(true){}","timeout":0.001}' '.error.message' 'The script did not finish within 1 seconds and was stopped'
+# setup.settle clamps to 0..110000 ms and echoes timeout_ms, with timeout_s beside it (the upper clamp would need a 110 s wait).
+qc "setup.settle timeout_ms 1000 echoes 1000 and timeout_s 1" setup.settle '{"timeout_ms":1000}' '.result | [.timeout_ms, .timeout_s] | tojson' '[1000,1]'
+# poll_ms is milliseconds, 1000..30000 (fractions kept); the reply has elapsed_ms and poll_ms and the old _s keys.
+# elapsed_ms is whole milliseconds. The loop sleeps only when the next poll fits the 2000 ms timeout, so a first
+# sample slower than 500 ms answers after 1 poll; either way the bound below holds only in milliseconds.
+qc "setup.settle poll_ms 1500 echoes 1500 with elapsed_ms" setup.settle '{"timeout_ms":2000,"poll_ms":1500}' '.result | (if .polls > 1 then 1500 else 500 end) as $b | [.poll_ms, (.elapsed_ms == (.elapsed_ms | floor)), (.elapsed_ms >= $b), .poll_s, (.elapsed_s * 1000 >= $b)] | tojson' '[1500,true,true,1.5,true]'
+for p in '1|1000' '99999|30000'; do qc "setup.settle poll_ms ${p%|*} clamps to ${p#*|}" setup.settle "{\"timeout_ms\":0,\"poll_ms\":${p%|*}}" '.result.poll_ms' "${p#*|}"; done
+qc "setup.settle poll_s 30 is 30000 ms" setup.settle '{"timeout_ms":0,"poll_s":30}' '.result | [.poll_ms, .poll_s] | tojson' '[30000,30]'
+qc "setup.settle poll_ms wins over poll_s" setup.settle '{"timeout_ms":0,"poll_ms":2000,"poll_s":30}' '.result.poll_ms' 2000
+# the HTTP route follows the rename; the old route still answers.
+for route in processes/spawn process/spawn; do
+    [ "$(cu -o /dev/null -w '%{http_code}' -H "Content-Type: application/json" -d '{"executable":"ps"}' http://$addr/v1/$route)" = 200 ] && chk "POST /v1/$route answers" ok || chk "POST /v1/$route answers" bad 200 "not 200"
+done
+# input.swipe takes from/to, and x1..y2 as before; input.drag answers count, and points as before.
+qc "input.swipe x1..y2 still accepted" input.swipe '{"x1":100,"y1":300,"x2":100,"y2":100}' '.result | [.from, .to] | tojson' '[[100,300],[100,100]]'
+qc "input.swipe one-number from refused" input.swipe '{"from":[1],"to":[2,2]}' '.error.message' 'from and to must be [x, y] pairs'
+qc "input.swipe from/to" input.swipe '{"from":[100,300],"to":[100,100]}' '.result | [.from, .to] | tojson' '[[100,300],[100,100]]'
+qc "input.drag one point refused" input.drag '{"points":[[1,1]]}' '.error.message' 'points must be at least two [x, y] pairs'
+qc "input.drag answers count and points" input.drag '{"points":[[100,300],[100,100]]}' '.result | [.count, .points] | tojson' '[2,2]'
+# location.current honours timeout_ms (the 10 s default would outlast the 5 s bound). ui.wait is judged by its reply: one accessibility poll can take longer than any bound, and an unconverted 300 would be refused as over 60 s.
+t0=$SECONDS; lr=$(rpc '{"method":"location.current","params":{"timeout_ms":300}}')
+# An immediate location_services_off refusal never reaches the wait.
+if print -r -- "$lr" | grep -q location_services_off; then echo "SKIP location.current timeout_ms: Location Services off"
+else [ $((SECONDS - t0)) -lt 5 ] && chk "location.current timeout_ms honoured" ok || chk "location.current timeout_ms honoured" bad "under 5 s" "$((SECONDS - t0)) s"; fi
+# screen.unlock checks timeout_ms (1000..60000) before it presses anything: 999 is refused, so the value is not read as
+# seconds; the old timeout in seconds is converted first (0.5 s is 500 ms, refused the same way).
+qc "screen.unlock timeout_ms 999 refused" screen.unlock '{"timeout_ms":999}' '.error.message' 'timeout_ms must be 1000–60000'
+qc "screen.unlock timeout 0.5 s is 500 ms, refused" screen.unlock '{"timeout":0.5}' '.error.message' 'timeout_ms must be 1000–60000'
+qc "ui.wait timeout_ms 300 is milliseconds" ui.wait '{"text":"__no_such_element__","timeout_ms":300}' '(.error.message // "") | contains("must be")' false
+qc "ui.wait timeout 0.3 s is accepted" ui.wait '{"text":"__no_such_element__","timeout":0.3}' '(.error.message // "") | contains("must be")' false
+# ui.wait and ui.wait_gone refuse timeout_ms outside 0..60000 in milliseconds; location.current refuses over 300000.
+for m in ui.wait ui.wait_gone; do for t in -1 60001; do qc "$m timeout_ms $t refused" $m "{\"text\":\"__no_such_element__\",\"timeout_ms\":$t}" '.error.message' 'timeout_ms must be 0–60000'; done; done
+qc "location.current timeout_ms 300001 refused" location.current '{"timeout_ms":300001}' '.error.message' 'timeout_ms must be more than 0 and at most 300000'
+# a failed status read carries `message`, and `error` with the same text for older clients.
+# A DNS that answers every name (a fake-IP proxy) gives no failure to check.
+r=$(q network.resolve '{"host":"no-such-host.invalid"}' '.result | if .status == "error" then ([has("message"), .error == .message] | tojson) else "answered: " + .status end')
+case $r in
+    answered:*) print "SKIP network.resolve failure message and error: the DNS $r no-such-host.invalid" ;;
+    *) [ "$r" = '[true,true]' ] && chk "network.resolve failure message and error" ok || chk "network.resolve failure message and error" bad '[true,true]' "$r" ;;
+esac
+qc "script.eval failure message and error" script.eval '{"source":"("}' '.result | [has("message"), .error == .message] | tojson' '[true,true]'
 
 # --- schema comparison of every read-class method ---------------------------
 schema_section

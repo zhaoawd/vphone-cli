@@ -220,7 +220,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
             return [:]
         }
         guard let object = try JSONSerialization.jsonObject(with: body) as? [String: Any] else {
-            throw GuestAPIError.invalidRequest("Request body must be a JSON object")
+            throw GuestAPIError.invalidRequest("Request body must be a JSON object", hint: "Send a JSON object such as {}, or no body")
         }
         return object
     }
@@ -242,7 +242,8 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
         case (.GET, "/v1/device"): "device.snapshot"
         case (.GET, "/v1/device/screen"): "device.screen"
         case (.GET, "/v1/apps"): "apps.list"
-        case (.POST, "/v1/process/spawn"): "process.spawn"
+        case (.POST, "/v1/processes/spawn"): "processes.spawn"
+        case (.POST, "/v1/process/spawn"): "processes.spawn" // its name before the rename
         case (.POST, "/v1/apps/refresh"): "apps.refresh"
         case (.POST, "/v1/apps/launch"): "apps.launch"
         case (.POST, "/v1/apps/terminate"): "apps.terminate"
@@ -280,7 +281,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
         case (.GET, "/v1/keychain"): "keychain.list"
         case (.POST, "/v1/keychain"): "keychain.add"
         case (.DELETE, "/v1/keychain"): "keychain.delete"
-        default: throw GuestAPIError.invalidRequest("No route for \(verb) \(path)")
+        default: throw GuestAPIError.invalidRequest("No route for \(verb) \(path)", hint: "Routes are /v1/<area>/<method> as listed in the method catalog; /v1/keychain takes GET, POST and DELETE")
         }
     }
 

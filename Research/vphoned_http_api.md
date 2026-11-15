@@ -195,7 +195,7 @@ choose Rootless or RootHide in the confirmation sheet. The item is enabled
 when vphoned advertises `bootstrap_install`. Its sheet polls
 `GET /v1/bootstrap/status` (RPC `bootstrap.status`) while installation runs.
 The status reports `phase` and, during download, `downloaded_bytes` and
-`total_bytes` when the server provides a length. The sheet shows the download
+`total_bytes` when the server provides a length. A failed installation reports `phase: failed` and its failure text as `message`. The sheet shows the download
 progress, then the installation result without closing.
 
 `GET /v1/bootstrap/inspect` (RPC `bootstrap.inspect`) reports `roots`, the
@@ -324,14 +324,14 @@ which is the one thing a script cannot work around: methods that depend on
 state the worker set up at startup, such as the virtual camera or the
 preloaded HID symbols, are not available through a session's `api()`.
 
-`POST /v1/rpc` with `script.eval` takes `{source, timeout?}` and answers
-`{ok, result, output, crashed}`, or `{ok: false, error, output, crashed}`. A
+`POST /v1/rpc` with `script.eval` takes `{source, timeout_ms?}` and answers
+`{ok, result, output, crashed}`, or `{ok: false, message, output, crashed}`. A
 script that throws is an answer rather than a failed request, so its output
 comes back either way; `result` is the value described as text and `output`
-is everything the script printed. `timeout` defaults to 30 seconds and is
-clamped to 1 through 600; a script that outruns it is killed with its group
+is everything the script printed. `timeout_ms` defaults to 30000 and is
+clamped to 1000 through 600000; a script that outruns it is killed with its group
 and the request fails. `crashed` is true when the session died before it
-could answer, and `error` then names the signal. `script.info` reports
+could answer, and `message` then names the signal. `script.info` reports
 `available`, `engine`, the globals below, and which of `bash`, `sh` and `zsh`
 this guest's bootstrap actually has.
 
@@ -513,10 +513,10 @@ request carries `"force": true`.
 | Area | Methods |
 | --- | --- |
 | Device | `device.snapshot`, `device.info` (snapshot plus network, screen, rotation, brightness, volume, low power, Developer Mode (the last answer amfid gave, refreshed in the background every 30 s; `{}` until it answers, and always on the tvOS 26.6 and HomePod 27.0 guests checked, whose amfid does not; `developer_mode.status` asks amfid directly and waits up to 10 s), agent, `device_name` `{name, own_name}`: the pinned name and the guest's own ComputerName), `device.screen`, `device.network`, `device.displays` (a flat IOService probe of every display-ish object with its small properties — what the display stack bound; built for the foldable display work: `AppleParavirtGPU` `DisplayPortCount`, and each `AppleParavirtDisplay` width/height/`primary`), `device.ioreg {plane}`, `device.environment`, `device.basebin {archive?}` |
-| Display, audio | `display.pose` (read-only SpringBoard pose snapshot: orientation, device_orientation, hinge, tabletop; reports unavailable for an unsupported ABI), `display.modes` (read-only CoreAnimation display bounds, native size, current/available modes, and virtual-mode selector availability; availability does not prove a mode change is supported), `display.brightness {value?}`, `display.rotation {orientation?}`, `display.posture {hinge, orientation?, tabletop?}` (a foldable guest's pose through SpringBoard's test-automation override, see below; capability `device_pose`), `display.orientation` (`{degrees, source, device_degrees?, fold_angle?, screen_off?}`: SpringBoard's interface orientation without a screen capture, for polling; `degrees` is null while SpringBoard has no answer; on a foldable `fold_angle` is the virtual hinge's angle, so a host can follow folds it did not ask for, and `screen_off` whether the panel is dark, so a host can keep the panel's frame from before off its window as it comes on (SpringBoard has the screen off and FoldDisplay saw the panel go off since it was last lit; the always-on Lock Screen keeps the panel on and is not dark); capability `display_orientation`), `display.rotation_lock {locked}`, `display.auto_lock` (`{auto_lock_seconds, never, lock_screen_minimum_seconds}`), `display.auto_lock.set {seconds}` (writes the mobile UserSettings input through cfprefsd, posts profiled's effective-settings notification, and returns an immediate readback; the caller must verify the effective value), `screen.unlock {passcode?, timeout?}` (`{locked, screen_off, was_locked, was_screen_off}`: the display on and the Lock Screen passed, see below; capability `screen_unlock`), `audio.volume {value?, category?}`, `audio.state` |
+| Display, audio | `display.pose` (read-only SpringBoard pose snapshot: orientation, device_orientation, hinge, tabletop; reports unavailable for an unsupported ABI), `display.modes` (read-only CoreAnimation display bounds, native size, current/available modes, and virtual-mode selector availability; availability does not prove a mode change is supported), `display.brightness {value?}`, `display.rotation {orientation?}`, `display.posture {hinge, orientation?, tabletop?}` (a foldable guest's pose through SpringBoard's test-automation override, see below; capability `device_pose`), `display.orientation` (`{degrees, source, device_degrees?, fold_angle?, screen_off?}`: SpringBoard's interface orientation without a screen capture, for polling; `degrees` is null while SpringBoard has no answer; on a foldable `fold_angle` is the virtual hinge's angle, so a host can follow folds it did not ask for, and `screen_off` whether the panel is dark, so a host can keep the panel's frame from before off its window as it comes on (SpringBoard has the screen off and FoldDisplay saw the panel go off since it was last lit; the always-on Lock Screen keeps the panel on and is not dark); capability `display_orientation`), `display.rotation_lock {locked}`, `display.auto_lock` (`{auto_lock_seconds, never, lock_screen_minimum_seconds}`), `display.auto_lock.set {seconds?, never?}` (writes the mobile UserSettings input through cfprefsd, posts profiled's effective-settings notification, and returns an immediate readback; the caller must verify the effective value), `screen.unlock {passcode?, timeout_ms?}` (`{locked, screen_off, was_locked, was_screen_off}`: the display on and the Lock Screen passed, see below; capability `screen_unlock`), `audio.volume {value?, category?}`, `audio.state` |
 | Input | `input.touch`, `input.hid {page, usage, down?, long_press?}`, `input.button {name}`, `input.key {name}`, `input.type {text, delay_ms?}`, `input.paste {text}`, `input.tap`, `input.double_tap`, `input.long_press`, `input.swipe`, `input.drag {points}`, `input.touch_sequence {events}` — gesture coordinates are screen points; `input.pointer {x, y, seq?, buttons?}`, `input.scroll {phase, dx?, dy?, x?, y?}` (capabilities `pointer_scroll` and `pointer_buttons`, see below) |
 | UI | `ui.tree` (alias `accessibility.tree`), `ui.element_at`, `ui.tap_element`, `ui.wait`, `ui.wait_gone`, `ui.ocr {languages?, min_confidence?}`, `ui.describe`, `screen.screenshot` |
-| Processes | `processes.list {filter?}`, `processes.kill {pid, signal?}` **force**, `process.spawn {executable, arguments?, timeout_seconds?}`, `memory.jetsam`, `memory.pressure` (only the three kernel memory sysctls, for polling) |
+| Processes | `processes.list {filter?}`, `processes.kill {pid, signal?}` **force**, `processes.spawn {executable, arguments?, timeout_ms?}`, `memory.jetsam`, `memory.pressure` (only the three kernel memory sysctls, for polling) |
 | launchd | `services.list`, `status`, `print`, `dump`, `disabled`, `start`, `enable`, `load`, `profile` (see below), `kickstart {label, kill?}` (`launchctl kickstart`, capability `service_kickstart`, see below); `services.stop`, `disable`, `remove`, `signal`, `unload`, `profile.apply {profile, groups?, allow?}` **force**, and `kickstart` with `kill` **force**; `launchd.getenv`, `setenv`, `unsetenv`. On tvOS, which never enables user sessions, they read the system domain alone; before icli 0.8.6 the foreground-user lookup trapped there and killed vphoned |
 | Logs | `logs.syslog {seconds, process?, level?, max_lines?, subsystem?, category?, message_contains?}` (a bounded capture of at most 60 s; filters apply before the line cap), `logs.crashes {bundle_id?}`, `logs.crash {path}` |
 | HomeView distance | `homeview.distance.get`, `homeview.distance.set {mode, reset_environment?}` (capability `homeview_distance`; near/standard/far map to native detail2/1/0; automatic requires `reset_environment:true` and clears persona, display-style, detail and backlight overrides together). Returns `available`, `mode`, `level_of_detail`, `override_active`, `applied`, `reset_scope:"environment"`, plus native `display_style` and `backlight_state` (null if their integer ABI is unavailable). Unknown ownership is `mode:"unknown"`, `override_active:null`; readback does not prove a rendered UI change. |
@@ -535,8 +535,8 @@ request carries `"force": true`.
 | Bootstrap | `bootstrap.install {layout}`, `bootstrap.status`, `bootstrap.inspect`, `bootstrap.uninstall {jbroot, force}`, `bootstrap.firmware` (see above) |
 | Environment | `environment.status` (SHA-256 of each vphone library in `/usr/lib`, or null when absent, plus the staging directory), `environment.install {libraries: [{name, sha256}]}` (see below) |
 | Profile UDID | `udid.get`, `udid.set {udid}`, `udid.clear` — each returns `{udid, path}`, the UDID the guest gives its profile checks and the host (null: the guest's own) and the settings file it came from; `set` and `clear` also return `restarted_pids`, `usb_serial` and `usb_reenumerated` (see below) |
-| Scripting | `script.eval {source, timeout?}` (`{ok, result, output, crashed}`; evaluated in a session process, capability `script_js`), `script.info` (`{available, engine, globals, programs}`) — the interactive form is the `/v1/shell` WebSocket, see "Scripting sessions" |
-| Setup Assistant | `setup.status` (`{pending, running, pid, setup_done, setup_version, current_version, data_migration_done}`), `setup.skip` **force** (sets `SetupDone`, `SetupFinishedAllSteps` and `SetupVersion` in `com.apple.purplebuddy`, restarts SpringBoard, returns the status plus `respring`; while the first boot's data migration is still running it does not restart SpringBoard, which reads the keys when migration ends, and `respring` is `{restarted: false, reason: "data_migration_pending"}`; a restart FrontBoard ignored is refused with `reason: busy`, `retryable: true`, the keys already written); `setup.settle {timeout_s?, poll_s?, stable_polls?}` (read-only wait for first-boot work, see below); `/v1/health` carries `setup_pending` — see `Research/Guest/setup_assistant_skip.md` |
+| Scripting | `script.eval {source, timeout_ms?}` (`{ok, result, output, crashed}`; evaluated in a session process, capability `script_js`), `script.info` (`{available, engine, globals, programs}`) — the interactive form is the `/v1/shell` WebSocket, see "Scripting sessions" |
+| Setup Assistant | `setup.status` (`{pending, running, pid, setup_done, setup_version, current_version, data_migration_done}`), `setup.skip` **force** (sets `SetupDone`, `SetupFinishedAllSteps` and `SetupVersion` in `com.apple.purplebuddy`, restarts SpringBoard, returns the status plus `respring`; while the first boot's data migration is still running it does not restart SpringBoard, which reads the keys when migration ends, and `respring` is `{restarted: false, reason: "data_migration_pending"}`; a restart FrontBoard ignored is refused with `reason: busy`, `retryable: true`, the keys already written); `setup.settle {timeout_ms?, poll_ms?, stable_polls?}` (read-only wait for first-boot work, see below); `/v1/health` carries `setup_pending` — see `Research/Guest/setup_assistant_skip.md` |
 
 `input.hid` sends a keyboard/consumer usage with 16-bit `page` and `usage`.
 Omitting `down` sends a 100 ms press; a Boolean `down` sends one transition.
@@ -636,8 +636,8 @@ passcode gets the passcode pad, into which `passcode` is typed
 (`VPhoneDaemon/Daemon/GuestScreenUnlock.swift`). A lit, unlocked guest returns
 at once; a dark but unlocked one is only woken. A guest with a passcode needs
 `passcode`, entered once and never retried; without it the call fails before
-any key is sent. It needs no private entitlement. `timeout` is 1–60 seconds,
-10 by default. Measurements: `Research/Guest/screen_unlock.md`.
+any key is sent. It needs no private entitlement. `timeout_ms` is 1000–60000,
+10000 by default. Measurements: `Research/Guest/screen_unlock.md`.
 
 A machine with `unlocksAtStartup` in its `config.plist` (`vphone-cli vm config
 <name> --unlock-at-startup on`, Device > Unlock at Startup in the VM window, or
@@ -854,8 +854,8 @@ See `Research/Guest/service_trimming.md`.
 `setup.settle` (capability `setup_settle`) waits until the guest's first-boot
 work has settled and returns, without changing anything
 (`VPhoneDaemon/Daemon/GuestAPI+FirstBoot.swift`, conditions in
-`GuestFirstBootSettle.swift`). It polls every `poll_s` seconds (default 5,
-1–30) and is settled when, over the last `stable_polls` polls (default 3,
+`GuestFirstBootSettle.swift`). It polls every `poll_ms` milliseconds (default 5000,
+1000–30000, fractions of a second kept) and is settled when, over the last `stable_polls` polls (default 3,
 2–20), `/private/var/staged_system_apps` is empty or absent (installd expands
 the removable system apps from it on the first boot), the number of
 registered apps did not change, installd used less than 0.2 s of CPU
@@ -896,11 +896,11 @@ seconds and reports `connect`, `connect_ms` and the `local` address used, which
 names the interface the connection left from; `first_only` connects to the
 first address only, as a client that does not fall back would.
 
-`process.spawn` is a bounded diagnostic escape hatch for guest-internal
+`processes.spawn` (route `POST /v1/processes/spawn`) is a bounded diagnostic escape hatch for guest-internal
 investigation. `executable` is a logical name mapped to a fixed path (`ps`,
 `launchctl`, or `log`); arguments are passed directly without a shell and are
-limited to 16 items, 256 bytes per item, and 2048 bytes total. The timeout is
-between 0.1 and 10 seconds (default 3), and each output stream is capped at
+limited to 16 items, 256 bytes per item, and 2048 bytes total. `timeout_ms` is
+between 100 and 10000 (default 3000), and each output stream is capped at
 64 KiB. The reply includes the child PID, timeout flag, exit code or signal,
 and UTF-8 stdout/stderr. It is intentionally insufficient for arbitrary code
 execution; future poster-extension tracing must stay within this allowlist or
@@ -1161,7 +1161,7 @@ simulation and returns `unavailable` (`no location within 5 s`, or `locationd
 did not apply the simulated location`). The reply is `simulating: true` plus
 the fix that was read back. `location.clear` stops the simulation and polls for
 up to 6 s until locationd stops reporting a fresh simulated fix.
-`location.current` reads the same way with the caller's timeout and reports
+`location.current` reads the same way with the caller's `timeout_ms` (default 10000; above 0, at most 300000) and reports
 `fresh` and `simulated` as CoreLocation gives them. The read-back needs
 locationd to deliver a fused fix. The 2.0.4 guest in
 `Research/Guest/location_simulation_26_4_failure.md` never got one; that build
@@ -1450,3 +1450,55 @@ the preview disconnects it. The output-only host window requests one JPEG at a
 time, targeting 60 Hz with actual throughput dependent on rendering, encoding,
 transfer and decoding. Resolution switching and reconnecting work at runtime;
 neither requires a VM reboot.
+
+### RPC contract integration (2026-11-15, Duo branch)
+
+The guest catalog has 197 methods and retains `scope: "guest", complete: true`.
+The following changes preserve the Duo native AX path, active display geometry,
+Auto-Lock `never: true` validation and render-server worker restart handling.
+
+- `processes.spawn` is the catalog name. `process.spawn` and both HTTP routes
+  remain accepted. Canonical timeout parameters use milliseconds:
+  `location.current`, `screen.unlock`, `script.eval`, `ui.wait`, `ui.wait_gone`
+  use `timeout_ms`; `processes.spawn` uses `timeout_ms`;
+  `setup.settle` uses `timeout_ms` and `poll_ms`.
+- Old seconds parameters remain accepted: `timeout` for the first five methods,
+  `timeout_seconds` for spawn, and `timeout_s`/`poll_s` for settle. A canonical
+  parameter wins if both are sent; its old alias is removed before admission.
+  `input.swipe` accepts `from`/`to` pairs and the old `x1,y1,x2,y2` fields.
+  When both pairs are present they win and the old fields are removed.
+  `input.drag` returns `count` and its old `points` key. Status results retain
+  the old `error` key beside `message`; settle retains its seconds result keys.
+- Unknown parameters return `invalid_param`, with a bounded message and a hint
+  listing valid parameters. Unknown methods return `not_found`; near names can
+  receive a suggestion. Guest errors also distinguish `unavailable`,
+  `permission`, `force_required` and `invalid_operation`. Existing component
+  errors retain their codes. Errno mapping is applied at the migrated native
+  boundaries; this does not reclassify every error from icli.
+- `apps.list`, `processes.list`, `services.list`, `services.dump`, `files.list`,
+  `files.find`, `apfs.snapshots` and `logs.crashes` accept `limit` (default 200,
+  range 1–1000) and `cursor`. Replies add `total`, `truncated` and, when more
+  remain, `next_cursor`. `count`, when present, is the page size. A cursor is a
+  decimal offset into a fresh listing, not a snapshot token; changes between
+  calls can shift entries. Host app/file/process/service/crash browsers and
+  template setup collect all pages; direct RPC calls retain paging metadata.
+- `processes.spawn` returns bounded first-page stdout/stderr. `max_output_bytes`
+  is 1–65536 per stream (default 65536); `max_capture_bytes` is 1–16777216 per
+  stream (default 2097152). Results include totals and truncation flags.
+  Truncated, non-timed-out output supplies `output_id` and `output_dir`.
+  `processes.output {output_id, stream, offset?, limit?, binary?}` reads another
+  slice, with `total` and optional `next_offset`. `processes.output_release`
+  releases that generated spool. The registry expires outputs after 10 minutes,
+  uses a shared 64 MiB cap, evicts completed outputs oldest first and clears
+  spools at worker startup. Released/expired IDs return `not_found`.
+  `files.read` with `offset` or `limit` uses the native bounded reader and adds
+  `total`/`next_offset`; its open/fstat/read errors use errno classification.
+- Every `input.*` method accepts `observe` (boolean, default false) and
+  `observe_delay_ms` (integer 0–5000, default 300). Values are validated before
+  action delivery. After a successful action, `observe: true` adds `observed`
+  containing `frontmost_bundle_id`, `frontmost_verified` and `ui_element_count`
+  capped at 500. Observation failure adds `observed.observe_error` and does not
+  fail the successful action. Without observation the reply is unchanged.
+
+Validation and limitations are recorded in
+`Integration/duo_m5_20261030/RPC_CONTRACT_NEXT_20261115.md`.

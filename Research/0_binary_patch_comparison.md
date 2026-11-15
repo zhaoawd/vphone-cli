@@ -7060,3 +7060,14 @@ precondition and is not counted as an AX measurement pass. Renames, coded
 errors, bounded output/paging and observe remain separate follow-up work.
 Commands, failed attempts, final evidence and limits are recorded in
 `Research/Integration/duo_m5_20261030/RPC_FOUNDATION_20261115.md`.
+
+### Duo RPC contract follow-up — 2026-11-15
+
+The five follow-up contract changes (#908, #914–#916) are integrated into
+vphoned's existing installation component. No firmware patch declaration or
+preset was added. The existing FoldDisplay patch and native Snapshot policy
+are unchanged. The guest catalog now has 197 methods; native AX PID metadata,
+strict Auto-Lock `never`, active geometry and render-server admission/drain
+remain present. Host list consumers follow paging while legacy daemon replies
+remain accepted. Evidence and the Trust reproduction limit are recorded in
+`Research/Integration/duo_m5_20261030/RPC_CONTRACT_NEXT_20261115.md`.

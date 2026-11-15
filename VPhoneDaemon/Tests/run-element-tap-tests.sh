@@ -41,7 +41,7 @@ done
 /usr/bin/xcrun --sdk macosx swiftc -swift-version 6 -parse-as-library \
     -module-cache-path "$temporary/module-cache" -I "$temporary" -L "$temporary" \
     -lIcliKit -lVphonedNative -Xlinker -rpath -Xlinker "$temporary" \
-    "$daemon/Daemon/GuestMethodSpec.swift" "$daemon/Daemon/GuestAPIInputMethods.swift" \
+    "$daemon/Daemon/GuestMethodSpec.swift" "$daemon/Daemon/GuestPaging.swift" "$daemon/Daemon/GuestAPIInputMethods.swift" \
     "${VPHONE_ELEMENT_TAP_INPUT:-$daemon/Daemon/GuestAPI+Input.swift}" \
     "$daemon/Daemon/GuestDuoMethod.swift" \
     "$daemon/Daemon/GuestFrontmostApp.swift" \

@@ -18,12 +18,15 @@ trap '/bin/rm -rf "$temporary"' EXIT
     "$daemon/Daemon/GuestDeviceNameRule.swift" \
     "$daemon/Daemon/GuestPointerScroll.swift" \
     "$daemon/Daemon/GuestProcessSpawnPolicy.swift" \
+    "$daemon/Daemon/GuestProcessOutput.swift" \
+    "$daemon/Daemon/GuestProcessSpool.swift" \
     "$daemon/Daemon/Bootstrap/GuestBootstrapPlatform.swift" \
     "$daemon/Daemon/GuestSetupAssistantState.swift" \
     "$daemon/Daemon/GuestHomeViewDistancePolicy.swift" \
     "$daemon/Daemon/GuestMobileGestaltAnswers.swift" \
     "$daemon/Daemon/GuestSettingsValue.swift" \
     "$daemon/Daemon/GuestMethodSpec.swift" \
+    "$daemon/Daemon/GuestPaging.swift" \
     "$daemon/Tests/LogicTests.swift" \
     -o "$temporary/logic-tests"
 

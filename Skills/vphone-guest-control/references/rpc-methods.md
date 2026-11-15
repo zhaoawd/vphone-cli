@@ -61,7 +61,7 @@ invalid-request error, read the source named there instead of guessing keys.
 | `audio.host_latency` | `seconds?` (0-1) | The Mac output latency the guest speaker adds; omit to read. The VM sends it on every connect and output change |
 | `display.rotation`, `display.orientation` | `orientation?` | |
 | `display.auto_lock` | none | Auto-Lock in seconds (`never` when it is Never) and the Lock Screen timeout vphoned sets to match |
-| `screen.unlock` | `passcode?`, `timeout?` (10) | Display on and Lock Screen passed, from any state; `guest unlock <machine>` calls it. `passcode` only for a guest that has one, entered once |
+| `screen.unlock` | `passcode?`, `timeout_ms?` (10000) | Display on and Lock Screen passed, from any state; `guest unlock <machine>` calls it. `passcode` only for a guest that has one, entered once |
 | `device.ioreg` | `plane` | e.g. `IODeviceTree` |
 
 ## Input
@@ -71,8 +71,8 @@ invalid-request error, read the source named there instead of guessing keys.
 | `input.tap` | `x`, `y` |
 | `input.double_tap` | `x`, `y`, `interval?` (0.1) |
 | `input.long_press` | `x`, `y`, `seconds?` (1) |
-| `input.swipe` | `x1`, `y1`, `x2`, `y2`, `seconds?` (0.3), `steps?` (20) |
-| `input.drag` | `points` (≥2 `[x,y]` pairs), `seconds?`, `hold?`, `steps?` |
+| `input.swipe` | `from` (`[x,y]`), `to` (`[x,y]`), `seconds?` (0.3), `steps?` (20) |
+| `input.drag` | `points` (≥2 `[x,y]` pairs), `seconds?`, `hold?`, `steps?`; answers `{count}` |
 | `input.touch_sequence` | `events` (`{phase,x,y,delay_ms}`), `normalized?` (true) |
 | `input.button` | `name` (hardware button) |
 | `input.key` | `name` (`return`, `cmd+v`, …) |
@@ -91,7 +91,7 @@ Prefer these to coordinates.
 | `ui.tree` | `max_elements?` (500), `visible_only?` (true), `clickable_only?`, `limit?` | Accessibility elements with positions |
 | `ui.element_at` | `x`, `y` | |
 | `ui.tap_element` | selector | Taps the match |
-| `ui.wait`, `ui.wait_gone` | selector, `timeout?` (10 s) | Wait for an element to appear or go |
+| `ui.wait`, `ui.wait_gone` | selector, `timeout_ms?` (10000; 0–60000) | Wait for an element to appear or go |
 | `ui.ocr` | `languages?` (`["en-US"]`), `min_confidence?` (0.3) | Text with boxes; use for non-accessible UI |
 
 Selector keys: `text`, `identifier`, `role`, `match` (`contains` by default),
@@ -171,6 +171,7 @@ are the usual way to hit the reply size problem.
 | --- | --- | --- |
 | `processes.list` | `filter?` | `cpu_seconds`, `start_time`, footprint, jetsam band; a stuck SpringBoard shows ~0 CPU |
 | `processes.kill` (force) | `pid`, `signal?` | |
+| `processes.spawn` | `executable` (`ps`, `launchctl`, `log`), `arguments?`, `timeout_ms?` (3000, 100–10000) | Bounded diagnostics, no shell |
 | `memory.jetsam`, `memory.pressure` | none | |
 | `logs.syslog` | `seconds?` (2, max 60), `process?`, `level?` (`all`), `max_lines?` (500) | A bounded capture |
 | `logs.crashes` | `bundle_id?` | Lists reports: `path`, `process`, `size`, `mtime` |
@@ -203,21 +204,21 @@ are the usual way to hit the reply size problem.
 
 ## Bootstrap
 
-`bootstrap.install {layout, package_path?}`, `bootstrap.status`,
+`bootstrap.install {layout, package_path?}`, `bootstrap.status` (a failed install answers `phase: failed` with `message`),
 `bootstrap.inspect`, `bootstrap.uninstall {roots, force, reboot?}`,
 `bootstrap.firmware`. Behavior and the install flow: [guest-layout](guest-layout.md).
 
 ## Running a script in the guest
 
-`script.eval {source, timeout?}` evaluates JavaScript with vphoned's own
-identity and answers `{ok, result, output, crashed}`. It is the way to reach
+`script.eval {source, timeout_ms?}` evaluates JavaScript with vphoned's own
+identity and answers `{ok, result, output, crashed}` (`message` replaces `result` when the script throws). It is the way to reach
 something no method covers, and on an Apple TV guest it is the only
 debugging environment there is: no shell, no package manager, no debugserver.
 `script.info` reports whether this guest has it (capability `script_js`;
 watchOS does not ship JavaScriptCore).
 
 The script runs in a session process of its own, so a crash or a runaway loop
-costs the session and nothing else; `timeout` defaults to 30 seconds. Inside
+costs the session and nothing else; `timeout_ms` defaults to 30000. Inside
 it, `api('method', {...})` calls any method in this file, `ObjC.use('NSFoo')`
 and `ObjC.classes.NSFoo` call ObjC methods by name — an underscore stands for
 a colon, `setValue_forKey_(v, k)` — and `fs`, `proc`, `console` and `print`
@@ -250,3 +251,25 @@ It adds streaming file transfer (`GET/PUT /v1/files/content?path=`), a TCP
 tunnel to a guest port (`/v1/ports/<port>` over WebSocket) and an event stream
 (`/v1/events`). Every `POST` needs `Content-Type: application/json`. Details
 and the 401/403/415/502 rules: `Research/vphoned_http_api.md` ("Access control").
+
+## Duo RPC contract update (2026-11-15)
+
+Use the running guest's `methods.list` for its supported contract. This branch
+has 197 methods. `processes.spawn` is canonical; `process.spawn` still works.
+Timeout parameters use `_ms`; the previous seconds names remain accepted, and
+the canonical name wins when both are supplied. `input.swipe` takes `from`/`to`
+while still accepting the old coordinate fields.
+
+Paged lists (`apps.list`, `processes.list`, `services.list`, `services.dump`,
+`files.list`, `files.find`, `apfs.snapshots`, `logs.crashes`) default to 200 rows.
+Follow `next_cursor` until `truncated` is false. Cursors refer to a fresh listing,
+so rows may shift while the guest changes. Do not assume the first reply is complete.
+
+Use `processes.output` to page a truncated spawn's `output_id`; release the
+generated output with `processes.output_release` when finished. Outputs expire
+after 10 minutes and disappear when the daemon starts. `input.*` can request
+`observe: true` and `observe_delay_ms: 0..5000`; inspect `observed` for the
+foreground bundle and capped UI count, or `observe_error` if observation failed.
+Unknown parameters are refused with `invalid_param`; inspect the error's `code`,
+`message` and optional `hint`. The complete defaults and compatibility behavior
+are in `Research/vphoned_http_api.md`, “RPC contract integration”.

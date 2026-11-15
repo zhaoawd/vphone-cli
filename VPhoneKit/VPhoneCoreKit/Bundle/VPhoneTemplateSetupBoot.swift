@@ -524,7 +524,7 @@ public final class VPhoneTemplateSetupBoot {
                     + (reasons.isEmpty ? "" : ": \(reasons.joined(separator: "; "))"))
             }
             let wait = Int(min(Double(Self.settleCallLimit), max(10, remaining.rounded(.up))))
-            let result = try call("setup.settle", ["timeout_s": wait], deadline: end, timeout: Double(wait) + 20)
+            let result = try call("setup.settle", ["timeout_ms": wait * 1000, "timeout_s": wait], deadline: end, timeout: Double(wait) + 20)
             let elapsed = Int(clock.now().timeIntervalSince(start))
             if result["settled"] as? Bool == true {
                 outcome.settled = true
@@ -679,7 +679,7 @@ public final class VPhoneTemplateSetupBoot {
         let end = deadline(timeouts.stallCapture)
         log("  capturing the stall:")
         do {
-            let rows = try call("processes.list", [:], deadline: end)["processes"] as? [[String: Any]] ?? []
+            let rows = try callList("processes.list", key: "processes", deadline: end)["processes"] as? [[String: Any]] ?? []
             let picked = rows.filter {
                 Self.isStallProcess(name: $0["name"] as? String ?? "", executable: $0["executable"] as? String ?? "")
             }
@@ -1000,7 +1000,7 @@ public final class VPhoneTemplateSetupBoot {
     }
 
     private func bootMarker(deadline: Date) throws -> Double {
-        let list = try call("processes.list", [:], deadline: deadline)
+        let list = try callList("processes.list", key: "processes", deadline: deadline)
         guard let marker = Self.bootMarker(list) else {
             throw StepError("processes.list does not list launchd (pid 1) with a start time")
         }
@@ -1046,7 +1046,7 @@ public final class VPhoneTemplateSetupBoot {
 
     private func verificationProblems(deadline end: Date) throws -> [String] {
         var problems: [String] = []
-        let snapshots = try strings(call("apfs.snapshots", [:], deadline: end)["snapshots"])
+        let snapshots = try strings(callList("apfs.snapshots", key: "snapshots", deadline: end)["snapshots"])
             .filter { $0.hasPrefix(Self.snapshotPrefix) }
         if !snapshots.isEmpty {
             problems.append("snapshots left: \(snapshots.joined(separator: ", "))")
@@ -1066,7 +1066,7 @@ public final class VPhoneTemplateSetupBoot {
         }
         let removed = Set(outcome.removedApps)
         if !removed.isEmpty {
-            let listed = try (call("apps.list", [:], deadline: end)["apps"] as? [[String: Any]] ?? [])
+            let listed = try (callList("apps.list", key: "apps", deadline: end)["apps"] as? [[String: Any]] ?? [])
                 .compactMap { $0["bundle_id"] as? String }
             let back = listed.filter { removed.contains($0) }
             if !back.isEmpty {
@@ -1091,7 +1091,7 @@ public final class VPhoneTemplateSetupBoot {
         guard plan.clearsCrashReports else { return }
         let end = deadline(timeouts.crashReports)
         do {
-            let reports = try (call("logs.crashes", [:], deadline: end)["crashes"] as? [[String: Any]] ?? [])
+            let reports = try (callList("logs.crashes", key: "crashes", deadline: end)["crashes"] as? [[String: Any]] ?? [])
                 .compactMap { $0["path"] as? String }
                 .filter(Self.isCrashReport)
             var left: [String] = []
@@ -1208,6 +1208,17 @@ public final class VPhoneTemplateSetupBoot {
                 throw StepError("\(method): \(error.message)\(error.code.map { " (\($0))" } ?? "")")
             }
         }
+    }
+
+    private func callList(_ method: String, key: String, deadline: Date) throws -> [String: Any] {
+        var pages = VPhoneGuestListPages(key: key)
+        var params: [String: Any] = [:]
+        repeat {
+            guard clock.now() < deadline else { throw StepError("List paging exceeded the step deadline") }
+            let page = try call(method, params, deadline: deadline)
+            guard let cursor = try pages.append(page) else { return pages.result }
+            params["cursor"] = cursor
+        } while true
     }
 
     private func strings(_ value: Any?) -> [String] {

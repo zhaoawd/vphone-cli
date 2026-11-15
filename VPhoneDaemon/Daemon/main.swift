@@ -45,6 +45,7 @@ vp_ios16_keybagless_ui_start()
 // The VM's touchscreen has no wake gesture; a tap on a dark screen lights it.
 GuestScreenUnlock.startTapToWake()
 GuestIrisinInstaller.refreshBootstrapOnStartup()
+GuestProcessSpool.shared.sweepAll()
 GuestAPI.restoreUSBSerialOnStartup()
 GuestStaticNames.shared.restoreOnStartup()
 // locationd can deadlock as it starts; this restarts it.

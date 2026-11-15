@@ -17,6 +17,9 @@ enum GuestAPI {
     static func touchPhaseCode(_ phase: TouchPhase) -> Int32 { switch phase { case .down: 0; case .move: 1; case .up: 3 } }
 }
 
+/// `GuestAPI.liveObservation` defaults to the real foreground lookup, which this harness does not link.
+func frontmostApp() -> [String: Any] { [:] }
+
 func layout(orientation: Int = 4) -> [String: Any] {
     let sideways = orientation == 3 || orientation == 4
     func rect(_ width: Double, _ height: Double) -> [String: Any] { ["x": 0, "y": 0, "width": width, "height": height] }
@@ -44,7 +47,7 @@ func rejects(_ operation: () throws -> Void) {
         LayoutWitness.layout = layout()
         // The real handler must validate and normalize beyond the legacy
         // 678-point capture width, using the actual Icli C conversion core.
-        _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.tap")!, ["x": 900, "y": 300])
+        _ = try GuestMethodArea.dispatch([.make(InputMethod.self, GuestAPI.executeInput)], method: "input.tap", params: ["x": 900, "y": 300], observer: { nil })
         let point = PointInputWitness.points.last!
         precondition(abs(point[0] - 300 / 669.0) < 1e-9 && abs(point[1] - 51 / 951.0) < 1e-9)
         precondition(!icli_interface_geometry_current(nil))
@@ -64,13 +67,14 @@ func rejects(_ operation: () throws -> Void) {
             let snapshots = PointInputWitness.snapshotReads
             precondition(NSDictionary(dictionary: GuestAPI.activeScreenState()).isEqual(NSDictionary(dictionary: legacy)))
             precondition(PointInputWitness.snapshotReads == snapshots)
-            _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.tap")!, ["x": 600, "y": 300])
+            _ = try GuestMethodArea.dispatch([.make(InputMethod.self, GuestAPI.executeInput)],
+                                            method: "input.tap", params: ["x": 600, "y": 300], observer: { nil })
             let fallbackPoint = PointInputWitness.points.last!
             precondition(abs(fallbackPoint[0] - 300 / 466.0) < 1e-9)
             precondition(abs(fallbackPoint[1] - 78 / 678.0) < 1e-9)
-            for method in ["input.double_tap", "input.long_press", "input.swipe", "input.drag"] {
-                _ = try GuestAPI.executeInput(InputMethod(rawValue: method)!, ["x": 600, "y": 300, "x1": 600, "y1": 300,
-                                                      "x2": 500, "y2": 200, "points": [[600, 300], [500, 200]]])
+            for method in [InputMethod.inputDoubleTap, .inputLongPress, .inputSwipe, .inputDrag] {
+                _ = try GuestAPI.executeInput(method, ["x": 600, "y": 300, "from": [600, 300], "to": [500, 200],
+                                                      "points": [[600, 300], [500, 200]]])
             }
             _ = try GuestAPI.executeTouch(["phase": "down", "x": 600, "y": 300, "normalized": false])
             _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.touch_sequence")!,
@@ -140,9 +144,9 @@ func rejects(_ operation: () throws -> Void) {
             _ = try GuestAPI.executeInput(InputMethod(rawValue: "input.touch_sequence")!, ["normalized": flag, "events": [["phase": "down", "x": 900, "y": 300]]])
             _ = try GuestAPI.executeTouch(["phase": "down", "normalized": flag, "x": 900, "y": 300])
         }
-        for method in ["input.double_tap", "input.long_press", "input.swipe", "input.drag"] {
-            _ = try GuestAPI.executeInput(InputMethod(rawValue: method)!, ["x": 900, "y": 300, "x1": 900, "y1": 300,
-                                                  "x2": 800, "y2": 400, "points": [[900, 300], [800, 400]]])
+        for method in [InputMethod.inputDoubleTap, .inputLongPress, .inputSwipe, .inputDrag] {
+            _ = try GuestAPI.executeInput(method, ["x": 900, "y": 300, "from": [900, 300], "to": [800, 400],
+                                                  "points": [[900, 300], [800, 400]]])
         }
         rejects { _ = try GuestAPI.withActivePointGeometry { throw IcliError.failed("input failed") } }
         precondition(!icli_interface_geometry_current(nil), "input error leaked geometry")
