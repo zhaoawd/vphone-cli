@@ -7071,3 +7071,10 @@ strict Auto-Lock `never`, active geometry and render-server admission/drain
 remain present. Host list consumers follow paging while legacy daemon replies
 remain accepted. Evidence and the Trust reproduction limit are recorded in
 `Research/Integration/duo_m5_20261030/RPC_CONTRACT_NEXT_20261115.md`.
+
+The final candidate cold boot passed 91 actual reply schemas, Trust denial,
+AX 15/15 with locked rejection and source recovery. The original daemon,
+markers and 21 library entries were restored. One baseline boot did not
+connect; after the user-approved SIGINT, a new cold boot verified the
+original components, read-only root and original Auto-Lock setting, followed
+by normal shutdown and no state-file handles. The boot failure cause is unknown.

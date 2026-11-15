@@ -54,6 +54,8 @@
 
 `contract-rollback.log` 已核对恢复原 daemon `446925b6…`、原标记、全部 21 项原库以及根只读。该次正常关机后状态句柄释放。
 
-再次冷启动 `contract-session.E6EeraJ5` 未完成连接：前 150 次就绪查询均未得到可用 guest RPC；清理阶段正常关机请求也因 `guest not connected` 未执行，仍有 VM 服务持有状态文件。串口已到 early boot complete，之后出现 DriverKit 启动失败；该日志不能证明 daemon 失败的原因。只读截图请求因输入显示几何不可用被拒绝，原因未查明。最终原组件冷启动复核和正常关机因此尚未通过；不得将该次启动记为已完成清理。
+再次冷启动 `contract-session.E6EeraJ5` 未完成连接：前 150 次就绪查询均未得到可用 guest RPC；清理阶段正常关机请求也因 `guest not connected` 未执行，仍有 VM 服务持有状态文件。串口已到 early boot complete，之后出现 DriverKit 启动失败；该日志不能证明 daemon 失败的原因。只读截图请求因输入显示几何不可用被拒绝，原因未查明。该次启动未通过冷启动复核，未计为正常清理。
 
 五项 RPC 的候选验收通过；新宿主与旧 daemon 的真实混合运行主要由宿主契约测试覆盖，未另行启动新宿主 GUI。列表变化时的游标一致性不提供快照保证。未分页旧 icli 错误分类和历史 Trust 失败的原因仍保留上述限制。
+
+用户随后明确批准仅对该副本已核实的 PID 9856 发送 SIGINT 并重试复核。执行前再次检查 executable 和完整 config 路径；未发送 SIGKILL。`approved-stop.json` 保存授权动作证据，停止后状态句柄释放。重试 `contract-session.nylzAtsG` 已连接原 daemon，核对 SHA-256 `446925b6…`、原标记、21 项原库及根只读均通过；Auto-Lock 与此前同一新身份副本记录相同，为 120 秒、never=false。最终 `system.shutdown` 返回 accepted，串口记录 `ApplePSCI - system off` 与 `[vphone] Guest stopped`，`handles-final.txt` 为空。最终回滚和关机检查完成；启动异常的原因仍未查明。
