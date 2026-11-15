@@ -1,5 +1,15 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **X1/TXM synchronization preflight (2026-11-15).** No production declaration,
+> preset or firmware bytes changed. All 35 upstream #924 accessibility paths
+> fall within Duo's aggregate accessibility directory; naive selection changes
+> were reproduced with the real plan resolver. TXM #919/#923 depend on the
+> missing native remap/profile implementation. Eight in-memory combinations on
+> one original TXM confirmed precheck precedence and byte identity between
+> upstream explicit precheck and the current Duo standard output. These checks
+> do not constitute guest acceptance of native remap or the 35-image migration.
+> See [preflight and migration plan](Integration/duo_m5_20261030/X1_TXM_PREFLIGHT_20261115.md).
+
 > **WebKit camera integration (2026-11-15).** Upstream #906 adds the
 > WebKit GPU process to the existing SystemHook CamFix loading path, before
 > the app-only gate. The original library reproduced a WebKit GPU abort;
