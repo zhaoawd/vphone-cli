@@ -12,9 +12,11 @@
 
 1. [x] #924 评估：独立 AX 插件清单、聚合目录重叠、旧选择负例、可选安装器依赖和迁移方案已保存。实际独立声明／审计移植及 35 项真实镜像验收未完成。
 2. [x] #919／#923 评估：依赖、版本／默认选择、优先级和参考 TXM 的 8 个组合已验证；旧选择改名负例已保存。native remap 生产移植和实际启动／注入／remap 验收未完成。
-3. [ ] DriverKit、Cryptex、启动链及其他设备改动：按组件列出尚未同步的最终上游差异，区分 Duo 27.1 必需项、其他设备／旧固件项和独立实验项，记录依赖及验收目标。
-4. [ ] 显示与启动诊断：保留原生 Snapshot，继续定位约 432 ms 重复亮度区间的完整原因；补方向变化／右横屏覆盖。单独保留一次原组件冷启动未连接 RPC 的日志，原因未查明，不能由后续启动成功推定已修复。
-5. [ ] 补验证缺口：实际 CFW 安装／System 卸载、Linux FUSE／并发、USB／DFU 与恢复空间峰值、27.2 独立候选。先准备可回归入口与明确环境；涉及擦除、宿主准入或其他新增范围时再核对批准。下次候选 VM 回归同时实测保存版摄像头脚本新增的前置断言。
+3. [x] 其余上游差异评估：#867／#877 DriverKit、#900 Cryptex、#909／#911 旧固件与 PCC GPU、#910 pairing、#920／#926 鼠标与 framebuffer、#921 SPTM 的最终差异、依赖、适用范围和验收目标已保存。实际生产移植另列。见 [差异清单](Research/Integration/duo_m5_20261030/UPSTREAM_REMAINDER_20261115.md)。
+4. [ ] 显示与启动诊断继续：约 432 ms 的 14 个相同缩略亮度样本，全尺寸 RGBA 摘要各异，但相邻最大通道差仅 5，不能据此证明源画面更新。CPU 保持区间与源更新边界已对齐，完整原因仍未查明。内屏右横屏需要 relay 不支持的 device orientation 2；新方向实测被当前 AMFI 拒绝阻塞。历史 guest 冷启动失败和本轮宿主准入失败分别报告。见 [诊断记录](Research/Integration/duo_m5_20261030/DISPLAY_BOOT_DIAGNOSIS_20261115.md)。
+5. [ ] 实际验证仍待完成：CFW 安装／System 卸载、Linux FUSE／并发、USB／DFU 与恢复空间峰值、27.2 独立候选。本轮完成 47 项文件／缓存、72 项恢复、libusb 7/7、IOKit 8/8、缓存身份 12/12 和确认 3/3；保存版摄像头脚本 7 项记录回复前置检查通过，未计为新实机结果。新身份 CFW 副本已准备，完整安装待批准；Linux 服务不可用，连接设备不在本轮授权目标内，三个独立候选仍被 AMFI 拒绝。见 [环境与具体执行方案](Research/Integration/duo_m5_20261030/VALIDATION_GAPS_20261115.md)。
+
+本轮 3–5 状态：第 3 项评估完成；第 4 项新增测量和诊断证据，原因及方向实测未完成；第 5 项完成离线回归、环境核对及新 CFW 副本准备，实际验收未完成。证据目录 `.build/followup-3-5-20261115/`。当前新宿主 `974031b5…` 与基线宿主 `d85f81ed…` 均被 AMFI 拒绝；本轮未修改 allowlist，VM 未进入 guest 启动。原副本、foundation 副本及新 CFW 副本均无状态文件句柄。需要批准当前宿主准入以及新副本的全量 CFW 安装；具体命令见验证方案。
 
 发布准备另行跟踪：四语手册 Argon 审阅、Release 产物及 Developer ID 签名／notarization 未完成；当前 Debug 构建和本地验收不替代发布验收。
 
@@ -23,7 +25,7 @@
 - [ ] X1：先引入完整转换／可选安装器，迁移旧聚合选择、备份、收据与 HomePop；每个文件只保留一个安装／撤销步骤，再接入独立声明和只读审计。保留 Duo 共享缓存撤销归属。
 - [ ] TXM：补齐 #831 和 profile 依赖及旧 ID／收据迁移，接入 #919／#923；准备保留旧 precheck 输出和 native remap 两份候选，完成静态与独立 VM 验证后决定 Duo 默认策略。
 
-前三项完成：真实新宿主 GUI × 旧 daemon 的五类面板刷新／筛选通过；#906 原生／WKWebView／Safari 变化帧通过；#861／#869／#870／#888 构建环境、固定依赖、许可证和分发门禁已集成。完整 Bundle 构建、严格签名、Launchpad Debug 构建和相关正反回归通过，版本保持 2.15.2。新宿主实际预检通过，未新增 AMFI allowlist。测试 App 已注销归档并保留数据；隔离副本已恢复原 daemon／标记、21 项库，冷启动核对根只读和 Auto-Lock 原值 120 秒后正常关机，无状态句柄。证据目录 `.build/host-webcam-distribution-20261115/`；见 [验收记录](Research/Integration/duo_m5_20261030/HOST_WEBCAM_DISTRIBUTION_20261115.md)。未推送、发布或执行 Developer ID 签名。
+上一批完成：真实新宿主 GUI × 旧 daemon 的五类面板刷新／筛选通过；#906 原生／WKWebView／Safari 变化帧通过；#861／#869／#870／#888 构建环境、固定依赖、许可证和分发门禁已集成。完整 Bundle 构建、严格签名、Launchpad Debug 构建和相关正反回归通过，版本保持 2.15.2。当次新宿主实际预检通过，未新增 AMFI allowlist；本轮重新预检已被拒绝。测试 App 已注销归档并保留数据；隔离副本已恢复原 daemon／标记、21 项库，冷启动核对根只读和 Auto-Lock 原值 120 秒后正常关机，无状态句柄。证据目录 `.build/host-webcam-distribution-20261115/`；见 [验收记录](Research/Integration/duo_m5_20261030/HOST_WEBCAM_DISTRIBUTION_20261115.md)。未推送、发布或执行 Developer ID 签名。
 
 本轮完成：五项 RPC 契约修改与候选验收通过（名称／单位兼容、错误码／未知参数、列表分页、进程输出暂存、输入观察）；197 方法、38 项兼容回归、1148 项逻辑、132 项 schema、109 项 fixture 和 687 项 CoreKit 测试通过。候选实际冷启动的 91 次回复 schema、Trust 拒绝、AX 15/15 和来源恢复通过。已恢复原 daemon／标记和 21 项库。一次原组件冷启动未连接 RPC；按用户批准对该副本发出 SIGINT 后重试冷启动，原组件、原标记、21 项库、根只读和原 Auto-Lock 120 秒均核对通过，随后正常关机，无状态句柄。该次启动异常原因未查明。证据目录 `.build/rpc-contract-next-20261115/`；见 [本轮记录](Research/Integration/duo_m5_20261030/RPC_CONTRACT_NEXT_20261115.md)。
 
@@ -51,12 +53,14 @@
 - [x] RPC 契约五项实现与候选验收（#908、#914–#916）：名称／单位兼容、错误码／未知参数、分页、输出暂存和 observe；保留 Duo AX、Auto-Lock `never` 与生命周期。
 - [x] 本轮隔离副本最终清理：用户批准异常停止后重试，原组件／标记、21 项库、根只读和 Auto-Lock 原值均通过；最终正常关机，无状态句柄。一次原组件启动未连接的原因未查明。
 - [x] 新宿主 GUI × 旧 daemon 实测；#906 网页摄像头路径；#861/#869/#870/#888 构建分发。Bundle／Launchpad 版本仍为 2.15.2，最低 Bundle 2.15.0；Bundle 严格签名、实际 notice 门禁、Launchpad 构建和兼容策略回归通过。未执行 Developer ID 发布签名或 notarization。
-- [ ] 单独评估 #924 X1 声明与撤销归属、#919/#923 TXM，以及 DriverKit、Cryptex、启动链和其他设备改动。旧固件与文档站另行评估。
+- [x] #924 X1、#919／#923 TXM 与其余 9 组 DriverKit、Cryptex、旧固件、启动链和设备改动的范围评估完成，方案与预检已保存。生产移植及独立设备实测仍待完成；文档站发布另行处理。
 
 ## 需要独立环境或权限
 
 | 项目 | 现状及继续条件 |
 | --- | --- |
+| 当前宿主与完整 CFW | `974031b5…` 预检被拒绝。`duo-cfw-followup-20261115` 已用 --new-identity 克隆并保持停机，计划／签名已核对。宿主 allowlist 和该副本的全量安装范围待批准；不修改原副本。 |
+| Linux FUSE／并发 | macOS 上的 Docker CLI 存在，当前 daemon socket 不存在，且没有 sshfs；需要可用 Linux 验收环境。离线映射测试不替代该项。 |
 | USB/DFU 恢复重试、恢复空间峰值 | 客户端 libusb 7/7、IOKit 8/8、原生恢复 72/72 通过。实际验收需要独立目标；涉及擦除的恢复须先获明确批准。 |
 | 27.2 铰链与音频、GLES、独立 RPC 候选 | 三个候选预检仍被 AMFI 拒绝。当前 27.1 的局部 RPC 验收已完成；不替代独立候选。见 [候选和运行条件](Research/Integration/duo_m5_20261030/ACCEPTANCE.md#后续独立候选)。 |
 | WDA HTTP、宿主快捷键 | 分别需要运行中的 WebDriverAgentRunner 和已获辅助功能权限的宿主环境。 |

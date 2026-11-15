@@ -1,5 +1,18 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Remaining integration assessment and diagnostics (2026-11-15).** Nine
+> upstream groups now have final-diff inventories and scoped validation plans;
+> no new production patch, declaration or preset was applied. Full-size movie
+> decoding shows that the 14 equal downscaled-luma samples over about 432 ms
+> have distinct RGBA hashes with very small channel differences; this neither
+> proves source progress nor identifies the remaining presentation cause.
+> Current AMFI refusals are recorded separately from the historical guest RPC
+> startup failure. A new stopped CFW clone is prepared; full installation and
+> external-environment acceptance remain pending. See
+> [remaining upstream inventory](Integration/duo_m5_20261030/UPSTREAM_REMAINDER_20261115.md),
+> [display/startup evidence](Integration/duo_m5_20261030/DISPLAY_BOOT_DIAGNOSIS_20261115.md)
+> and [validation scope](Integration/duo_m5_20261030/VALIDATION_GAPS_20261115.md).
+
 > **X1/TXM synchronization preflight (2026-11-15).** No production declaration,
 > preset or firmware bytes changed. All 35 upstream #924 accessibility paths
 > fall within Duo's aggregate accessibility directory; naive selection changes
