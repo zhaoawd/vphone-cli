@@ -46,6 +46,14 @@ static int vpIsMotionDaemon(const char *path) {
     return vpPathHasSuffix(path, "/usr/libexec/backboardd");
 }
 
+// WebKit runs camera capture for every web page in its GPU process, an XPC
+// service outside any .app, so the app gate below never gives it the camera
+// fix: its AVCaptureSession hit the virtual camera's nil active format and
+// aborted (issue #676).
+static int vpIsWebKitGPUProcess(const char *path) {
+    return vpPathHasSuffix(path, "/com.apple.WebKit.GPU");
+}
+
 static int vpIsInjectionTarget(const char *path) {
     if (!path)
         return 0;
@@ -275,6 +283,12 @@ __attribute__((constructor)) static void vpLogProcess(void) {
         vpLoadLibrary("accelerometer-hook", VP_ACCELEROMETER_HOOK);
         vpLoadLibrary("hinge-hook", VP_HINGE_HOOK);
         vpLoadLibrary("fold-display", VP_FOLD_DISPLAY);
+        return;
+    }
+    // libcamfix installs its hooks only when AVFCapture loads, so it is
+    // loaded without the AVFoundation check that keeps it out of other apps.
+    if (vpIsWebKitGPUProcess(path)) {
+        vpLoadLibrary("camera-hook", VP_CAMERA_APP_HOOK);
         return;
     }
     // SpringBoard needs the haptics swizzle before UIKit first asks for an
