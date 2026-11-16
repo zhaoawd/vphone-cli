@@ -126,7 +126,10 @@ jobs:
             -clonedSourcePackagesDirPath .build/XcodeBundle/SourcePackages \
             -disableAutomaticPackageResolution -parallel-testing-enabled NO -jobs 4 test \
             -only-testing:VPhoneCoreKitTests/TemplateSetupBootTests \
-            -only-testing:VPhoneCoreKitTests/APIRequestGateTests
+            -only-testing:VPhoneCoreKitTests/APIRequestGateTests \
+            -only-testing:VPhoneCoreKitTests/PCCGPUDriverTests \
+            -only-testing:VPhoneCoreKitTests/FirmwareCatalogReportTests \
+            -only-testing:VPhoneCoreKitTests/GuestDeviceTests
 
       - name: Dyld mapping lifetime and undo tests
         run: |
@@ -151,6 +154,9 @@ jobs:
             -clonedSourcePackagesDirPath .build/XcodeBundle/SourcePackages \
             -disableAutomaticPackageResolution -parallel-testing-enabled NO -jobs 4 test \
             -only-testing:FirmwarePatcherTests/DeviceTreeGuestDeviceTests \
+            -only-testing:FirmwarePatcherTests/SPTMSecondaryCPUTests \
+            -only-testing:FirmwarePatcherTests/FirmwarePatchDriftTests \
+            -only-testing:FirmwarePatcherTests/DyldSharedCacheQuartzCoreUnrotatedFramebufferTests \
             -only-testing:FirmwarePatcherTests/CustomFirmwareDriverKitTests \
             -only-testing:FirmwarePatcherTests/CustomFirmwareRemotePairingTests \
             -only-testing:FirmwarePatcherTests/FirmwareGuestPatchResolutionTests \

@@ -71,8 +71,9 @@ nonisolated struct VPhoneLaunchpadBundleReceipt: Codable, Equatable, Sendable {
 /// must not trust the app.
 nonisolated enum VPhoneLaunchpadNames {
     /// Minimum bundle version for Launchpad's CLI and receipt contract.
-    /// Series 2.16: standalone X1 selection migration and native TXM policy.
-    private static let minimumBundleComponents = (2, 16, 0)
+    /// Series 2.18: Duo's integrated SPTM catalogue and runtime Cryptex contract,
+    /// alongside standalone X1 selection migration and native TXM policy.
+    private static let minimumBundleComponents = (2, 18, 0)
     static let minimumBundleVersion =
         "\(minimumBundleComponents.0).\(minimumBundleComponents.1).\(minimumBundleComponents.2)"
 

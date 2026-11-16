@@ -1,6 +1,6 @@
 # Duo M5 当前任务
 
-更新：2026-11-16。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 已刷新到 `13169405`（2.17.1）；本地 `main` 仍为 `6f57024a`。本轮改动已按范围评审并拆分为本地提交；尚未推送或发布。
+更新：2026-11-16。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 固定为 `13169405`（2.17.1）；本地 `main` 已快进到同一提交。当前分支按功能组保存本地提交，完整归并仍待收尾；尚未推送或发布。
 
 ## 整体接入优先
 
@@ -16,7 +16,7 @@
 
 每组保留编译、补丁选择／版本门槛、兼容／撤销等必要回归。可以集中执行实际组合验收，不要求完成所有独立设备和扩展工作流后才继续下一组生产接入。
 
-第一组生产接入完成：CoreKit 45 项、DeviceTree／目录 65 项、transport 和实际恢复源码 CPU 策略 8 项通过。完整 Bundle 构建与后续组集中进行；旧固件运行验收后置。下一组为 SPTM。见 [整体接入记录](Research/Integration/duo_m5_20261030/OVERALL_PORT_20261116.md)。
+前四组生产接入已分别提交为 `c040e52c`、`4ba8aad6`、`931cc136`、`add61aef`。完整 Bundle、深度严格签名、CLI 目录和 framebuffer verb 通过；Launchpad 和版本契约回归通过。组合候选采用 2.18 系列，最低 Bundle 版本同步提高。Duo 实际 framebuffer／输入组合验收仍待候选准备。独立推进最后一组 Cryptex 的生产接入，不将其加入 Duo 默认计划。见 [整体接入记录](Research/Integration/duo_m5_20261030/OVERALL_PORT_20261116.md)。
 
 后置清单继续保留：内屏 AX 可见性过滤、首次姿态超时、间歇启动／AMFI 拒绝、显示交接与方向细节；LLDB、CMS／真实 profile 热重载、local pairing 协议、App 直接 posix_spawn；旧固件实机矩阵、27.2、Linux FUSE／并发、物理 USB／DFU、WDA 与宿主快捷键。发布准备另列四语手册审阅、Release 产物、Developer ID 签名和 notarization。
 

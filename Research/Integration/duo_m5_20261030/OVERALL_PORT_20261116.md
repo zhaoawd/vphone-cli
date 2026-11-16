@@ -44,3 +44,13 @@ SPTM／目录／drift 共 52 项通过（`group2-sptm-tests.log`），真实 IPS
 安装器通过原有 `applyDyldPatches` 路径传入独立 undo ID，共享页归属和签名重计算沿用 Duo 已有实现。未覆盖 `DyldSharedCacheUndoLog`、FoldDisplay、Snapshot 或输入方向转换。默认声明适用于 iOS 27 的候选；实际已有 VM 不因编译自动修改，Duo 选择结果仍需组合候选验收。
 
 `DyldSharedCacheQuartzCoreUnrotatedFramebufferTests`、`DyldSharedCacheUndoLogTests`、`DyldSharedCacheUndoWordsTests`、`FirmwarePatchSetCatalogTests`、`FirmwareGuestPatchResolutionTests` 共 92 项通过（`group4-framebuffer-tests.log`）。iPad 27 DSC fixture 未提供，实际 cache dry-run／重复应用／撤销测试跳过。当前没有新增恢复或 guest 安装。
+
+## 前四组组合检查
+
+完整 `VPhone` scheme 构建通过（`first-four-bundle-build.log`），Bundle 深度严格签名通过。实际 Bundle CLI 的 `fw patches --json` 和 framebuffer verb 的 `--help` 通过，产物保存为 `first-four-catalog.json`。该次 Bundle 仍为调整前的 2.16 标记；最终版本会再次完整构建。
+
+SPTM 新组件改变 Launchpad 的目录契约。固定上游已使用 2.17 系列，本地组合候选采用 2.18.0，并提高 `minimumBundleComponents` 为 `(2, 18, 0)`；helper build 提高为 22。Launchpad 完整构建及 15 个 store-name／机器绑定契约测试通过（`first-four-launchpad-build.log`、`version-contract-tests.log`）。相关 CoreKit／SPTM／framebuffer／drift suite 已纳入已有 CI。
+
+本地 `main` 从 `6f57024a` 快进到固定的 `13169405`，未访问远端、未推送。当前 Duo 分支尚未归并该祖先；额外上游平台差异需要在最终归并时逐项核对，不能以功能组移植提交代替完整同步。
+
+实际 Duo framebuffer／输入组合验收仍待新的可审阅候选。此前的两轮 native TXM 运行证据不替代本次显示候选验收。无依赖的 Cryptex 生产接入继续执行；不会在 Duo 27.1 启用 trusted darwinOS。
