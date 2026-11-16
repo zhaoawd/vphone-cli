@@ -240,17 +240,34 @@ struct FirmwareCatalogReportTests {
         }
     }
 
+    @Test func `SE 3 iOS 18 uses the measured 26_1 GPU transport pairing`() throws {
+        let pairing = try #require(VPhoneFirmwareCatalog.pairings(for: "iPhone14,6").first { $0.iosName == "iOS 18.6.2" })
+        #expect(pairing.iosURL.hasSuffix("iPhone14,6_18.6.2_22G100_Restore.ipsw"))
+        #expect(pairing.cloudosURL == VPhoneFirmwareCatalog.cloud261)
+        #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "iPhone14,6", version: "18.6.2", url: pairing.iosURL).url == VPhoneFirmwareCatalog.cloud261)
+        #expect(VPhoneFirmwareCatalog.iOS18CloudOS(forVersion: "18.6.2")?.name == "cloudOS 18.6 (22G86)")
+        #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "iPhone17,3", version: "18.6.2", url: "").url == VPhoneFirmwareCatalog.cloud261)
+        let report = try #require(VPhoneFirmwareCatalog.report.devices.first { $0.productType == "iPhone14,6" })
+        #expect(report.pairings.first?.recommendedCloudOS.url == VPhoneFirmwareCatalog.cloud261)
+    }
+
     @Test func `other i phones have pairings of their own`() {
         for guest in VPhoneGuestDevice.known where guest.family == .iPhone && guest.presentsBoard && guest != .iPhone17_3 && !Self.offCatalog.contains(guest) {
             let pairings = VPhoneFirmwareCatalog.pairings(for: guest.productType)
             let firstRelease = switch guest.productType {
+            case "iPhone14,6": "iOS 18.6.2"
             case "iPhone18,5": "iOS 26.3.1"
             case "iPhone19,2": "iOS 27.0.1"
             case "iPhone19,4": "iOS 27.1"
             default: "iOS 26.0"
             }
             #expect(pairings.map(\.iosName).first == firstRelease)
-            #expect(pairings.map(\.iosName).last == (guest.productType == "iPhone19,4" ? "iOS 27.2" : "iOS 27.0.1"))
+            let lastRelease = switch guest.productType {
+            case "iPhone14,6": "iOS 27.2.1"
+            case "iPhone19,4": "iOS 27.2"
+            default: "iOS 27.0.1"
+            }
+            #expect(pairings.map(\.iosName).last == lastRelease)
             for p in pairings {
                 #expect(p.device == guest.productType)
                 #expect(p.iosURL.hasPrefix("https://updates.cdn-apple.com/"))
@@ -306,6 +323,14 @@ struct FirmwareCatalogReportTests {
         #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "iPhone17,3", version: "18.6.2", url: "").url == VPhoneFirmwareCatalog.cloud261)
         #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "iPhone17,3", version: "26.2.9", url: "").url == VPhoneFirmwareCatalog.cloud262)
         #expect(VPhoneFirmwareCatalog.recommendedCloudOS(forDevice: "AppleTV5,3", version: "26.1", url: "").url == VPhoneFirmwareCatalog.cloud264)
+    }
+
+    @Test func `an iOS 18 release takes the GPU driver of its own release's cloudOS`() {
+        #expect(VPhoneFirmwareCatalog.iOS18CloudOS(forVersion: "18.6.2")?.name == "cloudOS 18.6 (22G86)")
+        #expect(VPhoneFirmwareCatalog.iOS18CloudOS(forVersion: "18.6")?.name == "cloudOS 18.6 (22G86)")
+        #expect(VPhoneFirmwareCatalog.iOS18CloudOS(forVersion: "18.7.2")?.name.hasPrefix("cloudOS 18.7") == true)
+        #expect(VPhoneFirmwareCatalog.iOS18CloudOS(forVersion: "18.4") == nil)
+        #expect(VPhoneFirmwareCatalog.iOS18CloudOS(forVersion: "26.1") == nil)
     }
 
     @Test func `round trips JSON`() throws {

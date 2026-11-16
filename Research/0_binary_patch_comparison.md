@@ -1,5 +1,15 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Remaining production integration (2026-11-16).** Adds SE 3 board registration
+> and installed-tree Home button values, with the restore-tree policy retained.
+> The iOS 18 GPU transport declaration is gated to iOS 18.6 with cloudOS 26.1;
+> preparation stages the driver from its matching older PCC release, using a
+> read-only OS image before temporary restore fallback. Only that temporary
+> restore uses one vCPU for cloudOS before 26. Transport sanitizers, 45 CoreKit
+> tests and eight production-source recovery CPU policy cases pass. Old firmware
+> restore and GPU runtime acceptance remain pending. See
+> [integration scope and evidence](Integration/duo_m5_20261030/OVERALL_PORT_20261116.md).
+
 > **Duo production patch port (2026-11-16, isolated guest validated).** Adds virtual
 > USB DriverKit runtime/Preboot declarations, semantic local-pairing gates,
 > complete/reversible standalone X1 installation, 35 independent AX declarations

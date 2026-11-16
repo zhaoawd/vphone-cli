@@ -310,6 +310,48 @@ struct DeviceTreeGuestDeviceTests {
 
     // MARK: - Tests
 
+    static func se3Board(home: Property?) -> Node {
+        let source = board(model: "iPhone14,6", unique: "D49AP", subtype: 1334,
+                           disablesStageManager: false, idiom: "phone", scale: 2)
+        return Node(properties: source.properties, children: [source.children[0],
+            Node(properties: [.string("name", "buttons")] + (home.map { [$0] } ?? []), children: []),
+        ])
+    }
+
+    @Test func `SE 3 copies its concrete Home button only to the installed tree`() throws {
+        let source = Self.se3Board(home: .integer("home-button-type", 1))
+        let installed = try Self.patch(device: .iPhone14_6, role: .installed, board: source)
+        #expect(Self.integer(installed["device-tree/buttons"]?["home-button-type"]) == 1)
+        #expect(installed["device-tree/buttons"]?["home-button-type"]?.0 == 0)
+        let restore = try Self.patch(device: .iPhone14_6, role: .restore, board: source)
+        #expect(Self.integer(restore["device-tree/buttons"]?["home-button-type"]) == 2)
+    }
+
+    @Test func `SE 3 refuses missing placeholder or malformed Home button data`() throws {
+        let invalid: [Property?] = [nil, .placeholder("home-button-type", "home"),
+                                   Property(name: "home-button-type", flags: 0, value: Data([2]))]
+        for home in invalid {
+            let input = Self.tree.serialized()
+            let patcher = DeviceTreePatcher(data: input, verbose: false, device: .iPhone14_6,
+                                           role: .installed, sourceTree: Self.se3Board(home: home).serialized())
+            #expect(throws: (any Error).self) { try patcher.findAll() }
+            #expect(patcher.patchedData == input)
+        }
+    }
+
+    @Test func `blocking the SE 3 Home button patch preserves the virtual placeholder`() throws {
+        let patcher = DeviceTreePatcher(data: Self.tree.serialized(), verbose: false, device: .iPhone14_6,
+                                       role: .installed, sourceTree: Self.se3Board(home: nil).serialized())
+        let declared = Set(FirmwareDeviceTreePatchSet.manifest.patches.map(\.identifier))
+        patcher.gate = VPhonePatchGate(declared: declared,
+                                      enabled: declared.subtracting(["devicetree-cfw-home_button_type"]))
+        let records = try patcher.findAll()
+        #expect(!records.contains { $0.patchID == "devicetree-cfw-home_button_type" })
+        let home = Self.read(patcher.patchedData)["device-tree/buttons"]?["home-button-type"]
+        #expect(home?.0 == 0x8000)
+        #expect(Self.string(home) == "syscfg/home")
+    }
+
     @Test func `phone and pad runtime trees enable the virtual USB HID driver`() throws {
         for device in [VPhoneGuestDevice.iPhone17_3, .iPhone19_4, .iPad16_1, .iPhone11_6] {
             let role: DeviceTreePatcher.TreeRole = device == .iPhone11_6 ? .shared : .installed

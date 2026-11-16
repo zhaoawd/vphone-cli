@@ -2,6 +2,24 @@
 
 更新：2026-11-16。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 已刷新到 `13169405`（2.17.1）；本地 `main` 仍为 `6f57024a`。本轮改动已按范围评审并拆分为本地提交；尚未推送或发布。
 
+## 整体接入优先
+
+用户当前方向：优先完成剩余功能组的生产接入，细节诊断和扩展验收后置。以下为建议执行顺序，固定上游仍为 `13169405`；具体差异见 `UPSTREAM_REMAINDER_20261115.md`，历史状态由下文较新的生产记录更新。
+
+- [x] 固定当前接入基线：75 个文件的已实现／已验证改动保存为本地提交 `119f1529`，保留测试与研究记录。
+- [x] 第一组生产接入，#909＋#911：PCC OS image GPU 提取、版本匹配／AEA 回退、临时恢复 vCPU 策略和 SE 3／transport 依赖已完成；相关回归通过，旧固件运行验收后置。
+- [ ] 第二组，#921：接入 SPTM 组件、语义补丁、pipeline、PatchKit／Launchpad 目录、预设和 drift；保留 cloudOS 18 版本门槛。
+- [ ] 第三组，#920：接入鼠标模式、偏好持久化、菜单及 iPad pointer／touch，核对共享输入路径中的 Duo 旋转和双面板逻辑。
+- [ ] 第四组，#926：接入 QuartzCore 未旋转 framebuffer 的 planner、声明、CLI、安装／撤销及共享缓存修改归属；Duo 默认选择通过组合候选确定，不将其作为已有显示诊断的已确认修复。
+- [ ] 前四组接入收尾：核对目录、预设、CLI、收据、Launchpad 与版本契约；按 upstream → main → Duo 整理同步，完成完整 Bundle／Launchpad 构建和一轮 Duo 组合验收。
+- [ ] 最后一组，#900：独立接入 trusted darwinOS／persistent Cryptex 的依赖组，包括 RPC、菜单、cryptexctl 来源及恢复回退；保留支持范围与拒绝路径，不加入 Duo 27.1 默认计划。
+
+每组保留编译、补丁选择／版本门槛、兼容／撤销等必要回归。可以集中执行实际组合验收，不要求完成所有独立设备和扩展工作流后才继续下一组生产接入。
+
+第一组生产接入完成：CoreKit 45 项、DeviceTree／目录 65 项、transport 和实际恢复源码 CPU 策略 8 项通过。完整 Bundle 构建与后续组集中进行；旧固件运行验收后置。下一组为 SPTM。见 [整体接入记录](Research/Integration/duo_m5_20261030/OVERALL_PORT_20261116.md)。
+
+后置清单继续保留：内屏 AX 可见性过滤、首次姿态超时、间歇启动／AMFI 拒绝、显示交接与方向细节；LLDB、CMS／真实 profile 热重载、local pairing 协议、App 直接 posix_spawn；旧固件实机矩阵、27.2、Linux FUSE／并发、物理 USB／DFU、WDA 与宿主快捷键。发布准备另列四语手册审阅、Release 产物、Developer ID 签名和 notarization。
+
 ## 2026-11-16 生产移植
 
 固定上游 `13169405`，起点 `c07ee974`。本轮修改工作树，未推送或发布。旧评估条目保留当时状态，以本节为当前进度。
