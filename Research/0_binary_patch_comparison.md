@@ -1,5 +1,19 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **DriverKit / execution-context validation (2026-11-16).** The target's live
+> Preboot tree has supports-driverkit=1 and its backup does not. Removing the
+> inherited conflicting selection override clears pending without changing plan,
+> receipt or tree bytes; an independent cold boot confirms the same state.
+> A separate no-sandbox/no-container App passes both direct-spawn signatures,
+> 20 remaps and 80 aliases without custom-trust; the original sandboxed App's
+> process-fork denial is retained. Real LLDB attach/read/write/restore and an
+> in-place 42→91→42 hook pass. Dirty alias RX still fails, including the tested
+> debugger and dynamic-codesigning contexts. Existing CoreDevice pairing carries
+> three guest notifications in each of two runs. New pairing, lockdown validate
+> and Development CMS/profile reload remain unvalidated or failed as recorded.
+> No production binary patch is added. See
+> [evidence and limits](Integration/duo_m5_20261030/FOLLOWUP_567_20261116.md).
+
 > **Ordered reliability checks (2026-11-16).** The AX candidate now passes an
 > independent cold boot, 9/9 discovery in three samples, six actual taps and
 > 15 context hits. Six supported poses pass 24 native PNG color checks against

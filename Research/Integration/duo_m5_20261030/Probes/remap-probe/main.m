@@ -183,6 +183,10 @@ static void run(void) {
 @implementation RemapProbeDelegate
 - (BOOL)application:(UIApplication *)app didFinishLaunchingWithOptions:(NSDictionary *)options {
     documents = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+    if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.vphone.tests.remap-context"]) {
+        documents = [NSURL fileURLWithPath:@"/var/mobile/Library/Caches/com.vphone.tests.remap-context" isDirectory:YES];
+        [NSFileManager.defaultManager createDirectoryAtURL:documents withIntermediateDirectories:YES attributes:nil error:NULL];
+    }
     return YES;
 }
 @end

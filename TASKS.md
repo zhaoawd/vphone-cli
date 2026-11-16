@@ -4,7 +4,13 @@
 
 ## 整体接入优先
 
-当前执行顺序（用户明确指定 1 → 2 → 3）已完成本轮检查：[x] AX 修复独立冷启动；[x] 显示交接／方向最小复现与受控像素验证；[x] 启动稳定性两组三次有界冷启动。第 2、3 项的有限通过不计为历史间歇问题已修复。目标仍为 `duo-overall-20261116`，使用冻结 VM 和已测 AX daemon，结束后恢复原 daemon／marker／设置；未执行擦除恢复、来源副本操作或发布。
+当前任务（用户明确要求解决第 5–7 项）：[x] DriverKit 选择／Preboot 修复冲突核对与一致化；[x] 保留原沙盒失败、完成独立测试身份的派生进程验收；[ ] 第 7 项部分完成：实际 LLDB 附加／读写／恢复、原地址 inline hook、现有 CoreDevice 配对的协议往返已通过。仅使用冻结 Bundle 和 `duo-overall-20261116`。详见 [第 5–7 项记录](Research/Integration/duo_m5_20261030/FOLLOWUP_567_20261116.md)。
+
+DriverKit 的 live DeviceTree 属性为 `01000000`，原备份没有该属性；停机后经公开选择命令移除一项冲突覆盖，pending=0，plan／receipt 字节不变。独立冷启动 `cold-run.ywGia8F6` 再次核对属性、文件摘要及原组件通过。独立 RemapContext 使用 no-sandbox／no-container，在无 custom-trust 的新 PID 中通过 20/20 remap、80 aliases、两种库和两种子进程 exit=0；原 RemapProbe 的 executable 摘要未变，原断言及同 PID 642 的 process-fork 拒绝保留。LLDB 实际写入后运行中回读 41→73→41，原地址 hook 42→91→42，生成任务均卸载；现有 CoreDevice 配对两轮通知往返均为 3/3。
+
+第 7 项保留的问题：修改后的 alias 恢复 RX 返回 2，真实 LLDB 上下文及单独增加 dynamic-codesigning 的对照均未解决，原因未查明；传统 lockdown validate 返回 Trust 响应等待，未建立新配对。宿主有效签名身份为 0、目标无已装 provisioning profile；用户确认暂无 Development CMS App／匹配 profile，明确保留注册／热重载正向验收缺口。来源副本、宿主安全设置及生产补丁未改动；收尾状态见上述记录。
+
+上一轮执行顺序（用户明确指定 1 → 2 → 3）已完成本轮检查：[x] AX 修复独立冷启动；[x] 显示交接／方向最小复现与受控像素验证；[x] 启动稳定性两组三次有界冷启动。第 2、3 项的有限通过不计为历史间歇问题已修复。目标仍为 `duo-overall-20261116`，使用冻结 VM 和已测 AX daemon，结束后恢复原 daemon／marker／设置；未执行擦除恢复、来源副本操作或发布。
 
 最新结果：候选冷启动 `cold-run.EnCziTP5` 核对独立 boot UUID 和 daemon hash 后，AX 9/9×3、原脚本实际点击 6/6、命中 15/15／锁屏拒绝通过。六种支持姿态的原生 PNG 有 24/24 个颜色点匹配 App 测得的窗口→固定坐标；Safari 恢复循环 3/3，通过不替代所有 App 的方向保证。两组各六次交接均确认，MOV 观察窗口无近黑帧；最长缩略亮度摘要重复约 465／440 ms。连续原生组仍有目标内屏近黑截图 2 次、unavailable 3 次，以及过渡期 0°↔90°变化；完整原因未查明。
 

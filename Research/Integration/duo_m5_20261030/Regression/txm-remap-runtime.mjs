@@ -7,13 +7,13 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {setTimeout as sleep} from 'node:timers/promises';
-const [socketArg,outArg,probeArg,bundleArg,mode='install']=process.argv.slice(2);
+const [socketArg,outArg,probeArg,bundleArg,mode='install',id='com.vphone.tests.remap-probe']=process.argv.slice(2);
 const root=fs.realpathSync(new URL('../../../../',import.meta.url));
 const socket=fs.realpathSync(socketArg),out=path.resolve(outArg),probe=fs.realpathSync(probeArg),bundle=fs.realpathSync(bundleArg);
 for(const p of [socket,out,probe,bundle])assert(p.startsWith(root+'/.build/'));
 const machineName=path.basename(path.dirname(socket));
 assert(['duo-txm-remap-20261116','duo-overall-20261116'].includes(machineName));
-assert(['install','run','run-no-custom-trust'].includes(mode));fs.mkdirSync(out);process.chdir(path.dirname(socket));
+assert(['install','reinstall','run','run-no-custom-trust'].includes(mode));fs.mkdirSync(out);process.chdir(path.dirname(socket));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const save=(name,value)=>fs.writeFileSync(out+'/'+name+'.json',JSON.stringify(value,null,2)+'\n');
 const rpc=(method,params={})=>new Promise((resolve,reject)=>{
@@ -38,7 +38,7 @@ const signature=bytes=>{
     const cd=slots.find(x=>x.type===0);assert(cd);assert.equal(bytes.readUInt32BE(cd.offset),0xfade0c02);
     return {flags:bytes.readUInt32BE(cd.offset+12),cms:slots.some(x=>x.type===0x10000),sha256:hash(bytes)};
 };
-const id='com.vphone.tests.remap-probe';
+assert(['com.vphone.tests.remap-probe','com.vphone.tests.remap-context'].includes(id));
 const info=await rpc('device.info');save('device',info);
 assert.equal(info.agent.binary_hash,hash(fs.readFileSync(bundle+'/Contents/Resources/guest-resources/vphoned')));
 const receipt=JSON.parse(execFileSync(bundle+'/Contents/MacOS/vphone-cli',['fw','patches',machineName,'-l',path.dirname(path.dirname(socket)),'--json'],{encoding:'utf8',maxBuffer:8*1024*1024}));
@@ -47,14 +47,21 @@ assert.equal(receipt.patches.find(x=>x.identifier==='txm-cfw-executable_remap').
 assert.equal(receipt.patches.find(x=>x.identifier==='txm-exp-precheck_admission').applied,false);
 let apps=await rpc('apps.list',{filter:'user'});assert.equal(apps.truncated,false);
 let app=apps.apps.find(x=>x.bundle_id===id);assert.equal(!!app,mode!=='install');
-if(mode==='install'){
-    const ipa=fs.readFileSync(probe+'/RemapProbe.ipa');save('input',{ipaSHA256:hash(ipa),bundleID:id,installationPath:'apps.install'});
+if(mode==='reinstall'&&app?.pid>0)save('terminate-before-install',await rpc('apps.terminate',{bundle_id:id}));
+if(mode==='install'||mode==='reinstall'){
+    const ipa=fs.readFileSync(probe+(id.endsWith('remap-context')?'/RemapContext.ipa':'/RemapProbe.ipa'));save('input',{ipaSHA256:hash(ipa),bundleID:id,installationPath:'apps.install'});
     const guestIPA='/var/root/Library/Caches/txm-remap-probe-20261116.ipa';
     save('upload',await rpc('files.write',{path:guestIPA,encoding:'base64',content:ipa.toString('base64')}));
     save('install',await rpc('apps.install',{path:guestIPA}));
     apps=await rpc('apps.list',{filter:'user'});assert.equal(apps.truncated,false);app=apps.apps.find(x=>x.bundle_id===id);
 }
-assert(app?.data_path&&app?.bundle_path);save('app',app);
+assert(app?.bundle_path&&(app.data_path||id.endsWith('remap-context')));save('app',app);
+const documents=id.endsWith('remap-context')?'/var/mobile/Library/Caches/com.vphone.tests.remap-context':app.data_path+'/Documents';
+if(id.endsWith('remap-context')){
+    await rpc('files.mkdir',{path:documents});
+    await rpc('files.chown',{path:documents,owner:'501:501'});
+    await rpc('files.chmod',{path:documents,mode:'755'});
+}
 // Each run needs a new PID: an old complete report is never a fresh result.
 if(app.pid>0)save('terminate-previous',await rpc('apps.terminate',{bundle_id:id}));
 if(mode==='run-no-custom-trust'){
@@ -78,7 +85,7 @@ if(mode==='run-no-custom-trust'){
 }
 const external=[];
 for(const name of ['libinjected-ldid.dylib','libinjected-adhoc.dylib','standalone-ldid','standalone-adhoc']){
-    const bytes=fs.readFileSync(probe+'/external/'+name),guest=app.data_path+'/Documents/'+name;
+    const bytes=fs.readFileSync(probe+'/external/'+name),guest=documents+'/'+name;
     await rpc('files.write',{path:guest,encoding:'base64',content:bytes.toString('base64')});await rpc('files.chmod',{path:guest,mode:'755'});
     assert.equal(hash(await read(guest)),hash(bytes));const meta=signature(bytes);
     assert.equal(meta.flags,name.includes('-adhoc')?2:0);external.push({name,...meta});
@@ -93,6 +100,12 @@ for(const relative of ['RemapProbe','Frameworks/RemapFixture.framework/RemapFixt
 }
 save('installed-signatures',installed);
 if(mode==='run-no-custom-trust')assert(!installed[0].entitlements.includes('jb.pmap_cs_custom_trust'));
+if(id.endsWith('remap-context')){
+    const actual=JSON.parse(execFileSync('/usr/bin/plutil',['-convert','json','-o','-','-'],{input:installed[0].entitlements,encoding:'utf8'}));
+    assert.equal(actual['com.apple.private.security.no-sandbox'],true);
+    assert.equal(actual['com.apple.private.security.no-container'],true);
+    assert.equal(actual['com.apple.private.security.container-required'],undefined);
+}
 const pose=await rpc('display.pose'),lock=await rpc('display.auto_lock'),snapshot=await rpc('device.snapshot');
 save('initial',{pose,lock,snapshot});save('crashes-before',await rpc('logs.crashes'));
 try {
@@ -101,7 +114,7 @@ try {
     let result;
     for(let attempt=0;attempt<100;attempt++){
         await sleep(500);
-        try {result=JSON.parse((await read(app.data_path+'/Documents/remap-probe.json')).toString());save('report',result);}
+        try {result=JSON.parse((await read(documents+'/remap-probe.json')).toString());save('report',result);}
         catch(error){save('read-error',{error:String(error)});}
         if(result?.complete&&result.pid===launch.pid)break;
     }

@@ -64,10 +64,34 @@ unloaded; plists remain in a cache directory, outside auto-loaded directories.
 The initial direct job environment did not retain DYLD_INSERT_LIBRARIES in
 the observed service description; its failing results remain separate.
 
-`Regression/txm-remap-runtime.mjs` accepts only `duo-txm-remap-20261116`, checks
+`Regression/txm-remap-runtime.mjs` accepts only `duo-txm-remap-20261116` and
+`duo-overall-20261116`, checks
 the restored TXM receipt, and records installed signatures and per-case
 results. It requires a completed report from the newly launched PID. A
 successful remap syscall without actual RX and successful execution fails the
 regression. The standalone ad-hoc injection assertion is retained even if it
 exposes the upstream compatibility limit. Physical installation, CMS-signed
 hot reload and stock-iOS policy equivalence are outside this probe's verdict.
+
+`remap-probe/build-context.zsh` builds the separate
+`com.vphone.tests.remap-context` identity with no-sandbox/no-container and a
+dedicated cache output path. Pass that identifier as the final runtime argument;
+the default sandboxed App and its failing spawn assertion are preserved.
+The context probe passes both standalone signatures after removing custom-trust.
+This is an explicit test entitlement context, not a change to ordinary Apps.
+
+`remap-probe/build-mutation.zsh` builds a standalone probe with an isolated code
+page. `Regression/debug-mutation-runtime.mjs <new-output> <build> inline`
+checks a 42→91→42 in-place branch hook and real LLDB attach/read/write/detach,
+including resumed-process confirmation of 41→73→41. It uses temporary launchd
+jobs and unloads every job. The context App must already be installed; the
+script launches it when needed and terminates a process it started.
+The separate `alias-first`, `source-first` and `debug-alias` modes retain the
+dirty-code mapping failures; their assertions are not replaced by the inline
+mode's verdict. A `dynamic` build policy adds only dynamic-codesigning for the
+recorded controlled comparison; that comparison still fails alias RX.
+
+`Regression/pairing-protocol-runtime.mjs` checks the existing CoreDevice pairing
+using three guest-origin Darwin notifications and actual device requests.
+It does not pair/unpair a host or validate traditional lockdown pairing.
+See [results and limits](../FOLLOWUP_567_20261116.md).
