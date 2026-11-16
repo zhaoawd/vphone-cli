@@ -34,3 +34,13 @@ SPTM／目录／drift 共 52 项通过（`group2-sptm-tests.log`），真实 IPS
 资源冲突按该提交实际变化的九个字符串合并，保留既有 Duo 本地化；没有引入冲突块中不属于本组的 Cryptex 字符串。JSON 解析往返通过。共享输入中的 `interfacePoint` 仍经过 active-panel/backing 比例及 `screenOrientation` 转换，未用上游版本覆盖。菜单和窗口的本地差异也保留。
 
 本组不新增固件补丁。`xcodebuild -workspace VPhone.xcworkspace -scheme vphone-vm -configuration Debug -destination 'platform=macOS,arch=arm64' -derivedDataPath .build/duo-sync-20261113/XcodeBundle -disableAutomaticPackageResolution -jobs 4 build` 通过（`group3-vm-build.log`）。实际 iPad 指针／滚轮、跨窗口偏好和 Duo 两面板／旋转点击仍属于集中运行验收。
+
+## 第四组：QuartzCore framebuffer
+
+接入 #926 `69d45fb7` 的 planner、iOS 27 声明、`patch-quartzcore-unrotated-framebuffer`、安装列表及 TV／HomePod／HomeView block。当前分支没有 visionos 平台／预设，该缺失不通过新增孤立预设补齐。上游研究记录另存并明确来源，未将其中运行结果算为本地验收。
+
+发现过程以 QuartzCore `get_surface` 和 framebuffer-compression 查询符号为锚点，核对查询后表面标志的 `ldrb`／`tbnz #2`，以及跳转目标的 landscape orientation 检查。唯一匹配时将分支写为 `ARM64.nop`，随后重新验证代码页签名；已修改形态可重复发现。缺失／歧义均拒绝。
+
+安装器通过原有 `applyDyldPatches` 路径传入独立 undo ID，共享页归属和签名重计算沿用 Duo 已有实现。未覆盖 `DyldSharedCacheUndoLog`、FoldDisplay、Snapshot 或输入方向转换。默认声明适用于 iOS 27 的候选；实际已有 VM 不因编译自动修改，Duo 选择结果仍需组合候选验收。
+
+`DyldSharedCacheQuartzCoreUnrotatedFramebufferTests`、`DyldSharedCacheUndoLogTests`、`DyldSharedCacheUndoWordsTests`、`FirmwarePatchSetCatalogTests`、`FirmwareGuestPatchResolutionTests` 共 92 项通过（`group4-framebuffer-tests.log`）。iPad 27 DSC fixture 未提供，实际 cache dry-run／重复应用／撤销测试跳过。当前没有新增恢复或 guest 安装。

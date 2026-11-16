@@ -1,5 +1,17 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **QuartzCore framebuffer integration (2026-11-16).** Ports upstream #926's
+> `dyld-cfw-quartzcore_unrotated_framebuffer` for iOS 27, its semantic planner,
+> dry-run/undo CLI and installer dispatch through the existing DSC undo owner.
+> TV/HomePod/HomeView presets block it. The branch is discovered from
+> `get_surface`, the compression query and the landscape orientation test;
+> replacement uses `ARM64.nop`. Ninety-two planner/catalog/undo/resolution tests
+> pass; the iPad cache fixture is unavailable and its image test is skipped.
+> Duo display runtime acceptance remains pending; this is not evidence of a fix
+> for the prior display handoff observations. See
+> [integration scope](Integration/duo_m5_20261030/OVERALL_PORT_20261116.md) and
+> [upstream investigation](Guest/ipad_pointer_landscape_scanout.md).
+
 > **SPTM integration (2026-11-16).** Ports upstream #921's
 > `sptm-boot-secondary_cpu_throttle_tunable`, gated to cloudOS 18, with a
 > separately declared firmware target, pipeline, restore receipt/drift and

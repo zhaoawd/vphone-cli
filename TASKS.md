@@ -10,7 +10,7 @@
 - [x] 第一组生产接入，#909＋#911：PCC OS image GPU 提取、版本匹配／AEA 回退、临时恢复 vCPU 策略和 SE 3／transport 依赖已完成；相关回归通过，旧固件运行验收后置。
 - [x] 第二组生产接入，#921：SPTM 组件、语义补丁、pipeline、PatchKit／Launchpad 目录、预设和 drift 已完成，cloudOS 18 版本门槛与相关回归通过；旧固件多 vCPU 运行验收后置。
 - [x] 第三组生产接入，#920：鼠标模式、偏好持久化、菜单及 iPad pointer／touch 已接入，保留 Duo 坐标转换；`vphone-vm` 编译通过，实际输入运行验收待集中执行。
-- [ ] 第四组，#926：接入 QuartzCore 未旋转 framebuffer 的 planner、声明、CLI、安装／撤销及共享缓存修改归属；Duo 默认选择通过组合候选确定，不将其作为已有显示诊断的已确认修复。
+- [x] 第四组生产接入，#926：QuartzCore planner、声明、CLI、安装／撤销已接入，保留共享缓存修改归属；92 项相关回归通过。实际 DSC／Duo 组合验收仍待执行，不将其作为已有显示诊断的已确认修复。
 - [ ] 前四组接入收尾：核对目录、预设、CLI、收据、Launchpad 与版本契约；按 upstream → main → Duo 整理同步，完成完整 Bundle／Launchpad 构建和一轮 Duo 组合验收。
 - [ ] 最后一组，#900：独立接入 trusted darwinOS／persistent Cryptex 的依赖组，包括 RPC、菜单、cryptexctl 来源及恢复回退；保留支持范围与拒绝路径，不加入 Duo 27.1 默认计划。
 
