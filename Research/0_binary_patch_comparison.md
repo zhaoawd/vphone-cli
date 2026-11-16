@@ -1,5 +1,14 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **SPTM integration (2026-11-16).** Ports upstream #921's
+> `sptm-boot-secondary_cpu_throttle_tunable`, gated to cloudOS 18, with a
+> separately declared firmware target, pipeline, restore receipt/drift and
+> minimal/watchos selections. The decoded MIDR mask/branch/indexed-load/store
+> construct identifies a unique branch, which becomes `ARM64.nop`. Rebuilt
+> SPTM containers retain PAYP. Local static regression and upstream runtime
+> evidence are recorded separately in the
+> [integration record](Integration/duo_m5_20261030/OVERALL_PORT_20261116.md).
+
 > **Remaining production integration (2026-11-16).** Adds SE 3 board registration
 > and installed-tree Home button values, with the restore-tree policy retained.
 > The iOS 18 GPU transport declaration is gated to iOS 18.6 with cloudOS 26.1;
