@@ -1,0 +1,16 @@
+import AppKit
+
+@MainActor final class MouseCaptureBoundary {
+    var mouseMode = VPhoneGuestMouseMode.pointer
+}
+@MainActor final class MouseControlBoundary {
+    var supportsPointerScroll = false
+}
+@MainActor final class MouseModeProduction: NSObject {
+    var mouseModeItems: [NSMenuItem] = []
+    var captureView: MouseCaptureBoundary? = MouseCaptureBoundary()
+    var control: MouseControlBoundary? = MouseControlBoundary()
+    var isMouseCaptured = false
+    var isPadGuest = false
+    var mouseMode = VPhoneGuestMouseMode.pointer
+    var usesGuestPointer: Bool { guestPointerFollowsMouse }

@@ -107,6 +107,9 @@ jobs:
       - name: Host orientation hold tests
         run: zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-orientation-hold-tests.sh
 
+      - name: Host mouse mode tests
+        run: zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-mouse-mode-tests.sh
+
       - name: Host HTTP read tests
         run: zsh VPhoneExecutable/VPhoneVirtualization/Tests/run-http-read-tests.sh
 
