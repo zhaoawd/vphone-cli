@@ -4,13 +4,15 @@ import net from 'node:net';
 import assert from 'node:assert/strict';
 import {setTimeout as sleep} from 'node:timers/promises';
 
-const [socket, output, testApp = 'com.apple.mobilesafari'] = process.argv.slice(2);
+const [socket, output, testApp = 'com.apple.mobilesafari', overallDaemon] = process.argv.slice(2);
+if (overallDaemon !== undefined) assert(/^[a-f0-9]{64}$/.test(overallDaemon));
 const expectedDaemons = {
     'duo-rpc-foundation-20261115': '446925b66b983e6395bc2c6715885f1eae1d1836cee014a3df136f468540419b',
     'duo-cfw-followup-20261115': 'c04e362ae02b6b521bac06d1f2833850935e8e88ea121b8d7fd8fb139dd48593',
+    'duo-overall-20261116': overallDaemon,
 };
 const expectedDaemon = expectedDaemons[path.basename(path.dirname(socket ?? ''))];
-if (!output || !expectedDaemon) throw Error('Use an authorised foundation or CFW followup socket and a new evidence directory');
+if (!output || !expectedDaemon) throw Error('Use an authorised socket, a new evidence directory, and the pinned daemon hash for overall acceptance');
 assert.equal(fs.existsSync(output), false);
 fs.mkdirSync(output, {recursive: true});
 process.chdir(path.dirname(socket));

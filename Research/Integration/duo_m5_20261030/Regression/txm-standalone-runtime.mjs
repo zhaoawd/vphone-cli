@@ -12,7 +12,7 @@ const root=fs.realpathSync(new URL('../../../../',import.meta.url));
 const socket=fs.realpathSync(socketArg),out=path.resolve(outArg),appFile=fs.realpathSync(appArg);
 const probe=probeArg?fs.realpathSync(probeArg):undefined;
 for(const p of [socket,out,appFile])assert(p.startsWith(root+'/.build/'));
-assert.equal(path.basename(path.dirname(socket)),'duo-txm-remap-20261116');
+assert(['duo-txm-remap-20261116','duo-overall-20261116'].includes(path.basename(path.dirname(socket))));
 assert(['environment','exec-env'].includes(route));
 const app=JSON.parse(fs.readFileSync(appFile));assert.equal(app.bundle_id,'com.vphone.tests.remap-probe');
 fs.mkdirSync(out);process.chdir(path.dirname(socket));

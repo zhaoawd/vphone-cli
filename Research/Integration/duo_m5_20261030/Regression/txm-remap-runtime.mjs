@@ -11,7 +11,8 @@ const [socketArg,outArg,probeArg,bundleArg,mode='install']=process.argv.slice(2)
 const root=fs.realpathSync(new URL('../../../../',import.meta.url));
 const socket=fs.realpathSync(socketArg),out=path.resolve(outArg),probe=fs.realpathSync(probeArg),bundle=fs.realpathSync(bundleArg);
 for(const p of [socket,out,probe,bundle])assert(p.startsWith(root+'/.build/'));
-assert.equal(path.basename(path.dirname(socket)),'duo-txm-remap-20261116');
+const machineName=path.basename(path.dirname(socket));
+assert(['duo-txm-remap-20261116','duo-overall-20261116'].includes(machineName));
 assert(['install','run','run-no-custom-trust'].includes(mode));fs.mkdirSync(out);process.chdir(path.dirname(socket));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const save=(name,value)=>fs.writeFileSync(out+'/'+name+'.json',JSON.stringify(value,null,2)+'\n');
@@ -40,7 +41,7 @@ const signature=bytes=>{
 const id='com.vphone.tests.remap-probe';
 const info=await rpc('device.info');save('device',info);
 assert.equal(info.agent.binary_hash,hash(fs.readFileSync(bundle+'/Contents/Resources/guest-resources/vphoned')));
-const receipt=JSON.parse(execFileSync(bundle+'/Contents/MacOS/vphone-cli',['fw','patches','duo-txm-remap-20261116','-l',path.dirname(path.dirname(socket)),'--json'],{encoding:'utf8',maxBuffer:8*1024*1024}));
+const receipt=JSON.parse(execFileSync(bundle+'/Contents/MacOS/vphone-cli',['fw','patches',machineName,'-l',path.dirname(path.dirname(socket)),'--json'],{encoding:'utf8',maxBuffer:8*1024*1024}));
 save('patches',receipt);
 assert.equal(receipt.patches.find(x=>x.identifier==='txm-cfw-executable_remap').applied,true);
 assert.equal(receipt.patches.find(x=>x.identifier==='txm-exp-precheck_admission').applied,false);

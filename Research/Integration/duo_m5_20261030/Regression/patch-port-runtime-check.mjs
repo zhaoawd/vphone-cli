@@ -7,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 const [socketArg,outArg,bundleArg]=process.argv.slice(2);
 const socket=fs.realpathSync(socketArg),out=fs.realpathSync(outArg),bundle=fs.realpathSync(bundleArg);
 const root=fs.realpathSync(new URL('../../../../',import.meta.url));
-assert(['duo-patches-20261116','duo-txm-remap-20261116'].includes(path.basename(path.dirname(socket))));
+assert(['duo-patches-20261116','duo-txm-remap-20261116','duo-overall-20261116'].includes(path.basename(path.dirname(socket))));
 for(const p of [socket,out,bundle])assert(p.startsWith(root+'/.build/'));
 process.chdir(path.dirname(socket));
 const hash=b=>createHash('sha256').update(b).digest('hex');

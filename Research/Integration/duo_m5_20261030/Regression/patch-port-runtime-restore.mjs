@@ -6,7 +6,7 @@ import {setTimeout as sleep} from 'node:timers/promises';
 const [socketArg,baselineArg,outArg]=process.argv.slice(2);
 const root=fs.realpathSync(new URL('../../../../',import.meta.url));
 const socket=fs.realpathSync(socketArg),baseline=fs.realpathSync(baselineArg),out=path.resolve(outArg);
-assert(['duo-patches-20261116','duo-txm-remap-20261116'].includes(path.basename(path.dirname(socket))));
+assert(['duo-patches-20261116','duo-txm-remap-20261116','duo-overall-20261116'].includes(path.basename(path.dirname(socket))));
 for(const p of [socket,baseline,out])assert(p.startsWith(root+'/.build/'));
 fs.mkdirSync(out);process.chdir(path.dirname(socket));
 const save=(name,value)=>fs.writeFileSync(out+'/'+name+'.json',JSON.stringify(value,null,2)+'\n');

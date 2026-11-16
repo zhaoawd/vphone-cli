@@ -90,3 +90,11 @@ SPTM 新组件改变 Launchpad 的目录契约。固定上游已使用 2.17 系�
 首轮收据断言要求 JSON 表示完全不变，失败原因是原有 `patch-dsc-revert` 会把一个旧 X1 bootstrap 的 32 字节 run 转入 word store。失败日志保留在 `framebuffer-cache-regression.log`。核对表明 bootstrap 原有 228,314 个 word 保留，新增 8 个来自该旧 run；cache-X1 的 24,606,083 个 word 字节哈希不变。保存的回归现在逐项核对旧 word 和这 8 个原始指令、保留其他 JSON 记录及所有 owner，未取消归属断言。修正版 `framebuffer-cache-regression-fixed/report.json` 全部通过；来源 fixture 的 cache 和 undo 哈希也未变化。应用态副本保存在同目录 `cache-applied`。
 
 候选当前报告有 9 项 `update-environment` 待办，涉及 framebuffer、GLES／compiler-cache 和文本识别；逐项列于 `combined-patch-report.json`。继承的 boot-chain DriverKit 收据漂移另列，不通过本次 environment update 改写。trusted darwinOS 仍关闭；SPTM 不适用于此 cloudOS。新的环境安装与两次冷启动组合验收尚未执行，需要为最终 VM 二进制准备新的宿主 AMFI 准入批准。
+
+## 已批准的组合运行验收
+
+用户随后批准 `REVIEWED/REVIEW.md` 中的最终候选：源码 `7e18551b`、版本 2.18.0、VM CDHash `5f3f79e7c4eaf331b1f0a438fcddf9042835ce19`。授权范围为该哈希准入、仅 `duo-overall-20261116` 一次环境更新、两次冷启动检查、恢复原设置与正常关机；没有擦除恢复或来源副本操作。
+
+同一管理员会话 `42115` 已通过 `run-approved-root.applescript` 启动。检查时系统认证进程存在，`REVIEWED/root-approved.log` 尚不存在，不能认定准入或安装已执行；没有启动第二个安装会话。系统认证仍需用户在现有窗口完成。
+
+保存的 `Regression/overall-runtime.zsh` 固定审核 Bundle 和目标，隔离宿主偏好并禁用宿主自动更新 daemon。`overall-candidate.mjs` 校验全部 197 个固定文件／符号链接、CDHash、严格签名，不再要求环境更新后的目标元数据等于更新前。该校验已通过。`overall-checks.zsh` 顺序执行既有原生输入、AX 上下文、方向、AX 发现、native remap、受控 exec 和原设置恢复，保存每项退出码；原失败断言未删改。恢复失败时保留运行状态供取证和恢复，不自动开始第二轮。脚本语法检查通过，实际运行结果待记录。

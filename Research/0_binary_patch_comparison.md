@@ -1,5 +1,16 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Combined 2.18 acceptance (2026-11-16, awaiting system authentication).**
+> The complete upstream merge is saved as `7e18551b`; the frozen 2.18.0 Bundle
+> passes all 197 manifest entries, strict signature verification and the approved
+> VM CDHash check. The user approved AMFI admission, one environment update and
+> two cold boots of `duo-overall-20261116`. One administrator session is pending;
+> no installation log exists yet. Saved regression drivers pin that Bundle and
+> target, retain the existing AX/remap assertions and restore the original
+> settings before shutdown. This does not establish runtime acceptance of the
+> nine pending environment patches. See the
+> [current execution record](Integration/duo_m5_20261030/OVERALL_PORT_20261116.md).
+
 > **Trusted darwinOS/Cryptex integration (2026-11-16).** Ports #900 as an
 > independent, opt-in restore-image feature: `filesystem-exp-trusted_darwinos`,
 > environment 6 in the build identity/TSS request, both REM trust-cache phases,
