@@ -1,6 +1,27 @@
 # Duo M5 当前任务
 
-更新：2026-11-15。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 已刷新到 `13169405`（2.17.1）；本地 `main` 仍为 `6f57024a`。本轮改动已按范围评审并拆分为本地提交；尚未推送或发布。
+更新：2026-11-16。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 已刷新到 `13169405`（2.17.1）；本地 `main` 仍为 `6f57024a`。本轮改动已按范围评审并拆分为本地提交；尚未推送或发布。
+
+## 2026-11-16 生产移植
+
+固定上游 `13169405`，起点 `c07ee974`。本轮修改工作树，未推送或发布。旧评估条目保留当时状态，以本节为当前进度。
+
+- [x] DriverKit：运行树、Preboot 修复、设备族排除及回归通过。新副本两次冷启动均有 driverkitd／HID dext 和 Virtual USB Touch Screen；两面板原生 VZ 触摸 6/6 通过。
+- [x] local pairing：语义发现、安装与撤销接线、合成负例及真实 27.1 镜像签名／重复应用通过；实际协议连接和真实 iOS 18 输入未验收。
+- [x] X1：完整转换／可选安装器、35 项独立 AX＋HomePop、旧选择／备份／收据兼容及只读审计。36 项真实备份共 3,168 条指令的转换、签名、重复应用和撤销通过；两次冷启动的 36/36 实际文件匹配候选，原备份不变，收据迁移通过。12 项 debug-library 实际文件无剩余 X1，严格签名 12/12，原始备份共 31,013 条待转换指令；LLDB 未验收。
+- [x] TXM：native remap／profile、旧 ID 兼容、precheck 优先级及两条静态候选。8 个生产组合通过，显式 precheck 保持旧标准输出。工作树 standard 候选跟随上游 native remap；仅切换 TXM 的新副本已完成恢复和下列运行范围，不等于其他启动链开关或完整 standard 已验收。
+- [x] 完整 2.16.0 Bundle、admission、深度严格签名、Launchpad 构建、15 个 suite／164 项回归和 CLI 存盘／导出往返通过；CI 已接入。
+- [x] 已批准的运行验收：`a91b9e15…` AMFI 准入、宿主预检、新副本 `duo-patches-20261116` 环境更新、收据和两次冷启动均通过。显式保留旧 precheck、关闭 remap；不能计为 native remap 验收。21 项环境库、原 daemon、根只读、两面板原生输入、AX 命中 15/15 和锁屏拒绝通过。KFC 前台 PID 在 15 秒内保持，Food AI 有可点击 AX 元素。两轮均恢复合盖纵向、Auto-Lock 120 秒、锁屏／熄屏和低电量原值后正常关机，退出 0、无状态句柄；未执行恢复。
+- [ ] 内屏 AX 发现限制：`patch-port-touch.mjs` 仍因默认 `ui.tree` 只返回 4/9 按钮而失败；未过滤查询返回全部 9 个。可见性过滤的具体边界原因待验证。原断言保留，独立 UIKit 坐标原生输入 6/6 不替代该项。
+- [x] TXM 候选准备：新身份副本 `duo-txm-remap-20261116` 的 126 项固件比较仅 TXM 不同，payload 匹配生产静态 remap 候选；来源关闭的三个启动链项继续关闭，RestoreRamDisk 沿用来源文件。原比较失败及重新生成产物保留。
+- [x] TXM 独立运行验收的已测范围：用户批准新副本 DFU／擦除恢复／停止／CFW 安装和运行验收后执行完成。默认签名、仅移除 custom-trust、再次冷启动后各 20/20 remap、80 个 alias，实际 RX、字节比较与执行通过；两种外部 dylib 均构造器=1／返回 73。ldid／Apple ad-hoc 两种 standalone 的受控 exec 注入均在两轮通过，自身路径匹配、exit=0，临时作业已卸载。原始 VM 和旧验收副本未启动。
+- [x] TXM 擦除恢复：绑定新副本 ECID `0x0C5CF189506BC959` 的恢复成功，记录 iOS 27.1／cloudOS 26.4 和 102 项启动链补丁；TXM 收据含 remap、不含 precheck。随后仅停止该副本的 DFU 进程，退出 0。
+- [x] TXM CFW 安装：用户完成系统管理员认证后，同一安装会话成功退出 0；日志记录完整安装成功，无 `[!]`／failed／Error。安装后 remap 为 enabled/planned/applied，precheck 三项均 false，二者 pending=false。
+- [x] TXM 冷启动与清理：同一 CDHash 的宿主拒绝在有效授权内重新准入后通过；拒绝原因未查明。两次冷启动、36/36 AX 文件、21 项库、根只读和 pairing 文件核对通过。实际 Preboot TXM 的 IM4P 与 payload 均完全匹配候选。两轮恢复稳定快照的合盖纵向、Auto-Lock 300 秒、锁屏／熄屏及低电量原值后正常关机，VM exit=0、无句柄；离线只读挂载已清理，前后镜像清单相同。
+- [ ] TXM 验证限制：首次姿态 RPC 超时保留，原因未查明；App 直接 posix_spawn 两种签名均 EPERM，原 aggregate 断言仍失败，独立 exec 注入通过不替代该路径。CMS／真实 profile 热重载、修改后私有代码／inline hook、LLDB 和其他 injector／系统／版本未覆盖。
+- [ ] 其他设备／旧固件、SPTM、鼠标／framebuffer 项目按原差异清单独立推进；trusted darwinOS 不加入 Duo 默认计划。
+
+来源、迁移规则、失败与修复、命令和未覆盖范围见 [生产移植记录](Research/Integration/duo_m5_20261030/PATCH_PORT_20261116.md)。静态证据为 `.build/upstream-port-20261116/saved-run.a1thV043/`；实际运行证据为同级 `cold-run.acMbD9pf/` 和 `cold-run.jM0hDUCb/`。新副本保留候选补丁及生成的 TapProbe，来源与原始副本未启动。
 
 ## 当前待办
 
@@ -20,10 +41,10 @@
 
 发布准备另行跟踪：四语手册 Argon 审阅、Release 产物及 Developer ID 签名／notarization 未完成；当前 Debug 构建和本地验收不替代发布验收。
 
-前两项的生产移植待办：
+前两项的生产移植与剩余验收：
 
-- [ ] X1：先引入完整转换／可选安装器，迁移旧聚合选择、备份、收据与 HomePop；每个文件只保留一个安装／撤销步骤，再接入独立声明和只读审计。保留 Duo 共享缓存撤销归属。
-- [ ] TXM：补齐 #831 和 profile 依赖及旧 ID／收据迁移，接入 #919／#923；准备保留旧 precheck 输出和 native remap 两份候选，完成静态与独立 VM 验证后决定 Duo 默认策略。
+- [x] X1：完整转换／可选安装器、旧选择／备份／收据迁移、35 项独立声明＋HomePop、只读审计及实际安装验收完成。Duo 共享缓存撤销归属保持。内屏 AX 过滤限制与 LLDB 未验收另列。
+- [x] TXM：#831、profile、旧 ID／收据迁移及 #919／#923 生产实现与 8 个静态组合完成；新副本已按独立批准恢复并完成原始代码 remap／简单注入及两次冷启动，实际 Preboot 字节匹配。CMS／真实 profile、修改后代码和 App 直接 posix_spawn 等限制见本节当前记录；guest 更新仍不替换 TXM。
 
 上一批完成：真实新宿主 GUI × 旧 daemon 的五类面板刷新／筛选通过；#906 原生／WKWebView／Safari 变化帧通过；#861／#869／#870／#888 构建环境、固定依赖、许可证和分发门禁已集成。完整 Bundle 构建、严格签名、Launchpad Debug 构建和相关正反回归通过，版本保持 2.15.2。当次新宿主实际预检通过，未新增 AMFI allowlist；本轮准入前重新预检被拒绝，用户批准后当前宿主已准入。测试 App 已注销归档并保留数据；隔离副本已恢复原 daemon／标记、21 项库，冷启动核对根只读和 Auto-Lock 原值 120 秒后正常关机，无状态句柄。证据目录 `.build/host-webcam-distribution-20261115/`；见 [验收记录](Research/Integration/duo_m5_20261030/HOST_WEBCAM_DISTRIBUTION_20261115.md)。未推送、发布或执行 Developer ID 签名。
 

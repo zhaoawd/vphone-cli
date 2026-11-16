@@ -221,9 +221,10 @@ public struct VPhonePatchCatalogReport: Sendable {
     /// "is this patch in the preset" answer from one rule.
     public static func patchesInPreset(_ preset: VPhonePatchPreset) -> Set<String> {
         let presetSets = Set(preset.patchSets.map(\.identifier))
+        let current = FirmwarePatchSetCatalog.currentSelection(preset.selection)
         var result: Set<String> = []
         for set in FirmwarePatchSetCatalog.bundled where presetSets.contains(set.identifier) {
-            for patch in set.patches where preset.selection.includes(patch.identifier) {
+            for patch in set.patches where current.includes(patch.identifier) {
                 result.insert(patch.identifier)
             }
         }
@@ -233,14 +234,13 @@ public struct VPhonePatchCatalogReport: Sendable {
     /// The patches this VM's choice leaves on, before any version gate.
     public func selectedPatches() -> Set<String> {
         let presetSets = Set(activePreset.patchSets.map(\.identifier))
-        let included = Self.patchesInPreset(activePreset)
-        let allowed = Set(selection.allowedPatches)
-        let blocked = Set(selection.blockedPatches)
+        let selected = FirmwarePatchSetCatalog.currentSelection(
+            activePreset.selection, blocked: Set(selection.blockedPatches), allowed: Set(selection.allowedPatches),
+        )
         var result: Set<String> = []
         for set in FirmwarePatchSetCatalog.bundled where presetSets.contains(set.identifier) {
             for patch in set.patches
-                where (included.contains(patch.identifier) || allowed.contains(patch.identifier))
-                && !blocked.contains(patch.identifier)
+                where selected.includes(patch.identifier)
             {
                 result.insert(patch.identifier)
             }

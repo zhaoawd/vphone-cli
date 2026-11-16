@@ -66,6 +66,7 @@ public enum FirmwarePatchSetCatalog {
     /// ``paravirtUserClientsPatch`` and ``proMotionPatch``.
     public static let manualOnlyPatches: Set<String> =
         Set(FirmwareKernelFridaPatchSet.manifest.patches.map(\.identifier))
+            .union(["txm-exp-precheck_admission"])
             .union(hypervisorConcealmentPatches)
             .union([FirmwareGuestSystemPatchSet.innerCutout])
             .union(experimentalIdentityPatches)
@@ -108,6 +109,7 @@ public enum FirmwarePatchSetCatalog {
     /// nothing declares. Include development bundles used on real VMs as well
     /// as releases: their records need the same migration.
     public static let renamedPatches: [String: String] = [
+        "txm-boot-precheck_admission": "txm-exp-precheck_admission",
         "kernel-exp-display_refresh_120hz": proMotionPatch,
         "kernel-exp-paravirt_gpu_task3": paravirtTask3Patch,
         "preboot-exp-devicetree_foldable_product_id": FirmwareGuestSystemPatchSet.prebootFoldableProductId,
@@ -243,7 +245,9 @@ public enum FirmwarePatchSetCatalog {
     /// validated port of: display, camera, audio, sensors, the GPU driver (a
     /// plain-arm64 HD cannot load it), debugserver, the environment hooks, and
     /// the iPhone 19 ARM64E_X1 boot path.
-    public static let tvOSBlockedPatches: Set<String> = [
+    public static let tvOSBlockedPatches: Set<String> = Set(FirmwareGuestSystemPatchSet.arm64eX1OptionalImages.map(\.identifier)).union([
+        FirmwareGuestSystemPatchSet.arm64eX1HomePopAccessibility,
+        CustomFirmwareRemotePairing.patchID,
         FirmwareGuestSystemPatchSet.metalCacheReuseKey,
         FirmwareGuestSystemPatchSet.glesPointDraw,
         FirmwareGuestSystemPatchSet.glesPrimitiveRestart,
@@ -253,7 +257,7 @@ public enum FirmwarePatchSetCatalog {
         FirmwareGuestSystemPatchSet.arm64eX1CacheBootstrap,
         FirmwareGuestSystemPatchSet.arm64eX1CacheRemaining,
         FirmwareGuestSystemPatchSet.arm64eX1CIBarcode,
-        FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles,
+        FirmwareGuestSystemPatchSet.arm64eX1AccessibilityRemaining,
         "dyld-boot-iomfb_force_kern",
         "dyld-boot-iomfb_swapend",
         "dyld-boot-lockdown_mode",
@@ -270,6 +274,7 @@ public enum FirmwarePatchSetCatalog {
         "preboot-cfw-devicetree_foldable_product_id",
         "preboot-cfw-devicetree_foldable_displays",
         "preboot-cfw-devicetree_microphone_array",
+        FirmwareGuestSystemPatchSet.prebootVirtualUSBDriverKit,
         RestoreRamDiskSealPatcher.patchIdentifier,
         "system-apps-cfw-attitude",
         FirmwareGuestSystemPatchSet.signInSheets,
@@ -308,7 +313,7 @@ public enum FirmwarePatchSetCatalog {
         "system-virtualaudio-cfw-speaker_raw_chains",
         "system-virtualaudio-cfw-speaker_route_throws",
         "system-virtualaudio-cfw-volume_mode_precondition",
-    ]
+    ])
 
     /// The iOS 27 shared-cache patches a 27 userland needs on the 26.4 kernel,
     /// the display swap through the kernel among them. The Apple TV 4K keeps
@@ -384,9 +389,11 @@ public enum FirmwarePatchSetCatalog {
     )
 
     /// The device tree patches ``minimalPreset`` keeps: the board presentation the
-    /// guest UI lays out against, and the haptics and microphone array no VM
-    /// has. They change no code, so they are no system modification.
+    /// guest UI lays out against, DriverKit for virtual USB input, and the
+    /// haptics and microphone array no VM has. They change no code, so they
+    /// are no system modification.
     public static let minimalDeviceTreePatches: Set<String> = [
+        "devicetree-cfw-virtual_usb_driverkit",
         "devicetree-cfw-serial_number",
         "devicetree-cfw-home_button_type",
         "devicetree-cfw-artwork_device_subtype",

@@ -495,7 +495,7 @@ public final class FirmwarePipeline {
                 + " (\(set.manifest.patches.count) patches) from \(set.url.path)")
         }
 
-        let plan = try VPhonePatchPlan.resolve(
+        let plan = try FirmwarePatchSetCatalog.resolve(
             preset: preset,
             patchSets: available,
             iOSBase: iOSBase,

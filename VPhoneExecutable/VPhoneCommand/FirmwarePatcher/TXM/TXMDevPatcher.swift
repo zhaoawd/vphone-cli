@@ -7,18 +7,46 @@ import VPhonePatchKit
 
 /// Dev-variant patcher for TXM images.
 ///
-/// Adds 5 patch methods (11 patch records) beyond base trustcache bypass:
+/// Adds admission and runtime policies beyond the base trustcache bypass:
 ///   1. selector24 force PASS (mov w0, #0xa1 + b epilogue)
 ///   2. get-task-allow entitlement BL → mov x0, #1
 ///   3. selector42|29 shellcode hook + manifest flag force
 ///   4. debugger entitlement BL → mov w0, #1
 ///   5. developer-mode guard → nop
+///   6. native signature classification for remapping
 public final class TXMDevPatcher: TXMPatcher {
+    static let precheckAdmissionID = "txm-exp-precheck_admission"
+
     override public func findAll() throws -> [PatchRecord] {
         patches = []
-        try patchTrustcacheBypass() // base patch
+        // The pre-check force-admit and native classification are mutually
+        // exclusive. txm-exp-precheck_admission passes the selector-24 walk as
+        // type 10 before classification runs, so txm-cfw-executable_remap's
+        // classifier rewrites would be dead code behind it. When both are
+        // selected, precheck takes precedence and executable_remap is not
+        // emitted, so `--allow txm-exp-precheck_admission` alone is enough and
+        // the patch receipt does not list a patch that never runs.
+        let precheckEnabled = gate.isEnabled(Self.precheckAdmissionID)
+        do {
+            if gate.isEnabled(Self.executableRemapID), !precheckEnabled {
+                try patchExecutableRemap() // includes the base bypass with real cache queries
+            } else {
+                try patchTrustcacheBypass()
+            }
+        } catch {
+            // A failed compatibility lookup must not leave an applicable
+            // partial plan behind if the caller retries apply().
+            patches = []
+            throw error
+        }
+        // Legacy force-admit of the selector-24 pre-check walk. Restored as a
+        // selectable patch: it admits every image (CS_ADHOC code included) at the
+        // top of the ladder, which native classification does not, so injected
+        // ad-hoc dylibs reach RX.
+        if precheckEnabled {
+            patchPrecheckForcePass()
+        }
         patchSelector24ForcePass()
-        patchPrecheckForcePass()
         patchGetTaskAllowForceTrue()
         patchSelector42_29Shellcode()
         patchDebuggerEntitlementForceTrue()
@@ -366,23 +394,24 @@ public final class TXMDevPatcher: TXMPatcher {
                 return
             }
 
-            emit(bodyStart, ARM64.movW8_0xA, patchID: "txm-boot-precheck_admission.mark_type",
+            emit(bodyStart, ARM64.movW8_0xA, patchID: "txm-exp-precheck_admission.mark_type",
                  description: "pre-check admission: mov w8, #0xa (tolerated type)")
-            emit(bodyStart + 4, ARM64.strbW8X19, patchID: "txm-boot-precheck_admission.store_type",
+            emit(bodyStart + 4, ARM64.strbW8X19, patchID: "txm-exp-precheck_admission.store_type",
                  description: "pre-check admission: strb w8, [x19]")
-            emit(bodyStart + 8, ARM64.movW0_0x90, patchID: "txm-boot-precheck_admission.pass",
+            emit(bodyStart + 8, ARM64.movW0_0x90, patchID: "txm-exp-precheck_admission.pass",
                  description: "pre-check admission: mov w0, #0x90 (PASS)")
             guard let bInsn = ARM64Encoder.encodeB(from: bodyStart + 12, to: epilogueOff) else {
                 log("  [-] TXM: pre-check admission branch encoding failed")
                 return
             }
-            emit(bodyStart + 12, bInsn, patchID: "txm-boot-precheck_admission.branch",
+            emit(bodyStart + 12, bInsn, patchID: "txm-exp-precheck_admission.branch",
                  description: "pre-check admission: b epilogue")
             return
         }
 
         log("  [-] TXM: pre-check walk (selector 0x7e51 policy callbacks) not found")
     }
+
 
     /// Patch selector24 handler to return 0xA1 (PASS) immediately.
     ///

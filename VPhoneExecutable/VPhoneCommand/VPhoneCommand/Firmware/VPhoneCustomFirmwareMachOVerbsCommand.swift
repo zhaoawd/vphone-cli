@@ -59,12 +59,19 @@ struct VPhoneCustomFirmwarePatchArm64eX1Command: ParsableCommand {
     @Argument(transform: URL.init(fileURLWithPath:)) var binary: URL
     func run() throws {
         try requireUntruncatedMachO(at: binary)
+        let optionalImage = FirmwareGuestSystemPatchSet.arm64eX1OptionalImages.first {
+            ($0.path as NSString).lastPathComponent == binary.lastPathComponent
+        }
         let identifier: String
         if let patchID {
-            guard patchID == FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles else {
+            guard patchID == FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles
+                || patchID == FirmwareGuestSystemPatchSet.arm64eX1AccessibilityRemaining
+                || FirmwareGuestSystemPatchSet.arm64eX1OptionalImages.contains(where: { $0.identifier == patchID })
+                || patchID == FirmwareGuestSystemPatchSet.arm64eX1HomePopAccessibility else {
                 throw ValidationError("--patch-id supports only \(FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles)")
             }
-            try CustomFirmwareArm64eX1.patch(fileAt: binary, identifier: patchID, log: machOVerbLog)
+            try CustomFirmwareArm64eX1.patch(fileAt: binary, identifier: patchID == FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles
+                    ? FirmwareGuestSystemPatchSet.arm64eX1AccessibilityRemaining : patchID, requireComplete: true, log: machOVerbLog)
             return
         }
         switch binary.lastPathComponent {
@@ -73,12 +80,17 @@ struct VPhoneCustomFirmwarePatchArm64eX1Command: ParsableCommand {
         case "fsck": identifier = FirmwareGuestSystemPatchSet.arm64eX1FsckBootstrap
         case "mount": identifier = FirmwareGuestSystemPatchSet.arm64eX1MountBootstrap
         case "CIBarcode": identifier = FirmwareGuestSystemPatchSet.arm64eX1CIBarcode
+        case "SpringBoardHomePopAccessibility": identifier = FirmwareGuestSystemPatchSet.arm64eX1HomePopAccessibility
         default:
-            throw ValidationError("X1 static lowering supports only dyld, launchd, fsck, mount and CIBarcode")
+            guard let optionalImage else {
+                throw ValidationError("X1 static lowering requires a bootstrap image or a declared standalone image")
+            }
+            identifier = optionalImage.identifier
         }
         try CustomFirmwareArm64eX1.patch(
             fileAt: binary,
             identifier: identifier,
+            requireComplete: optionalImage != nil || identifier == FirmwareGuestSystemPatchSet.arm64eX1HomePopAccessibility,
             log: machOVerbLog,
         )
     }
@@ -727,8 +739,10 @@ enum VPhoneCustomFirmwareMachOVerbs {
             VPhoneCustomFirmwarePatchMobileactivationdCommand.self,
             VPhoneCustomFirmwarePatchLaunchdJetsamCommand.self,
             VPhoneCustomFirmwarePatchArm64eX1Command.self,
+            VPhoneCustomFirmwareAuditArm64eX1Command.self,
             VPhoneCustomFirmwarePatchWatchdogdCommand.self,
             VPhoneCustomFirmwarePatchDiskimagesiodCommand.self,
+            VPhoneCustomFirmwarePatchRemotePairingCommand.self,
             VPhoneCustomFirmwarePatchVirtualAudioCommand.self,
             VPhoneCustomFirmwarePatchVirtualAudioMuteCommand.self,
             VPhoneCustomFirmwarePatchVirtualAudioSPGateCommand.self,
@@ -738,5 +752,23 @@ enum VPhoneCustomFirmwareMachOVerbs {
             VPhoneCustomFirmwarePatchParavirtGPUPrimitiveRestartCommand.self,
             VPhoneCustomFirmwarePatchParavirtGPUCompilerCacheCommand.self,
         ]
+    }
+}
+
+struct VPhoneCustomFirmwarePatchRemotePairingCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "patch-remotepairingdeviced",
+        abstract: "Allow local pairing control and tunnel connections",
+    )
+
+    @Argument(help: "Path to the remotepairingdeviced Mach-O, patched in place", transform: URL.init(fileURLWithPath:))
+    var binary: URL
+
+    @Flag(name: .customLong("dry-run"), help: "Report the sites without changing the file")
+    var dryRun = false
+
+    func run() throws {
+        try requireUntruncatedMachO(at: binary)
+        try CustomFirmwareRemotePairing.patch(fileAt: binary, dryRun: dryRun)
     }
 }

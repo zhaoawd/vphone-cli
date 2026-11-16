@@ -1,0 +1,58 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import net from 'node:net';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const [socketArg,outArg,bundleArg]=process.argv.slice(2);
+const socket=fs.realpathSync(socketArg),out=fs.realpathSync(outArg),bundle=fs.realpathSync(bundleArg);
+const root=fs.realpathSync(new URL('../../../../',import.meta.url));
+assert(['duo-patches-20261116','duo-txm-remap-20261116'].includes(path.basename(path.dirname(socket))));
+for(const p of [socket,out,bundle])assert(p.startsWith(root+'/.build/'));
+process.chdir(path.dirname(socket));
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const save=(name,value)=>fs.writeFileSync(out+'/'+name+'.json',JSON.stringify(value,null,2)+'\n');
+const raw=(method,params={})=>new Promise((resolve,reject)=>{
+    const chunks=[],c=net.createConnection('./vphone.sock',()=>c.write(JSON.stringify({t:'rpc',method,params,screen:false})+'\n'));
+    c.setTimeout(30000,()=>c.destroy(Error('RPC timeout')));c.on('data',b=>chunks.push(b));c.on('error',reject);
+    c.on('end',()=>{try{resolve(JSON.parse(Buffer.concat(chunks)))}catch(e){reject(e)}});
+});
+const rpc=async(method,params={})=>{const reply=await raw(method,params);assert(reply.ok,method+': '+JSON.stringify(reply));return reply.result;};
+const read=async p=>{
+    const r=await rpc('files.read',{path:p,binary:true,limit:8*1024*1024});
+    assert.equal(r.encoding,'base64');assert.equal(r.truncated,false,p);
+    return Buffer.from(r.content,'base64');
+};
+const info=await rpc('device.info');save('device',info);
+assert.equal(info.agent.binary_hash,hash(fs.readFileSync(bundle+'/Contents/Resources/guest-resources/vphoned')));
+const environment=await rpc('environment.status');save('environment',environment);assert.equal(environment.root_read_only,true);
+const original=JSON.parse(fs.readFileSync(root+'/.build/host-webcam-distribution-20261115/original-cache-state.json')).environment.libraries;
+assert.equal(environment.libraries.length,21);
+for(const library of environment.libraries){const baseline=original.find(x=>x.name===library.name);assert(baseline);assert.equal(library.sha256,baseline.sha256?hash(fs.readFileSync(bundle+'/Contents/Resources/guest-resources/'+library.name)):null,library.name);}
+save('auto-lock',await rpc('display.auto_lock'));save('pose',await rpc('display.pose'));
+save('processes',await rpc('processes.list'));
+const inputDevices=await rpc('device.input_devices');save('input-devices',inputDevices);
+assert.equal(inputDevices.available,true);assert(JSON.stringify(inputDevices.services).includes('Virtual USB Touch Screen'));
+const hidDrivers=await rpc('processes.list',{filter:'Apple'});save('hid-driver-processes',hidDrivers);
+assert(hidDrivers.processes.some(x=>x.executable?.includes('com.apple.AppleUserHIDDrivers.dext/')),'HID dext process required');
+const driverkit=await rpc('processes.list',{filter:'driverkitd'});save('driverkit-processes',driverkit);
+assert(driverkit.processes.some(x=>x.name==='driverkitd'));
+save('ioreg',await rpc('device.ioreg'));
+const ps=await rpc('processes.spawn',{executable:'ps',arguments:['-axww','-o','pid,ppid,command'],timeout_ms:10000});save('process-command-lines',ps);assert.equal(ps.exit_code,0);
+const candidates=JSON.parse(fs.readFileSync(root+'/.build/upstream-port-20261116/real-accessibility.json'));
+const actualRoot=out+'/installed-images';fs.mkdirSync(actualRoot);fs.mkdirSync(actualRoot+'/usr');
+const installed=[];
+for(const image of candidates){
+    const bytes=await read('/'+image.path),backup=await read('/'+image.path+'.bak');
+    const target=actualRoot+'/'+image.path;fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes);
+    assert.equal(hash(backup),image.pristine_sha256,image.path+' backup');
+    assert.equal(hash(bytes),image.lowered_sha256,image.path+' installed fixture');
+    installed.push({identifier:image.identifier,path:image.path,sha256:hash(bytes),matchesFileFixture:hash(bytes)===image.lowered_sha256,backupSHA256:hash(backup)});
+    save('installed-accessibility',installed);
+}
+const audit=JSON.parse(execFileSync(bundle+'/Contents/MacOS/vphone-cli',['cfw','audit-arm64e-x1',actualRoot,'--json','--strict'],{encoding:'utf8',maxBuffer:4*1024*1024}));save('installed-audit',audit);
+assert.equal(audit.images.length,36);assert.equal(audit.failures.length,0);assert(audit.images.every(x=>x.state==='noLoweringNeeded'));
+const pairing=await read('/usr/libexec/remotepairingdeviced');fs.writeFileSync(out+'/installed-remotepairingdeviced',pairing);
+const pairingExpected=JSON.parse(fs.readFileSync(root+'/.build/upstream-port-20261116/real-pairing.json'));assert.equal(hash(pairing),pairingExpected.signed_sha256);
+save('summary',{agent:info.agent.binary_hash,rootReadOnly:true,libraryEntries:21,accessibilityImages:installed.length,unchangedBackups:true,noRemainingX1:true,exactFixtureMatches:installed.filter(x=>x.matchesFileFixture).length,pairingSHA256:hash(pairing),uptimeSeconds:info.uptime_seconds});
+console.log(JSON.stringify({accessibilityImages:36,noRemainingX1:true,exactFixtureMatches:installed.filter(x=>x.matchesFileFixture).length,pairingVerified:true,rootReadOnly:true}));

@@ -121,9 +121,10 @@ public struct VPhoneVirtualMachinePatchPlan: Codable, Sendable, Hashable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         presetIdentifier = try container.decode(String.self, forKey: .presetIdentifier)
         patchSets = try container.decodeIfPresent([String].self, forKey: .patchSets) ?? []
-        enabledPatches = try FirmwarePatchSetCatalog.currentIdentifiers(
-            container.decodeIfPresent([String].self, forKey: .enabledPatches) ?? [],
-        )
+        let recorded = try container.decodeIfPresent([String].self, forKey: .enabledPatches) ?? []
+        // Plans carry selection, so the retired directory expands here. Receipt
+        // decoding below deliberately keeps its old ownership until installation.
+        enabledPatches = FirmwarePatchSetCatalog.currentSelection(.allow(Set(recorded))).namedIdentifiers.sorted()
         notApplicablePatches = try FirmwarePatchSetCatalog.currentIdentifiers(
             container.decodeIfPresent([String].self, forKey: .notApplicablePatches) ?? [],
         )

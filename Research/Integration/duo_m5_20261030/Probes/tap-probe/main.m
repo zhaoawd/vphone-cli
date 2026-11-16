@@ -49,7 +49,13 @@
     if (!scene) return;
     UIWindowSceneGeometry *geometry = scene.effectiveGeometry;
     UIScreen *screen = scene.screen;
-    NSDictionary *report = @{@"pid": @(getpid()), @"total": @(self.total),
+    NSMutableArray *targets = [NSMutableArray array];
+    for (UIButton *button in self.buttons) {
+        CGPoint centre = [button.superview convertPoint:button.center toView:self.view.window];
+        [targets addObject:@{@"identifier": button.accessibilityIdentifier,
+                             @"window_center": @[@(centre.x), @(centre.y)]}];
+    }
+    NSDictionary *report = @{@"pid": @(getpid()), @"total": @(self.total), @"targets": targets,
         @"last_identifier": self.lastIdentifier, @"counts": self.counts,
         @"orientation": @(geometry.interfaceOrientation),
         @"scene": @[@(geometry.coordinateSpace.bounds.size.width), @(geometry.coordinateSpace.bounds.size.height)],

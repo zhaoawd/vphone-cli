@@ -1,5 +1,42 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Duo production patch port (2026-11-16, isolated guest validated).** Adds virtual
+> USB DriverKit runtime/Preboot declarations, semantic local-pairing gates,
+> complete/reversible standalone X1 installation, 35 independent AX declarations
+> plus HomePop and debug-library dependencies, and native TXM remap/profile
+> compatibility. The retired AX directory selection expands to the independent
+> targets and a new residual-directory identifier; receipts transfer ownership
+> only after file updates. The working-tree standard TXM candidate follows
+> upstream native remap; explicit legacy precheck takes precedence and preserves
+> the measured old output. Bundle/Launchpad candidates move to series 2.16.
+> File-level checks cover all 36 real AX backups and three real pairing gates;
+> eight TXM policy outputs pass. With user-approved AMFI admission and environment
+> update, two cold boots match all 36 AX fixtures and the pairing executable;
+> all 12 debugger libraries have no remaining X1 and pass strict signature checks.
+> DriverKit enumeration, six native VZ taps and 15 AX hits pass. The inner-panel
+> default AX visible filter still omits five probe buttons; its failing regression
+> is retained. Both runs restored settings and shut down with exit 0 and no state
+> handles. That clone retains legacy TXM precheck; separate native TXM validation
+> follows below. LLDB and the pairing protocol remain untested. That initial guest validation
+> did not perform a restore. See
+> [implementation, migration and validation](Integration/duo_m5_20261030/PATCH_PORT_20261116.md).
+
+> A separate `duo-txm-remap-20261116` candidate was prepared for review.
+> Its boot selection differs from the source only at TXM; 126 compared firmware
+> files differ only in TXM after retaining the source RestoreRamDisk. The new
+> payload matches the production policy fixture. After explicit user approval,
+> its ECID-bound erase/restore and CFW install completed. Two cold boots verify
+> all 36 AX fixtures, the environment and DriverKit. Main/framework original-code
+> remaps pass 20 cases and 80 aliases with actual RX and correct calls, both with
+> default signing and without custom trust, including after the second boot.
+> Two external dylib signature forms and two standalone exec-injection controls
+> execute constructors/exports. App posix_spawn remains blocked with EPERM and
+> its original failing assertion is retained. Offline read-only verification
+> confirms the actual Preboot TXM's IM4P and payload exactly match the candidate.
+> Settings are restored, both VMs exit 0, and state handles/mounts are clear.
+> CMS hot reload, modified code/inline hooks, LLDB and pairing protocols remain
+> untested; the source and the earlier validated clone were not erased.
+
 > **Remaining integration assessment and diagnostics (2026-11-15).** Nine
 > upstream groups now have final-diff inventories and scoped validation plans;
 > no new production patch, declaration or preset was applied. Full-size movie

@@ -142,6 +142,32 @@ jobs:
             -only-testing:FirmwarePatcherTests/DyldSharedCacheUndoWordsTests \
             -only-testing:FirmwarePatcherTests/DyldSharedCacheOutdatedImplementationTests
 
+      - name: Standalone patches and selection migration tests
+        run: |
+          set -euo pipefail
+          xcodebuild -workspace VPhone.xcworkspace -scheme FirmwarePatcherTests \
+            -configuration Debug -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath .build/XcodeCommandTests \
+            -clonedSourcePackagesDirPath .build/XcodeBundle/SourcePackages \
+            -disableAutomaticPackageResolution -parallel-testing-enabled NO -jobs 4 test \
+            -only-testing:FirmwarePatcherTests/DeviceTreeGuestDeviceTests \
+            -only-testing:FirmwarePatcherTests/CustomFirmwareDriverKitTests \
+            -only-testing:FirmwarePatcherTests/CustomFirmwareRemotePairingTests \
+            -only-testing:FirmwarePatcherTests/FirmwareGuestPatchResolutionTests \
+            -only-testing:FirmwarePatcherTests/FirmwarePatchSetCatalogTests \
+            -only-testing:FirmwarePatcherTests/FirmwarePatchSelectionCompatibilityTests \
+            -only-testing:FirmwarePatcherTests/CustomFirmwareArm64eX1Tests \
+            -only-testing:FirmwarePatcherTests/CustomFirmwareArm64eX1InstallationTests \
+            -only-testing:FirmwarePatcherTests/CustomFirmwareArm64eX1AuditTests \
+            -only-testing:FirmwarePatcherTests/FirmwareAccessibilityPatchTests \
+            -only-testing:FirmwarePatcherTests/FirmwareDebugLibraryPatchTests \
+            -only-testing:FirmwarePatcherTests/TXMExecutableRemapTests \
+            -only-testing:FirmwarePatcherTests/TXMMissingProfileTests
+          node Research/Integration/duo_m5_20261030/Regression/test-patch-selection-cli.mjs \
+            .build/XcodeBundle/Build/Products/Debug/VPhone.bundle/Contents/MacOS/vphone-cli \
+            .build/patch-selection-cli-ci
+          zsh VPhoneLaunchpad/Tests/BundleNamesTests.sh
+
       - name: Guest display and point input tests
         run: |
           set -euo pipefail

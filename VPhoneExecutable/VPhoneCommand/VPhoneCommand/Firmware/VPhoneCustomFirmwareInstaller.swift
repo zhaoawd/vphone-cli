@@ -498,6 +498,7 @@ struct VPhoneCustomFirmwareInstaller {
         // the receipt. Each step that applies or reverts a guest patch adds to
         // it, so what it holds at the end is exactly the `Guest` part.
         var liveGuest = Set<String>()
+        var notApplicableGuest = Set<String>()
         // Resolved once the system volume is mounted (it needs the "was
         // installed" signal there), then used again by the Preboot pass.
         var priorGuest = Set<String>()
@@ -549,6 +550,7 @@ struct VPhoneCustomFirmwareInstaller {
                     kernelPatches: receiptKernel,
                     environmentOnly: false,
                     strict: isOTAUpdate,
+                    notApplicable: &notApplicableGuest,
                 )
                 if isOTAUpdate { liveGuest.insert(FirmwareGuestSystemPatchSet.otaUserland) }
             case .environmentOnly:
@@ -571,6 +573,7 @@ struct VPhoneCustomFirmwareInstaller {
                     priorGuest: priorGuest,
                     kernelPatches: receiptKernel,
                     environmentOnly: true,
+                    notApplicable: &notApplicableGuest,
                 )
             }
             if liveGuest.contains(FirmwareGuestSystemPatchSet.homePodOTAUserland)
@@ -614,7 +617,6 @@ struct VPhoneCustomFirmwareInstaller {
         // product repair on a non-iPhone, and the build spoof with no value set. A
         // guest whose board tree could not be recovered is not among them: its
         // repair is missing, and drift should keep saying so.
-        var notApplicableGuest = Set<String>()
         if !device.presentsBoard {
             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootBoardAudio)
         }
@@ -1353,6 +1355,7 @@ struct VPhoneCustomFirmwareInstaller {
         kernelPatches: Set<String>?,
         environmentOnly: Bool,
         strict: Bool = false,
+        notApplicable: inout Set<String>,
     ) throws -> Set<String> {
         var live = Set<String>()
         var failures: [String] = []
@@ -1527,45 +1530,53 @@ struct VPhoneCustomFirmwareInstaller {
             )
         }
 
-        // UIKit loads accessibility bundles into every app while app
-        // accessibility is on. Most are in the shared cache, which the cache
-        // lowering covers; the rest are standalone X1 executables, and an app
-        // with its own Mach exception handler dies on their first X1
-        // instruction instead of reaching the on-demand service. Each is
-        // lowered from its backup and its bundle re-sealed, as CIBarcode is;
-        // deselection restores every backup.
-        if version.hasPrefix("27.1.") || version == "27.1"
-            || priorGuest.contains(FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles)
-        {
-            let identifier = FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles
-            isolate([identifier]) {
-                let bundles = try accessibilityX1Executables(system: system)
-                if on(identifier) {
-                    for (bundle, executable) in bundles {
-                        try patchMachO(
-                            system: system, work: work, path: executable, verbs: ["patch-arm64e-x1"],
-                            verbArguments: ["--patch-id", identifier], preserveEntitlements: true,
-                        )
-                        try sealGuestBundle(system: system, bundle: bundle)
-                    }
-                    print("  [+] \(identifier): lowered \(bundles.count) accessibility bundle executables")
-                    live.insert(identifier)
-                } else {
-                    var restored = 0
-                    for (bundle, executable) in bundles {
-                        if try revertMachO(system: system, work: work, path: executable, bundle: bundle) {
-                            restored += 1
-                        }
-                    }
-                    if restored > 0 {
-                        print("  [+] \(identifier): restored \(restored) accessibility bundle executables from backup")
-                    } else if priorGuest.contains(identifier) {
-                        print("  [!] \(identifier): off now but no backup to revert; leaving the patched bundles (not revertible)")
-                        live.insert(identifier)
-                    }
+        // Independent targets take ownership only after their update succeeds.
+        // A new residual declaration owns unlisted images. The legacy receipt
+        // remains live if any transfer fails.
+        let legacyAggregate = FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles
+        let aggregate = FirmwareGuestSystemPatchSet.arm64eX1AccessibilityRemaining
+        let hadAggregate = priorGuest.contains(legacyAggregate)
+        let homePop = (identifier: FirmwareGuestSystemPatchSet.arm64eX1HomePopAccessibility,
+                       path: FirmwareGuestSystemPatchSet.homePopAccessibilityExecutablePath,
+                       bundle: Optional(FirmwareGuestSystemPatchSet.homePopAccessibilityBundlePath))
+        let independent = FirmwareGuestSystemPatchSet.arm64eX1OptionalImages + [homePop]
+        let independentPaths = Set(independent.map(\.path))
+        var images = independent
+        if version == "27.1" || version.hasPrefix("27.1.") || hadAggregate || priorGuest.contains(aggregate) {
+            images += try accessibilityX1Executables(system: system)
+                .filter { !independentPaths.contains($0.executable) }
+                .map { (identifier: aggregate, path: $0.executable, bundle: Optional($0.bundle)) }
+        }
+        var residualCount = 0
+        for image in images {
+            let legacyOwned = hadAggregate && image.path.hasPrefix(FirmwareGuestSystemPatchSet.accessibilityBundlesPath + "/")
+            let enabled = image.identifier == aggregate ? on(aggregate)
+                : (plan == nil ? guestDevice.family == .iPhone : on(image.identifier))
+            do {
+                let outcome = try CustomFirmwareArm64eX1Installation.update(
+                    system: system, identifier: image.identifier, path: image.path, bundle: image.bundle,
+                    enabled: enabled, priorApplied: priorGuest.contains(image.identifier) || legacyOwned,
+                    sealBundle: { try sealGuestBundle(system: system, bundle: $0, preserveEntitlements: true) },
+                )
+                switch outcome {
+                case .applied: live.insert(image.identifier)
+                case .notRevertible:
+                    live.insert(image.identifier)
+                    if legacyOwned { live.insert(legacyAggregate) }
+                case .notApplicable: notApplicable.insert(image.identifier)
+                case .inactive: break
                 }
+                if image.identifier == aggregate { residualCount += 1 }
+            } catch let error as CustomFirmwareArm64eX1Installation.RollbackFailure {
+                throw error
+            } catch {
+                failures.append(image.identifier)
+                print("  [!] \(image.identifier): patch step failed, left in its prior state: \(error)")
+                if priorGuest.contains(image.identifier) { live.insert(image.identifier) }
+                if legacyOwned { live.insert(aggregate) }
             }
         }
+        if residualCount == 0, !live.contains(aggregate) { notApplicable.insert(aggregate) }
 
         // 0. A cache whose span alone overruns the guest kernel's shared region
         //    maps at no slide, and the guest panics on first boot. Refuse before
@@ -2046,6 +2057,7 @@ struct VPhoneCustomFirmwareInstaller {
         if version.hasPrefix("27.") {
             machO("system-diskimagesiod-cfw-is_mount_complete", path: "usr/libexec/diskimagesiod", verbs: ["patch-diskimagesiod"], preserveEntitlements: true)
         }
+        machO(CustomFirmwareRemotePairing.patchID, path: "usr/libexec/remotepairingdeviced", verbs: ["patch-remotepairingdeviced"], preserveEntitlements: true)
 
         // The gigalocker rename pairs with seputil, a boot-essential first-install
         // step on the xART volume only a full install mounts. On an installed
@@ -2767,7 +2779,7 @@ struct VPhoneCustomFirmwareInstaller {
                 named: plan.presetIdentifier,
                 vmCopy: try? bundleDirectory.readData(VPhonePatchPresetStore.vmPresetFileName),
             ),
-            let resolved = try? VPhonePatchPlan.resolve(
+            let resolved = try? FirmwarePatchSetCatalog.resolve(
                 preset: preset,
                 patchSets: FirmwarePatchSetCatalog.bundled,
                 iOSBase: VPhoneVersion(plan.iOSBaseVersion),
@@ -3719,6 +3731,9 @@ struct VPhoneCustomFirmwareInstaller {
             repairGroup.append((FirmwareGuestSystemPatchSet.prebootFoldableDisplays, "patch-dt-foldable-displays",
                                 boardDeviceTree.map { [$0.path] } ?? []))
         }
+        if [.iPhone, .iPad].contains(guestDevice.family) {
+            repairGroup.append((FirmwareGuestSystemPatchSet.prebootVirtualUSBDriverKit, "patch-dt-driverkit", []))
+        }
         repairGroup.append((FirmwareGuestSystemPatchSet.prebootHaptics, "patch-dt-haptics", []))
         repairGroup.append((FirmwareGuestSystemPatchSet.ios16EphemeralStorage, "patch-dt-ios16-ephemeral", []))
         repairGroup.append((FirmwareGuestSystemPatchSet.prebootMicrophoneArray, "patch-dt-microphone-array", []))
@@ -4320,7 +4335,7 @@ struct VPhoneCustomFirmwareInstaller {
             else { continue }
             let executable = bundle + "/" + executableName
             guard try system.isRegularFile(executable) else { continue }
-            if try system.exists(executable + ".bak") || Self.isArm64eX1(try system.readData(executable)) {
+            if try system.exists(executable + ".bak") || CustomFirmwareArm64eX1Audit.needsInspection(try system.readData(executable)) {
                 found.append((bundle, executable))
             }
         }

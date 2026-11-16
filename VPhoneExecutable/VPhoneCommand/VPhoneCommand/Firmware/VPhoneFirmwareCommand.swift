@@ -575,10 +575,12 @@ struct VPhoneFirmwareSetPatchesCommand: ParsableCommand {
         let (resolved, presetFile) = try VPhonePatchPresetStore.resolve(preset ?? selection.presetIdentifier, forVM: bundle.url)
         selection.presetIdentifier = resolved.identifier
 
+        let block = FirmwarePatchSetCatalog.currentIdentifiers(self.block)
+        let allow = FirmwarePatchSetCatalog.currentIdentifiers(self.allow)
         let declarations = FirmwarePatchSetCatalog.allDeclarations
         let declared = Set(declarations.map(\.identifier))
         // A typo would otherwise write a list that turns nothing on or off.
-        let unknown = Set(block + allow).subtracting(declared).sorted()
+        let unknown = Set(block + allow).subtracting(declared.union([FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles])).sorted()
         guard unknown.isEmpty else {
             throw ValidationError(
                 "No patch declares \(unknown.joined(separator: ", ")). Run `fw patches` for the identifiers.",
@@ -593,8 +595,13 @@ struct VPhoneFirmwareSetPatchesCommand: ParsableCommand {
 
         // Only differences reach the plist, whatever the caller passed.
         let included = VPhonePatchCatalogReport.patchesInPreset(resolved)
-        selection.blockedPatches = Set(block).intersection(included).sorted()
-        selection.allowedPatches = Set(allow).subtracting(included).sorted()
+        let desired = FirmwarePatchSetCatalog.currentSelection(resolved.selection, blocked: Set(block), allowed: Set(allow))
+        let presetSets = Set(resolved.patchSets.map(\.identifier))
+        let selectable = Set(FirmwarePatchSetCatalog.bundled.filter { presetSets.contains($0.identifier) }
+            .flatMap { $0.patches.map(\.identifier) })
+        let selected = selectable.filter { desired.includes($0) }
+        selection.blockedPatches = included.subtracting(selected).sorted()
+        selection.allowedPatches = selected.subtracting(included).sorted()
 
         let essential = Set(declarations.filter(\.bootEssential).map(\.identifier))
         let essentialOff = Set(selection.blockedPatches).intersection(essential).sorted()
@@ -708,10 +715,10 @@ struct VPhoneFirmwareExportPresetCommand: ParsableCommand {
             // As fw set-patches: the options name the whole choice, and a VM
             // named with them is where a preset of its own resolves.
             original = try VPhonePatchPresetStore.resolve(preset ?? record.presetIdentifier, forVM: directory).preset
-            blocked = Set(block)
-            allowed = Set(allow)
+            blocked = Set(FirmwarePatchSetCatalog.currentIdentifiers(block))
+            allowed = Set(FirmwarePatchSetCatalog.currentIdentifiers(allow))
             // A typo would otherwise export a selection naming nothing.
-            let unknown = blocked.union(allowed).subtracting(FirmwarePatchSetCatalog.allDeclarations.map(\.identifier)).sorted()
+            let unknown = blocked.union(allowed).subtracting(Set(FirmwarePatchSetCatalog.allDeclarations.map(\.identifier)).union([FirmwareGuestSystemPatchSet.arm64eX1AccessibilityBundles])).sorted()
             guard unknown.isEmpty else {
                 throw ValidationError("No patch declares \(unknown.joined(separator: ", ")). Run `fw patches` for the identifiers.")
             }
@@ -734,7 +741,7 @@ struct VPhoneFirmwareExportPresetCommand: ParsableCommand {
         exported.identifier = identifier
         exported.title = "\(original.title), modified"
         // As VPhonePatchPlan.resolve composes a VM's overrides.
-        exported.selection = original.selection.allowing(allowed).blocking(blocked)
+        exported.selection = FirmwarePatchSetCatalog.currentSelection(original.selection, blocked: blocked, allowed: allowed)
         try exported.encodedPlist().write(to: url, options: .atomic)
         print("[fw export-preset] wrote \(identifier) to \(url.path) (from \(original.identifier), \(blocked.count) off, \(allowed.count) on)")
     }

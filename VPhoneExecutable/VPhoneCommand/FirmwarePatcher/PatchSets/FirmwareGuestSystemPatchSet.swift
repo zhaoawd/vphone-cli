@@ -65,10 +65,96 @@ public enum FirmwareGuestSystemPatchSet {
     public static let arm64eX1FsckBootstrap = "system-fsck-boot-arm64e_x1_bootstrap"
     public static let arm64eX1MountBootstrap = "system-mount-boot-arm64e_x1_bootstrap"
     public static let arm64eX1CIBarcode = "system-cibarcode-cfw-arm64e_x1"
+    /// Standalone iOS 27.1 accessibility bundle, not covered by shared-cache lowering.
+    public static let arm64eX1HomePopAccessibility = "system-homepopaccessibility-cfw-arm64e_x1"
+    public static let homePopAccessibilityBundlePath =
+        "System/Library/AccessibilityBundles/SpringBoardHomePopAccessibility.axbundle"
+    public static let homePopAccessibilityExecutablePath =
+        homePopAccessibilityBundlePath + "/SpringBoardHomePopAccessibility"
     public static let ciBarcodeBundlePath = "System/Library/CoreImage/CIBarcode.cifilter"
     public static let ciBarcodeExecutablePath = ciBarcodeBundlePath + "/CIBarcode"
+    public static let arm64eX1AccessibilityRemaining = "system-accessibilitybundles-cfw-arm64e_x1_remaining"
+    /// Retired directory identifier, retained only for migration of existing records.
     public static let arm64eX1AccessibilityBundles = "system-accessibilitybundles-cfw-arm64e_x1"
     public static let accessibilityBundlesPath = "System/Library/AccessibilityBundles"
+
+    /// Standalone debugger libraries and their dependencies, outside the shared
+    /// cache. Select by the installed binary's X1 instructions, not its OS label.
+    /// Paths are relative to System, including the installed OS cryptex.
+    public static let arm64eX1DebugImages: [(identifier: String, path: String, bundle: String?)] = [
+        ("system-libdispatch-cfw-arm64e_x1_introspection", "usr/lib/system/introspection/libdispatch.dylib", nil),
+        ("system-libbacktracerecording-cfw-arm64e_x1", "usr/lib/libBacktraceRecording.dylib", nil),
+        ("system-libmainthreadchecker-cfw-arm64e_x1", "usr/lib/libMainThreadChecker.dylib", nil),
+        ("system-librpac-cfw-arm64e_x1", "usr/lib/libRPAC.dylib", nil),
+        ("system-libviewdebuggersupport-cfw-arm64e_x1", "usr/lib/libViewDebuggerSupport.dylib", nil),
+        ("system-liblogredirect-cfw-arm64e_x1", "System/Cryptexes/OS/usr/lib/libLogRedirect.dylib", nil),
+        ("system-libmtlhud-cfw-arm64e_x1", "System/Cryptexes/OS/usr/lib/libMTLHud.dylib", nil),
+        ("system-libglinterpose-cfw-arm64e_x1", "System/Cryptexes/OS/usr/lib/libglInterpose.dylib", nil),
+        ("system-libmetalmetricsinterpose-cfw-arm64e_x1", "System/Cryptexes/OS/usr/lib/libMetalMetricsInterpose.dylib", nil),
+        (
+            "system-debughierarchyfoundation-cfw-arm64e_x1",
+            "System/Library/PrivateFrameworks/DebugHierarchyFoundation.framework/DebugHierarchyFoundation",
+            "System/Library/PrivateFrameworks/DebugHierarchyFoundation.framework"
+        ),
+        (
+            "system-gputoolscapture-cfw-arm64e_x1",
+            "System/Library/PrivateFrameworks/GPUToolsCapture.framework/GPUToolsCapture",
+            "System/Library/PrivateFrameworks/GPUToolsCapture.framework"
+        ),
+        (
+            "system-gputoolsdiagnostics-cfw-arm64e_x1",
+            "System/Library/PrivateFrameworks/GPUToolsDiagnostics.framework/GPUToolsDiagnostics",
+            "System/Library/PrivateFrameworks/GPUToolsDiagnostics.framework"
+        ),
+    ]
+
+    /// In-process accessibility plug-ins with standalone X1 images in 27.1.
+    /// HomePop keeps its existing declaration above. A cache-only or ordinary
+    /// arm64e image needs no write; inspect the installed bytes as for debug libraries.
+    public static let arm64eX1AccessibilityImages: [(identifier: String, path: String, bundle: String?)] = [
+        ("system-accessibilitysettingspopaccessibility-cfw-arm64e_x1", "AccessibilitySettingsPopAccessibility"),
+        ("system-accessibilityuiservicepopaccessibility-cfw-arm64e_x1", "AccessibilityUIServicePopAccessibility"),
+        ("system-accessibilityutilitiespopaccessibility-cfw-arm64e_x1", "AccessibilityUtilitiesPopAccessibility"),
+        ("system-activityachievementsui-cfw-arm64e_x1", "ActivityAchievementsUI"),
+        ("system-activitybridgesetup-cfw-arm64e_x1", "ActivityBridgeSetup"),
+        ("system-activityringsui-cfw-arm64e_x1", "ActivityRingsUI"),
+        ("system-activitysharing-cfw-arm64e_x1", "ActivitySharing"),
+        ("system-activitysharingui-cfw-arm64e_x1", "ActivitySharingUI"),
+        ("system-ambientsettingspopaccessibility-cfw-arm64e_x1", "AmbientSettingsPopAccessibility"),
+        ("system-assistivetouchpopaccessibility-cfw-arm64e_x1", "AssistiveTouchPopAccessibility"),
+        ("system-clarityboardpopaccessibility-cfw-arm64e_x1", "ClarityBoardPopAccessibility"),
+        ("system-fitnessapp-cfw-arm64e_x1", "FitnessApp"),
+        ("system-fitnessui-cfw-arm64e_x1", "FitnessUI"),
+        ("system-gaxspringboardserverpopaccessibility-cfw-arm64e_x1", "GAXSpringboardServerPopAccessibility"),
+        ("system-gaxuiserverpopaccessibility-cfw-arm64e_x1", "GAXUIServerPopAccessibility"),
+        ("system-livespeechuiservicepopaccessibility-cfw-arm64e_x1", "LiveSpeechUIServicePopAccessibility"),
+        ("system-magnifierangelpopaccessibility-cfw-arm64e_x1", "MagnifierAngelPopAccessibility"),
+        ("system-ntkcustomization-cfw-arm64e_x1", "NTKCustomization"),
+        ("system-ntkpride2026facebundle-cfw-arm64e_x1", "NTKPride2026FaceBundle"),
+        ("system-ntkultracubefacebundlecompanion-cfw-arm64e_x1", "NTKUltraCubeFaceBundleCompanion"),
+        ("system-nanomailbridgesettings-cfw-arm64e_x1", "NanoMailBridgeSettings"),
+        ("system-nanomediabridgeui-cfw-arm64e_x1", "NanoMediaBridgeUI"),
+        ("system-nanopeoplebridgesettings-cfw-arm64e_x1", "NanoPeopleBridgeSettings"),
+        ("system-nanotimekitcompanion-cfw-arm64e_x1", "NanoTimeKitCompanion"),
+        ("system-schooltimesettingsui-cfw-arm64e_x1", "SchoolTimeSettingsUI"),
+        ("system-speechrecognitioncommandandcontrolpopaccessibility-cfw-arm64e_x1", "SpeechRecognitionCommandAndControlPopAccessibility"),
+        ("system-springboardpopaccessibility-cfw-arm64e_x1", "SpringBoardPopAccessibility"),
+        ("system-springboardpopframework-cfw-arm64e_x1", "SpringBoardPopFramework"),
+        ("system-swiftuipopaccessibility-cfw-arm64e_x1", "SwiftUIPopAccessibility"),
+        ("system-systemstatusuipopaccessibility-cfw-arm64e_x1", "SystemStatusUIPopAccessibility"),
+        ("system-uikitpopaccessibility-cfw-arm64e_x1", "UIKitPopAccessibility"),
+        ("system-votaxuiservicepopaccessibility-cfw-arm64e_x1", "VOTAXUIServicePopAccessibility"),
+        ("system-voiceovertouchpopaccessibility-cfw-arm64e_x1", "VoiceOverTouchPopAccessibility"),
+        ("system-activity_widget-cfw-arm64e_x1", "activity-widget"),
+        ("system-com_apple_nanotimekit_createwatchface-cfw-arm64e_x1", "com.apple.NanoTimeKit.CreateWatchFace"),
+    ].map { image in
+        let bundle = "System/Library/AccessibilityBundles/" + image.1 + ".axbundle"
+        return (identifier: image.0, path: bundle + "/" + image.1, bundle: bundle)
+    }
+
+    /// Shared by installation and CLI lookup so declared optional images cannot
+    /// accidentally keep using the non-strict bootstrap conversion path.
+    public static let arm64eX1OptionalImages = arm64eX1DebugImages + arm64eX1AccessibilityImages
 
     public static let paravirtGPUIndexOffset = "system-paravirt_gpu-cfw-heap_index_offset"
     public static let paravirtGPUPrimitiveRestart = "system-paravirt_gpu-cfw-primitive_restart"
@@ -515,6 +601,16 @@ public enum FirmwareGuestSystemPatchSet {
                 bootEssential: true,
             ),
             VPhonePatchDeclaration(
+                identifier: arm64eX1HomePopAccessibility,
+                title: "ARM64E_X1 HomePop accessibility",
+                summary: """
+                Lowers the standalone HomePop accessibility plug-in before UIKit loads it. \
+                Its X1 instructions are outside the shared cache and can fault in app processes.
+                """,
+                target: .guestExecutable(path: "/" + homePopAccessibilityExecutablePath),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 1)),
+            ),
+            VPhonePatchDeclaration(
                 identifier: arm64eX1CIBarcode,
                 title: "ARM64E_X1 barcode filters",
                 summary: """
@@ -526,13 +622,12 @@ public enum FirmwareGuestSystemPatchSet {
                 applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 1)),
             ),
             VPhonePatchDeclaration(
-                identifier: arm64eX1AccessibilityBundles,
-                title: "ARM64E_X1 accessibility bundles",
+                identifier: arm64eX1AccessibilityRemaining,
+                title: "ARM64E_X1 remaining accessibility bundles",
                 summary: """
-                Lowers the X1 executables of the accessibility bundles kept on disk, outside the \
-                shared cache. UIKit loads them into every app while app accessibility is on, and \
-                an app that installs its own Mach exception handler never reaches the on-demand \
-                lowering service, so their first X1 instruction kills it.
+                Lowers standalone accessibility executables outside the independent inventory, \
+                preserving the former directory coverage on iOS 27.1. Uses each image's pristine \
+                backup for complete conversion and restores it when deselected.
                 """,
                 target: .guestExecutable(path: "/" + accessibilityBundlesPath),
                 applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 1)),
@@ -551,6 +646,12 @@ public enum FirmwareGuestSystemPatchSet {
                 summary: "Reports the personalised developer image as mounted on a 27 userland.",
                 target: .guestExecutable(path: "/usr/libexec/diskimagesiod"),
                 applicability: ios27,
+            ),
+            VPhonePatchDeclaration(
+                identifier: CustomFirmwareRemotePairing.patchID,
+                title: "Pairing from guest apps",
+                summary: "Allows apps inside the guest to connect to its pairing control channel and tunnels.",
+                target: .guestExecutable(path: "/usr/libexec/remotepairingdeviced"),
             ),
             VPhonePatchDeclaration(
                 identifier: "system-launchd_cache_loader-boot-unsecure_cache_gate",
@@ -1007,6 +1108,12 @@ public enum FirmwareGuestSystemPatchSet {
                 target: .prebootDeviceTree,
             ),
             VPhonePatchDeclaration(
+                identifier: prebootVirtualUSBDriverKit,
+                title: "Virtual USB HID DriverKit",
+                summary: "Enables DriverKit in an existing virtual iPhone or iPad's Preboot tree for its USB touchscreen. Changes only supports-driverkit and keeps the personalized IMG4 container. The shared pre-repair backup allows the change to be reverted with the selection.",
+                target: .prebootDeviceTree,
+            ),
+            VPhonePatchDeclaration(
                 identifier: prebootFoldableVMSubtype,
                 title: "Foldable VM sub-type",
                 summary: """
@@ -1078,7 +1185,21 @@ public enum FirmwareGuestSystemPatchSet {
                 """,
                 target: .guestFile(path: "/System/Library/CoreServices/SystemVersion.plist"),
             ),
-        ],
+        ] + arm64eX1DebugImages.map { image in
+            VPhonePatchDeclaration(
+                identifier: image.identifier,
+                title: "\((image.path as NSString).lastPathComponent) X1 compatibility",
+                summary: "Lowers unsupported X1 instructions in this standalone debug library before a debugger can intercept their faults. Missing images and images needing no conversion keep their original bytes and signature.",
+                target: .guestFile(path: "/" + image.path),
+            )
+        } + arm64eX1AccessibilityImages.map { image in
+            VPhonePatchDeclaration(
+                identifier: image.identifier,
+                title: "\((image.path as NSString).lastPathComponent) X1 compatibility",
+                summary: "Lowers unsupported X1 instructions in this standalone accessibility plug-in before UIKit loads it into an app. Missing images and images needing no conversion keep their original bytes and signature.",
+                target: .guestFile(path: "/" + image.path),
+            )
+        },
         requires: ["vphone.kernel.base"],
         provides: ["vphone.guest.system"],
     )
@@ -1145,6 +1266,7 @@ public enum FirmwareGuestSystemPatchSet {
     /// The iPhone product description in the restored Preboot device tree,
     /// taken from the iPhone's own tree: see `DeviceTreePatcher.presentPhoneProduct`.
     public static let prebootIPhoneProduct = "preboot-cfw-devicetree_iphone_product"
+    public static let prebootVirtualUSBDriverKit = "preboot-cfw-devicetree_virtual_usb_driverkit"
 
     /// Apple's VM sub-type for a foldable board in the restored Preboot
     /// device tree.
@@ -1168,6 +1290,7 @@ public enum FirmwareGuestSystemPatchSet {
     /// patch existed already has. Either one puts the change in the guest, so
     /// the drift report counts the pair as one.
     public static let prebootRepairs: [String: String] = [
+        "devicetree-cfw-virtual_usb_driverkit": prebootVirtualUSBDriverKit,
         "devicetree-cfw-ipad_audio": prebootBoardAudio,
         "devicetree-cfw-product_haptics_node": prebootHaptics,
         "devicetree-cfw-product_audio_microphone_array": prebootMicrophoneArray,
