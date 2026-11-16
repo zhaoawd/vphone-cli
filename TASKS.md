@@ -4,6 +4,12 @@
 
 ## 整体接入优先
 
+当前后续（用户要求继续推进）：内屏普通 App 的 AX 默认过滤已修复，App 直接 posix_spawn EPERM 已取得同 PID 的沙盒 process-fork 拒绝日志；鼠标菜单／偏好／指针策略自动化回归已补齐。实际 iPad pointer 外观和滚轮仍需独立 iPad guest。复用 `duo-overall-20261116` 和冻结 VM 宿主进行无恢复诊断，候选只临时切换 daemon；已恢复原 daemon／标记／设置，正常关机 exit=0、无状态句柄。独立系统、发布、宿主新增安全变更和擦除恢复不由该步骤自动授权。
+
+后续完成记录：`cold-run.qYvDOWMq` 上，原 daemon 的最小复现三次均为未过滤 9／默认 4；候选 daemon 三次均为 9／9，原 `patch-port-touch.mjs` 不改断言通过 6/6 实际点击，独立 AX 命中 15/15 与锁屏拒绝通过。真实 RPC 派发新增回归在旧实现有两项失败，修改后 244 项通过，原生几何及点坐标回归通过。完整 Bundle／严格签名及 UI 返回结构检查通过。仅普通 App 的双显示查询按 App 边界重新计算 visible，并校验查询期间 PID／前台／面板／App 尺寸；单显示与 SpringBoard 原路径保持。
+
+App 直接启动本轮仍失败：RemapProbe PID 2927 的两次 EPERM 与内核 `Sandbox: RemapProbe(2927) deny(1) process-fork` 对应，原 aggregate 断言继续失败。该次 20 项 remap 仍通过；本轮没有移除 App 沙盒或修改 TXM。鼠标模式回归编译真实菜单方法／偏好／策略代码，覆盖默认与非法值、模式单选、视图更新、16 组策略及新进程读取持久化 Touch，已接入 CI；真实 iPad 工作流未计为通过。详见 [后续诊断与修复](Research/Integration/duo_m5_20261030/FOLLOWUP_AX_SPAWN_20261116.md)。
+
 用户当前方向：优先完成剩余功能组的生产接入，细节诊断和扩展验收后置。以下为建议执行顺序，固定上游仍为 `13169405`；具体差异见 `UPSTREAM_REMAINDER_20261115.md`，历史状态由下文较新的生产记录更新。
 
 - [x] 固定当前接入基线：75 个文件的已实现／已验证改动保存为本地提交 `119f1529`，保留测试与研究记录。

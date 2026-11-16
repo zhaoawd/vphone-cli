@@ -1,5 +1,18 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Duo AX follow-up (2026-11-16).** Ordinary App flat AX queries on a dual
+> display now recompute geometric visibility against the App's canvas before
+> visible/clickable/limit filtering. The frozen daemon reproduces 4/9 visible
+> buttons; the candidate returns 9/9 in three samples and passes the unchanged
+> six-touch regression and 15 AX hits. Two new old-source API failures become
+> 244 passing checks. Main-based bridge visibility caused this measured case;
+> single-display and SpringBoard paths are retained. The same follow-up captures
+> the RemapProbe PID's sandbox `process-fork` denial for its direct-spawn EPERM;
+> remaps still pass and the original spawn assertion remains failed. Mouse
+> preference/menu/pointer-policy regression is added to CI; physical iPad pointer
+> workflows remain untested. See
+> [evidence and limits](Integration/duo_m5_20261030/FOLLOWUP_AX_SPAWN_20261116.md).
+
 > **Combined 2.18 acceptance (2026-11-16, measured scope with retained failures).**
 > The complete upstream merge is saved as `7e18551b`; the frozen 2.18.0 Bundle
 > passes all 197 manifest entries, strict signature verification and the approved

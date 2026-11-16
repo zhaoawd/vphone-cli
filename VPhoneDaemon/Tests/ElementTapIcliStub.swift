@@ -61,7 +61,10 @@ public func screenInfo() -> [String: Any] {
 public func uiElements(maxElements: Int = 250, visibleOnly: Bool = true, clickableOnly: Bool = false,
                        limit: Int? = nil) throws -> [String: Any] {
     TestIcli.afterQuery?()
-    return ["pid": 123, "elements": TestIcli.elements.filter { !visibleOnly || $0["visible"] as? Bool == true },
+    var elements = TestIcli.elements.filter { !visibleOnly || $0["visible"] as? Bool == true }
+    if clickableOnly { elements = elements.filter { $0["clickable"] as? Bool == true } }
+    if let limit { elements = Array(elements.prefix(limit)) }
+    return ["pid": 123, "elements": elements, "count": elements.count,
             "truncated": TestIcli.truncated]
 }
 public func waitForElement(_ selector: ElementSelector, appear: Bool, timeout: Double) throws -> [String: Any] {

@@ -115,6 +115,39 @@ extension GuestAPI {
             result["count"] = elements.count
             return result
         }
+        if let before = try elementTapDisplay() {
+            let pid = try elementHitPID(foreground)
+            let frame = vp_element_tap_application_frame(Int32(pid))
+            guard frame["x"] as? Double == 0, frame["y"] as? Double == 0,
+                  let width = frame["width"] as? Double, let height = frame["height"] as? Double else {
+                throw GuestAPIError.operationFailed("Full application coordinate space unavailable")
+            }
+            let sideways = before.degrees == 90 || before.degrees == 270
+            let application = try GuestElementTap.Display(name: "application", width: sideways ? height : width,
+                height: sideways ? width : height, degrees: before.degrees)
+            // icli's visible flag uses the daemon's Main scanout, which can
+            // be smaller than the foreground App's inner-panel canvas.
+            var result = try IcliKit.uiElements(maxElements: maxElements, visibleOnly: false)
+            let after = frontmostApp()
+            guard after["verified"] as? Bool == true, after["bundle_id"] as? String == bundle,
+                  try elementHitPID(after) == pid,
+                  (result["pid"] as? NSNumber)?.intValue == pid,
+                  try elementTapDisplay() == before,
+                  NSDictionary(dictionary: frame).isEqual(to: vp_element_tap_application_frame(Int32(pid))) else {
+                throw IcliError.failed("Foreground application or display changed during element query; retry")
+            }
+            var elements = (result["elements"] as? [[String: Any]] ?? []).map { element in
+                var element = element
+                element["visible"] = GuestElementTap.visible(element, display: application, source: nil)
+                return element
+            }
+            if visibleOnly { elements = elements.filter { $0["visible"] as? Bool == true } }
+            if clickableOnly { elements = elements.filter { $0["clickable"] as? Bool == true } }
+            if let limit { elements = Array(elements.prefix(limit)) }
+            result["elements"] = elements
+            result["count"] = elements.count
+            return result
+        }
         return try IcliKit.uiElements(
             maxElements: maxElements,
             visibleOnly: visibleOnly,

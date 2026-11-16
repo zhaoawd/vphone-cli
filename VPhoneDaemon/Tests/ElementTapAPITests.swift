@@ -163,6 +163,30 @@ enum ElementTapAPITests {
             expect((result["element"] as? [String: Any])?["identifier"] as? String == "second", "selector compatibility: \(selection)")
         }
 
+        // The live inner-panel probe has nine buttons in a 669x951 App
+        // canvas. icli marks only four visible using Main's 466x678 bounds.
+        TestIcli.bundle = "com.autophone.tap-probe"
+        TestIcli.degrees = 0
+        TestIcli.display = ["dual_display": true, "name": "inner", "width": 669.0, "height": 951.0]
+        TestIcli.elements = (0..<9).map { index in
+            let x = 97.8 + Double(index % 3) * 200.7
+            let y = 227.0 + Double(index / 3) * 250.5
+            return ["identifier": "tap-\(index)", "clickable": true,
+                    "visible": x < 466 && y < 678, "x": x + 36, "y": y + 22,
+                    "frame": ["x": x, "y": y, "width": 72.0, "height": 44.0]] as [String: Any]
+        }
+        let allInner = try GuestAPI.executeInterface(.uiTree, ["visible_only": false])
+        let innerTree = try GuestAPI.executeInterface(.uiTree, [:])
+        expect(innerTree["count"] as? Int == 9, "inner tree includes nine visible App buttons beyond Main bounds")
+        expect((allInner["elements"] as? [[String: Any]])?.allSatisfy { $0["visible"] as? Bool == true } == true,
+               "unfiltered inner tree reports App-scoped visibility")
+        let limitedInner = try GuestAPI.executeInterface(.uiTree, ["clickable_only": true, "limit": 2])
+        expect(limitedInner["count"] as? Int == 2, "limit applies after App visibility and clickable filters")
+        TestIcli.appFrame = ["x": 0.0, "y": 0.0, "width": 375.0, "height": 667.0]
+        let compatibilityTree = try GuestAPI.executeInterface(.uiTree, [:])
+        expect(compatibilityTree["count"] as? Int == 4, "compatibility canvas clips elements against App bounds")
+        TestIcli.appFrame = nil
+
         // MARK: - SpringBoard Frontmost App Recognition Tests
         TestIcli.bundle = "com.apple.springboard"
         TestIcli.springboardPID = 555
