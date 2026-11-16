@@ -51,6 +51,8 @@ GuestStaticNames.shared.restoreOnStartup()
 // locationd can deadlock as it starts; this restarts it.
 GuestLocationdWatchdog.shared.startOnStartup()
 GuestDeveloperModeSnapshot.shared.startOnStartup()
+// Trusted darwinOS guests only: reinstall persisted cryptexes serially.
+GuestAPI.reinstallPersistedCryptexesOnStartup()
 
 let group = MultiThreadedEventLoopGroup(numberOfThreads: 2)
 let filePool = NIOThreadPool(numberOfThreads: 2)

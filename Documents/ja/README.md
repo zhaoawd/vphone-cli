@@ -21,6 +21,7 @@ vphone を初めて使う場合は、[概要](get-started/overview.md)を読ん�
 | [デバイス名と時計](machines/device-name-and-clock.md) | ゲストが仮想マシン名と Mac の時計から受け取るもの |
 | [iPhone Duo のディスプレイ](machines/iphone-duo.md) | 折りたたみモードまたは固定ディスプレイを設定する |
 | [パッケージ環境](machines/package-environment.md) | ゲストへのパッケージマネージャのインストールと削除 |
+| [Cryptex](machines/cryptexes.md) | trusted darwinOS ゲストへの独自プログラムの cryptex としてのインストール |
 
 ## ファームウェアとデバイス
 

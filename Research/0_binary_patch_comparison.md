@@ -1,5 +1,16 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Trusted darwinOS/Cryptex integration (2026-11-16).** Ports #900 as an
+> independent, opt-in restore-image feature: `filesystem-exp-trusted_darwinos`,
+> environment 6 in the build identity/TSS request, both REM trust-cache phases,
+> staged cloudOS cryptexctl, NRDUpdated exclusion, host menu/RPC and serial
+> persistent reinstallation. Standard Duo does not name this restore-image set;
+> iPhone/iPad iOS 27 is refused by prepare and filesystem patching. The existing
+> Duo process-output spool remains intact. PCC tool extraction preserves
+> uncertain mounts through outer staging cleanup. Local runtime acceptance of
+> trusted darwinOS is pending. See
+> [integration and validation](Integration/duo_m5_20261030/OVERALL_PORT_20261116.md).
+
 > **QuartzCore framebuffer integration (2026-11-16).** Ports upstream #926's
 > `dyld-cfw-quartzcore_unrotated_framebuffer` for iOS 27, its semantic planner,
 > dry-run/undo CLI and installer dispatch through the existing DSC undo owner.

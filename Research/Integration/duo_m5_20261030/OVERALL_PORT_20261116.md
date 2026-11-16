@@ -54,3 +54,17 @@ SPTM 新组件改变 Launchpad 的目录契约。固定上游已使用 2.17 系�
 本地 `main` 从 `6f57024a` 快进到固定的 `13169405`，未访问远端、未推送。当前 Duo 分支尚未归并该祖先；额外上游平台差异需要在最终归并时逐项核对，不能以功能组移植提交代替完整同步。
 
 实际 Duo framebuffer／输入组合验收仍待新的可审阅候选。此前的两轮 native TXM 运行证据不替代本次显示候选验收。无依赖的 Cryptex 生产接入继续执行；不会在 Duo 27.1 启用 trusted darwinOS。
+
+## 最后一组：trusted darwinOS／persistent Cryptex
+
+接入 #900 `6f57024a` 的依赖组：`filesystem-exp-trusted_darwinos`、`Ap,OSEnvironment` 的 manifest／TSS 传递、REM 两阶段信任缓存标志、cloudOS cryptexctl 提取／缓存／临时恢复回退、NRDUpdated 排除、三个 Cryptex RPC、能力声明、宿主菜单及串行持久化重装。四语手册与研究资料一起移植；研究中的实际运行结果明确归属于上游，翻译尚未执行本轮发布审阅。
+
+冲突处理保留 Duo 已有的 `runProgram`、`process.spawn` 分页和 spool，Cryptex 直接复用其兼容签名。启动过程继续执行 spool 清理、USB serial、静态名称及 watchdog，再调用有能力门槛的 Cryptex 重装。仅按本次提交的六个字符串合并资源。
+
+本地改进：cryptexctl OS image 提取沿用 GPU 的挂载清理约束。通过 `hdiutil -plist` 识别整盘设备；卸载不确定或失败时保留 `.pcc-system-cryptexctl-*`，外层 staging 也保留。未增加解释器或运行时第三方工具。
+
+`trustedDarwinOSRefusal` 保留 iOS 27 及以后拒绝，standard／minimal 都不默认选择该实验。普通 Duo 27.1 不启用 trusted darwinOS。未执行新固件下载、恢复或 Cryptex guest 安装。
+
+本轮方法目录检查为 200 个方法／0 失败；`run-process-output-tests.sh`、live stub 和 Cryptex result-schema check 均通过。CoreKit 的 cryptexctl 发现／缓存、PCC GPU 和固件目录共 27 项通过。恢复环境选择、NRDUpdated、信任缓存、默认隔离及目录共 95 项通过（`cryptex-patcher-tests.log`）。实际恢复源码 vCPU 策略 8 项再次通过。
+
+包含本组的完整 2.18 Bundle／Launchpad 构建、Bundle 深度严格签名及 CLI 目录读取均通过（`cryptex-bundle-build.log`、`cryptex-launchpad-build.log`、`cryptex-catalog.json`）。集中回归入口为 `Regression/overall-production.zsh`。实际 trusted darwinOS／持久化重启验收未执行。

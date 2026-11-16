@@ -128,6 +128,7 @@ jobs:
             -only-testing:VPhoneCoreKitTests/TemplateSetupBootTests \
             -only-testing:VPhoneCoreKitTests/APIRequestGateTests \
             -only-testing:VPhoneCoreKitTests/PCCGPUDriverTests \
+            -only-testing:VPhoneCoreKitTests/PCCCryptexctlTests \
             -only-testing:VPhoneCoreKitTests/FirmwareCatalogReportTests \
             -only-testing:VPhoneCoreKitTests/GuestDeviceTests
 
@@ -155,6 +156,9 @@ jobs:
             -disableAutomaticPackageResolution -parallel-testing-enabled NO -jobs 4 test \
             -only-testing:FirmwarePatcherTests/DeviceTreeGuestDeviceTests \
             -only-testing:FirmwarePatcherTests/SPTMSecondaryCPUTests \
+            -only-testing:FirmwarePatcherTests/CryptexTrustedDarwinOSTests \
+            -only-testing:FirmwarePatcherTests/TrustCacheTests \
+            -only-testing:FirmwarePatcherTests/FirmwareManifestSelectionTests \
             -only-testing:FirmwarePatcherTests/FirmwarePatchDriftTests \
             -only-testing:FirmwarePatcherTests/DyldSharedCacheQuartzCoreUnrotatedFramebufferTests \
             -only-testing:FirmwarePatcherTests/CustomFirmwareDriverKitTests \

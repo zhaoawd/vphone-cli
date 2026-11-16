@@ -29,6 +29,7 @@ extension GuestAPI {
             .make(HomePodDebugMethod.self, executeHomePodDebug),
             .make(HomeViewDistanceMethod.self, executeHomeViewDistance),
             .make(ScriptMethod.self, executeScript),
+            .make(CryptexMethod.self, executeCryptex),
         ]
     }
 }

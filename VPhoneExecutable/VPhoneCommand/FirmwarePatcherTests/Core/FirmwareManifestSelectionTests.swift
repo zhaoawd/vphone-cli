@@ -217,10 +217,11 @@ struct FirmwareManifestSelectionTests {
             "Ap,SecurePageTableMonitor", "Ap,TrustedExecutionMonitor", "DeviceTree", "RestoreDeviceTree", "SEP",
             "RestoreSEP", "KernelCache", "RestoreKernelCache", "RestoreRamDisk", "RestoreTrustCache",
         ]
-        let cloudIdentities = [
+        var cloudIdentities = [
             Self.identity(deviceClass: "vresearch101ap", variant: "Darwin Cloud Customer Erase Install (IPSW)", components: cloud),
             Self.identity(deviceClass: "vresearch101ap", variant: "Research Darwin Cloud Customer Erase Install (IPSW)", components: cloud),
         ]
+        cloudIdentities[0][FirmwareManifest.osEnvironmentKey] = "0x06"
         let iPhoneIdentities = [
             Self.identity(deviceClass: "d47ap", variant: "Customer Erase Install (IPSW)", components: [
                 "Ap,SystemVolumeCanonicalMetadata", "OS", "StaticTrustCache", "SystemVolume",
@@ -237,6 +238,8 @@ struct FirmwareManifestSelectionTests {
             iErase: 0,
         )
         let manifest = try #require(identity["Manifest"] as? PlistDict)
+        #expect(identity[FirmwareManifest.osEnvironmentKey] == nil)
+        #expect(cloudIdentities[0][FirmwareManifest.osEnvironmentKey] as? String == "0x06")
         func path(_ component: String) -> String? {
             ((manifest[component] as? PlistDict)?["Info"] as? PlistDict)?["Path"] as? String
         }
