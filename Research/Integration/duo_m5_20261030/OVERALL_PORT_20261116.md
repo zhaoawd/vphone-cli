@@ -98,3 +98,46 @@ SPTM 新组件改变 Launchpad 的目录契约。固定上游已使用 2.17 系�
 同一管理员会话 `42115` 已通过 `run-approved-root.applescript` 启动。检查时系统认证进程存在，`REVIEWED/root-approved.log` 尚不存在，不能认定准入或安装已执行；没有启动第二个安装会话。系统认证仍需用户在现有窗口完成。
 
 保存的 `Regression/overall-runtime.zsh` 固定审核 Bundle 和目标，隔离宿主偏好并禁用宿主自动更新 daemon。`overall-candidate.mjs` 校验全部 197 个固定文件／符号链接、CDHash、严格签名，不再要求环境更新后的目标元数据等于更新前。该校验已通过。`overall-checks.zsh` 顺序执行既有原生输入、AX 上下文、方向、AX 发现、native remap、受控 exec 和原设置恢复，保存每项退出码；原失败断言未删改。恢复失败时保留运行状态供取证和恢复，不自动开始第二轮。脚本语法检查通过，实际运行结果待记录。
+
+## 本轮执行结果
+
+上段认证等待为历史记录。用户随后确认完成系统认证，同一会话 `42115` 于 08:17:07–08:18:16 UTC 完成准入和一次环境更新，退出 0。`REVIEWED/root-approved.log` 没有 `[!]`／failed／Error；记录 QuartzCore 的实际分支修改及 GLES、Metal、TextRecognition、compiler-cache 的应用过程。没有第二个安装会话。
+
+`Regression/overall-environment.mjs combined-patch-report.json post-update-patches.json environment-receipt-check.json` 核对九项新增环境补丁全部 enabled=true、applied=true、pending=false。原 plan 未新增这些标识符，故 planned=false 仍保留；不能把它解释为未应用。所有非 Guest 补丁的 enabled／planned／applied／pending 均与更新前相同。唯一剩余 pending 是继承的 `devicetree-cfw-virtual_usb_driverkit`，delivery=restore；本轮没有通过恢复改变它。实际 DriverKit 另由两轮运行检查证明。trusted darwinOS 仍关闭。
+
+两次实际冷启动目录分别为 `.build/overall-port-20261116/cold-run.7fsGjEjo/` 和 `cold-run.1q6rKAtH/`。均运行冻结的 2.18.0 Bundle，关闭宿主 daemon 自动更新；基础检查均通过：daemon SHA-256 `612828f62fd75b5f8901c04c47228a18119295849a352c0a1ff08bf41cc13933`、21 项环境库、DriverKit／HID dext／Virtual USB Touch Screen、根只读、36 项 AX 实际文件与 fixture 完全匹配、原备份不变、严格 X1 审计和 pairing 文件匹配。
+
+| 检查 | 第一轮 | 第二轮 |
+| --- | --- | --- |
+| 原生 VZ 触摸 | 缺少 TapProbe，前提失败 | 两面板 6/6 实际按钮回执通过 |
+| AX 上下文命中 | 实际 Trust 提示阻断 Home，前提失败 | 15/15，锁屏拒绝通过 |
+| 方向与原生来源 | 前台／恢复前提失败 | 外屏 0°／90°／270°、内屏 0°／90°／180°及两项明确拒绝，8/8 通过 |
+| 默认 AX 发现 | 缺少 TapProbe，前提失败 | 内屏 tap-8 未被发现，原断言失败 |
+| native remap | 20/20，80 个 alias | 20/20，80 个 alias |
+| 外部 dylib | 两种签名构造器=1／返回 73 | 两种签名构造器=1／返回 73 |
+| App 直接 posix_spawn | 两种签名 EPERM，aggregate 失败 | 两种签名 EPERM，aggregate 失败 |
+| 独立受控 exec | 两种签名通过，临时作业均卸载 | 两种签名通过，临时作业均卸载 |
+| 原设置恢复／关机 | 通过，VM exit=0、无句柄 | 通过，VM exit=0、无句柄 |
+
+第一轮的生成探针缺失是对来源副本状态的准备判断不正确，不能计为产品输入失败。第二轮新增保存入口 `overall-prepare.mjs`：只在指定副本缺少 TapProbe 时安装已有 `tap-probe-measured` 产物；安装走 `apps.install`，不计为 installd 验收。出现两个精确 lockdown AX 标识符时点击 Don’t Trust，并验证 20 次提示消失。随后使用同一输入、AX、方向断言。原失败日志和目录均保留，没有将 native 输入通过计为 AX 发现通过。两轮 TXM 实际 App 签名均没有 custom-trust；不将本轮表述为默认 custom-trust 或 CMS 验收。
+
+### 实际字节与撤销归属
+
+第二轮运行中通过 `overall-installed-cache.mjs` 读取实际 QuartzCore 分支和 undo，并 pull 284 MiB word store。实际分支 `0x1843c4c44` 为 `1f2003d5`，等于离线已验证候选。第一次比较误用了尚含旧 X1 JSON run 的 `cache-applied` 表示，原失败保留；安装器先规范化 X1 记录，因此最终比较采用离线撤销流程已逐条验证的 `cache` 规范化基线，并加入新 framebuffer 记录。23 条 JSON 记录保持，整个 word store SHA-256 为 `0dc6df399ee17839d58e4964de360a2ee01978b0f0e9bef741f12bea3efdc998`，与该基线完全相同，包含已验证的 8 条迁移原始指令。结果为 `cold-run.1q6rKAtH/installed-cache-normalized/`。这保留了全部原始字节断言，仅修正预期表示。
+
+两轮停止后，目标磁盘重新以 readonly 连接并挂载 System，`Writable`／`WritableMedia`／`WritableVolume` 均 false。`overall-installed-writes.mjs` 核对七项新 DSC 补丁的全部 14 条写入：每条 undo 原始值均等于更新前 `duo-cache-original` 的对应字节，实际字节已改变；GLES upper-left 标记为 `1\n`。复制实际 GPU driver／compiler plugin 到宿主工作目录后，实际 CLI 重复应用 compiler identity 没有改变 driver 哈希，两条 seed 均报告原值等于新值。
+
+第一次对脱离 bundle 的 driver 副本执行严格签名检查，因缺少它签入的 Info.plist 布局失败，原日志保留为 `installed-writes-readonly.log`；最终在只读实际 `.bundle` 布局上执行 `codesign --verify --strict` 通过，没有重签或修改 guest。结果为 `installed-writes-bundle-layout/summary.json`，driver SHA-256 `2c3efa4c3ede82457e3afb2cc542cf873e02f6fe7efd4b34de2b59994fe993d8`。先前在线读取尝试发生在正常关机完成后，ECONNREFUSED 另存于第二轮 `installed-writes.log`，不计为文件检查结果。
+
+命令入口（相对于仓库根目录；socket 和输出目录需使用绝对路径）：
+
+```zsh
+zsh Research/Integration/duo_m5_20261030/Regression/overall-runtime.zsh
+zsh Research/Integration/duo_m5_20261030/Regression/overall-checks.zsh <ready-cold-run-directory>
+node Research/Integration/duo_m5_20261030/Regression/overall-installed-cache.mjs <socket> <new-output> <daemon-sha256>
+node Research/Integration/duo_m5_20261030/Regression/overall-installed-writes.mjs - <new-output> <daemon-sha256> <readonly-system-mount>
+```
+
+两轮均恢复合盖纵向、Auto-Lock 300 秒、锁屏／熄屏及低电量原值，随后正常关机。最终只读 System 卷和磁盘连接均卸载；`final-images.plist` 与 `post-update-images.plist` 的连接镜像路径列表相同，`final-state-handles.txt` 为空。来源与原始副本未启动或更新；没有擦除恢复、推送或发布。
+
+本轮完成生产整体接入及上述范围的组合验收。内屏 AX 可见性过滤、App 直接 posix_spawn、内容方向像素验证、鼠标菜单模式／iPad pointer 外观、LLDB、CMS／真实 profile、local pairing 协议、trusted darwinOS、旧固件矩阵及其他独立环境继续后置。实际字节与启动通过不能替代这些未执行的工作流，也不证明此前显示交接异常已修复。

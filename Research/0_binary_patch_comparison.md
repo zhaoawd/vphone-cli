@@ -1,14 +1,20 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
-> **Combined 2.18 acceptance (2026-11-16, awaiting system authentication).**
+> **Combined 2.18 acceptance (2026-11-16, measured scope with retained failures).**
 > The complete upstream merge is saved as `7e18551b`; the frozen 2.18.0 Bundle
 > passes all 197 manifest entries, strict signature verification and the approved
-> VM CDHash check. The user approved AMFI admission, one environment update and
-> two cold boots of `duo-overall-20261116`. One administrator session is pending;
-> no installation log exists yet. Saved regression drivers pin that Bundle and
-> target, retain the existing AX/remap assertions and restore the original
-> settings before shutdown. This does not establish runtime acceptance of the
-> nine pending environment patches. See the
+> VM CDHash check. The approved admission and one environment update completed;
+> all nine new environment receipts are applied, with no environment pending.
+> Actual checks cover 14 writes across seven DSC patches, preserved X1 originals,
+> the GLES marker, compiler identity and the installed GPU bundle signature.
+> Both cold boots verify daemon/libraries, DriverKit, 36 AX files, pairing bytes
+> and a read-only root; both pass 20 remap cases/80 aliases, external dylibs and
+> controlled exec injection. After fixing missing-probe and Trust-prompt test
+> preconditions, the second boot passes six native taps, 15 AX hits and eight
+> orientation/source/refusal cases. Inner-panel AX discovery and App direct
+> posix_spawn assertions still fail. Both runs restore settings and shut down
+> with exit 0; read-only mounts are detached and no state handles remain.
+> Inherited DeviceTree restore drift and untested workflows stay separate. See the
 > [current execution record](Integration/duo_m5_20261030/OVERALL_PORT_20261116.md).
 
 > **Trusted darwinOS/Cryptex integration (2026-11-16).** Ports #900 as an

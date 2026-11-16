@@ -20,6 +20,7 @@ run_check() {
     printf '%s\t%s\n' "$label" "$result" >> "$out/checks-status.tsv"
     print -r -- "$label: exit $result"
 }
+run_check prepare node "$reg/overall-prepare.mjs" "$socket" "$out/prepare" "$expected"
 run_check native-input node "$reg/patch-port-native-input.mjs" "$socket" "$out/native-input" "$expected"
 run_check ax-context node "$reg/three-issues-ax.mjs" "$socket" "$out/ax-context" "$expected"
 run_check orientation node "$reg/followup-orientation.mjs" "$socket" "$out/orientation" com.apple.mobilesafari "$expected"

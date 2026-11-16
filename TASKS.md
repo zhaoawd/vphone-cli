@@ -1,6 +1,6 @@
 # Duo M5 当前任务
 
-更新：2026-11-16。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 固定为 `13169405`（2.17.1）；本地 `main` 已快进到同一提交。完整归并已保存为 `7e18551b`；组合运行验收进行中，尚未推送或发布。
+更新：2026-11-16。Duo 工作留在 `duo-integration-20261030`；同步方向为上游 → `main` → Duo。`origin/main` 固定为 `13169405`（2.17.1）；本地 `main` 已快进到同一提交。完整归并已保存为 `7e18551b`；本轮组合验收已执行，结果和限制见下文，尚未推送或发布。
 
 ## 整体接入优先
 
@@ -9,9 +9,9 @@
 - [x] 固定当前接入基线：75 个文件的已实现／已验证改动保存为本地提交 `119f1529`，保留测试与研究记录。
 - [x] 第一组生产接入，#909＋#911：PCC OS image GPU 提取、版本匹配／AEA 回退、临时恢复 vCPU 策略和 SE 3／transport 依赖已完成；相关回归通过，旧固件运行验收后置。
 - [x] 第二组生产接入，#921：SPTM 组件、语义补丁、pipeline、PatchKit／Launchpad 目录、预设和 drift 已完成，cloudOS 18 版本门槛与相关回归通过；旧固件多 vCPU 运行验收后置。
-- [x] 第三组生产接入，#920：鼠标模式、偏好持久化、菜单及 iPad pointer／touch 已接入，保留 Duo 坐标转换；`vphone-vm` 编译通过，实际输入运行验收待集中执行。
-- [x] 第四组生产接入，#926：QuartzCore planner、声明、CLI、安装／撤销已接入，保留共享缓存修改归属；92 项相关回归通过。实际 DSC／Duo 组合验收仍待执行，不将其作为已有显示诊断的已确认修复。
-- [ ] 前四组接入收尾：核对目录、预设、CLI、收据、Launchpad 与版本契约；按 upstream → main → Duo 整理同步，完成完整 Bundle／Launchpad 构建和一轮 Duo 组合验收。
+- [x] 第三组生产接入，#920：鼠标模式、偏好持久化、菜单及 iPad pointer／touch 已接入，保留 Duo 坐标转换；编译与静态回归通过，组合副本两面板原生 VZ 触摸 6/6 通过。鼠标菜单切换与 iPad pointer 外观未验收。
+- [x] 第四组生产接入，#926：QuartzCore planner、声明、CLI、安装／撤销已接入，保留共享缓存修改归属；92 项相关回归、实际 DSC 离线应用／撤销和组合副本分支／旧 undo 归属核对通过。不将其作为已有显示诊断的已确认修复。
+- [x] 前四组接入收尾：目录、预设、CLI、收据、Launchpad 与 2.18 版本契约已核对；upstream → main → Duo 归并、完整 Bundle／Launchpad 构建及本轮 Duo 组合验收已执行。原 AX 过滤和 App 直接 posix_spawn 失败继续单列。
 - [x] 最后一组生产接入，#900：trusted darwinOS／persistent Cryptex 的 RPC、菜单、cryptexctl 来源、恢复回退、manifest／TSS 和信任缓存依赖已接入。27 项 CoreKit、95 项补丁／目录、200 方法契约、spool、schema、完整 Bundle／Launchpad 与严格签名通过；实际独立系统运行验收后置，不加入 Duo 27.1 默认计划。
 
 每组保留编译、补丁选择／版本门槛、兼容／撤销等必要回归。可以集中执行实际组合验收，不要求完成所有独立设备和扩展工作流后才继续下一组生产接入。
@@ -23,6 +23,12 @@
 用户已批准最终候选（`7e18551b`／2.18.0，VM CDHash `5f3f79e7c4eaf331b1f0a438fcddf9042835ce19`）对新副本 `duo-overall-20261116` 的 AMFI 准入、一次环境更新及两次冷启动组合验收。197 个候选文件／严格签名和目标元数据核对通过，状态文件无句柄。管理员认证／安装会话已启动，日志为 `.build/overall-port-20261116/REVIEWED/root-approved.log`；同一范围不再询问批准。原副本与 TXM 来源副本不启动或更新。
 
 组合运行入口已保存为 `Regression/overall-runtime.zsh`、`overall-checks.zsh` 和 `overall-candidate.mjs`。入口固定审核 Bundle／目标，单独核对 Bundle 197 个文件、CDHash 和严格签名，不把获批更新导致的目标元数据变化计为 Bundle 损坏。现有原生输入、AX、方向、remap／受控 exec、原设置恢复断言继续保留；失败不计为通过。候选校验和脚本语法检查通过。截至本次检查，原管理员会话 `42115` 仍存在，系统认证进程存在，安装日志尚未创建；未重复启动准入或安装。需完成现有系统认证窗口后继续九项补丁核对和两次冷启动。
+
+上述等待为历史状态，用户随后完成系统认证，同一会话的准入与一次环境更新均退出 0。九项环境补丁全部 applied=true／pending=false，非 Guest 收据不变；继承的 DeviceTree DriverKit restore 漂移仍保留。实际七项 DSC 的 14 条写入原始值匹配更新前来源、当前字节均已改变；GLES 标记存在，GPU compiler identity 与实际插件匹配，GPU bundle 严格签名通过。QuartzCore 实际分支匹配候选，23 条规范化基线记录（含新 framebuffer 记录）保持，X1 word store 与独立验证过的规范化基线逐字节相同，包含迁移的 8 条原始指令。
+
+两次冷启动 `cold-run.7fsGjEjo`／`cold-run.1q6rKAtH` 均核对最终 daemon、21 项库、DriverKit／HID、36 项 AX 文件与原备份、pairing 文件及根只读。两轮各 20/20 remap、80 个 alias、两种外部 dylib 和两种受控 exec 通过；实际 App 签名均不含 custom-trust，App 直接 posix_spawn 两种签名仍为 EPERM，aggregate 保持失败。首轮缺少 TapProbe、且实际 Trust 提示阻断 Home 的前提失败保留；第二轮安装已有生成探针、拒绝提示并核对 20 次消失后，原生输入 6/6、AX 15/15／锁屏拒绝及 8 项方向／拒绝／原生来源检查通过。内屏 AX 默认过滤仍缺少 tap-8，原断言保持失败。两轮均恢复合盖纵向、Auto-Lock 300 秒、锁屏／熄屏及低电量原值，正常关机 exit=0、无状态句柄。只读挂载已清理，前后连接镜像列表相同；来源副本未启动或更新。
+
+本轮执行、首轮前提失败、DSC 规范化比较和 GPU 签名布局检查的原失败均保留于 `.build/overall-port-20261116/`，命令和范围见 [组合验收记录](Research/Integration/duo_m5_20261030/OVERALL_PORT_20261116.md)。没有擦除恢复、推送或发布。整体生产接入完成；独立系统、完整鼠标模式／pointer、显示内容方向像素验证和协议／调试细节仍为后置项目。
 
 后置清单继续保留：内屏 AX 可见性过滤、首次姿态超时、间歇启动／AMFI 拒绝、显示交接与方向细节；LLDB、CMS／真实 profile 热重载、local pairing 协议、App 直接 posix_spawn；旧固件实机矩阵、27.2、Linux FUSE／并发、物理 USB／DFU、WDA 与宿主快捷键。发布准备另列四语手册审阅、Release 产物、Developer ID 签名和 notarization。
 
