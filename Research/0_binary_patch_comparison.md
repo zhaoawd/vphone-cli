@@ -1,5 +1,17 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+> **Ordered reliability checks (2026-11-16).** The AX candidate now passes an
+> independent cold boot, 9/9 discovery in three samples, six actual taps and
+> 15 context hits. Six supported poses pass 24 native PNG color checks against
+> independent UIKit fixed-space measurements. Both six-fold MOV runs have no
+> near-black samples in their observation windows; continuous native capture
+> still returns two near-black target-panel images and three unavailable replies.
+> Transient orientation changes and repeated luma observations remain unexplained.
+> Three no-change and three first-transition baseline cold boots all pass;
+> historical startup/AMFI/pose failures were not reproduced. No new AMFI or
+> firmware changes were made. Original daemon, markers and settings are restored.
+> See [results and validation limits](Integration/duo_m5_20261030/RELIABILITY_123_20261116.md).
+
 > **Duo AX follow-up (2026-11-16).** Ordinary App flat AX queries on a dual
 > display now recompute geometric visibility against the App's canvas before
 > visible/clickable/limit filtering. The frozen daemon reproduces 4/9 visible

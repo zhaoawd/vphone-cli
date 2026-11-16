@@ -1,0 +1,23 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {classifyBoot} from './boot-evidence-report.mjs';
+const [root]=process.argv.slice(2);assert(root);
+const lines=fs.readFileSync(root+'/results.tsv','utf8').trim().split('\n').slice(1);assert.equal(lines.length,3);
+const rows=lines.map(line=>{
+    const [attempt,cold,driver,restore,firstPose]=line.split('\t');
+    assert.equal(driver,'0');assert.equal(restore,'0');assert.equal(firstPose,'passed');
+    const pose=JSON.parse(fs.readFileSync(cold+'/first-pose/summary.json'));
+    assert.equal(pose.passed,true);assert.equal(pose.poseUnchanged,true);
+    assert(Number.isFinite(pose.firstPostureMs)&&pose.firstPostureMs>=0);
+    const preflight=fs.readFileSync(cold+'/preflight.log','utf8');
+    const classification=classifyBoot(fs.readFileSync(cold+'/boot.log','utf8'),preflight);
+    assert.equal(classification.phase,'rpc_connected');assert.equal(classification.events.amfiRefused,false);
+    assert.equal(fs.readFileSync(cold+'/vm-exit-code.txt','utf8').trim(),'0');
+    assert.equal(fs.statSync(cold+'/final-handles.txt').size,0);
+    const candidate=JSON.parse(fs.readFileSync(cold+'/candidate.json'));
+    assert.equal(candidate.vmCDHash,'5f3f79e7c4eaf331b1f0a438fcddf9042835ce19');
+    return {attempt:Number(attempt),cold,...pose,classification:classification.phase,normalShutdown:true};
+});
+assert.equal(new Set(rows.map(r=>r.bootUUID)).size,3);
+const report={attempts:3,passed:3,rows,scope:'Three bounded cold boots; historical intermittent failures were not reproduced and their cause is not established'};
+fs.writeFileSync(root+'/report.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

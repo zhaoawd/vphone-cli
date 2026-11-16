@@ -4,6 +4,12 @@
 
 ## 整体接入优先
 
+当前执行顺序（用户明确指定 1 → 2 → 3）已完成本轮检查：[x] AX 修复独立冷启动；[x] 显示交接／方向最小复现与受控像素验证；[x] 启动稳定性两组三次有界冷启动。第 2、3 项的有限通过不计为历史间歇问题已修复。目标仍为 `duo-overall-20261116`，使用冻结 VM 和已测 AX daemon，结束后恢复原 daemon／marker／设置；未执行擦除恢复、来源副本操作或发布。
+
+最新结果：候选冷启动 `cold-run.EnCziTP5` 核对独立 boot UUID 和 daemon hash 后，AX 9/9×3、原脚本实际点击 6/6、命中 15/15／锁屏拒绝通过。六种支持姿态的原生 PNG 有 24/24 个颜色点匹配 App 测得的窗口→固定坐标；Safari 恢复循环 3/3，通过不替代所有 App 的方向保证。两组各六次交接均确认，MOV 观察窗口无近黑帧；最长缩略亮度摘要重复约 465／440 ms。连续原生组仍有目标内屏近黑截图 2 次、unavailable 3 次，以及过渡期 0°↔90°变化；完整原因未查明。
+
+启动稳定性：原 daemon 的无变化重设和首次实际展开各 3/3 冷启动通过，六个不同 boot UUID，固定 CDHash 六次预检均通过；首次 posture 分别约 32–37 ms／98–285 ms。RPC 未连接、姿态超时和 AMFI 拒绝均未复现，旧原因未查明。六轮均恢复合盖纵向、Auto-Lock 300 秒、锁屏／熄屏与低电量原值后正常退出 0，无状态句柄。AX／显示轮的 shell 收尾曾因编辑运行中驱动出现解析错误，原错误与 VM exit=0 分开保留。见 [顺序验收与诊断](Research/Integration/duo_m5_20261030/RELIABILITY_123_20261116.md)。
+
 当前后续（用户要求继续推进）：内屏普通 App 的 AX 默认过滤已修复，App 直接 posix_spawn EPERM 已取得同 PID 的沙盒 process-fork 拒绝日志；鼠标菜单／偏好／指针策略自动化回归已补齐。实际 iPad pointer 外观和滚轮仍需独立 iPad guest。复用 `duo-overall-20261116` 和冻结 VM 宿主进行无恢复诊断，候选只临时切换 daemon；已恢复原 daemon／标记／设置，正常关机 exit=0、无状态句柄。独立系统、发布、宿主新增安全变更和擦除恢复不由该步骤自动授权。
 
 后续完成记录：`cold-run.qYvDOWMq` 上，原 daemon 的最小复现三次均为未过滤 9／默认 4；候选 daemon 三次均为 9／9，原 `patch-port-touch.mjs` 不改断言通过 6/6 实际点击，独立 AX 命中 15/15 与锁屏拒绝通过。真实 RPC 派发新增回归在旧实现有两项失败，修改后 244 项通过，原生几何及点坐标回归通过。完整 Bundle／严格签名及 UI 返回结构检查通过。仅普通 App 的双显示查询按 App 边界重新计算 visible，并校验查询期间 PID／前台／面板／App 尺寸；单显示与 SpringBoard 原路径保持。
@@ -36,7 +42,7 @@ App 直接启动本轮仍失败：RemapProbe PID 2927 的两次 EPERM 与内核 
 
 本轮执行、首轮前提失败、DSC 规范化比较和 GPU 签名布局检查的原失败均保留于 `.build/overall-port-20261116/`，命令和范围见 [组合验收记录](Research/Integration/duo_m5_20261030/OVERALL_PORT_20261116.md)。没有擦除恢复、推送或发布。整体生产接入完成；独立系统、完整鼠标模式／pointer、显示内容方向像素验证和协议／调试细节仍为后置项目。
 
-后置清单继续保留：内屏 AX 可见性过滤、首次姿态超时、间歇启动／AMFI 拒绝、显示交接与方向细节；LLDB、CMS／真实 profile 热重载、local pairing 协议、App 直接 posix_spawn；旧固件实机矩阵、27.2、Linux FUSE／并发、物理 USB／DFU、WDA 与宿主快捷键。发布准备另列四语手册审阅、Release 产物、Developer ID 签名和 notarization。
+后置清单继续保留：首次姿态超时、间歇启动／AMFI 拒绝的历史原因，显示交接近黑原生截图、摘要重复与方向过渡细节；LLDB、CMS／真实 profile 热重载、local pairing 协议、App 沙盒内派生进程验收；独立 iPad 指针／滚轮／窗口流程、旧固件矩阵、27.2、Linux FUSE／并发、物理 USB／DFU、WDA 与宿主快捷键。发布准备另列四语手册审阅、Release 产物、Developer ID 签名和 notarization。
 
 ## 2026-11-16 生产移植
 
@@ -48,18 +54,18 @@ App 直接启动本轮仍失败：RemapProbe PID 2927 的两次 EPERM 与内核 
 - [x] TXM：native remap／profile、旧 ID 兼容、precheck 优先级及两条静态候选。8 个生产组合通过，显式 precheck 保持旧标准输出。工作树 standard 候选跟随上游 native remap；仅切换 TXM 的新副本已完成恢复和下列运行范围，不等于其他启动链开关或完整 standard 已验收。
 - [x] 完整 2.16.0 Bundle、admission、深度严格签名、Launchpad 构建、15 个 suite／164 项回归和 CLI 存盘／导出往返通过；CI 已接入。
 - [x] 已批准的运行验收：`a91b9e15…` AMFI 准入、宿主预检、新副本 `duo-patches-20261116` 环境更新、收据和两次冷启动均通过。显式保留旧 precheck、关闭 remap；不能计为 native remap 验收。21 项环境库、原 daemon、根只读、两面板原生输入、AX 命中 15/15 和锁屏拒绝通过。KFC 前台 PID 在 15 秒内保持，Food AI 有可点击 AX 元素。两轮均恢复合盖纵向、Auto-Lock 120 秒、锁屏／熄屏和低电量原值后正常关机，退出 0、无状态句柄；未执行恢复。
-- [ ] 内屏 AX 发现限制：`patch-port-touch.mjs` 仍因默认 `ui.tree` 只返回 4/9 按钮而失败；未过滤查询返回全部 9 个。可见性过滤的具体边界原因待验证。原断言保留，独立 UIKit 坐标原生输入 6/6 不替代该项。
+- [x] 内屏普通 App 的 AX 发现修复：原 4/9 失败由桥接层 Main 边界过滤解释；按 App 坐标空间修复后，热更新和独立冷启动均 9/9×3，原 `patch-port-touch.mjs` 断言与六次实际点击通过。原失败证据保留，单显示／SpringBoard 原路径不变。
 - [x] TXM 候选准备：新身份副本 `duo-txm-remap-20261116` 的 126 项固件比较仅 TXM 不同，payload 匹配生产静态 remap 候选；来源关闭的三个启动链项继续关闭，RestoreRamDisk 沿用来源文件。原比较失败及重新生成产物保留。
 - [x] TXM 独立运行验收的已测范围：用户批准新副本 DFU／擦除恢复／停止／CFW 安装和运行验收后执行完成。默认签名、仅移除 custom-trust、再次冷启动后各 20/20 remap、80 个 alias，实际 RX、字节比较与执行通过；两种外部 dylib 均构造器=1／返回 73。ldid／Apple ad-hoc 两种 standalone 的受控 exec 注入均在两轮通过，自身路径匹配、exit=0，临时作业已卸载。原始 VM 和旧验收副本未启动。
 - [x] TXM 擦除恢复：绑定新副本 ECID `0x0C5CF189506BC959` 的恢复成功，记录 iOS 27.1／cloudOS 26.4 和 102 项启动链补丁；TXM 收据含 remap、不含 precheck。随后仅停止该副本的 DFU 进程，退出 0。
 - [x] TXM CFW 安装：用户完成系统管理员认证后，同一安装会话成功退出 0；日志记录完整安装成功，无 `[!]`／failed／Error。安装后 remap 为 enabled/planned/applied，precheck 三项均 false，二者 pending=false。
 - [x] TXM 冷启动与清理：同一 CDHash 的宿主拒绝在有效授权内重新准入后通过；拒绝原因未查明。两次冷启动、36/36 AX 文件、21 项库、根只读和 pairing 文件核对通过。实际 Preboot TXM 的 IM4P 与 payload 均完全匹配候选。两轮恢复稳定快照的合盖纵向、Auto-Lock 300 秒、锁屏／熄屏及低电量原值后正常关机，VM exit=0、无句柄；离线只读挂载已清理，前后镜像清单相同。
-- [ ] TXM 验证限制：首次姿态 RPC 超时保留，原因未查明；App 直接 posix_spawn 两种签名均 EPERM，原 aggregate 断言仍失败，独立 exec 注入通过不替代该路径。CMS／真实 profile 热重载、修改后私有代码／inline hook、LLDB 和其他 injector／系统／版本未覆盖。
+- [ ] TXM 验证限制：首次姿态 RPC 超时历史原因未查明，两组六次启动未复现；App 直接 posix_spawn 两种签名均 EPERM，后续日志确认该次 App 被沙盒拒绝 process-fork，原 aggregate 断言保持失败，独立 exec 注入不替代该路径。CMS／真实 profile 热重载、修改后私有代码／inline hook、LLDB 和其他 injector／系统／版本未覆盖。
 - [ ] 其他设备／旧固件、SPTM、鼠标／framebuffer 项目按原差异清单独立推进；trusted darwinOS 不加入 Duo 默认计划。
 
 来源、迁移规则、失败与修复、命令和未覆盖范围见 [生产移植记录](Research/Integration/duo_m5_20261030/PATCH_PORT_20261116.md)。静态证据为 `.build/upstream-port-20261116/saved-run.a1thV043/`；实际运行证据为同级 `cold-run.acMbD9pf/` 和 `cold-run.jM0hDUCb/`。新副本保留候选补丁及生成的 TapProbe，来源与原始副本未启动。
 
-## 当前待办
+## 历史待办与执行记录（当前状态以开头最新记录为准）
 
 上一批实现与验收截至 `f168cb8b`；三个本地提交为 `cc3f1d85`（网页摄像头及复现资产）、`06bcf315`（构建配置与 notice 门禁）、`f168cb8b`（GUI／摄像头验收和回滚记录）。其后 3–5 的范围评估和离线回归保存为 `316fa62c`、`98426587`、`a22078e7`；本轮运行记录另行保存，未推送或发布。上游同步目标仍为已固定的 `13169405`，本次未刷新远端。
 
