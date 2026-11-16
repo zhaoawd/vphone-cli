@@ -24,3 +24,13 @@ DeviceTree 首轮新增测试将既有恢复树值误写为 0；代码中 `Devic
 发现过程：在 `__TEXT_EXEC,__text` 解码 `mrs MIDR_EL1` → `and #0xfff0` → `cmp #0`，核对条件分支与紧随跳转的目标关系，再要求目标块中的寄存器索引 `ldr`／`str` 使用相同内存操作数。唯一匹配时将 `b.eq` 替换为 `ARM64.nop`；多匹配拒绝，零匹配不写入。没有硬编码补丁地址或替换指令字。
 
 上游比较记录将该路径关联到 cloudOS 18 次 CPU reset 中未实现的核心寄存器访问，并报告旧固件多 vCPU 启动结果。本轮未独立重现该运行结果，不将上游运行证据计为本地验收。当前仓库 `ipsws/` 未提供该 suite 自动读取的 IPSW；实际镜像／PAYP 回归和多 vCPU 恢复仍需独立输入。本轮先执行语义 fixture、版本门槛、目录和 drift 回归。
+
+SPTM／目录／drift 共 52 项通过（`group2-sptm-tests.log`），真实 IPSW 测试明确跳过。生产实现保存为本地提交 `4ba8aad6`。
+
+## 第三组：鼠标模式
+
+接入 #920 `1518293c`：iPad 的 Guest Pointer／Touch 选择、`guestMouseMode` 用户偏好、菜单和工具提示、捕获状态副标题、断连释放，以及相同时间戳移动事件去重。iPhone 的非捕获输入继续使用触摸；显式捕获仍单独控制且不持久化。
+
+资源冲突按该提交实际变化的九个字符串合并，保留既有 Duo 本地化；没有引入冲突块中不属于本组的 Cryptex 字符串。JSON 解析往返通过。共享输入中的 `interfacePoint` 仍经过 active-panel/backing 比例及 `screenOrientation` 转换，未用上游版本覆盖。菜单和窗口的本地差异也保留。
+
+本组不新增固件补丁。`xcodebuild -workspace VPhone.xcworkspace -scheme vphone-vm -configuration Debug -destination 'platform=macOS,arch=arm64' -derivedDataPath .build/duo-sync-20261113/XcodeBundle -disableAutomaticPackageResolution -jobs 4 build` 通过（`group3-vm-build.log`）。实际 iPad 指针／滚轮、跨窗口偏好和 Duo 两面板／旋转点击仍属于集中运行验收。
