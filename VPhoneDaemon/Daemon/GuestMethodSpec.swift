@@ -16,7 +16,7 @@ enum GuestAPIError: Error, CustomStringConvertible {
     /// sent as the error code so a client can tell it apart from a failure.
     case alreadyDone(code: String, message: String)
     /// The guest's Location Services switch is off, so locationd gives no
-    /// client a location. vphoned leaves the switch to the guest's Settings.
+    /// client a location. `location.services {enabled:true}` turns it on.
     case locationServicesOff
 
     var description: String {
@@ -27,7 +27,7 @@ enum GuestAPIError: Error, CustomStringConvertible {
             "Unknown method: \(method.count > 64 ? String(method.prefix(64)) + "…" : method)"
         case let .alreadyDone(_, message): message
         case .locationServicesOff:
-            "Location Services are turned off in the guest. Turn them on in Settings > Privacy & Security > Location Services."
+            "Location Services are turned off in the guest. Turn them on with location.services {enabled:true}."
         }
     }
 

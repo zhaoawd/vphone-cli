@@ -140,6 +140,25 @@ rows m1=read m2=mutating m3=excluded:needs-network m4=read
 case_run call-log "{\"m1\":$G,\"m4\":$G}"
 calls_are 'm1 m4 '; has 'PASS m1'; has 'PASS m4'; last_is '2 passed, 0 failed'; rc_is 0
 
+# --- unforced force-gated call: a guest-closed reply is retried once -------------
+U=VPHONE_LIVE_UNFORCED_CHECK=1
+REF='{"error":{"code":"force_required","message":"Pass force: true to reboot the guest"}}'
+DROP='{"drop":true}'
+GC='{"status":502,"json":{"type":"response","id":null,"error":{"code":"guest_closed","message":"Guest closed the connection without a reply"}}}'
+RT='RETRY system.reboot {}: guest closed without a reply'; LK='LEAK: system.reboot was not refused unforced; stopping'
+case_run refusal-first "{\"system.reboot\":$REF}" $U
+has 'PASS system.reboot {}'; hasnt RETRY; hasnt LEAK; rc_is 0; calls_are 'system.reboot '
+case_run drop-then-refusal "{\"system.reboot\":[$DROP,$REF]}" $U
+has "$RT"; has 'PASS system.reboot {}'; hasnt LEAK; rc_is 0; calls_are 'system.reboot system.reboot '
+case_run 502-then-refusal "{\"system.reboot\":[$GC,$REF]}" $U
+has "$RT"; has 'PASS system.reboot {}'; hasnt LEAK; rc_is 0; calls_are 'system.reboot system.reboot '
+case_run drop-twice "{\"system.reboot\":[$DROP,$DROP,$REF]}" $U
+has "$RT"; has "$LK"; rc_is 1; calls_are 'system.reboot system.reboot '
+case_run result-first "{\"system.reboot\":{\"result\":{}}}" $U
+hasnt RETRY; has "$LK"; rc_is 1; calls_are 'system.reboot '
+case_run 502-other "{\"system.reboot\":{\"status\":502,\"json\":{\"type\":\"response\",\"error\":{\"code\":\"internal\",\"message\":\"x\"}}}}" $U
+hasnt RETRY; has "$LK"; rc_is 1; calls_are 'system.reboot '
+
 # --- usage -------------------------------------------------------------------------
 rows m1=read
 for v in abc 0 -1 1.5 ''; do

@@ -24,7 +24,7 @@ vphone-cli vm create iphone17pro \
 
 Each iPhone model has an IPSW of its own, so `--device` is not needed with explicit sources.
 
-To find a release, run `fw catalog`. It lists the iPhone 16 and 17 models' releases from 26.0 to 27.0.1 (the iPhone 17e from 26.3.1) and the iPhone 18 Pro's 27.0.1, each with the cloudOS an iPhone17,3 of that release uses. To list one model's releases:
+To find a release, run `fw catalog`. It lists the iPhone 13, 16 and 17 models' releases from 26.0 to 27.0.1 (the iPhone 17e from 26.3.1) and the iPhone 18 Pro's 27.0.1, each with the cloudOS an iPhone17,3 of that release uses. To list one model's releases:
 
 ```sh
 vphone-cli fw catalog --device iPhone18,1
@@ -34,7 +34,8 @@ vphone-cli fw catalog --device iPhone18,1
 
 | Product | Model | Board | Panel | Points @3x |
 | --- | --- | --- | --- | --- |
-| `iPhone17,3` | iPhone 16 | D47AP | 1290x2796 @ 460 ppi | 430x932 |
+| `iPhone14,5` | iPhone 13 | D17AP | 1170x2532 @ 460 ppi | 390x844 |
+| `iPhone17,3` | iPhone 16 | D47AP | 1179x2556 @ 460 ppi | 393x852 |
 | `iPhone17,4` | iPhone 16 Plus | D48AP | 1290x2796 @ 460 ppi | 430x932 |
 | `iPhone17,1` | iPhone 16 Pro | D93AP | 1206x2622 @ 460 ppi | 402x874 |
 | `iPhone17,2` | iPhone 16 Pro Max | D94AP | 1320x2868 @ 460 ppi | 440x956 |
@@ -46,7 +47,7 @@ vphone-cli fw catalog --device iPhone18,1
 | `iPhone18,5` | iPhone 17e | V159AP | 1170x2532 @ 460 ppi | 390x844 |
 | `iPhone19,2` | iPhone 18 Pro | V63AP | 1206x2622 @ 460 ppi | 402x874 |
 
-Every model, the iPhone17,3 included, gets its panel and identity from its own device tree; the iPhone17,3's panel is the display it has always had.
+Every model, the iPhone17,3 included, gets its panel and identity from its own device tree. A new iPhone17,3 machine gets the iPhone 16's own 1179x2556 panel; a machine created with an earlier VPhone.bundle keeps the 1290x2796 panel recorded in its configuration.
 
 The iPhone 17 Pro, 17 Pro Max and 18 Pro have recorded boot validation; see [Compatibility](compatibility.md#other-iphone-models). The iPhone 17 Pro and 17 Pro Max need a patch on iOS 27, described there.
 

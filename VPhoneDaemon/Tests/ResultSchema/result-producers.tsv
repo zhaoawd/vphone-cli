@@ -116,6 +116,7 @@ launchd.setenv	icli:IcliKit/Services.swift#setLaunchdEnvironment
 launchd.unsetenv	VPhoneDaemon/Daemon/GuestAPI+Service.swift#executeService
 location.clear	icli:IcliKit/Location.swift#clearSimulatedLocation
 location.current	icli:IcliKit/Location.swift#currentLocation
+location.services	VPhoneDaemon/Daemon/GuestAPI+Location.swift#locationServices;VPhoneDaemon/Daemon/GuestAPI+Location.swift#setLocationServices
 location.set	icli:IcliKit/Location.swift#simulateLocation
 logs.crash	icli:IcliKit/Host/Host.swift#readCrashLog
 logs.crashes	VPhoneDaemon/Daemon/GuestAPI+Log.swift#executeLog
@@ -198,3 +199,5 @@ ui.tap_element	VPhoneDaemon/Daemon/GuestAPI+Input.swift#tapInterfaceElement
 ui.tree	VPhoneDaemon/Daemon/GuestAPI+Input.swift#executeInterface;VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift#nestedHierarchy
 ui.wait	icli:IcliKit/Input/Screen.swift#waitForElement
 ui.wait_gone	icli:IcliKit/Input/Screen.swift#waitForElement
+visionos.immersion.get	VPhoneDaemon/Daemon/GuestAPI+VisionOSImmersion.swift#visionOSImmersionReadResult
+visionos.immersion.set	VPhoneDaemon/Daemon/GuestAPI+VisionOSImmersion.swift#visionOSImmersionSetResult

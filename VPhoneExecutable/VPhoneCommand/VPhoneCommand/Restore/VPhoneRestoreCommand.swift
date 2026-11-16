@@ -257,6 +257,7 @@ struct VPhoneCustomFirmwareCommand: ParsableCommand {
             VPhoneCustomFirmwarePatchBoardAudioCommand.self,
             VPhoneCustomFirmwarePatchHomePodAudioProductCommand.self,
             VPhoneCustomFirmwarePatchHomePodCryptexClassCommand.self,
+            VPhoneCustomFirmwarePatchVisionOSVirtualProductCommand.self,
             VPhoneCustomFirmwarePatchIPhoneProductCommand.self,
             VPhoneCustomFirmwarePatchDriverKitCommand.self,
             VPhoneCustomFirmwarePatchFoldableVMSubtypeCommand.self,

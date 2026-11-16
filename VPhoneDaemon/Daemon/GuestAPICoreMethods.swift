@@ -30,6 +30,7 @@ enum CoreMethod: String, GuestMethod {
     case developerModeStatus = "developer_mode.status"
     case developerModeEnable = "developer_mode.enable"
     case powerLowPowerMode = "power.low_power_mode"
+    case locationServices = "location.services"
     case clipboardGet = "clipboard.get"
     case clipboardSet = "clipboard.set"
     case clipboardClear = "clipboard.clear"
@@ -70,12 +71,18 @@ enum CoreMethod: String, GuestMethod {
                                                 .required("scale", .number),
                                                 .required("screen_off", .boolean),
                                                 .required("width", .number)])
-        case .screenScreenshot: MethodSpec(summary: "Capture the native screen as base64 image data.", result: [.required("bytes", .integer),
+        case .screenScreenshot: MethodSpec(.optional("max_dimension", .integer, "Scale the image down so its longer side is at most this many pixels", min: 1),
+                                           .optional("quality", .number, "JPEG quality of a re-encoded image; 0.8 when omitted", default: 0.8, min: 0.1, max: 1.0),
+                                           .optional("region", .object, "Crop to {x, y, width, height} in points; the whole screen when omitted"),
+                                           summary: "Capture the screen and return it as base64 image data, optionally cropped and scaled.",
+                                           result: [.required("bytes", .integer),
                                                     .required("coordinate_scale", .number),
-                                                    .optional("data", .string),
+                                                    .required("data", .string),
                                                     .required("height", .integer),
                                                     .required("mime_type", .string),
-                                                    .hidden("path", .string),
+                                                    .required("point_height", .number),
+                                                    .required("point_width", .number),
+                                                    .required("region", .object),
                                                     .required("width", .integer)])
         case .appsList: MethodSpec(.optional("filter", .string, "Which apps to list", values: ["all", "running", "user", "system"], default: "all"),
                                     summary: "List installed apps with bundle id, name, version, type, and running state.", result: [.required("apps", .array)], paged: MethodSpec.Paged(key: "apps", order: .keys(["bundle_id", "path"])))
@@ -258,6 +265,8 @@ enum CoreMethod: String, GuestMethod {
                                                        .required("writable", .boolean)])
         case .powerLowPowerMode: MethodSpec(.optional("enabled", .boolean, "Turn low power mode on or off; only reads the state when omitted"),
                                             summary: "Get or set low power mode.", result: [.optional("changed", .boolean), .required("enabled", .boolean), .required("method", .string)])
+        case .locationServices: MethodSpec(.optional("enabled", .boolean, "Turn location services on or off; only reads the state when omitted"),
+                                           summary: "Get or set the system location services switch.", result: [.required("enabled", .boolean)])
         case .clipboardGet: MethodSpec(summary: "Read the system clipboard text and describe any image on it.", result: [
                 .required("change_count", .integer),
                 .required("has_image", .boolean),

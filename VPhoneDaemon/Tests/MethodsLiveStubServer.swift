@@ -3,13 +3,14 @@ import Foundation
 
 /// Local fixture server for the saved shell regression. Never uses a guest.
 final class MethodsLiveStubServer: @unchecked Sendable {
-    let scenario: [String: [String: Any]]
+    let scenario: [String: Any]
     let callLog: String
     let token: String
     let logLock = NSLock()
+    var seen: [String: Int] = [:]
 
     init(arguments: [String]) throws {
-        scenario = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: arguments[1]))) as! [String: [String: Any]]
+        scenario = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: arguments[1]))) as! [String: Any]
         callLog = arguments[2]
         token = arguments[4]
     }
@@ -53,12 +54,13 @@ final class MethodsLiveStubServer: @unchecked Sendable {
                 try file.write(contentsOf: Data((method + "\n").utf8))
                 logLock.unlock()
             } catch { logLock.unlock(); throw error }
-            guard let entry = scenario[method] else {
+            guard let entry = nextEntry(for: method) else {
                 try sendJSON(client, status: 400, ["type": "response", "error": ["code": "unknown_method", "message": "Unknown method"]]); return
             }
+            if entry["drop"] != nil { return }
             if let delay = entry["stall"] as? Double { Thread.sleep(forTimeInterval: delay); return }
             if let raw = entry["raw"] as? String { send(client, status: 200, body: Data(raw.utf8)); return }
-            if let value = entry["json"] { try sendJSON(client, status: 200, value); return }
+            if let value = entry["json"] { try sendJSON(client, status: entry["status"] as? Int ?? 200, value); return }
             if let error = entry["error"] { try sendJSON(client, status: 400, ["type": "response", "error": error]); return }
             if let size = entry["pad"] as? Int {
                 let prefix = "{\"type\":\"response\",\"result\":{\"a\":\"", suffix = "\"}}"
@@ -66,6 +68,19 @@ final class MethodsLiveStubServer: @unchecked Sendable {
             }
             try sendJSON(client, status: 200, ["type": "response", "id": "1", "result": entry["result"] ?? NSNull()])
         } catch { send(client, status: 500, body: Data("{}".utf8)) }
+    }
+
+    func nextEntry(for method: String) -> [String: Any]? {
+        logLock.lock()
+        defer { logLock.unlock() }
+        guard let value = scenario[method] else { return nil }
+        if let replies = value as? [[String: Any]] {
+            guard !replies.isEmpty else { return nil }
+            let index = seen[method, default: 0]
+            seen[method] = index + 1
+            return replies[min(index, replies.count - 1)]
+        }
+        return value as? [String: Any]
     }
 
     func sendJSON(_ client: Int32, status: Int, _ object: Any) throws {

@@ -57,13 +57,14 @@ enum GuestAPI {
             "name": "vphoned",
             "api_version": 1,
             "status": "ok",
+            "os": GuestRuntimePlatform.isVisionOS ? "visionOS" : GuestRuntimePlatform.productName,
             "binary_hash": binaryHash,
             "instance": instance,
             "ios": "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)",
             "ip": ip ?? "",
-            "setup_pending": setupAssistantPending(),
+            "setup_pending": GuestRuntimePlatform.isVisionOS ? false : setupAssistantPending(),
             "mobilegestalt_restart_pending": GuestMobileGestaltCache.restartPending(),
-            "capabilities": [
+            "capabilities": GuestRuntimePlatform.isVisionOS ? (GuestRuntimePlatform.visionOSCapabilities + scriptCapabilities() + visionOSImmersionCapabilities) : [
                 "touch",
                 "touch2",
                 "touch_edge",
@@ -149,6 +150,37 @@ enum GuestAPI {
         try GuestMethodArea.dispatch(areas, method: method, params: params, observer: { try liveObservation() })
     }
 
+    /// `screen.screenshot`. Without options the capture is base64-encoded as it
+    /// is; otherwise the daemon crops, scales and encodes it, so only the final
+    /// image crosses vsock.
+    private static func sizedScreenshot(_ options: GuestScreenshotSizing.Options) throws -> [String: Any] {
+        let screen = screenInfo()
+        guard let pointWidth = (screen["width"] as? NSNumber)?.doubleValue,
+              let pointHeight = (screen["height"] as? NSNumber)?.doubleValue,
+              pointWidth > 0, pointHeight > 0
+        else {
+            throw GuestAPIError.operationFailed("screenshot failed: the screen size is unknown")
+        }
+        var capture: [String: Any]
+        do { capture = try takeScreenshot(base64: options.isEmpty, nativeResolution: true) } catch {
+            throw GuestAPIError.operationFailed("screenshot capture failed: \(error)")
+        }
+        if !options.isEmpty {
+            guard let path = capture["path"] as? String else {
+                throw GuestAPIError.operationFailed("screenshot capture failed: no scratch file")
+            }
+            defer { try? FileManager.default.removeItem(atPath: path) }
+            do { capture["jpeg"] = try Data(contentsOf: URL(fileURLWithPath: path)) } catch {
+                throw GuestAPIError.operationFailed("screenshot read failed: \(error.localizedDescription)")
+            }
+        }
+        return try GuestScreenshotSizing.reply(
+            capture: capture,
+            options: options,
+            pointSize: (Double(pointWidth), Double(pointHeight)),
+        )
+    }
+
     static func executeCore(_ m: CoreMethod, _ params: [String: Any]) throws -> [String: Any] {
         switch m {
         case .deviceSnapshot:
@@ -158,7 +190,7 @@ enum GuestAPI {
         case .deviceScreen:
             return try activeScreenInfo()
         case .screenScreenshot:
-            return try takeScreenshot(base64: true, nativeResolution: true)
+            return try sizedScreenshot(try GuestScreenshotSizing.parse(params))
         case .appsList:
             let filter = params["filter"] as? String ?? "all"
             let apps = try listedApps()
@@ -279,6 +311,9 @@ enum GuestAPI {
             return result
         case .bootstrapInstall:
             let layout = try string(params, "layout")
+            if GuestRuntimePlatform.isVisionOS, layout != "rootless" {
+                throw GuestAPIError.invalidRequest("visionOS currently supports the rootless Irisin layout only", hint: "Pass layout: rootless")
+            }
             return try GuestIrisinInstaller.install(
                 jailbreak: jailbreakInfo(),
                 layout: layout,
@@ -391,6 +426,11 @@ enum GuestAPI {
                 return try setLowPowerMode(enabled)
             }
             return try lowPowerMode()
+        case .locationServices:
+            if let enabled = params["enabled"] as? Bool {
+                return try setLocationServices(enabled)
+            }
+            return locationServices()
         case .clipboardGet:
             return try clipboardInfo()
         case .clipboardSet:

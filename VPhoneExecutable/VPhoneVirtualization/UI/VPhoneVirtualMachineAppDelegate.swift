@@ -343,6 +343,7 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
                 mc?.updateShutDownAvailability(available: caps.contains("system_shutdown"))
                 mc?.updateUDIDAvailability(available: caps.contains("udid_override"))
                 mc?.updateSoftwareKeyboardAvailability(available: true)
+                mc?.updateVisionOSImmersionAvailability(connected: true, capabilities: caps)
                 mc?.updatePanelAvailability(capabilities: caps)
                 if caps.contains("location") {
                     mc?.updateLocationCapability(available: true)
@@ -375,6 +376,7 @@ class VPhoneVirtualMachineAppDelegate: NSObject, NSApplicationDelegate {
                 mc?.captureView?.setMouseCaptured(false)
                 mc?.updateConnectAvailability(available: false)
                 mc?.updateSoftwareKeyboardAvailability(available: false)
+                mc?.updateVisionOSImmersionAvailability(connected: false, capabilities: [])
                 mc?.updateInstallAvailability(available: false)
                 mc?.updateCryptexAvailability(available: false)
                 mc?.updateBootstrapAvailability(available: false)

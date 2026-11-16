@@ -19,40 +19,49 @@ if mode != 1 {
 }
 
 guard vp_native_watch_proxy() == 0 else { exit(1) }
-// First, so the Lock Screen timeout is in place before SpringBoard reads it.
-GuestLockScreenIdle.startOnStartup()
-// Before the server, so `/v1/health` reports a drop from its first answer.
-GuestMobileGestaltCache.dropIfStaleOnStartup()
-GuestMobileGestaltCache.presentAlwaysOnDisplayOnStartup()
-// An iOS 18 screen stays black until backboardd runs without surface compression.
-GuestCoreAnimationCompression.applyOnStartup()
-// Before audiomxd is asked for sound again; see the type for what it cannot cover.
-GuestVirtualAudioProduct.storeOnStartup()
-// After SpringBoard has had time to come up, so the inner panel's layout
-// matches the posture it was booted with.
-GuestFoldPose.startOnStartup()
-if vp_core_motion_hinge() {
-    GuestRenderServerLifecycle.shared.start { vp_backboardd_epoch() }
+// visionOS runs this agent through iPad compatibility: none of the iPhone
+// display, input, sensor or lock-screen startup applies there.
+let iPhoneStartup = !GuestRuntimePlatform.isVisionOS
+if iPhoneStartup {
+    // First, so the Lock Screen timeout is in place before SpringBoard reads it.
+    GuestLockScreenIdle.startOnStartup()
+    // Before the server, so `/v1/health` reports a drop from its first answer.
+    GuestMobileGestaltCache.dropIfStaleOnStartup()
+    GuestMobileGestaltCache.presentAlwaysOnDisplayOnStartup()
+    // Settings' row icons rendered before the iOS 18 GPU transport are blank.
+    GuestIconServicesCache.dropIfOlderThanGPUOnStartup()
+    // An iOS 18 screen stays black until backboardd runs without surface compression.
+    GuestCoreAnimationCompression.applyOnStartup()
+    // Before audiomxd is asked for sound again; see the type for what it cannot cover.
+    GuestVirtualAudioProduct.storeOnStartup()
+    // After SpringBoard has had time to come up, so the inner panel's layout
+    // matches the posture it was booted with.
+    GuestFoldPose.startOnStartup()
+    if vp_core_motion_hinge() {
+        GuestRenderServerLifecycle.shared.start { vp_backboardd_epoch() }
+    }
+    GuestDeviceHubControl.startOnStartup()
+    vp_vcam_start()
+    GuestHomePodDisplay.startOnStartup()
+    // Multi-finger injection is resolved here so the first pinch is not the call
+    // that pays for `dlopen`; a base without the symbols logs and stays a no-op.
+    _ = vp_hid_load()
+    vp_ios16_touchscreen_start()
+    vp_ios16_keybagless_ui_start()
+    // The VM's touchscreen has no wake gesture; a tap on a dark screen lights it.
+    GuestScreenUnlock.startTapToWake()
 }
-GuestDeviceHubControl.startOnStartup()
-vp_vcam_start()
-GuestHomePodDisplay.startOnStartup()
-// Multi-finger injection is resolved here so the first pinch is not the call
-// that pays for `dlopen`; a base without the symbols logs and stays a no-op.
-_ = vp_hid_load()
-vp_ios16_touchscreen_start()
-vp_ios16_keybagless_ui_start()
-// The VM's touchscreen has no wake gesture; a tap on a dark screen lights it.
-GuestScreenUnlock.startTapToWake()
 GuestIrisinInstaller.refreshBootstrapOnStartup()
 GuestProcessSpool.shared.sweepAll()
-GuestAPI.restoreUSBSerialOnStartup()
-GuestStaticNames.shared.restoreOnStartup()
-// locationd can deadlock as it starts; this restarts it.
-GuestLocationdWatchdog.shared.startOnStartup()
-GuestDeveloperModeSnapshot.shared.startOnStartup()
-// Trusted darwinOS guests only: reinstall persisted cryptexes serially.
-GuestAPI.reinstallPersistedCryptexesOnStartup()
+if iPhoneStartup {
+    GuestAPI.restoreUSBSerialOnStartup()
+    GuestStaticNames.shared.restoreOnStartup()
+    // locationd can deadlock as it starts; this restarts it.
+    GuestLocationdWatchdog.shared.startOnStartup()
+    GuestDeveloperModeSnapshot.shared.startOnStartup()
+    // Trusted darwinOS guests only: the cryptexes installed with `persist`.
+    GuestAPI.reinstallPersistedCryptexesOnStartup()
+}
 
 let group = MultiThreadedEventLoopGroup(numberOfThreads: 2)
 let filePool = NIOThreadPool(numberOfThreads: 2)
@@ -65,9 +74,13 @@ let vsockSendBufferLimit: SocketOptionValue = 64 * 1024
 do {
     let server = try ServerBootstrap(group: group)
         .serverChannelOption(ChannelOptions.backlog, value: 128)
-        // Bound coalesced writes to the virtio-vsock payload limit. Do not
-        // validate a readback: cloudOS may reset the buffer to peer credit
-        // when the first request arrives, before channel setup completes.
+        // Bound Darwin's mbuf chains to the 64 KiB payload limit used by
+        // virtio-vsock backends, even when sosend coalesces a small remainder.
+        // The value is not read back: the cloudOS 26.4 kernel sets a VSOCK
+        // send buffer to the peer's credit again with every packet it
+        // receives (vsock_update_send_buffer_space), 262144 bytes under
+        // Virtualization, so a check that raced the first request refused a
+        // connection the host had already written to.
         .childChannelOption(ChannelOptions.socketOption(.so_sndbuf), value: vsockSendBufferLimit)
         .childChannelInitializer { channel in
             let http = GuestHyperTextHandler(hub: hub, fileIO: fileIO)
@@ -164,6 +177,10 @@ RunLoop.main.run()
 
 // MARK: - Refused connections
 
+/// Logs a connection that was closed while it was being set up, or an accept
+/// that failed. SwiftNIO reports both only as an error on the listening
+/// channel, after its accept handler, and closes the connection without a
+/// word; the host just sees it end before any reply.
 final class GuestAcceptErrorLogger: ChannelInboundHandler, Sendable {
     typealias InboundIn = Channel
 

@@ -50,7 +50,9 @@ public enum FirmwareGuestSystemPatchSet {
     public static let metalVertexIDFormat = "dyld-cfw-metal_vertex_id_format"
     public static let glesPrimitiveRestart = "dyld-cfw-gles_primitive_restart"
     public static let glesPointDraw = "dyld-cfw-gles_point_draw"
+    public static let glesDepthClip = "dyld-cfw-gles_depth_clip"
     public static let metalCacheReuseKey = "dyld-cfw-metal_cache_reuse_key"
+    public static let textRecognitionANE = "dyld-cfw-text_recognition_ane"
     public static let gyroscope = "system-backboardd-cfw-gyroscope"
     public static let accelerometer = "system-backboardd-cfw-accelerometer"
     public static let hinge = "system-backboardd-cfw-hinge"
@@ -188,6 +190,32 @@ public enum FirmwareGuestSystemPatchSet {
     public static let homePodSoundGlow = "system-homepod-exp-sound_glow"
     public static let homePodSoundGlowPath = "/usr/share/vphone/HomePodSoundGlow.plist"
     public static let otaUserland = "system-exp-ota_userland"
+    public static let visionOSNonfatalServices = "system-launchdaemons-exp-visionos_nonfatal_services"
+    public static let visionOSVirtualProduct = "preboot-exp-visionos_virtual_product"
+    public static let visionOSLegacyUXM = "system-featureflags-exp-visionos_legacy_uxm"
+    public static let visionOSFramePacing = "system-wakeboard-exp-visionos_frame_pacing"
+    public static let visionOSFramePacingPath = "/usr/libexec/wakeboardd"
+    public static let visionOSEnvironments = "system-featureflags-exp-visionos_environments"
+    public static let visionOSEnvironmentsPath = "/System/Library/FeatureFlags/Domain/RealityEnvironment.plist"
+    public static let visionOSSkipBuddy = "system-preferences-exp-visionos_skip_buddy"
+    public static let visionOSSkipBuddyMarker = "/usr/share/vphone/VisionOSSkipBuddy.plist"
+    public static let visionOSUXMIPC = "system-launchd-exp-visionos_uxm_ipc"
+    public static let visionOSUXMIPCLibrary = "/usr/lib/libvphonevisionosipc.dylib"
+    public static let visionOSUXMIPCMarker = "/usr/lib/vphone-visionos-uxm-ipc"
+    public static let visionOSHMDPropertiesIPC = "system-launchd-exp-visionos_hmd_properties_ipc"
+    public static let visionOSHMDPropertiesIPCMarker = "/usr/lib/vphone-visionos-hmd-properties-ipc"
+    public static let visionOSHMDPresentableIPC = "system-launchd-exp-visionos_hmd_presentable_ipc"
+    public static let visionOSHMDPresentableIPCMarker = "/usr/lib/vphone-visionos-hmd-presentable-ipc"
+    public static let visionOSHMDSystemSetterIPC = "system-launchd-exp-visionos_hmd_system_setter_ipc"
+    public static let visionOSHMDSystemSetterIPCMarker = "/usr/lib/vphone-visionos-hmd-system-setter-ipc"
+    public static let visionOSWakeboardSystemIPC = "system-launchd-exp-visionos_wakeboard_system_ipc"
+    public static let visionOSWakeboardSystemIPCMarker = "/usr/lib/vphone-visionos-wakeboard-system-ipc"
+    public static let visionOSEnvironmentIPC = "system-launchd-exp-visionos_environment_ipc"
+    public static let visionOSEnvironmentIPCMarker = "/usr/lib/vphone-visionos-environment-ipc"
+    public static let visionOSDisplayIPCPatches: Set<String> = [
+        visionOSHMDPropertiesIPC, visionOSHMDPresentableIPC, visionOSHMDSystemSetterIPC,
+        visionOSWakeboardSystemIPC, visionOSEnvironmentIPC,
+    ]
 
     private static let ios27 = VPhonePatchApplicability(iOSBase: .major(27))
 
@@ -295,6 +323,90 @@ public enum FirmwareGuestSystemPatchSet {
                 summary: "Enables BreadBoard's native environment simulation service on retail HomeView 27.2 by opening only its internal-install gate. Preserves the service's client entitlement check and global build identity. Experimental, off by default; native near/far runtime validation is pending.",
                 target: .dyldSharedCache,
                 applicability: VPhonePatchApplicability(iOSBase: .release(major: 27, minor: 2)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSFramePacing,
+                title: "visionOS virtual display frame pacing",
+                summary: "Corrects V201's late-vsync rounding so the native 60 Hz compositor does not skip another whole period after each synchronous present. Preserves its display clock, rendering, frame submission and native signature metadata. Experimental visionOS26.4/26.4 research only, independently reversible and off by default.",
+                target: .guestExecutable(path: visionOSFramePacingPath),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSEnvironments,
+                title: "visionOS native environments on VM",
+                summary: "Enables only RealityEnvironment's native ShowEnvironmentsOnSimulator feature flag so ordinary environment assets are not marked unavailable solely because the headset is virtual. Journals and restores the original Enabled Boolean or absence while retaining other feature fields. Does not supply assets or certify background rendering; experimental visionOS26.4 research only.",
+                target: .guestFile(path: visionOSEnvironmentsPath),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSSkipBuddy,
+                title: "visionOS skip headset onboarding",
+                summary: "Installs a System policy for a one-shot UID 501 helper to set only the native ForceNoBuddy debug preference on Data and skip headset onboarding UI. Does not alter activation or account data, but its early return skips the UI-need checks; it does not mark enrollment complete. Journals and restores only the original key.",
+                target: .guestFile(path: visionOSSkipBuddyMarker),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSEnvironmentIPC,
+                title: "visionOS environment service lookup",
+                summary: "Enables only RealityEnvironment's observed lookup of com.apple.surfboard.environmentservice in the scoped launchd adapter, avoiding its nil-endpoint startup crash. Requires the UXM IPC adapter plus its independent root-owned marker, exact native app path/signing identity and validated audit token. Retains the native service's command checks; experimental visionOS26.4 research only.",
+                target: .guestFile(path: visionOSEnvironmentIPCMarker),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSWakeboardSystemIPC,
+                title: "visionOS wakeboard system lookup",
+                summary: "Enables only backboardd's observed lookup of the native com.apple.wakeboardd.system endpoint in the scoped launchd adapter. Requires the UXM IPC adapter plus its independent root-owned marker, exact caller path/signing identity and validated audit token. Retains wakeboardd's per-command entitlement checks; experimental visionOS26.4 research, native Home and Settings were observed in the documented manually configured VM.",
+                target: .guestFile(path: visionOSWakeboardSystemIPCMarker),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSHMDPresentableIPC,
+                title: "visionOS HMD presentable lookup",
+                summary: "Enables only backboardd's observed lookup of com.apple.wakeboard.hmdpresentable.owner in the scoped launchd adapter. Requires the UXM IPC adapter plus its independent root-owned marker, exact caller path/signing identity and validated audit token. Experimental visionOS26.4 research; does not grant other display services.",
+                target: .guestFile(path: visionOSHMDPresentableIPCMarker),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSHMDSystemSetterIPC,
+                title: "visionOS HMD system setter lookup",
+                summary: "Enables only backboardd's native lookup of com.apple.wakeboard.hmdsystemsetter in the scoped launchd adapter. Requires the UXM IPC adapter plus its independent root-owned marker, exact caller path/signing identity and validated audit token. Selected from the native RS call chain and exercised in the documented UI checkpoint.",
+                target: .guestFile(path: visionOSHMDSystemSetterIPCMarker),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSHMDPropertiesIPC,
+                title: "visionOS HMD properties lookup",
+                summary: "Enables only backboardd's observed lookup of com.apple.wakeboard.hmdproperties in the scoped launchd adapter. Requires the UXM IPC adapter plus both root-owned markers, exact caller path/signing identity and validated audit token. Experimental visionOS26.4 research; does not grant other compositor channels.",
+                target: .guestFile(path: visionOSHMDPropertiesIPCMarker),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSUXMIPC,
+                title: "visionOS UXM service lookups",
+                summary: "Loads a scoped launchd adapter for the PCC sandbox's missing UXM/Polaris service rules. Requires exact caller path, signing identity, audit token and root-owned marker; permits only the two observed native service lookups and forwards other checks unchanged. Experimental visionOS26.4 research only.",
+                target: .guestExecutable(path: "/sbin/launchd"),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSVirtualProduct,
+                title: "visionOS virtual display product",
+                summary: "Replaces only the generic virtual iPhone product token with visionOS's native virtual V201 token, selecting wakeboardd's IOMobileFramebuffer display path. Keeps RealityDevice14,1 identity and paravirtual hardware; experimental and reversible through the Preboot repair backup.",
+                target: .prebootDeviceTree,
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSLegacyUXM,
+                title: "visionOS legacy UXM transport",
+                summary: "Diagnostic trial selecting BoundaryManagerLegacy by disabling UXMSharedMemoryBlackboard and UXMShim. Native ClientSession users abort in this mode, so it is incompatible with the full interface. Journals and restores only Enabled and DevelopmentPhase fields; keep off for normal UI experiments.",
+                target: .guestFile(path: "/System/Library/FeatureFlags/Domain/UserExperienceManagerFeatures.plist"),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4), cloudOS: .release(major: 26, minor: 4)),
+            ),
+            VPhonePatchDeclaration(
+                identifier: visionOSNonfatalServices,
+                title: "visionOS headless service exits",
+                summary: "Reversibly removes panic-on-crash policies from four headset service jobs while retaining their launch configuration. Headless visionOS research only; does not supply missing hardware or repair the services.",
+                target: .guestFile(path: "/System/Library/xpc/launchd.plist"),
+                applicability: VPhonePatchApplicability(iOSBase: .release(major: 26, minor: 4)),
             ),
             VPhonePatchDeclaration(
                 identifier: homePodCryptexClass,
@@ -429,6 +541,22 @@ public enum FirmwareGuestSystemPatchSet {
 
             // MARK: Shared Cache Policy
 
+            // Depth conversion and its cache dependencies are not tied to an
+            // OS release. Their patchers verify the actual binary semantics;
+            // unsupported layouts skip a new pair before any writes. Existing
+            // paired state is preserved when its upgrade cannot be completed.
+            VPhonePatchDeclaration(
+                identifier: glesDepthClip,
+                title: "GLES signed depth clipping",
+                summary: """
+                Converts GLES vertex positions and renderer depth endpoints together so \
+                the paravirtual Metal path preserves OpenGL's signed clip volume and \
+                glDepthRange. Versions the configured compiler plugin's shader cache. \
+                Native Metal shaders and viewport calls are unchanged.
+                """,
+                target: .dyldSharedCache,
+            ),
+
             VPhonePatchDeclaration(
                 identifier: metalCacheReuseKey,
                 title: "Metal cache version validation",
@@ -438,10 +566,6 @@ public enum FirmwareGuestSystemPatchSet {
                 cache reuse with the same identity and the opt-out path remain intact.
                 """,
                 target: .dyldSharedCache,
-                applicability: VPhonePatchApplicability(
-                    iOSBase: .release(major: 26, minor: 6),
-                    cloudOS: .release(major: 26, minor: 4),
-                ),
             ),
             VPhonePatchDeclaration(
                 identifier: glesPointDraw,
@@ -454,7 +578,6 @@ public enum FirmwareGuestSystemPatchSet {
                 """,
                 target: .dyldSharedCache,
                 applicability: VPhonePatchApplicability(
-                    iOSBase: .release(major: 26, minor: 6),
                     cloudOS: .release(major: 26, minor: 4),
                 ),
             ),
@@ -470,7 +593,6 @@ public enum FirmwareGuestSystemPatchSet {
                 """,
                 target: .dyldSharedCache,
                 applicability: VPhonePatchApplicability(
-                    iOSBase: .release(major: 26, minor: 6),
                     cloudOS: .release(major: 26, minor: 4),
                 ),
             ),
@@ -485,7 +607,6 @@ public enum FirmwareGuestSystemPatchSet {
                 """,
                 target: .dyldSharedCache,
                 applicability: VPhonePatchApplicability(
-                    iOSBase: .release(major: 26, minor: 6),
                     cloudOS: .release(major: 26, minor: 4),
                 ),
             ),
@@ -523,6 +644,19 @@ public enum FirmwareGuestSystemPatchSet {
                 target: .dyldSharedCache,
                 applicability: ios27,
                 bootEssential: true,
+            ),
+            VPhonePatchDeclaration(
+                identifier: textRecognitionANE,
+                title: "Accurate text recognition",
+                summary: """
+                Runs TextRecognition's E5 text detection and recognition models on the paravirtual \
+                Neural Engine, compiled from the host's copies of the same models, which are added \
+                beside the firmware's. Otherwise the guest picks CPU models the iPhone firmware has \
+                no weights for, and accurate recognition fails. Each app compiles the models once, \
+                on its first accurate request.
+                """,
+                target: .dyldSharedCache,
+                applicability: ios27,
             ),
             VPhonePatchDeclaration(
                 identifier: "dyld-exp-mis_trust_auth",
@@ -654,6 +788,7 @@ public enum FirmwareGuestSystemPatchSet {
                 title: "Pairing from guest apps",
                 summary: "Allows apps inside the guest to connect to its pairing control channel and tunnels.",
                 target: .guestExecutable(path: "/usr/libexec/remotepairingdeviced"),
+                applicability: VPhonePatchApplicability(iOSBase: .oneOf([.major(17), .major(18), .major(26), .major(27)])),
             ),
             VPhonePatchDeclaration(
                 identifier: "system-launchd_cache_loader-boot-unsecure_cache_gate",
@@ -714,11 +849,10 @@ public enum FirmwareGuestSystemPatchSet {
                 Selects AppleMetalGLRenderer's UPPER_LEFT viewport and scissor path at \
                 process startup because the paravirtual GPU does not preserve IOSurface \
                 attachment yInvert, which reverses GLES screen output. An explicit \
-                environment setting takes precedence. Validated on iOS 26.6 with cloudOS 26.4.
+                environment setting takes precedence.
                 """,
                 target: .guestFile(path: glesUpperLeftMarker),
                 applicability: VPhonePatchApplicability(
-                    iOSBase: .release(major: 26, minor: 6),
                     cloudOS: .release(major: 26, minor: 4),
                 ),
             ),
@@ -788,10 +922,6 @@ public enum FirmwareGuestSystemPatchSet {
                 existing caches are retained.
                 """,
                 target: .guestExecutable(path: "/\(paravirtGPUDriverPath)"),
-                applicability: VPhonePatchApplicability(
-                    iOSBase: .release(major: 26, minor: 6),
-                    cloudOS: .release(major: 26, minor: 4),
-                ),
             ),
             VPhonePatchDeclaration(
                 identifier: "system-vphoned-boot-install",
@@ -923,7 +1053,9 @@ public enum FirmwareGuestSystemPatchSet {
                 the hinge angle chosen by display.posture, so CoreMotion's angle manager — and \
                 through it CoreDevice's hingeAngle stream — reads the fold state instead of \
                 finding no sensor. With the foldable product identity patch, which is what makes \
-                CoreMotion look for the service. Foldable guests only.
+                CoreMotion look for the service. On iOS 27.2 it also loads into locationd, where \
+                the device-state relay then passes on an unchanged angle, so a CoreMotion client \
+                started while the hinge rests gets it. Foldable guests only.
                 """,
                 target: .guestFile(path: "/usr/lib/libvphonehinge.dylib"),
                 applicability: VPhonePatchApplicability(iOSBase: .atLeast(major: 18, minor: 0)),

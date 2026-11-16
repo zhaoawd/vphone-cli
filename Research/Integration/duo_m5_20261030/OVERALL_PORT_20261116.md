@@ -68,3 +68,25 @@ SPTM 新组件改变 Launchpad 的目录契约。固定上游已使用 2.17 系�
 本轮方法目录检查为 200 个方法／0 失败；`run-process-output-tests.sh`、live stub 和 Cryptex result-schema check 均通过。CoreKit 的 cryptexctl 发现／缓存、PCC GPU 和固件目录共 27 项通过。恢复环境选择、NRDUpdated、信任缓存、默认隔离及目录共 95 项通过（`cryptex-patcher-tests.log`）。实际恢复源码 vCPU 策略 8 项再次通过。
 
 包含本组的完整 2.18 Bundle／Launchpad 构建、Bundle 深度严格签名及 CLI 目录读取均通过（`cryptex-bundle-build.log`、`cryptex-launchpad-build.log`、`cryptex-catalog.json`）。集中回归入口为 `Regression/overall-production.zsh`。实际 trusted darwinOS／持久化重启验收未执行。
+
+## 固定 main 的完整归并
+
+以 `6b60c43e` 为已实现基线，归并本地 `main=13169405`。该步骤包含前述功能组以外的上游差异，包括 visionOS、截图裁剪／缩放、location services、GLES depth clipping、文本识别资源、iOS 18 多缓冲区 GPU submit 与图标缓存。文本冲突逐项核对；本记录随本地合并提交保存，未推送或发布。
+
+本地保留：Duo 的 AX 元素上下文点击、`GuestAPI+Gestures`、active-panel 坐标、`display.metrics`、Auto-Lock `never` 兼容参数、旧 X1 聚合收据迁移和残余目录、严格完整转换、DSC 撤销归属、macOS mapping 生命周期测试、RPC 布尔值检查／完整目录声明、process spool、连接代次与取消保护、模板重启竞态修复、`innerScreen`／`VPhoneFoldableDisplayChoice`、FoldDisplay 和 Snapshot。新增 visionOS 预设同步关闭 Duo 的残余 X1 和 inner-cutout 选择；2.18 系列契约保持。
+
+上游新增的无强制执行副作用的 stub 负例继续使用现有 Swift server，未引入 Python。该 fixture 补齐顺序回复、断连和指定 HTTP 状态，136 项 stub 通过。目录 203 个方法／0 失败，逻辑 1,262 项／0 失败，point geometry 回归通过。新 guest 的 transport、X1 task exception、Flutter、visionOS IPC／preference journal、hinge 及 GLES AIR 测试通过。
+
+整组回归保存于 `saved-run.Ux48Ye1J`（首轮自动归并重复 X1 表导致编译失败）和 `saved-run.dJUOw0MP`（去重后 49 项 CoreKit、188 项补丁／目录／撤销通过；完整 Bundle 编译发现安装器 `notApplicable` 参数重复）。相同 X1 表在逐字一致性检查后去重；安装器保留既有参数位置和所有调用归属。修正后完整 Bundle 构建通过（`merged-bundle-fixed-build.log`），严格签名、实际 CLI 选择迁移／导出往返和 Launchpad 完整构建通过。补充 166 项／22 suite 通过；真实 kernel、wakeboardd 和 reference cache fixture 缺失的项目明确跳过。模板／ProcessRunner 56 项、方向保持 10/10、元素点击 API 240 项及原生 AX／几何检查通过。未删除或弱化原有失败断言。
+
+内核参考核对仅针对 `kernelcache.release.vphone600` 范围的 EXC_GUARD 语义。`kernel_symbols.db` 存在两个 kernel 名称，但其 JSON 导出未在 `Research/KernelSymbols/json/` 提供，因此本轮没有独立符号地址证据。按本地 kernel skill 将 XNU 浅克隆至忽略目录 `Research/Reference/xnu`，提交 `f6217f891ac0bb64f3d375211650a4c1ff8ca1ea`；`osfmk/mach/port.h` 定义 `GUARD_TYPE_MACH_PORT=0x1`，`osfmk/kern/exc_guard.h` 的类型字段位于 bit 61–63，与移植的 `movk ... lsl #48` 类型判别一致。该源代码相关性不替代实际固件发现与启动验收。
+
+## 实际 Duo DSC 候选
+
+新的 `duo-overall-20261116` 从已停止的 `duo-txm-remap-20261116` 克隆，使用 `--new-identity`，未启动。其 System 卷以 readonly 连接／挂载，`Writable`、`WritableMedia`、`WritableVolume` 均 false。复制实际 DSC 与现有 undo 后，System 卷和 disk14 连接已卸载；不再保留挂载。
+
+`Regression/framebuffer-cache.mjs` 在宿主工作副本调用实际 Bundle CLI。Duo 27.1 QuartzCore 唯一分支为 `0x1843c4c44`，`88101037` → `1f2003d5`；这些是发现结果，不是补丁中的固定地址。试运行不改变 cache／undo，应用只改变 `.01` 一个 chunk，重复应用不改变字节／收据，撤销后所有 cache 文件（含签名）与输入逐字节哈希相同。
+
+首轮收据断言要求 JSON 表示完全不变，失败原因是原有 `patch-dsc-revert` 会把一个旧 X1 bootstrap 的 32 字节 run 转入 word store。失败日志保留在 `framebuffer-cache-regression.log`。核对表明 bootstrap 原有 228,314 个 word 保留，新增 8 个来自该旧 run；cache-X1 的 24,606,083 个 word 字节哈希不变。保存的回归现在逐项核对旧 word 和这 8 个原始指令、保留其他 JSON 记录及所有 owner，未取消归属断言。修正版 `framebuffer-cache-regression-fixed/report.json` 全部通过；来源 fixture 的 cache 和 undo 哈希也未变化。应用态副本保存在同目录 `cache-applied`。
+
+候选当前报告有 9 项 `update-environment` 待办，涉及 framebuffer、GLES／compiler-cache 和文本识别；逐项列于 `combined-patch-report.json`。继承的 boot-chain DriverKit 收据漂移另列，不通过本次 environment update 改写。trusted darwinOS 仍关闭；SPTM 不适用于此 cloudOS。新的环境安装与两次冷启动组合验收尚未执行，需要为最终 VM 二进制准备新的宿主 AMFI 准入批准。

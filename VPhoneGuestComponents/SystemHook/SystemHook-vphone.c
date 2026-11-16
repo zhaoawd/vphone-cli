@@ -47,6 +47,12 @@ static int vpIsMotionDaemon(const char *path) {
     return vpPathHasSuffix(path, "/usr/libexec/backboardd");
 }
 
+// The device-state relay the hinge feeds, which takes the hinge too; see
+// Hinge/VPhoneHingeRelayResend.h.
+static int vpIsLocationd(const char *path) {
+    return vpPathHasSuffix(path, "/usr/libexec/locationd");
+}
+
 // WebKit runs camera capture for every web page in its GPU process, an XPC
 // service outside any .app, so the app gate below never gives it the camera
 // fix: its AVCaptureSession hit the virtual camera's nil active format and
@@ -287,6 +293,10 @@ __attribute__((constructor)) static void vpLogProcess(void) {
         vpLoadLibrary("fold-display", VP_FOLD_DISPLAY);
         return;
     }
+    if (vpIsLocationd(path)) {
+        vpLoadLibrary("hinge-hook", VP_HINGE_HOOK);
+        return;
+    }
     // libcamfix installs its hooks only when AVFCapture loads, so it is
     // loaded without the AVFoundation check that keeps it out of other apps.
     if (vpIsWebKitGPUProcess(path)) {
@@ -343,5 +353,6 @@ __attribute__((used, section("__DATA,__interpose"))) static const struct {
     {(const void *)vpSpawnP, (const void *)posix_spawnp},
     {(const void *)vpSpawn, (const void *)posix_spawn},
     {(const void *)vpSetSpawnExceptionPortsPreservingX1, (const void *)posix_spawnattr_setexceptionports_np},
+    {(const void *)vpSetTaskExceptionPortsPreservingX1, (const void *)task_set_exception_ports},
     {(const void *)vpExecve, (const void *)execve},
 };

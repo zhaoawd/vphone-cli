@@ -18,6 +18,8 @@
 
 前四组生产接入已分别提交为 `c040e52c`、`4ba8aad6`、`931cc136`、`add61aef`。完整 Bundle、深度严格签名、CLI 目录和 framebuffer verb 通过；Launchpad 和版本契约回归通过。组合候选采用 2.18 系列，最低 Bundle 版本同步提高。Duo 实际 framebuffer／输入组合验收仍待候选准备。独立推进最后一组 Cryptex 的生产接入，不将其加入 Duo 默认计划。见 [整体接入记录](Research/Integration/duo_m5_20261030/OVERALL_PORT_20261116.md)。
 
+归并代码与静态校验完成：Cryptex 保存为 `6b60c43e`，版本／组合校验保存为 `6ad8f6f1`；本记录随 `main=13169405` → Duo 的本地合并提交保存。保留本地 AX／坐标、旧收据、spool、取消／连接代次保护、静态内屏和 FoldDisplay。归并后方法 203／0、逻辑 1,262／0、49 项 CoreKit、188 项补丁／目录、补充 166 项、136 项 Swift stub、56 项模板／ProcessRunner、方向 10/10、元素点击和 guest 测试通过；完整 Bundle／Launchpad、严格签名与实际 CLI 往返通过。新隔离副本 `duo-overall-20261116` 已准备，实际 Duo DSC 的试运行、应用、重复应用、字节级撤销及旧 owner 归属验证通过。原失败日志保留，临时只读挂载已清理。9 项环境更新及两次冷启动组合验收尚未执行；最终候选 AMFI 准入保留批准门。无新恢复或 guest 安装。
+
 后置清单继续保留：内屏 AX 可见性过滤、首次姿态超时、间歇启动／AMFI 拒绝、显示交接与方向细节；LLDB、CMS／真实 profile 热重载、local pairing 协议、App 直接 posix_spawn；旧固件实机矩阵、27.2、Linux FUSE／并发、物理 USB／DFU、WDA 与宿主快捷键。发布准备另列四语手册审阅、Release 产物、Developer ID 签名和 notarization。
 
 ## 2026-11-16 生产移植

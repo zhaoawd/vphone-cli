@@ -37,17 +37,46 @@ invalid-request error, read the source named there instead of guessing keys.
 
 - Coordinates for `input.*` and `ui.element_at` are **screen points** as
   `device.screen` reports, not the pixels used by the socket's `tap`.
-- **force methods** refuse to run unless the params carry `"force":true`:
-  `processes.kill`, `services.stop|disable|remove|signal|unload`,
-  `services.kickstart` with `kill`,
-  `apps.uninstall|unregister|unregister_dir`, `system.respring`,
-  `system.reboot`, `system.shutdown`, `setup.skip`. The flag is the
-  confirmation: use it only for what the user asked.
+- Every `input.*` method takes optional `observe` (boolean, false) and
+  `observe_delay_ms` (integer 0...5000, 300). With `observe: true` the reply
+  gains `observed: {frontmost_bundle_id, frontmost_verified, ui_element_count}`
+  after the delay; `ui_element_count` counts visible `ui.tree` elements and is
+  capped at 500 (500 means 500 or more). A failed observe gives
+  `observed: {observe_error}` and the action still succeeds.
+- **force methods** refuse to run unless the params carry `"force":true`.
+  `methods.list` (no params) lists every method with its params and its
+  `force` value (`always`, `never` or `when:<key>`, as for `services.kickstart`
+  with `kill`); this list is the authority. The flag is the confirmation: use it
+  only for what the user asked. Without it the call fails with `force_required`
+  and the hint `Confirm with the user, then repeat the call with force: true`.
+- **Errors** are `{code, message, hint?}`. BREAKING: codes changed, and a param
+  the method does not list now fails with `invalid_param` (it was dropped before).
+  Read `hint`: it names the fix (the closest param or method, valid values).
+  It is absent when there is none.
+
+  | Code | Meaning |
+  | --- | --- |
+  | `invalid_param` | Missing, malformed, out-of-range or undeclared param |
+  | `not_found` | Target or method does not exist (hint may name the closest method) |
+  | `unavailable` | Platform, OS or component cannot do it |
+  | `force_required` | Repeat with `"force":true` after the user confirms |
+  | `permission` | The OS refused for lack of entitlement or access |
+  | `invalid_operation` | Any other operation failure |
+  | `already_done`, `location_services_off` | Existing codes, unchanged |
 - Results can be large. Methods that read data take `limit`, `max_lines`,
   `max_elements` or a `filter`; use them. A reply in the 8–16 KiB band can be
   lost on close (see [troubleshooting](troubleshooting.md)).
-- Capability flags in `/v1/health` tell which areas this vphoned supports. An
-  `unknown method` error against an older guest means update its environment
+- **Paging.** `apps.list`, `processes.list`, `services.list`, `services.dump`,
+  `files.list`, `files.find`, `apfs.snapshots` and `logs.crashes` return at most
+  `limit` entries (1 to 1000, default 200, so a long list is cut by default). The
+  reply has `total` and `truncated`; when `truncated` is true it has
+  `next_cursor`: pass it as `cursor` for the next page. A bad `limit` or
+  `cursor` fails with code `invalid_param`; on a bad cursor repeat the call without
+  one. `processes.spawn` returns a first page per stream (`max_output_bytes`) and
+  spools the rest; page it with `processes.output` (see below).
+- Capability flags in `/v1/health` tell which areas this vphoned supports (`methods`
+  means it answers `methods.list`). An
+  `not_found` "Unknown method" error against an older guest means update its environment
   ([machines](machines.md)).
 
 ## Device and screen
@@ -56,7 +85,7 @@ invalid-request error, read the source named there instead of guessing keys.
 | --- | --- | --- |
 | `device.info` | none | Snapshot plus network, screen, rotation, brightness, volume, low power, Developer Mode. Start here |
 | `device.snapshot`, `device.screen`, `device.network` | none | Smaller views of the same |
-| `screen.screenshot` | none | Base64 JPEG with `mime_type`, `width`, `height` (1290×2796) |
+| `screen.screenshot` | `max_dimension?` (integer, 1 or more), `quality?` (0.1-1.0), `region?` `{x, y, width, height}` in points | Base64 JPEG at the panel's pixel size (1179×2556 on a new iPhone17,3); `max_dimension` scales the longer side down, `region` crops first. Reply adds `point_width`, `point_height`, `region`; pixel `(px, py)` is point `(region.x + px / coordinate_scale, region.y + py / coordinate_scale)`. Bad values fail with `invalid_param` |
 | `display.brightness`, `audio.volume` | `value?` | Omit `value` to read |
 | `audio.host_latency` | `seconds?` (0-1) | The Mac output latency the guest speaker adds; omit to read. The VM sends it on every connect and output change |
 | `display.rotation`, `display.orientation` | `orientation?` | |
@@ -102,9 +131,9 @@ Selector keys: `text`, `identifier`, `role`, `match` (`contains` by default),
 
 | Method | Params |
 | --- | --- |
-| `apps.list` | `filter?` (`all` default) |
+| `apps.list` | `filter?` (`all` default), `limit?`, `cursor?` (paging) |
 | `apps.search` | `query` |
-| `apps.launch` | `bundle_id`, `url?`. Returns `pid` and `frontmost_verified` |
+| `apps.launch` | `bundle_id`, `url?` |
 | `apps.foreground` | none; reports the verified front app |
 | `apps.terminate` | `bundle_id` |
 | `apps.open_url` | `url`, `bundle_id?` |
@@ -130,9 +159,7 @@ different meaning:
   bundle itself, bypassing installd and the profile checks, and keeps the app's
   own entitlements (so `get-task-allow` survives, which is the way to get a
   debuggable test app in). Its `PlugIns/*.appex` are registered with the app,
-  so extensions (packet tunnels, share sheets, widgets) launch; the result's
-  `plugins` lists them and `unregistered_plugins` any LaunchServices did not
-  take. It proves nothing about installd. To get the file
+  so extensions (packet tunnels, share sheets, widgets) launch. It proves nothing about installd. To get the file
   into the guest, see [guest-layout](guest-layout.md) ("Handing a file to
   vphoned").
 
@@ -144,14 +171,14 @@ Paths are real-root paths. All take `path` unless noted.
 
 | Method | Params |
 | --- | --- |
-| `files.list` | `path` |
-| `files.read` | `path`, `limit?`, `binary?` (base64) |
+| `files.list` | `path`, `limit?`, `cursor?` (paging) |
+| `files.read` | `path`, `limit?`, `binary?` (base64), `offset?` (raw bytes, 0 to 1099511627776, default 0); with `offset` or `limit` the reply adds `total` (file bytes) and, while `truncated`, `next_offset` |
 | `files.write` | `path`, `content`, `encoding?` (`utf8`) |
 | `files.mkdir` | `path` |
 | `files.remove` | `path`, `recursive?` |
 | `files.rename` | `from`, `to` |
 | `files.copy` | `from`, `to` |
-| `files.find` | `root`, `pattern` |
+| `files.find` | `root`, `pattern`, `limit?`, `cursor?` (paging) |
 | `files.symlink` | `target`, `link`, `replace?` |
 | `files.chmod` | `path`, `mode` |
 | `files.chown` | `path`, `owner` |
@@ -169,17 +196,22 @@ are the usual way to hit the reply size problem.
 
 | Method | Params | Notes |
 | --- | --- | --- |
-| `processes.list` | `filter?` | `cpu_seconds`, `start_time`, footprint, jetsam band; a stuck SpringBoard shows ~0 CPU |
+| `processes.list` | `filter?`, `limit?`, `cursor?` (paging) | a stuck SpringBoard shows ~0 CPU |
+| `processes.spawn` | `executable` (`ps`, `launchctl`, `log`), `arguments?`, `timeout_ms?` (3000, 100 to 10000), `max_output_bytes?` (65536, 1 to 65536 per stream), `max_capture_bytes?` (2097152, 1 to 16777216 per stream) | First page per stream cut at a character boundary; `stdout_total` / `stderr_total` (bytes captured), `stdout_truncated` / `stderr_truncated`, `capture_truncated`; when truncated also `output_id` and `output_dir` (a timed-out spawn has neither) |
+| `processes.output` | `output_id`, `stream` (`stdout`, `stderr`), `offset?` (0 to 1099511627776 raw bytes), `limit?` (65536, 1 to 65536), `binary?` (base64 of the raw bytes) | Reply `data`, `total`, `next_offset` while more remains. `files.read` with `offset` on `<output_dir>/stdout` reads the same bytes |
+| `processes.output_release` | `output_id` | Removes the spool. Spools expire after 10 minutes, the spool dir is capped at 64 MiB and the oldest are evicted first; a released, expired or evicted id fails with code `not_found`, so repeat `processes.spawn`; a spawn that cannot fit fails with code `unavailable` ("spool full") |
 | `processes.kill` (force) | `pid`, `signal?` | |
 | `processes.spawn` | `executable` (`ps`, `launchctl`, `log`), `arguments?`, `timeout_ms?` (3000, 100–10000) | Bounded diagnostics, no shell |
 | `memory.jetsam`, `memory.pressure` | none | |
 | `logs.syslog` | `seconds?` (2, max 60), `process?`, `level?` (`all`), `max_lines?` (500) | A bounded capture |
-| `logs.crashes` | `bundle_id?` | Lists reports: `path`, `process`, `size`, `mtime` |
+| `logs.crashes` | `bundle_id?`, `limit?`, `cursor?` (paging) | Lists reports |
 | `logs.crash` | `path` | Reads one report |
-| `services.list` | none | launchd |
+| `services.list` | `limit?`, `cursor?` (paging) | launchd |
+| `apfs.snapshots` | `mount?` (`/`), `limit?`, `cursor?` (paging) | Lists a volume's APFS snapshots |
+| `services.dump` | `limit?`, `cursor?` (paging) | Every service with its description; the daemon builds the full dump, paging shrinks only the reply |
 | `services.status`, `services.print` | `label` | |
 | `services.start`, `services.enable` | `label` | |
-| `services.kickstart` | `label`, `kill?` | `launchctl kickstart`; answers the new `pid`. `kill` (force) replaces a running instance, so a re-deployed daemon runs its new binary; without it a running service is left alone (capability `service_kickstart`) |
+| `services.kickstart` | `label`, `kill?` | `launchctl kickstart`. `kill` (force) replaces a running instance, so a re-deployed daemon runs its new binary; without it a running service is left alone (capability `service_kickstart`) |
 | `services.stop`, `disable`, `remove`, `unload` (force) | `label` | |
 | `launchd.getenv` / `setenv` / `unsetenv` | `key`, `value?` | |
 
@@ -196,7 +228,7 @@ are the usual way to hit the reply size problem.
 | `settings.set` | `domain`, `key`, `value`, `type?` |
 | `settings.delete` | `domain`, `key` |
 | `clipboard.get` / `set` / `clear` | `set` takes `text` |
-| `location.set` / `clear` / `current` | `set` takes latitude/longitude; `set` and `current` fail with `location_services_off` while the guest's Location Services switch is off (vphoned never turns it on); read-back can fail on some guests |
+| `location.set` / `clear` / `current` / `services` | `set` takes latitude/longitude; `current` takes `timeout_ms?` (10000); `set` and `current` fail with `location_services_off` while the guest's Location Services switch is off; `location.services` reads `{enabled}`, and `enabled: true/false` sets the switch and returns the state read back (fails with `operation_failed` if it did not change; idempotent, so re-read with `location.services` before retrying); read-back can fail on some guests |
 | `time.timezone` | none reads `{identifier, automatic, seconds_from_gmt}`; `identifier` (Olson name) pins the zone and turns automatic off; `automatic: true` hands it back to timed. The VM sends the Mac's zone on every connect |
 | `time.clock` | none reads `{time, automatic}` (seconds since 1970; `automatic` is timed's automatic time); `time` (the Mac's time) moves a guest more than a second away onto it unless `automatic` is off, and adds `offset` and `changed`; `automatic` turns automatic time on or off. The VM sends the Mac's time on every connect and every minute, so a time set this way lasts only with `automatic: false` |
 | `notify.post` / `notify.state` | `name`, `state?` |
@@ -255,7 +287,7 @@ and the 401/403/415/502 rules: `Research/vphoned_http_api.md` ("Access control")
 ## Duo RPC contract update (2026-11-15)
 
 Use the running guest's `methods.list` for its supported contract. This branch
-has 197 methods. `processes.spawn` is canonical; `process.spawn` still works.
+includes the Duo display methods. `processes.spawn` is canonical; `process.spawn` still works.
 Timeout parameters use `_ms`; the previous seconds names remain accepted, and
 the canonical name wins when both are supplied. `input.swipe` takes `from`/`to`
 while still accepting the old coordinate fields.

@@ -102,6 +102,11 @@ char * _Null_unspecified vp_homepod_debug_copy_json(const char * _Null_unspecifi
 bool vp_homeview_distance_available(void);
 char * _Null_unspecified vp_homeview_distance_copy_json(const char * _Null_unspecified mode);
 
+/// Native visionOS system-environment immersion. Availability checks artifact
+/// identity and method ABI; each call independently reads back the native level.
+bool vp_visionos_immersion_available(void);
+char * _Null_unspecified vp_visionos_immersion_copy_json(double level, bool apply);
+
 /// Load the IOKit digitizer symbols used for multi-finger injection. Idempotent,
 /// safe to call more than once; returns false (injection then stays a no-op)
 /// on bases that do not expose the private symbols.
@@ -185,9 +190,6 @@ typedef struct {
     double cpu_seconds;
     uint64_t footprint_bytes;
     uint64_t resident_bytes;
-    /// When the process started on the uptime clock (`ProcessInfo.systemUptime`),
-    /// which, unlike `start_time`, a change of the wall clock does not move.
-    double start_uptime;
     bool has_task_info;
 } VPProcessUsage;
 

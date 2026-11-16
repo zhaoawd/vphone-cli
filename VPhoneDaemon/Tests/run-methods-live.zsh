@@ -130,13 +130,51 @@ schema_section() {
 }
 schema_summary() { [ $schema_ran = 0 ] || echo "$sp passed, $sf failed"; }
 
-# Test seam: a stub server stands in for the guest and only the schema comparison runs.
+# --- shared helpers (VM run and test seam) -----------------------------------
+# The daemon answers 200, or 400 for a handler error (APIWire.swift); 401/403 are refusals before the daemon.
+daemon_status() { case $1 in 200|400) return 0 ;; *) return 1 ;; esac; }
+# cu [curl-args]: silent curl with the shared timeouts and the token header file; noauth=1 omits the header.
+cu() { local a=(); [ -n "${noauth-}" ] || a=(-H @"$hdr"); curl -s --connect-timeout 3 --max-time 30 $a "$@"; }
+# rpc <method> <json>: POST /v1/rpc with the token; prints the body, leaves the HTTP status in "$hdr.code".
+# A failed or timed-out request or jq yields an empty value, which fails its check; it never aborts the run.
+rpc() { cu -H "Content-Type: application/json" -w '%{stderr}%{http_code}' -d "$1" "$schema_base/v1/rpc" 2> "$hdr.code" || true; }
+# All string values of a reply, one per line (messages live in nested fields).
+strs() { print -r -- "$1" | jq -r '.. | strings' 2>/dev/null || print -r -- "$1"; }
+J() { jq "$@" 2>/dev/null || true; }
+chk() { total=$((total+1)); if [ "$2" = ok ]; then echo "PASS $1"; else echo "FAIL $1: expected $3 got $4"; fails=$((fails+1)); fi }
+finish() { echo "live: $total checks, $fails failures"; echo "TOTAL_FAILS=$fails"; schema_summary; [ $fails = 0 ] && [ $sf = 0 ]; }
+# guest_closed <reply> <status>: true for no HTTP reply (000 or empty) or the proxy's 502 guest_closed.
+guest_closed() { case $2 in 000|'') return 0 ;; 502) print -r -- "$1" | jq -e '.error.code == "guest_closed"' >/dev/null 2>&1 ;; *) return 1 ;; esac; }
+# unforced <method> <params>: one rpc, retried once when the guest closed without a reply (seen after a vphoned
+# restart; not a leak); sets r and c.
+unforced() {
+  r=$(rpc "{\"method\":\"$1\",\"params\":$2}"); c=$(cat "$hdr.code" 2>/dev/null || true)
+  if guest_closed "$r" "$c"; then
+    echo "RETRY $1 $2: guest closed without a reply"
+    r=$(rpc "{\"method\":\"$1\",\"params\":$2}"); c=$(cat "$hdr.code" 2>/dev/null || true)
+  fi
+}
+# e <method> <params> <message>: an unforced call must answer <message> with status 200/400.
+# A reply to an unforced destructive call without `Pass force` means it may have run: stop at once.
+e() {
+  unforced "$1" "$2"; s=$(strs "$r")
+  if daemon_status "$c" && print -r -- "$s" | grep -qxF -- "$3"; then chk "$1 $2" ok; else chk "$1 $2" bad "'$3' with status 200/400" "status=$c '$s'"; fi
+  case $3 in *'Pass force'*) if ! print -r -- "$s" | grep -qF 'Pass force'; then echo "LEAK: $1 was not refused unforced; stopping"; finish || true; exit 1; fi ;; esac
+}
+
+# Test seam: a stub server stands in for the guest and only the schema comparison runs
+# (or, with VPHONE_LIVE_UNFORCED_CHECK=1, one unforced system.reboot check).
 if [ -n "${VPHONE_LIVE_BASE_URL-}" ]; then
   root=${0:a:h:h:h}
   schema_base=$VPHONE_LIVE_BASE_URL
   sdir=$(mktemp -d); hdr=$sdir/hdr
   trap 'rm -rf "$sdir"' EXIT
   (umask 077; printf 'Authorization: Bearer %s\n' "${VPHONE_LIVE_TOKEN-}" > "$hdr")
+  if [ "${VPHONE_LIVE_UNFORCED_CHECK-}" = 1 ]; then
+    total=0; fails=0
+    e system.reboot '{}' 'Pass force: true to reboot the guest'
+    finish; exit
+  fi
   schema_section
   schema_summary
   [ $sf = 0 ]; exit
@@ -152,8 +190,6 @@ mkdir -p .build; log=$root/.build/methods-vm.log
 tests=$root/VPhoneDaemon/Tests/run-methods-tests.sh
 n_specs=$(zsh "$tests" --specs | wc -l | tr -d ' ')
 n_forces=$(zsh "$tests" --forces | wc -l | tr -d ' ')
-# The daemon answers 200, or 400 for a handler error (APIWire.swift); 401/403 are refusals before the daemon.
-daemon_status() { case $1 in 200|400) return 0 ;; *) return 1 ;; esac; }
 [ -x "$cli" ] || { echo "UNAVAILABLE: no built bundle at $bundle; build the bundle (AGENTS.md Quick Reference) or set VPHONE_BUNDLE"; exit 2; }
 "$cli" host preflight >/dev/null 2>&1 || { echo "UNAVAILABLE: preflight failed; operator must run: sudo $bundle/Contents/MacOS/vphone-escalator allow $bundle/Contents/MacOS/vphone-vm"; exit 2; }
 
@@ -185,8 +221,6 @@ cleanup() {
   if [ -n "$lpid" ] && kill -0 $lpid 2>/dev/null; then kill $lpid 2>/dev/null || true; fi
   rm -rf "$hdr" "$hdr.code" "$sdir"
 }
-# cu [curl-args]: silent curl with the shared timeouts and the token header file; noauth=1 omits the header.
-cu() { local a=(); [ -n "${noauth-}" ] || a=(-H @"$hdr"); curl -s --connect-timeout 3 --max-time 30 $a "$@"; }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
@@ -206,15 +240,7 @@ done
 [ $ok = 1 ] || { echo "UNAVAILABLE: hash not matched in 300s; see $log"; tail -20 "$log"; exit 2; }
 echo "hash matched after ${SECONDS}s"
 
-# rpc <method> <json>: POST /v1/rpc with the token; prints the body, leaves the HTTP status in "$hdr.code".
-# A failed or timed-out request or jq yields an empty value, which fails its check; it never aborts the run.
-rpc() { cu -H "Content-Type: application/json" -w '%{stderr}%{http_code}' -d "$1" http://$addr/v1/rpc 2> "$hdr.code" || true; }
-# All string values of a reply, one per line (messages live in nested fields).
-strs() { print -r -- "$1" | jq -r '.. | strings' 2>/dev/null || print -r -- "$1"; }
-J() { jq "$@" 2>/dev/null || true; }
 total=0; fails=0
-chk() { total=$((total+1)); if [ "$2" = ok ]; then echo "PASS $1"; else echo "FAIL $1: expected $3 got $4"; fails=$((fails+1)); fi }
-finish() { echo "live: $total checks, $fails failures"; echo "TOTAL_FAILS=$fails"; schema_summary; [ $fails = 0 ] && [ $sf = 0 ]; }
 
 # --- capability and catalog -------------------------------------------------
 h=$(cu http://$addr/v1/health || true)
@@ -387,9 +413,12 @@ sl=$(rf "$ss" '.stdout | utf8bytelength')
 if [ "$(rf "$ss" '.stdout_truncated')" = false ] && [ "$(rf "$ss" '.stdout_total')" = "$sl" ] && [ "$(rf "$ss" '.capture_truncated')" = false ] \
    && [ "$(rf "$ss" '(.output_id // empty), (.output_dir // empty)')" = "" ]; then chk "13 short ps spawn: not truncated, no output_id or output_dir" ok
 else chk "13 short ps spawn: not truncated, no output_id or output_dir" bad "flags false, stdout_total $sl, no output_id/output_dir" "$(rf "$ss" '@json')"; fi
-# timed out: the spool is dropped, so no output_id or output_dir
+# timed out: the spool is dropped, so no output_id or output_dir. ps is the only allowed program a trimmed guest has
+# (no /usr/bin/log or /bin/launchctl there), and a full listing can finish inside 100 ms on a fast guest; then there is
+# no timeout to check, which is a SKIP, not a pass.
 ts=$(rpc "{\"method\":\"processes.spawn\",\"params\":{\"executable\":\"ps\",\"arguments\":[\"-axwwo\",\"$pscols\"],\"timeout_ms\":100}}")
-if [ "$(rf "$ts" '.timed_out')" = true ] && [ "$(rf "$ts" '(.output_id // empty), (.output_dir // empty)')" = "" ]; then chk "13 timed-out spawn has no output_id or output_dir" ok
+if [ "$(rf "$ts" '.timed_out')" = false ]; then echo "SKIP 13 timed-out spawn has no output_id or output_dir: ps finished inside 100 ms"
+elif [ "$(rf "$ts" '.timed_out')" = true ] && [ "$(rf "$ts" '(.output_id // empty), (.output_dir // empty)')" = "" ]; then chk "13 timed-out spawn has no output_id or output_dir" ok
 else chk "13 timed-out spawn has no output_id or output_dir" bad "timed_out true, no output_id/output_dir" "$(rf "$ts" '[.timed_out, .output_id, .output_dir] | @json')"; fi
 # default capture with a small max_output_bytes: the cut is not a capture truncation
 ds=$(bigspawn ',"max_output_bytes":100')
@@ -406,13 +435,6 @@ done
 r=$(rpc "{\"method\":\"processes.output\",\"params\":{\"output_id\":\"$rid\",\"stream\":\"stdout\"}}"); s=$(strs "$r"); c=$(cat "$hdr.code" 2>/dev/null || true)
 if [ -n "$rid" ] && [ $back = 1 ] && daemon_status "$c" && print -r -- "$r" | grep -qF '"not_found"' && print -r -- "$s" | grep -qF "$gone"; then chk "13 spool is gone after a vphoned restart" ok
 else chk "13 spool is gone after a vphoned restart" bad "reconnect within 30 s, then not_found $gone" "id=$rid back=$back status=$c '$s'"; fi
-
-e() {
-  local r c s
-  r=$(rpc "{\"method\":\"$1\",\"params\":$2}"); c=$(cat "$hdr.code" 2>/dev/null || true); s=$(print -r -- "$r" | J -r '.error.message // empty')
-  if daemon_status "$c" && print -r -- "$s" | grep -qxF -- "$3"; then chk "$1 $2" ok; else chk "$1 $2" bad "'$3' with status 200/400" "status=$c '$s'"; fi
-  case $3 in *'Pass force'*) if ! print -r -- "$s" | grep -qF 'Pass force'; then echo "LEAK: $1 was not refused unforced; stopping"; finish || true; exit 1; fi ;; esac
-}
 
 # --- the 20 force methods: refused unforced (e, above), a required param is validated before the force refusal
 e processes.kill '{"pid":4242}' 'Pass force: true to send SIGTERM to 4242'
@@ -517,7 +539,7 @@ fa=$(print -r -- "$r1" | J -r "$L"'
 verified=0
 while IFS=$'\t' read -r fm fp fpat; do
   [ -n "$fm" ] || continue
-  r=$(rpc "{\"method\":\"$fm\",\"params\":$fp}"); s=$(strs "$r")
+  unforced "$fm" "$fp"; s=$(strs "$r")
   if print -r -- "$s" | grep -qE -- "$fpat"; then chk "8 $fm force text" ok; verified=$((verified+1))
   elif print -r -- "$s" | grep -qF 'Pass force: true to'; then chk "8 $fm force text" bad "$fpat" "$s"
   elif print -r -- "$r" | jq -e '.. | objects | select(has("error"))' >/dev/null 2>&1; then echo "SKIP 8 $fm force text: params rejected first"
@@ -536,11 +558,13 @@ qc() { local g; g=$(q "$2" "$3" "$4"); [ "$g" = "$5" ] && chk "$1" ok || chk "$1
 # processes.spawn is dispatched, and so is its old name process.spawn.
 qc "processes.spawn dispatched" processes.spawn '{"executable":"ps"}' '.result.executable' /bin/ps
 qc "process.spawn still dispatched" process.spawn '{"executable":"ps"}' '.result.executable' /bin/ps
-# timeout_ms is milliseconds, 100..10000 for processes.spawn; the old timeout_seconds is read as seconds.
+# timeout_ms is milliseconds, 100..10000 for processes.spawn. The old timeout_seconds is read as seconds and dropped when
+# timeout_ms is sent too; names that were never the timeout are refused as unknown params.
 for t in 100 10000; do qc "processes.spawn timeout_ms $t accepted" processes.spawn "{\"executable\":\"ps\",\"timeout_ms\":$t}" '.result.pid | type' number; done
-for t in 99 10001; do qc "processes.spawn timeout_ms $t refused" processes.spawn "{\"executable\":\"ps\",\"timeout_ms\":$t}" '.error.message' 'timeout_ms must be 100–10000'; done
+for t in 99 10001; do qc "processes.spawn timeout_ms $t refused" processes.spawn "{\"executable\":\"ps\",\"timeout_ms\":$t}" '.error | [.code, .message, has("hint")] | tojson' '["invalid_param","timeout_ms must be 100–10000",false]'; done
 qc "process.spawn timeout_seconds 10 is 10000 ms" process.spawn '{"executable":"ps","timeout_seconds":10}' '.result.pid | type' number
 qc "processes.spawn timeout_seconds 11 is 11000 ms, refused" processes.spawn '{"executable":"ps","timeout_seconds":11}' '.error.message' 'timeout_ms must be 100–10000'
+qc "processes.spawn timeout_ms wins over timeout_seconds" processes.spawn '{"executable":"ps","timeout_ms":1000,"timeout_seconds":99}' '.result.pid | type' number
 for k in timeout timeout_s; do qc "processes.spawn $k refused as unknown" processes.spawn "{\"executable\":\"ps\",\"$k\":99999}" '.error.message' "Unknown param: $k"; done
 # script.eval clamps to 1000..600000 ms: 1 ms becomes 1 s (the upper clamp would need a 10 minute script); the old
 # timeout in seconds reaches the same clamp.
@@ -555,6 +579,7 @@ qc "setup.settle poll_ms 1500 echoes 1500 with elapsed_ms" setup.settle '{"timeo
 for p in '1|1000' '99999|30000'; do qc "setup.settle poll_ms ${p%|*} clamps to ${p#*|}" setup.settle "{\"timeout_ms\":0,\"poll_ms\":${p%|*}}" '.result.poll_ms' "${p#*|}"; done
 qc "setup.settle poll_s 30 is 30000 ms" setup.settle '{"timeout_ms":0,"poll_s":30}' '.result | [.poll_ms, .poll_s] | tojson' '[30000,30]'
 qc "setup.settle poll_ms wins over poll_s" setup.settle '{"timeout_ms":0,"poll_ms":2000,"poll_s":30}' '.result.poll_ms' 2000
+qc "setup.settle poll_ms string refused" setup.settle '{"poll_ms":"5000"}' '.error | [.code, .message, .hint] | tojson' '["invalid_param","poll_ms must be a number","Pass poll_ms as a JSON number, not a string"]'
 # the HTTP route follows the rename; the old route still answers.
 for route in processes/spawn process/spawn; do
     [ "$(cu -o /dev/null -w '%{http_code}' -H "Content-Type: application/json" -d '{"executable":"ps"}' http://$addr/v1/$route)" = 200 ] && chk "POST /v1/$route answers" ok || chk "POST /v1/$route answers" bad 200 "not 200"
@@ -571,14 +596,17 @@ t0=$SECONDS; lr=$(rpc '{"method":"location.current","params":{"timeout_ms":300}}
 if print -r -- "$lr" | grep -q location_services_off; then echo "SKIP location.current timeout_ms: Location Services off"
 else [ $((SECONDS - t0)) -lt 5 ] && chk "location.current timeout_ms honoured" ok || chk "location.current timeout_ms honoured" bad "under 5 s" "$((SECONDS - t0)) s"; fi
 # screen.unlock checks timeout_ms (1000..60000) before it presses anything: 999 is refused, so the value is not read as
-# seconds; the old timeout in seconds is converted first (0.5 s is 500 ms, refused the same way).
-qc "screen.unlock timeout_ms 999 refused" screen.unlock '{"timeout_ms":999}' '.error.message' 'timeout_ms must be 1000–60000'
+# seconds; the old timeout in seconds is converted first (0.5 s is 500 ms, refused the same way). Sent together, as
+# the VM window and Launchpad do for an older vphoned, timeout_ms wins and timeout is not an unknown param.
+qc "screen.unlock timeout_ms 999 refused" screen.unlock '{"timeout_ms":999}' '.error | [.code, .message] | tojson' '["invalid_param","timeout_ms must be 1000–60000"]'
 qc "screen.unlock timeout 0.5 s is 500 ms, refused" screen.unlock '{"timeout":0.5}' '.error.message' 'timeout_ms must be 1000–60000'
+qc "screen.unlock timeout_ms 999 wins over timeout 60" screen.unlock '{"timeout_ms":999,"timeout":60}' '.error.message' 'timeout_ms must be 1000–60000'
 qc "ui.wait timeout_ms 300 is milliseconds" ui.wait '{"text":"__no_such_element__","timeout_ms":300}' '(.error.message // "") | contains("must be")' false
 qc "ui.wait timeout 0.3 s is accepted" ui.wait '{"text":"__no_such_element__","timeout":0.3}' '(.error.message // "") | contains("must be")' false
 # ui.wait and ui.wait_gone refuse timeout_ms outside 0..60000 in milliseconds; location.current refuses over 300000.
-for m in ui.wait ui.wait_gone; do for t in -1 60001; do qc "$m timeout_ms $t refused" $m "{\"text\":\"__no_such_element__\",\"timeout_ms\":$t}" '.error.message' 'timeout_ms must be 0–60000'; done; done
-qc "location.current timeout_ms 300001 refused" location.current '{"timeout_ms":300001}' '.error.message' 'timeout_ms must be more than 0 and at most 300000'
+# Each refusal is a coded invalid_param whose message names the range, so it carries no hint.
+for m in ui.wait ui.wait_gone; do for t in -1 60001; do qc "$m timeout_ms $t refused" $m "{\"text\":\"__no_such_element__\",\"timeout_ms\":$t}" '.error | [.code, .message, has("hint")] | tojson' '["invalid_param","timeout_ms must be 0–60000",false]'; done; done
+qc "location.current timeout_ms 300001 refused" location.current '{"timeout_ms":300001}' '.error | [.code, .message, has("hint")] | tojson' '["invalid_param","timeout_ms must be more than 0 and at most 300000",false]'
 # a failed status read carries `message`, and `error` with the same text for older clients.
 # A DNS that answers every name (a fake-IP proxy) gives no failure to check.
 r=$(q network.resolve '{"host":"no-such-host.invalid"}' '.result | if .status == "error" then ([has("message"), .error == .message] | tojson) else "answered: " + .status end')
@@ -587,6 +615,70 @@ case $r in
     *) [ "$r" = '[true,true]' ] && chk "network.resolve failure message and error" ok || chk "network.resolve failure message and error" bad '[true,true]' "$r" ;;
 esac
 qc "script.eval failure message and error" script.eval '{"source":"("}' '.result | [has("message"), .error == .message] | tojson' '[true,true]'
+# --- input observe --------------------
+# Launches Settings (the Home Screen has no verifiable frontmost app, so ui.tree fails there). Mutating: taps the Settings status bar, presses
+# keys and the home button. A failed step prints FAIL, never a silent skip.
+# ob <jq-filter> <reply>: the filter applied to the reply's result object (empty when absent).
+ob() { print -r -- "$2" | J -c "(.result // .) | $1"; }
+OT='{"method":"ui.tree","params":{"visible_only":true,"max_elements":500}}'
+rpc '{"method":"input.button","params":{"name":"home"}}' >/dev/null; sleep 2
+# A freshly booted guest is locked and refuses to unlock for up to ~60 s; retry for up to 100 s.
+for _ in $(seq 20); do [ "$(ob '.locked' "$(rpc '{"method":"screen.unlock"}')")" = false ] && break; sleep 5; done
+rpc '{"method":"apps.launch","params":{"bundle_id":"com.apple.Preferences"}}' >/dev/null
+tc0=
+for _ in 1 2 3 4 5 6 7 8 9 10; do sleep 2; tc0=$(ob '.count' "$(rpc "$OT")"); case $tc0 in ''|*[!0-9]*|0) ;; *) break ;; esac; done
+sx=196; sy=60
+case $tc0 in ''|*[!0-9]*|0) chk "9 Settings ui.tree has elements" bad "an integer > 0" "${tc0:-none}" ;; *) chk "9 Settings ui.tree has elements" ok ;; esac
+# The tap is a harmless status-bar tap in Settings.
+# without observe a tap returns exactly {x, y}.
+r=$(rpc "{\"method\":\"input.tap\",\"params\":{\"x\":$sx,\"y\":$sy}}")
+z=$(ob 'keys | sort' "$r")
+[ "$z" = '["x","y"]' ] && chk "9 input.tap without observe returns exactly x,y" ok || chk "9 input.tap without observe returns exactly x,y" bad '["x","y"]' "${z:-no reply}"
+sleep 1
+# observed tap on Settings keeps x,y and adds observed.
+r=$(rpc "{\"method\":\"input.tap\",\"params\":{\"x\":$sx,\"y\":$sy,\"observe\":true}}")
+[ "$(ob 'keys | sort' "$r")" = '["observed","x","y"]' ] && chk "9 input.tap observe keeps x,y and adds observed" ok || chk "9 input.tap observe keeps x,y and adds observed" bad '["observed","x","y"]' "$(ob 'keys | sort' "$r")"
+z=$(ob '.observed.frontmost_bundle_id' "$r")
+[ "$z" = '"com.apple.Preferences"' ] && chk "9 observed.frontmost_bundle_id is com.apple.Preferences" ok || chk "9 observed.frontmost_bundle_id is com.apple.Preferences" bad '"com.apple.Preferences"' "${z:-none}"
+z=$(ob '.observed.frontmost_verified' "$r")
+[ "$z" = true ] && chk "9 observed.frontmost_verified is true" ok || chk "9 observed.frontmost_verified is true" bad true "${z:-none}"
+oc=$(ob '.observed.ui_element_count' "$r")
+case $oc in ''|*[!0-9]*|0) chk "9 observed.ui_element_count > 0" bad "an integer > 0" "${oc:-none}" ;; *) chk "9 observed.ui_element_count > 0" ok ;; esac
+# a ui.tree call just after reports the same count.
+tc=$(ob '.count' "$(rpc "$OT")")
+[ -n "$oc" ] && [ "$oc" = "$tc" ] && chk "9 observed.ui_element_count equals ui.tree count" ok || chk "9 observed.ui_element_count equals ui.tree count" bad "$oc" "${tc:-none}"
+# input.key with and without observe (a letter key: harmless on any screen).
+r=$(rpc '{"method":"input.key","params":{"name":"a"}}')
+z=$(ob 'keys | sort' "$r")
+[ "$z" = '["dispatched","key"]' ] && chk "9 input.key without observe has no observed" ok || chk "9 input.key without observe has no observed" bad '["dispatched","key"]' "${z:-no reply}"
+r=$(rpc '{"method":"input.key","params":{"name":"a","observe":true}}')
+z=$(ob 'keys | sort' "$r")
+[ "$z" = '["dispatched","key","observed"]' ] && chk "9 input.key observe adds observed" ok || chk "9 input.key observe adds observed" bad '["dispatched","key","observed"]' "${z:-no reply}"
+z=$(ob '.observed | (.frontmost_bundle_id | type) + " " + (.frontmost_verified | type) + " " + (.ui_element_count | type)' "$r")
+[ "$z" = '"string boolean number"' ] && chk "9 input.key observed field types" ok || chk "9 input.key observed field types" bad '"string boolean number"' "${z:-none}"
+# a failed action returns its own error and no observed.
+r=$(rpc '{"method":"input.key","params":{"name":"no-such-key"}}'); e1=$(strs "$r")
+r=$(rpc '{"method":"input.key","params":{"name":"no-such-key","observe":true}}'); e2=$(strs "$r")
+z=$(print -r -- "$r" | J '[.. | objects | select(has("observed"))] | length')
+if [ -n "$e2" ] && [ "$e1" = "$e2" ] && [ "$z" = 0 ]; then chk "9 input.key invalid name with observe: same error, no observed" ok
+else chk "9 input.key invalid name with observe: same error, no observed" bad "the unobserved error and no observed" "plain='$e1' observe='$e2' observed=${z:-?}"; fi
+# delay 5001 is refused before the action runs: the home button must not run, so the screen is unchanged.
+b=$(ob '.count' "$(rpc "$OT")")
+r=$(rpc '{"method":"input.button","params":{"name":"home","observe":true,"observe_delay_ms":5001}}')
+strs "$r" | grep -qxF 'observe_delay_ms must be an integer from 0 to 5000' && chk "9 observe_delay_ms 5001 is invalid-request" ok || chk "9 observe_delay_ms 5001 is invalid-request" bad "observe_delay_ms must be an integer from 0 to 5000" "$(strs "$r")"
+sleep 1; a=$(ob '.count' "$(rpc "$OT")")
+[ -n "$b" ] && [ "$b" = "$a" ] && chk "9 delay 5001 leaves the screen unchanged" ok || chk "9 delay 5001 leaves the screen unchanged" bad "$b" "${a:-none}"
+# observe passes the unknown-param check; any other undeclared param is still refused before the action.
+r=$(rpc '{"method":"input.button","params":{"name":"home","observe":true,"bogus":1}}')
+z=$(print -r -- "$r" | J -r '[.error.code, .error.message] | join(" ")')
+[ "$z" = 'invalid_param Unknown param: bogus' ] && chk "9 input.button observe with a bogus param is Unknown param: bogus" ok || chk "9 input.button observe with a bogus param is Unknown param: bogus" bad 'invalid_param Unknown param: bogus' "${z:-none}"
+rpc '{"method":"input.button","params":{"name":"home"}}' >/dev/null
+# Catalog: exactly the 15 input.* methods, each declaring observe, observe_delay_ms and the observed result key.
+rc=$(rpc '{"method":"methods.list"}')
+n=$(print -r -- "$rc" | J -r "$L"' | [.[] | select(.name | startswith("input."))] | length')
+z=$(print -r -- "$rc" | J -r "$L"' | [.[] | select(.name | startswith("input.")) | select(([.params[].name] | index("observe")) != null and ([.params[].name] | index("observe_delay_ms")) != null and ([.result[].name] | index("observed")) != null) | .name | ltrimstr("input.")] | sort | join(",")')
+want=button,double_tap,drag,hid,key,long_press,paste,pointer,scroll,swipe,tap,touch,touch2,touch_sequence,type
+[ "$n" = 15 ] && [ "$z" = "$want" ] && chk "9 methods.list has 15 input.* methods with observe, observe_delay_ms, observed" ok || chk "9 methods.list has 15 input.* methods with observe, observe_delay_ms, observed" bad "15 input.* methods: $want" "n=${n:-none} with=${z:-none}"
 
 # --- schema comparison of every read-class method ---------------------------
 schema_section

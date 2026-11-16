@@ -385,6 +385,8 @@ final class VPhoneGuestControl {
             if !isConnected {
                 cancelOrientationExpiry()
                 isConnected = true
+                orientationExpiry?.cancel()
+                orientationExpiry = nil
                 print("[control] connected to vphoned HTTP API (iOS \(guestIOSVersion ?? "?"))")
                 onConnect?(guestCapabilities)
                 let instance = info["instance"] as? String
