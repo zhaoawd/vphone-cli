@@ -1,5 +1,7 @@
 # iPhone Duo / M5 integration, 2026-10-30
 
+2026-11-16 status: [overall progress and remaining validation](OVERALL_PORT_20261116.md#当前整体进度).
+
 2026-11-02 follow-up: [ui.tap_element active-panel coordinates](ELEMENT_TAP.md).
 Offline regressions, the full bundle build and 324 App button/touch receipts pass
 on an independent iOS 27.1 Duo VM in native and compatibility layouts. Coverage

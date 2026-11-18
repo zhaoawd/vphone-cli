@@ -16,8 +16,8 @@ capture="${5:-}"
 clock_option="${6:-}"
 capture_args=()
 if [[ -n "$capture" ]]; then
-    [[ "$capture" == --guest=native || "$capture" == --guest=screenshot ]] || {
-        print -u2 'Expected --guest=native or --guest=screenshot'
+    [[ "$capture" == --guest=native || "$capture" == --guest=luma || "$capture" == --guest=screenshot ]] || {
+        print -u2 'Expected --guest=native, --guest=luma or --guest=screenshot'
         exit 2
     }
     capture_args=("$capture")

@@ -88,12 +88,20 @@ for (const name of fs.readdirSync(root).filter(x => /^\d+-\d+-(open|closed)$/.te
             let state = 'unavailable';
             let hash = '';
             if (sample.file) {
-                if (!/^guest-\d+\.(png|jpg)$/.test(sample.file)) throw Error('Unexpected capture filename');
-                const image = spawnSync('ffmpeg', ['-v', 'error', '-threads', '1', '-i', path.join(dir, sample.file),
-                    '-vf', 'scale=64:64:flags=area,format=gray', '-frames:v', '1', '-f', 'rawvideo', '-']);
-                if (image.status !== 0 || image.stdout.length !== pixels) throw Error(`Invalid guest image: ${name}/${sample.file}`);
-                state = isDark(image.stdout) ? 'dark' : 'visible';
-                hash = createHash('sha256').update(image.stdout).digest('hex');
+                if (!/^guest-\d+\.(png|jpg|luma64)$/.test(sample.file)) throw Error('Unexpected capture filename');
+                const file = path.join(dir, sample.file);
+                let luma;
+                if (sample.file.endsWith('.luma64')) {
+                    luma = fs.readFileSync(file);
+                } else {
+                    const image = spawnSync('ffmpeg', ['-v', 'error', '-threads', '1', '-i', file,
+                        '-vf', 'scale=64:64:flags=area,format=gray', '-frames:v', '1', '-f', 'rawvideo', '-']);
+                    if (image.status !== 0) throw Error(`Invalid guest image: ${name}/${sample.file}`);
+                    luma = image.stdout;
+                }
+                if (luma.length !== pixels) throw Error(`Invalid guest luma size: ${name}/${sample.file}`);
+                state = isDark(luma) ? 'dark' : 'visible';
+                hash = createHash('sha256').update(luma).digest('hex');
             }
             printSample(name, 'guest', source?.name ?? 'unknown', source?.display_id ?? '-', state, sample, action,
                 sample.metadata?.reason ?? sample.error ?? '', hash);

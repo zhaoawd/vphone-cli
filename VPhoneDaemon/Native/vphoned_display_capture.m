@@ -136,7 +136,20 @@ static NSDictionary *vpCaptureSource(NSDictionary *layout, NSString **reason) {
     return source;
 }
 
-static NSDictionary *vpCaptureRender(NSDictionary *source, BOOL (^cancelled)(void)) {
+static NSString *vpCaptureLumaGrid(const uint8_t *pixels, size_t width, size_t height, size_t stride) {
+    const size_t side = 64;
+    uint8_t grid[64 * 64];
+    for (size_t y = 0; y < side; y++) {
+        const uint8_t *row = pixels + height * (2 * y + 1) / (2 * side) * stride;
+        for (size_t x = 0; x < side; x++) {
+            const uint8_t *pixel = row + width * (2 * x + 1) / (2 * side) * 4;
+            grid[y * side + x] = (uint8_t)((29 * pixel[0] + 150 * pixel[1] + 77 * pixel[2] + 128) >> 8);
+        }
+    }
+    return [[NSData dataWithBytes:grid length:sizeof(grid)] base64EncodedStringWithOptions:0];
+}
+
+static NSDictionary *vpCaptureRender(NSDictionary *source, BOOL sampleOnly, BOOL (^cancelled)(void)) {
     // This is the same private C ABI and arguments already used by
     // FoldDisplayPanel.m. A void return provides no renderer error status.
     static void (*render)(mach_port_t, CFStringRef, void *, int32_t, int32_t);
@@ -191,8 +204,18 @@ static NSDictionary *vpCaptureRender(NSDictionary *source, BOOL (^cancelled)(voi
         }
         locked = NO;
         if (cancelled()) return vpCaptureUnavailable(@"Capture was cancelled before rendering", @"cancelled");
+        NSTimeInterval renderStarted = NSProcessInfo.processInfo.systemUptime;
         render(0, (__bridge CFStringRef)source[@"name"], surface, 0, 0);
+        NSTimeInterval renderFinished = NSProcessInfo.processInfo.systemUptime;
         if (cancelled()) return vpCaptureUnavailable(@"Capture exceeded its deadline during rendering", @"cancelled");
+        // Only the render needs both layout readings. PNG encoding can
+        // overlap the next panel transition without affecting this raster.
+        NSString *reason = nil;
+        NSDictionary *after = vpCaptureSource(sampleOnly ? vp_display_layout_for_capture() : vp_display_layout(), &reason);
+        if (!after || ![source isEqualToDictionary:after]) {
+            return vpCaptureUnavailable(@"Active display identity or geometry changed during capture", @"source_changed");
+        }
+        if (cancelled()) return vpCaptureUnavailable(@"Capture exceeded its deadline during source validation", @"cancelled");
         if (IOSurfaceLock(surface, kIOSurfaceLockReadOnly, NULL) != KERN_SUCCESS) {
             return vpCaptureUnavailable(@"The rendered native surface could not be read", @"surface_lock_failed");
         }
@@ -210,6 +233,21 @@ static NSDictionary *vpCaptureRender(NSDictionary *source, BOOL (^cancelled)(voi
         if (!changed) {
             return vpCaptureUnavailable(@"The render server left the zero-initialized surface unchanged; content is unverified", @"empty_surface");
         }
+        NSMutableDictionary *result = [@{
+            @"available": @YES, @"width": @(width), @"height": @((NSUInteger)height),
+            @"row_bytes": @((NSUInteger)stride), @"surface_bytes": @((NSUInteger)bytes), @"pixel_format": @"BGRA8",
+            @"rotation_applied": @0, @"orientation_mapping_verified": @NO,
+            @"color_profile_verified": @NO, @"capture_content_verified": @NO,
+            @"renderer": @"CARenderServerRenderDisplay", @"renderer_status": @"private_void_return_no_error_status",
+            @"render_started_uptime": @(renderStarted), @"render_finished_uptime": @(renderFinished),
+            @"source_after": after,
+        } mutableCopy];
+        if (sampleOnly) {
+            NSString *encoded = vpCaptureLumaGrid(base, width, height, stride);
+            result[@"format"] = @"luma64";
+            result[@"base64"] = encoded;
+            return result;
+        }
         colorSpace = CGColorSpaceCreateDeviceRGB();
         provider = CGDataProviderCreateWithData(NULL, base, stride * height, NULL);
         if (colorSpace && provider) {
@@ -225,15 +263,12 @@ static NSDictionary *vpCaptureRender(NSDictionary *source, BOOL (^cancelled)(voi
         }
         if (cancelled()) return vpCaptureUnavailable(@"Capture exceeded its deadline during encoding", @"cancelled");
         NSString *encoded = [png base64EncodedStringWithOptions:0];
-        return @{
-            @"available": @YES, @"format": @"png", @"base64": encoded,
-            @"width": @(width), @"height": @((NSUInteger)height),
-            @"row_bytes": @((NSUInteger)stride), @"surface_bytes": @((NSUInteger)bytes),
-            @"pixel_format": @"BGRA8", @"png_bitmap": @"premultiplied_first_32_little", @"color_space": @"DeviceRGB",
-            @"rotation_applied": @0, @"resized": @NO, @"orientation_mapping_verified": @NO,
-            @"color_profile_verified": @NO, @"capture_content_verified": @NO,
-            @"renderer": @"CARenderServerRenderDisplay", @"renderer_status": @"private_void_return_no_error_status",
-        };
+        result[@"format"] = @"png";
+        result[@"base64"] = encoded;
+        result[@"png_bitmap"] = @"premultiplied_first_32_little";
+        result[@"color_space"] = @"DeviceRGB";
+        result[@"resized"] = @NO;
+        return result;
     } @finally {
         if (destination) CFRelease(destination);
         if (image) CGImageRelease(image);
@@ -244,21 +279,16 @@ static NSDictionary *vpCaptureRender(NSDictionary *source, BOOL (^cancelled)(voi
     }
 }
 
-static NSDictionary *vpCapturePerform(BOOL (^cancelled)(void)) {
+static NSDictionary *vpCaptureAttempt(BOOL sampleOnly, BOOL (^cancelled)(void)) {
     NSString *reason = nil;
-    NSDictionary *before = vpCaptureSource(vp_display_layout(), &reason);
+    NSDictionary *before = vpCaptureSource(sampleOnly ? vp_display_layout_for_capture() : vp_display_layout(), &reason);
     if (!before) return vpCaptureUnavailable(reason, @"source_unavailable");
     if (cancelled()) return vpCaptureUnavailable(@"Capture was cancelled before rendering", @"cancelled");
-    NSDictionary *raster = vpCaptureRender(before, cancelled);
+    NSDictionary *raster = vpCaptureRender(before, sampleOnly, cancelled);
     if (![raster[@"available"] boolValue]) return raster;
-    NSDictionary *after = vpCaptureSource(vp_display_layout(), &reason);
-    if (!after || ![before isEqualToDictionary:after]) {
-        return vpCaptureUnavailable(@"Active display identity or geometry changed during capture", @"source_changed");
-    }
     if (cancelled()) return vpCaptureUnavailable(@"Capture exceeded its response deadline", @"cancelled");
     NSMutableDictionary *result = [raster mutableCopy];
     result[@"source"] = before;
-    result[@"source_after"] = after;
     result[@"identity_binding"] = before[@"hardware_identifier"]
         ? @"matching_nonzero_hardware_uuid_display_id_and_scale_with_unique_render_name"
         : @"matching_display_id_render_name_scale_and_reference_bounds_without_hardware_uuid";
@@ -266,7 +296,21 @@ static NSDictionary *vpCapturePerform(BOOL (^cancelled)(void)) {
     return result;
 }
 
-NSDictionary<NSString *, id> *vp_display_capture_active(void) {
+static NSDictionary *vpCapturePerform(BOOL sampleOnly, BOOL (^cancelled)(void)) {
+    NSDictionary *result = vpCaptureAttempt(sampleOnly, cancelled);
+    NSUInteger attempts = 1;
+    if ([result[@"state"] isEqual:@"source_changed"] && !cancelled()) {
+        // Discard the transitional raster. The retry must bind and render
+        // its own source under the same gate and original deadline.
+        attempts++;
+        result = vpCaptureAttempt(sampleOnly, cancelled);
+    }
+    NSMutableDictionary *report = [result mutableCopy];
+    report[@"source_attempts"] = @(attempts);
+    return report;
+}
+
+NSDictionary<NSString *, id> *vp_display_capture_active(BOOL sampleOnly) {
     dispatch_time_t responseDeadline = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(vpDisplayCaptureTimeout * NSEC_PER_SEC));
     if (NSThread.isMainThread) {
         return vpCaptureUnavailable(@"Native capture requires a background caller", @"main_thread_caller");
@@ -305,7 +349,7 @@ NSDictionary<NSString *, id> *vp_display_capture_active(void) {
                 NSDictionary *report;
                 @try {
                     report = isCancelled() ? vpCaptureUnavailable(@"Queued capture was cancelled before starting", @"cancelled")
-                                           : vpCapturePerform(isCancelled);
+                                           : vpCapturePerform(sampleOnly, isCancelled);
                 } @catch (NSException *exception) {
                     report = vpCaptureUnavailable(exception.reason ?: exception.name, @"exception");
                 }

@@ -113,7 +113,9 @@ enum DeviceMethod: String, GuestMethod {
                                                  .optional("bounds", .object).open(),
                                                  .optional("reference_bounds", .object).open(),
                                                  .optional("point_scale", .number)])
-        case .displayCaptureActive: MethodSpec(summary: "Capture the active display surface as an image with capture diagnostics", result: [.required("available", .boolean),
+        case .displayCaptureActive: MethodSpec(.optional("sample_only", .boolean, "Return a row-major 64×64 grid of 8-bit luma samples as base64 instead of PNG"),
+                                                summary: "Capture the active display surface as a PNG or a 64×64 luma grid",
+                                                result: [.required("available", .boolean),
                                                        .optional("reason", .string),
                                                        .optional("state", .string),
                                                        .optional("format", .string),
@@ -132,8 +134,11 @@ enum DeviceMethod: String, GuestMethod {
                                                        .optional("capture_content_verified", .boolean),
                                                        .optional("renderer", .string),
                                                        .optional("renderer_status", .string),
+                                                       .optional("render_started_uptime", .number),
+                                                       .optional("render_finished_uptime", .number),
                                                        .optional("source", .object).open(),
                                                        .optional("source_after", .object).open(),
+                                                       .optional("source_attempts", .integer),
                                                        .optional("identity_binding", .string),
                                                        .optional("attribution_limit", .string)])
         case .displayExternalStatus: MethodSpec(summary: "Read whether the virtual external display is enabled and its size", result: [.required("enabled", .any),

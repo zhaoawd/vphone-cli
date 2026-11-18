@@ -53,6 +53,7 @@ BOOL vpSceneIsOnInnerDisplay(id scene);
 /// display, or on Main.
 id vpSpringBoardWindowScene(BOOL inner);
 void vpInstallInnerDisplayAdapter(void);
+void vpRefreshPanelOrientationLock(void);
 
 // MARK: - FoldDisplayPanel.m
 

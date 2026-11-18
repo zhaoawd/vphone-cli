@@ -10,18 +10,52 @@ const char *const vpPanelDarkNotification = "fixture.dark";
 static BOOL actualInner;
 static id fixtureDisplay;
 static unsigned offRequests;
+static unsigned orientationRefreshes, nativeTransitions;
 void vpFoldDisplayLog(NSString *line) { (void)line; }
 BOOL vpFoldTraceEnabled(void) { return NO; }
 void vpFoldTrace(NSString *event, void *surface, id layer, NSDictionary *fields) { (void)event; (void)surface; (void)layer; (void)fields; }
 void vpInstallAlwaysOnWakePolicy(void) {}
+void vpRefreshPanelOrientationLock(void) { orientationRefreshes++; }
 id vpSpringBoardWindowScene(BOOL inner) { return inner ? @"inner" : @"cover"; }
 BOOL vpIsInnerDisplay(id display) { return display == fixtureDisplay; }
+static id fixtureCloakView;
+id vpReadObjectIvar(id object, const char *name) {
+    (void)object;
+    return !strcmp(name, "_cloakContentsView") ? fixtureCloakView : nil;
+}
 id vpReadObject(id object, const char *name) {
     (void)object;
     if (!strcmp(name, "primaryWindowScene")) return vpSpringBoardWindowScene(actualInner);
     if (!strcmp(name, "sharedApplication") || !strcmp(name, "displayContentModeCoordinator")) return @"coordinator";
     if (!strcmp(name, "displays")) return @[fixtureDisplay];
     return nil;
+}
+@interface FoldCloakView : NSObject
+@property(nonatomic, strong) id backgroundColor;
+@property(nonatomic, assign) double alpha;
+@end
+@implementation FoldCloakView
+@end
+@interface FoldSnapshotTransitionCoordinator : NSObject
+@property(nonatomic, copy) void (^preflight)(id);
+@property(nonatomic, copy) void (^cloakInstaller)(void);
+- (void)addPreflightActionsFromParticipant:(id)participant actions:(void (^)(id))actions;
+@end
+@implementation FoldSnapshotTransitionCoordinator
+- (void)addPreflightActionsFromParticipant:(id)participant actions:(void (^)(id))actions {
+    (void)participant; self.preflight = actions;
+}
+@end
+static void originalSnapshotHandleTransition(id self, SEL selector, id coordinator, FoldSnapshotTransitionCoordinator *transitionCoordinator) {
+    (void)self; (void)selector; (void)coordinator;
+    transitionCoordinator.cloakInstaller = ^{
+        ((FoldCloakView *)fixtureCloakView).backgroundColor = @"black";
+        ((FoldCloakView *)fixtureCloakView).alpha = 1.0;
+    };
+}
+static BOOL originalDeferEffect(id self, SEL selector, id context) {
+    (void)self; (void)selector; (void)context;
+    return YES;
 }
 @interface FoldPowerControl : NSObject {
 @public unsigned int _display_id;
@@ -50,6 +84,8 @@ id vpReadObject(id object, const char *name) {
 static unsigned nativeCompletions;
 static void perform(id receiver, SEL selector, FoldModeCoordinator *coordinator) {
     (void)receiver; (void)selector;
+    nativeTransitions++;
+    assert(orientationRefreshes == nativeTransitions);
     actualInner=NO;
     if (coordinator.handler) { nativeCompletions++; coordinator.handler(nil,nil); }
 }
@@ -115,5 +151,63 @@ int main(void) { @autoreleasepool {
     dispatch_source_cancel(vpPanelHoldWatch);
     vpPanelHoldWatch=nil;
     vpPanelHold=nil;
-    puts("FoldDisplay panel power: ownership, actual off, wake, native mode, postflight and obsolete completion passed");
+    // Awake transitions keep snapshot cloak transparent and avoid deferring the arriving effect;
+    // panel-off transitions preserve native cloak opacity and defer behavior.
+    FoldCloakView *cloakView = [FoldCloakView new];
+    fixtureCloakView = cloakView;
+    vpOriginalSnapshotHandleTransition = (IMP)originalSnapshotHandleTransition;
+    vpOriginalShouldDeferEffectUntilReveal = (IMP)originalDeferEffect;
+    FoldSnapshotTransitionCoordinator *snapshotCoordinator = [FoldSnapshotTransitionCoordinator new];
+    id dummyHost = [NSObject new];
+    vpSnapshotHandleTransition(dummyHost, sel_registerName("displayContentModeCoordinator:handleDisplayContentModeTransition:"), nil, snapshotCoordinator);
+    assert(snapshotCoordinator.preflight != nil);
+    vpPanelOnAt = 0; vpScreenBlankChangedAt = 0; vpPrimaryAppliedState = 1;
+    snapshotCoordinator.cloakInstaller();
+    snapshotCoordinator.preflight(nil);
+    assert(cloakView.alpha == 0.0);
+    assert(!vpShouldDeferEffectUntilReveal(nil, sel_registerName("_shouldDeferEffectUntilRevealForContext:"), nil));
+    vpPrimaryAppliedState = 0;
+    snapshotCoordinator.cloakInstaller();
+    snapshotCoordinator.preflight(nil);
+    assert([cloakView.backgroundColor isEqual:@"black"] && cloakView.alpha == 1.0);
+    assert(vpShouldDeferEffectUntilReveal(nil, sel_registerName("_shouldDeferEffectUntilRevealForContext:"), nil));
+    // Close swap isolates the departing surface into a veil layer that dissolves
+    // across [swap .. didChange]; open swap removes lingering dissolve layers.
+    Class layerClass = objc_getClass("CALayer");
+    assert(layerClass != Nil);
+    id holdLayer = [layerClass new];
+    CGRect holdBounds = CGRectMake(0, 0, 1200, 2600);
+    ((void (*)(id, SEL, CGRect))objc_msgSend)(holdLayer, sel_registerName("setBounds:"), holdBounds);
+    id shownProbe = [@"shown-probe" mutableCopy];
+    id spareVeil = [@"spare-veil" mutableCopy];
+    vpPanelHoldProbes[0] = (__bridge_retained void *)shownProbe;
+    vpPanelHoldVeilSurface = (__bridge_retained void *)spareVeil;
+    vpPanelHoldProbeShown = 0;
+    vpPanelHold = holdLayer;
+    vpPanelHoldAwaitingChange = YES;
+    vpPrimaryAppliedState = 1;
+    vpCrossfadePanelHoldSwap(NO);
+    assert(vpPanelHoldProbes[0] == (__bridge void *)spareVeil);
+    assert(vpPanelHoldVeilSurface == (__bridge void *)shownProbe);
+    NSArray *sublayers = [holdLayer valueForKey:@"sublayers"];
+    assert(sublayers.count == 1);
+    id veil = sublayers[0];
+    assert([veil valueForKey:@"contents"] == shownProbe);
+    assert([[veil valueForKey:@"opacity"] floatValue] == 0.0f);
+    assert(CGRectEqualToRect(((CGRect (*)(id, SEL))objc_msgSend)(veil, sel_registerName("frame")), holdBounds));
+    id dissolve = ((id (*)(id, SEL, id))objc_msgSend)(veil, sel_registerName("animationForKey:"), @"vpCloseDissolve");
+    assert(dissolve && [[dissolve valueForKey:@"keyPath"] isEqual:@"opacity"]);
+    assert([[dissolve valueForKey:@"fromValue"] isEqual:@1.0] && [[dissolve valueForKey:@"toValue"] isEqual:@0.0]);
+    assert(fabs([[dissolve valueForKey:@"duration"] doubleValue] - 0.24) < 1e-6);
+    assert([[dissolve valueForKey:@"removedOnCompletion"] boolValue]);
+    vpCrossfadePanelHoldSwap(YES);
+    assert([[holdLayer valueForKey:@"sublayers"] count] == 0);
+    CFRelease(vpPanelHoldProbes[0]);
+    CFRelease(vpPanelHoldVeilSurface);
+    vpPanelHoldProbes[0] = NULL;
+    vpPanelHoldVeilSurface = NULL;
+    vpPanelHoldProbeShown = -1;
+    vpPanelHoldAwaitingChange = NO;
+    vpPanelHold = nil;
+    puts("FoldDisplay panel power: ownership, actual off, wake, native mode, postflight, cloak/defer, close dissolve and obsolete completion passed");
 } }

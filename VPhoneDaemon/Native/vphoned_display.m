@@ -280,7 +280,7 @@ static void vpLayoutFinish(NSMutableDictionary *capture, NSMutableDictionary *re
     completion(report);
 }
 
-static void vpLayoutSample(NSMutableDictionary *capture, BOOL (^cancelled)(void),
+static void vpLayoutSample(NSMutableDictionary *capture, double firstRetryInterval, BOOL (^cancelled)(void),
                            void (^completion)(NSDictionary *)) {
     // Yield the main run loop between samples so FrontBoard can deliver its
     // initial state. Sampling and owned-monitor cleanup remain on main.
@@ -302,9 +302,10 @@ static void vpLayoutSample(NSMutableDictionary *capture, BOOL (^cancelled)(void)
     BOOL available = [report[@"available"] boolValue];
     BOOL canObserve = capture[@"owned_monitor"] && ![capture[@"failed"] boolValue];
     if (!available && canObserve && elapsed < 1.2 && !cancelled()) {
-        int64_t delay = (int64_t)(fmin(0.05, 1.2 - elapsed) * NSEC_PER_SEC);
+        double interval = samples == 1 ? firstRetryInterval : 0.05;
+        int64_t delay = (int64_t)(fmin(interval, 1.2 - elapsed) * NSEC_PER_SEC);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay), dispatch_get_main_queue(), ^{
-            @autoreleasepool { vpLayoutSample(capture, cancelled, completion); }
+            @autoreleasepool { vpLayoutSample(capture, firstRetryInterval, cancelled, completion); }
         });
         return;
     }
@@ -315,7 +316,7 @@ static void vpLayoutSample(NSMutableDictionary *capture, BOOL (^cancelled)(void)
     vpLayoutFinish(capture, report, completion);
 }
 
-NSDictionary<NSString *, id> *vp_display_layout(void) {
+static NSDictionary<NSString *, id> *vpDisplayLayout(double firstRetryInterval) {
     dispatch_time_t entered = dispatch_time(DISPATCH_TIME_NOW, 0);
     dispatch_time_t deadline = dispatch_time(entered, 1500 * NSEC_PER_MSEC);
     if (NSThread.isMainThread) {
@@ -343,7 +344,7 @@ NSDictionary<NSString *, id> *vp_display_layout(void) {
         [lock unlock];
         @autoreleasepool {
             NSMutableDictionary *capture = [NSMutableDictionary dictionaryWithObject:@(vpLayoutMonotonicTime()) forKey:@"started_at"];
-            vpLayoutSample(capture, ^BOOL {
+            vpLayoutSample(capture, firstRetryInterval, ^BOOL {
                 [lock lock];
                 BOOL value = cancelled;
                 [lock unlock];
@@ -374,6 +375,16 @@ NSDictionary<NSString *, id> *vp_display_layout(void) {
     NSDictionary *report = result;
     [lock unlock];
     return vpLayoutResponse(report);
+}
+
+NSDictionary<NSString *, id> *vp_display_layout(void) {
+    return vpDisplayLayout(0.05);
+}
+
+NSDictionary<NSString *, id> *vp_display_layout_for_capture(void) {
+    // Continuous sampling checks the layout twice per frame. Give an initial
+    // update already queued on the run loop a chance to arrive early.
+    return vpDisplayLayout(0.008);
 }
 
 static NSDictionary *vpModeDescription(id mode) {

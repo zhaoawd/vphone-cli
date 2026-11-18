@@ -7502,6 +7502,18 @@ trace=0 and original power/rotation settings, followed by normal shutdown
 with no state-file handles. Final source and candidate bundle remain for
 review; see `rollback-final.json` in the task evidence directory.
 
+### Duo rotation lock during fold handoff (2026-11-17)
+
+The existing `system-springboard-cfw-fold_display` component now reads the
+cover's locked interface orientation when the global rotation lock changes
+and before a native content-mode transition. If the inner scene has no
+independent user lock, FoldDisplay converts the interface orientation through
+that scene's native mapping and holds a
+`SBTraitsContinuousFoldDeviceOrientationLockAssertion`. Clearing the global
+lock releases the assertion. The assertion leaves the inner user's persisted
+lock preference intact and uses the system's Snapshot transition policy.
+See [the guest handoff evidence](Integration/duo_m5_20261030/RELIABILITY_123_20261116.md#内屏场景提交与方向仲裁).
+
 ### DSC mapping lifetime and cached worker integration (2026-11-15)
 
 Integrated the final changes from #853 (`2fdcf16c`), #897 (`aa3d1ed9`)

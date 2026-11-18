@@ -35,13 +35,13 @@ const observe = observeOption ? Number(observeOption.slice('--observe='.length))
 const aod = options.includes('--aod');
 const orientations = options.filter(x => !['--lock-rotation', '--match-panel-orientation', '--check-panel', '--guest-clock', '--aod', guestOption, settleOption, observeOption, appOption, pageOption, sweepOption].includes(x));
 if (!socketArg || !outputArg || !/^[a-f0-9]{64}$/.test(expected ?? '') ||
-    (guestOption && !['native', 'screenshot'].includes(guestCapture)) ||
+    (guestOption && !['native', 'luma', 'screenshot'].includes(guestCapture)) ||
     !Number.isInteger(settle) || settle < 0 ||
     !Number.isFinite(observe) || observe < 1 || observe > 12000 || (app && aod) ||
     (pageOption && (app !== 'com.apple.mobilesafari' || !/^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:\d{1,5}\/[a-z0-9-]+$/.test(page))) ||
     !(sweep >= 0 && sweep <= 10) || (app !== undefined && !/^[A-Za-z0-9.-]+$/.test(app)) ||
     !orientations.length || orientations.some(x => !['portrait', 'landscape-left'].includes(x))) {
-    throw Error('Usage: f5-clock.mjs <vphone.sock> <new output> <vphoned SHA-256> [--guest=native|screenshot] [--guest-clock] [--check-panel] [--lock-rotation] [--match-panel-orientation] [--settle=<ms>] [--observe=<ms>] [--app=<bundle id>] [--page=<local probe URL>] [--sweep=<s>] [--aod] <portrait|landscape-left> ...');
+    throw Error('Usage: f5-clock.mjs <vphone.sock> <new output> <vphoned SHA-256> [--guest=native|luma|screenshot] [--guest-clock] [--check-panel] [--lock-rotation] [--match-panel-orientation] [--settle=<ms>] [--observe=<ms>] [--app=<bundle id>] [--page=<local probe URL>] [--sweep=<s>] [--aod] <portrait|landscape-left> ...');
 }
 const socket = fs.realpathSync(socketArg);
 const requestedOutput = path.resolve(outputArg);
@@ -209,19 +209,22 @@ async function sampleBlock(block, orientation) {
                 }
             })();
             const guestSampler = !guestCapture ? null : (async () => {
-                const native = guestCapture === 'native';
+                const native = guestCapture !== 'screenshot';
+                const luma = guestCapture === 'luma';
+                const captureParams = luma ? { sample_only: true } : {};
+                const format = luma ? 'luma64' : 'png';
                 while (!stop) {
                     const sent = now();
                     let sample;
                     try {
-                        const response = await rpc(native ? 'display.capture_active' : 'screen.screenshot');
+                        const response = await rpc(native ? 'display.capture_active' : 'screen.screenshot', captureParams);
                         const received = now();
                         const { base64, data, ...metadata } = response.result ?? {};
                         sample = { sent, received, metadata, error: response.error };
                         const encoded = native ? base64 : data;
                         if (response.ok && typeof encoded === 'string' &&
-                            (native ? metadata.available === true && metadata.format === 'png' : metadata.mime_type === 'image/jpeg')) {
-                            sample.file = `guest-${guestFrames.length}.${native ? 'png' : 'jpg'}`;
+                            (native ? metadata.available === true && metadata.format === format : metadata.mime_type === 'image/jpeg')) {
+                            sample.file = `guest-${guestFrames.length}.${native ? format : 'jpg'}`;
                             fs.writeFileSync(path.join(folder, sample.file), Buffer.from(encoded, 'base64'));
                         }
                     } catch (error) {

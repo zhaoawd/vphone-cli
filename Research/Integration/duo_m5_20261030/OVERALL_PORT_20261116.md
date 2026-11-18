@@ -2,6 +2,34 @@
 
 固定上游：`13169405`。工作分支：`duo-integration-20261030`。已验证的上一批接入保存为本地提交 `119f1529`。本记录区分生产实现、静态回归和运行验收；未推送、发布或修改生产环境。
 
+## 当前整体进度
+
+截至 2026-11-16，固定上游已归并至 `7e18551b`。2.18.0 Bundle 与 Launchpad 构建通过，Bundle 严格签名检查通过。组合运行使用冻结 Bundle 和 `duo-overall-20261116`。九项环境补丁已实际应用，DriverKit 的选择冲突在后续冷启动验收中解决，补丁 pending 为 0。最新本地提交为 `ce38045d`。传统 lockdown 的复测脚本及记录在工作区。
+
+| 项目 | 当前进度 | 证据 |
+| --- | --- | --- |
+| 内屏 AX 可见性 | 修复候选已通过独立冷启动。默认与未过滤查询各三次均为 9/9，两面板实际点击 6/6，AX 上下文命中 15/15，锁屏拒绝通过。验收后目标已恢复原 daemon。 | [AX 冷启动记录](RELIABILITY_123_20261116.md#1-ax-候选独立冷启动) |
+| 显示内容与方向 | 受控 App 六种姿态、24 个颜色点通过。Safari 三次有前提的恢复循环未复现历史方向失败；两组各完成 6/6 次开合交接，MOV 观察窗口均无近黑帧。 | [显示与交接记录](RELIABILITY_123_20261116.md#2-显示内容方向与交接) |
+| 启动稳定性 | 两组三次独立冷启动全部通过，包含首次实际展开、基础检查、设置恢复和正常关机。覆盖同一宿主、Bundle 和目标。 | [启动稳定性记录](RELIABILITY_123_20261116.md#3-启动稳定性) |
+| 鼠标模式 | 宿主回归通过，覆盖默认值、偏好持久化、菜单与 16 组指针策略。 | [鼠标回归记录](FOLLOWUP_AX_SPAWN_20261116.md#鼠标模式回归) |
+| DriverKit | 选择与实际交付一致，pending 由 1 降为 0。计划、收据及实际 DeviceTree 字节未变，独立冷启动复核通过。 | [DriverKit 记录](FOLLOWUP_567_20261116.md#第-5-项driverkit-选择冲突) |
+| App 派生进程 | 独立无沙盒、无容器、无 custom-trust 的 App 中，两种子进程均启动并退出 0。原始签名代码 remap 为 20/20，80 个 alias。原沙盒 App 仍返回 `EPERM`，同 PID 日志记录 `process-fork` 被拒绝。 | [执行上下文记录](FOLLOWUP_567_20261116.md#第-6-项app-的派生进程执行上下文) |
+| LLDB 与配对 | LLDB 附加、读写及恢复通过，受控原地址 inline hook 通过。既有 CoreDevice 配对的通知往返为 3/3。用户确认 Trust 后，传统 lockdown `validate` 退出 0，设备查询读回同一 UDID。 | [第 7 项记录](FOLLOWUP_567_20261116.md#第-7-项lldb修改代码配对与签名输入) |
+
+最近一次实机操作是传统 lockdown 复测。关机前锁屏、熄屏及低电量状态与启动时一致。VM 正常退出 0，磁盘、NVRAM 和 SEP 存储均无打开句柄。证据目录为 `.build/overall-port-20261116/lockdown-run.lcwFt5uI/`。
+
+## 剩余问题与验收缺口
+
+| 项目 | 当前结果与缺口 |
+| --- | --- |
+| Development CMS 与真实描述文件 | 等待 Apple Development 签名的 iOS `.app` 或 `.ipa`，以及授权目标 UDID `0000FE01-C5A51D613717F61A` 的匹配 `.mobileprovision`。宿主代码签名身份检查返回 0。主程序启动、描述文件注册和热重载尚未实机验收。[输入要求](FOLLOWUP_567_20261116.md#cms真实-profile) |
+| 修改后代码页 alias 恢复 RX | `vm_protect` 返回 2，原因未查明。普通 signed code remap 和原地址 inline hook 的结果仅覆盖各自测试路径。[限制记录](FOLLOWUP_567_20261116.md#修改后的代码页-alias-限制) |
+| 显示开合交接 | 修正原生截图源校验时序并增加一次重新绑定。独立副本三轮共 18/18 次交接，14 次重新绑定成功，0 次不可用，MOV 观察窗口无近黑样本。短间隔采样在 400 ms 亮度摘要重复段内记录到目标内屏从全零亮度恢复，FrontBoard 方向也发生变化。近黑原生图和方向过渡的原因未查明。[交接回归](RELIABILITY_123_20261116.md#2026-11-17-显示交接回归) |
+| 历史间歇启动／姿态异常 | 本次六轮未复现。历史事件原因未查明，尚无不同宿主或固件组合的运行证据。[启动稳定性记录](RELIABILITY_123_20261116.md#3-启动稳定性) |
+| 独立 iPad 指针 | 真实指针外观、滚轮、捕获／释放及跨窗口行为待独立 iPad guest 验收。[鼠标回归范围](FOLLOWUP_AX_SPAWN_20261116.md#鼠标模式回归) |
+| 配对覆盖范围 | 传统 lockdown 重启后未复测。当前 `idevicepair list` 未列出目标，按 UDID 查询配对记录可读到有效 HostID。CoreDevice 只验证了既有配对，未测新建配对或未打补丁二进制对照。[配对记录](FOLLOWUP_567_20261116.md#配对协议) |
+| 旧固件与其他环境 | 旧固件恢复、PCC GPU 运行、cloudOS 18 SPTM 实际 IPSW／多 vCPU，以及 iPad 27 实际 DSC 的应用／撤销待对应镜像与独立环境。trusted darwinOS 与 persistent Cryptex 的实际安装及重启持久化尚未本地验收；Duo 27.1 保持关闭 trusted darwinOS。 |
+
 ## 第一组：旧固件与 PCC GPU
 
 生产接入包含 #909 `b41ad87c`、#911 `12378954`，以及必要依赖 `8fadd384`（SE 3）、`24fd20d7`（iOS 18 GPU transport）、`89f325c7`（Home 按钮）。未整体替换 Duo 共享文件。
@@ -140,4 +168,4 @@ node Research/Integration/duo_m5_20261030/Regression/overall-installed-writes.mj
 
 两轮均恢复合盖纵向、Auto-Lock 300 秒、锁屏／熄屏及低电量原值，随后正常关机。最终只读 System 卷和磁盘连接均卸载；`final-images.plist` 与 `post-update-images.plist` 的连接镜像路径列表相同，`final-state-handles.txt` 为空。来源与原始副本未启动或更新；没有擦除恢复、推送或发布。
 
-本轮完成生产整体接入及上述范围的组合验收。内屏 AX 可见性过滤、App 直接 posix_spawn、内容方向像素验证、鼠标菜单模式／iPad pointer 外观、LLDB、CMS／真实 profile、local pairing 协议、trusted darwinOS、旧固件矩阵及其他独立环境继续后置。实际字节与启动通过不能替代这些未执行的工作流，也不证明此前显示交接异常已修复。
+以上为初次组合验收记录。后续实机结果及尚未覆盖的范围见文首的[当前整体进度](#当前整体进度)和[剩余问题与验收缺口](#剩余问题与验收缺口)。

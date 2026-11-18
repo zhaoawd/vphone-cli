@@ -125,7 +125,7 @@ extension GuestAPI {
         case .displayMetrics:
             return GuestDisplayMetrics.report(from: vp_display_layout())
         case .displayCaptureActive:
-            return vp_display_capture_active()
+            return vp_display_capture_active(params["sample_only"] as? Bool == true)
         case .displayExternalStatus:
             return try GuestAPIError.inBandFailure(vp_external_display_status(), as: { .unavailable($0) })
         case .displayExternalDiagnostics:

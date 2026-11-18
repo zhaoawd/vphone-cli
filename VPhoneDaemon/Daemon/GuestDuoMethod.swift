@@ -59,11 +59,15 @@ enum GuestDuoMethod: String, CaseIterable {
                      .init("display_id", .integer, optional: true), .init("bounds", .object, optional: true),
                      .init("reference_bounds", .object, optional: true), .init("point_scale", .number, optional: true)])
         case .capture:
-            return ("Capture the active display surface as a PNG, or report why it is unavailable.", [],
+            return ("Capture the active display surface as a PNG or a 64×64 luma grid.",
+                    [.init("sample_only", .boolean, optional: true)],
                     [.init("available", .boolean), .init("reason", .string, optional: true),
                      .init("state", .string, optional: true), .init("format", .string, optional: true),
                      .init("base64", .string, optional: true), .init("width", .integer, optional: true),
                      .init("height", .integer, optional: true), .init("identity_binding", .string, optional: true),
+                     .init("render_started_uptime", .number, optional: true),
+                     .init("render_finished_uptime", .number, optional: true),
+                     .init("source_attempts", .integer, optional: true),
                      .init("source", .object, optional: true), .init("source_after", .object, optional: true)])
         case .orientation:
             return ("Read the interface orientation and available device pose.", [],

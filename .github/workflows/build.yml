@@ -218,6 +218,7 @@ jobs:
           zsh VPhoneDaemon/Tests/run-render-server-lifecycle-tests.zsh
           zsh Research/Integration/duo_m5_20261030/Regression/test-runtime-cleanup.zsh
           node Research/Integration/duo_m5_20261030/Regression/test-display-marker-pixels.mjs
+          node --test Research/Integration/duo_m5_20261030/Regression/test-f5-source-report.mjs
           node Research/Integration/duo_m5_20261030/Regression/test-followup-evidence.mjs
 
       - name: Guest component tests

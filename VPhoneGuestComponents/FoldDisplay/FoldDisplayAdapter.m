@@ -2,6 +2,7 @@
 // content mode resolver so the hinge can move content onto it.
 
 #import "FoldDisplayPrivate.h"
+#include <notify.h>
 
 static id vpInnerIdentity;
 
@@ -269,6 +270,75 @@ static void vpInstallPanelOrientation(void) {
     method_setImplementation(orientation, (IMP)vpPanelOrientation);
 }
 
+// The global rotation lock is applied to the cover. The inner scene has its
+// own user lock and can briefly arbitrate from the previous device orientation
+// when a fold arrives before the new orientation. Hold the cover's locked
+// interface orientation through the inner pipeline without persisting an inner
+// user preference.
+static id vpInheritedOrientationAssertion;
+static id vpInheritedOrientationScene;
+static NSInteger vpInheritedInterfaceOrientation;
+
+static void vpReleaseInheritedOrientation(void) {
+    id assertion = vpInheritedOrientationAssertion;
+    vpInheritedOrientationAssertion = nil;
+    vpInheritedOrientationScene = nil;
+    vpInheritedInterfaceOrientation = 0;
+    SEL invalidate = sel_registerName("invalidate");
+    Method method = class_getInstanceMethod(object_getClass(assertion), invalidate);
+    if (method && strcmp(method_getTypeEncoding(method), "v16@0:8") == 0)
+        ((void (*)(id, SEL))objc_msgSend)(assertion, invalidate);
+}
+
+void vpRefreshPanelOrientationLock(void) {
+    id cover = vpReadObject(vpSpringBoardWindowScene(NO), "orientationLockManager");
+    id scene = vpSpringBoardWindowScene(YES);
+    id inner = vpReadObject(scene, "orientationLockManager");
+    SEL isLocked = sel_registerName("isUserLocked");
+    SEL lockedOrientation = sel_registerName("lockedInterfaceOrientation");
+    Method coverLock = class_getInstanceMethod(object_getClass(cover), isLocked);
+    Method innerLock = class_getInstanceMethod(object_getClass(inner), isLocked);
+    Method orientation = class_getInstanceMethod(object_getClass(cover), lockedOrientation);
+    BOOL canInherit = coverLock && innerLock && orientation &&
+        strcmp(method_getTypeEncoding(coverLock), "B16@0:8") == 0 &&
+        strcmp(method_getTypeEncoding(innerLock), "B16@0:8") == 0 &&
+        strcmp(method_getTypeEncoding(orientation), "q16@0:8") == 0 &&
+        ((BOOL (*)(id, SEL))objc_msgSend)(cover, isLocked) &&
+        !((BOOL (*)(id, SEL))objc_msgSend)(inner, isLocked);
+    NSInteger requested = canInherit
+        ? ((NSInteger (*)(id, SEL))objc_msgSend)(cover, lockedOrientation) : 0;
+    if (vpInheritedOrientationAssertion && scene == vpInheritedOrientationScene &&
+        requested == vpInheritedInterfaceOrientation) return;
+    vpReleaseInheritedOrientation();
+    if (requested < 1 || requested > 4) return;
+
+    id traits = vpReadObject(scene, "traitsPipelineManager");
+    SEL acquire = sel_registerName("acquireContinuousFoldDeviceOrientationLock:");
+    SEL convert = sel_registerName("deviceOrientationForSystemSpaceOrientation:");
+    Method acquisition = class_getInstanceMethod(object_getClass(traits), acquire);
+    Method conversion = class_getInstanceMethod(object_getClass(scene), convert);
+    if (!acquisition || strcmp(method_getTypeEncoding(acquisition), "@24@0:8q16") != 0 ||
+        !conversion || strcmp(method_getTypeEncoding(conversion), "q24@0:8q16") != 0) return;
+    NSInteger device = ((NSInteger (*)(id, SEL, NSInteger))objc_msgSend)(scene, convert, requested);
+    if (device < 1 || device > 4) return;
+
+    id assertion = ((id (*)(id, SEL, NSInteger))objc_msgSend)(traits, acquire, device);
+    if (!assertion) return;
+    vpInheritedOrientationAssertion = assertion;
+    vpInheritedOrientationScene = scene;
+    vpInheritedInterfaceOrientation = requested;
+}
+
+static void vpObservePanelOrientationLock(void) {
+    int token;
+    notify_register_dispatch("com.apple.springboard.orientationlock", &token, dispatch_get_main_queue(), ^(int changed) {
+        uint64_t state;
+        if (notify_get_state(changed, &state) != NOTIFY_STATUS_OK) return;
+        if (state) vpRefreshPanelOrientationLock();
+        else vpReleaseInheritedOrientation();
+    });
+}
+
 // MARK: - installation
 
 // Installed before SpringBoard's display monitor reads the render displays.
@@ -279,6 +349,7 @@ void vpInstallInnerDisplayAdapter(void) {
     vpInstallInnerScreenCorners();
     vpInstallInnerIdentityEncode();
     vpInstallPanelOrientation();
+    vpObservePanelOrientationLock();
     // Type 0 without the FrontBoard scope is a second UIKit-main-like
     // display, so no scope means no adapter.
     Method configurationInit = class_getInstanceMethod(objc_getClass("FBSDisplayConfiguration"),

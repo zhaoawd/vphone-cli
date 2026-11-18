@@ -5,6 +5,7 @@
 #import "FoldDisplayPrivate.h"
 #include <notify.h>
 #include <math.h>
+#include <os/lock.h>
 
 static void vpShowInnerDisplay(BOOL shown);
 static void vpFollowInnerPages(void);
@@ -233,6 +234,12 @@ static void vpSharedScanoutTransition(id self, SEL selector, long long state, id
 // left lit for 3 s after a swap, and without this the scanout went on showing
 // it (black) until then.
 static IMP vpOriginalPerformContentModeTransition, vpOriginalHandlePrimarySwap;
+static IMP vpOriginalSnapshotHandleTransition, vpOriginalShouldDeferEffectUntilReveal;
+
+static BOOL vpPanelAwakeFoldEligible(void) {
+    NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
+    return vpPrimaryAppliedState && now - vpPanelOnAt >= 1 && !vpScreenBlanked() && now - vpScreenBlankChangedAt >= 1;
+}
 
 static void vpApplyPanelOwner(void) {
     vpApplyPanelStates(nil, nil);
@@ -265,14 +272,15 @@ static NSString *vpTransitionStyleName(id transitionCoordinator) {
 }
 
 static void vpFollowContentModeTransition(id self, SEL selector, id transitionCoordinator) {
+    vpRefreshPanelOrientationLock();
     NSString *style = vpTransitionStyleName(transitionCoordinator);
     if (vpFoldTraceEnabled()) {
         vpFoldTrace(@"transition_perform", NULL, nil, @{@"owner": @(vpInnerOwnedPanel),
             @"coordinator": NSStringFromClass([transitionCoordinator class]), @"transition_style": style ?: @"unavailable"});
     }
-    vpSetFoldFadeToBlack(!vpPrimaryAppliedState || NSProcessInfo.processInfo.systemUptime - vpPanelOnAt < 1);
-    NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
-    if (vpPrimaryAppliedState && now - vpPanelOnAt >= 1 && !vpScreenBlanked() && now - vpScreenBlankChangedAt >= 1) {
+    BOOL awake = vpPanelAwakeFoldEligible();
+    vpSetFoldFadeToBlack(!awake);
+    if (awake) {
         vpHoldPanel();
         vpWatchNativePanelContent();
     }
@@ -305,14 +313,60 @@ static void vpFollowPrimarySwap(id self, SEL selector, id coordinator, id from, 
     // This also covers a swap not seen at the transition entry. A frame
     // rendered as the screen wakes may be the one
     // from before it blanked (bde6440c), so only a fold made awake is held.
-    NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
-    BOOL eligible = vpPrimaryAppliedState && now - vpPanelOnAt >= 1 && !vpScreenBlanked() && now - vpScreenBlankChangedAt >= 1;
-    if (vpFoldTraceEnabled()) vpFoldTrace(@"swap", NULL, nil, @{@"eligible": @(eligible), @"owner": @(vpInnerOwnedPanel),
-        @"panel_on_age": @(now - vpPanelOnAt), @"blank_changed_age": @(now - vpScreenBlankChangedAt)});
+    BOOL eligible = vpPanelAwakeFoldEligible();
+    if (vpFoldTraceEnabled()) {
+        NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
+        vpFoldTrace(@"swap", NULL, nil, @{@"eligible": @(eligible), @"owner": @(vpInnerOwnedPanel),
+            @"panel_on_age": @(now - vpPanelOnAt), @"blank_changed_age": @(now - vpScreenBlankChangedAt)});
+    }
     if (eligible)
         vpHoldPanel();
     ((void (*)(id, SEL, id, id, id, id))vpOriginalHandlePrimarySwap)(self, selector, coordinator, from, to, lockProvider);
     vpApplyPanelOwner();
+}
+
+// SBContinuousFoldSnapshotCoordinator._installCloakForConfiguration: is
+// objc_direct and cannot be swizzled directly; it runs inside the coordinator's
+// phase -1 preflight action. Registering a phase 0 preflight action right after
+// handleDisplayContentModeTransition: neutralizes the opaque black cloak view
+// before the first CoreAnimation commit while preserving overlay lifetime.
+static void vpClearSnapshotCloak(id snapshotCoordinator) {
+    if (!vpPanelAwakeFoldEligible()) return;
+    id contentsView = vpReadObjectIvar(snapshotCoordinator, "_cloakContentsView");
+    if (!contentsView) return;
+    id clear = vpReadObject(objc_getClass("UIColor"), "clearColor");
+    if (clear) ((void (*)(id, SEL, id))objc_msgSend)(contentsView, sel_registerName("setBackgroundColor:"), clear);
+    ((void (*)(id, SEL, double))objc_msgSend)(contentsView, sel_registerName("setAlpha:"), 0.0);
+    if (vpFoldTraceEnabled()) vpFoldTrace(@"cloak_cleared", NULL, nil, @{@"owner": @(vpInnerOwnedPanel)});
+}
+
+static void vpSnapshotHandleTransition(id self, SEL selector, id coordinator, id transitionCoordinator) {
+    if (vpOriginalSnapshotHandleTransition)
+        ((void (*)(id, SEL, id, id))vpOriginalSnapshotHandleTransition)(self, selector, coordinator, transitionCoordinator);
+    SEL preflight = sel_registerName("addPreflightActionsFromParticipant:actions:");
+    Method addPreflight = transitionCoordinator
+        ? class_getInstanceMethod(object_getClass(transitionCoordinator), preflight) : NULL;
+    if (!addPreflight || strcmp(method_getTypeEncoding(addPreflight), "v32@0:8@16@?24") != 0) return;
+    static id cloakParticipant;
+    if (!cloakParticipant) cloakParticipant = [NSObject new];
+    __weak id weakSelf = self;
+    ((void (*)(id, SEL, id, id))objc_msgSend)(transitionCoordinator, preflight, cloakParticipant, ^(id context) {
+        (void)context;
+        id strongSelf = weakSelf;
+        if (strongSelf) vpClearSnapshotCloak(strongSelf);
+    });
+}
+
+// Without an opaque cloak on the arriving panel, deferring the arriving
+// fold effect until didChange leaves Main (close) or Inner (open) static
+// across [swap .. didChange]. Run the native effect immediately when awake
+// so blur and perspective track live instead of stalling between displays.
+static BOOL vpShouldDeferEffectUntilReveal(id self, SEL selector, id context) {
+    BOOL deferred = vpOriginalShouldDeferEffectUntilReveal
+        ? ((BOOL (*)(id, SEL, id))vpOriginalShouldDeferEffectUntilReveal)(self, selector, context)
+        : NO;
+    if (!deferred) return NO;
+    return !vpPanelAwakeFoldEligible();
 }
 
 static void vpInstallContentModeOwnership(void) {
@@ -331,6 +385,22 @@ static void vpInstallContentModeOwnership(void) {
         return;
     }
     vpOriginalHandlePrimarySwap = method_setImplementation(swap, (IMP)vpFollowPrimarySwap);
+    Method snapshotTransition = class_getInstanceMethod(objc_getClass("SBContinuousFoldSnapshotCoordinator"),
+        sel_registerName("displayContentModeCoordinator:handleDisplayContentModeTransition:"));
+    const char *snapshotEncoding = snapshotTransition ? method_getTypeEncoding(snapshotTransition) : NULL;
+    if (!snapshotEncoding || strcmp(snapshotEncoding, "v32@0:8@16@24") != 0) {
+        vpFoldDisplayLog([NSString stringWithFormat:@"inner display: snapshot transition ABI unavailable (%s)", snapshotEncoding ?: "missing"]);
+    } else {
+        vpOriginalSnapshotHandleTransition = method_setImplementation(snapshotTransition, (IMP)vpSnapshotHandleTransition);
+    }
+    Method defer = class_getInstanceMethod(objc_getClass("SBContinuousFoldController"),
+        sel_registerName("_shouldDeferEffectUntilRevealForContext:"));
+    const char *deferEncoding = defer ? method_getTypeEncoding(defer) : NULL;
+    if (!deferEncoding || (strcmp(deferEncoding, "B24@0:8@16") != 0 && strcmp(deferEncoding, "c24@0:8@16") != 0)) {
+        vpFoldDisplayLog([NSString stringWithFormat:@"inner display: fold effect defer ABI unavailable (%s)", deferEncoding ?: "missing"]);
+    } else {
+        vpOriginalShouldDeferEffectUntilReveal = method_setImplementation(defer, (IMP)vpShouldDeferEffectUntilReveal);
+    }
 }
 
 void vpInstallSharedPanel(void) {
@@ -466,15 +536,19 @@ static void vpReleaseInnerPanelSurfaces(void) {
 // release after two nonblack probes, with a 2 s content deadline. The outer
 // 12 s deadline covers the public 10 s sweep and 2 s for arriving content.
 // Panel-off/screen blanking still releases immediately.
-static id vpPanelHold, vpPanelHoldContext;
+static id vpPanelHold, vpPanelHoldContext, vpPanelHoldInnerHost;
 static NSString *vpPanelHoldDisplayName;
 static uint32_t vpPanelHoldDisplayId;
 static BOOL (*vpRenderDisplayClients)(mach_port_t, CFStringRef, uint32_t, const uint32_t *, void *, int32_t, int32_t);
-static void *vpPanelHoldSurface, *vpPanelHoldProbes[3];
+static void *vpPanelHoldSurface, *vpPanelHoldVeilSurface, *vpPanelHoldProbes[3];
 static int vpPanelHoldProbeShown = -1;
 static double vpPanelHoldSince;
 static dispatch_source_t vpPanelHoldWatch;
-static BOOL vpPanelHoldProbing; // main thread only
+static dispatch_queue_t vpPanelHoldProbeQueue;
+static NSData *vpPanelHoldClients;
+static NSData *vpPanelHoldFallbackClients;
+static BOOL vpPanelHoldSwapped, vpPanelHoldInnerHostActive;
+static os_unfair_lock vpPanelHoldLock = OS_UNFAIR_LOCK_INIT;
 static unsigned vpPanelHoldReadyFrames;
 static BOOL vpPanelHoldAwaitingChange;
 static unsigned long vpPanelHoldTargetEpoch;
@@ -519,31 +593,47 @@ static BOOL vpSurfaceHasContent(void *surface) {
 }
 
 static void vpReleasePanelHold(NSString *reason) {
+    os_unfair_lock_lock(&vpPanelHoldLock);
     if (vpPanelHoldWatch) {
         dispatch_source_cancel(vpPanelHoldWatch);
         vpPanelHoldWatch = nil;
     }
-    if (!vpPanelHold) return;
-    if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_off_request", NULL, vpPanelHold,
-        @{@"generation": @(vpPanelHoldGeneration), @"reason": reason, @"owner": @(vpInnerOwnedPanel)});
-    Class transaction = objc_getClass("CATransaction");
-    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
-    ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
-    ((void (*)(id, SEL, id))objc_msgSend)(vpPanelHoldContext, sel_registerName("setLayer:"), nil);
-    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+    if (!vpPanelHold) {
+        os_unfair_lock_unlock(&vpPanelHoldLock);
+        return;
+    }
+    id hold = vpPanelHold;
+    id context = vpPanelHoldContext;
+    unsigned long generation = vpPanelHoldGeneration;
     vpPanelHold = nil;
     vpPanelHoldGeneration++;
     // The render server may still show the old contents for this commit, and
     // a probe render may still be running into its surface.
     void *surface = vpPanelHoldSurface;
+    void *veilSurface = vpPanelHoldVeilSurface;
     void *probe0 = vpPanelHoldProbes[0], *probe1 = vpPanelHoldProbes[1], *probe2 = vpPanelHoldProbes[2];
     vpPanelHoldSurface = NULL;
+    vpPanelHoldVeilSurface = NULL;
     memset(vpPanelHoldProbes, 0, sizeof(vpPanelHoldProbes));
     vpPanelHoldProbeShown = -1;
-    dispatch_queue_t queue = vpInnerPanelQueue;
+    vpPanelHoldClients = nil;
+    vpPanelHoldFallbackClients = nil;
+    vpPanelHoldInnerHostActive = NO;
+    vpPanelHoldSwapped = NO;
+    os_unfair_lock_unlock(&vpPanelHoldLock);
+    vpPanelHoldInnerHost = nil;
+    if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_off_request", NULL, hold,
+        @{@"generation": @(generation), @"reason": reason, @"owner": @(vpInnerOwnedPanel)});
+    Class transaction = objc_getClass("CATransaction");
+    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
+    ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
+    ((void (*)(id, SEL, id))objc_msgSend)(context, sel_registerName("setLayer:"), nil);
+    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+    dispatch_queue_t queue = vpPanelHoldProbeQueue ?: vpInnerPanelQueue;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (surface) CFRelease(surface);
-        dispatch_async(queue, ^{
+        if (veilSurface) CFRelease(veilSurface);
+        if (queue) dispatch_async(queue, ^{
             if (probe0) CFRelease(probe0);
             if (probe1) CFRelease(probe1);
             if (probe2) CFRelease(probe2);
@@ -660,6 +750,7 @@ static void vpHoldPanel(void) {
         vpPanelHoldReadyFrames = 0;
         vpPanelHoldAwaitingChange = YES;
         vpPanelHoldUsesNativeLifecycle = NO;
+        vpPanelHoldSwapped = NO;
         vpPanelHoldTargetEpoch++;
         vpPanelHoldSurface = surface;
         vpPanelHoldSince = NSDate.date.timeIntervalSince1970;
@@ -675,81 +766,320 @@ static void vpHoldPanel(void) {
     }
 }
 
+static NSData *vpCollectCoverFallbackClients(uint32_t displayId) {
+    id cover = vpSpringBoardWindowScene(NO);
+    SEL windowsSel = sel_registerName("windows");
+    if (!cover || ![cover respondsToSelector:windowsSel]) return nil;
+    static NSSet *allowed;
+    if (!allowed) allowed = [NSSet setWithObjects:
+        @"_SBWallpaperSecureWindow", @"SBHomeScreenWindow", @"SBFloatingDockWindow",
+        @"SBFolderWindow", @"SBStatusBarWindow", nil];
+    struct VPFallbackClient { uint32_t cid; float level; } items[32];
+    size_t count = 0;
+    SEL hiddenSel = sel_registerName("isHidden");
+    SEL idSel = sel_registerName("contextId");
+    SEL displaySel = sel_registerName("displayId");
+    SEL levelSel = sel_registerName("level");
+    for (id window in ((id (*)(id, SEL))objc_msgSend)(cover, windowsSel)) {
+        if (![allowed containsObject:NSStringFromClass([window class])]) continue;
+        if ([window respondsToSelector:hiddenSel] && ((BOOL (*)(id, SEL))objc_msgSend)(window, hiddenSel)) continue;
+        id context = vpReadObject(vpReadObject(window, "layer"), "context");
+        if (!context) continue;
+        uint32_t cid = ((uint32_t (*)(id, SEL))objc_msgSend)(context, idSel);
+        if (!cid || ((uint32_t (*)(id, SEL))objc_msgSend)(context, displaySel) != displayId) continue;
+        float level = ((float (*)(id, SEL))objc_msgSend)(context, levelSel);
+        if (!isfinite(level)) level = 0;
+        if (count < sizeof(items) / sizeof(items[0])) items[count++] = (struct VPFallbackClient){cid, level};
+    }
+    if (!count) return nil;
+    for (size_t i = 1; i < count; i++) {
+        struct VPFallbackClient key = items[i];
+        size_t j = i;
+        while (j > 0 && items[j - 1].level > key.level) {
+            items[j] = items[j - 1];
+            j--;
+        }
+        items[j] = key;
+    }
+    NSMutableData *data = [NSMutableData dataWithCapacity:count * sizeof(uint32_t)];
+    for (size_t i = 0; i < count; i++) [data appendBytes:&items[i].cid length:sizeof(uint32_t)];
+    return [data copy];
+}
+
+static void vpRefreshPanelHoldClients(void) {
+    if (!vpPanelHoldContext) return;
+    NSMutableData *clients = [NSMutableData data];
+    uint32_t holdIdentifier = ((uint32_t (*)(id, SEL))objc_msgSend)(vpPanelHoldContext, sel_registerName("contextId"));
+    CFStringRef *nameKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayName");
+    CFStringRef *displayableKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayable");
+    for (id context in vpReadObject(objc_getClass("CAContext"), "allContexts")) {
+        uint32_t identifier = ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("contextId"));
+        NSDictionary *options = vpReadObject(context, "options");
+        // Hosted window contexts are drawn by their displayable parent.
+        // Rendering them directly bypasses that parent's visibility.
+        if (!displayableKey || ![options[(__bridge NSString *)*displayableKey] boolValue]) continue;
+        NSString *name = nameKey ? options[(__bridge NSString *)*nameKey] : nil;
+        if (identifier == holdIdentifier || (name && ![name isEqual:vpPanelHoldDisplayName]) ||
+            ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("displayId")) != vpPanelHoldDisplayId) continue;
+        if (identifier) [clients appendBytes:&identifier length:sizeof(identifier)];
+    }
+    BOOL postSwapAwaiting = vpPanelHoldSwapped && vpPanelHoldAwaitingChange && vpPanelAwakeFoldEligible();
+    NSData *fallbackClients = (postSwapAwaiting && !vpInnerOwnedPanel)
+        ? vpCollectCoverFallbackClients(vpPanelHoldDisplayId) : nil;
+    os_unfair_lock_lock(&vpPanelHoldLock);
+    vpPanelHoldClients = [clients copy];
+    vpPanelHoldFallbackClients = fallbackClients;
+    os_unfair_lock_unlock(&vpPanelHoldLock);
+}
+
 // Render the native physical panel without the hold, for either direction.
 static void vpWatchNativePanelContent(void) {
-    if (!vpPanelHold || vpPanelHoldWatch) return;
+    if (!vpPanelHold) return;
+    vpRefreshPanelHoldClients();
+    if (vpPanelHoldWatch) return;
     if (!vpPanelHoldProbes[0]) {
         id main = vpReadObject(objc_getClass("CADisplay"), "mainDisplay");
         CGSize pixels = ((CGRect (*)(id, SEL))objc_msgSend)(main, sel_registerName("bounds")).size;
         for (int index = 0; index < 3; index++) vpPanelHoldProbes[index] = vpCreatePanelSurface(pixels);
+        vpPanelHoldVeilSurface = vpCreatePanelSurface(pixels);
     }
-    if (!vpPanelHoldProbes[0] || !vpPanelHoldProbes[1] || !vpPanelHoldProbes[2] || !vpRenderDisplay) {
+    if (!vpPanelHoldProbes[0] || !vpPanelHoldProbes[1] || !vpPanelHoldProbes[2] || !vpPanelHoldVeilSurface || !vpRenderDisplay) {
         vpReleasePanelHold(@"inner display not observable");
         return;
     }
+    if (!vpPanelHoldProbeQueue) {
+        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, 0);
+        vpPanelHoldProbeQueue = dispatch_queue_create("com.vphone.folddisplay.panel-probe", attr);
+    }
     unsigned long generation = vpPanelHoldGeneration;
-    vpPanelHoldWatch = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
-    dispatch_source_set_timer(vpPanelHoldWatch, DISPATCH_TIME_NOW, NSEC_PER_SEC / 60, NSEC_PER_SEC / 240);
-    dispatch_source_set_event_handler(vpPanelHoldWatch, ^{
-        if (vpPanelHoldProbing || generation != vpPanelHoldGeneration) return;
-        vpPanelHoldProbing = YES;
+    os_unfair_lock_lock(&vpPanelHoldLock);
+    vpPanelHoldWatch = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, vpPanelHoldProbeQueue);
+    dispatch_source_t watch = vpPanelHoldWatch;
+    os_unfair_lock_unlock(&vpPanelHoldLock);
+    dispatch_source_set_timer(watch, DISPATCH_TIME_NOW, NSEC_PER_SEC / 60, NSEC_PER_SEC / 240);
+    dispatch_source_set_event_handler(watch, ^{
+        os_unfair_lock_lock(&vpPanelHoldLock);
+        if (generation != vpPanelHoldGeneration || vpPanelHoldWatch != watch || !vpPanelHold) {
+            os_unfair_lock_unlock(&vpPanelHoldLock);
+            return;
+        }
         int next = (vpPanelHoldProbeShown + 1) % 3;
         void *probe = vpPanelHoldProbes[next];
         unsigned long epoch = vpPanelHoldTargetEpoch;
-        BOOL awaitingChange = vpPanelHoldAwaitingChange;
-        CFRetain(probe);
-        NSMutableData *clients = [NSMutableData data];
-        uint32_t holdIdentifier = ((uint32_t (*)(id, SEL))objc_msgSend)(vpPanelHoldContext, sel_registerName("contextId"));
-        CFStringRef *nameKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayName");
-        CFStringRef *displayableKey = dlsym(RTLD_DEFAULT, "kCAContextDisplayable");
-        for (id context in vpReadObject(objc_getClass("CAContext"), "allContexts")) {
-            uint32_t identifier = ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("contextId"));
-            NSDictionary *options = vpReadObject(context, "options");
-            // Hosted window contexts are drawn by their displayable parent.
-            // Rendering them directly bypasses that parent's visibility.
-            if (!displayableKey || ![options[(__bridge NSString *)*displayableKey] boolValue]) continue;
-            NSString *name = nameKey ? options[(__bridge NSString *)*nameKey] : nil;
-            if (identifier == holdIdentifier || (name && ![name isEqual:vpPanelHoldDisplayName]) ||
-                ((uint32_t (*)(id, SEL))objc_msgSend)(context, sel_registerName("displayId")) != vpPanelHoldDisplayId) continue;
-            if (identifier) [clients appendBytes:&identifier length:sizeof(identifier)];
-        }
+        NSData *clients = vpPanelHoldClients;
+        NSData *fallbackClients = vpPanelHoldFallbackClients;
+        BOOL innerHostWaiting = vpPanelHoldInnerHostActive && vpPanelHoldAwaitingChange;
         NSString *displayName = vpPanelHoldDisplayName;
-        dispatch_async(vpInnerPanelQueue, ^{
-            BOOL rendered = clients.length && vpRenderDisplayClients(0, (__bridge CFStringRef)displayName,
-                (uint32_t)(clients.length / sizeof(uint32_t)), clients.bytes, probe, 0, 0);
-            BOOL drawn = rendered && vpSurfaceHasContent(probe);
-            if (drawn && vpFoldTraceEnabled()) vpFoldTrace(awaitingChange ? @"hold_frame_update" : @"target_content_detected", probe, nil,
-                @{@"generation": @(generation), @"display": displayName, @"client_count": @(clients.length / sizeof(uint32_t))});
-            CFRelease(probe);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                vpPanelHoldProbing = NO;
-                if (generation != vpPanelHoldGeneration || !vpPanelHoldWatch) return;
-                if (epoch != vpPanelHoldTargetEpoch) return;
-                if (drawn) {
-                    Class transaction = objc_getClass("CATransaction");
-                    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
-                    ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
-                    ((void (*)(id, SEL, id))objc_msgSend)(vpPanelHold, sel_registerName("setContents:"), (__bridge id)probe);
-                    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
-                    vpPanelHoldProbeShown = next;
-                }
-                if (vpPanelHoldAwaitingChange) { vpPanelHoldReadyFrames = 0; return; }
+        if (!probe || innerHostWaiting) {
+            os_unfair_lock_unlock(&vpPanelHoldLock);
+            return;
+        }
+        CFRetain(probe);
+        os_unfair_lock_unlock(&vpPanelHoldLock);
+
+        BOOL rendered = clients.length && vpRenderDisplayClients(0, (__bridge CFStringRef)displayName,
+            (uint32_t)(clients.length / sizeof(uint32_t)), clients.bytes, probe, 0, 0);
+        BOOL drawn = rendered && vpSurfaceHasContent(probe);
+        if (!drawn && fallbackClients.length) {
+            rendered = vpRenderDisplayClients(0, (__bridge CFStringRef)displayName,
+                (uint32_t)(fallbackClients.length / sizeof(uint32_t)), fallbackClients.bytes, probe, 0, 0);
+            drawn = rendered && vpSurfaceHasContent(probe);
+        }
+
+        os_unfair_lock_lock(&vpPanelHoldLock);
+        BOOL accepted = (generation == vpPanelHoldGeneration && vpPanelHoldWatch == watch && vpPanelHold && epoch == vpPanelHoldTargetEpoch);
+        BOOL awaitingChange = vpPanelHoldAwaitingChange;
+        BOOL releaseAfter = NO;
+        unsigned long releaseEpoch = 0;
+        if (accepted) {
+            if (drawn) {
+                Class transaction = objc_getClass("CATransaction");
+                ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
+                ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
+                ((void (*)(id, SEL, id))objc_msgSend)(vpPanelHold, sel_registerName("setContents:"), (__bridge id)probe);
+                ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+                ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("flush"));
+                vpPanelHoldProbeShown = next;
+            }
+            if (awaitingChange) {
+                vpPanelHoldReadyFrames = 0;
+            } else {
                 vpPanelHoldReadyFrames = drawn ? vpPanelHoldReadyFrames + 1 : 0;
-                if (vpPanelHoldReadyFrames < 2) return;
-                dispatch_source_cancel(vpPanelHoldWatch);
-                vpPanelHoldWatch = nil;
-                vpReleasePanelHoldAfter(1.0 / 30, @"native panel content drawn");
+                if (vpPanelHoldReadyFrames >= 2) {
+                    dispatch_source_cancel(watch);
+                    vpPanelHoldWatch = nil;
+                    releaseAfter = YES;
+                    releaseEpoch = epoch;
+                }
+            }
+        }
+        os_unfair_lock_unlock(&vpPanelHoldLock);
+        if (accepted && drawn && vpFoldTraceEnabled()) vpFoldTrace(awaitingChange ? @"hold_frame_update" : @"target_content_detected", probe, nil,
+            @{@"generation": @(generation), @"display": displayName, @"client_count": @(clients.length / sizeof(uint32_t))});
+        CFRelease(probe);
+        if (releaseAfter) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (generation == vpPanelHoldGeneration && releaseEpoch == vpPanelHoldTargetEpoch)
+                    vpReleasePanelHoldAfter(1.0 / 30, @"native panel content drawn");
             });
-        });
+        }
     });
-    dispatch_resume(vpPanelHoldWatch);
+    dispatch_resume(watch);
+}
+
+// On close, cover's auxiliary overlay stays opaque black until reveal (~200 ms after swap).
+// Hide it without animation while awake cover ownership activates, and unhide on open
+// or panel-off transitions so SpringBoard's open dimming remains intact.
+static void vpSetCoverAuxiliaryHidden(BOOL hidden) {
+    if (hidden && !vpPanelAwakeFoldEligible()) return;
+    Class auxClass = objc_getClass("SBWindowSceneAuxiliaryContentWindow");
+    id cover = vpSpringBoardWindowScene(NO);
+    SEL windowsSel = sel_registerName("windows");
+    if (!auxClass || !cover || ![cover respondsToSelector:windowsSel]) return;
+    void (^apply)(void) = ^{
+        Class transaction = objc_getClass("CATransaction");
+        if (transaction) {
+            ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
+            ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
+        }
+        for (id window in ((id (*)(id, SEL))objc_msgSend)(cover, windowsSel)) {
+            if (![window isKindOfClass:auxClass]) continue;
+            ((void (*)(id, SEL, BOOL))objc_msgSend)(window, sel_registerName("setHidden:"), hidden);
+            id layer = vpReadObject(window, "layer");
+            if (layer) {
+                ((void (*)(id, SEL))objc_msgSend)(layer, sel_registerName("removeAllAnimations"));
+                if (hidden) ((void (*)(id, SEL, float))objc_msgSend)(layer, sel_registerName("setOpacity:"), 0.0f);
+            }
+        }
+        if (transaction) {
+            ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+            if (objc_getClass("UIView")) ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("flush"));
+        }
+    };
+    Class uiView = objc_getClass("UIView");
+    SEL withoutAnim = sel_registerName("performWithoutAnimation:");
+    if (uiView && [uiView respondsToSelector:withoutAnim]) {
+        ((void (*)(id, SEL, void (^)(void)))objc_msgSend)(uiView, withoutAnim, apply);
+    } else {
+        apply();
+    }
+}
+
+static void vpClearPanelHoldVeils(id hold) {
+    os_unfair_lock_lock(&vpPanelHoldLock);
+    vpPanelHoldInnerHostActive = NO;
+    os_unfair_lock_unlock(&vpPanelHoldLock);
+    vpPanelHoldInnerHost = nil;
+    if (!hold || ![hold respondsToSelector:sel_registerName("sublayers")]) return;
+    NSArray *sublayers = ((id (*)(id, SEL))objc_msgSend)(hold, sel_registerName("sublayers"));
+    if (!sublayers.count) return;
+    Class transaction = objc_getClass("CATransaction");
+    if (!transaction) return;
+    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
+    ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
+    for (id sub in [sublayers copy]) ((void (*)(id, SEL))objc_msgSend)(sub, sel_registerName("removeFromSuperlayer"));
+    ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+}
+
+static void vpAttachInnerHoldHost(id hold) {
+    uint32_t hosted = vpInnerPagesContext();
+    Class hostClass = objc_getClass("CALayerHost");
+    CGSize innerPixels = vpInnerDisplayPixels();
+    if (!hold || !hosted || !hostClass || innerPixels.width < 1 || innerPixels.height < 1 ||
+        ![hold respondsToSelector:sel_registerName("bounds")] ||
+        ![hold respondsToSelector:sel_registerName("insertSublayer:atIndex:")]) return;
+    CGRect bounds = ((CGRect (*)(id, SEL))objc_msgSend)(hold, sel_registerName("bounds"));
+    if (bounds.size.width < 1 || bounds.size.height < 1) return;
+    BOOL turned = innerPixels.width > innerPixels.height;
+    CGSize upright = turned ? CGSizeMake(innerPixels.height, innerPixels.width) : innerPixels;
+    CGAffineTransform transform = CGAffineTransformConcat(
+        turned ? CGAffineTransformMakeRotation(-M_PI_2) : CGAffineTransformIdentity,
+        CGAffineTransformMakeScale(bounds.size.width / upright.width, bounds.size.height / upright.height));
+    Class transaction = objc_getClass("CATransaction");
+    if (transaction) {
+        ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
+        ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
+    }
+    if (vpPanelHoldInnerHost) ((void (*)(id, SEL))objc_msgSend)(vpPanelHoldInnerHost, sel_registerName("removeFromSuperlayer"));
+    id host = [hostClass new];
+    ((void (*)(id, SEL, uint32_t))objc_msgSend)(host, sel_registerName("setContextId:"), hosted);
+    ((void (*)(id, SEL, CGRect))objc_msgSend)(host, sel_registerName("setBounds:"), (CGRect){CGPointZero, innerPixels});
+    ((void (*)(id, SEL, CGPoint))objc_msgSend)(host, sel_registerName("setPosition:"), CGPointMake(CGRectGetMidX(bounds), CGRectGetMidY(bounds)));
+    ((void (*)(id, SEL, CGAffineTransform))objc_msgSend)(host, sel_registerName("setAffineTransform:"), transform);
+    ((void (*)(id, SEL, id, unsigned))objc_msgSend)(hold, sel_registerName("insertSublayer:atIndex:"), host, 0);
+    if (transaction) {
+        ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+        if (objc_getClass("UIView")) ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("flush"));
+    }
+    vpPanelHoldInnerHost = host;
+    os_unfair_lock_lock(&vpPanelHoldLock);
+    vpPanelHoldInnerHostActive = YES;
+    os_unfair_lock_unlock(&vpPanelHoldLock);
+}
+
+// Keep an unshared departing IOSurface in a child veil layer while probes (or the hosted
+// inner context) update underneath, crossfading across [swap .. didChange].
+static void vpCrossfadePanelHoldSwap(BOOL innerOwns) {
+    id hold = nil;
+    void *departing = NULL;
+    os_unfair_lock_lock(&vpPanelHoldLock);
+    hold = vpPanelHold;
+    if (hold && vpPanelHoldAwaitingChange && vpPanelAwakeFoldEligible() && (!innerOwns || vpInnerPagesContext())) {
+        if (!innerOwns && vpPanelHoldProbeShown >= 0 && vpPanelHoldProbeShown < 3 &&
+            vpPanelHoldVeilSurface && vpPanelHoldProbes[vpPanelHoldProbeShown]) {
+            departing = vpPanelHoldProbes[vpPanelHoldProbeShown];
+            vpPanelHoldProbes[vpPanelHoldProbeShown] = vpPanelHoldVeilSurface;
+            vpPanelHoldVeilSurface = departing;
+        } else {
+            departing = vpPanelHoldSurface;
+        }
+    }
+    if (departing) CFRetain(departing);
+    os_unfair_lock_unlock(&vpPanelHoldLock);
+    vpClearPanelHoldVeils(hold);
+    if (!hold || !departing) {
+        if (departing) CFRelease(departing);
+        return;
+    }
+    if (innerOwns) vpAttachInnerHoldHost(hold);
+    Class layerClass = objc_getClass("CALayer");
+    Class animationClass = objc_getClass("CABasicAnimation");
+    Class transaction = objc_getClass("CATransaction");
+    if (layerClass && animationClass && transaction &&
+        [hold respondsToSelector:sel_registerName("bounds")] &&
+        [hold respondsToSelector:sel_registerName("addSublayer:")]) {
+        CGRect bounds = ((CGRect (*)(id, SEL))objc_msgSend)(hold, sel_registerName("bounds"));
+        id veil = [layerClass new];
+        ((void (*)(id, SEL, CGRect))objc_msgSend)(veil, sel_registerName("setFrame:"), bounds);
+        ((void (*)(id, SEL, id))objc_msgSend)(veil, sel_registerName("setContents:"), (__bridge id)departing);
+        ((void (*)(id, SEL, float))objc_msgSend)(veil, sel_registerName("setOpacity:"), 0.0f);
+        id anim = ((id (*)(id, SEL, id))objc_msgSend)(animationClass, sel_registerName("animationWithKeyPath:"), @"opacity");
+        ((void (*)(id, SEL, id))objc_msgSend)(anim, sel_registerName("setFromValue:"), @1.0);
+        ((void (*)(id, SEL, id))objc_msgSend)(anim, sel_registerName("setToValue:"), @0.0);
+        ((void (*)(id, SEL, double))objc_msgSend)(anim, sel_registerName("setDuration:"), innerOwns ? 0.30 : 0.24);
+        ((void (*)(id, SEL, BOOL))objc_msgSend)(anim, sel_registerName("setRemovedOnCompletion:"), YES);
+        ((void (*)(id, SEL, id))objc_msgSend)(anim, sel_registerName("setFillMode:"), @"backwards");
+        ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("begin"));
+        ((void (*)(id, SEL, BOOL))objc_msgSend)(transaction, sel_registerName("setDisableActions:"), YES);
+        ((void (*)(id, SEL, id))objc_msgSend)(hold, sel_registerName("addSublayer:"), veil);
+        ((void (*)(id, SEL, id, id))objc_msgSend)(veil, sel_registerName("addAnimation:forKey:"), anim, @"vpCloseDissolve");
+        ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("commit"));
+        if (objc_getClass("UIView")) ((void (*)(id, SEL))objc_msgSend)(transaction, sel_registerName("flush"));
+        if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_close_dissolve", departing, nil, @{@"generation": @(vpPanelHoldGeneration)});
+    }
+    CFRelease(departing);
 }
 
 static void vpPanelHoldFollowOwner(BOOL innerOwns) {
+    vpSetCoverAuxiliaryHidden(!innerOwns);
     if (!vpPanelHold) return;
+    os_unfair_lock_lock(&vpPanelHoldLock);
     if (!vpPanelHoldUsesNativeLifecycle) vpPanelHoldAwaitingChange = NO;
+    vpPanelHoldSwapped = YES;
     vpPanelHoldReadyFrames = 0;
     vpPanelHoldTargetEpoch++;
+    os_unfair_lock_unlock(&vpPanelHoldLock);
+    vpCrossfadePanelHoldSwap(innerOwns);
     if (!vpPanelHoldUsesNativeLifecycle) vpReleasePanelHoldAfter(2.0, @"native content timeout");
     if (vpFoldTraceEnabled()) vpFoldTrace(@"hold_follow_owner", NULL, nil, @{@"generation": @(vpPanelHoldGeneration), @"inner_owns": @(innerOwns)});
     vpWatchNativePanelContent();
@@ -762,9 +1092,13 @@ static void vpNativeContentModeDidChange(unsigned long generation, BOOL finished
     }
     vpApplyPanelStates(nil, nil);
     if (vpPanelHold && generation == vpPanelHoldGeneration) {
-        if (finished) vpPanelHoldAwaitingChange = NO;
-        vpPanelHoldReadyFrames = 0;
-        vpPanelHoldTargetEpoch++;
+        os_unfair_lock_lock(&vpPanelHoldLock);
+        if (vpPanelHold && generation == vpPanelHoldGeneration) {
+            if (finished) vpPanelHoldAwaitingChange = NO;
+            vpPanelHoldReadyFrames = 0;
+            vpPanelHoldTargetEpoch++;
+        }
+        os_unfair_lock_unlock(&vpPanelHoldLock);
         if (finished) vpReleasePanelHoldAfter(2.0, @"native content timeout");
         vpWatchNativePanelContent();
     }
@@ -845,7 +1179,12 @@ static void vpShowInnerDisplay(BOOL shown) {
         vpFoldDisplayLog([NSString stringWithFormat:@"inner display: shown=1 panel={%.0f, %.0f} inner={%.0f, %.0f} turned=%d scale={%.3f, %.3f} fps=%ld context=%u",
             panel.size.width, panel.size.height, inner.width, inner.height, turned,
             panel.size.width / upright.width, panel.size.height / upright.height, (long)fps, hosted]);
-        if (hosted) return;
+        if (hosted) {
+            if (vpPanelHold && vpPanelHoldSwapped && vpPanelHoldAwaitingChange && vpInnerOwnedPanel && !vpPanelHoldInnerHostActive) {
+                vpAttachInnerHoldHost(vpPanelHold);
+            }
+            return;
+        }
         vpInnerPanelRefresh = ((id (*)(id, SEL, id, SEL))objc_msgSend)(objc_getClass("CADisplayLink"),
             sel_registerName("displayLinkWithTarget:selector:"), [VPhoneInnerPanelRefresh new], @selector(refresh:));
         // The panel shows the inner display at the panel's top rate, asked for
@@ -869,5 +1208,6 @@ static void vpFollowInnerPages(void) {
         if (!vpInnerPanelRoot || vpInnerPagesContext() == vpInnerPanelContextId) return;
         vpShowInnerDisplay(NO);
         vpShowInnerDisplay(YES);
+        if (vpPanelHold && vpPanelHoldSwapped && vpPanelHoldAwaitingChange && vpInnerOwnedPanel) vpAttachInnerHoldHost(vpPanelHold);
     });
 }

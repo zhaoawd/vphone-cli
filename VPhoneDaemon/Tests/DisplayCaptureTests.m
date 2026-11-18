@@ -1,12 +1,18 @@
 #import <Foundation/Foundation.h>
 #import "../Native/Include/VphonedNative.h"
 #define vp_display_layout productionDisplayLayout
+#define vp_display_layout_for_capture productionDisplayLayoutForCapture
 #import "../Native/vphoned_display.m"
+#undef vp_display_layout_for_capture
 #undef vp_display_layout
+#import <ImageIO/ImageIO.h>
 #include <dlfcn.h>
 static void *captureSymbol(void *handle, const char *name);
+static bool finalizeFixture(CGImageDestinationRef destination);
 #define dlsym captureSymbol
+#define CGImageDestinationFinalize finalizeFixture
 #import "../Native/vphoned_display_capture.m"
+#undef CGImageDestinationFinalize
 #undef dlsym
 #include <stdatomic.h>
 #include <stdio.h>
@@ -17,6 +23,13 @@ static dispatch_semaphore_t layoutEntered, layoutRelease;
 static atomic_bool blockLayout;
 static NSArray<NSDictionary *> *captureLayouts;
 static NSUInteger captureLayoutIndex;
+static NSUInteger expectedLayoutsAtEncoding;
+static NSUInteger renderCount;
+static NSUInteger encodeCount;
+static NSUInteger samplingLayoutCount;
+static BOOL blackFixture;
+static BOOL emptyFixture;
+static CFTimeInterval fixtureRenderUptime;
 
 @interface VPUUIDFixture : NSObject
 @property(nonatomic, strong) id hardwareIdentifier;
@@ -41,12 +54,19 @@ static NSUInteger captureLayoutIndex;
 
 static void renderFixture(mach_port_t port, CFStringRef name, void *value, int32_t x, int32_t y) {
     (void)port; (void)name; (void)x; (void)y;
+    renderCount++;
+    fixtureRenderUptime = NSProcessInfo.processInfo.systemUptime;
+    if (emptyFixture) return;
     IOSurfaceRef surface = value;
     if (IOSurfaceLock(surface, 0, NULL) != KERN_SUCCESS) abort();
     unsigned char *pixels = IOSurfaceGetBaseAddress(surface);
     if (!pixels) abort();
-    pixels[0] = 255;
+    pixels[0] = blackFixture ? 0 : 255;
     pixels[3] = 255;
+    size_t gridFirst = IOSurfaceGetHeight(surface) / 128 * IOSurfaceGetBytesPerRow(surface)
+        + IOSurfaceGetWidth(surface) / 128 * 4;
+    pixels[gridFirst + 2] = blackFixture ? 0 : 255;
+    pixels[gridFirst + 3] = 255;
     if (IOSurfaceUnlock(surface, 0, NULL) != KERN_SUCCESS) abort();
 }
 
@@ -69,11 +89,25 @@ NSDictionary<NSString *, id> *vp_display_layout(void) {
     return @{@"available": @NO, @"geometry_available": @NO};
 }
 
+NSDictionary<NSString *, id> *vp_display_layout_for_capture(void) {
+    samplingLayoutCount++;
+    return vp_display_layout();
+}
+
 static void require(BOOL condition, const char *message) {
     if (!condition) {
         fprintf(stderr, "%s\n", message);
         exit(EXIT_FAILURE);
     }
+}
+
+static bool finalizeFixture(CGImageDestinationRef destination) {
+    encodeCount++;
+    if (expectedLayoutsAtEncoding) {
+        require(captureLayoutIndex == expectedLayoutsAtEncoding,
+                "capture must validate the source before PNG encoding");
+    }
+    return CGImageDestinationFinalize(destination);
 }
 
 static NSDictionary *rect(double width, double height) {
@@ -241,16 +275,22 @@ static void uuidReadChecks(void) {
 }
 
 static void captureChecks(void) {
+    expectedLayoutsAtEncoding = 2;
     captureLayouts = @[layout(), layout()];
     captureLayoutIndex = 0;
-    NSDictionary *report = vpCapturePerform(^BOOL { return NO; });
+    NSDictionary *report = vpCapturePerform(NO, ^BOOL { return NO; });
     require([report[@"available"] boolValue]
             && [report[@"identity_binding"] isEqual:@"matching_nonzero_hardware_uuid_display_id_and_scale_with_unique_render_name"],
             "matching hardware UUIDs must retain the existing capture binding");
+    require([report[@"render_started_uptime"] isKindOfClass:NSNumber.class]
+            && [report[@"render_finished_uptime"] isKindOfClass:NSNumber.class]
+            && [report[@"render_started_uptime"] doubleValue] <= fixtureRenderUptime
+            && [report[@"render_finished_uptime"] doubleValue] >= fixtureRenderUptime,
+            "guest uptime must bracket the actual render");
     NSMutableDictionary *before = coverLayout();
     captureLayouts = @[before, before];
     captureLayoutIndex = 0;
-    report = vpCapturePerform(^BOOL { return NO; });
+    report = vpCapturePerform(NO, ^BOOL { return NO; });
     require([report[@"available"] boolValue] && [report[@"format"] isEqual:@"png"],
             "stable UUID-less metadata must reach the production renderer and PNG encoder");
     require([report[@"source"] isEqual:report[@"source_after"]], "both capture samples must retain the same binding");
@@ -259,22 +299,56 @@ static void captureChecks(void) {
     require([report[@"rotation_applied"] isEqual:@0] && [report[@"resized"] isEqual:@NO]
             && [report[@"orientation_mapping_verified"] isEqual:@NO] && [report[@"capture_content_verified"] isEqual:@NO],
             "raw capture cannot claim orientation or content verification");
+    require([report[@"source_attempts"] isEqual:@1], "a stable source must render once");
+    NSUInteger previousEncodeCount = encodeCount;
+    captureLayoutIndex = 0;
+    NSDictionary *sample = vpCapturePerform(YES, ^BOOL { return NO; });
+    NSData *grid = [[NSData alloc] initWithBase64EncodedString:sample[@"base64"] options:0];
+    require([sample[@"format"] isEqual:@"luma64"] && grid.length == 64 * 64 && encodeCount == previousEncodeCount
+            && samplingLayoutCount == 2,
+            "luma sampling must use two sampling layout reads and return a 64×64 grid without PNG encoding");
+    const uint8_t *luma = grid.bytes;
+    require(luma[0] == 77 && luma[1] == 0 && [sample[@"source"] isEqual:report[@"source"]],
+            "luma samples must use the native raster and the same display binding as PNG");
+    blackFixture = YES;
+    captureLayoutIndex = 0;
+    require([vpCapturePerform(NO, ^BOOL { return NO; })[@"available"] boolValue],
+            "opaque black is valid raw capture evidence");
+    blackFixture = NO;
+    emptyFixture = YES;
+    captureLayoutIndex = 0;
+    require([vpCapturePerform(NO, ^BOOL { return NO; })[@"state"] isEqual:@"empty_surface"],
+            "a stable source with an untouched surface must remain unavailable");
+    emptyFixture = NO;
     for (NSString *field in @[@"displayId", @"name", @"pointScale", @"bounds", @"uniqueId"]) {
         NSMutableDictionary *after = coverLayout();
         after[@"cadisplays"][0][field] = [field isEqual:@"bounds"] ? rect(1398, 2031)
             : [field isEqual:@"name"] ? @"Other" : [field isEqual:@"uniqueId"] ? @"11111111-2222-4333-8444-555555555555" : @2;
         captureLayouts = @[before, after];
         captureLayoutIndex = 0;
-        require([vpCapturePerform(^BOOL { return NO; })[@"state"] isEqual:@"source_changed"],
-                "capture must refuse changed identity, name, scale, geometry or UUID availability");
+        NSDictionary *rejected = vpCapturePerform(NO, ^BOOL { return NO; });
+        require([rejected[@"state"] isEqual:@"source_unavailable"] && !rejected[@"base64"],
+                "a retry must refuse invalid identity, name, scale, geometry or UUID availability");
     }
     NSMutableDictionary *changed = coverLayout();
     changed[@"monitors"][0][@"display_id"] = @99;
     changed[@"cadisplays"][0][@"displayId"] = @99;
     captureLayouts = @[before, changed];
     captureLayoutIndex = 0;
-    require([vpCapturePerform(^BOOL { return NO; })[@"state"] isEqual:@"source_changed"],
-            "two individually valid bindings cannot change across a capture");
+    expectedLayoutsAtEncoding = 4;
+    NSUInteger previousRenderCount = renderCount;
+    report = vpCapturePerform(NO, ^BOOL { return NO; });
+    require([report[@"available"] boolValue] && [report[@"source_attempts"] isEqual:@2]
+            && [report[@"source"][@"display_id"] isEqual:@99] && renderCount == previousRenderCount + 2,
+            "a transient panel change must discard the first raster and capture the settled source");
+    captureLayouts = @[before, changed, changed, before, before];
+    captureLayoutIndex = 0;
+    previousRenderCount = renderCount;
+    report = vpCapturePerform(NO, ^BOOL { return NO; });
+    require([report[@"state"] isEqual:@"source_changed"] && [report[@"source_attempts"] isEqual:@2]
+            && !report[@"base64"] && renderCount == previousRenderCount + 2,
+            "a second source change must stop without returning a raster");
+    expectedLayoutsAtEncoding = 0;
     captureLayouts = nil;
 }
 
@@ -283,7 +357,7 @@ int main(void) {
         sourceChecks();
         uuidReadChecks();
         captureChecks();
-        require([vp_display_capture_active()[@"state"] isEqual:@"main_thread_caller"],
+        require([vp_display_capture_active(NO)[@"state"] isEqual:@"main_thread_caller"],
                 "main-thread capture must not block its run loop");
         layoutEntered = dispatch_semaphore_create(0);
         layoutRelease = dispatch_semaphore_create(0);
@@ -292,7 +366,7 @@ int main(void) {
         dispatch_queue_t requests = dispatch_queue_create("vphone.test.capture-requests", DISPATCH_QUEUE_SERIAL);
         __block NSDictionary *first;
         dispatch_async(requests, ^{
-            first = vp_display_capture_active();
+            first = vp_display_capture_active(NO);
             dispatch_semaphore_signal(done);
         });
         require(dispatch_semaphore_wait(layoutEntered, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC)) == 0,
@@ -301,7 +375,7 @@ int main(void) {
                 "caller response must be bounded while its private dependency stalls");
         require([first[@"state"] isEqual:@"timed_out"], "stalled capture must time out");
         dispatch_async(requests, ^{
-            require([vp_display_capture_active()[@"state"] isEqual:@"busy"],
+            require([vp_display_capture_active(NO)[@"state"] isEqual:@"busy"],
                     "timed-out capture must retain admission while its dependency runs");
             dispatch_semaphore_signal(done);
         });
@@ -312,7 +386,7 @@ int main(void) {
         dispatch_async(requests, ^{
             dispatch_time_t deadline = dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC);
             while (true) {
-                NSDictionary *report = vp_display_capture_active();
+                NSDictionary *report = vp_display_capture_active(NO);
                 if (![report[@"state"] isEqual:@"busy"]) {
                     require([report[@"state"] isEqual:@"source_unavailable"], "admission must recover after the task drains");
                     break;
